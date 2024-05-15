@@ -37,10 +37,10 @@
   --border-strong: var(--colors-gray-dark-700);
   --border-alternative: var(--colors-gray-dark-500);
   --border-control: var(--colors-gray-dark-600);
-  --border-overlay: var(--colors-gray-dark-400);
-  --border-secondary: var(--colors-gray-dark-400);
-  --border-muted: var(--colors-gray-dark-400);
-  --border-default: var(--colors-gray-dark-500);
+  --border-overlay: var(--colors-gray-dark-500);
+  --border-secondary: var(--colors-gray-dark-500);
+  --border-muted: var(--colors-gray-dark-500);
+  --border-default: var(--colors-gray-dark-600);
   --background-button-default: var(--colors-gray-dark-500);
   --background-muted: var(--colors-gray-dark-400);
   --background-overlay-hover: var(--colors-gray-dark-500);

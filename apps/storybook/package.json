@@ -24,7 +24,7 @@
     "@storybook/test": "^8.0.0-rc.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^8.0.0-rc.1"
+    "storybook": "^8.0.4"
   },
   "dependencies": {
     "@storybook/node-logger": "^8.0.0-rc.1"

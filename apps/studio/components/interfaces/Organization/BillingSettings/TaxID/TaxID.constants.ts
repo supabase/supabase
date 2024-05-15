@@ -26,6 +26,18 @@ export const TAX_IDS: TaxId[] = [
     vatPrefix: 'ATU',
   },
   {
+    name: 'AD NRT',
+    code: 'ad_nrt',
+    country: 'Andorra',
+    placeholder: 'A-123456-Z',
+  },
+  {
+    name: 'AR CUIT',
+    code: 'ar_cuit',
+    country: 'Argentina',
+    placeholder: '12-3456789-01',
+  },
+  {
     name: 'AU ABN',
     code: 'au_abn',
     country: 'Australia',
@@ -43,6 +55,12 @@ export const TAX_IDS: TaxId[] = [
     country: 'Belgium',
     placeholder: 'BE0123456789',
     vatPrefix: 'BE',
+  },
+  {
+    name: 'BO TIN',
+    code: 'bo_tin',
+    country: 'Bolivia',
+    placeholder: '123456789',
   },
   {
     name: 'BG VAT',
@@ -113,6 +131,24 @@ export const TAX_IDS: TaxId[] = [
     placeholder: '12.345.678-K',
   },
   {
+    name: 'CN TIN',
+    code: 'cn_tin',
+    country: 'China',
+    placeholder: '123456789012345678',
+  },
+  {
+    name: 'CO NIT',
+    code: 'co_nit',
+    country: 'Colombia',
+    placeholder: '123.456.789-0',
+  },
+  {
+    name: 'CR TIN',
+    code: 'cr_tin',
+    country: 'Costa Rica',
+    placeholder: '1-234-567890',
+  },
+  {
     name: 'CY VAT',
     code: 'eu_vat',
     country: 'Cyprus',
@@ -139,6 +175,12 @@ export const TAX_IDS: TaxId[] = [
     country: 'Denmark',
     placeholder: 'DK12345678',
     vatPrefix: 'DK',
+  },
+  {
+    name: 'DO RCN',
+    code: 'do_rcn',
+    country: 'Dominican Republic',
+    placeholder: '123-4567890-1',
   },
   {
     name: 'EE VAT',
@@ -259,6 +301,12 @@ export const TAX_IDS: TaxId[] = [
     placeholder: '1234567891234',
   },
   {
+    name: 'KE PIN',
+    code: 'ke_pin',
+    country: 'Kenya',
+    placeholder: 'P000111111A',
+  },
+  {
     name: 'JP RN',
     code: 'jp_rn',
     country: 'Japan',
@@ -342,6 +390,18 @@ export const TAX_IDS: TaxId[] = [
     placeholder: '123456789MVA',
   },
   {
+    name: 'PE RUC',
+    code: 'pe_ruc',
+    country: 'Peru',
+    placeholder: '12345678901',
+  },
+  {
+    name: 'PH TIN',
+    code: 'ph_tin',
+    country: 'Philippines',
+    placeholder: '123456789012',
+  },
+  {
     name: 'NZ GST',
     code: 'nz_gst',
     country: 'New Zealand',
@@ -387,6 +447,12 @@ export const TAX_IDS: TaxId[] = [
     placeholder: '123456789012345',
   },
   {
+    name: 'RS PIB',
+    code: 'rs_pib',
+    country: 'Serbia',
+    placeholder: '123456789',
+  },
+  {
     name: 'SE VAT',
     code: 'eu_vat',
     country: 'Sweden',
@@ -426,6 +492,12 @@ export const TAX_IDS: TaxId[] = [
     placeholder: '1234567891234',
   },
   {
+    name: 'TR TIN',
+    code: 'tr_tin',
+    country: 'Turkey',
+    placeholder: '0123456789',
+  },
+  {
     name: 'TW VAT',
     code: 'tw_vat',
     country: 'Taiwan',
@@ -455,5 +527,23 @@ export const TAX_IDS: TaxId[] = [
     code: 'za_vat',
     country: 'South Africa',
     placeholder: '4123456789',
+  },
+  {
+    name: 'UY RUC',
+    code: 'uy_ruc',
+    country: 'Uruguay',
+    placeholder: '123456789012',
+  },
+  {
+    name: 'VE RIF',
+    code: 've_rif',
+    country: 'Venezuela',
+    placeholder: 'A-12345678-9',
+  },
+  {
+    name: 'VN TIN',
+    code: 'vn_tin',
+    country: 'Vietnam',
+    placeholder: '1234567890',
   },
 ]

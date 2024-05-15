@@ -1,29 +1,41 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { Alert, Button, Form, InputNumber, Modal } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  InputNumber,
+  Modal,
+} from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
 }
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const { lastDatabaseResizeAt } = project ?? {}
+
+  const organization = useSelectedOrganization()
 
   const timeTillNextAvailableDatabaseResize =
     lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
@@ -68,9 +80,9 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const diskSizeValidationSchema = object({
     'new-disk-size': number()
       .required('Please enter a GB amount you want to resize the disk up to.')
-      .moreThan(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
+      .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
       // to do, update with max_disk_volume_size_gb
-      .lessThan(Number(maxDiskSize), 'Must be no more than 200 GB'),
+      .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
   })
 
   return (
@@ -129,51 +141,33 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
               </div>
             </Panel.Content>
           </Panel>
-          <Alert withIcon variant="info" title={'Importing a lot of data?'}>
-            <p className=" max-w-2xl">
-              We auto-scale your disk as you need more storage, but can only do this every 6 hours.
-              If you upload more than 1.5x the current size of your storage, your database will go
-              into read-only mode. If you know how big your database is going to be, you can
-              manually increase the size here.
-            </p>
+          <Alert_Shadcn_>
+            <Info size={16} />
+            <AlertTitle_Shadcn_>Importing a lot of data?</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <Markdown
+                className="max-w-full"
+                content={`
+We auto-scale your disk as you need more storage, but can only do this every 6 hours.
+If you upload more than 1.5x the current size of your storage, your database will go
+into read-only mode. If you know how big your database is going to be, you can
+manually increase the size here.
 
-            <p className="mt-4">
-              Read more about{' '}
-              <a
-                className="underline"
-                href="https://supabase.com/docs/guides/platform/database-size#disk-management"
-              >
-                disk management
-              </a>
-              .
-            </p>
-          </Alert>
+Read more about [disk management](https://supabase.com/docs/guides/platform/database-size#disk-management).
+`}
+              />
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </div>
       ) : (
-        <Alert
-          withIcon
-          variant="info"
-          title={
-            projectSubscriptionData?.plan?.id === 'free'
+        <Alert_Shadcn_>
+          <Info size={16} />
+          <AlertTitle_Shadcn_>
+            {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free plan'
-              : 'Disk size configuration is only available when disabling the spend cap.'
-          }
-          actions={
-            <Button asChild type="default">
-              <Link
-                href={`/org/${organization?.slug}/billing?panel=${
-                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                }`}
-                target="_blank"
-              >
-                {projectSubscriptionData?.plan?.id === 'free'
-                  ? 'Upgrade subscription'
-                  : 'Disable spend cap'}
-              </Link>
-            </Button>
-          }
-        >
-          <div>
+              : 'Disk size configuration is only available when the spend cap has been disabled'}
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free' ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
@@ -185,8 +179,20 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                 disable your spend cap.
               </p>
             )}
-          </div>
-        </Alert>
+            <Button asChild type="default" className="mt-3">
+              <Link
+                href={`/org/${organization?.slug}/billing?panel=${
+                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                }`}
+                target="_blank"
+              >
+                {projectSubscriptionData?.plan?.id === 'free'
+                  ? 'Upgrade subscription'
+                  : 'Disable spend cap'}
+              </Link>
+            </Button>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       )}
 
       <Modal
@@ -205,29 +211,42 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         >
           {() =>
             currentDiskSize >= maxDiskSize ? (
-              <>
-                <Alert withIcon variant="warning" title="Maximum manual disk size increase reached">
-                  You cannot manually expand the disk size any more than {maxDiskSize} GB. If you
-                  need more than this, contact us to learn more about the Enterprise plan.
-                </Alert>
-              </>
+              <Alert_Shadcn_ variant="warning" className="rounded-t-none border-0">
+                <WarningIcon />
+                <AlertTitle_Shadcn_>Maximum manual disk size increase reached</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p>
+                    You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
+                    need more than this, contact us via support for help.
+                  </p>
+                  <Button asChild type="default" className="mt-3">
+                    <Link
+                      href={`/support/new?ref=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
+                    >
+                      Contact support
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             ) : (
               <>
                 <Modal.Content>
                   <div className="w-full space-y-4 py-6">
-                    <Alert
-                      withIcon
-                      variant={isAbleToResizeDatabase ? 'info' : 'warning'}
-                      title="This operation is only possible every 6 hours"
-                    >
-                      {isAbleToResizeDatabase
-                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}`
-                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                    </Alert>
+                    <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                      <Info size={16} />
+                      <AlertTitle_Shadcn_>
+                        This operation is only possible every 6 hours
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        {isAbleToResizeDatabase
+                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                              'DD MMM YYYY, HH:mm (ZZ)'
+                            )}`
+                          : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                              'DD MMM YYYY, HH:mm (ZZ)'
+                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                     <InputNumber
                       required
                       id="new-disk-size"

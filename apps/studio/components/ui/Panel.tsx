@@ -5,20 +5,20 @@ interface PanelProps {
   bodyClassName?: string
   className?: string
   footer?: JSX.Element | false
-  hideHeaderStyling?: boolean
   loading?: boolean
   noMargin?: boolean
   title?: ReactNode | false
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
-  headerClasses?: string
+  titleClasses?: string
 }
 
 function Panel(props: PropsWithChildren<PanelProps>) {
   const content = (
     <div
       className={cn(
-        'rounded-md border border-overlay shadow-sm',
+        'bg-surface-100',
+        'rounded-md border shadow-sm',
         props.noHideOverflow ? '' : 'overflow-hidden',
         props.noMargin ? '' : 'mb-8',
         props.className
@@ -27,17 +27,16 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       {props.title && (
         <div
           className={cn(
-            props.hideHeaderStyling ? 'bg-surface-100 border-b border-overlay' : 'bg-surface-100',
-            props.headerClasses
+            'bg-surface-100 border-b border-muted flex items-center px-6 py-4',
+            props.titleClasses
           )}
         >
-          <div className="flex items-center px-6 py-4">{props.title}</div>
+          {props.title}
         </div>
       )}
-      <div className={cn('bg-surface-100', props.bodyClassName)}>{props.children}</div>
-
+      {props.children}
       {props.footer && (
-        <div className="bg-surface-100 border-t border-overlay">
+        <div className="bg-surface-100 border-t border-muted">
           <div className="flex h-12 items-center px-6">{props.footer}</div>
         </div>
       )}

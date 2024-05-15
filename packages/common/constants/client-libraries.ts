@@ -217,7 +217,7 @@ export const CLIENT_LIBRARIES = [
     libraries: [
       {
         name: 'supabase-swift',
-        url: 'https://github.com/supabase-community/supabase-swift',
+        url: 'https://github.com/supabase/supabase-swift',
       },
       {
         name: 'postgrest-swift',

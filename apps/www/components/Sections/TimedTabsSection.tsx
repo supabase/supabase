@@ -1,3 +1,5 @@
+import 'swiper/css'
+
 import React, { useState, useEffect, ReactNode } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'

@@ -1,4 +1,4 @@
-import type { Session, User } from '@supabase/gotrue-js'
+import type { Session, User } from '@supabase/auth-js'
 import { gotrueClient } from 'common'
 
 export const auth = gotrueClient

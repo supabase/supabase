@@ -209,7 +209,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="!mb-4 w-full border-b border-gray-600" />
+          <div className="!mb-4 w-full border-b border-muted" />
           <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control

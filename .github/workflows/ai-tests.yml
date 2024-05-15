@@ -22,11 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     defaults:
       run:
@@ -37,10 +33,10 @@ jobs:
         with:
           sparse-checkout: |
             packages
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - name: Install deps
         run: npm ci

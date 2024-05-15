@@ -2,7 +2,7 @@ import { expect } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 
-const openAiKey = process.env.OPENAI_KEY
+const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
 expect.extend({
@@ -16,7 +16,7 @@ expect.extend({
           role: 'system',
           content: codeBlock`
             You are a test runner. Your job is to evaluate whether 'Received' adheres to the test 'Criteria'.
-            
+
             You must output JSON, specifically an object containing a "pass" boolean and "reason" string:
             - \`{ "pass": true, "reason": "<reason>" }\` if 'Received' adheres to the test 'Criteria'
             - \`{ "pass": false, "reason": "<reason>" }\` if 'Received' does not adhere to the test 'Criteria'
@@ -63,7 +63,7 @@ expect.extend({
             isNot: this.isNot,
             promise: this.promise,
           })}
-          
+
           ${reason}
         `,
       pass,

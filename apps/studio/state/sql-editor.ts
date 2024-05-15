@@ -95,6 +95,12 @@ export const sqlEditorState = proxy({
 
     sqlEditorState.needsSaving.delete(id)
   },
+  updateSnippet: (id: string, snippet: SqlSnippet) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet = snippet
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = splitSizes
@@ -202,7 +208,11 @@ const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentP
   memoizedUpdate(id)(id, projectRef, payload)
 
 if (typeof window !== 'undefined') {
-  devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
+  devtools(sqlEditorState, {
+    name: 'sqlEditorState',
+    // [Joshen] So that jest unit tests can ignore this
+    enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
+  })
 
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorStateSnapshot()

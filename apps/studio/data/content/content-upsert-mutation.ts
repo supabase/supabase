@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Content['content']
 }
 
@@ -45,11 +45,14 @@ export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
 export const useContentUpsertMutation = ({
   onError,
   onSuccess,
+  invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
   UseMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
   'mutationFn'
-> = {}) => {
+> & {
+  invalidateQueriesOnSuccess?: boolean
+} = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>(
@@ -57,7 +60,9 @@ export const useContentUpsertMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        if (invalidateQueriesOnSuccess) {
+          await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        }
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

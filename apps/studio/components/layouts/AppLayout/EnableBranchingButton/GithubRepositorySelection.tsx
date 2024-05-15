@@ -47,7 +47,7 @@ const GithubRepositorySelection = ({
         <div className="py-6">
           <div className="flex items-center space-x-2">
             <p>Git Connection</p>
-            <Badge color="amber">Required</Badge>
+            <Badge variant="warning">Required</Badge>
           </div>
           <p className="text-sm text-foreground-light !mb-4">
             {githubConnection !== undefined

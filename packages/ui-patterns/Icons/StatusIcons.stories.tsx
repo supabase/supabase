@@ -1,5 +1,5 @@
 import { StoryObj } from '@storybook/react'
-import { Badge_Shadcn_ } from 'ui'
+import { Badge } from 'ui'
 import { StatusIcon } from './StatusIcons'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -91,10 +91,10 @@ export const InsideBadge: Story = {
    */
   render: function Render(args) {
     return (
-      <Badge_Shadcn_ variant={'destructive'} className="flex gap-1">
+      <Badge variant={'destructive'} className="flex gap-1">
         <StatusIcon {...args} hideBackground />
         Caution
-      </Badge_Shadcn_>
+      </Badge>
     )
   },
 }

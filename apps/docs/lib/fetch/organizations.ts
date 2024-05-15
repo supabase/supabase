@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from './fetchWrappers'
-import { components } from '~/types/api'
-import { ResponseError } from '~/types/fetch'
+import type { components } from '~/types/api'
+import type { ResponseError } from '~/types/fetch'
 
 const organizationKeys = {
   list: () => ['organizations'] as const,

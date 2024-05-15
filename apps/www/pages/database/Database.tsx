@@ -1,5 +1,5 @@
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
@@ -21,6 +21,8 @@ import TableViewCarouselData from 'data/products/database/table-view-carousel.js
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -68,6 +70,7 @@ function Database() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}
@@ -248,22 +251,22 @@ function Database() {
                   <p className="text-foreground-light m-0">Available libraries:</p>
                   <div className="flex gap-1">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
-                      <Badge dot={false}>Javascript</Badge>
+                      <Badge>Javascript</Badge>
                     </Link>
                     <Link href="/docs/reference/dart/introduction" target="_blank">
-                      <Badge dot={false}>Flutter</Badge>
+                      <Badge>Flutter</Badge>
                     </Link>
                     <Link href="/docs/reference/python/introduction" target="_blank">
-                      <Badge dot={false}>Python</Badge>
+                      <Badge>Python</Badge>
                     </Link>
                     <Link href="/docs/reference/csharp/introduction" target="_blank">
-                      <Badge dot={false}>C#</Badge>
+                      <Badge>C#</Badge>
                     </Link>
                     <Link href="/docs/reference/kotlin/introduction" target="_blank">
-                      <Badge dot={false}>Kotlin</Badge>
+                      <Badge>Kotlin</Badge>
                     </Link>
                     <Link href="/docs/reference/swift/introduction" target="_blank">
-                      <Badge dot={false}>Swift</Badge>
+                      <Badge>Swift</Badge>
                     </Link>
                   </div>
                 </div>

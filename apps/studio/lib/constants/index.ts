@@ -34,7 +34,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
-  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
@@ -48,6 +47,10 @@ export const LOCAL_STORAGE_KEYS = {
   PGBOUNCER_IPV6_DEPRECATION_WARNING: 'pgbouncer-ipv6-deprecation-warning-dismissed',
   VERCEL_IPV6_DEPRECATION_WARNING: 'vercel-ipv6-deprecation-warning-dismissed',
   PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
+
+  PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
+
+  QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
 }
 
 export const OPT_IN_TAGS = {

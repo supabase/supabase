@@ -24,7 +24,7 @@ import { useSelectedOrganization } from 'hooks'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { LOGS_TABLES } from './Logs.constants'
+import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -110,9 +110,23 @@ export const LogsPreviewer = ({
   }, [its, subscription])
 
   useEffect(() => {
-    if (readReplicasEnabled && db !== undefined) {
-      const database = databases?.find((d) => d.identifier === db)
-      if (database !== undefined) state.setSelectedDatabaseId(db)
+    if (readReplicasEnabled) {
+      if (db !== undefined) {
+        const database = databases?.find((d) => d.identifier === db)
+        if (database !== undefined) state.setSelectedDatabaseId(db)
+      } else if (
+        state.selectedDatabaseId !== undefined &&
+        state.selectedDatabaseId !== projectRef
+      ) {
+        if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
+          router.push({
+            pathname: router.pathname,
+            query: { ...router.query, db: state.selectedDatabaseId },
+          })
+        } else {
+          state.setSelectedDatabaseId(projectRef)
+        }
+      }
     }
   }, [readReplicasEnabled, db, isSuccess])
 

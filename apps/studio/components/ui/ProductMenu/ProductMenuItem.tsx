@@ -7,6 +7,7 @@ interface ProductMenuItemProps {
   isActive: boolean
   isExternal?: boolean
   icon?: ReactNode
+  rightIcon?: ReactNode
   url?: string
   target?: '_blank' | '_self'
   onClick?: () => void
@@ -20,6 +21,7 @@ const ProductMenuItem = ({
   isActive,
   isExternal,
   icon,
+  rightIcon,
   url = '',
   target = '_self',
   onClick,
@@ -35,8 +37,9 @@ const ProductMenuItem = ({
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           <span className="truncate">{name} </span>
-          {label !== undefined && <Badge color="amber">{label}</Badge>}
+          {label !== undefined && <Badge variant="warning">{label}</Badge>}
         </div>
+        {rightIcon && <div>{rightIcon}</div>}
       </div>
     </Menu.Item>
   )

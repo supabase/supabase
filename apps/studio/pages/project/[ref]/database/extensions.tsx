@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Extensions } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -22,7 +23,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <h3 className="mb-4 text-xl text-foreground">Database Extensions</h3>
+          <FormHeader title="Database Extensions" />
           <Extensions />
         </div>
       </ScaffoldSection>

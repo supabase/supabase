@@ -18,9 +18,9 @@ export default function LaunchWeekPrizeSection({
         <Image
           src="/images/launchweek/8/swag-bg.png"
           alt="prizes background"
-          layout="fill"
-          objectFit="cover"
-          objectPosition="top"
+          fill
+          sizes="100%"
+          className="object-cover object-top"
           quality={100}
         />
       </div>
@@ -32,8 +32,9 @@ export default function LaunchWeekPrizeSection({
               <Image
                 src="/images/launchweek/8/swag-illustration.png"
                 alt="prizes"
-                layout="fill"
-                objectFit="contain"
+                fill
+                sizes="100%"
+                className="object-contain"
                 quality={100}
               />
             </div>
@@ -47,7 +48,6 @@ export default function LaunchWeekPrizeSection({
               className="col-span-full"
               imageUrl="/images/launchweek/8/swag/deskmat-lg.jpg"
               imageWrapperClassName="w-full aspect-[1.9/1] md:h-[300px]"
-              imgObjectPosition="center"
               content={
                 <h3 className="w-full text-sm md:text-center flex md:justify-center items-center gap-4">
                   Supabase Desk Mat <LabelBadge text="10 mats" />

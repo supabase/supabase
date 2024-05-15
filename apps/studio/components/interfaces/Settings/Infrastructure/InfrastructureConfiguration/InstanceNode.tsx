@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Database, DatabaseBackup } from 'lucide-react'
+import { Database, DatabaseBackup, HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps, Position } from 'reactflow'
 import {
@@ -11,11 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconHelpCircle,
   IconMoreVertical,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
@@ -173,6 +173,15 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   const { ref } = useParams()
   const created = dayjs(inserted_at).format('DD MMM YYYY')
 
+  const isInTransition = (
+    [
+      REPLICA_STATUS.COMING_UP,
+      REPLICA_STATUS.GOING_DOWN,
+      REPLICA_STATUS.RESTORING,
+      REPLICA_STATUS.INIT_READ_REPLICA,
+    ] as string[]
+  ).includes(status)
+
   return (
     <>
       <Handle
@@ -186,8 +195,19 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
-          <div className="w-8 h-8 bg-brand-400 border border-brand-500 rounded-md flex items-center justify-center">
-            <DatabaseBackup size={16} />
+          <div
+            className={cn(
+              'w-8 h-8 border rounded-md flex items-center justify-center',
+              status === REPLICA_STATUS.ACTIVE_HEALTHY
+                ? 'bg-brand-400 border-brand-500'
+                : 'bg-surface-100 border-foreground/20'
+            )}
+          >
+            {isInTransition ? (
+              <Loader2 className="animate-spin" size={16} />
+            ) : (
+              <DatabaseBackup size={16} />
+            )}
           </div>
           <div className="flex flex-col gap-y-0.5">
             <div className="flex items-center gap-x-2">
@@ -195,27 +215,34 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
               </p>
               {status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge color="green">Healthy</Badge>
+                <Badge variant="brand">Healthy</Badge>
               ) : status === REPLICA_STATUS.INIT_READ_REPLICA ? (
-                <Badge color="slate">Initializing</Badge>
+                <Badge>Initializing</Badge>
               ) : status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
-                  <Badge color="red">Init failed</Badge>
+                  <Badge variant="destructive">Init failed</Badge>
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_>
-                      <IconHelpCircle />
+                      <HelpCircle size={16} />
                     </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom" className="w-60 text-center">
-                      Replica failed to initialize. Please drop this replica, and spin up a new one.
+                    <TooltipContent_Shadcn_
+                      side="bottom"
+                      align="end"
+                      alignOffset={-70}
+                      className="w-60 text-center"
+                    >
+                      Replica failed to initialize. Please drop this replica and spin up a new one.
                     </TooltipContent_Shadcn_>
                   </Tooltip_Shadcn_>
                 </>
               ) : status === REPLICA_STATUS.COMING_UP ? (
-                <Badge color="slate">Coming up</Badge>
+                <Badge>Coming up</Badge>
+              ) : status === REPLICA_STATUS.GOING_DOWN ? (
+                <Badge>Going down</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
-                <Badge color="slate">Restoring</Badge>
+                <Badge>Restarting</Badge>
               ) : (
-                <Badge color="amber">Unhealthy</Badge>
+                <Badge variant="warning">Unhealthy</Badge>
               )}
             </div>
             <div className="my-0.5">
@@ -242,10 +269,18 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 View connection string
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={status !== PROJECT_STATUS.ACTIVE_HEALTHY}
+              className="gap-x-2"
+            >
+              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+                View replication lag
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
-                Restart replica
-              </DropdownMenuItem> */}
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
+              Restart replica
+            </DropdownMenuItem>
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}

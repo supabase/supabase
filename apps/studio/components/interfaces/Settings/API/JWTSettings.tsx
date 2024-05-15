@@ -213,32 +213,31 @@ const JWTSettings = () => {
       </Panel>
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="medium"
         visible={isRegeneratingKey}
-        header="Confirm to generate a new JWT secret"
-        buttonLabel="Generate new secret"
-        buttonLoadingLabel="Generating"
-        onSelectCancel={() => setIsGeneratingKey(false)}
-        onSelectConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
-      >
-        <Modal.Content className="py-4 space-y-4">
-          <Alert_Shadcn_ variant="warning">
-            <IconAlertTriangle />
-            <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+        title="Confirm to generate a new JWT secret"
+        confirmLabel="Generate new secret"
+        confirmLabelLoading="Generating"
+        onCancel={() => setIsGeneratingKey(false)}
+        onConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
+        alert={{
+          title: 'This will invalidate all existing API keys',
+          description: (
+            <>
               Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
               your API keys, including your <code className="text-xs">service_role</code> and{' '}
               <code className="text-xs">anon</code> keys. Your project will also be restarted during
               this process, which will terminate any existing connections. You may receive API
               errors for up to 2 minutes while the new secret is deployed.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-          <p className="text-foreground text-sm">
-            This action cannot be undone and the old JWT secret will be lost. All existing API keys
-            will be invalidated, and any open connections will be terminated.
-          </p>
-        </Modal.Content>
+            </>
+          ),
+        }}
+      >
+        <p className="text-foreground text-sm">
+          This action cannot be undone and the old JWT secret will be lost. All existing API keys
+          will be invalidated, and any open connections will be terminated.
+        </p>
       </ConfirmationModal>
 
       <Modal

@@ -135,6 +135,7 @@ const IPv4SidePanel = () => {
             addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
             database via a IPv4 address.
           </p>
+
           <p className="text-sm">
             If you are connecting via our connection pooler, you do not need this add-on as our
             pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
@@ -208,7 +209,9 @@ const IPv4SidePanel = () => {
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
-                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                        <p className="text-foreground-light translate-y-[1px]">
+                          / month / database
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -233,9 +236,17 @@ const IPv4SidePanel = () => {
                     minute.
                   </Alert>
                   <p className="text-sm text-foreground-light">
-                    Upon clicking confirm, the amount of{' '}
-                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
-                    will be added to your monthly invoice.
+                    By default, this is only applied to the Primary database for your project. If{' '}
+                    <Link
+                      href="/docs/guides/platform/read-replicas"
+                      className="text-brand"
+                      target="_blank"
+                    >
+                      Read replicas
+                    </Link>{' '}
+                    are used, each replica also gets its own IPv4 address, with a corresponding{' '}
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>
+                    charge.
                   </p>
                 </>
               )}

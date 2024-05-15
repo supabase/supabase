@@ -77,7 +77,7 @@ const SchemaSelector = ({
             Failed to load schemas
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
-            Error: {schemasError?.message}
+            Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas

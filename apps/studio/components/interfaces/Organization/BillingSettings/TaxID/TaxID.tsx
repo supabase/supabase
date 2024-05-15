@@ -21,7 +21,7 @@ import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utilts'
+import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utils'
 
 const TaxID = () => {
   const { slug } = useParams()
@@ -135,7 +135,7 @@ const TaxID = () => {
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Tax ID</p>
+          <p className="text-foreground text-base m-0">Tax ID</p>
           <p className="text-sm text-foreground-light pr-4 m-0">
             Add tax ID(s) to have them appear in your invoices. Old invoices are not affected.
           </p>

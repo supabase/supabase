@@ -40,24 +40,19 @@ export const EmptyBucketModal = ({ visible = false, bucket, onClose }: EmptyBuck
 
   return (
     <ConfirmationModal
-      danger
+      variant={'destructive'}
       size="small"
+      title={`Confirm to delete all contents from ${bucket?.name}`}
+      confirmLabel="Empty bucket"
       visible={visible}
-      onSelectCancel={() => onClose()}
-      onSelectConfirm={onEmptyBucket}
-      header={`Confirm to delete all contents from ${bucket?.name}`}
-      buttonLabel="Empty bucket"
+      onCancel={() => onClose()}
+      onConfirm={onEmptyBucket}
+      alert={{
+        title: 'This action cannot be undone',
+        description: 'The contents of your bucket cannot be recovered once deleted',
+      }}
     >
-      <Modal.Content className="py-4 space-y-2">
-        <Alert_Shadcn_ variant="warning">
-          <IconAlertTriangle strokeWidth={2} />
-          <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            The contents of your bucket cannot be recovered once deleted
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-        <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
-      </Modal.Content>
+      <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
     </ConfirmationModal>
   )
 }

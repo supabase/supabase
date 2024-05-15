@@ -6,6 +6,8 @@ import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/Fea
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks'
+import Link from 'next/link'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ProjectLayout } from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
@@ -13,7 +15,7 @@ export interface AuthLayoutProps {
   title?: string
 }
 
-const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+const AuthProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
@@ -23,15 +25,35 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
   const page = router.pathname.split('/')[4]
 
   return (
+    <>
+      <ProductMenu page={page} menu={generateAuthMenu(projectRef)} />
+      {columnLevelPrivileges && (
+        <div className="px-3">
+          <Alert_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">
+              Column Privileges has been shifted
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              <p className="mb-2">It can now be found in the menu under the database section.</p>
+              <Button asChild type="default" size="tiny">
+                <Link href={`/project/${projectRef}/database/column-privileges`}>
+                  Head over to Database
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </div>
+      )}
+    </>
+  )
+}
+
+const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+  return (
     <ProjectLayout
       title={title || 'Authentication'}
       product="Authentication"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { columnLevelPrivileges })}
-        />
-      }
+      productMenu={<AuthProductMenu />}
       isBlocking={false}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

@@ -14,7 +14,7 @@ import {
   cleanupProps,
   formatFilterURLParams,
   formatSortURLParams,
-  initTable,
+  getStorageKey,
   saveStorageDebounced,
 } from './SupabaseGrid.utils'
 import { Shortcuts } from './components/common'
@@ -24,6 +24,74 @@ import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import type { SupabaseGridProps } from './types'
+import { InitialStateType } from './store/reducers'
+import { STORAGE_KEY_PREFIX } from './constants'
+import { getGridColumns } from './utils/gridColumns'
+
+function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
+  const jsonStr = localStorage.getItem(storageKey)
+  if (!jsonStr) return
+  const json = JSON.parse(jsonStr)
+  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
+  return json[tableKey]
+}
+
+async function initTable(
+  props: SupabaseGridProps,
+  state: InitialStateType,
+  dispatch: (value: any) => void,
+  sort?: string[], // Comes directly from URL param
+  filter?: string[] // Comes directly from URL param
+): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
+  const savedState = props.projectRef
+    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
+    : undefined
+
+  // Check for saved state on initial load and also, load sort and filters via URL param only if given
+  // Otherwise load from local storage to resume user session
+  if (
+    !state.isInitialComplete &&
+    sort === undefined &&
+    filter === undefined &&
+    (savedState?.sorts || savedState?.filters)
+  ) {
+    return {
+      savedState: {
+        sorts: savedState.sorts,
+        filters: savedState.filters,
+      },
+    }
+  }
+
+  const gridColumns = getGridColumns(props.table, {
+    projectRef: props.projectRef,
+    tableId: props.tableId,
+    editable: props.editable,
+    defaultWidth: props.gridProps?.defaultColumnWidth,
+    onAddColumn: props.editable ? props.onAddColumn : undefined,
+    onExpandJSONEditor: props.onExpandJSONEditor,
+    onExpandTextEditor: props.onExpandTextEditor,
+  })
+
+  const defaultErrorHandler = (error: any) => {
+    console.error('Supabase grid error: ', error)
+  }
+
+  dispatch({
+    type: 'INIT_TABLE',
+    payload: {
+      table: props.table,
+      gridProps: props.gridProps,
+      gridColumns,
+      savedState,
+      editable: props.editable,
+      onError: props.onError ?? defaultErrorHandler,
+    },
+  })
+
+  return { savedState: {} }
+}
 
 /** Supabase Grid: React component to render database table */
 

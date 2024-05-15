@@ -1,32 +1,29 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get, handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { configKeys } from './keys'
 import type { ResponseError } from 'types'
+import { components } from 'data/api'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
 }
 
-// TODO: Add proper type
-export type ProjectStorageConfigResponse = any
+export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse']
 
 export async function getProjectStorageConfig(
   { projectRef }: ProjectStorageConfigVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/projects/${projectRef}/config/storage`, {
+  const { data, error } = await get('/platform/projects/{ref}/config/storage', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response as ProjectStorageConfigResponse
+  if (error) throw handleError(error)
+  return data
 }
 
 export type ProjectStorageConfigData = Awaited<ReturnType<typeof getProjectStorageConfig>>
