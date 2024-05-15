@@ -235,7 +235,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                     </TooltipContent_Shadcn_>
                   </Tooltip_Shadcn_>
                 </>
-              ) : status === REPLICA_STATUS.COMING_UP ? (
+              ) : status === REPLICA_STATUS.COMING_UP || status === REPLICA_STATUS.UNKNOWN ? (
                 <Badge>Coming up</Badge>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>

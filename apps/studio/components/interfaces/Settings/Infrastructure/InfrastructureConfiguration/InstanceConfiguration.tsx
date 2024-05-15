@@ -73,6 +73,8 @@ const InstanceConfigurationUI = () => {
     [data, projectRef]
   )
 
+  console.log(data)
+
   useReadReplicasStatusesQuery(
     { projectRef },
     {
