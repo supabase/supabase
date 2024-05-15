@@ -29,32 +29,12 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { Lint } from '../../../data/lint/lint-query'
+import { checkEntityForLints } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 export interface EntityListItemProps {
   id: number
   projectRef: string
   isLocked: boolean
-}
-
-const checkEntityForLints = (
-  entity: Entity,
-  lintName: string,
-  lintLevels: ('ERROR' | 'WARN')[],
-  lints: Lint[],
-  snap: any
-): { hasLint: boolean; count: number } => {
-  const matchingLints = lints?.filter(
-    (lint) =>
-      lint?.metadata?.name === entity.name &&
-      lint?.metadata?.schema === snap.selectedSchemaName &&
-      lint?.name === lintName &&
-      lintLevels.includes(lint?.level as 'ERROR' | 'WARN')
-  )
-
-  return {
-    hasLint: matchingLints.length > 0,
-    count: matchingLints.length,
-  }
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -68,33 +48,32 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
   const isActive = Number(id) === entity.id
 
-  // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const tableHasLints = checkEntityForLints(
-    entity,
+    entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
-    snap
+    snap.selectedSchemaName
   )
 
   const viewHasLints = checkEntityForLints(
-    entity,
+    entity.name,
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
-    snap
+    snap.selectedSchemaName
   )
   const materializedViewHasLints = checkEntityForLints(
-    entity,
+    entity.name,
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
-    snap
+    snap.selectedSchemaName
   )
 
   const formatTooltipText = (entityType: string) => {
@@ -168,12 +147,12 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         break
       case ENTITY_TYPE.VIEW:
         if (viewHasLints.hasLint) {
-          tooltipContent = 'View is public'
+          tooltipContent = 'Security Definer view'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
         if (materializedViewHasLints.hasLint) {
-          tooltipContent = 'Materialized View is public'
+          tooltipContent = 'Security Definer view'
         }
 
         break
