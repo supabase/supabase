@@ -48,7 +48,7 @@ const CreateWarehouseAccessToken = (props: Props) => {
           >
             <FormItemLayout
               label="Description"
-              description="A short description for identifying what this access token is to be used for."
+              description="A short description identifying this access token."
               isReactForm={false}
             >
               <Input
