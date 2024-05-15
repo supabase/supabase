@@ -41,7 +41,7 @@ You can only read data from a Read Replica. This is in contrast to a Primary dat
 
 <Admonition type="note" label="Read Replicas are available on the Team and Enterprise plans">
 
-Read replicas are available to projects created on the Teams and Enterprise plans after 2024 March 20. They will be progressively rolled out to older projects, and eventually available on the Pro plan.
+Read replicas are available to projects created on the Teams and Enterprise plans on or after 2023 January 1. They will be progressively rolled out to older projects, and eventually available on the Pro plan.
 
 If your project doesn't meet these criteria, you can join the [early access queue](https://forms.supabase.com/read-replica).
 
@@ -117,6 +117,12 @@ In the SQL editor, you can choose if you want to run the query on a particular R
 Observability and metrics for Read Replicas are not currently available in the Supabase Dashboard.
 
 If you're ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can update [your scraping setup](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
+
+<Admonition type="caution">
+
+If you use a [custom domain](/docs/guides/platform/custom-domains), requests will not be routed through the load balancer. You should use the dedicated endpoints provided in the dashboard.
+
+</Admonition>
 
 ### Centralized configuration management
 

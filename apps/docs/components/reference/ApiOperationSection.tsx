@@ -1,6 +1,7 @@
-import { CodeBlock, Tabs } from 'ui'
+import { CodeBlock } from 'ui'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { Tabs, TabPanel } from '~/components/Tabs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {
@@ -96,7 +97,7 @@ const ApiOperationSection = (props) => {
             queryGroup="response-status"
           >
             {operation.responseList.map((response: any, i: number) => (
-              <Tabs.Panel key={i} id={response.responseCode} label={response.responseCode}>
+              <TabPanel key={i} id={response.responseCode} label={response.responseCode}>
                 <ReactMarkdown className="text-foreground">{response.description}</ReactMarkdown>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
@@ -105,7 +106,7 @@ const ApiOperationSection = (props) => {
                     </CodeBlock>
                   </div>
                 )}
-              </Tabs.Panel>
+              </TabPanel>
             ))}
           </Tabs>
         </RefSubLayout.Examples>

@@ -74,7 +74,6 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
 }
 
 /**
- * Sends data to Mixpanel.
  * @deprecated use sendEvent instead.
  */
 const sendActivity = (
