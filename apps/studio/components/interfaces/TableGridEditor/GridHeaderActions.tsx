@@ -325,7 +325,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </h3>
               <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                 <p>
-                  Materialized view is in the public schema and can be queried by anon and
+                  Materialized view in the public schema makes that view accessible via your project's
+                  APIs.
                   authenticated roles
                 </p>
 
