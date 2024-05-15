@@ -69,7 +69,7 @@ const ProjectLints: NextPageWithLayout = () => {
         detail:
           'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
         cache_key: 'auth_otp_long_expiry',
-        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        remediation: {}, // 'https://supabase.com/docs/guides/platform/going-into-prod#security',
         metadata: {
           type: 'auth',
           entity: 'Auth',
@@ -86,7 +86,7 @@ const ProjectLints: NextPageWithLayout = () => {
         description: 'OTP length is less than recommended threshold',
         detail: 'We have detected that you have set the OTP length to less than 6 characters',
         cache_key: 'auth_otp_short_length',
-        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        remediation: {}, // 'https://supabase.com/docs/guides/platform/going-into-prod#security',
         metadata: {
           type: 'auth',
           entity: 'Auth',
