@@ -5,6 +5,7 @@ import { Tabs, TabPanel } from '~/components/Tabs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import BodyContentTypeDropdown from '~/components/BodyContentTypeDropdown'
 import { useState } from 'react'
+import Options from '~/components/Options'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
@@ -85,9 +86,24 @@ const ApiOperationSection = (props) => {
                       <Param
                         key={index}
                         {...parameter}
-                        type={parameter.schema.type}
+                        type={parameter.schema.type === 'array' ? `${parameter.schema.type} ${parameter.schema.items?.type}` :parameter.schema.type}
                         isOptional={!parameter.required}
-                      ></Param>
+                      >
+                        {parameter.schema.enum && (
+                          <Options>
+                            {parameter.schema.enum.map((value) => {
+                              return <Options.Option key={value} name={value} isEnum={true} />
+                            })}
+                          </Options>
+                        )}
+                        {parameter.schema.items?.enum && (
+                          <Options>
+                            {parameter.schema.items?.enum.map((value) => {
+                              return <Options.Option key={value} name={value} isEnum={true} />
+                            })}
+                          </Options>
+                        )}
+                      </Param>
                     ))}
               </ul>
             </div>
@@ -174,7 +190,15 @@ const ApiOperationSection = (props) => {
                         selectedContentType
                       ]?.schema?.required?.includes(key)
                     }
-                  ></Param>
+                  >
+                    {(value as any).enum && (
+                      <Options>
+                        {(value as any).enum.map((value) => {
+                          return <Options.Option key={value} name={value} isEnum={true} />
+                        })}
+                      </Options>
+                    )}
+                  </Param>
                 ))
               )}
             </ul>
