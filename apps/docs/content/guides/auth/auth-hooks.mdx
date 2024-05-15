@@ -167,7 +167,6 @@ Errors returned from a Postgres Hook are not retryable. When an error is returne
 </TabPanel>
 
 <TabPanel id="https-hook-errors" label="HTTP">
-For HTTP Hooks, errors are responses which contain status codes 400 and above. Here's a breakdown of the status codes:
 
 | HTTP Status Code | Description                                                   | Example Usage                                  |
 | ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
@@ -175,7 +174,7 @@ For HTTP Hooks, errors are responses which contain status codes 400 and above. H
 | 429, 503         | Retryable errors with Retry-after header supported            | Temporary server overload or maintenance       |
 | 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-Errors with `429` and `503` Status codes are retryable. On a retryable error, HTTP Hooks will attempt up to three retries with a backoff of two seconds. Here’s an overview of a HTTP retry schedule:
+For HTTP Hooks, errors are responses which contain status codes 400 and above. On a retryable error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a backoff of two seconds. Here’s a sample HTTP retry schedule:
 
 | Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
 | --------------------------- | ----------------------- | ------------------------------------------------- |
@@ -376,7 +375,7 @@ Example payload:
 
 </TabPanel>
 <TabPanel id="mfa-verification-attempt-json-schema" label="JSON Schema">
-```
+```json
 {
   "type": "object",
   "properties": {
@@ -542,7 +541,7 @@ Check if a password is valid prior to taking any additional action to ensure the
 
 </TabPanel>
 <TabPanel id="password-verification-attempt-json-schema" label="JSON Schema">
-```
+```json
 {
   "type": "object",
   "properties": {
@@ -838,7 +837,7 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 ```
 </TabPanel>
 <TabPanel id="custom-access-token-json-schema" label="JSON Schema">
-```
+```json
 {
   "type": "object",
   "properties": {
@@ -1166,7 +1165,7 @@ revoke execute
 
 ## Hook: Send SMS
 
-The send sms hook runs before an SMS is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
+The send SMS hook runs before an SMS is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
 
 **Inputs**
 
@@ -1226,7 +1225,7 @@ The send sms hook runs before an SMS is sent and allows you to use an alternativ
 ```
 </TabPanel>
 <TabPanel id="send-sms-json-schema" label="JSON Schema">
-```
+```json
 {
   "type": "object",
   "properties": {
@@ -1450,7 +1449,7 @@ The send sms hook runs before an SMS is sent and allows you to use an alternativ
 
 ## Hook: Send Email
 
-The send sms hook runs before any email is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
+The send SMS hook runs before any email is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
 **Inputs**
 
 - `user` User attempting to sign in. Correlate this to the `auth.users` table.
@@ -1516,7 +1515,7 @@ The send sms hook runs before any email is sent and allows you to use an alterna
 ```
 </TabPanel>
 <TabPanel id="send-email-json-schema" label="JSON Schema">
-```
+```json
 {
   "type": "object",
   "properties": {
