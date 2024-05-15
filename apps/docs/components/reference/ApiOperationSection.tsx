@@ -3,12 +3,23 @@ import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Tabs, TabPanel } from '~/components/Tabs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import BodyContentTypeDropdown from '~/components/BodyContentTypeDropdown'
+import { useState } from 'react'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
+  const bodyContentTypes = Object.keys(operation.requestBody?.content ?? {})
+  const [selectedContentType, setSelectedContentType] = useState(bodyContentTypes[0] || '');
+
+  const hasBodyArray = operation?.requestBody?.content[selectedContentType]?.schema?.type === 'array'
+  const hasBodyArrayObject = operation?.requestBody?.content[selectedContentType]?.schema?.items?.type === 'object'
 
   // gracefully return nothing if function does not exist
   if (!operation) return <></>
+
+  const handleSelectType = (value:string) => {
+    setSelectedContentType(value)
+  };
 
   return (
     <RefSubLayout.Section
@@ -86,27 +97,45 @@ const ApiOperationSection = (props) => {
             </div>
           )}
 
-        {/* Body Parameters */}
+        {/* Body */}
         {operation.requestBody && (
-            <div className="not-prose mt-12">
-              <h5 className="mb-3 text-base text-foreground">Body Parameters</h5>
-              <ul className="mt-4">
-                {operation?.requestBody?.content['application/json']?.schema?.properties &&
-                  Object.entries(operation?.requestBody?.content['application/json']?.schema?.properties)
-                    .map(([key, value]) => (
-                      <Param key={key} name={key} {...(value as  object)}
-                             isOptional={!operation.requestBody?.content['application/json']?.schema?.required?.includes(key)}>
-                      </Param>
-                    ))}
-                {operation?.requestBody?.content['application/json']?.schema?.items?.properties &&
-                  Object.entries(operation?.requestBody?.content['application/json']?.schema?.items?.properties)
-                    .map(([key, value]) => (
-                      <Param key={key} name={key} {...(value as  object)}
-                             isOptional={!operation.requestBody?.content['application/json']?.schema?.items?.required?.includes(key)}>
-                      </Param>
-                    ))}
-              </ul>
+          <div className="not-prose mt-12">
+            <div className="mb-3 flex flex-row justify-between">
+              <h5 className="text-base text-foreground">Body</h5>
+              <BodyContentTypeDropdown types={Object.keys(operation.requestBody?.content)} onSelect={handleSelectType} />
             </div>
+            <ul className="mt-4">
+              {hasBodyArray ? (
+                <div className="space-y-4">
+                  <span>array of:</span>
+                  <div className="ml-10">
+                    {hasBodyArrayObject &&
+                      operation?.requestBody?.content[selectedContentType]?.schema?.items?.properties &&
+                      Object.entries(operation?.requestBody?.content[selectedContentType]?.schema?.items?.properties)
+                      .map(([key, value]) => (
+                        <Param key={key} name={key} {...(value as  object)}
+                               isOptional={!operation.requestBody?.content[selectedContentType]?.schema?.items?.required?.includes(key)}>
+                        </Param>
+                    ))}
+
+                    {!hasBodyArrayObject &&
+                      operation?.requestBody?.content[selectedContentType]?.schema?.items?.type && (
+                        <Param type={operation?.requestBody?.content[selectedContentType]?.schema?.items?.type} isPrimitive={true}>
+                        </Param>
+                      )}
+                  </div>
+                </div>
+              ) : (
+                operation?.requestBody?.content[selectedContentType]?.schema?.properties &&
+                Object.entries(operation?.requestBody?.content[selectedContentType]?.schema?.properties)
+                  .map(([key, value]) => (
+                    <Param key={key} name={key} {...(value as  object)}
+                           isOptional={!operation.requestBody?.content[selectedContentType]?.schema?.required?.includes(key)}>
+                    </Param>
+                  ))
+              )}
+            </ul>
+          </div>
           )}
       </RefSubLayout.Details>
       {operation.responseList && operation.responseList.length > 0 && (

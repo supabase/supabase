@@ -196,5 +196,17 @@
         "type": "operation"
       }
     ]
+  },
+  {
+    "type": "category",
+    "title": "Health",
+    "items": [
+      {
+        "id": "gets-projects-service-health-status",
+        "title": "Gets project's service health status",
+        "slug": "gets-projects-service-health-status",
+        "type": "operation"
+      }
+    ]
   }
 ]
