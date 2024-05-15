@@ -279,7 +279,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                View is defined with the Security Definer property
+                Security Definer view
               </Button>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
@@ -288,13 +288,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </h3>
               <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                 <p>
-                  Postgres' default setting for views is SECURITY DEFINER which means they use the
-                  permissions of the view's creator, rather than the permissions of the querying
-                  user when executing the view's underlying query.
+                  This view is defined with the Security Definer property, giving it permissions of
+                  the view's creator (Postgres), rather than the permissions of the querying user.
                 </p>
+
                 <p>
-                  Creating a view in the public schema makes that view accessible via your project's
-                  APIs.
+                  Since this view is in the public schema, it is accessible via your project's APIs.
                 </p>
 
                 <div className="mt-2">
@@ -316,7 +315,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                 View is defined with the Security Definer property
+                Security Definer view
               </Button>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
@@ -325,9 +324,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </h3>
               <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                 <p>
-                  Materialized view in the public schema makes that view accessible via your project's
-                  APIs.
-                  authenticated roles
+                  This view is defined with the Security Definer property, giving it permissions of
+                  the view's creator (Postgres), rather than the permissions of the querying user.
+                </p>
+
+                <p>
+                  Since this view is in the public schema, it is accessible via your project's APIs.
                 </p>
 
                 <div className="mt-2">
