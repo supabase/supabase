@@ -150,7 +150,7 @@ export const options: typeof _options = async (url, init) => {
   })
 }
 
-export const handleError = (error: any) => {
+export const handleError = (error: any): never => {
   if (error && error.msg) {
     throw new Error(error.msg)
   }
