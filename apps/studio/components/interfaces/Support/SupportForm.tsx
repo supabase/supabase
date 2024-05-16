@@ -694,13 +694,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
                     {docsResults.length > 0 && hasResults && (
                       <div>
-                        {docsResults.map((page, i) => (
+                        {docsResults.slice(0, 5).map((page, i) => (
                           <Command key={page.id}>
                             <CommandGroup
                               key={`${page.path}-group`}
                               heading=""
                               value={`${encodeURIComponent(page.title)}-group-index-${i}`}
                               forceMount={true}
+                              className="p-2"
                             >
                               <CommandItem
                                 key={`${page.path}-item`}
@@ -708,6 +709,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 type="block-link"
                                 onSelect={() => openLink(page.type, formatPageUrl(page))}
                                 forceMount={true}
+                                className="hover:cursor-pointer hover:bg-overlay-hover p-2 text-sm"
                               >
                                 <div className="grow flex gap-3 items-center">
                                   <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -732,7 +734,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 <div className="border-l border-default ml-3 pt-3">
                                   {page.sections.map((section: PageSection, index: number) => (
                                     <CommandItem
-                                      className="ml-3 mb-3"
+                                      className="ml-3 mb-3 hover:cursor-pointer p-2 text-sm"
                                       onSelect={() =>
                                         openLink(page.type, formatSectionUrl(page, section))
                                       }
@@ -746,7 +748,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                         <div className="flex flex-col gap-2">
                                           <cite>
                                             <TextHighlighter
-                                              className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
+                                              className="not-italic text-xs rounded-full px-3 py-1 bg-overlay-hover text-foreground"
                                               text={page.title}
                                               query="test"
                                             />
