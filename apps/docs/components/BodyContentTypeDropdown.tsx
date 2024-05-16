@@ -33,12 +33,11 @@ const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
           hover:bg-overlay-hover
           border-control px-2 h-[32px] rounded
           font-mono
-          flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
+          flex items-center gap-1
+          text-foreground text-sm group-hover:text-foreground transition
           "
         >
-          <span className="text-foreground text-sm group-hover:text-foreground transition">
-            {selectedType}
-          </span>
+          {selectedType}
           <IconChevronDown size={14} strokeWidth={2} />
         </div>
       </DropdownMenuTrigger>
@@ -47,9 +46,9 @@ const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
           <DropdownMenuItem
             key={type}
             onClick={() => myOnSelectType(type)}
-            className="justify-between flex"
+            className={`justify-between flex ${selectedType === type ? 'font-bold' : ''}`}
           >
-            <span className={`${selectedType === type ? 'font-bold' : ''}`}>{type}</span>
+            {type}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
