@@ -168,6 +168,8 @@ export * from './src/components/shadcn/ui/hover-card'
 
 export * from './src/components/shadcn/ui/aspect-ratio'
 
+export * from './src/components/shadcn/ui/table'
+
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,

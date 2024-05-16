@@ -37,6 +37,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { ComponentProps } from './component-props'
 // import { Style } from '@/registry/styles'
 
 const components = {
@@ -210,6 +211,7 @@ const components = {
   ComponentPreview,
   ComponentExample,
   ComponentSource,
+  ComponentProps,
   AspectRatio,
   CodeBlockWrapper: ({ ...props }) => <CodeBlockWrapper className="rounded-md border" {...props} />,
   Step: ({ className, ...props }: React.ComponentProps<'h3'>) => (
