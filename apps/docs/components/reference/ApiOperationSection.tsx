@@ -5,6 +5,7 @@ import { useState } from 'react'
 import Options from '~/components/Options'
 import ApiBodyParam from '~/components/ApiBodyParam'
 import ApiSchema from '~/components/ApiSchema'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
@@ -206,16 +207,15 @@ const ApiOperationSection = (props) => {
         <RefSubLayout.Examples>
           <h5 className="mb-3 text-base text-foreground">Response</h5>
           {operation.responseList[0] &&
-            operation.responseList[0]?.content &&
-            operation.responseList[0]?.content['application/json'] && (
-              <ApiSchema
-                id={operation.operationId}
-                schema={
-                  operation.responseList[0].content['application/json']
-                    .schema
-                }
-              ></ApiSchema>
-            )}
+          operation.responseList[0]?.content &&
+          operation.responseList[0]?.content['application/json'] ? (
+            <ApiSchema
+              id={operation.operationId}
+              schema={operation.responseList[0].content['application/json'].schema}
+            ></ApiSchema>
+          ) : (
+            <ReactMarkdown className="text-foreground text-sm">[No content]</ReactMarkdown>
+          )}
         </RefSubLayout.Examples>
       )}
     </RefSubLayout.Section>
