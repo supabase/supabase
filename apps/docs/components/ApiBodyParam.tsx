@@ -1,6 +1,7 @@
 import Options from '~/components/Options'
-import { CodeBlock } from '@ui/components/CodeBlock'
 import Param from '~/components/Params'
+import ApiSchema from '~/components/ApiSchema'
+import ApiSchemaOptions from '~/components/ApiSchemaOption'
 
 type IParamProps = any
 
@@ -25,9 +26,18 @@ const ApiBodyParam = ({ name, value, isOptional }: IParamProps) => {
         </Options>
       )}
       {(value as any).type === 'object' && (
-        <CodeBlock language="bash" className="relative">
-          {JSON.stringify(value, null, 2)}
-        </CodeBlock>
+        <ApiSchemaOptions>
+          <div
+            className="
+              px-5 py-3 first:border-t border-b border-l border-r
+              border-default
+              last:rounded-bl-lg last:rounded-br-lg
+              flex flex-col gap-3
+            "
+          >
+            <ApiSchema id={name} schema={value}></ApiSchema>
+          </div>
+        </ApiSchemaOptions>
       )}
     </Param>
   )

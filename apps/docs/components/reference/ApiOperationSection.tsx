@@ -207,11 +207,11 @@ const ApiOperationSection = (props) => {
           <h5 className="mb-3 text-base text-foreground">Response</h5>
           {operation.responseList[0] &&
             operation.responseList[0]?.content &&
-            operation.responseList[0]?.content[selectedContentType ?? 'application/json'] && (
+            operation.responseList[0]?.content['application/json'] && (
               <ApiSchema
                 id={operation.operationId}
                 schema={
-                  operation.responseList[0].content[selectedContentType ?? 'application/json']
+                  operation.responseList[0].content['application/json']
                     .schema
                 }
               ></ApiSchema>
