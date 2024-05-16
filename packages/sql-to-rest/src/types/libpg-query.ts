@@ -184,7 +184,7 @@ export type WhereExpression = A_Expr | BoolExpr | NullTest
 
 export type SortBy = {
   SortBy: {
-    node: ColumnRef
+    node: ColumnRef | A_Expr
     sortby_dir: string
     sortby_nulls: string
   }

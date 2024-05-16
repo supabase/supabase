@@ -1169,6 +1169,23 @@ describe('select', () => {
     expect(fullPath).toBe('/books?select=address->city->>name&address->city->>code=eq.SFO')
   })
 
+  test('order by json column', async () => {
+    const sql = stripIndents`
+      select
+        address->'city'->>'name'
+      from
+        books
+      order by
+        address->'city'->>'code'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=address->city->>name&order=address->city->>code')
+  })
+
   test('aggregate', async () => {
     const sql = stripIndents`
       select

@@ -651,10 +651,6 @@ function processQueryTarget(
 
 function processWhereClause(expression: WhereExpression, from: string): Filter {
   if ('A_Expr' in expression) {
-    if ('TypeCast' in expression.A_Expr.lexpr) {
-      throw new UnsupportedError('Casting is not supported in the WHERE clause')
-    }
-
     let column: string
 
     if ('A_Expr' in expression.A_Expr.lexpr) {
@@ -695,6 +691,8 @@ function processWhereClause(expression: WhereExpression, from: string): Filter {
       else {
         column = [relationName, columnName].join('.')
       }
+    } else if ('TypeCast' in expression.A_Expr.lexpr) {
+      throw new UnsupportedError('Casting is not supported in the WHERE clause')
     } else {
       throw new UnsupportedError(`Left side of WHERE clause must be a column`)
     }
@@ -835,41 +833,46 @@ function processWhereClause(expression: WhereExpression, from: string): Filter {
 
 function processSortClause(sorts: SortBy[], from: string): Sort[] {
   return sorts.map((sortBy) => {
-    if ('TypeCast' in sortBy.SortBy.node) {
-      throw new UnsupportedError('Casting is not supported in the ORDER BY clause')
-    }
-
-    if (!('ColumnRef' in sortBy.SortBy.node)) {
-      throw new UnsupportedError('ORDER BY clause only accepts columns')
-    }
-
-    const { fields } = sortBy.SortBy.node.ColumnRef
-
-    const [field] = fields
-
-    if (!('String' in field)) {
-      const [fieldType] = Object.keys(field)
-      throw new UnsupportedError(
-        `ORDER BY column fields must be String type, received '${fieldType}'`
-      )
-    }
-
-    const stringFields = fields.filter((field): field is PgString => 'String' in field)
-    const qualifiedName = stringFields.map((field) => field.String.sval)
-
-    // Relation and column names are last two parts of the qualified name
-    const [relationName] = qualifiedName.slice(-2, -1)
-    const [columnName] = qualifiedName.slice(-1)
-
     let column: string
 
-    // If the column is prefixed with the primary table name, strip the prefix
-    if (!relationName || relationName === from) {
-      column = columnName
-    }
-    // Otherwise this is a foreign column, so keep the relation prefix
-    else {
-      column = [relationName, columnName].join('.')
+    if ('A_Expr' in sortBy.SortBy.node) {
+      try {
+        const target = processJsonTarget(sortBy.SortBy.node)
+        column = target.column
+      } catch (err) {
+        throw new UnsupportedError(`ORDER BY clause must reference a column`)
+      }
+    } else if ('ColumnRef' in sortBy.SortBy.node) {
+      const { fields } = sortBy.SortBy.node.ColumnRef
+
+      const [field] = fields
+
+      if (!('String' in field)) {
+        const [fieldType] = Object.keys(field)
+        throw new UnsupportedError(
+          `ORDER BY column fields must be String type, received '${fieldType}'`
+        )
+      }
+
+      const stringFields = fields.filter((field): field is PgString => 'String' in field)
+      const qualifiedName = stringFields.map((field) => field.String.sval)
+
+      // Relation and column names are last two parts of the qualified name
+      const [relationName] = qualifiedName.slice(-2, -1)
+      const [columnName] = qualifiedName.slice(-1)
+
+      // If the column is prefixed with the primary table name, strip the prefix
+      if (!relationName || relationName === from) {
+        column = columnName
+      }
+      // Otherwise this is a foreign column, so keep the relation prefix
+      else {
+        column = [relationName, columnName].join('.')
+      }
+    } else if ('TypeCast' in sortBy.SortBy.node) {
+      throw new UnsupportedError('Casting is not supported in the ORDER BY clause')
+    } else {
+      throw new UnsupportedError(`ORDER BY clause must reference a column`)
     }
 
     const direction = mapSortByDirection(sortBy.SortBy.sortby_dir)
