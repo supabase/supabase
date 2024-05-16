@@ -33,6 +33,7 @@ import {
 } from 'data/read-replicas/replicas-status-query'
 import { ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
 import SparkBar from 'components/ui/SparkBar'
+import { formatSeconds } from './InstanceConfiguration.utils'
 
 interface NodeData {
   id: string
@@ -280,16 +281,39 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </p>
             </div>
             {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
-              <div className="w-52 -mt-0.5">
-                <SparkBar
-                  labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                  labelBottomClass="text-xs !normal-nums text-foreground-light"
-                  type="horizontal"
-                  value={stagePercent * 100}
-                  max={100}
-                  barClass="bg-brand"
-                />
-              </div>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <div className="w-56">
+                    <SparkBar
+                      labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
+                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      type="horizontal"
+                      value={stagePercent * 100}
+                      max={100}
+                      barClass="bg-brand"
+                    />
+                  </div>
+                </TooltipTrigger_Shadcn_>
+                {estimations !== undefined && (
+                  <TooltipContent_Shadcn_ asChild side="bottom">
+                    <div className="w-56">
+                      <p className="text-foreground-light mb-0.5">Duration estimates:</p>
+                      {estimations.baseBackupDownloadEstimateSeconds !== undefined && (
+                        <p>
+                          Base backup download:{' '}
+                          {formatSeconds(estimations.baseBackupDownloadEstimateSeconds)}
+                        </p>
+                      )}
+                      {estimations.walArchiveReplayEstimateSeconds !== undefined && (
+                        <p>
+                          WAL archive replay:{' '}
+                          {formatSeconds(estimations.walArchiveReplayEstimateSeconds)}
+                        </p>
+                      )}
+                    </div>
+                  </TooltipContent_Shadcn_>
+                )}
+              </Tooltip_Shadcn_>
             ) : (
               <p className="text-sm text-foreground-light">Created: {created}</p>
             )}
