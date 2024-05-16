@@ -86,7 +86,7 @@ select
     'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
+    'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in schemas exposed to PostgREST, potentially compromising user data security.' as description,
     format(
         'View/Materialized View "%s" in the public schema may expose \`auth.users\` data to anon or authenticated roles.',
         c.relname
@@ -576,9 +576,9 @@ select
     'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
+    'Detects views defined with the SECURITY DEFINER property. These views enforce Postgres permissions and row level security policies (RLS) of the view creator, rather than that of the querying user' as description,
     format(
-        'View \`%s.%s\` is SECURITY DEFINER',
+        'View \`%s.%s\` is defined with the SECURITY DEFINER property',
         n.nspname,
         c.relname
     ) as detail,
@@ -668,7 +668,7 @@ select
     'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects cases where row level security (RLS) has not been enabled on a table in the \`public\` schema.' as description,
+    'Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST' as description,
     format(
         'Table \`%s.%s\` is public, but RLS has not been enabled.',
         n.nspname,
@@ -798,7 +798,7 @@ select
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects materialized views that are potentially accessible over APIs.' as description,
+    'Detects materialized views that are potentially accessible over the Data APIs.' as description,
     format(
         'Materialized view \`%s.%s\` is selectable by anon or authenticated roles',
         n.nspname,

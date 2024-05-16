@@ -11,6 +11,7 @@ import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS }
 import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -60,6 +61,8 @@ const PreviewFilterPanel = ({
   const [search, setSearch] = useState('')
   const { project } = useProjectContext()
 
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: project?.ref })
+
   // [Joshen] These are the routes tested that can show replica logs
   const showDatabaseSelector =
     project?.is_read_replicas_enabled && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
@@ -77,6 +80,7 @@ const PreviewFilterPanel = ({
     <Tooltip_Shadcn_ delayDuration={100}>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
+          title="refresh"
           type="default"
           className="px-1.5"
           icon={
@@ -214,7 +218,16 @@ const PreviewFilterPanel = ({
               Open query in Logs Explorer
             </TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
-          <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
+          <DatabaseSelector
+            onSelectId={onSelectedDatabaseChange}
+            additionalOptions={
+              table === LogsTableName.EDGE
+                ? (loadBalancers ?? []).length > 0
+                  ? [{ id: `${project.ref}-all`, name: 'API Load Balancer' }]
+                  : []
+                : []
+            }
+          />
         </div>
       ) : (
         <Button asChild type="default" onClick={onExploreClick}>
