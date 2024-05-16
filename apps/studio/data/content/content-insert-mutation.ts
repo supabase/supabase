@@ -35,7 +35,7 @@ export async function insertContent(
     },
     signal,
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
 
   // [Joshen] There's an issue with the API codegen due to content endpoint having 2 versions
   return data as unknown as InsertContentResponse[]

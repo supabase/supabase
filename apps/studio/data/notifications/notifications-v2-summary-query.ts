@@ -11,7 +11,7 @@ export async function getNotificationsSummary(signal?: AbortSignal) {
   const { data, error } = await get('/platform/notifications/summary', {
     signal,
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

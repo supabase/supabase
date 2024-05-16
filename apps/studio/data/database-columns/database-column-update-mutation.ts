@@ -33,7 +33,7 @@ export async function updateDatabaseColumn({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

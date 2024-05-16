@@ -19,7 +19,7 @@ export async function createCustomDomain({
     body: { custom_hostname: customDomain },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

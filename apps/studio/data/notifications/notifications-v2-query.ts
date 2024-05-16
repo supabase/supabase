@@ -53,7 +53,7 @@ export async function getNotifications(options: NotificationVariables, signal?: 
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
 
   return data
 }

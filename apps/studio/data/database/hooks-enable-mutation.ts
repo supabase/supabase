@@ -13,7 +13,7 @@ export async function enableDatabaseWebhooks({ ref }: HooksEnableVariables) {
   const { data, error } = await post('/platform/database/{ref}/hook-enable', {
     params: { path: { ref } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -32,7 +32,7 @@ export async function createOrganization({
     },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

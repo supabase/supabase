@@ -12,7 +12,7 @@ export async function enablePhysicalBackups({ ref }: EnablePhysicalBackupsVariab
   const { data, error } = await post('/platform/database/{ref}/backups/enable-physical-backups', {
     params: { path: { ref } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

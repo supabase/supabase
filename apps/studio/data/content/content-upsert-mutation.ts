@@ -35,7 +35,7 @@ export async function upsertContent(
     },
     signal,
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
 
   return data
 }

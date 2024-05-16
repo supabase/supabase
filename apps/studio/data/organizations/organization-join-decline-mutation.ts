@@ -17,7 +17,7 @@ export async function declineJoinOrganization({
     // @ts-ignore [Joshen] API spec might be wrong here
     params: { path: { slug }, query: { invited_id } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

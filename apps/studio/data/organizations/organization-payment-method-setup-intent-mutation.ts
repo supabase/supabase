@@ -19,7 +19,7 @@ export async function setupPaymentMethodIntent({
     // @ts-ignore [Joshen] API seems to be having the wrong spec
     body: { hcaptchaToken },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

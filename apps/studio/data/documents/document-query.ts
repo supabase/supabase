@@ -22,7 +22,7 @@ export async function getDocument({ orgSlug, docType }: DocumentVariables, signa
       }
     )
 
-    if (error) throw handleError(error)
+    if (error) handleError(error)
     return data as { fileUrl: string }
   }
 

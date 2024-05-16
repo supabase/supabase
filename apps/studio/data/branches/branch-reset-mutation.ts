@@ -15,7 +15,7 @@ export async function resetBranch({ id }: Pick<BranchResetVariables, 'id'>) {
     params: { path: { branch_id: id } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

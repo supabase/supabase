@@ -36,7 +36,7 @@ export async function updateDatabasePolicy({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -30,7 +30,7 @@ export async function createDatabaseColumn({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

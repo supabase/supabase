@@ -18,7 +18,7 @@ export async function resetDatabasePassword({ ref, password }: DatabasePasswordR
     body: { password },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -12,7 +12,7 @@ export type NotificationsDismissVariables = {
 export async function dismissNotifications({ ids }: NotificationsDismissVariables) {
   const { data, error } = await del('/platform/notifications', { body: { ids } })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

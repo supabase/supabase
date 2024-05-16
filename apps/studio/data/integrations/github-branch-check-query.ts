@@ -26,7 +26,7 @@ export async function checkGithubBranchValidity(
     }
   )
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

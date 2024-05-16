@@ -23,7 +23,7 @@ export async function getGitHubConnections(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data.connections
 }
 

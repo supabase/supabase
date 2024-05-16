@@ -22,7 +22,7 @@ export async function updateConnection(
     body: { workdir, supabase_changes_only: supabaseChangesOnly },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

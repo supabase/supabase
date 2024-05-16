@@ -11,7 +11,7 @@ export async function createGitHubConnection({ connection }: GitHubConnectionCre
     body: connection,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

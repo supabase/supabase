@@ -14,7 +14,7 @@ export async function joinOrganization({ slug, token }: OrganizationJoinVariable
   const { data, error } = await post('/platform/organizations/{slug}/members/join', {
     params: { path: { slug }, query: { token } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

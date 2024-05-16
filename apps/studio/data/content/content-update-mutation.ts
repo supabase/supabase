@@ -21,7 +21,7 @@ export async function updateContent(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

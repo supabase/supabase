@@ -46,7 +46,7 @@ export async function updateDatabasePublication({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

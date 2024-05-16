@@ -16,7 +16,7 @@ export async function resetPassword({ email, hcaptchaToken, redirectTo }: ResetP
     body: { email, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

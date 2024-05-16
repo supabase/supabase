@@ -28,7 +28,7 @@ export async function deleteDatabaseFunction({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

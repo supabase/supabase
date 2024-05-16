@@ -30,7 +30,7 @@ export async function getProjectUpgradeEligibility(
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data as ProjectUpgradeEligibilityResponse
 }
 

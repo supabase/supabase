@@ -20,7 +20,7 @@ export async function deleteContents(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data.map((x) => x.id)
 }
 

@@ -15,7 +15,7 @@ export async function getInvoice({ id }: InvoiceVariables, signal?: AbortSignal)
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

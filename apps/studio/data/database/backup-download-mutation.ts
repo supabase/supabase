@@ -23,7 +23,7 @@ export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
       status: 'deprecated',
     },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

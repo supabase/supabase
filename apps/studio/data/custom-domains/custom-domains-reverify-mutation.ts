@@ -14,7 +14,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

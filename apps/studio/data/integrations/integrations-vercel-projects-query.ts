@@ -29,7 +29,7 @@ export async function getVercelProjects(
     }
   )
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data.projects
 }
 

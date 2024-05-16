@@ -16,7 +16,7 @@ export async function updateVercelConnection({ id, envSyncTargets }: UpdateConne
     },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

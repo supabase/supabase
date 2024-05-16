@@ -27,7 +27,7 @@ export async function sendFeedback({
       pathname,
     },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

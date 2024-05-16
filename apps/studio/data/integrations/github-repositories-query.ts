@@ -9,7 +9,7 @@ export async function getGitHubRepositories(signal?: AbortSignal) {
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   // [Alaister]: temp fix until we have a proper response type
   return (data as any).repositories
 }

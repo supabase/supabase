@@ -16,7 +16,7 @@ export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVaria
     },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -32,7 +32,7 @@ export async function getDatabasePolicies(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

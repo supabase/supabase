@@ -2,9 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { Dictionary, ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
-import type { Dictionary } from 'types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
@@ -39,7 +38,7 @@ export async function createDatabaseFunction({
     headers,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

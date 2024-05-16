@@ -15,7 +15,7 @@ export async function deleteBranch({ id }: Pick<BranchDeleteVariables, 'id'>) {
     params: { path: { branch_id: id } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

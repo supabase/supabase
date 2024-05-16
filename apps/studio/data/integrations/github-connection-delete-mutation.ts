@@ -16,7 +16,7 @@ export async function deleteConnection({ connectionId }: DeleteVariables, signal
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

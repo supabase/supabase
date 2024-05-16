@@ -22,7 +22,7 @@ export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signa
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
 
   const tables = data.definitions
     ? Object.entries(data.definitions).map(([key, table]: any) => ({

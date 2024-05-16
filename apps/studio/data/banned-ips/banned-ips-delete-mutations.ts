@@ -19,7 +19,7 @@ export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) {
     body: { ipv4_addresses: ips },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -10,7 +10,7 @@ export async function archiveAllNotifications() {
     headers: { Version: '2' },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

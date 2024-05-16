@@ -14,7 +14,7 @@ export async function restoreFromPitr({ ref, recovery_time_target_unix }: PitrRe
     params: { path: { ref } },
     body: { recovery_time_target_unix },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

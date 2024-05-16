@@ -17,7 +17,7 @@ export async function getPgBouncerStatus({ projectRef }: PgBouncerVariables, sig
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

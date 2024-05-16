@@ -22,7 +22,7 @@ export async function updatePoolingConfiguration({
     body: { default_pool_size, pool_mode },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -24,7 +24,7 @@ export async function getProjectLogRequestsCountStats(
     }
   )
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

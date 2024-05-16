@@ -17,7 +17,7 @@ export async function signup({ email, password, hcaptchaToken, redirectTo }: Sig
     body: { email, password, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

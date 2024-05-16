@@ -14,7 +14,7 @@ export async function activateCustomDomain({ projectRef }: CustomDomainActivateV
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

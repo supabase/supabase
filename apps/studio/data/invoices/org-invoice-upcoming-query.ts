@@ -49,7 +49,7 @@ export async function getUpcomingInvoice(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data as unknown as UpcomingInvoiceResponse
 }
 

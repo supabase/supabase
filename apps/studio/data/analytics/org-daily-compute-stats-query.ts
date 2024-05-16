@@ -35,7 +35,7 @@ export async function getOrgDailyComputeStats(
     params: { path: { slug: orgSlug }, query: { projectRef, startDate, endDate } },
     signal,
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data as AnalyticsData
 }
 

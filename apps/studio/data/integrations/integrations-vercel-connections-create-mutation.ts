@@ -22,7 +22,7 @@ export async function createIntegrationVercelConnections({
     },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

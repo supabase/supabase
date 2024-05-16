@@ -13,7 +13,7 @@ export async function updateNotifications({ ids }: NotificationsUpdateVariables)
   // @ts-ignore
   const { data, error } = await patch('/platform/notifications', { body: { ids } })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -16,7 +16,7 @@ export async function updateNotifications({ ids, status }: NotificationsUpdateVa
     }),
     headers: { Version: '2' },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

@@ -13,7 +13,7 @@ export async function createGitHubAuthorization({ code }: GitHubAuthorizationCre
     body: { code },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

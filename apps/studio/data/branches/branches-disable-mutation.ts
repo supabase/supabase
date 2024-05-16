@@ -32,7 +32,7 @@ export async function disableBranching({ branchIds, projectRef }: BranchesDisabl
   const { data, error } = await del('/v1/projects/{ref}/branches', {
     params: { path: { ref: projectRef } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

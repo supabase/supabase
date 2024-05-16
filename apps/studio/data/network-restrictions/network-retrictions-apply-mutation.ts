@@ -23,7 +23,7 @@ export async function applyNetworkRestrictions({
     body: { dbAllowedCidrs, dbAllowedCidrsV6 },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

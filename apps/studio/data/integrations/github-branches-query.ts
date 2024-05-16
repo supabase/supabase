@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import { integrationKeys } from './keys'
 import type { ResponseError } from 'types'
+import { integrationKeys } from './keys'
 
 export type GitHubBranchesVariables = {
   connectionId?: number
@@ -18,7 +18,7 @@ export async function getGitHubBranches(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

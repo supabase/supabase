@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { del, handleError } from 'data/fetchers'
+import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
-import { permissionKeys } from 'data/permissions/keys'
 
 export type OrganizationDeleteVariables = {
   slug: string
@@ -14,7 +14,7 @@ export async function deleteOrganization({ slug }: OrganizationDeleteVariables) 
   const { data, error } = await del('/platform/organizations/{slug}', {
     params: { path: { slug } },
   })
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

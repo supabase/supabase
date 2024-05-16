@@ -21,7 +21,7 @@ export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateV
     },
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 
