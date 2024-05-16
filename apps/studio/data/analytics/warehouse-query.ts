@@ -23,6 +23,10 @@ export async function getWarehouseQuery(
     signal,
   } as any)
 
+  if (response.error || !response.response.ok) {
+    throw response.error
+  }
+
   return {
     // TODO: Remove the type assertion once the generated OpenAPI client is typed
     data: response.data as unknown as any,
@@ -46,8 +50,7 @@ export const useWarehouseQueryQuery = <TData = WarehouseQueryData>(
     {
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: Infinity,
-      // 15 mins cache time
-      cacheTime: 15 * 60 * 1000,
+      cacheTime: 15 * 60 * 1000, // 15 mins cache time
       refetchOnMount: false,
       refetchInterval: false,
       ...options,

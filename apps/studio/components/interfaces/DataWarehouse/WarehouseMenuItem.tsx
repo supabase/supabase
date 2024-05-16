@@ -113,7 +113,6 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           onSubmit={async (e) => {
             e.preventDefault()
             try {
-              console.log('update')
               const formData = new FormData(e.target as HTMLFormElement)
 
               const name = formData.get('name') as string

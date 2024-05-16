@@ -55,6 +55,7 @@ interface Props {
   maxHeight?: string
   className?: string
   hideHeader?: boolean
+  collectionName?: string // Used for warehouse queries
 }
 type LogMap = { [id: string]: LogData }
 
@@ -78,6 +79,7 @@ const LogTable = ({
   maxHeight,
   className,
   hideHeader = false,
+  collectionName,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -132,6 +134,9 @@ const LogTable = ({
     columns
   } else {
     switch (queryType) {
+      case 'warehouse':
+        columns = DEFAULT_COLUMNS
+        break
       case 'api':
         columns = DatabaseApiColumnRender
         break
@@ -175,7 +180,7 @@ const LogTable = ({
     }, {}) as LogMap
 
     return [deduped, map]
-  }, [stringData])
+  }, [data, hasId])
 
   useEffect(() => {
     if (!data) return
@@ -184,7 +189,7 @@ const LogTable = ({
       // close selection panel if not found in dataset
       setFocusedLog(null)
     }
-  }, [stringData])
+  }, [data, focusedLog, stringData])
 
   // [Joshen] Hmm quite hacky now, but will do
   const _maxHeight =
@@ -196,7 +201,7 @@ const LogTable = ({
     } else {
       return dedupedData
     }
-  }, [stringData])
+  }, [dedupedData, hasId, hasTimestamp, logMap])
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
@@ -406,6 +411,7 @@ const LogTable = ({
               log={focusedLog}
               queryType={queryType}
               params={params}
+              collectionName={collectionName}
             />
           </div>
         ) : null}

@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { RefreshCcw, Rewind } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -33,16 +34,16 @@ export const WarehouseCollectionDetail = () => {
 
   useEffect(() => {
     if (collection) {
-      setParams({
-        ...params,
+      setParams((prevParams) => ({
+        ...prevParams,
         sql: `
-        select id, timestamp, event_message from \`${collection.name}\` 
-        where timestamp > '2024-01-01' 
+        select id, timestamp, event_message from \`${collection.name}\`
+        where timestamp > '2024-01-01'
         order by timestamp desc limit ${pagination.limit} offset ${pagination.offset}
         `,
-      })
+      }))
     }
-  }, [collection, pagination, params])
+  }, [collection, pagination])
 
   const {
     isLoading: queryLoading,
@@ -50,7 +51,18 @@ export const WarehouseCollectionDetail = () => {
     isError,
     refetch,
     isRefetching,
-  } = useWarehouseQueryQuery({ ref: projectRef, sql: params.sql }, { enabled: !!params.sql })
+  } = useWarehouseQueryQuery(
+    { ref: projectRef, sql: params.sql },
+    {
+      enabled: !!params.sql,
+    }
+  )
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Error loading collection data')
+    }
+  }, [isError])
 
   const formatResults = (results: any) => {
     if (!results || !results.length) {
@@ -99,6 +111,8 @@ export const WarehouseCollectionDetail = () => {
               </div>
             </div>
             <LogTable
+              collectionName={collection?.name}
+              queryType="warehouse"
               hasEditorValue={false}
               projectRef={projectRef}
               isLoading={isLoading}
@@ -113,7 +127,6 @@ export const WarehouseCollectionDetail = () => {
 
         {!isError && (
           <div className="border-t flex flex-row justify-between p-2">
-            {/* <pre>{JSON.stringify(pagination)}</pre> */}
             <div className="flex items-center gap-2">
               {results.length > 0 && (
                 <>

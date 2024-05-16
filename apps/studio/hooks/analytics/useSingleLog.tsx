@@ -10,6 +10,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { useQuery } from '@tanstack/react-query'
+import { getWarehouseQuery } from 'data/analytics/warehouse-query'
 
 interface SingleLogHook {
   logData: LogData | undefined
@@ -26,11 +27,14 @@ function useSingleLog(
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
   const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
+
   const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
     params as any
   )}`
 
-  const enabled = Boolean(id && table)
+  const isWarehouseQuery = queryType === 'warehouse'
+  // Warehouse queries are handled differently
+  const enabled = Boolean(id && table && !isWarehouseQuery)
 
   const {
     data,

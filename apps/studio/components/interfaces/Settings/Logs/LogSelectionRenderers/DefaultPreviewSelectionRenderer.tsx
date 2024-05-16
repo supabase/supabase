@@ -14,7 +14,7 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (
     <div className="flex flex-col gap-3">
       <h3 className="text-foreground-lighter text-sm">Metadata</h3>
       <pre
-        className=" className={`text-foreground text-sm col-span-8 overflow-x-auto text-xs font-mono`}"
+        className="text-foreground col-span-8 overflow-x-auto text-xs font-mono"
         dangerouslySetInnerHTML={{
           __html: jsonSyntaxHighlight(log.metadata || {}),
         }}
