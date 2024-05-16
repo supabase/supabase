@@ -29,8 +29,8 @@ export async function getOrganizationMembers(
   const { data: orgMembers, error: orgMembersError } = members
   const { data: orgInvites, error: orgInvitesError } = invites
 
-  if (orgMembersError) throw handleError(orgMembersError)
-  if (orgInvitesError) throw handleError(orgInvitesError)
+  if (orgMembersError) handleError(orgMembersError)
+  if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
   const invitedMembers = orgInvites.map((invite) => {

@@ -38,7 +38,7 @@ export async function getNetworkRestrictions(
         status: '',
       } as NetworkRestrictionsResponse
     } else {
-      throw handleError(error)
+      handleError(error)
     }
   }
 

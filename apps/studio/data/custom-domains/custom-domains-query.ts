@@ -93,7 +93,7 @@ export async function getCustomDomains(
       } as const
     }
 
-    throw handleError(error)
+    handleError(error)
   }
 
   return { customDomain: data.data.result as CustomDomainResponse, status: data.status }
