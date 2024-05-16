@@ -283,7 +283,7 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
-### Log source reference
+### Logs field reference
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 
@@ -313,3 +313,19 @@ Refer to the full field reference for each available source below. Do note that 
     </Tabs>
   )}
 </SharedData>
+
+## Log Drains
+
+Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Teams and Enterprise plans. See [pricing](https://supabase.com/pricing) for more information.
+
+<Admonition type="note">
+
+Log drains is in **Private Alpha**, and is not available in the dashboared yet. Please reach out to [support](https://supabase.com/support) and indicate your interest in enabling log drains for your project.
+
+</Admonition>
+
+The following table lists the supported destinations and the required setup configuration:
+
+| Destination | Configuration         |
+| ----------- | --------------------- |
+| Datadog     | API Key <br /> Region |
