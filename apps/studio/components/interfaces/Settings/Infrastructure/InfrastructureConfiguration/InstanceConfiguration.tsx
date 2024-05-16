@@ -32,10 +32,6 @@ import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
 
-// [Joshen] Just FYI, UI assumes single provider for primary + replicas
-// [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
-// [Joshen] Show flags for regions
-
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
@@ -144,6 +140,7 @@ const InstanceConfigurationUI = () => {
                 animated: true,
                 className: '!cursor-default',
                 data: {
+                  status: database.status,
                   identifier: database.identifier,
                   connectionString: database.connectionString,
                 },
@@ -164,9 +161,12 @@ const InstanceConfigurationUI = () => {
     []
   )
 
-  const edgeTypes = {
-    smoothstep: SmoothstepEdge,
-  }
+  const edgeTypes = useMemo(
+    () => ({
+      smoothstep: SmoothstepEdge,
+    }),
+    []
+  )
 
   const setReactFlow = async () => {
     const graph = getDagreGraphLayout(nodes, edges)
@@ -182,8 +182,9 @@ const InstanceConfigurationUI = () => {
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
-    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow')
+    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
       setReactFlow()
+    }
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
