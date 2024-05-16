@@ -10,7 +10,6 @@ import {
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { useQuery } from '@tanstack/react-query'
-import { getWarehouseQuery } from 'data/analytics/warehouse-query'
 
 interface SingleLogHook {
   logData: LogData | undefined
