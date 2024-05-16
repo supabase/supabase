@@ -1499,7 +1499,7 @@ describe('select', () => {
     expect(fullPath).toBe('/profiles?select=region,count()')
   })
 
-  test('primary relation prefix stripped', async () => {
+  test('primary relation prefix stripped from qualified column', async () => {
     const sql = stripIndents`
       select
         profiles.name
@@ -1518,7 +1518,7 @@ describe('select', () => {
     expect(fullPath).toBe('/profiles?select=name&name=eq.Bob&order=name')
   })
 
-  test('primary relation alias prefix stripped', async () => {
+  test('primary relation alias prefix stripped from qualified column', async () => {
     const sql = stripIndents`
       select
         p.name
@@ -1535,5 +1535,107 @@ describe('select', () => {
 
     expect(method).toBe('GET')
     expect(fullPath).toBe('/profiles?select=name&name=eq.Bob&order=name')
+  })
+
+  test('primary relation prefix stripped from qualified json column', async () => {
+    const sql = stripIndents`
+      select
+        books.address->'city'->>'name'
+      from
+        books
+      where
+        books.address->'country'->>'code' = 'CA'
+      order by
+        books.address->'city'->>'code'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe(
+      '/books?select=address->city->>name&address->country->>code=eq.CA&order=address->city->>code'
+    )
+  })
+
+  test('joined relation prefix retained in qualified json column', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      join author
+        on author_id = author.id
+      where
+        author.address->'country'->>'code' = 'CA'
+      order by
+        author.address->'city'->>'code'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe(
+      '/books?select=*,...author!inner()&author.address->country->>code=eq.CA&order=author.address->city->>code'
+    )
+  })
+
+  test('reference to non-existent relation in select target list fails', async () => {
+    const sql = stripIndents`
+      select
+        editor.name
+      from
+        books
+      join author
+        on author_id = author.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('reference to non-existent relation in where clause fails', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      join author
+        on author_id = author.id
+      where
+        editor.name = 'Bob'
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('reference to non-existent relation in group by clause fails', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      join author
+        on author_id = author.id
+      group by
+        editor.name
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('reference to non-existent relation in order by clause fails', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      join author
+        on author_id = author.id
+      order by
+        editor.name
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
   })
 })

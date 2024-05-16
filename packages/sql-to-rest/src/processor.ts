@@ -191,6 +191,15 @@ export type Sort = {
   nulls?: 'first' | 'last'
 }
 
+type Relations = {
+  primary: {
+    name: string
+    alias?: string
+    get reference(): string
+  }
+  joined: EmbeddedTarget[]
+}
+
 export const supportedAggregateFunctions = ['avg', 'count', 'max', 'min', 'sum']
 
 /**
@@ -283,17 +292,19 @@ function processSelectStmt(stmt: SelectStmt): Select {
 
   const [fromClause] = stmt.SelectStmt.fromClause
 
-  const { from, alias, embeddedTargets } = processFromClause(fromClause)
+  const relations = processFromClause(fromClause)
 
-  const targets = processTargetList(stmt.SelectStmt.targetList, alias ?? from, embeddedTargets)
+  const from = relations.primary.name
 
-  validateGroupClause(stmt.SelectStmt.groupClause ?? [], targets, alias ?? from)
+  const targets = processTargetList(stmt.SelectStmt.targetList, relations)
+
+  validateGroupClause(stmt.SelectStmt.groupClause ?? [], targets, relations)
 
   const filter = stmt.SelectStmt.whereClause
-    ? processWhereClause(stmt.SelectStmt.whereClause, alias ?? from)
+    ? processWhereClause(stmt.SelectStmt.whereClause, relations)
     : undefined
 
-  const sorts = processSortClause(stmt.SelectStmt.sortClause ?? [], alias ?? from)
+  const sorts = processSortClause(stmt.SelectStmt.sortClause ?? [], relations)
 
   const limit = processLimit(stmt)
 
@@ -307,27 +318,28 @@ function processSelectStmt(stmt: SelectStmt): Select {
   }
 }
 
-function processFromClause(fromClause: FromExpression): {
-  from: string
-  alias?: string
-  embeddedTargets: EmbeddedTarget[]
-} {
+function processFromClause(fromClause: FromExpression): Relations {
   if ('RangeVar' in fromClause) {
     return {
-      from: fromClause.RangeVar.relname,
-      alias: fromClause.RangeVar.alias?.aliasname,
-      embeddedTargets: [],
+      primary: {
+        name: fromClause.RangeVar.relname,
+        alias: fromClause.RangeVar.alias?.aliasname,
+        get reference() {
+          return this.alias ?? this.name
+        },
+      },
+      joined: [],
     }
   } else if ('JoinExpr' in fromClause) {
     const joinType = mapJoinType(fromClause.JoinExpr.jointype)
-    const { from, alias, embeddedTargets } = processFromClause(fromClause.JoinExpr.larg)
+    const { primary, joined } = processFromClause(fromClause.JoinExpr.larg)
 
     const joinedRelationAlias = fromClause.JoinExpr.rarg.RangeVar.alias?.aliasname
     const joinedRelation = joinedRelationAlias ?? fromClause.JoinExpr.rarg.RangeVar.relname
 
     const existingRelations = [
-      alias ?? from,
-      ...embeddedTargets.map((t) => t.alias ?? t.relation),
+      primary.reference,
+      ...joined.map((t) => t.alias ?? t.relation),
       joinedRelation,
     ]
 
@@ -361,7 +373,7 @@ function processFromClause(fromClause: FromExpression): {
     const [leftColumnName] = leftColumnFields.slice(-1)
 
     if (!leftRelationName) {
-      leftQualifierRelation = alias ?? from
+      leftQualifierRelation = primary.reference
     } else if (existingRelations.includes(leftRelationName)) {
       leftQualifierRelation = leftRelationName
     } else if (leftRelationName === joinedRelation) {
@@ -393,7 +405,7 @@ function processFromClause(fromClause: FromExpression): {
     const [rightColumnName] = rightColumnFields.slice(-1)
 
     if (!rightRelationName) {
-      rightQualifierRelation = alias ?? from
+      rightQualifierRelation = primary.reference
     } else if (existingRelations.includes(rightRelationName)) {
       rightQualifierRelation = rightRelationName
     } else if (rightRelationName === joinedRelation) {
@@ -457,9 +469,8 @@ function processFromClause(fromClause: FromExpression): {
     }
 
     return {
-      from,
-      alias,
-      embeddedTargets: [...embeddedTargets, embeddedTarget],
+      primary,
+      joined: [...joined, embeddedTarget],
     }
   } else {
     const [fieldType] = Object.keys(fromClause)
@@ -467,14 +478,10 @@ function processFromClause(fromClause: FromExpression): {
   }
 }
 
-function processTargetList(
-  targetList: SelectResTarget[],
-  from: string,
-  embeddedTargets: EmbeddedTarget[]
-): Target[] {
+function processTargetList(targetList: SelectResTarget[], relations: Relations): Target[] {
   // First pass: map each SQL target column to a PostgREST target 1-to-1
   const flattenedColumnTargets: (ColumnTarget | AggregateTarget)[] = targetList.map((resTarget) => {
-    const target = processQueryTarget(resTarget.ResTarget.val)
+    const target = processQueryTarget(resTarget.ResTarget.val, relations)
     target.alias = resTarget.ResTarget.name
 
     return target
@@ -494,20 +501,14 @@ function processTargetList(
     const [relationName] = qualifiedName.slice(-2, -1)
     const [columnName] = qualifiedName.slice(-1)
 
-    // If the column was prefixed with the primary table name
-    if (!relationName || relationName === from) {
-      // Strip the table name from the column
-      target.column = columnName
-
-      // Keep this column at the top level
+    // If there is no prefix, this column belongs to the primary relation at the top level
+    if (!relationName) {
       return true
     }
 
     // If this column is part of a joined relation
     if (relationName) {
-      const embeddedTarget = embeddedTargets.find(
-        (t) => (!t.alias && t.relation === relationName) || t.alias === relationName
-      )
+      const embeddedTarget = relations.joined.find((t) => (t.alias ?? t.relation) === relationName)
 
       if (!embeddedTarget) {
         throw new UnsupportedError(
@@ -530,15 +531,15 @@ function processTargetList(
   })
 
   // Third pass: nest embedded targets within each other based on the relations in their join qualifiers
-  const nestedEmbeddedTargets = embeddedTargets.reduce<EmbeddedTarget[]>(
+  const nestedEmbeddedTargets = relations.joined.reduce<EmbeddedTarget[]>(
     (output, embeddedTarget) => {
       // If the embedded target was joined with the primary relation, return it
-      if (embeddedTarget.joinedColumns.left.relation === from) {
+      if (embeddedTarget.joinedColumns.left.relation === relations.primary.reference) {
         return [...output, embeddedTarget]
       }
 
       // Otherwise identify the correct parent and nest it within its targets
-      const parent = embeddedTargets.find(
+      const parent = relations.joined.find(
         (t) => (t.alias ?? t.relation) === embeddedTarget.joinedColumns.left.relation
       )
 
@@ -558,7 +559,8 @@ function processTargetList(
 }
 
 function processQueryTarget(
-  queryTarget: TypeCast | ColumnRef | FuncCall | A_Expr
+  queryTarget: TypeCast | ColumnRef | FuncCall | A_Expr,
+  relations: Relations
 ): ColumnTarget | AggregateTarget {
   if ('TypeCast' in queryTarget) {
     const cast = renderDataType(queryTarget.TypeCast.typeName.names)
@@ -569,7 +571,7 @@ function processQueryTarget(
       )
     }
 
-    const nestedTarget = processQueryTarget(queryTarget.TypeCast.arg)
+    const nestedTarget = processQueryTarget(queryTarget.TypeCast.arg, relations)
 
     const { type } = nestedTarget
 
@@ -589,11 +591,11 @@ function processQueryTarget(
   } else if ('ColumnRef' in queryTarget) {
     return {
       type: 'column-target',
-      column: renderFields(queryTarget.ColumnRef.fields),
+      column: renderFields(queryTarget.ColumnRef.fields, relations),
     }
   } else if ('A_Expr' in queryTarget) {
     try {
-      return processJsonTarget(queryTarget)
+      return processJsonTarget(queryTarget, relations)
     } catch (err) {
       const maybeJsonHint =
         err instanceof Error && err.message === 'Invalid JSON path'
@@ -602,7 +604,7 @@ function processQueryTarget(
       throw new UnsupportedError(`Expressions not supported as targets`, maybeJsonHint)
     }
   } else if ('FuncCall' in queryTarget) {
-    const functionName = renderFields(queryTarget.FuncCall.funcname)
+    const functionName = renderFields(queryTarget.FuncCall.funcname, relations)
 
     if (!supportedAggregateFunctions.includes(functionName)) {
       throw new UnsupportedError(
@@ -628,7 +630,7 @@ function processQueryTarget(
 
     const [arg] = queryTarget.FuncCall.args
 
-    const nestedTarget = processQueryTarget(arg)
+    const nestedTarget = processQueryTarget(arg, relations)
 
     if (nestedTarget.type === 'aggregate-target') {
       throw new UnsupportedError(`Aggregate functions cannot contain another function`)
@@ -649,48 +651,24 @@ function processQueryTarget(
   }
 }
 
-function processWhereClause(expression: WhereExpression, from: string): Filter {
+function processWhereClause(expression: WhereExpression, relations: Relations): Filter {
   if ('A_Expr' in expression) {
     let column: string
 
+    if (expression.A_Expr.name.length > 1) {
+      throw new UnsupportedError('Only one operator name supported per expression')
+    }
+
     if ('A_Expr' in expression.A_Expr.lexpr) {
       try {
-        const target = processJsonTarget(expression.A_Expr.lexpr)
+        const target = processJsonTarget(expression.A_Expr.lexpr, relations)
         column = target.column
       } catch (err) {
         throw new UnsupportedError(`Left side of WHERE clause must be a column`)
       }
     } else if ('ColumnRef' in expression.A_Expr.lexpr) {
       const { fields } = expression.A_Expr.lexpr.ColumnRef
-
-      const [field] = fields
-
-      if (!('String' in field)) {
-        const [fieldType] = Object.keys(field)
-        throw new UnsupportedError(
-          `WHERE clause fields must be String type, received '${fieldType}'`
-        )
-      }
-
-      if (expression.A_Expr.name.length > 1) {
-        throw new UnsupportedError('Only one operator name supported per expression')
-      }
-
-      const stringFields = fields.filter((field): field is PgString => 'String' in field)
-      const qualifiedName = stringFields.map((field) => field.String.sval)
-
-      // Relation and column names are last two parts of the qualified name
-      const [relationName] = qualifiedName.slice(-2, -1)
-      const [columnName] = qualifiedName.slice(-1)
-
-      // If the column is prefixed with the primary table name, strip the prefix
-      if (!relationName || relationName === from) {
-        column = columnName
-      }
-      // Otherwise this is a foreign column, so keep the relation prefix
-      else {
-        column = [relationName, columnName].join('.')
-      }
+      column = renderFields(fields, relations)
     } else if ('TypeCast' in expression.A_Expr.lexpr) {
       throw new UnsupportedError('Casting is not supported in the WHERE clause')
     } else {
@@ -771,16 +749,7 @@ function processWhereClause(expression: WhereExpression, from: string): Filter {
   } else if ('NullTest' in expression) {
     const { fields } = expression.NullTest.arg.ColumnRef
 
-    const [field] = fields
-
-    if (!('String' in field)) {
-      const [fieldType] = Object.keys(field)
-      throw new UnsupportedError(`WHERE clause fields must be String type, received '${fieldType}'`)
-    }
-
-    const stringFields = fields.filter((field): field is PgString => 'String' in field)
-    const column = stringFields.map((field) => field.String.sval).join('.')
-
+    const column = renderFields(fields, relations)
     const negate = expression.NullTest.nulltesttype === 'IS_NOT_NULL'
     const operator = 'is'
     const value = null
@@ -805,7 +774,7 @@ function processWhereClause(expression: WhereExpression, from: string): Filter {
       throw new UnsupportedError(`Unknown boolop '${expression.BoolExpr.boolop}'`)
     }
 
-    const values = expression.BoolExpr.args.map((arg) => processWhereClause(arg, from))
+    const values = expression.BoolExpr.args.map((arg) => processWhereClause(arg, relations))
 
     // The 'not' operator is special - instead of wrapping its child,
     // we just return the child directly and set negate=true on it.
@@ -831,44 +800,20 @@ function processWhereClause(expression: WhereExpression, from: string): Filter {
   }
 }
 
-function processSortClause(sorts: SortBy[], from: string): Sort[] {
+function processSortClause(sorts: SortBy[], relations: Relations): Sort[] {
   return sorts.map((sortBy) => {
     let column: string
 
     if ('A_Expr' in sortBy.SortBy.node) {
       try {
-        const target = processJsonTarget(sortBy.SortBy.node)
+        const target = processJsonTarget(sortBy.SortBy.node, relations)
         column = target.column
       } catch (err) {
         throw new UnsupportedError(`ORDER BY clause must reference a column`)
       }
     } else if ('ColumnRef' in sortBy.SortBy.node) {
       const { fields } = sortBy.SortBy.node.ColumnRef
-
-      const [field] = fields
-
-      if (!('String' in field)) {
-        const [fieldType] = Object.keys(field)
-        throw new UnsupportedError(
-          `ORDER BY column fields must be String type, received '${fieldType}'`
-        )
-      }
-
-      const stringFields = fields.filter((field): field is PgString => 'String' in field)
-      const qualifiedName = stringFields.map((field) => field.String.sval)
-
-      // Relation and column names are last two parts of the qualified name
-      const [relationName] = qualifiedName.slice(-2, -1)
-      const [columnName] = qualifiedName.slice(-1)
-
-      // If the column is prefixed with the primary table name, strip the prefix
-      if (!relationName || relationName === from) {
-        column = columnName
-      }
-      // Otherwise this is a foreign column, so keep the relation prefix
-      else {
-        column = [relationName, columnName].join('.')
-      }
+      column = renderFields(fields, relations)
     } else if ('TypeCast' in sortBy.SortBy.node) {
       throw new UnsupportedError('Casting is not supported in the ORDER BY clause')
     } else {
@@ -1004,21 +949,40 @@ function mapOperatorSymbol(kind: A_Expr['A_Expr']['kind'], operatorSymbol: strin
   }
 }
 
-function renderFields(fields: Field[]) {
-  return fields
-    .map((field) => {
-      if ('String' in field) {
-        return field.String.sval
-      } else if ('A_Star' in field) {
-        return '*'
-      } else {
-        const [internalType] = Object.keys(field)
-        throw new UnsupportedError(
-          `Unsupported internal type '${internalType}' for data type names`
-        )
-      }
-    })
-    .join('.')
+function renderFields(fields: Field[], relations: Relations) {
+  // Get qualified column name segments, eg. `author.name` -> ['author', 'name']
+  const nameSegments = fields.map((field) => {
+    if ('String' in field) {
+      return field.String.sval
+    } else if ('A_Star' in field) {
+      return '*'
+    } else {
+      const [internalType] = Object.keys(field)
+      throw new UnsupportedError(`Unsupported internal type '${internalType}' for data type names`)
+    }
+  })
+
+  // Relation and column names are last two parts of the qualified name
+  const [relationName] = nameSegments.slice(-2, -1)
+  const [columnName] = nameSegments.slice(-1)
+
+  // If the column is prefixed with the primary relation, strip the prefix
+  if (!relationName || relationName === relations.primary.reference) {
+    return columnName
+  }
+  // If it's prefixed with a joined relation in the FROM clause, keep the relation prefix
+  else if (relations.joined.some((t) => (t.alias ?? t.relation) === relationName)) {
+    return [relationName, columnName].join('.')
+  }
+  // If it's prefixed with an unknown relation, throw an error
+  else {
+    const qualifiedName = [relationName, columnName].join('.')
+
+    throw new UnsupportedError(
+      `Found foreign column '${qualifiedName}' without a join to that relation`,
+      'Did you forget to join that relation or alias it to something else?'
+    )
+  }
 }
 
 function renderDataType(names: PgString[]) {
@@ -1050,7 +1014,7 @@ function renderDataType(names: PgString[]) {
   }
 }
 
-function processJsonTarget(expression: A_Expr): ColumnTarget {
+function processJsonTarget(expression: A_Expr, relations: Relations): ColumnTarget {
   if (expression.A_Expr.name.length > 1) {
     throw new UnsupportedError('Only one operator name supported per expression')
   }
@@ -1073,10 +1037,10 @@ function processJsonTarget(expression: A_Expr): ColumnTarget {
       throw new UnsupportedError('Invalid JSON path')
     }
   } else if ('A_Expr' in expression.A_Expr.lexpr) {
-    const { column } = processJsonTarget(expression.A_Expr.lexpr)
+    const { column } = processJsonTarget(expression.A_Expr.lexpr, relations)
     left = column
   } else if ('ColumnRef' in expression.A_Expr.lexpr) {
-    left = renderFields(expression.A_Expr.lexpr.ColumnRef.fields)
+    left = renderFields(expression.A_Expr.lexpr.ColumnRef.fields, relations)
   } else {
     throw new UnsupportedError('Invalid JSON path')
   }
@@ -1186,9 +1150,9 @@ export function flattenTargets(targets: Target[]): Target[] {
   })
 }
 
-function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: string) {
+function validateGroupClause(groupClause: ColumnRef[], targets: Target[], relations: Relations) {
   const groupByColumns =
-    groupClause.map((columnRef) => renderFields(columnRef.ColumnRef.fields)) ?? []
+    groupClause.map((columnRef) => renderFields(columnRef.ColumnRef.fields, relations)) ?? []
 
   if (
     !groupByColumns.every((column) =>
@@ -1198,15 +1162,14 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
           return false
         }
 
-        const paths = parent
+        const path = parent
           ? // joined columns have to be prefixed with their relation
-            [[parent.alias ?? parent.relation, target.column]]
-          : // top-level columns can be optionally prefixed with the primary table
-            [[target.column], [from, target.column]]
+            [parent.alias ?? parent.relation, target.column]
+          : // top-level columns will have no prefix
+            [target.column]
 
-        const qualifiedNames = paths.map((path) => path.join('.'))
-
-        return qualifiedNames.includes(column)
+        const qualifiedName = path.join('.')
+        return qualifiedName === column
       })
     )
   ) {
@@ -1220,15 +1183,15 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
         return true
       }
 
-      const paths = parent
+      const path = parent
         ? // joined columns have to be prefixed with their relation
-          [[parent.alias ?? parent.relation, target.column]]
-        : // top-level columns can be optionally prefixed with the primary table
-          [[target.column], [from, target.column]]
+          [parent.alias ?? parent.relation, target.column]
+        : // top-level columns will have no prefix
+          [target.column]
 
-      const qualifiedNames = paths.map((path) => path.join('.'))
+      const qualifiedName = path.join('.')
 
-      return groupByColumns.some((column) => qualifiedNames.includes(column))
+      return groupByColumns.some((column) => qualifiedName === column)
     })
   ) {
     throw new UnsupportedError(
