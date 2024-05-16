@@ -170,8 +170,9 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
 }
 
 export const formatSeconds = (value: number) => {
+  const hours = ~~(value / 3600)
   const minutes = Math.floor((value % 3600) / 60)
   const seconds = Math.floor(value % 60)
 
-  return `${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
+  return `${hours > 0 ? `${hours}h` : ''} ${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
 }
