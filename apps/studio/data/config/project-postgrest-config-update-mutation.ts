@@ -11,6 +11,7 @@ export type ProjectPostgrestConfigUpdateVariables = {
   dbSchema: string
   maxRows: string
   dbExtraSearchPath: string
+  dbPool: string | null
 }
 
 export async function updateProjectPostgrestConfig({
@@ -18,11 +19,13 @@ export async function updateProjectPostgrestConfig({
   dbSchema,
   maxRows,
   dbExtraSearchPath,
+  dbPool,
 }: ProjectPostgrestConfigUpdateVariables) {
   const response = await patch(`${API_URL}/projects/${projectRef}/config/postgrest`, {
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
+    db_pool: dbPool,
   })
 
   if (response.error) throw response.error

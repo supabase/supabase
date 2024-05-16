@@ -71,18 +71,20 @@ You can use the Snaplet configuration file `seed.mts` to define the values you w
 import { createSeedClient } from '@snaplet/seed'
 import { copycat } from '@snaplet/copycat'
 
-const seed = await createSeedClient();
+const seed = await createSeedClient()
 
-await seed.posts([{
-  title: "There is a lot of snow around here!"
-  createdBy: {
-    email: (ctx) =>
-      copycat.email(ctx.seed, {
-        domain: 'acme.org',
-      })
+await seed.posts([
+  {
+    title: 'There is a lot of snow around here!',
+    createdBy: {
+      email: (ctx) =>
+        copycat.email(ctx.seed, {
+          domain: 'acme.org',
+        }),
+    },
+    comments: (x) => x(3),
   },
-  comments: (x) => x(3)
-}])
+])
 ```
 
 Running `npx tsx seed.mts > supabase/seed.sql` generates the relevant SQL statements inside your `supabase/seed.sql` file:

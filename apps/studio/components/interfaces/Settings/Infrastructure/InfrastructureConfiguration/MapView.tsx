@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ComposableMap,
   Geographies,
@@ -17,25 +17,31 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMoreVertical,
   ScrollArea,
 } from 'ui'
 
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { AWS_REGIONS_KEYS, BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
+import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { MoreVertical } from 'lucide-react'
+import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
 interface MapViewProps {
   onSelectDeployNewReplica: (region: AWS_REGIONS_KEYS) => void
+  onSelectRestartReplica: (database: Database) => void
   onSelectDropReplica: (database: Database) => void
 }
 
-const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps) => {
+const MapView = ({
+  onSelectDeployNewReplica,
+  onSelectRestartReplica,
+  onSelectDropReplica,
+}: MapViewProps) => {
   const { ref } = useParams()
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
@@ -63,14 +69,10 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
   const selectedRegion = AVAILABLE_REPLICA_REGIONS.find(
     (region) => region.region === selectedRegionKey
   )
-  const databasesInSelectedRegion = useMemo(
-    () =>
-      databases
-        .filter((database) => database.region.includes(selectedRegionKey))
-        .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
-        .sort((database) => (database.identifier === ref ? -1 : 0)),
-    [ref, selectedRegionKey]
-  )
+  const databasesInSelectedRegion = databases
+    .filter((database) => database.region.includes(selectedRegionKey))
+    .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
+    .sort((database) => (database.identifier === ref ? -1 : 0))
 
   useEffect(() => {
     setTimeout(() => setMount(true), 100)
@@ -257,10 +259,12 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
                                 database.identifier.length > 0 &&
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
-                          {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
+                          {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                             <Badge variant="brand">Healthy</Badge>
-                          ) : database.status === PROJECT_STATUS.COMING_UP ? (
+                          ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
+                          ) : database.status === REPLICA_STATUS.RESTORING ? (
+                            <Badge>Restarting</Badge>
                           ) : (
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
@@ -273,9 +277,9 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
                       {database.identifier !== ref && (
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                            <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
+                          <DropdownMenuContent className="w-40" side="bottom" align="end">
                             <DropdownMenuItem className="gap-x-2">
                               <Link
                                 href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
@@ -283,7 +287,22 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            <div className="border-t" />
+                            <DropdownMenuItem className="gap-x-2">
+                              <Link
+                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                              >
+                                View replication lag
+                              </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={() => onSelectRestartReplica(database)}
+                            >
+                              Restart replica
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectDropReplica(database)}

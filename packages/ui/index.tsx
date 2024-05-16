@@ -1,7 +1,3 @@
-'use client'
-
-import * as React from 'react'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
@@ -116,6 +112,7 @@ export {
   FormDescription as FormDescription_Shadcn_,
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
+  useWatch as useWatch_Shadcn_,
 } from './src/components/shadcn/ui/form'
 
 export {
@@ -123,6 +120,7 @@ export {
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
   PopoverAnchor as PopoverAnchor_Shadcn_,
+  PopoverSeparator as PopoverSeparator_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {

@@ -1,3 +1,5 @@
+'use client'
+
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import announcement from '../data/Announcement.json'

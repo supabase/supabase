@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { Button, IconRewind } from 'ui'
+import { Button } from 'ui'
 
 import {
   Filters,
@@ -23,8 +23,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { Rewind } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { LOGS_TABLES } from './Logs.constants'
+import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -110,9 +111,23 @@ export const LogsPreviewer = ({
   }, [its, subscription])
 
   useEffect(() => {
-    if (readReplicasEnabled && db !== undefined) {
-      const database = databases?.find((d) => d.identifier === db)
-      if (database !== undefined) state.setSelectedDatabaseId(db)
+    if (readReplicasEnabled) {
+      if (db !== undefined) {
+        const database = databases?.find((d) => d.identifier === db)
+        if (database !== undefined) state.setSelectedDatabaseId(db)
+      } else if (
+        state.selectedDatabaseId !== undefined &&
+        state.selectedDatabaseId !== projectRef
+      ) {
+        if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
+          router.push({
+            pathname: router.pathname,
+            query: { ...router.query, db: state.selectedDatabaseId },
+          })
+        } else {
+          state.setSelectedDatabaseId(projectRef)
+        }
+      }
     }
   }, [readReplicasEnabled, db, isSuccess])
 
@@ -259,7 +274,7 @@ export const LogsPreviewer = ({
           <div className="border-t flex flex-row justify-between p-2">
             <Button
               onClick={loadOlder}
-              icon={<IconRewind />}
+              icon={<Rewind />}
               type="default"
               loading={isLoadingOlder}
               disabled={isLoadingOlder}

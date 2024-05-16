@@ -4,7 +4,6 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import type { Database } from './replicas-query'
 
 export type Region =
   | 'us-east-1'
@@ -56,32 +55,8 @@ export const useReadReplicaSetUpMutation = ({
     (vars) => setUpReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, region, size } = variables
-
-        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
-        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
-          const scaffoldNewDatabase: Database = {
-            db_port: 5432,
-            db_name: 'postgres',
-            db_user: 'postgres',
-            restUrl: '',
-            db_host: '',
-            connectionString: '',
-            identifier: `${projectRef}-rr-${region}-None`,
-            size,
-            region,
-            inserted_at: new Date().toISOString(),
-            status: 'COMING_UP',
-            cloud_provider: 'AWS',
-          }
-          return [...old, scaffoldNewDatabase]
-        })
-
-        // [Joshen] Wait 30 seconds before checking if the replica actually is coming up
-        setTimeout(async () => {
-          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        }, 30000)
-
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(replicaKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
