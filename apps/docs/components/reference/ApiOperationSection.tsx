@@ -1,17 +1,15 @@
-import { CodeBlock } from 'ui'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import { Tabs, TabPanel } from '~/components/Tabs'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import BodyContentTypeDropdown from '~/components/BodyContentTypeDropdown'
 import { useState } from 'react'
 import Options from '~/components/Options'
 import ApiBodyParam from '~/components/ApiBodyParam'
+import ApiSchema from '~/components/ApiSchema'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
   const bodyContentTypes = Object.keys(operation.requestBody?.content ?? {})
-  const [selectedContentType, setSelectedContentType] = useState(bodyContentTypes[0] || '')
+  const [selectedContentType, setSelectedContentType] = useState(bodyContentTypes[0] || undefined)
 
   const hasBodyArray =
     operation?.requestBody?.content[selectedContentType]?.schema?.type === 'array'
@@ -206,27 +204,18 @@ const ApiOperationSection = (props) => {
       </RefSubLayout.Details>
       {operation.responseList && operation.responseList.length > 0 && (
         <RefSubLayout.Examples>
-          <h5 className="mb-3 text-base text-foreground">Responses</h5>
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            defaultActiveId={operation.responseList[0].responseCode}
-            queryGroup="response-status"
-          >
-            {operation.responseList.map((response: any, i: number) => (
-              <TabPanel key={i} id={response.responseCode} label={response.responseCode}>
-                <ReactMarkdown className="text-foreground">{response.description}</ReactMarkdown>
-                {response?.content && response?.content['application/json'] && (
-                  <div className="mt-8">
-                    <CodeBlock language="bash" className="relative">
-                      {JSON.stringify(response.content['application/json'], null, 2)}
-                    </CodeBlock>
-                  </div>
-                )}
-              </TabPanel>
-            ))}
-          </Tabs>
+          <h5 className="mb-3 text-base text-foreground">Response</h5>
+          {operation.responseList[0] &&
+            operation.responseList[0]?.content &&
+            operation.responseList[0]?.content[selectedContentType ?? 'application/json'] && (
+              <ApiSchema
+                id={operation.operationId}
+                schema={
+                  operation.responseList[0].content[selectedContentType ?? 'application/json']
+                    .schema
+                }
+              ></ApiSchema>
+            )}
         </RefSubLayout.Examples>
       )}
     </RefSubLayout.Section>
