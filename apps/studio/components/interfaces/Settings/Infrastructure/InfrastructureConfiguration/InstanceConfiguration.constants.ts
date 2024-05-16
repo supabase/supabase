@@ -1,4 +1,4 @@
-import { ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
+import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
 
 import { components } from 'data/api'
 import { AWS_REGIONS, AWS_REGIONS_KEYS, PROJECT_STATUS } from 'lib/constants'
@@ -85,4 +85,12 @@ export const INIT_PROGRESS = {
   [ReadReplicaSetupProgress.DownloadedBaseBackup]: 'Replaying WAL archives',
   [ReadReplicaSetupProgress.ReplayedWalArchives]: 'Completing set up',
   [ReadReplicaSetupProgress.CompletedReadReplicaSetup]: 'Completed',
+}
+
+export const ERROR_STATES = {
+  [ReadReplicaSetupError.ReadReplicaInstanceLaunchFailed]: 'Failed to launch replica',
+  [ReadReplicaSetupError.InitiateReadReplicaSetupFailed]: 'Failed to initiate replica',
+  [ReadReplicaSetupError.DownloadBaseBackupFailed]: 'Failed to download backup',
+  [ReadReplicaSetupError.ReplayWalArchivesFailed]: 'Failed to replay WAL archives',
+  [ReadReplicaSetupError.CompleteReadReplicaSetupFailed]: 'Failed to set up replica',
 }

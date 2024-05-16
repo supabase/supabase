@@ -20,6 +20,7 @@ import {
   cn,
 } from 'ui'
 import {
+  ERROR_STATES,
   INIT_PROGRESS,
   NODE_SEP,
   NODE_WIDTH,
@@ -31,7 +32,7 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
-import { ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
+import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
 import SparkBar from 'components/ui/SparkBar'
 import { formatSeconds } from './InstanceConfiguration.utils'
 
@@ -186,11 +187,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     status: initStatus,
     progress,
     estimations,
+    error,
   } = (replicaInitializationStatus as {
     status?: string
     progress?: string
     estimations?: DatabaseInitEstimations
-  }) ?? { status: undefined, progress: undefined, estimations: undefined }
+    error?: string
+  }) ?? { status: undefined, progress: undefined, estimations: undefined, error: undefined }
 
   const stage = progress !== undefined ? Number(progress.split('_')[0]) : 0
   const stagePercent = stage / (Object.keys(INIT_PROGRESS).length - 1)
@@ -314,6 +317,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   </TooltipContent_Shadcn_>
                 )}
               </Tooltip_Shadcn_>
+            ) : error !== undefined ? (
+              <p className="text-sm text-foreground-light">
+                Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
+              </p>
             ) : (
               <p className="text-sm text-foreground-light">Created: {created}</p>
             )}
