@@ -246,7 +246,6 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
         table={props.table}
         sorts={sorts}
         filters={filters}
-        isRefetching={isRefetching}
         onAddRow={editable ? onAddRow : undefined}
         onAddColumn={editable ? onAddColumn : undefined}
         onImportData={editable ? onImportData : undefined}
