@@ -30,6 +30,7 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { SmoothstepEdge } from './Edge'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -142,6 +143,10 @@ const InstanceConfigurationUI = () => {
                 type: 'smoothstep',
                 animated: true,
                 className: '!cursor-default',
+                data: {
+                  identifier: database.identifier,
+                  connectionString: database.connectionString,
+                },
               }
             }),
           ]
@@ -158,6 +163,10 @@ const InstanceConfigurationUI = () => {
     }),
     []
   )
+
+  const edgeTypes = {
+    smoothstep: SmoothstepEdge,
+  }
 
   const setReactFlow = async () => {
     const graph = getDagreGraphLayout(nodes, edges)
@@ -250,6 +259,7 @@ const InstanceConfigurationUI = () => {
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color={backgroundPatternColor} />

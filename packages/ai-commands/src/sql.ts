@@ -4,43 +4,6 @@ import { jsonrepair } from 'jsonrepair'
 import OpenAI from 'openai'
 import { ContextLengthError, EmptyResponseError, EmptySqlError } from './errors'
 
-// Declare JSON schema for each function that the LLM can call
-const generateSqlSchema = SchemaBuilder.emptySchema()
-  .addString('sql', {
-    description: stripIndent`
-      The generated SQL (must be valid SQL).
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - Prefer creating foreign key references in the create statement
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
-      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-      - Always use semicolons
-    `,
-  })
-  .addString('title', {
-    description: stripIndent`
-      The title of the SQL.
-      - Omit words like 'SQL', 'Postgres', or 'Query'
-    `,
-  })
-
-const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
-  description: stripIndent`
-      The modified SQL (must be valid SQL).
-      - Assume the query hasn't been executed yet
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - When creating tables, always add foreign key references inline
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
-      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-      - Use real examples when possible
-      - Add constraints if requested
-      - Always use semicolons
-    `,
-})
-
 const debugSqlSchema = SchemaBuilder.emptySchema()
   .addString('solution', {
     description: 'A short suggested solution for the error (as concise as possible).',
@@ -64,23 +27,11 @@ const generateTitleSchema = SchemaBuilder.emptySchema()
   })
 
 // Reference auto-generated types for each JSON schema
-export type GenerateSqlResult = typeof generateSqlSchema.T
-export type EditSqlResult = typeof editSqlSchema.T
 export type DebugSqlResult = typeof debugSqlSchema.T
 export type GenerateTitleResult = typeof generateTitleSchema.T
 
 // Combine the completion functions
 const completionFunctions = {
-  generateSql: {
-    name: 'generateSql',
-    description: 'Generates Postgres SQL based on a natural language prompt',
-    parameters: generateSqlSchema.schema as Record<string, unknown>,
-  },
-  editSql: {
-    name: 'editSql',
-    description: "Edits a Postgres SQL query based on the user's instructions",
-    parameters: editSqlSchema.schema as Record<string, unknown>,
-  },
   debugSql: {
     name: 'debugSql',
     description: stripIndent`
@@ -108,164 +59,6 @@ const completionFunctions = {
     parameters: generateTitleSchema.schema as Record<string, unknown>,
   },
 } satisfies Record<string, OpenAI.Chat.Completions.ChatCompletionCreateParams.Function>
-
-/**
- * Generates a SQL snippet based on the provided prompt.
- *
- * @returns The generated SQL along with a title for it.
- */
-export async function generateSql(openai: OpenAI, prompt: string, entityDefinitions?: string[]) {
-  const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
-
-  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
-
-  if (hasEntityDefinitions) {
-    completionMessages.push({
-      role: 'user',
-      content: codeBlock`
-        Here is my database schema for reference:
-        ${entityDefinitions.join('\n\n')}
-      `,
-    })
-  }
-
-  completionMessages.push({
-    role: 'user',
-    content: prompt,
-  })
-
-  try {
-    const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
-      messages: completionMessages,
-      max_tokens: 1024,
-      temperature: 0,
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: completionFunctions.generateSql.name,
-        },
-      },
-      tools: [
-        {
-          type: 'function',
-          function: completionFunctions.generateSql,
-        },
-      ],
-      stream: false,
-    })
-
-    const [firstChoice] = completionResponse.choices
-    const [firstTool] = firstChoice.message?.tool_calls ?? []
-
-    const sqlResponseString = firstTool?.function.arguments
-
-    if (!sqlResponseString) {
-      throw new EmptyResponseError()
-    }
-
-    const repairedJsonString = jsonrepair(sqlResponseString)
-
-    const result: GenerateSqlResult = JSON.parse(repairedJsonString)
-
-    if (!result.sql) {
-      throw new EmptySqlError()
-    }
-
-    return result
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'context_length_exceeded') {
-      throw new ContextLengthError()
-    }
-    throw error
-  }
-}
-
-/**
- * Modifies a SQL snippet based on the provided prompt.
- *
- * @returns The modified SQL.
- */
-export async function editSql(
-  openai: OpenAI,
-  prompt: string,
-  sql: string,
-  entityDefinitions?: string[]
-) {
-  const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
-
-  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
-
-  if (hasEntityDefinitions) {
-    completionMessages.push({
-      role: 'user',
-      content: codeBlock`
-        Here is my database schema for reference:
-        ${entityDefinitions.join('\n\n')}
-      `,
-    })
-  }
-
-  completionMessages.push(
-    {
-      role: 'user',
-      content: stripIndent`
-        Here is my current SQL:
-        ${sql}
-      `,
-    },
-    {
-      role: 'user',
-      content: prompt,
-    }
-  )
-
-  try {
-    const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
-      messages: completionMessages,
-      max_tokens: 2048,
-      temperature: 0,
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: completionFunctions.editSql.name,
-        },
-      },
-      tools: [
-        {
-          type: 'function',
-          function: completionFunctions.editSql,
-        },
-      ],
-      stream: false,
-    })
-
-    const [firstChoice] = completionResponse.choices
-    const [firstTool] = firstChoice.message?.tool_calls ?? []
-
-    const sqlResponseString = firstTool?.function.arguments
-
-    if (!sqlResponseString) {
-      throw new EmptyResponseError()
-    }
-
-    const repairedJsonString = jsonrepair(sqlResponseString)
-
-    const result: EditSqlResult = JSON.parse(repairedJsonString)
-
-    if (!result.sql) {
-      throw new EmptySqlError()
-    }
-
-    return result
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'context_length_exceeded') {
-      throw new ContextLengthError()
-    }
-    throw error
-  }
-}
 
 /**
  * Debugs SQL errors.
