@@ -5028,6 +5028,7 @@ export interface components {
       is_default: boolean
       git_branch?: string
       pr_number?: number
+      latest_check_run_id?: number
       reset_on_push: boolean
       persistent: boolean
       /** @enum {string} */
