@@ -1,0 +1,29 @@
+---
+id: 'log-drains'
+title: 'Log Drains'
+description: 'Getting started with Supabase Log Drains'
+---
+
+Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Teams and Enterprise plans. See [pricing](https://supabase.com/pricing) for more information.
+
+<Admonition type="note">
+
+Log drains is in **Private Alpha**, and is not available in the dashboared yet. Please reach out to [support](https://supabase.com/support) and indicate your interest in enabling log drains for your project.
+
+</Admonition>
+
+The following table lists the supported destinations and the required setup configuration:
+
+| Destination | Transport Method | Configuration         |
+| ----------- | ---------------- | --------------------- |
+| Datadog     | HTTP             | API Key <br /> Region |
+
+### Destinations and Behaviour
+
+HTTP requests will be batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
+
+#### Datadog
+
+Logs sent to datadog will have the name of the log source set on the `service` field of the event.
+
+The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.

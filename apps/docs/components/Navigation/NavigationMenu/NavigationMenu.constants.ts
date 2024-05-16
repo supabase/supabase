@@ -1655,6 +1655,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Log Drains', url: '/guides/platform/log-drains' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
         { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
       ],
