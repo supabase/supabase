@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 import type { components } from 'data/api'
@@ -30,7 +30,7 @@ export async function updateOrganization({
     body: payload,
   })
 
-  if (error) throw error
+  if (error) throw handleError(error)
   return data
 }
 

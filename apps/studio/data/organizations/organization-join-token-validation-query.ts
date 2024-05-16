@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { components } from 'data/api'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
@@ -20,7 +20,7 @@ export async function validateTokenInformation(
     signal,
   })
 
-  if (error) throw error
+  if (error) throw handleError(error)
   return data
 }
 

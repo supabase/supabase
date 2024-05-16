@@ -30,7 +30,7 @@ export async function updateBranch({
     },
   })
 
-  if (error) throw error
+  if (error) throw handleError(error)
   return data
 }
 

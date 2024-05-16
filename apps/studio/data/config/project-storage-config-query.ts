@@ -1,9 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
-import { configKeys } from './keys'
-import type { ResponseError } from 'types'
+
 import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { configKeys } from './keys'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string

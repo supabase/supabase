@@ -30,7 +30,7 @@ export async function sendUpgradeFeedback({
       ...(message !== undefined && { additionalFeedback: message }),
     },
   })
-  if (error) handleError(error)
+  if (error) throw handleError(error)
   return data
 }
 

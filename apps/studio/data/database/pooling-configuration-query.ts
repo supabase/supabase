@@ -21,7 +21,7 @@ export async function getPoolingConfiguration(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) handleError(error)
+  if (error) throw handleError(error)
   return data
 }
 

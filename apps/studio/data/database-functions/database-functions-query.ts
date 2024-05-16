@@ -1,5 +1,5 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
 import type { components } from 'data/api'
@@ -26,7 +26,7 @@ export async function getDatabaseFunctions(
     signal,
   })
 
-  if (error) throw error
+  if (error) throw handleError(error)
   // [Joshen] API codegen is wrong, its matching Edge functions type to database functions
   return data as unknown as DatabaseFunction[]
 }
