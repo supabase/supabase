@@ -19,7 +19,20 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { NODE_SEP, NODE_WIDTH, REPLICA_STATUS, Region } from './InstanceConfiguration.constants'
+import {
+  INIT_PROGRESS,
+  NODE_SEP,
+  NODE_WIDTH,
+  REPLICA_STATUS,
+  Region,
+} from './InstanceConfiguration.constants'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
+import { ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
+import SparkBar from 'components/ui/SparkBar'
 
 interface NodeData {
   id: string
@@ -164,14 +177,33 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   const { ref } = useParams()
   const created = dayjs(inserted_at).format('DD MMM YYYY')
 
-  const isInTransition = (
-    [
-      REPLICA_STATUS.COMING_UP,
-      REPLICA_STATUS.GOING_DOWN,
-      REPLICA_STATUS.RESTORING,
-      REPLICA_STATUS.INIT_READ_REPLICA,
-    ] as string[]
-  ).includes(status)
+  const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
+  const { replicaInitializationStatus } =
+    (databaseStatuses ?? []).find((db) => db.identifier === id) || {}
+
+  const {
+    status: initStatus,
+    progress,
+    estimations,
+  } = (replicaInitializationStatus as {
+    status?: string
+    progress?: string
+    estimations?: DatabaseInitEstimations
+  }) ?? { status: undefined, progress: undefined, estimations: undefined }
+
+  const stage = progress !== undefined ? Number(progress.split('_')[0]) : 0
+  const stagePercent = stage / (Object.keys(INIT_PROGRESS).length - 1)
+
+  const isInTransition =
+    (
+      [
+        REPLICA_STATUS.UNKNOWN,
+        REPLICA_STATUS.COMING_UP,
+        REPLICA_STATUS.GOING_DOWN,
+        REPLICA_STATUS.RESTORING,
+        REPLICA_STATUS.INIT_READ_REPLICA,
+      ] as string[]
+    ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
 
   return (
     <>
@@ -184,7 +216,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
           <div
             className={cn(
               'w-8 h-8 border rounded-md flex items-center justify-center',
-              status === REPLICA_STATUS.ACTIVE_HEALTHY
+              status === REPLICA_STATUS.ACTIVE_HEALTHY &&
+                initStatus === ReplicaInitializationStatus.Completed
                 ? 'bg-brand-400 border-brand-500'
                 : 'bg-surface-100 border-foreground/20'
             )}
@@ -200,11 +233,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <p className="text-sm truncate">
                 Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
               </p>
-              {status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
-              ) : status === REPLICA_STATUS.INIT_READ_REPLICA ? (
-                <Badge>Initializing</Badge>
-              ) : status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
+              {initStatus === ReplicaInitializationStatus.InProgress ||
+              status === REPLICA_STATUS.COMING_UP ||
+              status === REPLICA_STATUS.UNKNOWN ||
+              status === REPLICA_STATUS.INIT_READ_REPLICA ? (
+                <Badge>Coming up</Badge>
+              ) : initStatus === ReplicaInitializationStatus.Failed ||
+                status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
                   <Badge variant="destructive">Init failed</Badge>
                   <Tooltip_Shadcn_>
@@ -221,12 +256,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                     </TooltipContent_Shadcn_>
                   </Tooltip_Shadcn_>
                 </>
-              ) : status === REPLICA_STATUS.COMING_UP || status === REPLICA_STATUS.UNKNOWN ? (
-                <Badge>Coming up</Badge>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
                 <Badge>Restarting</Badge>
+              ) : initStatus === ReplicaInitializationStatus.Completed &&
+                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                <Badge variant="brand">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -235,11 +271,28 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
                 <span>{provider}</span>
-                <span>•</span>
-                <span>{computeSize}</span>
+                {!!computeSize && (
+                  <>
+                    <span>•</span>
+                    <span>{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
-            <p className="text-sm text-foreground-light">Created: {created}</p>
+            {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
+              <div className="w-52 -mt-0.5">
+                <SparkBar
+                  labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
+                  labelBottomClass="text-xs !normal-nums text-foreground-light"
+                  type="horizontal"
+                  value={stagePercent * 100}
+                  max={100}
+                  barClass="bg-brand"
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-foreground-light">Created: {created}</p>
+            )}
           </div>
         </div>
         <DropdownMenu modal={false}>
