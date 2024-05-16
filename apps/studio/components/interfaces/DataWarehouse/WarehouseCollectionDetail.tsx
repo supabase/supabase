@@ -2,31 +2,20 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  IconRefreshCcw,
-  IconRewind,
-} from 'ui'
+import { Button } from 'ui'
 import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import Link from 'next/link'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
 import { TestCollectionDialog } from './TestCollectionDialog'
+import { RefreshCcw, Rewind } from 'lucide-react'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
   const collectionToken = router.query.collectionToken as string
   const projectRef = router.query.ref as string
   const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
-
-  const notProd = process.env.NODE_ENV !== 'production'
 
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef },
@@ -53,7 +42,7 @@ export const WarehouseCollectionDetail = () => {
         `,
       })
     }
-  }, [collection, pagination])
+  }, [collection, pagination, params])
 
   const {
     isLoading: queryLoading,
@@ -124,36 +113,37 @@ export const WarehouseCollectionDetail = () => {
 
         {!isError && (
           <div className="border-t flex flex-row justify-between p-2">
+            {/* <pre>{JSON.stringify(pagination)}</pre> */}
             <div className="flex items-center gap-2">
               {results.length > 0 && (
                 <>
                   <Button
                     onClick={loadOlder}
-                    icon={<IconRewind />}
+                    icon={<Rewind />}
                     type="default"
                     loading={isLoading}
                     disabled={isLoading}
                   >
                     Load older
                   </Button>
-                  {pagination.offset !== 0 && (
-                    <>
-                      <Button
-                        onClick={() => setPagination({ ...pagination, offset: 0 })}
-                        type="default"
-                        loading={isLoading}
-                        disabled={isLoading}
-                      >
-                        Load latest
-                      </Button>
-                    </>
-                  )}
+                </>
+              )}
+              {pagination.offset !== 0 && (
+                <>
+                  <Button
+                    onClick={() => setPagination({ ...pagination, offset: 0 })}
+                    type="default"
+                    loading={isLoading}
+                    disabled={isLoading}
+                  >
+                    Load latest
+                  </Button>
                 </>
               )}
             </div>
             <Button
               onClick={() => refetch()}
-              icon={<IconRefreshCcw />}
+              icon={<RefreshCcw />}
               type="default"
               loading={isLoading}
               disabled={isLoading}

@@ -17,7 +17,6 @@ import {
   IconDownload,
   IconEye,
   IconEyeOff,
-  IconPlay,
   cn,
 } from 'ui'
 
@@ -25,6 +24,7 @@ import CSVButton from 'components/ui/CSVButton'
 import { useCheckPermissions } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { Play } from 'lucide-react'
 import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
@@ -220,7 +220,8 @@ const LogTable = ({
     <div
       className={cn(
         'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
-        className
+        className,
+        { hidden: hideHeader }
       )}
     >
       <div className="flex items-center gap-2">
@@ -294,10 +295,11 @@ const LogTable = ({
           </Tooltip.Root>
         )}
         <Button
+          title="run-logs-query"
           type={hasEditorValue ? 'primary' : 'alternative'}
           disabled={!hasEditorValue}
           onClick={onRun}
-          iconRight={<IconPlay />}
+          iconRight={<Play size={12} />}
           loading={isLoading}
         >
           Run
@@ -345,73 +347,70 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <>
-      <section className={'flex w-full flex-col h-full'} style={{ maxHeight: _maxHeight }}>
-        {!hideHeader && <LogsExplorerTableHeader />}
-        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
-          <DataGrid
-            style={{ height: '100%' }}
-            className={`
+    <section
+      className={'flex w-full flex-col h-full' + (!queryType ? '' : '')}
+      style={{ maxHeight }}
+    >
+      {!queryType && <LogsExplorerTableHeader />}
+      <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
+        <DataGrid
+          role="table"
+          style={{ height: '100%' }}
+          className={`
             flex-1 flex-grow h-full
             ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
           `}
-            rowHeight={40}
-            headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ rowIdx }) => {
-              if (!hasId) return
-              setFocusedLog(data[rowIdx] as LogData)
-            }}
-            selectedRows={new Set([])}
-            columns={columns}
-            rowClass={(row: LogData) =>
-              [
-                'font-mono tracking-tight',
-                isEqual(row, focusedLog)
-                  ? 'rdg-row--focused'
-                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-              ].join(' ')
+          rowHeight={40}
+          headerRowHeight={queryType ? 0 : 28}
+          onSelectedCellChange={({ rowIdx }) => {
+            if (!hasId) return
+            setFocusedLog(data[rowIdx] as LogData)
+          }}
+          selectedRows={new Set([])}
+          columns={columns}
+          rowClass={(row: LogData) =>
+            [
+              'font-mono tracking-tight',
+              isEqual(row, focusedLog)
+                ? '!bg-border-stronger rdg-row--focused'
+                : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
+            ].join(' ')
+          }
+          rows={logDataRows}
+          rowKeyGetter={(r) => {
+            if (!hasId) return JSON.stringify(r)
+            const row = r as LogData
+            return row.id
+          }}
+          // [Next 18 refactor] need to fix
+          // onRowClick={setFocusedLog}
+          renderers={{
+            renderRow: RowRenderer,
+            noRowsFallback: !isLoading ? (
+              <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                {!error && renderNoResultAlert()}
+                {error && renderErrorAlert()}
+              </div>
+            ) : null,
+          }}
+        />
+        {logDataRows.length > 0 ? (
+          <div
+            className={
+              queryType ? 'flex w-1/2 flex-col' : focusedLog ? 'flex w-1/2 flex-col' : 'hidden w-0'
             }
-            rows={logDataRows}
-            rowKeyGetter={(r) => {
-              if (!hasId) return JSON.stringify(r)
-              const row = r as LogData
-              return row.id
-            }}
-            // [Next 18 refactor] need to fix
-            // onRowClick={setFocusedLog}
-            renderers={{
-              renderRow: RowRenderer,
-              noRowsFallback: !isLoading ? (
-                <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                  {!error && renderNoResultAlert()}
-                  {error && renderErrorAlert()}
-                </div>
-              ) : null,
-            }}
-          />
-          {logDataRows.length > 0 ? (
-            <motion.div
-              variants={{
-                hidden: { width: 0 },
-                visible: { width: '50%' },
-              }}
-              initial="hidden"
-              animate={focusedLog ? 'visible' : 'hidden'}
-              exit="hidden"
-              transition={{ duration: 0.2 }}
-            >
-              <LogSelection
-                projectRef={projectRef}
-                onClose={() => setFocusedLog(null)}
-                log={focusedLog}
-                queryType={queryType}
-                params={params}
-              />
-            </motion.div>
-          ) : null}
-        </div>
-      </section>
-    </>
+          >
+            <LogSelection
+              projectRef={projectRef}
+              onClose={() => setFocusedLog(null)}
+              log={focusedLog}
+              queryType={queryType}
+              params={params}
+            />
+          </div>
+        ) : null}
+      </div>
+    </section>
   )
 }
 export default LogTable
