@@ -690,7 +690,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     </div>
 
                     {docsResults.length > 0 && hasResults && (
-                      <div>
+                      <div className="py-4 px-6 bg-surface-200 mx-6">
+                        <h2 className="text-sm text-foreground-light">Suggested resources</h2>
                         {docsResults.slice(0, 5).map((page, i) => (
                           <Command key={page.id}>
                             <CommandGroup
