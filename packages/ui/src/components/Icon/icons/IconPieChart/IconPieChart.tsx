@@ -9,5 +9,12 @@
     return <IconBase icon={PieChart} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { pieChart } from 'lucide-react'
+  */
   export default IconPieChart
   

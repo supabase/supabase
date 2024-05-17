@@ -1,6 +1,7 @@
 import dagre from '@dagrejs/dagre'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
@@ -12,13 +13,13 @@ import ReactFlow, {
   ReactFlowProvider,
   useReactFlow,
 } from 'reactflow'
+import 'reactflow/dist/style.css'
 
-import { PostgresTable } from '@supabase/postgres-meta'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTheme } from 'next-themes'
-import 'reactflow/dist/style.css'
-import { IconLoader, TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui'
+import { IconLoader } from 'ui'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui-patterns/SchemaTableNode'
+import SchemaGraphLegend from './SchemaGraphLegend'
 
 type TableNodeData = {
   name: string
@@ -258,6 +259,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
             maskColor={miniMapMaskColor}
             className="border rounded-md shadow-sm"
           />
+          <SchemaGraphLegend />
         </ReactFlow>
       </div>
     </>
@@ -275,6 +277,7 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema,
+    includeColumns: true,
   })
 
   if (isLoading) {
@@ -302,4 +305,4 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
   )
 }
 
-export default observer(SchemaGraph)
+export default SchemaGraph

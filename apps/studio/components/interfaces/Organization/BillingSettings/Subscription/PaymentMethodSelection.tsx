@@ -1,15 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
 
-import { useParams } from 'common'
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
@@ -22,8 +22,6 @@ const PaymentMethodSelection = ({
   onSelectPaymentMethod,
   layout = 'vertical',
 }: PaymentMethodSelectionProps) => {
-  const { ui } = useStore()
-  const { ref: projectRef } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
   const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
@@ -167,10 +165,7 @@ const PaymentMethodSelection = ({
         onCancel={() => setShowAddNewPaymentMethodModal(false)}
         onConfirm={async () => {
           setShowAddNewPaymentMethodModal(false)
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully added new payment method',
-          })
+          toast.success('Successfully added new payment method')
           const { data } = await refetchPaymentMethods()
           if (data?.length) {
             // Preselect the card that was just added

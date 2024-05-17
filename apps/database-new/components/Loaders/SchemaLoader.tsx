@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react'
 
-const SchemaLoader = async () => {
+const SchemaLoader = () => {
   return (
     <div className="h-full w-full text-muted justify-start">
       <div className="flex items-center m-4 gap-2">

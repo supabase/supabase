@@ -1,4 +1,4 @@
-import { Button, IconPlayCircle } from 'ui'
+import { Button, IconPlayCircle, cn } from 'ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import Image from 'next/image'
@@ -32,14 +32,14 @@ interface Types {
 
 const ProductHeaderCentered = (props: Types) => (
   <div
-    className={[
+    className={cn(
       'container relative w-full mx-auto px-6 pt-2 pb-0 sm:px-16 xl:px-20',
-      props.className,
-    ].join(' ')}
+      props.className
+    )}
   >
     <div className="flex flex-col text-center items-center">
       {props.image && typeof props.image === 'string' ? (
-        <div className="relative w-full max-w-[830px] mx-auto z-0 aspect-[2.3/1] -mb-8 md:-mb-12 lg:-mb-16">
+        <div className="relative w-full max-w-[630px] mx-auto z-0 aspect-[2.3/1] -mt-8 -mb-8 md:-mb-12 lg:-mb-12">
           <Image
             src={props.image}
             priority
@@ -56,7 +56,7 @@ const ProductHeaderCentered = (props: Types) => (
       )}
       <div className="relative w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
         {props.announcement && (
-          <AnnouncementBadge {...props.announcement} className="pb-4 md:pb-8 z-10" />
+          <AnnouncementBadge {...props.announcement} className="pb-4 md:pb-4 z-10" />
         )}
         <div>
           {props.icon || props.title ? (
@@ -73,13 +73,13 @@ const ProductHeaderCentered = (props: Types) => (
             </div>
           ) : null}
         </div>
-        <div className={[styles['appear-from-bottom']].join(' ')}>
-          <h1 className="h1 text-3xl md:text-4xl xl:!text-5xl tracking-[-1.5px]" key={`h1`}>
+        <div className={cn(styles['appear-from-bottom'])}>
+          <h1 className="h1 text-3xl md:text-4xl tracking-[-1.5px]" key={`h1`}>
             {props.h1}
           </h1>
           <p className="p !text-foreground-light">{props.subheader}</p>
         </div>
-        <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:pt-8 sm:items-center gap-2">
+        <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
             <Button size="medium" className="text-white" asChild>
               <Link href={props.cta.link} as={props.cta.link}>

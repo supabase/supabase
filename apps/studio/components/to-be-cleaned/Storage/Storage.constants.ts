@@ -33,16 +33,6 @@ export const STORAGE_ROW_STATUS = {
   EDITING: 'EDITING',
 }
 
-export const STORAGE_POLICY_DEFAULT_DEFINITION_PLACEHOLDER = `/*
-  Example: Apply this policy to all authenticated users
-  for a folder called 'public'
-
-  storage.foldername(name))[[1]] = 'public'
-  and auth.role() = 'authenticated'
-*/
-
-`
-
 export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   upload: ['INSERT'],
   download: ['SELECT'],

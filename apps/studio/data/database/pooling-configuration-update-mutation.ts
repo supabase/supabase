@@ -1,37 +1,28 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdatePgbouncerConfigBody']
+} & components['schemas']['UpdateSupavisorConfigBody']
 
 export async function updatePoolingConfiguration({
   ref,
-  pgbouncer_enabled,
-  ignore_startup_parameters,
   pool_mode,
   default_pool_size,
-  max_client_conn,
 }: PoolingConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
-  const { data, error } = await patch('/platform/projects/{ref}/config/pgbouncer', {
+  const { data, error } = await patch('/platform/projects/{ref}/config/supavisor', {
     params: { path: { ref } },
-    body: {
-      pgbouncer_enabled,
-      default_pool_size,
-      ignore_startup_parameters,
-      pool_mode,
-      max_client_conn,
-    },
+    body: { default_pool_size, pool_mode },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

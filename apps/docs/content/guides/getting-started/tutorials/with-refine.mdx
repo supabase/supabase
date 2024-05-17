@@ -1,0 +1,629 @@
+---
+title: 'Build a User Management App with refine'
+description: 'Learn how to use Supabase in your refine App.'
+---
+
+<QuickstartIntro />
+
+![Supabase User Management example](/docs/img/user-management-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
+
+</Admonition>
+
+## About refine
+
+[refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as logging in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction that is equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
+
+refine provides hassle-free integration with Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/master/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose Supabase as our backend service while creating the app with `create refine-app`.
+
+<Admonition type="note">
+
+It is possible to customize the `authProvider` for Supabase and as we'll see below, it can be tweaked from `src/authProvider.ts` file. In contrast, the Supabase `dataProvider` is part of `node_modules` and therefore is not subject to modification.
+
+</Admonition>
+
+<ProjectSetup />
+
+## Building the app
+
+Let's start building the refine app from scratch.
+
+### Initialize a refine app
+
+We can use [create refine-app](https://refine.dev/docs/tutorial/getting-started/headless/create-project/#launch-the-refine-cli-setup) command to initialize
+an app. Run the following in the terminal:
+
+```bash
+npm create refine-app@latest -- --preset refine-supabase
+```
+
+In the above command, we are using the `refine-supabase` preset which chooses the Supabase supplementary package for our app. We are not using any UI framework, so we'll have a headless UI with plain React and CSS styling.
+
+The `refine-supabase` preset installs the `@refinedev/supabase` package which out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
+
+We also need to install `@refinedev/react-hook-form` and `react-hook-form` packages that allow us to use [React Hook Form](https://react-hook-form.com) inside refine apps. Run:
+
+```bash
+npm install @refinedev/react-hook-form react-hook-form
+```
+
+With the app initialized and packages installed, at this point before we begin discussing refine concepts, let's try running the app:
+
+```bash
+cd app-name
+npm run dev
+```
+
+We should have a running instance of the app with a Welcome page at `http://localhost:5173`.
+
+Let's move ahead to understand the generated code now.
+
+### Refine `supabaseClient`
+
+The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `SUPABASE_URL` and `SUPABASE_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
+
+We'll update it with environment variables managed by Vite:
+
+```ts src/utility/supabaseClient.ts
+import { createClient } from '@refinedev/supabase'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    persistSession: true,
+  },
+})
+```
+
+And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+
+```bash .env.local
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using Refine's auth provider methods and CRUD actions with appropriate data provider methods.
+
+One optional step is to update the CSS file `src/App.css` to make the app look nice.
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/refine-user-management/src/App.css).
+
+In order for us to add login and user profile pages in this App, we have to tweak the `<Refine />` component inside `App.tsx`.
+
+### The `<Refine />` Component
+
+The `App.tsx` file initially looks like this:
+
+```tsx src/App.tsx
+import { Refine, WelcomePage } from '@refinedev/core'
+import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
+import routerBindings, {
+  DocumentTitleHandler,
+  UnsavedChangesNotifier,
+} from '@refinedev/react-router-v6'
+import { dataProvider, liveProvider } from '@refinedev/supabase'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+import './App.css'
+import authProvider from './authProvider'
+import { supabaseClient } from './utility'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <RefineKbarProvider>
+        <Refine
+          dataProvider={dataProvider(supabaseClient)}
+          liveProvider={liveProvider(supabaseClient)}
+          authProvider={authProvider}
+          routerProvider={routerBindings}
+          options={{
+            syncWithLocation: true,
+            warnWhenUnsavedChanges: true,
+          }}
+        >
+          <Routes>
+            <Route index element={<WelcomePage />} />
+          </Routes>
+          <RefineKbar />
+          <UnsavedChangesNotifier />
+          <DocumentTitleHandler />
+        </Refine>
+      </RefineKbarProvider>
+    </BrowserRouter>
+  )
+}
+
+export default App
+```
+
+We'd like to focus on the [`<Refine />`](https://refine.dev/docs/api-reference/core/components/refine-config/) component, which comes with several props passed to it. Notice the `dataProvider` prop. It uses a `dataProvider()` function with `supabaseClient` passed as argument to generate the data provider object. The `authProvider` object also uses `supabaseClient` in implementing its methods. You can look it up in `src/authProvider.ts` file.
+
+## Customize `authProvider`
+
+If you examine the `authProvider` object you can notice that it has a `login` method that implements a OAuth and Email / Password strategy for authentication. We'll, however, remove them and use Magic Links to allow users sign in with their email without using passwords.
+
+We want to use `supabaseClient` auth's `signInWithOtp` method inside `authProvider.login` method:
+
+```ts
+login: async ({ email }) => {
+  try {
+    const { error } = await supabaseClient.auth.signInWithOtp({ email });
+
+    if (!error) {
+      alert("Check your email for the login link!");
+      return {
+        success: true,
+      };
+    };
+
+    throw error;
+  } catch (e: any) {
+    alert(e.message);
+    return {
+      success: false,
+      e,
+    };
+  }
+},
+```
+
+We also want to remove `register`, `updatePassword`, `forgotPassword` and `getPermissions` properties, which are optional type members and also not necessary for our app. The final `authProvider` object looks like this:
+
+```ts src/authProvider.ts
+import { AuthBindings } from '@refinedev/core'
+
+import { supabaseClient } from './utility'
+
+const authProvider: AuthBindings = {
+  login: async ({ email }) => {
+    try {
+      const { error } = await supabaseClient.auth.signInWithOtp({ email })
+
+      if (!error) {
+        alert('Check your email for the login link!')
+        return {
+          success: true,
+        }
+      }
+
+      throw error
+    } catch (e: any) {
+      alert(e.message)
+      return {
+        success: false,
+        e,
+      }
+    }
+  },
+  logout: async () => {
+    const { error } = await supabaseClient.auth.signOut()
+
+    if (error) {
+      return {
+        success: false,
+        error,
+      }
+    }
+
+    return {
+      success: true,
+      redirectTo: '/',
+    }
+  },
+  onError: async (error) => {
+    console.error(error)
+    return { error }
+  },
+  check: async () => {
+    try {
+      const { data } = await supabaseClient.auth.getSession()
+      const { session } = data
+
+      if (!session) {
+        return {
+          authenticated: false,
+          error: {
+            message: 'Check failed',
+            name: 'Session not found',
+          },
+          logout: true,
+          redirectTo: '/login',
+        }
+      }
+    } catch (error: any) {
+      return {
+        authenticated: false,
+        error: error || {
+          message: 'Check failed',
+          name: 'Not authenticated',
+        },
+        logout: true,
+        redirectTo: '/login',
+      }
+    }
+
+    return {
+      authenticated: true,
+    }
+  },
+  getIdentity: async () => {
+    const { data } = await supabaseClient.auth.getUser()
+
+    if (data?.user) {
+      return {
+        ...data.user,
+        name: data.user.email,
+      }
+    }
+
+    return null
+  },
+}
+
+export default authProvider
+```
+
+### Set up a login component
+
+We have chosen to use the headless refine core package that comes with no supported UI framework. So, let's set up a plain React component to manage logins and sign ups.
+
+Create and edit `src/components/auth.tsx`:
+
+```ts src/components/auth.tsx
+import { useState } from 'react'
+import { useLogin } from '@refinedev/core'
+
+export default function Auth() {
+  const [email, setEmail] = useState('')
+  const { isLoading, mutate: login } = useLogin()
+
+  const handleLogin = async (event: { preventDefault: () => void }) => {
+    event.preventDefault()
+    login({ email })
+  }
+
+  return (
+    <div className="row flex flex-center container">
+      <div className="col-6 form-widget">
+        <h1 className="header">Supabase + refine</h1>
+        <p className="description">Sign in via magic link with your email below</p>
+        <form className="form-widget" onSubmit={handleLogin}>
+          <div>
+            <input
+              className="inputField"
+              type="email"
+              placeholder="Your email"
+              value={email}
+              required={true}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <button className={'button block'} disabled={isLoading}>
+              {isLoading ? <span>Loading</span> : <span>Send magic link</span>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+```
+
+Notice we are using the [`useLogin()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogin/) refine auth hook to grab the `mutate: login` method to use inside `handleLogin()` function and `isLoading` state for our form submission. The `useLogin()` hook conveniently offers us access to `authProvider.login` method for authenticating the user with OTP.
+
+### Account page
+
+After a user is signed in we can allow them to edit their profile details and manage their account.
+
+Let's create a new component for that in `src/components/account.tsx`.
+
+```tsx src/components/account.tsx
+import { BaseKey, useGetIdentity, useLogout } from '@refinedev/core'
+import { useForm } from '@refinedev/react-hook-form'
+
+interface IUserIdentity {
+  id?: BaseKey
+  username: string
+  name: string
+}
+
+export interface IProfile {
+  id?: string
+  username?: string
+  website?: string
+  avatar_url?: string
+}
+
+export default function Account() {
+  const { data: userIdentity } = useGetIdentity<IUserIdentity>()
+
+  const { mutate: logOut } = useLogout()
+
+  const {
+    refineCore: { formLoading, queryResult, onFinish },
+    register,
+    control,
+    handleSubmit,
+  } = useForm<IProfile>({
+    refineCoreProps: {
+      resource: 'profiles',
+      action: 'edit',
+      id: userIdentity?.id,
+      redirect: false,
+      onMutationError: (data) => alert(data?.message),
+    },
+  })
+
+  return (
+    <div className="container" style={{ padding: '50px 0 100px 0' }}>
+      <form onSubmit={handleSubmit(onFinish)} className="form-widget">
+        <div>
+          <label htmlFor="email">Email</label>
+          <input id="email" name="email" type="text" value={userIdentity?.name} disabled />
+        </div>
+        <div>
+          <label htmlFor="username">Name</label>
+          <input id="username" type="text" {...register('username')} />
+        </div>
+        <div>
+          <label htmlFor="website">Website</label>
+          <input id="website" type="url" {...register('website')} />
+        </div>
+
+        <div>
+          <button className="button block primary" type="submit" disabled={formLoading}>
+            {formLoading ? 'Loading ...' : 'Update'}
+          </button>
+        </div>
+
+        <div>
+          <button className="button block" type="button" onClick={() => logOut()}>
+            Sign Out
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+```
+
+Notice above that, we are using three refine hooks, namely the [`useGetIdentity()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useGetIdentity/), [`useLogOut()`](https://refine.dev/docs/api-reference/core/hooks/authentication/useLogout/) and [`useForm()`](https://refine.dev/docs/packages/documentation/react-hook-form/useForm/) hooks.
+
+`useGetIdentity()` is a auth hook that gets the identity of the authenticated user. It grabs the current user by invoking the `authProvider.getIdentity` method under the hood.
+
+`useLogOut()` is also an auth hook. It calls the `authProvider.logout` method to end the session.
+
+`useForm()`, in contrast, is a data hook that exposes a series of useful objects that serve the edit form. For example, we are grabbing the `onFinish` function to submit the form with the `handleSubmit` event handler. We are also using `formLoading` property to present state changes of the submitted form.
+
+The `useForm()` hook is a higher-level hook built on top of Refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
+
+### Launch!
+
+Now that we have all the components in place, let's define the routes for the pages in which they should be rendered.
+
+Add the routes for `/login` with the `<Auth />` component and the routes for `index` path with the `<Account />` component. So, the final `App.tsx`:
+
+```tsx src/App.tsx
+import { Authenticated, Refine } from '@refinedev/core'
+import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
+import routerBindings, {
+  CatchAllNavigate,
+  DocumentTitleHandler,
+  UnsavedChangesNotifier,
+} from '@refinedev/react-router-v6'
+import { dataProvider, liveProvider } from '@refinedev/supabase'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
+
+import './App.css'
+import authProvider from './authProvider'
+import { supabaseClient } from './utility'
+import Account from './components/account'
+import Auth from './components/auth'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <RefineKbarProvider>
+        <Refine
+          dataProvider={dataProvider(supabaseClient)}
+          liveProvider={liveProvider(supabaseClient)}
+          authProvider={authProvider}
+          routerProvider={routerBindings}
+          options={{
+            syncWithLocation: true,
+            warnWhenUnsavedChanges: true,
+          }}
+        >
+          <Routes>
+            <Route
+              element={
+                <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                  <Outlet />
+                </Authenticated>
+              }
+            >
+              <Route index element={<Account />} />
+            </Route>
+            <Route element={<Authenticated fallback={<Outlet />} />}>
+              <Route path="/login" element={<Auth />} />
+            </Route>
+          </Routes>
+          <RefineKbar />
+          <UnsavedChangesNotifier />
+          <DocumentTitleHandler />
+        </Refine>
+      </RefineKbarProvider>
+    </BrowserRouter>
+  )
+}
+
+export default App
+```
+
+Let's test the App by running the server again:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
+
+![Supabase refine](/docs/img/supabase-refine-demo.png)
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+
+Create and edit `src/components/avatar.tsx`:
+
+```tsx src/components/avatar.tsx
+import { useEffect, useState } from 'react'
+import { supabaseClient } from '../utility/supabaseClient'
+
+type TAvatarProps = {
+  url?: string
+  size: number
+  onUpload: (filePath: string) => void
+}
+
+export default function Avatar({ url, size, onUpload }: TAvatarProps) {
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(() => {
+    if (url) downloadImage(url)
+  }, [url])
+
+  async function downloadImage(path: string) {
+    try {
+      const { data, error } = await supabaseClient.storage.from('avatars').download(path)
+      if (error) {
+        throw error
+      }
+      const url = URL.createObjectURL(data)
+      setAvatarUrl(url)
+    } catch (error: any) {
+      console.log('Error downloading image: ', error?.message)
+    }
+  }
+
+  async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+    try {
+      setUploading(true)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+      onUpload(filePath)
+    } catch (error: any) {
+      alert(error.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="avatar image"
+          style={{ height: size, width: size }}
+        />
+      ) : (
+        <div className="avatar no-image" style={{ height: size, width: size }} />
+      )}
+      <div style={{ width: size }}>
+        <label className="button primary block" htmlFor="single">
+          {uploading ? 'Uploading ...' : 'Upload'}
+        </label>
+        <input
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
+          type="file"
+          id="single"
+          name="avatar_url"
+          accept="image/*"
+          onChange={uploadAvatar}
+          disabled={uploading}
+        />
+      </div>
+    </div>
+  )
+}
+```
+
+### Add the new widget
+
+And then we can add the widget to the Account page at `src/components/account.tsx`:
+
+```tsx src/components/account.tsx
+// Import the new components
+import { Controller } from 'react-hook-form'
+import Avatar from './avatar'
+
+// ...
+
+return (
+  <div className="container" style={{ padding: '50px 0 100px 0' }}>
+    <form onSubmit={handleSubmit} className="form-widget">
+      <Controller
+        control={control}
+        name="avatar_url"
+        render={({ field }) => {
+          return (
+            <Avatar
+              url={field.value}
+              size={150}
+              onUpload={(filePath) => {
+                onFinish({
+                  ...queryResult?.data?.data,
+                  avatar_url: filePath,
+                  onMutationError: (data: { message: string }) => alert(data?.message),
+                })
+                field.onChange({
+                  target: {
+                    value: filePath,
+                  },
+                })
+              }}
+            />
+          )
+        }}
+      />
+      {/* ... */}
+    </form>
+  </div>
+)
+```
+
+At this stage, you have a fully functional application!

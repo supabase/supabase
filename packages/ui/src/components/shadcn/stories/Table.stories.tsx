@@ -1,13 +1,13 @@
 import { Meta } from '@storybook/react'
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@ui/components/shadcn/ui/table'
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '../ui/table'
 
 const invoices = [
   {

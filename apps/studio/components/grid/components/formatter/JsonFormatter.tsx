@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { RenderCellProps } from 'react-data-grid'
-import { SupaRow } from '../../types'
+import type { RenderCellProps } from 'react-data-grid'
+import type { SupaRow } from '../../types'
 import { EmptyValue, NullValue } from '../common'
 
 export const JsonFormatter = (p: React.PropsWithChildren<RenderCellProps<SupaRow, unknown>>) => {

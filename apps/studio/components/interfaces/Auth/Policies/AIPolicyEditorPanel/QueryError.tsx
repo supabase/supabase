@@ -15,6 +15,10 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const QueryError = ({
   error,
@@ -27,6 +31,7 @@ const QueryError = ({
   setOpen: Dispatch<SetStateAction<boolean>>
   onSelectDebug: () => void
 }) => {
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
@@ -34,6 +39,8 @@ const QueryError = ({
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   return (
     <div className="flex flex-col gap-y-3 px-5">
@@ -45,9 +52,9 @@ const QueryError = ({
           className="w-5 h-5"
         >
           <path
-            fill-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
-            clip-rule="evenodd"
           />
         </svg>
         <div className="flex flex-col gap-3">
@@ -69,7 +76,7 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              {!hasHipaaAddon && (
+              {!hasHipaaAddon && isAiAssistantEnabled && (
                 <Button
                   size={'tiny'}
                   type="default"
@@ -77,7 +84,18 @@ const QueryError = ({
                     'group',
                     styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
                   )}
-                  onClick={() => onSelectDebug()}
+                  onClick={() => {
+                    onSelectDebug()
+                    Telemetry.sendEvent(
+                      {
+                        category: 'rls_editor',
+                        action: 'ai_debugger_requested',
+                        label: 'rls-ai-assistant',
+                      },
+                      telemetryProps,
+                      router
+                    )
+                  }}
                 >
                   Fix with Assistant
                 </Button>

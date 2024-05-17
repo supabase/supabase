@@ -1,0 +1,176 @@
+---
+title: 'Use Supabase with Next.js'
+subtitle: 'Learn how to create a Supabase project, add some sample data, and query from a Next.js app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project">
+
+    Head over to [database.new](https://database.new) and create a new Supabase project.
+
+    When your project is up and running, navigate to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
+
+    Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- Create the table
+      create table notes (
+        id serial primary key,
+        title text
+      );
+
+      -- Insert some sample data
+      insert into notes (title)
+      values
+        ('Today I created a Supabase project.'),
+        ('I added some data and queried it from Next.js.'),
+        ('It was awesome!');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Next.js app">
+
+    Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
+    - [Cookie-based Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+    - [TypeScript](https://www.typescriptlang.org/)
+    - [Tailwind CSS](https://tailwindcss.com/)
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npx create-next-app -e with-supabase
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+
+    Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```text .env.local
+        NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Query Supabase data from Next.js">
+
+    Create a new file at `app/notes/page.tsx` and populate with the following.
+
+    This will select all the rows from the `notes` table in Supabase and render them on the page.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <CH.Code className="min-h-[34rem]">
+
+      ```ts app/notes/page.tsx
+        import { createClient } from '@/utils/supabase/server';
+
+        export default async function Notes() {
+          const supabase = createClient();
+          const { data: notes } = await supabase.from("notes").select();
+
+          return <pre>{JSON.stringify(notes, null, 2)}</pre>
+        }
+      ```
+
+      ```ts utils/supabase/server.ts
+        import { createServerClient, type CookieOptions } from '@supabase/ssr'
+        import { cookies } from 'next/headers'
+
+        export function createClient() {
+          const cookieStore = cookies()
+
+          return createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+              cookies: {
+                get(name: string) {
+                  return cookieStore.get(name)?.value
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                  try {
+                    cookieStore.set({ name, value, ...options })
+                  } catch (error) {
+                    // The `set` method was called from a Server Component.
+                    // This can be ignored if you have middleware refreshing
+                    // user sessions.
+                  }
+                },
+                remove(name: string, options: CookieOptions) {
+                  try {
+                    cookieStore.set({ name, value: '', ...options })
+                  } catch (error) {
+                    // The `delete` method was called from a Server Component.
+                    // This can be ignored if you have middleware refreshing
+                    // user sessions.
+                  }
+                },
+              },
+            }
+          )
+        }
+      ```
+
+    </CH.Code>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the development server, go to http://localhost:3000/notes in a browser and you should see the list of notes.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

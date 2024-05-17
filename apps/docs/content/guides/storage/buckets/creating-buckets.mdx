@@ -1,0 +1,87 @@
+---
+id: 'storage-creating-buckets'
+title: 'Creating Buckets'
+description: 'Learn how to create Supabase Storage buckets.'
+sidebar_label: 'Buckets'
+---
+
+You can create a bucket using the Supabase Dashboard. Since storage is interoperable with your Postgres database, you can also use SQL or our client libraries.
+Here we create a bucket called "avatars":
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```js
+// Use the JS library to create a bucket.
+
+const { data, error } = await supabase.storage.createBucket('avatars', {
+  public: true, // default: false
+})
+```
+
+[Reference.](/docs/reference/javascript/storage-createbucket)
+
+</TabPanel>
+
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+2. Click **New Bucket** and enter a name for the bucket.
+3. Click **Create Bucket**.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Use Postgres to create a bucket.
+
+insert into storage.buckets
+  (id, name, public)
+values
+  ('avatars', 'avatars', true);
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() async {
+  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  final storageResponse = await supabase
+      .storage
+      .createBucket('avatars');
+}
+```
+
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
+
+</TabPanel>
+</Tabs>
+
+## Restricting uploads
+
+When creating a bucket you can add additional configurations to restrict the type or size of files you want this bucket to contain.
+For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB.
+
+You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
+
+```js
+// Use the JS library to create a bucket.
+
+const { data, error } = await supabase.storage.createBucket('avatars', {
+  public: true,
+  allowedMimeTypes: ['image/*'],
+  fileSizeLimit: '1MB',
+})
+```
+
+If an upload request doesn't meet the above restrictions it will be rejected.
+
+For more information check [File Limits](/docs/guides/storage/uploads/file-limits) Section.

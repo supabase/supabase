@@ -1,33 +1,39 @@
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
+import type { VaultSecret } from 'types'
 import { Modal } from 'ui'
 
-import { useStore } from 'hooks'
-import { VaultSecret } from 'types'
-
 interface DeleteSecretModalProps {
-  selectedSecret: VaultSecret
+  selectedSecret: VaultSecret | undefined
   onClose: () => void
 }
 
 const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
-  const { vault, ui } = useStore()
+  const { project } = useProjectContext()
 
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const { mutateAsync: deleteSecret } = useVaultSecretDeleteMutation()
+
   const onConfirmDeleteSecret = async () => {
+    if (!project) return console.error('Project is required')
+
     setIsDeleting(true)
-    const res = await vault.deleteSecret(selectedSecret.id)
+    if (!selectedSecret) {
+      return
+    }
+    const res = await deleteSecret({
+      projectRef: project.ref,
+      connectionString: project?.connectionString,
+      id: selectedSecret.id,
+    })
     if (res.error) {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to delete secret: ${res.error.message}`,
-      })
+      toast.error(`Failed to delete secret: ${res.error.message}`)
     } else {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted secret ${selectedSecret.name}`,
-      })
+      toast.success(`Successfully deleted secret ${selectedSecret.name}`)
       onClose()
     }
     setIsDeleting(false)

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, LWXCountdownBanner, cn } from 'ui'
+import { Announcement, Button, cn, LW11CountdownBanner } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -25,7 +25,11 @@ import { menu } from '~/data/nav'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
-const Nav = () => {
+interface Props {
+  hideNavbar: boolean
+}
+
+const Nav = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -34,9 +38,11 @@ const Nav = () => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname.includes('launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week'
-  const showLaunchWeekNavMode = isLaunchWeekPage && !open
+  const isGAWeekSection = router.pathname.includes('/ga-week')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekSection
+  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
+  const isLaunchWeek11Page = router.pathname === '/ga-week'
+  const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -52,38 +58,30 @@ const Nav = () => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
+  if (props.hideNavbar) {
     return null
   }
 
-  const showDarkLogo =
-    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
+  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
   return (
     <>
       <Announcement>
-        <LWXCountdownBanner />
+        <LW11CountdownBanner />
       </Announcement>
       <div
-        className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          (isLaunchWeekXPage || isLaunchWeek11Page) && 'relative'
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
           className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all'
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav
@@ -102,22 +100,35 @@ const Nav = () => {
                     className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <Image
-                      src={showDarkLogo ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                      src={supabaseLogoWordmarkLight}
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      className="dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src={supabaseLogoWordmarkDark}
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                      className="hidden dark:block"
+                      priority
                     />
                   </Link>
 
-                  {isLaunchWeekPage && !isLaunchWeekXPage && (
-                    <Link
-                      href="/launch-week"
-                      as="/launch-week"
-                      className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                    >
-                      Launch Week
-                    </Link>
-                  )}
+                  {!isGAWeekSection &&
+                    !isLaunchWeek11Page &&
+                    isLaunchWeekPage &&
+                    !isLaunchWeekXPage && (
+                      <Link
+                        href="/launch-week"
+                        as="/launch-week"
+                        className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                      >
+                        Launch Week
+                      </Link>
+                    )}
                 </div>
                 <NavigationMenu
                   delayDuration={0}
@@ -153,7 +164,7 @@ const Nav = () => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
                 {!isUserLoading && (
                   <>

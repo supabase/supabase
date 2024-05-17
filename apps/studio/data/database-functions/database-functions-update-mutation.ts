@@ -1,26 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
-import { Dictionary } from 'components/grid'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string
   id: number
-  payload: {
-    name: string
-    schema: string
-    args: string[]
-    behavior: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-    definition: string
-    language: string
-    return_type: string
-    security_definer: boolean
-    config_params?: Dictionary<string>
-  }
+  payload: components['schemas']['UpdateFunctionBody']
 }
 
 export async function updateDatabaseFunction({
@@ -42,7 +32,7 @@ export async function updateDatabaseFunction({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

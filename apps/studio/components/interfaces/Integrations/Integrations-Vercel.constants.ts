@@ -1,4 +1,4 @@
-export const ENV_VAR_KEYS = {
+const ENV_VAR_KEYS = {
   POSTGRES_URL: {
     key: 'POSTGRES_URL',
     type: 'encrypted',
@@ -37,6 +37,10 @@ export const ENV_VAR_KEYS = {
   },
   SUPABASE_SERVICE_ROLE_KEY: {
     key: 'SUPABASE_SERVICE_ROLE_KEY',
+    type: 'encrypted',
+  },
+  SUPABASE_JWT_SECRET: {
+    key: 'SUPABASE_JWT_SECRET',
     type: 'encrypted',
   },
   NEXT_PUBLIC_SUPABASE_ANON_KEY: {

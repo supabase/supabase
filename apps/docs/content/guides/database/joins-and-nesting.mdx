@@ -1,0 +1,419 @@
+---
+id: 'joins-and-nested-tables'
+title: 'Querying Joins and Nested tables'
+description: 'The Data APIs automatically detect relationships between Postgres tables.'
+---
+
+The data APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
+
+## One-to-many joins
+
+Let's use an example database that stores `countries` and `cities`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="table"
+  queryGroup="output-format"
+>
+<TabPanel id="table" label="Tables">
+
+**Countries**
+
+| `id` | `name`         |
+| ---- | -------------- |
+| 1    | United Kingdom |
+| 2    | United States  |
+
+**Cities**
+
+| `id` | `name`      | `country_id` |
+| ---- | ----------- | ------------ |
+| 1    | London      | 1            |
+| 2    | Manchester  | 1            |
+| 3    | Los Angeles | 2            |
+| 4    | New York    | 2            |
+
+</TabPanel>
+<TabPanel id="SQL" label="SQL">
+
+```sql
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
+
+insert into countries
+  (id, name)
+values
+  (1, 'United Kingdom'),
+  (2, 'United States');
+
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
+
+insert into cities
+  (name, country_id)
+values
+  ('London', 1),
+  ('Manchester', 1),
+  ('Los Angeles', 2),
+  ('New York', 2);
+```
+
+</TabPanel>
+</Tabs>
+
+The APIs will automatically detect relationships based on the foreign keys:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('countries').select(`
+  id, 
+  name, 
+  cities ( id, name )
+`)
+```
+
+### TypeScript types for joins
+
+`supabase-js` always returns a `data` object (for success), and an `error` object (for unsuccessful requests).
+
+These helper types provide the result types from any query, including nested types for database joins.
+
+Given the following schema with a relation between cities and countries:
+
+```sql
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
+
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
+```
+
+We can get the nested `CountriesWithCities` type like this:
+
+```ts
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+
+const countriesWithCitiesQuery = supabase.from('countries').select(`
+  id,
+  name,
+  cities (
+    id,
+    name
+  )
+`)
+type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
+
+const { data, error } = await countriesWithCitiesQuery
+if (error) throw error
+const countriesWithCities: CountriesWithCities = data
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.from('countries').select('id, name, cities(id, name)');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Country: Codable {
+  let id: Int
+  let name: String
+  let cities: [City]
+
+  struct City: Codable {
+    let id: Int
+    let name: String
+  }
+}
+
+let countries: [Country] = try await supabase
+  .from("countries")
+  .select("id, name, cities(id, name)")
+  .execute()
+  .value
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, name)"))
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+```javascript
+const Query = `
+  query {
+    countriesCollection {
+      edges {
+        node {
+          id
+          name 
+          cities {
+            id, 
+            name
+          }
+        }
+      }
+    }
+  }
+`
+```
+
+</TabPanel>
+<TabPanel id="url" label="URL">
+
+```bash
+GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
+```
+
+</TabPanel>
+</Tabs>
+
+## Many-to-many joins
+
+The data APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
+
+```sql
+create table users (
+  "id" serial primary key,
+  "name" text
+);
+
+create table teams (
+  "id" serial primary key,
+  "team_name" text
+);
+
+create table members (
+  "user_id" int references users,
+  "team_id" int references teams,
+  primary key (user_id, team_id)
+);
+```
+
+In these cases you don't need to explicitly define the joining table (members). If we wanted to fetch all the teams and the members in each team:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('teams').select(`
+  id, 
+  team_name, 
+  users ( id, name )
+`)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.from('teams').select('id, team_name, users(id, name)');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Team: Codable {
+  let id: Int
+  let name: String
+  let users: [User]
+
+  struct User: Codable {
+    let id: Int
+    let name: String
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id, users
+    case name = "team_name"
+  }
+}
+let teams [Team] = try await supabase
+  .from("teams")
+  .select(
+    """
+      id,
+      team_name,
+      users ( id, name )
+    """
+  )
+  .execute()
+  .value
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, name)"));
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+```javascript
+const Query = `
+  query {
+    teamsCollection {
+      edges {
+        node {
+          id
+          team_name 
+          users {
+            id, 
+            name
+          }
+        }
+      }
+    }
+  }
+`
+```
+
+</TabPanel>
+<TabPanel id="url" label="URL">
+
+```bash
+GET https://[REF].supabase.co/rest/v1/teams?select=id,team_name,users(id,name)
+```
+
+</TabPanel>
+</Tabs>
+
+## Specifying the `ON` clause for joins with multiple foreign keys
+
+For example, if you have a project that tracks when employees check in and out of work shifts:
+
+```sql
+-- Employees
+create table users (
+  "id" serial primary key,
+  "name" text
+);
+
+-- Badge scans
+create table scans (
+  "id" serial primary key,
+  "user_id" int references users,
+  "badge_scan_time" timestamp
+);
+
+-- Work shifts
+create table shifts (
+  "id" serial primary key,
+  "user_id" int references users,
+  "scan_id_start" int references scans, -- clocking in
+  "scan_id_end" int references scans, -- clocking out
+  "attendance_status" text
+);
+```
+
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+
+To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('shifts').select(
+  `
+    *,
+    scans:scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  `
+)
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Shift: Codable {
+  let id: Int
+  let userId: Int
+  let attendanceStatus: String?
+
+  let scans: [Scan]
+
+  struct Scan: Codable {
+    let id: Int
+    let userId: Int
+    let badgeScanTime: TimeInterval
+
+    enum CodingKeys: String, CodingKey {
+      case id
+      case userId = "user_id"
+      case badgeScanTime = "badge_scan_time"
+    }
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case userId = "user_id"
+    case attendanceStatus = "attendance_status"
+  }
+}
+
+let shifts: [Shift] = try await supabase
+  .from("shifts")
+  .select(
+    """
+      *,
+      scans:scan_id_start (
+        id,
+        user_id,
+        badge_scan_time
+      )
+    """
+  )
+  .execute()
+  .value
+```
+
+</TabPanel>
+</Tabs>

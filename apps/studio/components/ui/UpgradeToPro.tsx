@@ -10,11 +10,12 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef: string
-  organizationSlug: string
+  projectRef?: string
+  organizationSlug?: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
+  disabled?: boolean
 }
 
 const UpgradeToPro = ({
@@ -25,6 +26,7 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  disabled = false,
 }: UpgradeToProProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
@@ -55,14 +57,14 @@ const UpgradeToPro = ({
             <Tooltip.Trigger asChild>
               <Button
                 type="primary"
-                disabled={!canUpdateSubscription || projectUpdateDisabled}
+                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
                 asChild
               >
                 <Link
                   href={
                     plan === 'free'
-                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                      ? `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan`
+                      : `/project/${projectRef ?? '_'}/settings/addons?panel=${addon}`
                   }
                 >
                   {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}

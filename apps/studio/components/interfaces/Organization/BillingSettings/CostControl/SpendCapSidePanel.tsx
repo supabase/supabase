@@ -1,20 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
-import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import Table from 'components/to-be-cleaned/Table'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import Table from 'components/to-be-cleaned/Table'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { useCheckPermissions } from 'hooks'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import Image from 'next/image'
+import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel, cn } from 'ui'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -37,7 +38,6 @@ const SPEND_CAP_OPTIONS: {
 ]
 
 const SpendCapSidePanel = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
@@ -58,19 +58,11 @@ const SpendCapSidePanel = () => {
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-        })
-
+        toast.success(`Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`)
         onClose()
       },
       onError: (error) => {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to toggle spend cap: ${error.message}`,
-        })
+        toast.error(`Failed to toggle spend cap: ${error.message}`)
       },
     }
   )
@@ -228,7 +220,7 @@ const SpendCapSidePanel = () => {
                 return (
                   <div
                     key={option.value}
-                    className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
+                    className={cn('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
                     onClick={() => {
                       !isFreePlan && setSelectedOption(option.value)
                       Telemetry.sendActivity(
@@ -248,7 +240,7 @@ const SpendCapSidePanel = () => {
                   >
                     <Image
                       alt="Spend Cap"
-                      className={clsx(
+                      className={cn(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                         isSelected
                           ? 'border-foreground'
@@ -262,7 +254,7 @@ const SpendCapSidePanel = () => {
                     />
 
                     <p
-                      className={clsx(
+                      className={cn(
                         'text-sm transition',
                         !isFreePlan && 'group-hover:text-foreground',
                         isSelected ? 'text-foreground' : 'text-foreground-light'

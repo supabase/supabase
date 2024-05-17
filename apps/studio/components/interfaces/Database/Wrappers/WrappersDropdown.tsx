@@ -1,9 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
+
+import { useParams } from 'common'
+import { useCheckPermissions } from 'hooks'
 import {
   Button,
   DropdownMenu,
@@ -13,9 +15,6 @@ import {
   DropdownMenuTrigger,
   IconPlus,
 } from 'ui'
-
-import { useParams } from 'common/hooks'
-import { useCheckPermissions } from 'hooks'
 import { WRAPPERS } from './Wrappers.constants'
 
 interface WrapperDropdownProps {
@@ -85,4 +84,4 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   )
 }
 
-export default observer(WrapperDropdown)
+export default WrapperDropdown

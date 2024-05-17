@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -188,38 +187,33 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
           <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
-          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
 
           <ConfirmationModal
             visible={isConfirmPreviousModalOpen}
-            header="Confirm moving to previous page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmPreviousModalOpen(false)}
-            onSelectConfirm={() => {
+            title="Confirm moving to previous page"
+            confirmLabel="Confirm"
+            onCancel={() => setIsConfirmPreviousModalOpen(false)}
+            onConfirm={() => {
               onConfirmPreviousPage()
             }}
           >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              The currently selected lines will be deselected, do you want to proceed?
+            </p>
           </ConfirmationModal>
 
           <ConfirmationModal
             visible={isConfirmNextModalOpen}
-            header="Confirm moving to next page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmNextModalOpen(false)}
-            onSelectConfirm={() => {
+            title="Confirm moving to next page"
+            confirmLabel="Confirm"
+            onCancel={() => setIsConfirmNextModalOpen(false)}
+            onConfirm={() => {
               onConfirmNextPage()
             }}
           >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              The currently selected lines will be deselected, do you want to proceed?
+            </p>
           </ConfirmationModal>
         </>
       )}

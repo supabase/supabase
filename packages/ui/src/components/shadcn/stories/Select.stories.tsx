@@ -1,7 +1,7 @@
+import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Card } from '@ui/components/shadcn/ui/card'
+import { Button } from '../ui/button'
 import {
   Form,
   FormControl,
@@ -10,7 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@ui/components/shadcn/ui/form'
+} from '../ui/form'
 import {
   Select,
   SelectContent,
@@ -19,12 +19,12 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
+} from '../ui/select'
+import { toast } from '../ui/use-toast'
 // import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { SelectSeparator } from '@ui/components/shadcn/ui/select'
+import { SelectSeparator } from '../ui/select'
 
 const meta: Meta = {
   title: 'shadcn/Select',

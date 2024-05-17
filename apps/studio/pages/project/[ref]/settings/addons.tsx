@@ -1,6 +1,6 @@
 import Addons from 'components/interfaces/Settings/Addons/Addons'
 import { SettingsLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectAddons: NextPageWithLayout = () => {
   return <Addons />

@@ -1,15 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const { ui } = useStore()
-
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
@@ -32,20 +31,14 @@ const DeleteOrganizationButton = () => {
 
   const onConfirmDelete = async (values: any) => {
     if (!canDeleteOrganization) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to delete this organization',
-      })
+      return toast.error('You do not have the required permissions to delete this organization')
     }
     if (!orgSlug) return console.error('Org slug is required')
 
     try {
       await deleteOrganization({ slug: orgSlug })
     } finally {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted ${orgName}`,
-      })
+      toast.success(`Successfully deleted ${orgName}`)
       router.push('/projects')
     }
   }

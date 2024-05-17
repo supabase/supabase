@@ -5,10 +5,10 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { Organization, Project } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -16,6 +16,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
@@ -53,7 +54,7 @@ const ProjectLink = ({
   project,
   setOpen,
 }: {
-  project: Project
+  project: ProjectInfo
   organization?: Organization
   setOpen: (value: boolean) => void
 }) => {
@@ -67,7 +68,7 @@ const ProjectLink = ({
   return (
     <CommandItem_Shadcn_
       key={project.ref}
-      value={`${project.name}-${project.ref}`}
+      value={`${project.name.replaceAll('"', '')}-${project.ref}`}
       className="cursor-pointer w-full"
       onSelect={() => {
         router.push(href)
@@ -142,27 +143,30 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               {projectCreationEnabled && (
-                <CommandGroup_Shadcn_ className="border-t">
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push(`/new/${selectedOrganization?.slug}`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link
-                      href={`/new/${selectedOrganization?.slug}`}
-                      onClick={() => {
+                <>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
                         setOpen(false)
+                        router.push(`/new/${selectedOrganization?.slug}`)
                       }}
-                      className="w-full flex items-center gap-2"
+                      onClick={() => setOpen(false)}
                     >
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New project</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                      <Link
+                        href={`/new/${selectedOrganization?.slug}`}
+                        onClick={() => {
+                          setOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2"
+                      >
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New project</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </>
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>

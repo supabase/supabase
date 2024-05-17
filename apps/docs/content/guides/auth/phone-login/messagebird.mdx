@@ -1,0 +1,69 @@
+---
+id: 'auth-messagebird'
+title: 'Phone Auth with MessageBird'
+description: 'How to set up and use Mobile OTP with MessageBird and Supabase.'
+---
+
+<Admonition type="tip">
+
+Authenticating users via SMS can become expensive. Adjust your project's rate limits and [configure CAPTCHA](/docs/guides/auth/auth-captcha) to control the bill. Read more about this in the [Production Checklist](/docs/guides/platform/going-into-prod).
+
+</Admonition>
+
+## Prerequisites
+
+You'll need:
+
+- A MessageBird account (sign up [here](https://dashboard.messagebird.com/en/sign-up))
+- A Supabase project (create one [here](https://supabase.com/dashboard))
+- A mobile phone capable of receiving SMS
+
+## Set up MessageBird as your SMS provider
+
+Start by logging into your MessageBird account and verify the mobile number you'll be using to test with [here](https://dashboard.messagebird.com/en/getting-started/sms). This is the number that will be receiving the SMS OTPs.
+
+![Verify your own phone number](/docs/img/guides/auth-messagebird/1.png)
+
+![Get your API Keys](/docs/img/guides/auth-messagebird/2.png)
+
+Navigate to the [dashboard settings](https://dashboard.messagebird.com/en/settings/sms) to set the default originator. The messagebird originator is the name or number from which the message is sent. For more information, you can refer to the messagebird article on choosing an originator [here](https://support.messagebird.com/hc/en-us/articles/115002628665-Choosing-an-originator)
+
+![Set the default originator](/docs/img/guides/auth-messagebird/3.png)
+
+You will need the following values to get started:
+
+- Live API Key / Test API Key
+- MessageBird originator
+
+Now go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select "Phone" from the Auth Providers list.
+
+You should see an option to enable the Phone provider.
+
+Toggle it on, and copy the 2 values over from the Messagebird dashboard. Click save.
+
+<Admonition>
+
+If you use the Test API Key, the OTP will not be delivered to the mobile number specified but messagebird will log the response in the dashboard. If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits.
+
+</Admonition>
+
+Plugin MessageBird credentials
+
+Now the backend should be setup, we can proceed to add our client-side code!
+
+#### SMS custom template
+
+The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
+
+Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
+
+Use the variable `.Code` in the template to display the code.
+
+## Next steps
+
+To implement Phone Login, see the docs on [using Phone Login](/docs/guides/auth/phone-login#using-phone-login).
+
+## Resources
+
+- [MessageBird Signup](https://dashboard.messagebird.com/en/sign-up)
+- [Supabase Dashboard](https://supabase.com/dashboard)

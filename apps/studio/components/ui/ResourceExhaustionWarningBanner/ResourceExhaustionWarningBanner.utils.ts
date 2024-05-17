@@ -1,4 +1,4 @@
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 
 export const getWarningContent = (

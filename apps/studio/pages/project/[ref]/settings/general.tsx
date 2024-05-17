@@ -7,7 +7,7 @@ import {
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useIsFeatureEnabled } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -16,7 +16,7 @@ const ProjectSettings: NextPageWithLayout = () => {
 
   // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <General />
       {!isBranch ? (
         <>

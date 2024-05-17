@@ -1,7 +1,6 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import { ResponseError } from 'types'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationsVariables = {
@@ -31,7 +30,7 @@ export async function getDatabasePublications(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -53,15 +52,3 @@ export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
       ...options,
     }
   )
-
-export const useDatabasePublicationsPrefetch = ({ projectRef }: DatabasePublicationsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databasePublicationsKeys.list(projectRef), ({ signal }) =>
-        getDatabasePublications({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

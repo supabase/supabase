@@ -1,19 +1,23 @@
 import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback, useRef } from 'react'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { Project, ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import type { Project } from './project-detail-query'
 
 export type ProjectsVariables = {
   ref?: string
 }
 
+export type ProjectInfo = components['schemas']['ProjectInfo']
+
 export async function getProjects(signal?: AbortSignal) {
-  const data = await get(`${API_URL}/projects`, { signal })
-  if (data.error) throw data.error
-  return data as Project[]
+  const { data, error } = await get('/platform/projects', { signal })
+
+  if (error) throw error
+  return data
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
@@ -22,12 +26,13 @@ export type ProjectsError = ResponseError
 export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) =>
-  useQuery<ProjectsData, ProjectsError, TData>(
+}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
+  return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
-    { enabled: enabled, ...options }
+    { enabled, ...options }
   )
+}
 
 export function prefetchProjects(client: QueryClient) {
   return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects(signal))

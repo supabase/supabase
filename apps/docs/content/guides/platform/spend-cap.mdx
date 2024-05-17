@@ -1,0 +1,61 @@
+---
+title: 'Spend cap'
+description: 'Learn about the cost control of Supabase.'
+subtitle: 'Learn about the cost control of Supabase.'
+---
+
+Supabase offers a "Spend Cap" on each organization to manage your usage and costs.
+
+This Spend Cap determines whether your organization can exceed the free quota allowance of any [line item](#what-additional-usage-can-i-be-charged-for) in a given billing cycle. If you exceed the free quota allowance of a line item, and the Spend Cap is **"off"**, then you will be billed for any additional usage on that line item.
+
+## What additional usage can I be charged for?
+
+Supabase charges for certain usage line items in your organization. Those line items include:
+
+- Database Size
+- Storage Size
+- Egress
+- Storage Image Transformations
+- Realtime concurrent peak connections
+- Realtime messages
+- Edge function invocations
+- Number of Edge functions
+
+You can view the pricing, and free quota allowance of each line item on the [pricing page](/pricing).
+
+You can monitor your usage and costs using the [Usage section of your organization](https://supabase.com/dashboard/org/_/usage) in the dashboard.
+This will show you how much you have spent so far in the current billing cycle, as well as an estimate of your expected total cost for the cycle based on your current usage.
+
+## Can I use the spend cap to limit my compute costs?
+
+The spend cap does not apply to compute usage. Each project is a dedicated server and database and incurs compute costs depending on the selected instance size. Costs for compute are predictable, as the maximum amount is number of hours in month \* hourly compute price (per project).
+
+Launching additional projects on a paid plan incurs compute costs, even if your spend cap is toggled on.
+
+Read more about [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+
+## How can I turn the Spend Cap on or off?
+
+To set up a Spend Cap in your organization, navigate to the [Subscription section](https://supabase.com/dashboard/org/_/billing) of your organization.
+From there, you can click on "Change subscription" to select the plan you want to use and, at the same time, turn on or off the Spend Cap.
+
+## What happens when the Spend Cap is on?
+
+Once you use all your free quota allowance for a [line item](#what-additional-usage-can-i-be-charged-for), your organization will not allow any further usage on that line item until the next billing cycle begins.
+
+This can help you to avoid unexpected costs and manage your expenses more effectively.
+
+## What happens when Spend Cap is off?
+
+Your projects will continue to operate after using all the free quota allowance for each [line item](#what-additional-usage-can-i-be-charged-for).
+This additional usage will be charged based on the line item's cost per unit outlined on the [pricing page](/pricing).
+
+<Admonition type="note">
+
+When your Spend Cap is **off**, we recommend monitoring your consumption and costs using the [Usage section of your organization](https://supabase.com/dashboard/org/_/usage) in the dashboard.
+
+</Admonition>
+
+## Can I cap certain usage items?
+
+The Spend Cap is currently an all-or-nothing toggle. You can either opt into paying for usage beyond your plans quota or opt out and run into restrictions when exceeding the limits. We do have plans to make the spend cap more flexible in the future.

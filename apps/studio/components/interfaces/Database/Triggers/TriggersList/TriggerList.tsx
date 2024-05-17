@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes } from 'lodash'
+import { includes, sortBy } from 'lodash'
 import {
   Badge,
   Button,
@@ -41,11 +41,14 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x: any) =>
+  const filteredTriggers = (triggers ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
 
-  const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
+  const _triggers = sortBy(
+    filteredTriggers.filter((x) => x.schema == schema),
+    (trigger) => trigger.name.toLocaleLowerCase()
+  )
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (_triggers.length === 0 && filterString.length === 0) {
@@ -64,7 +67,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+        <Table.td colSpan={6}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
@@ -97,7 +100,7 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}

@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import { useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { useStore } from 'hooks'
 
 interface AddNewSecretModalProps {
   visible: boolean
@@ -11,17 +11,13 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const submitRef = useRef<HTMLButtonElement>(null)
   const [showSecretValue, setShowSecretValue] = useState(false)
 
   const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
     onSuccess: (res, variables) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created new secret "${variables.secrets[0].name}"`,
-      })
+      toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
       onClose()
     },
   })

@@ -1,0 +1,139 @@
+---
+id: 'database-size'
+title: 'Database size'
+description: 'Understanding how database size applies to your subscription.'
+---
+
+Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your organization's [billing usage](https://supabase.com/dashboard/org/_/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
+
+- "Database size" is the total size of used storage from your database.
+- "Disk Storage size" describes the size of the underlying available storage.
+
+## Database space management
+
+### Database size
+
+This SQL query will show the current size of your Postgres database:
+
+```sql
+select
+  sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+from pg_database;
+```
+
+This value is reported in the [database report page](https://supabase.com/dashboard/project/_/reports/database).
+
+Database Space is consumed primarily by your data, indexes, and materialized views. You can reduce your disk size by removing any of these and running a Vacuum operation.
+
+<Admonition type="note">
+
+Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+
+</Admonition>
+
+### Vacuum operations
+
+Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. They are marked as "removed" until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your database may not immediately reduce the reported disk usage. You can use the [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started) `inspect db bloat` command to view all dead tuples in your database. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](https://supabase.com/dashboard/project/_/sql/)
+
+```bash
+# login to the CLI
+npx supabase login
+
+# initlize a local supabase directory
+npx supabase init
+
+# link a project
+npx supabase link
+
+# detect bloat
+npx supabase inspect db bloat --linked
+```
+
+If you find a table you would like to immediately clean, you can run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new):
+
+```sql
+vacuum full <table name>;
+```
+
+<Admonition type="note">
+
+Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
+
+</Admonition>
+
+Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
+It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
+
+### Preoccupied space
+
+New Supabase projects have a database size of ~40-60mb. This space includes pre-installed extensions, schemas, and default Postgres data. Additional database size is used when installing extensions, even if those extensions are inactive.
+
+## Disk management
+
+Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing plan.
+
+### Paid plan behavior
+
+Projects on the Pro plan and above have auto-scaling Disk Storage.
+
+Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+
+<Admonition type="note">
+
+The automatic resize operation will add an additional 50% capped to a maximum of 200GB. If 50% of your current usage is more than 200GB then only 200GB will be added to your disk (e.g. a size of 1500GB will resize to 1700GB).
+
+</Admonition>
+
+The Disk Storage Size can also be manually expanded on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it to any more than 200GB, please [contact us](https://supabase.com/dashboard/support/new) to discuss expanding the 200GB limit.
+
+<Admonition type="note">
+
+You may want to import a lot of data into your database which requires multiple disk expansions; for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the Disk Storage Size manually on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database).
+
+Due to provider restrictions, disk expansions can occur only once every six hours. During the six-hour window, the disk cannot be resized again.
+
+</Admonition>
+
+<Admonition type="note">
+
+Disks don't automatically downsize during normal operation. They _will_ automatically "right-size" when a Supabase (or Postgres) update is applied. Their final size after the update is 1.2x the size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the size after a Supabase update will be 120GB.
+
+</Admonition>
+
+The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
+
+### Free plan behavior
+
+Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
+
+- [Upgrade to the Pro plan](https://supabase.com/dashboard/org/_/billing) to increase the limit to 8GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale and expand beyond the 8GB database size limit.
+- [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
+
+### Read-only mode
+
+In some cases Supabase may put your database into read-only mode to prevent your database from exceeding the billing or disk limitations.
+
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size,
+
+### Disabling read-only mode
+
+You manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
+
+First, change the [transaction access mode](https://www.postgresql.org/docs/current/sql-set-transaction.html):
+
+```sql
+set session characteristics as transaction read write;
+```
+
+This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible. After deleting data, consider running a vacuum to reclaim as much space as possible:
+
+```sql
+vacuum;
+```
+
+Once you have reclaimed space, you can run the following to disable [read-only](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY) mode:
+
+```sql
+set default_transaction_read_only = 'off';
+```

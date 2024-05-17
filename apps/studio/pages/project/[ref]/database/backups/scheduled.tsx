@@ -1,23 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
 
 import { BackupsList } from 'components/interfaces/Database'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
-import { IconInfo, Tabs } from 'ui'
+import type { NextPageWithLayout } from 'types'
+import { IconInfo } from 'ui'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const router = useRouter()
   const { project } = useProjectContext()
-  const ref = project?.ref
+  const ref = project?.ref || 'default'
 
   const {
     data: backups,
@@ -36,21 +36,10 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-foreground">Database Backups</h3>
+            <FormHeader className="!mb-0" title="Database Backups" />
 
-            <Tabs
-              type="underlined"
-              size="small"
-              activeId="scheduled"
-              onChange={(id: any) => {
-                if (id === 'pitr') router.push(`/project/${ref}/database/backups/pitr`)
-              }}
-            >
-              <Tabs.Panel id="scheduled" label="Scheduled backups" />
-              <Tabs.Panel id="pitr" label="Point in Time" />
-            </Tabs>
-
-            <div className="space-y-4">
+            <DatabaseBackupsNav active="scheduled" projRef={ref} />
+            <div className="space-y-8">
               {isLoading && <GenericSkeletonLoader />}
 
               {isError && (

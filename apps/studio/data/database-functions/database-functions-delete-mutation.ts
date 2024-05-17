@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
 
 export type DatabaseFunctionDeleteVariables = {
@@ -28,7 +28,7 @@ export async function deleteDatabaseFunction({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

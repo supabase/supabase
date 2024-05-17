@@ -1,8 +1,9 @@
-import { Button, IconX } from 'ui'
+import { Button } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   isDefaultLogPreviewFormat,
@@ -10,7 +11,7 @@ import {
   LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import { LogData, QueryType } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -100,13 +101,13 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
       className={[
         'relative flex h-full flex-grow flex-col border border-l',
         'border-overlay',
-        'overflow-y-scroll bg-background',
+        'overflow-y-scroll bg-studio',
       ].join(' ')}
     >
       <div
         className={
           `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-background text-center opacity-0 transition-all ` +
+          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all ` +
           (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
         }
       >
@@ -165,12 +166,12 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
               className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
+              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {isLoading && <Connecting />}
+        {isLoading && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>

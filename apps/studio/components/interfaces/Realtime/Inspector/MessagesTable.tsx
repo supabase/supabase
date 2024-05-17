@@ -1,14 +1,16 @@
-import { useParams } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Loader2, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
 import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 import MessageSelection from './MessageSelection'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 
@@ -33,7 +35,7 @@ const NoResultAlert = ({
         <NoChannelEmptyState />
       ) : (
         <>
-          {enabled ? <p>No Realtime messages found</p> : null}
+          {enabled && <p className="text-foreground">No Realtime messages found</p>}
           <p className="text-foreground-lighter">Realtime message logs will be shown here</p>
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
@@ -71,13 +73,13 @@ const NoResultAlert = ({
                 <p className="text-foreground">Listen to a table for changes</p>
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
-              <Link href={`/project/${ref}/database/replication`} target="_blank" rel="noreferrer">
+              <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconExternalLink />}>
-                  Replication settings
+                  Publications settings
                 </Button>
               </Link>
             </div>
-            <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-studio">
               <div className="grow flex-col flex">
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
@@ -118,6 +120,8 @@ const MessagesTable = ({
 }: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   useEffect(() => {
     if (!data) return
@@ -136,7 +140,7 @@ const MessagesTable = ({
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
-              <div className="w-full h-8 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
+              <div className="w-full h-9 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
                   <Loader2 size="16" className="animate-spin" />
                   <div>Listening</div>
@@ -149,10 +153,12 @@ const MessagesTable = ({
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button type="text" onClick={showSendMessage} className="group">
-                  <span className="text-foreground-light group-hover:text-foreground transition">
-                    Broadcast a message
-                  </span>
+                <Button
+                  type="default"
+                  onClick={showSendMessage}
+                  icon={<MegaphoneIcon size={14} strokeWidth={1.5} />}
+                >
+                  <span>Broadcast a message</span>
                 </Button>
               </div>
             )}
@@ -162,6 +168,16 @@ const MessagesTable = ({
               rowHeight={40}
               headerRowHeight={0}
               onSelectedCellChange={({ rowIdx }) => {
+                Telemetry.sendEvent(
+                  {
+                    category: 'realtime_inspector',
+                    action: 'focused-specific-message',
+                    label: 'realtime_inspector_results',
+                  },
+                  telemetryProps,
+                  router
+                )
+
                 setFocusedLog(data[rowIdx])
               }}
               selectedRows={new Set([])}

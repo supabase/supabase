@@ -5,13 +5,16 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 import components from '~/components'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -114,7 +117,7 @@ interface PGGraphQLDocsProps {
 
 export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId={MenuId.Graphql}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )
@@ -167,7 +170,7 @@ export const getStaticProps: GetStaticProps<PGGraphQLDocsProps> = async ({ param
 
       // If we have a mapping for this page, use the mapped path
       if (page) {
-        return page.slug + hash
+        return 'graphql/' + page.slug + hash
       }
 
       // If we don't have this page in our docs, link to original docs

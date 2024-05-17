@@ -1,25 +1,26 @@
-import { Children } from 'react'
+'use client'
+
+import { Check, Copy } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Children, ReactNode, useState } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { Button, cn } from 'ui'
 import { monokaiCustomTheme } from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from 'ui'
 
-import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
-import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
-import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
-import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
+import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
-
-import { useState } from 'react'
-import { useTheme } from 'next-themes'
+import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 
 export interface CodeBlockProps {
-  title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  title?: ReactNode
+  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -85,24 +86,24 @@ export const CodeBlock = ({
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
-          {title.replace(/%20/g, ' ')}
+        <div className="text-sm rounded-t-md bg-surface-100 py-2 px-4 border border-b-0 border-default font-sans">
+          {title}
         </div>
       )}
       {className ? (
-        <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
+        <div className="group relative max-w-[90vw] md:max-w-none overflow-auto">
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
             wrapLines={true}
             // @ts-ignore
             style={monokaiTheme}
-            className={[
-              'code-block border p-4 w-full !my-0 !bg-surface-100',
+            className={cn(
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
-              className,
-            ].join(' ')}
+              className
+            )}
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
@@ -136,9 +137,9 @@ export const CodeBlock = ({
           {!hideCopy && (value || children) && className ? (
             <div
               className={[
-                'absolute right-2',
+                'absolute right-2 top-2',
+                'opacity-0 group-hover:opacity-100 transition',
                 `${isDarkTheme ? 'dark' : ''}`,
-                `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
               {/* //
@@ -146,7 +147,8 @@ export const CodeBlock = ({
               <CopyToClipboard text={value || children}>
                 <Button
                   type="default"
-                  icon={copied ? <IconCheck /> : <IconCopy />}
+                  className="px-1.5"
+                  icon={copied ? <Check /> : <Copy />}
                   onClick={() => handleCopy()}
                 >
                   {copied ? 'Copied' : ''}

@@ -16,7 +16,7 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import useLwxGame from '../../hooks/useLwxGame'
+import useLwxGame from '../../hooks/useLwGame'
 import LWXGame from './LWXGame'
 
 const TicketingFlow = () => {
@@ -60,7 +60,7 @@ const TicketingFlow = () => {
         </div>
         <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
-            <AnimatePresence exitBeforeEnter key={ticketState}>
+            <AnimatePresence mode="wait" key={ticketState}>
               {isLoading && (
                 <m.div
                   key="loading"
@@ -134,12 +134,12 @@ const TicketingFlow = () => {
                     ) : winningChances !== 2 ? (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-[#8B9092]">You're in!</span>{' '}
-                        <span className="">Now share your ticket to win limited swag.</span>
+                        <span>Now share your ticket to win limited swag.</span>
                       </p>
                     ) : (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-[#8B9092]">Just one more.</span>{' '}
-                        <span className="">Keep sharing to increase your chances.</span>
+                        <span>Keep sharing to increase your chances.</span>
                       </p>
                     )}
                     <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />

@@ -26,7 +26,7 @@ import * as z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerated-type-update-mutation'
-import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 
@@ -108,7 +108,7 @@ const EditEnumeratedTypeSidePanel = ({
         .filter((x) => x.updatedValue.length !== 0)
         .map((x) => ({
           original: x.originalValue,
-          updated: x.updatedValue,
+          updated: x.updatedValue.trim(),
           isNew: x.isNew,
         })),
       ...(data.description !== selectedEnumeratedType.comment
@@ -128,6 +128,12 @@ const EditEnumeratedTypeSidePanel = ({
       form.reset({
         name: selectedEnumeratedType.name,
         description: selectedEnumeratedType.comment ?? '',
+        values: originalEnumeratedTypes,
+      })
+    }
+
+    if (selectedEnumeratedType == undefined) {
+      form.reset({
         values: originalEnumeratedTypes,
       })
     }

@@ -1,0 +1,374 @@
+---
+title: 'Presence'
+description: 'Share state between users with Realtime Presence.'
+subtitle: 'Share state between users with Realtime Presence.'
+---
+
+Let's explore how to implement Realtime Presence to track state between multiple users.
+
+## Usage
+
+You can use the Supabase client libraries to track Presence state between users.
+
+### Initialize the client
+
+Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = 'https://<project>.supabase.co'
+const SUPABASE_KEY = '<your-anon-key>'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+  );
+
+  runApp(MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let supabaseURL = "https://<project>.supabase.co"
+let supabaseKey = "<your-anon-key>"
+let supabase = SupabaseClient(supabaseURL: URL(string: supabaseURL)!, supabaseKey: supabaseKey)
+
+let realtime = supabase.realtime
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabaseUrl = "https://<project>.supabase.co"
+val supabaseKey = "<your-anon-key>"
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+    install(Realtime)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Sync and track state
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
+
+```js
+const roomOne = supabase.channel('room_01')
+
+roomOne
+  .on('presence', { event: 'sync' }, () => {
+    const newState = roomOne.presenceState()
+    console.log('sync', newState)
+  })
+  .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+    console.log('join', key, newPresences)
+  })
+  .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+    console.log('leave', key, leftPresences)
+  })
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final supabase = Supabase.instance.client;
+
+final roomOne = supabase.channel('room_01');
+
+roomOne.onPresenceSync((_) {
+  final newState = roomOne.presenceState();
+  print('sync: $newState');
+}).onPresenceJoin((payload) {
+  print('join: $payload');
+}).onPresenceLeave((payload) {
+  print('leave: $payload');
+}).subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Listen to the presence change stream, emitting a new `PresenceAction` whenever someone joins or leaves:
+
+```swift
+let roomOne = await supabase.channel("room_01")
+let presenceStream = await roomOne.presenceChange()
+
+await roomOne.subscribe()
+
+for await presence in presenceStream {
+  print(presence.join) // You can also use presence.decodeJoins(as: MyType.self)
+  print(presence.leaves) // You can also use presence.decodeLeaves(as: MyType.self)
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Listen to the presence change flow, emitting new a new `PresenceAction` whenever someone joins or leaves:
+
+```kotlin
+val roomOne = supabase.channel("room_01")
+val presenceFlow: Flow<PresenceAction> = roomOne.presenceChangeFlow()
+presenceFlow
+    .onEach {
+        println(it.joins) //You can also use it.decodeJoinsAs<YourType>()
+        println(it.leaves) //You can also use it.decodeLeavesAs<YourType>()
+    }
+    .launchIn(yourCoroutineScope) //You can also use .collect { } here
+
+roomOne.subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+### Sending state
+
+You can send state to all subscribers using `track()`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+{/* prettier-ignore */}
+```js
+const roomOne = supabase.channel('room_01')
+
+const userStatus = {
+  user: 'user-1',
+  online_at: new Date().toISOString(),
+}
+
+roomOne.subscribe(async (status) => {
+  if (status !== 'SUBSCRIBED') { return }
+
+  const presenceTrackStatus = await roomOne.track(userStatus)
+  console.log(presenceTrackStatus)
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+final userStatus = {
+  'user': 'user-1',
+  'online_at': DateTime.now().toIso8601String(),
+};
+
+roomOne.subscribe((status, error) async {
+  if (status != RealtimeSubscribeStatus.subscribed) return;
+
+  final presenceTrackStatus = await roomOne.track(userStatus);
+  print(presenceTrackStatus);
+});
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let roomOne = await supabase.channel("room_01")
+
+// Using a custom type
+let userStatus = UserStatus(
+    user: "user-1",
+    onlineAt: Date().timeIntervalSince1970
+)
+
+await roomOne.subscribe()
+
+try await roomOne.track(userStatus)
+
+// Or using a raw JSONObject.
+await roomOne.track(
+  [
+    "user": .string("user-1"),
+    "onlineAt": .double(Date().timeIntervalSince1970)
+  ]
+)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val roomOne = supabase.channel("room_01")
+
+val userStatus = UserStatus( //Your custom class
+    user = "user-1",
+    onlineAt = Clock.System.now().toEpochMilliseconds()
+)
+
+roomOne.subscribe(blockUntilSubscribed = true) //You can also use the roomOne.status flow instead, but this parameter will block the coroutine until the status is joined.
+
+roomOne.track(userStatus)
+```
+
+</TabPanel>
+</Tabs>
+
+A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
+
+### Stop tracking
+
+You can stop tracking presence using the `untrack()` method. This will trigger the `sync` and `leave` event handlers.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const untrackPresence = async () => {
+  const presenceUntrackStatus = await roomOne.untrack()
+  console.log(presenceUntrackStatus)
+}
+
+untrackPresence()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+untrackPresence() async {
+  final presenceUntrackStatus = await roomOne.untrack();
+  print(presenceUntrackStatus);
+}
+
+untrackPresence();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await roomOne.untrack()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+suspend fun untrackPresence() {
+	roomOne.untrack()
+}
+
+untrackPresence()
+```
+
+</TabPanel>
+</Tabs>
+
+## Presence options
+
+You can pass configuration options while initializing the Supabase Client.
+
+### Presence key
+
+By default, Presence will generate a unique `UUIDv1` key on the server to track a client channel's state. If you prefer, you can provide a custom key when creating the channel. This key should be unique among clients.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const channelC = supabase.channel('test', {
+  config: {
+    presence: {
+      key: 'userId-123',
+    },
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final channelC = supabase.channel(
+  'test',
+  opts: const RealtimeChannelConfig(key: 'userId-123'),
+);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let channelC = await supabase.channel("test") {
+  $0.presence.key = "userId-123"
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val channelC = supabase.channel("test") {
+    presence {
+        key = "userId-123"
+    }
+}
+```
+
+</TabPanel>
+</Tabs>

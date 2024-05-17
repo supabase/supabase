@@ -1,4 +1,4 @@
-import { SpreadsheetData } from './SpreadsheetImport.types'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 
 export const UPLOAD_FILE_TYPES = [
   'text/csv',

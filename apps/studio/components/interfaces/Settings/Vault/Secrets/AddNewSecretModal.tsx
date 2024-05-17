@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
-import { useStore } from 'hooks'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
+import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
+import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface AddNewSecretModalProps {
@@ -11,18 +15,24 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
-  const { vault, ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
+  const { project } = useProjectContext()
 
-  const keys = vault.listKeys()
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
+  const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
+
+  const { data: keys } = usePgSodiumKeysQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   useEffect(() => {
-    if (visible) {
+    if (visible && keys) {
       setShowSecretValue(false)
       setSelectedKeyId(keys[0]?.id ?? 'create-new')
     }
-  }, [visible])
+  }, [visible, keys])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -34,23 +44,27 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   const onAddNewSecret = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     setSubmitting(true)
     let encryptionKeyId = selectedKeyId
 
     if (selectedKeyId === 'create-new') {
-      const addKeyRes = await vault.addKey(values.keyName || undefined)
+      const addKeyRes = await addKeyMutation({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        name: values.keyName || undefined,
+      })
       if (addKeyRes.error) {
-        return ui.setNotification({
-          error: addKeyRes.error,
-          category: 'error',
-          message: `Failed to create new key: ${addKeyRes.error.message}`,
-        })
+        return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
       } else {
         encryptionKeyId = addKeyRes[0].id
       }
     }
 
-    const res = await vault.addSecret({
+    const res = await addSecret({
+      projectRef: project.ref,
+      connectionString: project?.connectionString,
       name: values.name,
       description: values.description,
       secret: values.secret,
@@ -58,18 +72,11 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     })
 
     if (!res.error) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully added new secret ${values.name}`,
-      })
+      toast.success(`Successfully added new secret ${values.name}`)
       onClose()
       setSubmitting(false)
     } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to add secret ${values.name}: ${res.error.message}`,
-      })
+      toast.error(`Failed to add secret ${values.name}: ${res.error.message}`)
       setSubmitting(false)
     }
   }

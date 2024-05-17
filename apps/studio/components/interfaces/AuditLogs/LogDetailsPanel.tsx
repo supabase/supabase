@@ -1,5 +1,5 @@
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import { AuditLog } from 'data/organizations/organization-audit-logs-query'
+import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import dayjs from 'dayjs'

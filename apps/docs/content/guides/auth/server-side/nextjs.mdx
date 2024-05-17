@@ -1,0 +1,998 @@
+---
+title: 'Setting up Server-Side Auth for Next.js'
+sidebar_label: 'Next.js guide'
+hideToc: true
+---
+
+Next.js comes in two flavors: the [App Router](https://nextjs.org/docs/app) and the [Pages Router](https://nextjs.org/docs/pages). You can set up Server-Side Auth with either strategy. You can even use both in the same application.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="app" queryGroup="router">
+
+<TabPanel id="app" label="App Router">
+
+<StepHikeCompact>
+
+<StepHikeCompact.Step step={1}>
+
+<StepHikeCompact.Details title="Install Supabase packages">
+
+Install the `@supabase/supabase-js` package and the helper `@supabase/ssr` package.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```sh
+npm install @supabase/supabase-js @supabase/ssr
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={2}>
+
+<StepHikeCompact.Details title="Set up environment variables">
+
+Create a `.env.local` file in your project root directory.
+
+Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
+
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="anonKey" />
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```txt .env.local
+NEXT_PUBLIC_SUPABASE_URL=<your_supabase_project_url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={3}>
+
+<StepHikeCompact.Details title="Write utility functions to create Supabase clients">
+
+To access Supabase from your Next.js app, you need 2 types of Supabase clients:
+
+1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
+1. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
+
+Create a `utils/supabase` folder with a file for each type of client. Then copy the utility functions for each client type.
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <Accordion.Item
+      header={<span className="text-foreground">What does the `cookies` object do?</span>}
+      id="utility-cookies"
+    >
+
+    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
+
+    The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up middleware in the next step to write refreshed cookies to storage.
+
+    The cookie is named `sb-<project_ref>-auth-token` by default.
+
+    </Accordion.Item>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <Accordion.Item
+      header={<span className="text-foreground">Do I need to create a new client for every route?</span>}
+      id="client-deduplication"
+    >
+
+        Yes! Creating a Supabase client is lightweight.
+
+        - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
+        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
+
+    </Accordion.Item>
+
+  </div>
+</Accordion>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code className="min-h-[34rem]">
+
+```ts utils/supabase/client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+```
+
+```ts utils/supabase/server.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export function createClient() {
+  const cookieStore = cookies()
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={4}>
+
+<StepHikeCompact.Details title="Hook up middleware">
+
+Create a `middleware.ts` file at the root of your project.
+
+Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
+
+The middleware is responsible for:
+
+1. Refreshing the Auth token (by calling `supabase.auth.getUser`).
+1. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
+1. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
+
+Copy the middleware code for your app.
+
+Add a [matcher](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths) so the middleware doesn't run on routes that don't access Supabase.
+
+<Admonition type="danger">
+
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
+
+Always use `supabase.auth.getUser()` to protect pages and user data.
+
+_Never_ trust `supabase.auth.getSession()` inside server code such as middleware. It isn't guaranteed to revalidate the Auth token.
+
+It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+
+</Admonition>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code className="min-h-[800px]">
+
+```ts middleware.ts
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/utils/supabase/middleware'
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
+```
+
+```ts utils/supabase/middleware.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getUser()
+
+  return response
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={5}>
+
+<StepHikeCompact.Details title="Create a login page">
+
+Create a login page for your app. Use a Server Action to call the Supabase signup function.
+
+Since Supabase is being called from an Action, use the client defined in `@/utils/supabase/server.ts`.
+
+<Admonition type="note">
+
+Note that `cookies` is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
+
+See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+
+</Admonition>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code className="min-h-[34rem]">
+
+```ts app/login/page.tsx
+import { login, signup } from './actions'
+
+export default function LoginPage() {
+  return (
+    <form>
+      <label htmlFor="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+      <label htmlFor="password">Password:</label>
+      <input id="password" name="password" type="password" required />
+      <button formAction={login}>Log in</button>
+      <button formAction={signup}>Sign up</button>
+    </form>
+  )
+}
+```
+
+```ts app/login/actions.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function login(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+
+export async function signup(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+```
+
+```ts app/error/page.tsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={6}>
+
+<StepHikeCompact.Details title="Change the Auth confirmation path">
+
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
+
+Change the email template to support a server-side authentication flow.
+
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
+
+</StepHikeCompact.Details>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={7}>
+
+<StepHikeCompact.Details title="Create a route handler for Auth confirmation">
+
+Create a Route Handler for `auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+
+Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```ts app/auth/confirm/route.ts
+import { type EmailOtpType } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
+  const next = searchParams.get('next') ?? '/'
+
+  const redirectTo = request.nextUrl.clone()
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
+
+  if (token_hash && type) {
+    const supabase = createClient()
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+    if (!error) {
+      redirectTo.searchParams.delete('next')
+      return NextResponse.redirect(redirectTo)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/error'
+  return NextResponse.redirect(redirectTo)
+}
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={8}>
+
+<StepHikeCompact.Details title="Access user info from Server Component">
+
+Server Components can read cookies, so you can get the Auth status and user info.
+
+Since you're calling Supabase from a Server Component, use the client created in `@/utils/supabase/server.ts`.
+
+Create a `private` page that users can only access if they're logged in. The page displays their email.
+
+<Admonition type="danger">
+
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
+
+Always use `supabase.auth.getUser()` to protect pages and user data.
+
+_Never_ trust `supabase.auth.getSession()` inside Server Components. It isn't guaranteed to revalidate the Auth token.
+
+It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+
+</Admonition>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```ts app/private/page.tsx
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export default async function PrivatePage() {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/login')
+  }
+
+  return <p>Hello {data.user.email}</p>
+}
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Called Supabase from a Server Action.
+- Called Supabase from a Server Component.
+- Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
+- Set up middleware to automatically refresh the Supabase Auth session.
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
+<TabPanel id="pages" label="Pages Router">
+
+<StepHikeCompact>
+
+<StepHikeCompact.Step step={1}>
+
+<StepHikeCompact.Details title="Install Supabase packages">
+
+Install the `@supabase/supabase-js` package and the helper `@supabase/ssr` package.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```sh
+npm install @supabase/supabase-js @supabase/ssr
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={2}>
+
+<StepHikeCompact.Details title="Set up environment variables">
+
+Create a `.env.local` file in your project root directory.
+
+Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
+
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="anonKey" />
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```txt .env.local
+NEXT_PUBLIC_SUPABASE_URL=<your_supabase_project_url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={3}>
+
+<StepHikeCompact.Details title="Write utility functions to create Supabase clients">
+
+To access Supabase from your Next.js app, you need 4 types of Supabase clients:
+
+1. **`getServerSideProps` client** - To access Supabase from `getServerSideProps`.
+1. **`getStaticProps` client** - To access Supabase from `getStaticProps`.
+1. **Component client** - To access Supabase from within components.
+1. **API route client** - To access Supabase from API route handlers.
+
+Create a `utils/supabase` folder with a file for each type of client. Then copy the utility functions for each client type.
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b pb-3">
+    <Accordion.Item
+      header={<span className="text-foreground">Why do I need so many types of clients?</span>}
+      id="nextjs-clients"
+    >
+
+      A Supabase client reads and sets cookies in order to access and update the user session. Depending on where the client is used, it needs to interact with cookies in a different way:
+
+      - **`getServerSideProps`** - Runs on the server. Reads cookies from the request, which is passed through from `GetServerSidePropsContext`.
+      - **`getStaticProps`** - Runs at build time, where there is no user, session, or cookies.
+      - **Component** - Runs on the client. Reads cookies from browser storage. Behind the scenes, `createBrowserClient` reuses the same client instance if called multiple times, so don't worry about deduplicating the client yourself.
+      - **API route** - Runs on the server. Reads cookies from the request, which is passed through from `NextApiRequest`.
+
+    </Accordion.Item>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <Accordion.Item
+      header={<span className="text-foreground">What does the `cookies` object do?</span>}
+      id="client-storage-cookies"
+    >
+
+    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. But you only need to set them up once. You can then reuse your utility functions whenever you need a Supabase client.
+
+    The cookie is named `sb-<project_ref>-auth-token` by default.
+
+    </Accordion.Item>
+
+  </div>
+</Accordion>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code>
+
+```ts utils/supabase/server-props.ts
+import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
+import { type GetServerSidePropsContext } from 'next'
+
+export function createClient(context: GetServerSidePropsContext) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return context.req.cookies[name]
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          context.res.appendHeader('Set-Cookie', serialize(name, value, options))
+        },
+        remove(name: string, options: CookieOptions) {
+          context.res.appendHeader('Set-Cookie', serialize(name, '', options))
+        },
+      },
+    }
+  )
+
+  return supabase
+}
+```
+
+```ts utils/supabase/static-props.ts
+import { createClient as createClientPrimitive } from '@supabase/supabase-js'
+
+export function createClient() {
+  const supabase = createClientPrimitive(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return supabase
+}
+```
+
+```ts utils/supabase/component.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return supabase
+}
+```
+
+```ts utils/supabase/api.ts
+import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
+import { type NextApiRequest, type NextApiResponse } from 'next'
+
+export default function createClient(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies[name]
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          res.appendHeader('Set-Cookie', serialize(name, value, options))
+        },
+        remove(name: string, options: CookieOptions) {
+          res.appendHeader('Set-Cookie', serialize(name, '', options))
+        },
+      },
+    }
+  )
+
+  return supabase
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={4}>
+
+<StepHikeCompact.Details title="Create a login page">
+
+Create a login page for your app.
+
+Since Supabase is being called from a component, use the client defined in `@/utils/supabase/component.ts`.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code>
+
+```ts pages/login.tsx
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
+import { createClient } from '@/utils/supabase/component'
+
+export default function LoginPage() {
+  const router = useRouter()
+  const supabase = createClient()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  async function logIn() {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
+  }
+
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
+  }
+
+  return (
+    <main>
+      <form>
+        <label htmlFor="email">Email:</label>
+        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label htmlFor="password">Password:</label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="button" onClick={logIn}>
+          Log in
+        </button>
+        <button type="button" onClick={signUp}>
+          Sign up
+        </button>
+      </form>
+    </main>
+  )
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={5}>
+
+<StepHikeCompact.Details title="Change the Auth confirmation path">
+
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
+
+Change the email template to support a server-side authentication flow.
+
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
+
+</StepHikeCompact.Details>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={6}>
+
+<StepHikeCompact.Details title="Create a route handler for Auth confirmation">
+
+Create an API route for `api/auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+
+Since this is an API route, use the Supabase client from `@/utils/supabase/api.ts`.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+<CH.Code>
+
+```ts pages/api/auth/confirm.ts
+import { type EmailOtpType } from '@supabase/supabase-js'
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+import createClient from '@/utils/supabase/api'
+
+function stringOrFirstString(item: string | string[] | undefined) {
+  return Array.isArray(item) ? item[0] : item
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'GET') {
+    res.status(405).appendHeader('Allow', 'GET').end()
+    return
+  }
+
+  const queryParams = req.query
+  const token_hash = stringOrFirstString(queryParams.token_hash)
+  const type = stringOrFirstString(queryParams.type)
+
+  let next = '/error'
+
+  if (token_hash && type) {
+    const supabase = createClient(req, res)
+    const { error } = await supabase.auth.verifyOtp({
+      type: type as EmailOtpType,
+      token_hash,
+    })
+    if (error) {
+      console.error(error)
+    } else {
+      next = stringOrFirstString(queryParams.next) || '/'
+    }
+  }
+
+  res.redirect(next)
+}
+```
+
+```tsx pages/error.tsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={7}>
+
+<StepHikeCompact.Details title="Make an authenticated-only page using `getServerSideProps`">
+
+If you use dynamic server-side rendering, you can serve a page to authenticated users only by checking for the user data in `getServerSideProps`. Unauthenticated users will be redirected to the home page.
+
+Since you're calling Supabase from `getServerSideProps`, use the client from `@/utils/supabase/server-props.ts`.
+
+<Admonition type="danger">
+
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
+
+Always use `supabase.auth.getUser()` to protect pages and user data.
+
+_Never_ trust `supabase.auth.getSession()` inside server code. It isn't guaranteed to revalidate the Auth token.
+
+It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+
+</Admonition>
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```ts pages/private.tsx
+import type { User } from '@supabase/supabase-js'
+import type { GetServerSidePropsContext } from 'next'
+
+import { createClient } from '@/utils/supabase/server-props'
+
+export default function PrivatePage({ user }: { user: User }) {
+  return <h1>Hello, {user.email || 'user'}!</h1>
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const supabase = createClient(context)
+
+  const { data, error } = await supabase.auth.getUser()
+
+  if (error || !data) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user: data.user,
+    },
+  }
+}
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={8}>
+
+<StepHikeCompact.Details title="Fetch static data using `getStaticProps`">
+
+You can also fetch static data at build time using Supabase. Note that there's no session or user at build time, so the data will be the same for everyone who sees the page.
+
+Add some countries data to your database by running the [Countries Quickstart](https://supabase.com/dashboard/project/_/sql/quickstarts) in the dashboard.
+
+Then fetch the countries data using `getStaticProps` with the client from `@/utils/supabase/static-props.ts`.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```ts pages/public.tsx
+import { createClient } from '@/utils/supabase/static-props'
+
+export default function PublicPage({ data }: { data?: any[] }) {
+  return <pre>{data && JSON.stringify(data, null, 2)}</pre>
+}
+
+export async function getStaticProps() {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.from('countries').select()
+
+  if (error || !data) {
+    return { props: {} }
+  }
+
+  return { props: { data } }
+}
+```
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Called Supabase from a component
+- Called Supabase from an API route
+- Called Supabase from `getServerSideProps`
+- Called Supabase from `getStaticProps`
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
+<TabPanel id="hybrid" label="Hybrid router strategies">
+
+You can use both the App and Pages Routers together.
+
+Follow the instructions for both the App and Pages Routers. Whenever you need to connect to Supabase, import the `createClient` utility that you need:
+
+| Router       | Code location                                     | Which `createClient` to use |
+| ------------ | ------------------------------------------------- | --------------------------- |
+| App Router   | Server Component, Server Action, or Route Handler | `server.ts`                 |
+|              | Client Component                                  | `client.ts`                 |
+| Pages Router | `getServerSideProps`                              | `server-props.ts`           |
+|              | `getStaticProps`                                  | `static-props.ts`           |
+|              | Component                                         | `component.ts`              |
+|              | API route                                         | `api.ts`                    |
+
+Remember to create the `middleware.ts` file for the App Router so the session refreshes for App Router pages.
+
+</TabPanel>
+
+</Tabs>

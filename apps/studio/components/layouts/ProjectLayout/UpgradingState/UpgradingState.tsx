@@ -18,15 +18,13 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useStore } from 'hooks'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 const UpgradingState = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
@@ -57,8 +55,6 @@ const UpgradingState = () => {
   const refetchProjectDetails = async () => {
     setLoading(true)
 
-    const projectDetail = await getProjectDetail({ ref })
-    if (projectDetail) meta.setProjectDetails(projectDetail)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
@@ -161,8 +157,8 @@ const UpgradingState = () => {
                               (progressStage - 2 <= 0
                                 ? 0
                                 : progressStage > 6
-                                ? 5
-                                : progressStage - 2) * -28
+                                  ? 5
+                                  : progressStage - 2) * -28
                             }px`,
                       }}
                     >
@@ -191,15 +187,15 @@ const UpgradingState = () => {
                                 isCurrent
                                   ? 'text-foreground'
                                   : isCompleted
-                                  ? 'text-foreground-light'
-                                  : 'text-foreground-lighter'
+                                    ? 'text-foreground-light'
+                                    : 'text-foreground-lighter'
                               } hover:text-foreground transition`}
                             >
                               {isCurrent
                                 ? message.progress
                                 : isCompleted
-                                ? message.completed
-                                : message.initial}
+                                  ? message.completed
+                                  : message.initial}
                             </p>
                           </div>
                         )

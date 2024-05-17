@@ -456,7 +456,7 @@ const DATABASE_PERMISSIONS = {
       },
     },
     {
-      description: 'Can read database replications',
+      description: 'Can read database publications',
       permissions: {
         owner: true,
         admin: true,
@@ -466,7 +466,7 @@ const DATABASE_PERMISSIONS = {
       },
     },
     {
-      description: 'Can update database replications',
+      description: 'Can update database publications',
       permissions: {
         owner: true,
         admin: true,

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ComposableMap,
   Geographies,
@@ -17,30 +17,29 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMoreVertical,
   ScrollArea,
 } from 'ui'
 
-import { AWS_REGIONS_KEYS, BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
-import GeographyData from './MapData.json'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { MoreVertical } from 'lucide-react'
+import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
+import GeographyData from './MapData.json'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
 interface MapViewProps {
   onSelectDeployNewReplica: (region: AWS_REGIONS_KEYS) => void
   onSelectRestartReplica: (database: Database) => void
-  onSelectResizeReplica: (database: Database) => void
   onSelectDropReplica: (database: Database) => void
 }
 
 const MapView = ({
   onSelectDeployNewReplica,
   onSelectRestartReplica,
-  onSelectResizeReplica,
   onSelectDropReplica,
 }: MapViewProps) => {
   const { ref } = useParams()
@@ -70,21 +69,17 @@ const MapView = ({
   const selectedRegion = AVAILABLE_REPLICA_REGIONS.find(
     (region) => region.region === selectedRegionKey
   )
-  const databasesInSelectedRegion = useMemo(
-    () =>
-      databases
-        .filter((database) => database.region.includes(selectedRegionKey))
-        .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
-        .sort((database) => (database.identifier === ref ? -1 : 0)),
-    [ref, selectedRegionKey]
-  )
+  const databasesInSelectedRegion = databases
+    .filter((database) => database.region.includes(selectedRegionKey))
+    .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
+    .sort((database) => (database.identifier === ref ? -1 : 0))
 
   useEffect(() => {
     setTimeout(() => setMount(true), 100)
   }, [])
 
   return (
-    <div className="bg-background h-[500px] relative">
+    <div className="bg-studio h-[500px] relative">
       <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
         <ZoomableGroup
           className={mount ? 'transition-all duration-300' : ''}
@@ -159,14 +154,14 @@ const MapView = ({
                       name: hasNoDatabases
                         ? undefined
                         : hasPrimary
-                        ? `Primary Database${
-                            replicas.length > 0
-                              ? ` + ${replicas.length} replica${replicas.length > 1 ? 's' : ''} `
-                              : ''
-                          }`
-                        : `${replicas.length} Read Replica${
-                            replicas.length > 1 ? 's' : ''
-                          } deployed`,
+                          ? `Primary Database${
+                              replicas.length > 0
+                                ? ` + ${replicas.length} replica${replicas.length > 1 ? 's' : ''} `
+                                : ''
+                            }`
+                          : `${replicas.length} Read Replica${
+                              replicas.length > 1 ? 's' : ''
+                            } deployed`,
                     },
                   })
                 }}
@@ -192,8 +187,8 @@ const MapView = ({
                     hasNoDatabases
                       ? 'fill-background-surface-300 stroke-border-stronger'
                       : hasPrimary
-                      ? 'fill-brand stroke-brand-500'
-                      : 'fill-brand-500 stroke-brand-400'
+                        ? 'fill-brand stroke-brand-500'
+                        : 'fill-brand-500 stroke-brand-400'
                   }`}
                 />
               </Marker>
@@ -203,7 +198,7 @@ const MapView = ({
           {tooltip !== undefined && zoom === 1.5 && (
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
-                <div className="bg-background/50 rounded border">
+                <div className="bg-studio/50 rounded border">
                   <div className="px-3 py-2 flex flex-col gap-y-1">
                     <div className="flex items-center gap-x-2">
                       <img
@@ -229,7 +224,7 @@ const MapView = ({
       </ComposableMap>
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col bg-background/50 backdrop-blur-sm border rounded w-[400px]">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-studio/50 backdrop-blur-sm border rounded w-[400px]">
           <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">
@@ -264,12 +259,14 @@ const MapView = ({
                                 database.identifier.length > 0 &&
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
-                          {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
-                            <Badge color="green">Healthy</Badge>
-                          ) : database.status === PROJECT_STATUS.COMING_UP ? (
-                            <Badge color="slate">Coming up</Badge>
+                          {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                            <Badge variant="brand">Healthy</Badge>
+                          ) : database.status === REPLICA_STATUS.COMING_UP ? (
+                            <Badge>Coming up</Badge>
+                          ) : database.status === REPLICA_STATUS.RESTORING ? (
+                            <Badge>Restarting</Badge>
                           ) : (
-                            <Badge color="amber">Unhealthy</Badge>
+                            <Badge variant="warning">Unhealthy</Badge>
                           )}
                         </p>
                         <p className="text-xs text-foreground-light">AWS • {database.size}</p>
@@ -280,31 +277,42 @@ const MapView = ({
                       {database.identifier !== ref && (
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                            <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
-                            <DropdownMenuItem className="gap-x-2">
+                          <DropdownMenuContent className="w-40" side="bottom" align="end">
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                            >
                               <Link
                                 href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
                               >
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            {/* <DropdownMenuItem
+                            <DropdownMenuItem
                               className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                            >
+                              <Link
+                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                              >
+                                View replication lag
+                              </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                               onClick={() => onSelectRestartReplica(database)}
                             >
                               Restart replica
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
-                              onClick={() => onSelectResizeReplica(database)}
-                            >
-                              Resize replica
-                            </DropdownMenuItem> */}
-                            <div className="border-t" />
-                            <DropdownMenuItem
-                              className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                               onClick={() => onSelectDropReplica(database)}
                             >
                               Drop replica

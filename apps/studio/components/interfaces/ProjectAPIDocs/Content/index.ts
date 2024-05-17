@@ -1,26 +1,12 @@
-import EdgeFunctions from './EdgeFunctions'
-import Entities from './Entities'
-import Introduction from './Introduction'
-import Realtime from './Realtime'
-import Storage from './Storage'
-import StoredProcedures from './StoredProcedures'
-import UserManagement from './UserManagement'
+export { default as EdgeFunctions } from './EdgeFunctions'
+export { default as Entities } from './Entities'
+export { default as Introduction } from './Introduction'
+export { default as Realtime } from './Realtime'
+export { default as Storage } from './Storage'
+export { default as StoredProcedures } from './StoredProcedures'
+export { default as UserManagement } from './UserManagement'
 
-import Bucket from './Bucket'
-import EdgeFunction from './EdgeFunction'
-import Entity from './Entity'
-import RPC from './RPC'
-
-export {
-  Bucket,
-  EdgeFunction,
-  EdgeFunctions,
-  Entities,
-  Entity,
-  Introduction,
-  RPC,
-  Realtime,
-  Storage,
-  StoredProcedures,
-  UserManagement,
-}
+export { default as Bucket } from './Bucket'
+export { default as EdgeFunction } from './EdgeFunction'
+export { default as Entity } from './Entity'
+export { default as RPC } from './RPC'

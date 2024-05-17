@@ -6,7 +6,6 @@ import {
 } from '@supabase/shared-types/out/events'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
-import { useCallback } from 'react'
 import { configKeys } from './keys'
 
 export type ProjectUpgradingStatusVariables = {
@@ -77,19 +76,4 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
       ...options,
     }
   )
-}
-
-export const useProjectUpgradingStatusPrefetch = ({
-  projectRef,
-}: ProjectUpgradingStatusVariables) => {
-  const client = useQueryClient()
-
-  //[josheh] need to invalidate the eligibility key
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.upgradeStatus(projectRef), ({ signal }) =>
-        getProjectUpgradingStatus({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
 }

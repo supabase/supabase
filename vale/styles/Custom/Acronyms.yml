@@ -1,0 +1,71 @@
+extends: conditional
+message: "The first instance of '%s' should be spelled out, followed by the acronym in brackets. For example: 'Data Definition Language (DDL)'"
+link: 'https://developers.google.com/style/abbreviations'
+level: suggestion
+ignorecase: false
+# Ensures that the existence of 'first' implies the existence of 'second'.
+first: '\b([A-Z]{3,5})\b'
+second: '(?:\b[A-Z][a-z]+ )+\(([A-Z]{3,5})\)'
+# ... with the exception of these:
+exceptions:
+  - API
+  - ARM
+  - ASP
+  - CLI
+  - CPU
+  - CSS
+  - CSV
+  - DEBUG
+  - DOM
+  - DPI
+  - FAQ
+  - GCC
+  - GDB
+  - GDPR
+  - GET
+  - GPT
+  - GPU
+  - GTK
+  - GUI
+  - HTML
+  - HTTP
+  - HTTPS
+  - IDE
+  - IMDB
+  - JAR
+  - JSON
+  - JSX
+  - JWT
+  - LESS
+  - LLDB
+  - NET
+  - NOTE
+  - NVDA
+  - OSS
+  - PATH
+  - PDF
+  - PHP
+  - POST
+  - RAM
+  - REPL
+  - REST
+  - RSA
+  - SCM
+  - SCSS
+  - SDK
+  - SQL
+  - SSH
+  - SSL
+  - SVG
+  - TBD
+  - TCP
+  - TODO
+  - URI
+  - URL
+  - USB
+  - USD
+  - UTF
+  - XML
+  - XSS
+  - YAML
+  - ZIP

@@ -19,6 +19,7 @@
   - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
   - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
 - [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai)
 - [x] Gösterge Tablosu
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -36,19 +37,6 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) 
 - [E-posta Desteği](https://supabase.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
 - [Discord](https://discord.supabase.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
 
-## Durum
-
-- [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
-- [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
-- [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-Şu anda Genel Beta aşamasındayız. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
----
-
 ## Nasıl çalışır
 
 Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özelliklerini kurumsal düzeyde, açık kaynaklı ürünler kullanarak oluşturuyoruz. Araçlar ve topluluklar MIT, Apache 2 veya eşdeğer bir açık lisansla mevcutsa, bu aracı kullanacak ve destekleyeceğiz. Araç mevcut değilse, kendimiz oluşturur ve açık kaynak kullanırız. Supabase, Firebase'in bire bir eşlemesi değildir. Amacımız, geliştiricilere açık kaynak araçları kullanarak Firebase benzeri bir geliştirici deneyimi sunmaktır.
@@ -58,7 +46,7 @@ Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özellikler
 Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
 Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
 
-![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/), 30 yılı aşkın süredir aktif olarak geliştirilmekte olan ve güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne sahip olan nesne ilişkisel bir veritabanı sistemidir.
 - [Realtime](https://github.com/supabase/realtime), websockets kullanarak PostgreSQL ekleme, güncelleme ve silme işlemlerini dinlemenizi sağlayan bir Elixir sunucusudur. Realtime, veritabanı değişiklikleri için Postgres'in yerleşik çoğaltma işlevini yoklar, değişiklikleri JSON'a dönüştürür ve ardından JSON'u web soketleri üzerinden yetkili istemcilere yayınlar.
@@ -210,6 +198,42 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
+## Rozetler
+
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
 
 ## Çeviriler
 

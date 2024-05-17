@@ -103,7 +103,9 @@
 @layer base {
   body {
     @apply bg text;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
     font-family: 'Circular std';
   }
 }
@@ -113,6 +115,12 @@
 .light .docs-story,
 .dark .docs-story {
   @apply bg text font-[400];
-  font-feature-settings: 'rlig' 1, 'calt' 1;
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
   font-family: 'Circular std';
+}
+
+html {
+  @apply bg text font-[400];
 }

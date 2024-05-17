@@ -90,8 +90,8 @@ const Team = () => {
 
   return (
     <div className="border-t border-default">
-      <SectionContainer className="">
-        <SectionHeader title="Team" paragraph={<div className=""></div>} />
+      <SectionContainer>
+        <SectionHeader title="Team" paragraph={<div></div>} />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
             <p>

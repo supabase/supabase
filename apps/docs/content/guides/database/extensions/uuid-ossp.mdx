@@ -1,0 +1,96 @@
+---
+id: 'uuid-ossp'
+title: 'uuid-ossp: Unique Identifiers'
+description: 'A UUID generator for PostgreSQL.'
+---
+
+The `uuid-ossp` extension can be used to generate a `UUID`.
+
+## Overview
+
+A `UUID` is a "Universally Unique Identifier" and it is, for practical purposes, unique.
+This makes them particularly well suited as Primary Keys. It is occasionally referred to as a `GUID`, which stands for "Globally Unique Identifier".
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "uuid-ossp" and enable the extension.
+
+**Note**:
+Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Example: enable the "uuid-ossp" extension
+create extension "uuid-ossp" with schema extensions;
+
+-- Example: disable the "uuid-ossp" extension
+drop extension if exists "uuid-ossp";
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
+
+**Note**:
+Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
+
+</TabPanel>
+</Tabs>
+
+## The `uuid` type
+
+Once the extension is enabled, you now have access to a `uuid` type.
+
+## `uuid_generate_v1()`
+
+Creates a UUID value based on the combination of computer’s MAC address, current timestamp, and a random value.
+
+<Admonition type="note">
+
+UUIDv1 leaks identifiable details, which might make it unsuitable for certain security-sensitive applications.
+
+</Admonition>
+
+## `uuid_generate_v4()`
+
+Creates UUID values based solely on random numbers. You can also use Postgres's built-in [`gen_random_uuid()`](https://www.postgresql.org/docs/current/functions-uuid.html) function to generate a UUIDv4.
+
+## Examples
+
+### Within a query
+
+```sql
+select uuid_generate_v4();
+```
+
+### As a primary key
+
+Automatically create a unique, random ID in a table:
+
+```sql
+create table contacts (
+  id uuid default uuid_generate_v4(),
+  first_name text,
+  last_name text,
+  primary key (id)
+);
+```
+
+## Resources
+
+- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
+- [The Basics Of PostgreSQL `UUID` Data Type](https://www.postgresqltutorial.com/postgresql-uuid/)

@@ -116,7 +116,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                 </div>
               </div>
             </div>
-            <SectionContainer className="">
+            <SectionContainer>
               <LaunchWeekPrizeSection />
             </SectionContainer>
             {users && <TicketBrickWall users={users.slice(0, 17)} />}

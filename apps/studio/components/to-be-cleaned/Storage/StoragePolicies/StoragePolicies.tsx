@@ -1,36 +1,57 @@
+import { useParams } from 'common'
 import { filter, find, get, isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useStore } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-import { useParams } from 'common'
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-
 const StoragePolicies = () => {
-  const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
-  const storageStore = useStorageStore()
-  const { loaded } = storageStore
-
-  const { data } = useBucketsQuery({ projectRef })
+  const { data, isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
 
-  const roles = meta.roles.list((role: any) => !meta.roles.systemRoles.includes(role.name))
-
-  const [policies, setPolicies] = useState<any[]>([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
   const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<any>({})
+
+  const {
+    data: policiesData,
+    refetch,
+    isLoading: isLoadingPolicies,
+  } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: 'storage',
+  })
+  const policies = policiesData ?? []
+
+  const isLoading = isLoadingBuckets || isLoadingPolicies
+
+  const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
+  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
+    onSuccess: async () => {
+      await refetch()
+      toast.success('Successfully deleted policy!')
+      setSelectedPolicyToDelete({})
+    },
+  })
 
   // Only use storage policy editor when creating new policies for buckets
   const showStoragePolicyEditor =
@@ -52,19 +73,6 @@ const StoragePolicies = () => {
   // Policies under storage.buckets
   const storageBucketPolicies = filter(policies, { table: 'buckets' })
 
-  useEffect(() => {
-    fetchPolicies()
-  }, [])
-
-  const fetchPolicies = async () => {
-    if (meta) {
-      await meta.policies.load()
-      const storagePolicies =
-        meta?.policies.list((policy: any) => policy.schema === 'storage') ?? []
-      setPolicies(storagePolicies)
-    }
-  }
-
   const onSelectPolicyAdd = (bucketName = '', table = '') => {
     setSelectedPolicyToEdit({})
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
@@ -83,8 +91,8 @@ const StoragePolicies = () => {
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
 
   const onSavePolicySuccess = async () => {
-    ui.setNotification({ category: 'success', message: 'Successfully saved policy!' })
-    await fetchPolicies()
+    toast.success('Successfully saved policy!')
+    await refetch()
     onCancelPolicyEdit()
   }
 
@@ -93,57 +101,74 @@ const StoragePolicies = () => {
     For each API call within the Promise.all, return true if an error occurred, else return false
   */
   const onCreatePolicies = async (payloads: any[]) => {
+    if (!project) {
+      console.error('Project is required')
+      return true
+    }
+
     return await Promise.all(
       payloads.map(async (payload) => {
-        const res = await meta.policies.create(payload)
-        if (res.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Error adding policy: ${res.error.message}`,
+        try {
+          await createDatabasePolicy({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            payload,
           })
+          return false
+        } catch (error: any) {
+          toast.error(`Error adding policy: ${error.message}`)
           return true
         }
-        return false
       })
     )
   }
 
   const onCreatePolicy = async (payload: any) => {
-    const res = await meta.policies.create(payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error adding policy: ${res.error.message}`,
-      })
+    if (!project) {
+      console.error('Project is required')
       return true
     }
-    return false
+
+    try {
+      await createDatabasePolicy({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        payload,
+      })
+      return false
+    } catch (error: any) {
+      toast.error(`Error adding policy: ${error.message}`)
+      return true
+    }
   }
 
   const onUpdatePolicy = async (payload: any) => {
-    const res = await meta.policies.update(payload.id, payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error updating policy: ${res.error.message}`,
-      })
+    if (!project) {
+      console.error('Project is required')
       return true
     }
-    return false
+
+    try {
+      await updateDatabasePolicy({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        id: payload.id,
+        payload,
+      })
+      return false
+    } catch (error: any) {
+      toast.error(`Error updating policy: ${error.message}`)
+      return true
+    }
   }
 
   const onDeletePolicy = async () => {
-    const res: any = await meta.policies.del(selectedPolicyToDelete.id)
-    if (res) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete policy: ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
-    }
-    setSelectedPolicyToDelete({})
-    await fetchPolicies()
+    if (!project) return console.error('Project is required')
+    deleteDatabasePolicy({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: selectedPolicyToDelete.id,
+    })
   }
 
   return (
@@ -154,7 +179,7 @@ const StoragePolicies = () => {
         bucket level.
       </p>
 
-      {!loaded ? (
+      {isLoading ? (
         <div className="flex h-full items-center justify-center">
           <IconLoader className="animate-spin" size={16} />
         </div>
@@ -168,7 +193,8 @@ const StoragePolicies = () => {
               find(formattedStorageObjectPolicies, { name: bucket.name }),
               ['policies'],
               []
-            )
+            ).sort((a: any, b: any) => a.name.localeCompare(b.name))
+
             return (
               <StoragePoliciesBucketRow
                 key={bucket.name}
@@ -183,7 +209,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="!mb-4 w-full border-b border-gray-600" />
+          <div className="!mb-4 w-full border-b border-muted" />
           <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control
@@ -215,7 +241,6 @@ const StoragePolicies = () => {
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
-        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -223,9 +248,8 @@ const StoragePolicies = () => {
 
       {/* Adding policies to objets/buckets table or editting any policy uses the general policy editor */}
       <PolicyEditorModal
-        visible={showGeneralPolicyEditor}
         schema="storage"
-        roles={roles}
+        visible={showGeneralPolicyEditor}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}
@@ -248,4 +272,4 @@ const StoragePolicies = () => {
   )
 }
 
-export default observer(StoragePolicies)
+export default StoragePolicies

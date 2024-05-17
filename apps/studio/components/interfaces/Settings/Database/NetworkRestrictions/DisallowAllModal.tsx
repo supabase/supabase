@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { Button, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
@@ -16,12 +16,15 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['127.0.0.1/32'] })
+    await applyNetworkRestrictions({
+      projectRef: ref,
+      dbAllowedCidrs: [],
+      dbAllowedCidrsV6: [],
+    })
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}
@@ -37,8 +40,8 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
           <InformationBox
             defaultVisibility
             hideCollapse
-            title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
-            description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+            title="Note: Restrictions only apply to direct connections to your database and Supavisor"
+            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
           />
         </div>
       </Modal.Content>

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { invoicesKeys } from './keys'
 
 export type InvoicesVariables = {
@@ -25,7 +25,7 @@ export async function getInvoices(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

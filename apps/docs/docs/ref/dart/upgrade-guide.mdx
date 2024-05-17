@@ -497,6 +497,76 @@ We have brought numerous updates behind the scenes to make the SDK work more int
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
+    #### Deprecate FetchOption in favor of `count()` and `head()` methods
+
+    `FetchOption()` on `.select()` is now deprecated, and new `.count()` and `head()` methods are added to the query builder.
+
+    `count()` on `.select()` performs the select while also getting the count value, and `.count()` directly on `.from()` performs a head request resulting in only fetching the count value.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // Request with count option
+        final res = await supabase.from('cities').select(
+              'name',
+              const FetchOptions(
+                count: CountOption.exact,
+              ),
+            );
+
+        final data = res.data;
+        final count = res.count;
+
+        // Request with count and head option
+        // obtains the count value without fetching the data.
+        final res = await supabase.from('cities').select(
+              'name',
+              const FetchOptions(
+                count: CountOption.exact,
+                head: true,
+              ),
+            );
+
+        final count = res.count;
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Request with count option
+        final res = await supabase
+            .from('cities')
+            .select('name')
+            .count(); // CountOption.exact is the default value
+
+        final data = res.data;
+        final int count = res.count;
+
+        // `.count()` directly on `.from()` performs a head request,
+        // obtaining the count value without fetching the data.
+        final int count = await supabase
+            .from('cities')
+            .count(); // CountOption.exact is the default value
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
     #### PostgREST error codes
 
     The `PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code.

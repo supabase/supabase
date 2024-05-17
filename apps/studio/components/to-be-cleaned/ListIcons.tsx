@@ -1,5 +1,4 @@
 import { IconDatabase } from 'ui'
-import SVG from 'react-inlinesvg'
 
 export const vercelIcon = (
   <div className="flex items-center justify-center rounded bg-black p-1">

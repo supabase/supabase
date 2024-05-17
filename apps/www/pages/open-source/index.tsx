@@ -12,7 +12,7 @@ import Sponsorships from '~/components/OpenSource/Sponsorships'
 import pageData from '~/data/open-source'
 
 // Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 const OpenSource = () => {
   const router = useRouter()

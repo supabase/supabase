@@ -1,40 +1,38 @@
-import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { observer } from 'mobx-react-lite'
+import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import {
-  Button,
-  Checkbox,
-  Form,
-  IconAlertCircle,
-  IconExternalLink,
-  IconLoader,
-  IconMail,
-  IconPlus,
-  IconX,
-  Input,
-  Listbox,
-} from 'ui'
+import toast from 'react-hot-toast'
 
-import Divider from 'components/ui/Divider'
+import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
-import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Project } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Listbox,
+  Separator,
+} from 'ui'
+import MultiSelect from 'ui-patterns/MultiSelect'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -44,9 +42,8 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
-  const { ui } = useStore()
   const { isReady } = useRouter()
-  const { ref, subject, category, message } = useParams()
+  const { ref, slug, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -54,6 +51,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [textAreaValue, setTextAreaValue] = useState('')
 
   const {
     data: organizations,
@@ -73,15 +71,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (res, variables) => {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to submit support ticket: ${error.message}`,
-      })
+      toast.error(`Failed to submit support ticket: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -90,6 +84,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
   const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedOrganizationFromUrl = organizations?.find((org) => org.slug === slug)
   const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
@@ -98,31 +93,23 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
-      ? projects[0].ref
-      : 'no-project'
+        ? projects[0].ref
+        : 'no-project'
   )
 
   const selectedOrganizationSlug =
-    selectedProjectRef !== 'no-project'
-      ? organizations?.find((org) => {
-          const project = projects.find((project) => project.ref === selectedProjectRef)
-          return org.id === project?.organization_id
-        })?.slug
-      : organizations?.[0]?.slug
+    selectedOrganizationFromUrl !== undefined
+      ? selectedOrganizationFromUrl.slug
+      : selectedProjectRef !== 'no-project'
+        ? organizations?.find((org) => {
+            const project = projects.find((project) => project.ref === selectedProjectRef)
+            return org.id === project?.organization_id
+          })?.slug
+        : organizations?.[0]?.slug
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganizationSlug,
   })
-
-  useEffect(() => {
-    if (!uploadedFiles) return
-    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
-    setUploadedDataUrls(objectUrls)
-
-    return () => {
-      objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
-    }
-  }, [uploadedFiles])
 
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
@@ -149,10 +136,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
     setUploadedFiles(uploadedFiles.concat(itemsToBeUploaded))
     if (items.length + uploadedFiles.length > MAX_ATTACHMENTS) {
-      ui.setNotification({
-        category: 'info',
-        message: `Only up to ${MAX_ATTACHMENTS} attachments are allowed`,
-      })
+      toast(`Only up to ${MAX_ATTACHMENTS} attachments are allowed`)
     }
 
     event.target.value = ''
@@ -210,6 +194,44 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     submitSupportTicket(payload)
   }
 
+  const handleTextMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextAreaValue(event.target.value)
+  }
+
+  const ipv4MigrationStrings = [
+    'ipv4',
+    'ipv6',
+    'supavisor',
+    'pgbouncer',
+    '5432',
+    'ENETUNREACH',
+    'ECONNREFUSED',
+    'P1001',
+    'connect: no route to',
+    'network is unreac',
+    'could not translate host name',
+    'address family not supported by protocol',
+  ]
+
+  const ipv4MigrationStringMatched = ipv4MigrationStrings.some((str) => textAreaValue.includes(str))
+
+  useEffect(() => {
+    if (!uploadedFiles) return
+    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
+    setUploadedDataUrls(objectUrls)
+
+    return () => {
+      objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
+    }
+  }, [uploadedFiles])
+
+  useEffect(() => {
+    if (isSuccessProjects && ref !== undefined) {
+      const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+      if (selectedProjectFromUrl !== undefined) setSelectedProjectRef(selectedProjectFromUrl.ref)
+    }
+  }, [isSuccessProjects])
+
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
       {({ resetForm, values }: any) => {
@@ -266,7 +288,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
-        }, [isSuccessProjects, isSuccessOrganizations])
+        }, [
+          isSuccessProjects,
+          isSuccessOrganizations,
+          selectedProjectRef,
+          selectedOrganizationSlug,
+        ])
 
         // Populate fields when router is ready, required when navigating to
         // support form on a refresh browser session
@@ -285,7 +312,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         }, [isReady])
 
         return (
-          <div className="space-y-8 w-[620px]">
+          <div className="space-y-8 max-w-[620px] overflow-hidden">
             <div className="px-6">
               <h3 className="text-xl">How can we help?</h3>
             </div>
@@ -313,7 +340,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
             {values.category !== 'Login_issues' && (
               <div className="px-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
                   {isLoadingProjects && (
                     <div className="space-y-2">
                       <p className="text-sm prose">Which project is affected?</p>
@@ -324,7 +351,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="space-y-2">
                       <p className="text-sm prose">Which project is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve projects</p>
                       </div>
                     </div>
@@ -347,6 +374,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             key={`option-${option.ref}`}
                             label={option.name || ''}
                             value={option.ref}
+                            className="!w-72"
                           >
                             <span>{option.name}</span>
                             <span className="block text-xs opacity-50">{organization?.name}</span>
@@ -362,6 +390,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
+                          className="!w-72"
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -378,7 +407,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   </p>
                 ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                   <div className="flex items-center space-x-2 mt-2">
-                    <IconLoader size={14} className="animate-spin" />
+                    <Loader2 size={14} className="animate-spin" />
                     <p className="text-sm text-foreground-light">Checking project's plan</p>
                   </div>
                 ) : (
@@ -408,7 +437,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="space-y-2">
                       <p className="text-sm prose">Which organization is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve organizations</p>
                       </div>
                     </div>
@@ -438,7 +467,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
-                  icon={<IconAlertCircle strokeWidth={2} />}
+                  icon={<AlertCircle size={18} strokeWidth={2} />}
                   defaultVisibility={true}
                   hideCollapse={true}
                   title="Expected response times are based on your project's plan"
@@ -473,7 +502,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         </p>
                       )}
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
                         <Button asChild>
                           <Link
                             href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
@@ -481,7 +510,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             Upgrade project
                           </Link>
                         </Button>
-                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                        <Button asChild type="default" icon={<ExternalLink />}>
                           <Link
                             href="https://supabase.com/contact/enterprise"
                             target="_blank"
@@ -497,7 +526,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </div>
             )}
 
-            <Divider light />
+            <Separator />
 
             {!isDisabled ? (
               <>
@@ -526,7 +555,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
                                 Github discussions
-                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                <ExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -594,7 +623,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                    icon={<ExternalLink size={14} strokeWidth={1.5} />}
                                   >
                                     <Link href={library.url} target="_blank" rel="noreferrer">
                                       View Github issues
@@ -620,7 +649,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Button
                                 asChild
                                 type="default"
-                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                icon={<ExternalLink size={14} strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/supabase/supabase"
@@ -650,14 +679,47 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         />
                       </div>
                     )}
-                    <div className="text-area-text-sm px-6">
+                    <div className="text-area-text-sm px-6 grid gap-4">
                       <Input.TextArea
                         id="message"
                         label="Message"
                         placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
                         limit={5000}
                         labelOptional="5000 character limit"
+                        value={textAreaValue}
+                        onChange={(e) => handleTextMessageChange(e)}
                       />
+                      {ipv4MigrationStringMatched && (
+                        <Alert_Shadcn_ variant="default">
+                          <HelpCircle strokeWidth={2} />
+                          <AlertTitle_Shadcn_>Connection issues?</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="grid gap-3">
+                            <p>
+                              Having trouble connecting to your project? It could be related to our
+                              migration from PGBouncer and IPv4.
+                            </p>
+                            <p>
+                              Please review this GitHub discussion. It's up to date and covers many
+                              frequently asked questions.
+                            </p>
+                            <p>
+                              <Button
+                                asChild
+                                type="default"
+                                icon={<ExternalLink strokeWidth={1.5} />}
+                              >
+                                <Link
+                                  href="https://github.com/orgs/supabase/discussions/17817"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  PGBouncer and IPv4 Deprecation #17817
+                                </Link>
+                              </Button>
+                            </p>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                     </div>
                     {['Problem', 'Database_unresponsive', 'Performance'].includes(
                       values.category
@@ -703,7 +765,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               ].join(' ')}
                               onClick={() => removeUploadedFile(idx)}
                             >
-                              <IconX size={12} strokeWidth={2} />
+                              <X size={12} strokeWidth={2} />
                             </div>
                           </div>
                         ))}
@@ -717,7 +779,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
                             }}
                           >
-                            <IconPlus strokeWidth={2} size={20} />
+                            <Plus strokeWidth={2} size={20} />
                           </div>
                         )}
                       </div>
@@ -736,7 +798,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <Button
                           htmlType="submit"
                           size="small"
-                          icon={<IconMail />}
+                          icon={<Mail />}
                           disabled={isSubmitting}
                           loading={isSubmitting}
                         >
@@ -757,4 +819,4 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   )
 }
 
-export default observer(SupportForm)
+export default SupportForm

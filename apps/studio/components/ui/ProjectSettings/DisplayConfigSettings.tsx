@@ -78,8 +78,8 @@ const DisplayConfigSettings = () => {
                 jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
                   ? 'JWT secret update failed'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                  ? 'Updating JWT secret...'
-                  : jwtSecret
+                    ? 'Updating JWT secret...'
+                    : jwtSecret
               }
               className="input-mono"
               descriptionText="Used to decode your JWTs. You can also use this to mint your own JWTs."

@@ -1,9 +1,5 @@
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
-export interface Dictionary<T> {
-  [Key: string]: T
-}
-
 export interface Sort {
   column: string
   ascending?: boolean

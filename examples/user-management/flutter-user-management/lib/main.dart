@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
 import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
+  await dotenv.load();
+
   await Supabase.initialize(
-    // TODO: Replace credentials with your own
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
-    authFlowType: AuthFlowType.pkce,
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

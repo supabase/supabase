@@ -1,7 +1,8 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
-import { Dictionary, SupaRow } from 'components/grid'
+import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { SupaRow } from 'components/grid'
+import type { Dictionary } from 'types'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import { proxy, useSnapshot } from 'valtio'
 
@@ -12,6 +13,7 @@ type ForeignKey = {
 }
 
 export type SidePanel =
+  | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
@@ -167,6 +169,12 @@ export const createTableEditorState = () => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'json', jsonValue },
+      }
+    },
+    onExpandTextEditor: (column: string, row: Dictionary<any>) => {
+      state.ui = {
+        open: 'side-panel',
+        sidePanel: { type: 'cell', value: { column, row } },
       }
     },
     onEditForeignKeyColumnValue: (foreignKey: ForeignKey) => {

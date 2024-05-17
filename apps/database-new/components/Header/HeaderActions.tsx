@@ -1,37 +1,13 @@
 'use client'
-import { useAppStateSnapshot } from '@/lib/state'
-import { createClient } from '@/lib/supabase/client'
-import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { useRouter, useSelectedLayoutSegment } from 'next/navigation'
-import { useState } from 'react'
+import { useSelectedLayoutSegment } from 'next/navigation'
 import { Button } from 'ui'
-import AvatarDropdown from './AvatarDropdown'
-import NoUserDropdown from './NoUserDropdown'
+
 import SaveSchemaDropdown from './SaveSchemaDropdown'
-import ThemeSwitcherButton from './ThemeSwitcher'
 import ToggleCodeEditorButton from './ToggleCodeEditorButton'
 
-interface HeaderActionsProps {
-  user: User | null
-}
-const HeaderActions = ({ user }: HeaderActionsProps) => {
-  const supabase = createClient()
-  const router = useRouter()
+const HeaderActions = () => {
   const segment = useSelectedLayoutSegment()
-
-  const [currentUser, setCurrentUser] = useState<User | null>(user)
-
-  async function signout() {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      console.log('Error logging out:', error.message)
-      return
-    }
-
-    router.push('/')
-    setCurrentUser(null)
-  }
 
   return (
     <div className="flex items-center gap-x-2">
@@ -46,12 +22,6 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       <Button type="default" className="hidden xl:block">
         <Link href="/">New conversation</Link>
       </Button>
-
-      {/* {currentUser ? (
-        <AvatarDropdown currentUser={currentUser} signout={signout} />
-      ) : (
-        <NoUserDropdown />
-      )} */}
     </div>
   )
 }
