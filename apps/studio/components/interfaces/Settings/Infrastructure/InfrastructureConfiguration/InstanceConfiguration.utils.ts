@@ -10,22 +10,24 @@ import {
 import { groupBy } from 'lodash'
 import type { Database } from 'data/read-replicas/replicas-query'
 import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import { DatabaseStatus } from 'data/read-replicas/replicas-status-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise
 
-export const generateNodes = (
-  primary: Database,
-  replicas: Database[],
-  loadBalancers: LoadBalancer[],
-  {
-    onSelectRestartReplica,
-    onSelectDropReplica,
-  }: {
-    onSelectRestartReplica: (database: Database) => void
-    onSelectDropReplica: (database: Database) => void
-  }
-): Node[] => {
+export const generateNodes = ({
+  primary,
+  replicas,
+  loadBalancers,
+  onSelectRestartReplica,
+  onSelectDropReplica,
+}: {
+  primary: Database
+  replicas: Database[]
+  loadBalancers: LoadBalancer[]
+  onSelectRestartReplica: (database: Database) => void
+  onSelectDropReplica: (database: Database) => void
+}): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
@@ -165,4 +167,12 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   })
 
   return { nodes: [...regionNodes, ...nodes], edges }
+}
+
+export const formatSeconds = (value: number) => {
+  const hours = ~~(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  const seconds = Math.floor(value % 60)
+
+  return `${hours > 0 ? `${hours}h` : ''} ${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
 }
