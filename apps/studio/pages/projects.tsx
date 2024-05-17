@@ -18,6 +18,11 @@ const ProjectsPage: NextPageWithLayout = () => {
   const [search, setSearch] = useState('')
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
+  const [error, setError] = useState(false)
+
+  if (error) {
+    throw new Error('boom')
+  }
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -39,6 +44,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
+      <Button onClick={() => setError(true)}>Throw error</Button>
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
@@ -76,13 +82,6 @@ ProjectsPage.getLayout = (page) => (
       },
     ]}
   >
-    <Button
-      onClick={() => {
-        throw new Error('boom')
-      }}
-    >
-      Throw error
-    </Button>
     {page}
   </AccountLayout>
 )
