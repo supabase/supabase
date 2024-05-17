@@ -253,6 +253,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
         const selectedProject = projects.find((project) => project.ref === values.projectRef)
         const isFreeProject = (subscription?.plan.id ?? 'free') === 'free'
+
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
@@ -322,112 +323,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             <div className="px-6">
               <h3 className="text-xl">How can we help?</h3>
             </div>
-            <div className="px-6">
-              <Listbox
-                id="category"
-                layout="vertical"
-                label="What area are you having problems with?"
-              >
-                {CATEGORY_OPTIONS.map((option, i) => {
-                  return (
-                    <Listbox.Option
-                      key={`option-${option.value}`}
-                      label={option.label}
-                      value={option.value}
-                      className="min-w-[500px]"
-                    >
-                      <span>{option.label}</span>
-                      <span className="block text-xs opacity-50">{option.description}</span>
-                    </Listbox.Option>
-                  )
-                })}
-              </Listbox>
-            </div>
-
-            {values.category !== 'Login_issues' && (
-              <div className="px-6">
-                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
-                  {isLoadingProjects && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which project is affected?</p>
-                      <ShimmeringLoader className="!py-[19px]" />
-                    </div>
-                  )}
-                  {isErrorProjects && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which project is affected?</p>
-                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
-                        <p className="text-sm prose">Failed to retrieve projects</p>
-                      </div>
-                    </div>
-                  )}
-                  {isSuccessProjects && (
-                    <Listbox
-                      id="projectRef"
-                      layout="vertical"
-                      label="Which project is affected?"
-                      onChange={(val) => {
-                        setSelectedProjectRef(val)
-                      }}
-                    >
-                      {projects.map((option) => {
-                        const organization = organizations?.find(
-                          (x) => x.id === option.organization_id
-                        )
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.ref}`}
-                            label={option.name || ''}
-                            value={option.ref}
-                            className="!w-72"
-                          >
-                            <span>{option.name}</span>
-                            <span className="block text-xs opacity-50">{organization?.name}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  )}
-                  <Listbox id="severity" layout="vertical" label="Severity">
-                    {SEVERITY_OPTIONS.map((option: any) => {
-                      return (
-                        <Listbox.Option
-                          key={`option-${option.value}`}
-                          label={option.label}
-                          value={option.value}
-                          className="!w-72"
-                        >
-                          <span>{option.label}</span>
-                          <span className="block text-xs opacity-50">{option.description}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                </div>
-
-                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
-                  <p className="text-sm text-foreground-light mt-2">
-                    This project is on the{' '}
-                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
-                  </p>
-                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
-                  <div className="flex items-center space-x-2 mt-2">
-                    <IconLoader size={14} className="animate-spin" />
-                    <p className="text-sm text-foreground-light">Checking project's plan</p>
-                  </div>
-                ) : (
-                  <></>
-                )}
-                {(values.severity === 'Urgent' || values.severity === 'High') && (
-                  <p className="text-sm text-foreground-light mt-2">
-                    We do our best to respond to everyone as quickly as possible; however,
-                    prioritization will be based on production status. We ask that you reserve High
-                    and Urgent severity for production-impacting issues only.
-                  </p>
-                )}
-              </div>
-            )}
 
             {isSuccessProjects &&
               values.projectRef === 'no-project' &&
@@ -470,6 +365,63 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 </div>
               )}
 
+            {isLoadingProjects && (
+              <div className="space-y-2">
+                <p className="text-sm prose">Which project is affected?</p>
+                <ShimmeringLoader className="!py-[19px]" />
+              </div>
+            )}
+            {isErrorProjects && (
+              <div className="space-y-2">
+                <p className="text-sm prose">Which project is affected?</p>
+                <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                  <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                  <p className="text-sm prose">Failed to retrieve projects</p>
+                </div>
+              </div>
+            )}
+            {isSuccessProjects && (
+              <div className="px-6">
+                <Listbox
+                  id="projectRef"
+                  layout="vertical"
+                  label="Which project is affected?"
+                  onChange={(val) => {
+                    setSelectedProjectRef(val)
+                  }}
+                  className="w-full"
+                >
+                  {projects.map((option) => {
+                    const organization = organizations?.find((x) => x.id === option.organization_id)
+                    return (
+                      <Listbox.Option
+                        key={`option-${option.ref}`}
+                        label={option.name || ''}
+                        value={option.ref}
+                        className="w-full"
+                      >
+                        <span>{option.name}</span>
+                        <span className="block text-xs opacity-50">{organization?.name}</span>
+                      </Listbox.Option>
+                    )
+                  })}
+                </Listbox>
+                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
+                  <p className="text-sm text-foreground-light mt-2">
+                    This project is on the{' '}
+                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
+                  </p>
+                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <IconLoader size={14} className="animate-spin" />
+                    <p className="text-sm text-foreground-light">Checking project's plan</p>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
+            )}
+
             {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
@@ -479,7 +431,10 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   title="Expected response times are based on your project's plan"
                   description={
                     <div className="space-y-4 mb-1">
-                      {subscription?.plan.id === 'free' && (
+                      {selectedProjectRef == 'no-project' && (
+                        <p>Please note that no specific project has been selected.</p>
+                      )}
+                      {subscription?.plan.id === 'free' && selectedProjectRef !== 'no-project' && (
                         <p>
                           Free plan support is available within the community and officially by the
                           team on a best efforts basis. For a guaranteed response we recommend
@@ -529,6 +484,54 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     </div>
                   }
                 />
+              </div>
+            )}
+
+            {values.category !== 'Login_issues' && (
+              <div className="px-6">
+                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
+                  <Listbox
+                    id="category"
+                    layout="vertical"
+                    label="What area are you having problems with?"
+                  >
+                    {CATEGORY_OPTIONS.map((option, i) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
+                          className="min-w-[50px] !w-72"
+                        >
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                  <Listbox id="severity" layout="vertical" label="Severity">
+                    {SEVERITY_OPTIONS.map((option: any) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
+                          className="!w-72"
+                        >
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                </div>
+                {(values.severity === 'Urgent' || values.severity === 'High') && (
+                  <p className="text-sm text-foreground-light mt-2">
+                    We do our best to respond to everyone as quickly as possible; however,
+                    prioritization will be based on production status. We ask that you reserve High
+                    and Urgent severity for production-impacting issues only.
+                  </p>
+                )}
               </div>
             )}
 
