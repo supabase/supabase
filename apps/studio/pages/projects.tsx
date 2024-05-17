@@ -11,6 +11,7 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -75,6 +76,13 @@ ProjectsPage.getLayout = (page) => (
       },
     ]}
   >
+    <Button
+      onClick={() => {
+        throw new Error('boom')
+      }}
+    >
+      Throw error
+    </Button>
     {page}
   </AccountLayout>
 )
