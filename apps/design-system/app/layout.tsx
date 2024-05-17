@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 import { ThemeProvider } from 'common/Providers'
 import { themes } from 'ui'
 import { Provider as JotaiProvider } from 'jotai'
+import Navigation from './Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,7 +29,13 @@ export default function RootLayout({
         enableSystem
         // forcedTheme={forceDarkMode ? 'dark' : undefined}
       > */}
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <main className="mx-auto max-w-[1400px] flex flex-row gap-32">
+            <Navigation />
+
+            <article>{children}</article>
+          </main>
+        </body>
         {/* </ThemeProvider> */}
       </JotaiProvider>
     </html>
