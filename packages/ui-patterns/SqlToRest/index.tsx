@@ -25,7 +25,7 @@ import {
   processSql,
   renderHttp,
   renderSupabaseJs,
-} from 'sql-to-rest'
+} from '@supabase/sql-to-rest'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { assumptions } from './assumptions'

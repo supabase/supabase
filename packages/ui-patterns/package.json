@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
+    "@supabase/sql-to-rest": "^0.1.0",
     "cmdk": "^0.2.1",
     "common": "*",
     "common-tags": "^1.8.2",
@@ -25,7 +26,6 @@
     "reactflow": "*",
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.1",
-    "sql-to-rest": "*",
     "tsconfig": "*",
     "ui": "*"
   },

@@ -1,4 +1,4 @@
-import { HttpRequest, Statement, SupabaseJsQuery } from 'sql-to-rest'
+import { HttpRequest, Statement, SupabaseJsQuery } from '@supabase/sql-to-rest'
 
 export type BaseResult = {
   statement: Statement
