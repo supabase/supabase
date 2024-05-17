@@ -428,61 +428,64 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   icon={<IconAlertCircle strokeWidth={2} />}
                   defaultVisibility={true}
                   hideCollapse={true}
-                  title="Expected response times are based on your project's plan"
-                  description={
-                    <div className="space-y-4 mb-1">
-                      {selectedProjectRef == 'no-project' && (
-                        <p>Please note that no specific project has been selected.</p>
-                      )}
-                      {subscription?.plan.id === 'free' && selectedProjectRef !== 'no-project' && (
-                        <p>
-                          Free plan support is available within the community and officially by the
-                          team on a best efforts basis. For a guaranteed response we recommend
-                          upgrading to the Pro plan. Enhanced SLAs for support are available on our
-                          Enterprise Plan.
-                        </p>
-                      )}
-
-                      {subscription?.plan.id === 'pro' && (
-                        <p>
-                          Pro Plan includes email-based support. You can expect an answer within 1
-                          business day in most situation for all severities. We recommend upgrading
-                          to the Team plan for prioritized ticketing on all issues and prioritized
-                          escalation to product engineering teams. Enhanced SLAs for support are
-                          available on our Enterprise Plan.
-                        </p>
-                      )}
-
-                      {subscription?.plan.id === 'team' && (
-                        <p>
-                          Team plan includes email-based support. You get prioritized ticketing on
-                          all issues and prioritized escalation to product engineering teams. Low,
-                          Normal, and High severity tickets will generally be handled within 1
-                          business day, while Urgent issues, we respond within 1 day, 365 days a
-                          year. Enhanced SLAs for support are available on our Enterprise Plan.
-                        </p>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
-                        <Button asChild>
-                          <Link
-                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade project
-                          </Link>
-                        </Button>
-                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
-                          <Link
-                            href="https://supabase.com/contact/enterprise"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Enquire about Enterprise
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
+                  title={
+                    selectedProjectRef === 'no-project'
+                      ? 'Please note that no project has been selected'
+                      : "Expected response times are based on your project's plan"
                   }
+                  {...(selectedProjectRef !== 'no-project' && {
+                    description: (
+                      <div className="space-y-4 mb-1">
+                        {subscription?.plan.id === 'free' && (
+                          <p>
+                            Free plan support is available within the community and officially by
+                            the team on a best efforts basis. For a guaranteed response we recommend
+                            upgrading to the Pro plan. Enhanced SLAs for support are available on
+                            our Enterprise Plan.
+                          </p>
+                        )}
+
+                        {subscription?.plan.id === 'pro' && (
+                          <p>
+                            Pro Plan includes email-based support. You can expect an answer within 1
+                            business day in most situations for all severities. We recommend
+                            upgrading to the Team plan for prioritized ticketing on all issues and
+                            prioritized escalation to product engineering teams. Enhanced SLAs for
+                            support are available on our Enterprise Plan.
+                          </p>
+                        )}
+
+                        {subscription?.plan.id === 'team' && (
+                          <p>
+                            Team plan includes email-based support. You get prioritized ticketing on
+                            all issues and prioritized escalation to product engineering teams. Low,
+                            Normal, and High severity tickets will generally be handled within 1
+                            business day, while Urgent issues, we respond within 1 day, 365 days a
+                            year. Enhanced SLAs for support are available on our Enterprise Plan.
+                          </p>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
+                          <Button asChild>
+                            <Link
+                              href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
+                            >
+                              Upgrade project
+                            </Link>
+                          </Button>
+                          <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                            <Link
+                              href="https://supabase.com/contact/enterprise"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Enquire about Enterprise
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ),
+                  })}
                 />
               </div>
             )}
