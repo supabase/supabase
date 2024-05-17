@@ -31,7 +31,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
@@ -52,6 +52,7 @@ import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { useRouter } from 'next/router'
+import { ErrorBoundary } from 'react-error-boundary'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -111,6 +112,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
+  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    console.error(error.stack)
+    Sentry.captureException(error, { level: 'error' })
+  }
+
   useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
@@ -144,9 +150,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <Sentry.ErrorBoundary
-      fallback={(props) => <ErrorBoundaryState pathname={router.pathname} {...props} />}
-    >
+    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <AuthContainer>
@@ -185,7 +189,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           </AuthContainer>
         </Hydrate>
       </QueryClientProvider>
-    </Sentry.ErrorBoundary>
+    </ErrorBoundary>
   )
 }
 
