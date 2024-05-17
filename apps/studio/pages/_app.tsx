@@ -51,6 +51,7 @@ import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -80,6 +81,7 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
+  const router = useRouter()
   const queryClient = useRootQueryClient()
   const consentToastId = useRef<string>()
 
@@ -142,7 +144,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <Sentry.ErrorBoundary fallback={ErrorBoundaryState}>
+    <Sentry.ErrorBoundary
+      fallback={(props) => <ErrorBoundaryState pathname={router.pathname} {...props} />}
+    >
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <AuthContainer>

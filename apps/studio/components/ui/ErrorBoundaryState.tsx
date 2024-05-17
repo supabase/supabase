@@ -1,13 +1,23 @@
-import { FallbackRender } from '@sentry/nextjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { Button } from 'ui'
 
-export const ErrorBoundaryState: FallbackRender = ({ error, componentStack, resetError }) => {
-  const router = useRouter()
-  const message = `Path name: ${router.pathname}\n\n${componentStack}`
+type ErrorBoundaryStateProps = {
+  error: Error
+  componentStack: string
+  eventId: string
+  resetError(): void
+  pathname: string
+}
+
+export const ErrorBoundaryState = ({
+  pathname,
+  error,
+  componentStack,
+  resetError,
+}: ErrorBoundaryStateProps) => {
+  const message = `Path name: ${pathname}\n\n${componentStack}`
 
   return (
     <div className="w-screen h-screen flex items-center justify-center flex-col gap-y-3">
