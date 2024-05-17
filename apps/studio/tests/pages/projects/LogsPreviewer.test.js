@@ -1,10 +1,11 @@
+import { act, findByRole, findByText, fireEvent, screen, waitFor } from '@testing-library/react'
+import { wait } from '@testing-library/user-event/dist/utils'
+import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-
-dayjs.extend(utc)
+import { useRouter } from 'next/router'
 
 import { get } from 'lib/common/fetch'
-import { useRouter } from 'next/router'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -13,22 +14,32 @@ const defaultRouterMock = () => {
   router.pathname = 'logs/path'
   return router
 }
-useRouter.mockReturnValue(defaultRouterMock())
 
+useRouter.mockReturnValue(defaultRouterMock())
+dayjs.extend(utc)
+
+import { useParams } from 'common'
+import { auth } from 'lib/gotrue'
+import { LogsTableName } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { fireEvent, waitFor, screen, act } from '@testing-library/react'
-import { render } from '../../helpers'
-import userEvent from '@testing-library/user-event'
-import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
-jest.mock('common/hooks')
-import { useParams } from 'common/hooks'
+import { render } from '../../helpers'
+
+// [Joshen] There's gotta be a much better way to mock these things so that it applies for ALL tests
+// Since these are easily commonly used things across all pages/components that we might be testing for
+jest.mock('common', () => ({
+  useParams: jest.fn().mockReturnValue({}),
+  useIsLoggedIn: jest.fn(),
+}))
+jest.mock('lib/gotrue', () => ({
+  auth: { onAuthStateChange: jest.fn() },
+}))
 
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
+
   useRouter.mockReset()
   const routerReturnValue = defaultRouterMock()
   useRouter.mockReturnValue(routerReturnValue)
@@ -43,7 +54,7 @@ const defaultRendererFallbacksCases = [
   'api',
   'database',
   'auth',
-  'pgbouncer',
+  'supavisor',
   'postgrest',
   'storage',
   'realtime',
@@ -142,7 +153,7 @@ test.each([
   },
   ...defaultRendererFallbacksCases,
   // these all use teh default selection/table renderers
-  ...['pgbouncer', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
+  ...['supavisor', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
     queryType,
     tableName: undefined,
     tableLog: logDataFixture({
@@ -212,12 +223,12 @@ test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
     if (url.includes('something')) {
       return {
-        result: [logDataFixture({ id: 'some-event-id' })],
+        result: [logDataFixture({ id: 'some-event-id-123', event_message: 'some-message' })],
       }
     }
     return { result: [] }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer projectRef="123" queryType="auth" />)
 
   userEvent.type(screen.getByPlaceholderText(/Search events/), 'something{enter}')
 
@@ -238,26 +249,29 @@ test('Search will trigger a log refresh', async () => {
     },
     { timeout: 1500 }
   )
-  await screen.findByText(/some-event-id/)
+  const table = await screen.findByRole('table')
+  await findByText(table, /some-message/, { selector: '*' }, { timeout: 1500 })
 })
 
 test('poll count for new messages', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
       return { result: [{ count: 999 }] }
-    }
-    return {
-      result: [logDataFixture({ id: 'some-uuid123' })],
+    } else {
+      return {
+        result: [logDataFixture({ id: 'some-uuid123', status_code: 200, method: 'GET' })],
+      }
     }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await waitFor(() => screen.queryByText(/some-uuid123/) === null)
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
+  await waitFor(() => screen.queryByText(/200/) === null)
   // should display new logs count
   await waitFor(() => screen.getByText(/999/))
 
-  userEvent.click(screen.getByText(/Refresh/))
+  // Refresh button only exists with the queryType param, which no longer shows the id column
+  userEvent.click(screen.getByTitle('refresh'))
   await waitFor(() => screen.queryByText(/999/) === null)
-  await screen.findByText(/some-uuid123/)
+  await screen.findByText(/200/)
 })
 
 test('stop polling for new count on error', async () => {
@@ -322,6 +336,7 @@ test('te= query param will populate the timestamp to input', async () => {
     )
   })
 })
+
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
   const newDate = new Date()
@@ -347,21 +362,21 @@ test('load older btn will fetch older logs', async () => {
       return {}
     }
     return {
-      result: [logDataFixture({ id: 'first event' })],
+      result: [logDataFixture({ id: 'some-uuid123', status_code: 200, method: 'GET' })],
     }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
   // should display first log but not second
-  await waitFor(() => screen.getByText('first event'))
-  await expect(screen.findByText('second event')).rejects.toThrow()
+  await waitFor(() => screen.getByText('GET'))
+  await expect(screen.findByText('POST')).rejects.toThrow()
 
   get.mockResolvedValueOnce({
-    result: [logDataFixture({ id: 'second event' })],
+    result: [logDataFixture({ id: 'some-uuid234', status_code: 203, method: 'POST' })],
   })
   // should display first and second log
   userEvent.click(await screen.findByText('Load older'))
-  await screen.findByText('first event')
-  await screen.findByText('second event')
+  await screen.findByText('GET')
+  await screen.findByText('POST')
   expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end='), expect.anything())
 })
 
@@ -373,7 +388,7 @@ test('bug: load older btn does not error out when previous page is empty', async
     }
     return { result: [] }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
 
   userEvent.click(await screen.findByText('Load older'))
   // NOTE: potential race condition, since we are asserting that something DOES NOT EXIST
@@ -424,17 +439,20 @@ test('bug: nav backwards with params change results in ui changing', async () =>
 })
 
 test('bug: nav to explorer preserves newlines', async () => {
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  const router = useRouter()
-  userEvent.click(await screen.findByText(/Explore/))
-  await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent('\n')))
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
+  const button = screen.getByRole('link', { name: 'Explore via query' })
+  expect(button.href).toContain(encodeURIComponent('\n'))
 })
+
 test('filters alter generated query', async () => {
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))
   userEvent.click(await screen.findByText(/500 error codes/))
   userEvent.click(await screen.findByText(/200 codes/))
-  userEvent.click(await screen.findByText(/Save/))
+  userEvent.click(await screen.findByText(/Apply/))
 
   await waitFor(() => {
     // counts are adjusted
@@ -458,7 +476,7 @@ test('filters alter generated query', async () => {
 
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))
   userEvent.click(await screen.findByText(/400 codes/))
-  userEvent.click(await screen.findByText(/Save/))
+  userEvent.click(await screen.findByText(/Apply/))
 
   await waitFor(() => {
     // counts are adjusted
@@ -481,6 +499,7 @@ test('filters alter generated query', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'), expect.anything())
   })
 })
+
 test('filters accept filterOverride', async () => {
   render(
     <LogsPreviewer
@@ -532,7 +551,7 @@ test('datepicker onChange will set the query params for outbound api request', a
   get.mockImplementation((url) => {
     return { result: [] }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer queryType="api" projectRef="123" tableName={LogsTableName.EDGE} />)
   // renders time locally
   userEvent.click(await screen.findByText('Custom'))
   // inputs with local time

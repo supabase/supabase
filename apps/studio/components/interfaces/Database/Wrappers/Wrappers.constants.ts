@@ -46,6 +46,57 @@ export const WRAPPERS: WrapperMeta[] = [
     },
     tables: [
       {
+        label: 'Accounts',
+        description: 'List of accounts on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'business_type',
+            type: 'text',
+          },
+          {
+            name: 'country',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'accounts',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
         label: 'Balance',
         description: 'The balance currently on your Stripe account',
         availableColumns: [

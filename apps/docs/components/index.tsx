@@ -4,10 +4,11 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TabPanel, Tabs } from '~/components/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
@@ -23,9 +24,10 @@ import RefHeaderSection from './reference/RefHeaderSection'
 
 // Other components
 import AuthProviders from '~/components/AuthProviders'
+import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
-import { ProjectConfigVariables } from './ProjectConfigVariables'
+import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -33,10 +35,12 @@ import { SharedData } from './SharedData'
 
 // Partials
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
 import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
+import OAuthPkceFlow from './MDX/oauth_pkce_flow.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
@@ -70,6 +74,7 @@ import {
 // Heavy/rare (lazy-loaded)
 import SqlToRest from '@ui-patterns/SqlToRest'
 import { AppleSecretGenerator } from './AppleSecretGenerator'
+import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
 import { Mermaid } from './Mermaid'
@@ -86,11 +91,14 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthRateLimits,
+  AuthSmsProviderConfig,
   Button,
   ButtonCard,
   CH,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   CodeBlock,
+  CostWarning,
   DatabaseSetup,
   Extensions,
   GetSessionWarning,
@@ -141,6 +149,7 @@ const components = {
   Mermaid,
   MigrationWarnings,
   NavData,
+  OAuthPkceFlow,
   Options,
   Param,
   ProjectConfigVariables,
@@ -154,8 +163,8 @@ const components = {
   SocialProviderSetup,
   SqlToRest,
   StepHikeCompact,
-  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-  Tabs: (props: any) => <Tabs wrappable {...props} />,
+  TabPanel,
+  Tabs,
 }
 
 export default components

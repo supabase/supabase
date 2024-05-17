@@ -85,7 +85,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -280,7 +280,7 @@ functions:
       - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false``.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
@@ -496,6 +496,14 @@ functions:
           ```swift
           try await supabase.auth.session
           ```
+      - id: get-current-session-no-validation
+        name: Get the current session without validation
+        isSpotlight: true
+        description: The session returned by this property may be expired.
+        code: |
+          ```swift
+          let session = supabase.auth.currentSession
+          ```
   - id: get-user
     title: "user()"
     description: |
@@ -516,6 +524,14 @@ functions:
         code: |
           ```swift
           let user = try await supabase.auth.user(jwt: "custom-jwt")
+          ```
+      - id: get-current-user
+        name: Get current user
+        isSpotlight: true
+        description: The user returned by this property may be outdated.
+        code: |
+          ```swift
+          let user = supabase.auth.currentUser
           ```
   - id: update-user
     title: "updateUser()"
@@ -3206,6 +3222,21 @@ functions:
                 headers: [
                   "my-custom-header": "my-custom-header-value"
                 ]
+              )
+            )
+          ```
+      - id: additional-query-params
+        name: Pass additional query params
+        description: |
+          You can pass additional query params when invoking a function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                query: [URLQueryItem(name: "key", value: "value")]
               )
             )
           ```

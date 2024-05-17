@@ -116,7 +116,7 @@ export const MultiSelectV2 = ({
             <CommandList_Shadcn_>
               <CommandEmpty_Shadcn_>No options found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
-                <ScrollArea className={cn(formattedOptions.length > 5 ? 'h-[225px]' : '')}>
+                <ScrollArea className={cn(formattedOptions.length > 7 ? 'h-[210px]' : '')}>
                   {formattedOptions?.map((option) => {
                     const active =
                       selectedOptions &&

@@ -64,7 +64,7 @@ export const UsePoolerCheckbox = ({
   return (
     <>
       <div className="flex flex-col gap-y-1">
-        <div className="flex gap-x-3">
+        <div className="flex gap-x-3 items-center">
           <Checkbox_Shadcn_
             id={`use-pooler-${id}`}
             checked={checked}

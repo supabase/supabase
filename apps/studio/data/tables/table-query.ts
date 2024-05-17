@@ -1,10 +1,9 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-// import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { tableKeys } from './keys'
 import { useCallback } from 'react'
+
 import { get, handleError } from 'data/fetchers'
+import { tableKeys } from './keys'
 
 export type TableVariables = {
   id?: number

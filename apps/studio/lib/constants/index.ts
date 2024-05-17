@@ -34,7 +34,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
-  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
