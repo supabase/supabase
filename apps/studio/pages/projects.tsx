@@ -11,14 +11,12 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
-  const [error, setError] = useState(false)
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
@@ -38,12 +36,8 @@ const ProjectsPage: NextPageWithLayout = () => {
     }
   }, [navLayoutV2, isSuccess, hasWindowLoaded])
 
-  if (error) {
-    throw new Error('boom')
-  }
   return (
     <>
-      <Button onClick={() => setError(true)}>Throw error</Button>
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}

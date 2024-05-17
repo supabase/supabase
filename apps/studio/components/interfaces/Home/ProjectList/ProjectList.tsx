@@ -16,6 +16,7 @@ import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-w
 import { useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
+import { useState } from 'react'
 import type { Organization, ResponseError } from 'types'
 import { Button, IconPlus } from 'ui'
 import ProjectCard from './ProjectCard'
@@ -27,6 +28,7 @@ export interface ProjectListProps {
 }
 
 const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
+  const [error, setError] = useState(false)
   const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
@@ -66,8 +68,13 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
     return <NoSearchResults searchString={search} />
   }
 
+  if (error) {
+    throw new Error('boom')
+  }
+
   return isSuccess && organizations && organizations?.length > 0 ? (
     <>
+      <Button onClick={() => setError(true)}>Throw error</Button>
       {organizations?.map((organization) => {
         return (
           <OrganizationProjects
