@@ -20,10 +20,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   useAutoProjectsPrefetch()
   const [error, setError] = useState(false)
 
-  if (error) {
-    throw new Error('boom')
-  }
-
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -42,6 +38,9 @@ const ProjectsPage: NextPageWithLayout = () => {
     }
   }, [navLayoutV2, isSuccess, hasWindowLoaded])
 
+  if (error) {
+    throw new Error('boom')
+  }
   return (
     <>
       <Button onClick={() => setError(true)}>Throw error</Button>
