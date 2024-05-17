@@ -580,6 +580,34 @@ functions:
           ```swift
           let identities = try await supabase.auth.userIdentities()
           ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider)
+          ```
+        description: |
+          Uses:
+            - `NSWorkspace.shared.open` in macOS
+            - `UIApplication.shared.open` in iOS, tvOS, visionOS, and macOS Catalyst
+            - `WKExtension.shared().openSystemURL` in watchOS
+      - id: link-identity-custom-urlopener
+        name: Link an identity to a user with custom URL opening logic
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider) { url in 
+            // custom URL opening logic
+          }
+          ```
   - id: unlink-identity
     title: 'unlinkIdentity()'
     notes: |
