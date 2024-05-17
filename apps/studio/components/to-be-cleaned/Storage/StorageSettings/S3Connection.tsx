@@ -1,25 +1,25 @@
-import { differenceInDays } from 'date-fns'
-import React from 'react'
-import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
+
+import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { AlertCircle, MoreVertical, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -33,10 +33,6 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Form_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
@@ -46,55 +42,31 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { FormField } from '@ui/components/shadcn/ui/form'
+import { StorageCredItem } from './StorageCredItem'
+import { getConnectionURL } from './StorageSettings.utils'
 
 export const S3Connection = () => {
-  const [openCreateCred, setOpenCreateCred] = React.useState(false)
-  const [showSuccess, setShowSuccess] = React.useState(false)
-  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
-  const [deleteCred, setDeleteCred] = React.useState<{ id: string; description: string } | null>(
-    null
-  )
-
   const { ref: projectRef } = useParams()
+  const isProjectActive = useIsProjectActive()
   const { project, isLoading: projectIsLoading } = useProjectContext()
 
-  const isProjectActive = useIsProjectActive()
+  const [openCreateCred, setOpenCreateCred] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [deleteCred, setDeleteCred] = useState<{ id: string; description: string } | null>(null)
 
+  const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
   const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery({
     projectRef,
   })
-
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
 
-  const createS3AccessKey = useS3AccessKeyCreateMutation({
-    projectRef,
-  })
-
-  const deleteS3AccessKey = useS3AccessKeyDeleteMutation({
-    projectRef,
-  })
-
-  const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
-
-  function getConnectionURL() {
-    const projUrl = projectAPI
-      ? `${projectAPI.autoApiService.protocol}://${projectAPI.autoApiService.endpoint}`
-      : `https://${projectRef}.supabase.co`
-
-    const url = new URL(projUrl)
-    url.pathname = '/storage/v1/s3'
-    return url.toString()
-  }
-
-  const s3connectionUrl = getConnectionURL()
-
+  const s3connectionUrl = getConnectionURL(projectRef ?? '', projectAPI)
   const FormSchema = z.object({
     description: z.string().min(3, {
       message: 'Description must be at least 3 characters long',
     }),
   })
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -102,9 +74,26 @@ export const S3Connection = () => {
     },
   })
 
+  const {
+    data: createS3KeyData,
+    mutate: createS3AccessKey,
+    isLoading: isCreating,
+  } = useS3AccessKeyCreateMutation({
+    onSuccess: () => {
+      setShowSuccess(true)
+      form.reset()
+    },
+  })
+
+  const { mutate: deleteS3AccessKey, isLoading: isDeleting } = useS3AccessKeyDeleteMutation({
+    onSuccess: () => {
+      setOpenDeleteDialog(false)
+      toast.success('S3 access keys revoked')
+    },
+  })
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    await createS3AccessKey.mutateAsync(data)
-    setShowSuccess(true)
+    createS3AccessKey({ projectRef, ...data })
   }
 
   return (
@@ -193,7 +182,7 @@ export const S3Connection = () => {
                           readOnly
                           copy
                           disabled
-                          value={createS3AccessKey.data?.data?.access_key}
+                          value={createS3KeyData?.access_key}
                         />
                       </FormItemLayout>
                       <FormItemLayout label={'Secret access key'} isReactForm={false}>
@@ -202,7 +191,7 @@ export const S3Connection = () => {
                           readOnly
                           copy
                           disabled
-                          value={createS3AccessKey.data?.data?.secret_key}
+                          value={createS3KeyData?.secret_key}
                         />
                       </FormItemLayout>
                     </DialogSection>
@@ -246,11 +235,7 @@ export const S3Connection = () => {
                         </DialogSection>
 
                         <DialogFooter>
-                          <Button
-                            className="mt-4"
-                            htmlType="submit"
-                            loading={createS3AccessKey.isLoading}
-                          >
+                          <Button className="mt-4" htmlType="submit" loading={isCreating}>
                             Create access key
                           </Button>
                         </DialogFooter>
@@ -333,17 +318,17 @@ export const S3Connection = () => {
       </div>
 
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-        <DialogContent>
+        <DialogContent size="small">
           <DialogHeader>
             <DialogTitle>
-              Revoke <code>{deleteCred?.description}</code> credential
+              Revoke <code className="text-sm">{deleteCred?.description}</code> credential
             </DialogTitle>
             <DialogDescription>
               This action is irreversible and requests made with these access keys will stop
               working.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex justify-end gap-1">
+          <DialogFooter className="flex justify-end gap-x-1">
             <Button
               type="outline"
               onClick={() => {
@@ -355,12 +340,10 @@ export const S3Connection = () => {
             </Button>
             <Button
               type="danger"
-              loading={deleteS3AccessKey.isLoading}
+              loading={isDeleting}
               onClick={async () => {
                 if (!deleteCred) return
-                await deleteS3AccessKey.mutateAsync({ id: deleteCred.id })
-                setOpenDeleteDialog(false)
-                toast.success('S3 access keys revoked')
+                deleteS3AccessKey({ id: deleteCred.id, projectRef })
               }}
             >
               Yes, revoke access keys
@@ -369,73 +352,5 @@ export const S3Connection = () => {
         </DialogContent>
       </Dialog>
     </>
-  )
-}
-
-function StorageCredItem({
-  description,
-  id,
-  created_at,
-  access_key,
-  onDeleteClick,
-}: {
-  description: string
-  id: string
-  created_at: string
-  access_key: string
-  onDeleteClick: (id: string) => void
-}) {
-  function daysSince(date: string) {
-    const now = new Date()
-    const created = new Date(date)
-    const diffInDays = differenceInDays(now, created)
-
-    if (diffInDays === 0) {
-      return 'Today'
-    } else if (diffInDays === 1) {
-      return `${diffInDays} day ago`
-    } else {
-      return `${diffInDays} days ago`
-    }
-  }
-
-  return (
-    <tr className="h-8 text-ellipsis group">
-      <td>
-        <span className="text-foreground">{description}</span>
-      </td>
-      <td>
-        <div className="flex items-center justify-between">
-          <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
-          <span className="w-24 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-            <CopyButton text={access_key} type="default" />
-          </span>
-        </div>
-      </td>
-      <td>{daysSince(created_at)}</td>
-      <td className="text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              icon={<MoreVertical size={14} strokeWidth={1} />}
-              type="text"
-              className="px-1.5 text-foreground-lighter hover:text-foreground"
-            ></Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-w-40" align="end">
-            <DropdownMenuItem
-              className="flex gap-1.5 "
-              onClick={(e) => {
-                e.preventDefault()
-                onDeleteClick(id)
-              }}
-            >
-              <TrashIcon size="14" />
-              Revoke key
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </td>
-    </tr>
   )
 }
