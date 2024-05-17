@@ -332,7 +332,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
-              disabled={status !== PROJECT_STATUS.ACTIVE_HEALTHY}
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
             >
               <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
@@ -340,7 +340,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={status !== PROJECT_STATUS.ACTIVE_HEALTHY}
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
             >
               <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
@@ -348,13 +348,21 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
+            <DropdownMenuItem
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+              className="gap-x-2"
+              onClick={() => onSelectRestartReplica()}
+            >
               Restart replica
             </DropdownMenuItem>
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
+            <DropdownMenuItem
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+              className="gap-x-2"
+              onClick={() => onSelectDropReplica()}
+            >
               Drop replica
             </DropdownMenuItem>
           </DropdownMenuContent>
