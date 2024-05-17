@@ -97,7 +97,6 @@ const WarehouseAccessTokens = () => {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
 
   const deleteWarehouseAccessToken = useDeleteWarehouseAccessToken({
-    projectRef,
     onSuccess: () => {
       toast.success('Access token revoked')
     },
@@ -212,7 +211,10 @@ const WarehouseAccessTokens = () => {
                 loading={deleteWarehouseAccessToken.isLoading}
                 onClick={async () => {
                   if (!tokenToDelete) return
-                  await deleteWarehouseAccessToken.mutateAsync(tokenToDelete)
+                  await deleteWarehouseAccessToken.mutateAsync({
+                    projectRef,
+                    token: tokenToDelete,
+                  })
                   setShowDeleteDialog(false)
                   setTokenToDelete(null)
                 }}
