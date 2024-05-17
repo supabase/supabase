@@ -137,7 +137,7 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="-mb-48">
+        <SectionContainer className="mb-48">
           <APISection
             title="Simple APIs"
             // @ts-ignore
