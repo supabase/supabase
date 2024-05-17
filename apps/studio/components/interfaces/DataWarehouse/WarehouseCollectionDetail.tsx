@@ -38,7 +38,7 @@ export const WarehouseCollectionDetail = () => {
         ...prevParams,
         sql: `
         select id, timestamp, event_message from \`${collection.name}\`
-        where timestamp > '2024-01-01'
+        where timestamp > timestamp_sub(current_timestamp(), interval 7 day)
         order by timestamp desc limit ${pagination.limit} offset ${pagination.offset}
         `,
       }))

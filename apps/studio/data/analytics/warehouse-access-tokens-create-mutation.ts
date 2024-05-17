@@ -1,45 +1,61 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
+import { ResponseError } from 'types'
+import toast from 'react-hot-toast'
 
-type CreateWarehouseAccessToken = {
+type WarehouseAccessTokenCreateVariables = {
+  ref: string
   description: string
 }
-async function createWarehouseAccessToken(ref: string, payload: CreateWarehouseAccessToken) {
-  const res = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
+async function createWarehouseAccessToken({
+  ref,
+  description,
+}: WarehouseAccessTokenCreateVariables) {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: {
       path: { ref },
     },
-    body: payload,
-  } as any)
-  // TODO: remove type casts when openapi client generates correct types
+    body: { description },
+  } as any) // TODO: remove type cast when fetcher fn params are typed
 
-  return res as any as {
-    id: string
-    token: string
-    scopes: string
-    inserted_at: string
-    description?: string
-  }
+  if (error) handleError(error)
+
+  return data
 }
 
-type CreateAccessTokenArgs = {
-  projectRef: string
-  onSuccess: (data: Awaited<ReturnType<typeof createWarehouseAccessToken>>) => void
-}
+type WarehouseAccessTokenUpdateData = Awaited<ReturnType<typeof createWarehouseAccessToken>>
 
-export function useCreateWarehouseAccessToken({ projectRef, onSuccess }: CreateAccessTokenArgs) {
+export function useCreateWarehouseAccessToken({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<
+    WarehouseAccessTokenUpdateData,
+    ResponseError,
+    WarehouseAccessTokenCreateVariables
+  >,
+  'mutationFn'
+> = {}) {
   const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: (payload: CreateWarehouseAccessToken) =>
-      createWarehouseAccessToken(projectRef, payload),
-    mutationKey: analyticsKeys.warehouseCollections(projectRef),
-    onSuccess: (data) => {
-      onSuccess(data)
-      const keysToInvalidate = analyticsKeys.warehouseAccessTokens(projectRef)
-      queryClient.invalidateQueries(keysToInvalidate)
-    },
-  })
 
-  return mutation
+  return useMutation(
+    (payload: WarehouseAccessTokenCreateVariables) => createWarehouseAccessToken(payload),
+    {
+      async onSuccess(data, vars, context) {
+        const keysToInvalidate = analyticsKeys.warehouseAccessTokens(vars.ref)
+        await queryClient.invalidateQueries(keysToInvalidate)
+        await onSuccess?.(data, vars, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create token: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }

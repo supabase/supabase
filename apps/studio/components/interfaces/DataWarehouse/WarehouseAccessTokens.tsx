@@ -107,7 +107,6 @@ const WarehouseAccessTokens = () => {
   })
 
   const createWarehouseAccessToken = useCreateWarehouseAccessToken({
-    projectRef,
     onSuccess: () => {
       toast.success('Access token created')
     },
@@ -122,7 +121,10 @@ const WarehouseAccessTokens = () => {
           actions={
             <CreateWarehouseAccessToken
               onSubmit={async ({ description }) => {
-                await createWarehouseAccessToken.mutateAsync({ description: description })
+                await createWarehouseAccessToken.mutateAsync({
+                  ref: projectRef,
+                  description: description,
+                })
               }}
             />
           }
