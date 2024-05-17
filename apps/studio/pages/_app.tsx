@@ -24,14 +24,14 @@ import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider, useThemeSandbox } from 'common'
+import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
@@ -45,7 +45,6 @@ import {
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
-import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
@@ -110,13 +109,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
-    console.error(error.stack)
-    Sentry.captureMessage(`Full page crash: ${error.message || 'Unknown error message'}`, {
-      level: 'error',
-    })
-  }
-
   useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
@@ -150,7 +142,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+    <Sentry.ErrorBoundary fallback={ErrorBoundaryState}>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <AuthContainer>
@@ -189,7 +181,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           </AuthContainer>
         </Hydrate>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </Sentry.ErrorBoundary>
   )
 }
 
