@@ -21,6 +21,11 @@ import { OPT_IN_TAGS } from 'lib/constants'
 import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
+const isValidName = (name: string): boolean => {
+  const regex = /^[\p{L}\p{N}\s]*$/u
+  return regex.test(name)
+}
+
 const GeneralSettings = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
@@ -44,6 +49,10 @@ const GeneralSettings = () => {
     }
 
     if (!slug) return console.error('Slug is required')
+
+    if (!isValidName(values.name)) {
+      return toast.error('Organization name contains invalid characters')
+    }
 
     const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
     const updatedOptInTags =

@@ -19,8 +19,18 @@ import type { Profile } from 'data/profile/types'
 import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
+  first_name: z
+    .string()
+    .optional()
+    .refine((value) => /^[\p{L}\s]*$/u.test(value || ''), {
+      message: 'First name can only contain letters and spaces',
+    }),
+  last_name: z
+    .string()
+    .optional()
+    .refine((value) => /^[\p{L}\s]*$/u.test(value || ''), {
+      message: 'Last name can only contain letters and spaces',
+    }),
 })
 
 const formId = 'profile-information-form'
