@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Index } from '@/registry'
+import { Index } from '@/__registry__'
 
 import { cn } from 'ui'
 import { useConfig } from '@/hooks/use-config'
@@ -44,6 +44,10 @@ export function ComponentPreview({
   const Code = Codes[index]
 
   const Preview = React.useMemo(() => {
+    console.log('Index', Index)
+    console.log('name', name)
+    console.log('config.style', config.style)
+
     const Component = Index[config.style][name]?.component
     // const Component = Index[name]?.component
 

@@ -80,7 +80,22 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
-      title: 'Components',
+      title: 'Pattern Components',
+      items: [
+        {
+          title: 'Accordion',
+          href: '/docs/components/accordion',
+          items: [],
+        },
+        {
+          title: 'Alert',
+          href: '/docs/components/alert',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'Atom Components',
       items: [
         {
           title: 'Accordion',
