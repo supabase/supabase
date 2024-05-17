@@ -1,9 +1,16 @@
+import { supportedAggregateFunctions } from '@supabase/sql-to-rest'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { OpenAIStream } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import OpenAI from 'openai'
 
-import { ApplicationError, ContextLengthError, UserError } from './errors'
+import {
+  ApplicationError,
+  ContextLengthError,
+  EmptyResponseError,
+  EmptySqlError,
+  UserError,
+} from './errors'
 import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
 
 interface Message {
@@ -370,4 +377,90 @@ function capMessages(
   }
 
   return [...initMessages, ...cappedContextMessages]
+}
+
+/**
+ * Generates SQL that is compatible with PostgREST. Intended to be used with
+ * the sql-to-rest translator.
+ *
+ * Background: AI is good at generating SQL, but not PostgREST requests. So we ask
+ * it to generate PostgREST compatible SQL, then run it through the translator lib.
+ *
+ * @returns The generated SQL.
+ */
+export async function generatePostgrestSql(
+  openai: OpenAI,
+  prompt: string,
+  entityDefinitions?: string[]
+) {
+  const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
+
+  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
+
+  completionMessages.push({
+    role: 'system',
+    content: codeBlock`
+      You are a SQL generator for a database called TinyPostgres. TinyPostgres is very similar to Postgres,
+      except that it only supports a subset of SQL. Here are the rules for the type of SQL that is supported:
+
+      - Only SELECT statements are supported
+      - Only the following aggregate functions are supported: ${supportedAggregateFunctions.join(', ')}
+      - All GROUP BY columns must also appear in the select target list
+      - Sub-queries are not supported
+      - Left joins and inner joins must join using columns from each table
+      - Inline expressions are not supported
+      - Unless specified, assume that all tables and columns follow a standard lowercase snake_case naming convention
+
+      Output as JSON in the following format:
+      {"sql": "<generated sql here>"}
+    `,
+  })
+
+  if (hasEntityDefinitions) {
+    completionMessages.push({
+      role: 'user',
+      content: codeBlock`
+        Here is my database schema for reference:
+        ${entityDefinitions.join('\n\n')}
+      `,
+    })
+  }
+
+  completionMessages.push({
+    role: 'user',
+    content: prompt,
+  })
+
+  try {
+    const completionResponse = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo-0125',
+      messages: completionMessages,
+      max_tokens: 1024,
+      temperature: 0,
+      response_format: {
+        type: 'json_object',
+      },
+      stream: false,
+    })
+
+    const [firstChoice] = completionResponse.choices
+    const sqlResponseString = firstChoice.message.content
+
+    if (!sqlResponseString) {
+      throw new EmptyResponseError()
+    }
+
+    const result = JSON.parse(sqlResponseString)
+
+    if (!result.sql) {
+      throw new EmptySqlError()
+    }
+
+    return result
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'context_length_exceeded') {
+      throw new ContextLengthError()
+    }
+    throw error
+  }
 }

@@ -85,6 +85,10 @@ export const generateDocsMenu = (
       ],
     },
     {
+      title: 'Supabase AI',
+      items: [{ name: 'API Generator', key: 'ai', url: `/project/${ref}/api/ai`, items: [] }],
+    },
+    {
       title: 'More Resources',
       items: [
         {

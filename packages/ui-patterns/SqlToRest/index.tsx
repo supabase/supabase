@@ -8,6 +8,7 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import Markdown from 'react-markdown'
@@ -35,17 +36,22 @@ import { transformRenderer } from './syntax-highlighter/transform-renderer'
 import { ResultBundle } from './util'
 
 export interface SqlToRestProps {
+  value?: string
   defaultValue?: string
   defaultBaseUrl?: string
+  hideSql?: boolean
 }
 
 export default function SqlToRest({
+  value,
   defaultValue,
   defaultBaseUrl = 'http://localhost:54321/rest/v1',
+  hideSql = false,
 }: SqlToRestProps) {
   const monaco = useMonaco()
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme?.includes('dark') ?? true
+  const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   useLayoutEffect(() => {
     if (monaco) {
@@ -55,6 +61,18 @@ export default function SqlToRest({
       monaco.editor.defineTheme('supabase-dark', darkMode)
     }
   }, [monaco])
+
+  useEffect(() => {
+    if (value) {
+      const formattedCode = format(value, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+
+      setSql(formattedCode)
+      process(formattedCode)
+    }
+  }, [value])
 
   const [sql, setSql] = useState(defaultValue ?? '')
   const [statement, setStatement] = useState<Statement>()
@@ -248,100 +266,104 @@ export default function SqlToRest({
   }, [process])
 
   return (
-    <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 mt-4">
-      <div className="flex flex-col gap-4">
-        <div className="font-medium">Enter SQL to translate</div>
-        <div
-          className={cn('h-96 py-4 border rounded-md', isDark ? 'bg-[#1f1f1f]' : 'bg-[#f0f0f0]')}
-        >
-          <Editor
-            language="pgsql"
-            theme={isDark ? 'supabase-dark' : 'supabase-light'}
-            value={sql}
-            options={{
-              tabSize: 2,
-              minimap: {
-                enabled: false,
-              },
-              fontSize: 13,
-            }}
-            onMount={async (editor, monaco) => {
-              // Register pgsql formatter
-              monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-                async provideDocumentFormattingEdits(model) {
-                  const currentCode = editor.getValue()
-                  const formattedCode = format(currentCode, {
-                    language: 'postgresql',
-                    keywordCase: 'lower',
-                  })
-                  return [
-                    {
-                      range: model.getFullModelRange(),
-                      text: formattedCode,
-                    },
-                  ]
-                },
-              })
-
-              // Format on cmd+s
-              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
-                await editor.getAction('editor.action.formatDocument').run()
-              })
-
-              // Run format on the initial value
-              await editor.getAction('editor.action.formatDocument').run()
-            }}
-            onChange={async (sql) => {
-              if (!sql) {
-                return
-              }
-              await process(sql)
-            }}
-          />
-        </div>
-
-        {parsingError && (
-          <Alert className="text-red-900">
-            {parsingError.message}. {parsingError.hint}
-          </Alert>
-        )}
-        {unsupportedError && (
-          <Alert className="text-red-900">
-            <div>
-              {unsupportedError.message}. {unsupportedError.hint}
-            </div>
-            <div className="prose text-sm mt-2">
-              PostgREST doesn't support this query. If you're sure the syntax is correct and are
-              unable to modify it, wrap it in a stored procedure and call it using the{' '}
-              <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
-                RPC
-              </a>{' '}
-              endpoint.
-            </div>
-          </Alert>
-        )}
-        {unimplementedError && (
-          <Alert className="text-orange-1000">
-            {unimplementedError.message}.
-            <div className="mt-2 text-white flex gap-1 leading-6">
-              <GitPullRequest className="inline-block" width={16} />
-              <a
-                href="https://github.com/supabase/supabase/issues/new/choose"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Create a PR
-              </a>
-            </div>
-          </Alert>
-        )}
-      </div>
+    <div className={cn('grid grid-cols-1 gap-4 mt-4')}>
       <BaseUrlDialog
         defaultValue={baseUrl}
         onChange={(value) => setBaseUrl(value)}
         open={isBaseUrlDialogOpen}
         onOpenChange={(open) => setIsBaseUrlDialogOpen(open)}
       />
+      {!hideSql && (
+        <div className="flex flex-col gap-4">
+          <div className="font-medium">Enter SQL to translate</div>
+          <div
+            className={cn('h-96 py-4 border rounded-md', isDark ? 'bg-[#1f1f1f]' : 'bg-[#f0f0f0]')}
+          >
+            <Editor
+              language="pgsql"
+              theme={isDark ? 'supabase-dark' : 'supabase-light'}
+              value={sql}
+              options={{
+                tabSize: 2,
+                minimap: {
+                  enabled: false,
+                },
+                fontSize: 13,
+              }}
+              onMount={async (editor, monaco) => {
+                editorRef.current = editor
+
+                // Register pgsql formatter
+                monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+                  async provideDocumentFormattingEdits(model) {
+                    const currentCode = editor.getValue()
+                    const formattedCode = format(currentCode, {
+                      language: 'postgresql',
+                      keywordCase: 'lower',
+                    })
+                    return [
+                      {
+                        range: model.getFullModelRange(),
+                        text: formattedCode,
+                      },
+                    ]
+                  },
+                })
+
+                // Format on cmd+s
+                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+                  await editor.getAction('editor.action.formatDocument').run()
+                })
+
+                // Run format on the initial value
+                await editor.getAction('editor.action.formatDocument').run()
+              }}
+              onChange={async (sql) => {
+                if (!sql) {
+                  return
+                }
+                await process(sql)
+              }}
+            />
+          </div>
+
+          {parsingError && (
+            <Alert className="text-red-900">
+              {parsingError.message}. {parsingError.hint}
+            </Alert>
+          )}
+          {unsupportedError && (
+            <Alert className="text-red-900">
+              <div>
+                {unsupportedError.message}. {unsupportedError.hint}
+              </div>
+              <div className="prose text-sm mt-2">
+                PostgREST doesn't support this query. If you're sure the syntax is correct and are
+                unable to modify it, wrap it in a stored procedure and call it using the{' '}
+                <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
+                  RPC
+                </a>{' '}
+                endpoint.
+              </div>
+            </Alert>
+          )}
+          {unimplementedError && (
+            <Alert className="text-orange-1000">
+              {unimplementedError.message}.
+              <div className="mt-2 text-white flex gap-1 leading-6">
+                <GitPullRequest className="inline-block" width={16} />
+                <a
+                  href="https://github.com/supabase/supabase/issues/new/choose"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Create a PR
+                </a>
+              </div>
+            </Alert>
+          )}
+        </div>
+      )}
 
       <div
         className={cn(
