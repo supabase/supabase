@@ -84,7 +84,7 @@ const DocView = observer(() => {
       ? `https://${customDomainData.customDomain?.hostname}`
       : `${data?.autoApiService.protocol ?? 'https'}://${data?.autoApiService.endpoint ?? '-'}`
 
-  const { paths, definitions } = PageState.jsonSchema
+  const { paths, definitions } = PageState.jsonSchema || {}
   const PAGE_KEY: any = resource || rpc || page || 'index'
   const autoApiService = { ...(data?.autoApiService ?? {}), endpoint }
 
