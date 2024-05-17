@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
 
@@ -32,7 +32,7 @@ export async function updateDatabaseFunction({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
