@@ -35,6 +35,18 @@ const LinksProperties = defineNestedType(() => ({
   },
 }))
 
+const NestedProperties = defineNestedType(() => ({
+  name: 'NestedProperties',
+  fields: {
+    radix: {
+      type: 'boolean',
+    },
+    shadcn: {
+      type: 'boolean',
+    },
+  },
+}))
+
 export const Doc = defineDocumentType(() => ({
   name: 'Doc',
   filePathPattern: `docs/**/*.mdx`,
@@ -70,6 +82,10 @@ export const Doc = defineDocumentType(() => ({
       type: 'boolean',
       default: true,
       required: false,
+    },
+    source: {
+      type: 'nested',
+      of: NestedProperties,
     },
   },
   computedFields,
