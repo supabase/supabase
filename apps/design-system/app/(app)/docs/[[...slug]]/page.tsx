@@ -15,7 +15,7 @@ import { DocsPager } from '@/components/pager'
 import { DashboardTableOfContents } from '@/components/toc'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import { Button, ScrollArea } from 'ui'
-import { badgeVariants } from 'ui/src/components/shadcn/ui/badge'
+// import { badgeVariants } from 'ui/src/components/shadcn/ui/badge'
 // import { buttonVariants } from '@ui/components/Button/Button'
 // import { ScrollArea } from '@/registry/new-york/ui/scroll-area'
 
@@ -86,17 +86,17 @@ export default async function DocPage({ params }: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw)
 
   return (
-    <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
-      <div className="mx-auto w-full min-w-0">
-        <div className="mb-4 flex items-center space-x-1 text-sm text-muted-foreground">
+    <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] pr-6 lg:py-8">
+      <div className="mx-auto w-full min-w-0 max-w-4xl">
+        <div className="mb-4 flex items-center space-x-1 text-sm text-foreground-muted">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap">Docs</div>
-          <ChevronRight className="h-4 w-4" />
-          <div className="font-medium text-foreground">{doc.title}</div>
+          <ChevronRight className="h-4 w-4 text-foreground-muted" />
+          <div className="text-foreground-lighter">{doc.title}</div>
         </div>
         <div className="space-y-2">
-          <h1 className={cn('scroll-m-20 text-4xl font-bold tracking-tight')}>{doc.title}</h1>
+          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
           {doc.description && (
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-foreground-light">
               <Balancer>{doc.description}</Balancer>
             </p>
           )}

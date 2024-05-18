@@ -73,17 +73,23 @@ export default function ComboboxForm() {
                 <PopoverTrigger_Shadcn_ asChild>
                   <FormControl_Shadcn_>
                     <Button
-                      type="outline"
+                      type="default"
                       role="combobox"
                       className={cn(
                         'w-[200px] justify-between',
                         !field.value && 'text-muted-foreground'
                       )}
+                      size="small"
+                      iconRight={
+                        <ChevronsUpDown
+                          className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                          strokeWidth={1}
+                        />
+                      }
                     >
                       {field.value
                         ? languages.find((language) => language.value === field.value)?.label
                         : 'Select language'}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl_Shadcn_>
                 </PopoverTrigger_Shadcn_>
@@ -120,7 +126,9 @@ export default function ComboboxForm() {
             </FormItem_Shadcn_>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button htmlType="submit" type="secondary" size="small">
+          Submit
+        </Button>
       </form>
     </Form_Shadcn_>
   )

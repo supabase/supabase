@@ -1,7 +1,15 @@
 'use client'
 
 import * as React from 'react'
-import { ArrowUpCircle, CheckCircle2, Circle, HelpCircle, LucideIcon, XCircle } from 'lucide-react'
+import {
+  ArrowUpCircle,
+  CheckCircle2,
+  Circle,
+  HelpCircle,
+  LucideIcon,
+  Plus,
+  XCircle,
+} from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button, CommandList_Shadcn_ } from 'ui'
@@ -53,19 +61,23 @@ export default function ComboboxPopover() {
   const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(null)
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center gap-4">
       <p className="text-sm text-muted-foreground">Status</p>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="outline" size="small" className="w-[150px] justify-start">
-            {selectedStatus ? (
-              <>
+          <Button
+            type="default"
+            size="small"
+            className="w-[150px] justify-start rounded-full"
+            icon={
+              selectedStatus ? (
                 <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                {selectedStatus.label}
-              </>
-            ) : (
-              <>+ Set status</>
-            )}
+              ) : (
+                <Plus className="mr-2 h-4 w-4 shrink-0 text-foreground-muted" />
+              )
+            }
+          >
+            {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="right" align="start">

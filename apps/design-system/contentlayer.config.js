@@ -110,7 +110,6 @@ export default makeSource({
       [
         rehypePrettyCode,
         {
-          // theme: 'ayu-dark',
           getHighlighter: async () => {
             const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/dark.json'))
             return await getHighlighter({ theme })

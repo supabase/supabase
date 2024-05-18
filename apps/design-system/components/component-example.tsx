@@ -40,7 +40,7 @@ export function ComponentExample({
   }, [Code])
 
   return (
-    <div className={cn('group relative my-4 flex flex-col space-y-2', className)} {...props}>
+    <div className={cn('group relative my-4 flex flex-col gap-2', className)} {...props}>
       <Tabs defaultValue="preview" className="relative mr-auto w-full">
         <div className="flex items-center justify-between pb-3">
           <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
@@ -57,14 +57,15 @@ export function ComponentExample({
               Code
             </TabsTrigger>
           </TabsList>
-          {extractedClassNames ? (
-            <CopyWithClassNames
-              value={codeString}
-              classNames={extractedClassNames}
-              className="absolute right-4 top-20"
-            />
-          ) : undefined
-          // codeString && <CopyButton value={codeString} className="absolute right-4 top-20" />
+          {
+            extractedClassNames ? (
+              <CopyWithClassNames
+                value={codeString}
+                classNames={extractedClassNames}
+                className="absolute right-4 top-20"
+              />
+            ) : undefined
+            // codeString && <CopyButton value={codeString} className="absolute right-4 top-20" />
           }
         </div>
         <TabsContent value="preview" className="rounded-md border">

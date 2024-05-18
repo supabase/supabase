@@ -56,18 +56,19 @@ export default function CalendarForm() {
                 <PopoverTrigger_Shadcn_ asChild>
                   <FormControl_Shadcn_>
                     <Button
-                      type={'outline'}
+                      type={'default'}
+                      size="small"
                       className={cn(
-                        'w-[240px] pl-3 text-left font-normal',
+                        'w-[240px] justify-start',
                         !field.value && 'text-muted-foreground'
                       )}
+                      icon={<CalendarIcon className="ml-auto opacity-50" />}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl_Shadcn_>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                <PopoverContent_Shadcn_ className="w-auto p-0" align="start" side="right">
                   <Calendar
                     mode="single"
                     selected={field.value}

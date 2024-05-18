@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import { Drawer, DrawerContent, DrawerTrigger } from 'ui'
+import { Plus } from 'lucide-react'
 
 type Status = {
   value: string
@@ -51,8 +52,13 @@ export default function ComboBoxResponsive() {
     return (
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="outline" className="w-[150px] justify-start">
-            {selectedStatus ? <>{selectedStatus.label}</> : <>+ Set status</>}
+          <Button
+            type="default"
+            size="small"
+            className="w-[150px] justify-start"
+            icon={!selectedStatus && <Plus className="text-foreground-muted" />}
+          >
+            {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="w-[200px] p-0" align="start">

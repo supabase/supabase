@@ -6,6 +6,11 @@ export const siteConfig = {
   links: {
     twitter: 'https://twitter.com/supabase',
     github: 'https://github.com/supabase/supabase/apps/design-system',
+    credits: {
+      radix: 'https://www.radix-ui.com/themes/docs/overview/getting-started',
+      shadcn: 'https://ui.shadcn.com/',
+      geist: 'https://vercel.com/geist/introduction',
+    },
   },
 }
 
