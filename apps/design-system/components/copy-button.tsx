@@ -47,7 +47,7 @@ export function CopyButton({
       size="small"
       type="outline"
       className={cn(
-        'relative z-10 h-6 w-6 text-zinc-50 hover:bg-zinc-700 hover:text-zinc-50',
+        'relative z-10 h-6 w-6 text-foreground-muted hover:bg-surface-100 hover:text-foreground p-0',
         className
       )}
       onClick={() => {
@@ -67,7 +67,7 @@ export function CopyButton({
       {...props}
     >
       <span className="sr-only">Copy</span>
-      {hasCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      {hasCopied ? <Check className="h-3 w-3 text-brand-600" /> : <Copy className="h-3 w-3" />}
     </Button>
   )
 }
