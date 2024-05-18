@@ -3,10 +3,11 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"],
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "ES2021",
     "module": "esnext",
     "jsx": "preserve",
     "strict": true,

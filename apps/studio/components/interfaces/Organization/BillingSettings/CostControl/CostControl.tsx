@@ -59,7 +59,7 @@ const CostControl = ({}: CostControlProps) => {
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
             <div className="space-y-2">
-              <p className="text-base m-0">Cost Control</p>
+              <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
                 Control whether to use beyond your plans included quota
               </p>

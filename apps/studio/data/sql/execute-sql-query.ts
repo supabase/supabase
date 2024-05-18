@@ -52,7 +52,7 @@ export async function executeSql(
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
-  })
+  } as any) // Needed to fix generated api types for now
 
   if (error) {
     if (

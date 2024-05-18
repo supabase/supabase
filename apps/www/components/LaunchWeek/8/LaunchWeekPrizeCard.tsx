@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
 import { motion } from 'framer-motion'
+import { cn } from 'ui'
 
 type animateFromType = 'left' | 'right' | 'up' | 'down' | 'opacityOnly'
 
@@ -56,10 +57,13 @@ export default function LaunchWeekPrizeCard({
         >
           <Image
             src={imageUrl}
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="100%"
+            className={cn(
+              'object-cover',
+              imgObjectPosition === 'right' ? 'object-right' : 'object-center'
+            )}
             quality={100}
-            objectPosition={imgObjectPosition}
             alt=""
           />
         </div>

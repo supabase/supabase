@@ -1,6 +1,6 @@
 'use client'
 
-import { Message as MessageItem } from 'ai/react'
+import type { Message as MessageItem } from 'ai/react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'

@@ -7,7 +7,7 @@ subtitle: 'Connecting to your Postgres database in serverless environments.'
 
 Supabase provides several options for connecting to your Postgres database from serverless environments.
 
-[supabase-js](/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
+[supabase-js](/docs/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/docs/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/docs/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
 
 ## Vercel Edge Functions
 
@@ -26,12 +26,11 @@ Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integra
         href: 'https://supabase.link/nextjs-with-supabase-starter',
         description: 'A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.'
       },
-      {
-        title: 'Drizzle',
+      /* { TODO: Link the correct next.js template that uses drizzle ORM with supabase database.
         hasLightIcon: true,
         href: 'https://supabase.link/nextjs-supabase-drizzle',
         description: "Simple Next.js template that uses Supabase as the database and Drizzle as the ORM.",
-      },
+      },*/
       {
         title: 'Kysely',
         hasLightIcon: true,
@@ -152,7 +151,7 @@ Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/) but prov
 
 Supabase Edge Functions uses the [Deno runtime](https://deno.com/) which has native support for TCP connections allowing you to choose your favorite client:
 
-- [supabase-js](/guides/functions/connect-to-postgres#using-supabase-js)
-- [Deno Postgres driver](/guides/functions/connect-to-postgres#using-a-postgres-client)
+- [supabase-js](/docs/guides/functions/connect-to-postgres#using-supabase-js)
+- [Deno Postgres driver](/docs/guides/functions/connect-to-postgres#using-a-postgres-client)
 - [Postgres.js](https://github.com/porsager/postgres)
-- [Drizzle](/guides/functions/connect-to-postgres#using-drizzle)
+- [Drizzle](/docs/guides/functions/connect-to-postgres#using-drizzle)

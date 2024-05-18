@@ -3,6 +3,21 @@ import { get } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { components } from 'api-types'
+
+// [Joshen] Is it possible to import this from the code gen?
+// https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
+export enum ReplicaInitializationStatus {
+  'InProgress' = 'in_progress',
+  'Completed' = 'completed',
+  'Failed' = 'failed',
+}
+
+export type DatabaseStatus = components['schemas']['DatabaseStatusResponse']
+export type DatabaseInitEstimations = {
+  baseBackupDownloadEstimateSeconds: number
+  walArchiveReplayEstimateSeconds: number
+}
 
 export type ReadReplicasStatusesVariables = {
   projectRef?: string

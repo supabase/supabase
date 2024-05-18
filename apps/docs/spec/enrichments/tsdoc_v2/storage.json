@@ -13,14 +13,14 @@
 			"flags": {},
 			"children": [
 				{
-					"id": 445,
+					"id": 449,
 					"name": "StorageApiError",
 					"kind": 128,
 					"kindString": "Class",
 					"flags": {},
 					"children": [
 						{
-							"id": 446,
+							"id": 450,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -34,14 +34,14 @@
 							],
 							"signatures": [
 								{
-									"id": 447,
+									"id": 451,
 									"name": "new StorageApiError",
 									"kind": 16384,
 									"kindString": "Constructor signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 448,
+											"id": 452,
 											"name": "message",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -52,7 +52,7 @@
 											}
 										},
 										{
-											"id": 449,
+											"id": 453,
 											"name": "status",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -65,24 +65,24 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 445,
+										"id": 449,
 										"name": "StorageApiError"
 									},
 									"overwrites": {
 										"type": "reference",
-										"id": 442,
+										"id": 446,
 										"name": "StorageError.constructor"
 									}
 								}
 							],
 							"overwrites": {
 								"type": "reference",
-								"id": 441,
+								"id": 445,
 								"name": "StorageError.constructor"
 							}
 						},
 						{
-							"id": 450,
+							"id": 454,
 							"name": "status",
 							"kind": 1024,
 							"kindString": "Property",
@@ -100,7 +100,7 @@
 							}
 						},
 						{
-							"id": 451,
+							"id": 455,
 							"name": "toJSON",
 							"kind": 2048,
 							"kindString": "Method",
@@ -114,7 +114,7 @@
 							],
 							"signatures": [
 								{
-									"id": 452,
+									"id": 456,
 									"name": "toJSON",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -122,14 +122,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 453,
+											"id": 457,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 455,
+													"id": 459,
 													"name": "message",
 													"kind": 1024,
 													"kindString": "Property",
@@ -148,7 +148,7 @@
 													"defaultValue": "..."
 												},
 												{
-													"id": 454,
+													"id": 458,
 													"name": "name",
 													"kind": 1024,
 													"kindString": "Property",
@@ -167,7 +167,7 @@
 													"defaultValue": "..."
 												},
 												{
-													"id": 456,
+													"id": 460,
 													"name": "status",
 													"kind": 1024,
 													"kindString": "Property",
@@ -191,9 +191,9 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														455,
-														454,
-														456
+														459,
+														458,
+														460
 													]
 												}
 											]
@@ -208,21 +208,21 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								446
+								450
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								450
+								454
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								451
+								455
 							]
 						}
 					],
@@ -236,20 +236,20 @@
 					"extendedTypes": [
 						{
 							"type": "reference",
-							"id": 440,
+							"id": 444,
 							"name": "StorageError"
 						}
 					]
 				},
 				{
-					"id": 300,
+					"id": 304,
 					"name": "StorageClient",
 					"kind": 128,
 					"kindString": "Class",
 					"flags": {},
 					"children": [
 						{
-							"id": 301,
+							"id": 305,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -263,14 +263,14 @@
 							],
 							"signatures": [
 								{
-									"id": 302,
+									"id": 306,
 									"name": "new StorageClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 303,
+											"id": 307,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -281,7 +281,7 @@
 											}
 										},
 										{
-											"id": 304,
+											"id": 308,
 											"name": "headers",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -289,20 +289,20 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 305,
+													"id": 309,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"indexSignature": {
-														"id": 306,
+														"id": 310,
 														"name": "__index",
 														"kind": 8192,
 														"kindString": "Index signature",
 														"flags": {},
 														"parameters": [
 															{
-																"id": 307,
+																"id": 311,
 																"name": "key",
 																"kind": 32768,
 																"flags": {},
@@ -322,7 +322,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 308,
+											"id": 312,
 											"name": "fetch",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -332,21 +332,21 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 309,
+													"id": 313,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"signatures": [
 														{
-															"id": 310,
+															"id": 314,
 															"name": "__type",
 															"kind": 4096,
 															"kindString": "Call signature",
 															"flags": {},
 															"parameters": [
 																{
-																	"id": 311,
+																	"id": 315,
 																	"name": "input",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -359,7 +359,7 @@
 																	}
 																},
 																{
-																	"id": 312,
+																	"id": 316,
 																	"name": "init",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -396,7 +396,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 300,
+										"id": 304,
 										"name": "StorageClient"
 									},
 									"overwrites": {
@@ -413,7 +413,7 @@
 							}
 						},
 						{
-							"id": 343,
+							"id": 347,
 							"name": "createBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -427,7 +427,7 @@
 							],
 							"signatures": [
 								{
-									"id": 344,
+									"id": 348,
 									"name": "createBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -438,7 +438,7 @@
 									},
 									"parameters": [
 										{
-											"id": 345,
+											"id": 349,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -452,7 +452,7 @@
 											}
 										},
 										{
-											"id": 346,
+											"id": 350,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -460,14 +460,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 347,
+													"id": 351,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 350,
+															"id": 354,
 															"name": "allowedMimeTypes",
 															"kind": 1024,
 															"kindString": "Property",
@@ -502,7 +502,7 @@
 															}
 														},
 														{
-															"id": 349,
+															"id": 353,
 															"name": "fileSizeLimit",
 															"kind": 1024,
 															"kindString": "Property",
@@ -538,7 +538,7 @@
 															}
 														},
 														{
-															"id": 348,
+															"id": 352,
 															"name": "public",
 															"kind": 1024,
 															"kindString": "Property",
@@ -564,9 +564,9 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																350,
-																349,
-																348
+																354,
+																353,
+																352
 															]
 														}
 													]
@@ -584,14 +584,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 351,
+															"id": 355,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 352,
+																	"id": 356,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -608,7 +608,7 @@
 																		"typeArguments": [
 																			{
 																				"type": "reference",
-																				"id": 395,
+																				"id": 399,
 																				"name": "Bucket"
 																			},
 																			{
@@ -622,7 +622,7 @@
 																	}
 																},
 																{
-																	"id": 353,
+																	"id": 357,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -645,8 +645,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		352,
-																		353
+																		356,
+																		357
 																	]
 																}
 															]
@@ -655,14 +655,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 354,
+															"id": 358,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 355,
+																	"id": 359,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -680,7 +680,7 @@
 																	}
 																},
 																{
-																	"id": 356,
+																	"id": 360,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -694,7 +694,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -704,8 +704,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		355,
-																		356
+																		359,
+																		360
 																	]
 																}
 															]
@@ -732,7 +732,7 @@
 							}
 						},
 						{
-							"id": 384,
+							"id": 388,
 							"name": "deleteBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -746,7 +746,7 @@
 							],
 							"signatures": [
 								{
-									"id": 385,
+									"id": 389,
 									"name": "deleteBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -756,7 +756,7 @@
 									},
 									"parameters": [
 										{
-											"id": 386,
+											"id": 390,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -779,14 +779,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 387,
+															"id": 391,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 388,
+																	"id": 392,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -801,14 +801,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 389,
+																			"id": 393,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 390,
+																					"id": 394,
 																					"name": "message",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -831,7 +831,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						390
+																						394
 																					]
 																				}
 																			]
@@ -839,7 +839,7 @@
 																	}
 																},
 																{
-																	"id": 391,
+																	"id": 395,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -862,8 +862,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		388,
-																		391
+																		392,
+																		395
 																	]
 																}
 															]
@@ -872,14 +872,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 392,
+															"id": 396,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 393,
+																	"id": 397,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -897,7 +897,7 @@
 																	}
 																},
 																{
-																	"id": 394,
+																	"id": 398,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -911,7 +911,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -921,8 +921,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		393,
-																		394
+																		397,
+																		398
 																	]
 																}
 															]
@@ -949,7 +949,7 @@
 							}
 						},
 						{
-							"id": 373,
+							"id": 377,
 							"name": "emptyBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -963,7 +963,7 @@
 							],
 							"signatures": [
 								{
-									"id": 374,
+									"id": 378,
 									"name": "emptyBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -973,7 +973,7 @@
 									},
 									"parameters": [
 										{
-											"id": 375,
+											"id": 379,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -996,14 +996,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 376,
+															"id": 380,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 377,
+																	"id": 381,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1018,14 +1018,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 378,
+																			"id": 382,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 379,
+																					"id": 383,
 																					"name": "message",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -1048,7 +1048,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						379
+																						383
 																					]
 																				}
 																			]
@@ -1056,7 +1056,7 @@
 																	}
 																},
 																{
-																	"id": 380,
+																	"id": 384,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1079,8 +1079,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		377,
-																		380
+																		381,
+																		384
 																	]
 																}
 															]
@@ -1089,14 +1089,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 381,
+															"id": 385,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 382,
+																	"id": 386,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1114,7 +1114,7 @@
 																	}
 																},
 																{
-																	"id": 383,
+																	"id": 387,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1128,7 +1128,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -1138,8 +1138,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		382,
-																		383
+																		386,
+																		387
 																	]
 																}
 															]
@@ -1166,7 +1166,7 @@
 							}
 						},
 						{
-							"id": 313,
+							"id": 317,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1180,7 +1180,7 @@
 							],
 							"signatures": [
 								{
-									"id": 314,
+									"id": 318,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1190,7 +1190,7 @@
 									},
 									"parameters": [
 										{
-											"id": 315,
+											"id": 319,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1213,7 +1213,7 @@
 							]
 						},
 						{
-							"id": 334,
+							"id": 338,
 							"name": "getBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1227,7 +1227,7 @@
 							],
 							"signatures": [
 								{
-									"id": 335,
+									"id": 339,
 									"name": "getBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1237,7 +1237,7 @@
 									},
 									"parameters": [
 										{
-											"id": 336,
+											"id": 340,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1260,14 +1260,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 337,
+															"id": 341,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 338,
+																	"id": 342,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1281,12 +1281,12 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 395,
+																		"id": 399,
 																		"name": "Bucket"
 																	}
 																},
 																{
-																	"id": 339,
+																	"id": 343,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1309,8 +1309,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		338,
-																		339
+																		342,
+																		343
 																	]
 																}
 															]
@@ -1319,14 +1319,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 340,
+															"id": 344,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 341,
+																	"id": 345,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1344,7 +1344,7 @@
 																	}
 																},
 																{
-																	"id": 342,
+																	"id": 346,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1358,7 +1358,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -1368,8 +1368,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		341,
-																		342
+																		345,
+																		346
 																	]
 																}
 															]
@@ -1396,7 +1396,7 @@
 							}
 						},
 						{
-							"id": 326,
+							"id": 330,
 							"name": "listBuckets",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1410,7 +1410,7 @@
 							],
 							"signatures": [
 								{
-									"id": 327,
+									"id": 331,
 									"name": "listBuckets",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1427,14 +1427,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 328,
+															"id": 332,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 329,
+																	"id": 333,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1450,13 +1450,13 @@
 																		"type": "array",
 																		"elementType": {
 																			"type": "reference",
-																			"id": 395,
+																			"id": 399,
 																			"name": "Bucket"
 																		}
 																	}
 																},
 																{
-																	"id": 330,
+																	"id": 334,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1479,8 +1479,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		329,
-																		330
+																		333,
+																		334
 																	]
 																}
 															]
@@ -1489,14 +1489,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 331,
+															"id": 335,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 332,
+																	"id": 336,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1514,7 +1514,7 @@
 																	}
 																},
 																{
-																	"id": 333,
+																	"id": 337,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1528,7 +1528,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -1538,8 +1538,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		332,
-																		333
+																		336,
+																		337
 																	]
 																}
 															]
@@ -1566,7 +1566,7 @@
 							}
 						},
 						{
-							"id": 357,
+							"id": 361,
 							"name": "updateBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1580,7 +1580,7 @@
 							],
 							"signatures": [
 								{
-									"id": 358,
+									"id": 362,
 									"name": "updateBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1590,7 +1590,7 @@
 									},
 									"parameters": [
 										{
-											"id": 359,
+											"id": 363,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1604,7 +1604,7 @@
 											}
 										},
 										{
-											"id": 360,
+											"id": 364,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1612,14 +1612,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 361,
+													"id": 365,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 364,
+															"id": 368,
 															"name": "allowedMimeTypes",
 															"kind": 1024,
 															"kindString": "Property",
@@ -1654,7 +1654,7 @@
 															}
 														},
 														{
-															"id": 363,
+															"id": 367,
 															"name": "fileSizeLimit",
 															"kind": 1024,
 															"kindString": "Property",
@@ -1690,7 +1690,7 @@
 															}
 														},
 														{
-															"id": 362,
+															"id": 366,
 															"name": "public",
 															"kind": 1024,
 															"kindString": "Property",
@@ -1716,9 +1716,9 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																364,
-																363,
-																362
+																368,
+																367,
+																366
 															]
 														}
 													]
@@ -1735,14 +1735,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 365,
+															"id": 369,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 366,
+																	"id": 370,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1757,14 +1757,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 367,
+																			"id": 371,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 368,
+																					"id": 372,
 																					"name": "message",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -1787,7 +1787,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						368
+																						372
 																					]
 																				}
 																			]
@@ -1795,7 +1795,7 @@
 																	}
 																},
 																{
-																	"id": 369,
+																	"id": 373,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1818,8 +1818,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		366,
-																		369
+																		370,
+																		373
 																	]
 																}
 															]
@@ -1828,14 +1828,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 370,
+															"id": 374,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 371,
+																	"id": 375,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1853,7 +1853,7 @@
 																	}
 																},
 																{
-																	"id": 372,
+																	"id": 376,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -1867,7 +1867,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -1877,8 +1877,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		371,
-																		372
+																		375,
+																		376
 																	]
 																}
 															]
@@ -1910,20 +1910,20 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								301
+								305
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								343,
-								384,
-								373,
-								313,
-								334,
-								326,
-								357
+								347,
+								388,
+								377,
+								317,
+								338,
+								330,
+								361
 							]
 						}
 					],
@@ -1943,14 +1943,14 @@
 					]
 				},
 				{
-					"id": 440,
+					"id": 444,
 					"name": "StorageError",
 					"kind": 128,
 					"kindString": "Class",
 					"flags": {},
 					"children": [
 						{
-							"id": 441,
+							"id": 445,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -1964,14 +1964,14 @@
 							],
 							"signatures": [
 								{
-									"id": 442,
+									"id": 446,
 									"name": "new StorageError",
 									"kind": 16384,
 									"kindString": "Constructor signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 443,
+											"id": 447,
 											"name": "message",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1984,7 +1984,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 440,
+										"id": 444,
 										"name": "StorageError"
 									},
 									"overwrites": {
@@ -2004,7 +2004,7 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								441
+								445
 							]
 						}
 					],
@@ -2026,25 +2026,25 @@
 					"extendedBy": [
 						{
 							"type": "reference",
-							"id": 445,
+							"id": 449,
 							"name": "StorageApiError"
 						},
 						{
 							"type": "reference",
-							"id": 458,
+							"id": 462,
 							"name": "StorageUnknownError"
 						}
 					]
 				},
 				{
-					"id": 458,
+					"id": 462,
 					"name": "StorageUnknownError",
 					"kind": 128,
 					"kindString": "Class",
 					"flags": {},
 					"children": [
 						{
-							"id": 459,
+							"id": 463,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -2058,14 +2058,14 @@
 							],
 							"signatures": [
 								{
-									"id": 460,
+									"id": 464,
 									"name": "new StorageUnknownError",
 									"kind": 16384,
 									"kindString": "Constructor signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 461,
+											"id": 465,
 											"name": "message",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2076,7 +2076,7 @@
 											}
 										},
 										{
-											"id": 462,
+											"id": 466,
 											"name": "originalError",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2089,24 +2089,24 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 458,
+										"id": 462,
 										"name": "StorageUnknownError"
 									},
 									"overwrites": {
 										"type": "reference",
-										"id": 442,
+										"id": 446,
 										"name": "StorageError.constructor"
 									}
 								}
 							],
 							"overwrites": {
 								"type": "reference",
-								"id": 441,
+								"id": 445,
 								"name": "StorageError.constructor"
 							}
 						},
 						{
-							"id": 463,
+							"id": 467,
 							"name": "originalError",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2129,14 +2129,14 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								459
+								463
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								463
+								467
 							]
 						}
 					],
@@ -2150,20 +2150,20 @@
 					"extendedTypes": [
 						{
 							"type": "reference",
-							"id": 440,
+							"id": 444,
 							"name": "StorageError"
 						}
 					]
 				},
 				{
-					"id": 395,
+					"id": 399,
 					"name": "Bucket",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 400,
+							"id": 404,
 							"name": "allowed_mime_types",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2186,7 +2186,7 @@
 							}
 						},
 						{
-							"id": 401,
+							"id": 405,
 							"name": "created_at",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2204,7 +2204,7 @@
 							}
 						},
 						{
-							"id": 399,
+							"id": 403,
 							"name": "file_size_limit",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2224,7 +2224,7 @@
 							}
 						},
 						{
-							"id": 396,
+							"id": 400,
 							"name": "id",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2242,7 +2242,7 @@
 							}
 						},
 						{
-							"id": 397,
+							"id": 401,
 							"name": "name",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2260,7 +2260,7 @@
 							}
 						},
 						{
-							"id": 398,
+							"id": 402,
 							"name": "owner",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2278,7 +2278,7 @@
 							}
 						},
 						{
-							"id": 403,
+							"id": 407,
 							"name": "public",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2296,7 +2296,7 @@
 							}
 						},
 						{
-							"id": 402,
+							"id": 406,
 							"name": "updated_at",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2319,14 +2319,14 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
+								404,
+								405,
+								403,
 								400,
 								401,
-								399,
-								396,
-								397,
-								398,
-								403,
-								402
+								402,
+								407,
+								406
 							]
 						}
 					],
@@ -2339,14 +2339,14 @@
 					]
 				},
 				{
-					"id": 427,
+					"id": 431,
 					"name": "FetchParameters",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 428,
+							"id": 432,
 							"name": "signal",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2376,7 +2376,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								428
+								432
 							]
 						}
 					],
@@ -2389,14 +2389,14 @@
 					]
 				},
 				{
-					"id": 404,
+					"id": 408,
 					"name": "FileObject",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 406,
+							"id": 410,
 							"name": "bucket_id",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2414,7 +2414,7 @@
 							}
 						},
 						{
-							"id": 413,
+							"id": 417,
 							"name": "buckets",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2428,12 +2428,12 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 399,
 								"name": "Bucket"
 							}
 						},
 						{
-							"id": 410,
+							"id": 414,
 							"name": "created_at",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2451,7 +2451,7 @@
 							}
 						},
 						{
-							"id": 408,
+							"id": 412,
 							"name": "id",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2469,7 +2469,7 @@
 							}
 						},
 						{
-							"id": 411,
+							"id": 415,
 							"name": "last_accessed_at",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2487,7 +2487,7 @@
 							}
 						},
 						{
-							"id": 412,
+							"id": 416,
 							"name": "metadata",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2517,7 +2517,7 @@
 							}
 						},
 						{
-							"id": 405,
+							"id": 409,
 							"name": "name",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2535,7 +2535,7 @@
 							}
 						},
 						{
-							"id": 407,
+							"id": 411,
 							"name": "owner",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2553,7 +2553,7 @@
 							}
 						},
 						{
-							"id": 409,
+							"id": 413,
 							"name": "updated_at",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2576,15 +2576,15 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								406,
-								413,
 								410,
-								408,
-								411,
+								417,
+								414,
 								412,
-								405,
-								407,
-								409
+								415,
+								416,
+								409,
+								411,
+								413
 							]
 						}
 					],
@@ -2597,14 +2597,14 @@
 					]
 				},
 				{
-					"id": 417,
+					"id": 421,
 					"name": "FileOptions",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 418,
+							"id": 422,
 							"name": "cacheControl",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2627,7 +2627,7 @@
 							}
 						},
 						{
-							"id": 419,
+							"id": 423,
 							"name": "contentType",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2650,7 +2650,7 @@
 							}
 						},
 						{
-							"id": 421,
+							"id": 425,
 							"name": "duplex",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2673,7 +2673,7 @@
 							}
 						},
 						{
-							"id": 420,
+							"id": 424,
 							"name": "upsert",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2701,10 +2701,10 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								418,
-								419,
-								421,
-								420
+								422,
+								423,
+								425,
+								424
 							]
 						}
 					],
@@ -2717,14 +2717,14 @@
 					]
 				},
 				{
-					"id": 429,
+					"id": 433,
 					"name": "Metadata",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 430,
+							"id": 434,
 							"name": "name",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2747,7 +2747,7 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								430
+								434
 							]
 						}
 					],
@@ -2760,14 +2760,14 @@
 					]
 				},
 				{
-					"id": 422,
+					"id": 426,
 					"name": "SearchOptions",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 423,
+							"id": 427,
 							"name": "limit",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2790,7 +2790,7 @@
 							}
 						},
 						{
-							"id": 424,
+							"id": 428,
 							"name": "offset",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2813,7 +2813,7 @@
 							}
 						},
 						{
-							"id": 426,
+							"id": 430,
 							"name": "search",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2836,7 +2836,7 @@
 							}
 						},
 						{
-							"id": 425,
+							"id": 429,
 							"name": "sortBy",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2855,7 +2855,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 414,
+								"id": 418,
 								"name": "SortBy"
 							}
 						}
@@ -2865,10 +2865,10 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								423,
-								424,
-								426,
-								425
+								427,
+								428,
+								430,
+								429
 							]
 						}
 					],
@@ -2881,14 +2881,14 @@
 					]
 				},
 				{
-					"id": 414,
+					"id": 418,
 					"name": "SortBy",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 415,
+							"id": 419,
 							"name": "column",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2908,7 +2908,7 @@
 							}
 						},
 						{
-							"id": 416,
+							"id": 420,
 							"name": "order",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2933,8 +2933,8 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								415,
-								416
+								419,
+								420
 							]
 						}
 					],
@@ -2947,14 +2947,14 @@
 					]
 				},
 				{
-					"id": 431,
+					"id": 435,
 					"name": "TransformOptions",
 					"kind": 256,
 					"kindString": "Interface",
 					"flags": {},
 					"children": [
 						{
-							"id": 436,
+							"id": 440,
 							"name": "format",
 							"kind": 1024,
 							"kindString": "Property",
@@ -2978,7 +2978,7 @@
 							}
 						},
 						{
-							"id": 433,
+							"id": 437,
 							"name": "height",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3001,7 +3001,7 @@
 							}
 						},
 						{
-							"id": 435,
+							"id": 439,
 							"name": "quality",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3024,7 +3024,7 @@
 							}
 						},
 						{
-							"id": 434,
+							"id": 438,
 							"name": "resize",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3060,7 +3060,7 @@
 							}
 						},
 						{
-							"id": 432,
+							"id": 436,
 							"name": "width",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3088,11 +3088,11 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								436,
-								433,
-								435,
-								434,
-								432
+								440,
+								437,
+								439,
+								438,
+								436
 							]
 						}
 					],
@@ -3105,7 +3105,7 @@
 					]
 				},
 				{
-					"id": 437,
+					"id": 441,
 					"name": "isStorageError",
 					"kind": 64,
 					"kindString": "Function",
@@ -3119,14 +3119,14 @@
 					],
 					"signatures": [
 						{
-							"id": 438,
+							"id": 442,
 							"name": "isStorageError",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 439,
+									"id": 443,
 									"name": "error",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -3143,7 +3143,7 @@
 								"asserts": false,
 								"targetType": {
 									"type": "reference",
-									"id": 440,
+									"id": 444,
 									"name": "StorageError"
 								}
 							}
@@ -3156,31 +3156,31 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						445,
-						300,
-						440,
-						458
+						449,
+						304,
+						444,
+						462
 					]
 				},
 				{
 					"title": "Interfaces",
 					"kind": 256,
 					"children": [
-						395,
-						427,
-						404,
-						417,
-						429,
-						422,
-						414,
-						431
+						399,
+						431,
+						408,
+						421,
+						433,
+						426,
+						418,
+						435
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						437
+						441
 					]
 				}
 			],
@@ -3556,7 +3556,7 @@
 																		"typeArguments": [
 																			{
 																				"type": "reference",
-																				"id": 395,
+																				"id": 399,
 																				"name": "Bucket"
 																			},
 																			{
@@ -3642,7 +3642,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -3849,7 +3849,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -4056,7 +4056,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -4152,7 +4152,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 395,
+																		"id": 399,
 																		"name": "Bucket"
 																	}
 																},
@@ -4229,7 +4229,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -4311,7 +4311,7 @@
 																		"type": "array",
 																		"elementType": {
 																			"type": "reference",
-																			"id": 395,
+																			"id": 399,
 																			"name": "Bucket"
 																		}
 																	}
@@ -4389,7 +4389,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -4718,7 +4718,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -4777,7 +4777,7 @@
 					"extendedBy": [
 						{
 							"type": "reference",
-							"id": 300,
+							"id": 304,
 							"name": "StorageClient"
 						}
 					]
@@ -4982,7 +4982,7 @@
 							]
 						},
 						{
-							"id": 203,
+							"id": 207,
 							"name": "copy",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4996,7 +4996,7 @@
 							],
 							"signatures": [
 								{
-									"id": 204,
+									"id": 208,
 									"name": "copy",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5006,7 +5006,7 @@
 									},
 									"parameters": [
 										{
-											"id": 205,
+											"id": 209,
 											"name": "fromPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5020,7 +5020,7 @@
 											}
 										},
 										{
-											"id": 206,
+											"id": 210,
 											"name": "toPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5043,14 +5043,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 207,
+															"id": 211,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 208,
+																	"id": 212,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5065,14 +5065,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 209,
+																			"id": 213,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 210,
+																					"id": 214,
 																					"name": "path",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -5095,7 +5095,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						210
+																						214
 																					]
 																				}
 																			]
@@ -5103,7 +5103,7 @@
 																	}
 																},
 																{
-																	"id": 211,
+																	"id": 215,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5126,8 +5126,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		208,
-																		211
+																		212,
+																		215
 																	]
 																}
 															]
@@ -5136,14 +5136,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 212,
+															"id": 216,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 213,
+																	"id": 217,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5161,7 +5161,7 @@
 																	}
 																},
 																{
-																	"id": 214,
+																	"id": 218,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5175,7 +5175,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -5185,8 +5185,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		213,
-																		214
+																		217,
+																		218
 																	]
 																}
 															]
@@ -5203,7 +5203,7 @@
 							]
 						},
 						{
-							"id": 165,
+							"id": 167,
 							"name": "createSignedUploadUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5217,7 +5217,7 @@
 							],
 							"signatures": [
 								{
-									"id": 166,
+									"id": 168,
 									"name": "createSignedUploadUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5227,7 +5227,7 @@
 									},
 									"parameters": [
 										{
-											"id": 167,
+											"id": 169,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5250,14 +5250,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 168,
+															"id": 170,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 169,
+																	"id": 171,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5272,14 +5272,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 170,
+																			"id": 172,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 173,
+																					"id": 175,
 																					"name": "path",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -5297,7 +5297,7 @@
 																					}
 																				},
 																				{
-																					"id": 171,
+																					"id": 173,
 																					"name": "signedUrl",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -5315,7 +5315,7 @@
 																					}
 																				},
 																				{
-																					"id": 172,
+																					"id": 174,
 																					"name": "token",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -5338,9 +5338,9 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
+																						175,
 																						173,
-																						171,
-																						172
+																						174
 																					]
 																				}
 																			]
@@ -5348,7 +5348,7 @@
 																	}
 																},
 																{
-																	"id": 174,
+																	"id": 176,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5371,8 +5371,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		169,
-																		174
+																		171,
+																		176
 																	]
 																}
 															]
@@ -5381,14 +5381,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 175,
+															"id": 177,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 176,
+																	"id": 178,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5406,7 +5406,7 @@
 																	}
 																},
 																{
-																	"id": 177,
+																	"id": 179,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5420,7 +5420,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -5430,8 +5430,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		176,
-																		177
+																		178,
+																		179
 																	]
 																}
 															]
@@ -5448,7 +5448,7 @@
 							]
 						},
 						{
-							"id": 215,
+							"id": 219,
 							"name": "createSignedUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5462,7 +5462,7 @@
 							],
 							"signatures": [
 								{
-									"id": 216,
+									"id": 220,
 									"name": "createSignedUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5472,7 +5472,7 @@
 									},
 									"parameters": [
 										{
-											"id": 217,
+											"id": 221,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5486,7 +5486,7 @@
 											}
 										},
 										{
-											"id": 218,
+											"id": 222,
 											"name": "expiresIn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5500,7 +5500,7 @@
 											}
 										},
 										{
-											"id": 219,
+											"id": 223,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5510,14 +5510,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 220,
+													"id": 224,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 221,
+															"id": 225,
 															"name": "download",
 															"kind": 1024,
 															"kindString": "Property",
@@ -5549,7 +5549,7 @@
 															}
 														},
 														{
-															"id": 222,
+															"id": 226,
 															"name": "transform",
 															"kind": 1024,
 															"kindString": "Property",
@@ -5568,7 +5568,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 431,
+																"id": 435,
 																"name": "TransformOptions"
 															}
 														}
@@ -5578,8 +5578,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																221,
-																222
+																225,
+																226
 															]
 														}
 													]
@@ -5596,14 +5596,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 223,
+															"id": 227,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 224,
+																	"id": 228,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5618,14 +5618,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 225,
+																			"id": 229,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 226,
+																					"id": 230,
 																					"name": "signedUrl",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -5648,7 +5648,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						226
+																						230
 																					]
 																				}
 																			]
@@ -5656,7 +5656,7 @@
 																	}
 																},
 																{
-																	"id": 227,
+																	"id": 231,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5679,8 +5679,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		224,
-																		227
+																		228,
+																		231
 																	]
 																}
 															]
@@ -5689,14 +5689,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 228,
+															"id": 232,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 229,
+																	"id": 233,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5714,7 +5714,7 @@
 																	}
 																},
 																{
-																	"id": 230,
+																	"id": 234,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5728,7 +5728,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -5738,8 +5738,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		229,
-																		230
+																		233,
+																		234
 																	]
 																}
 															]
@@ -5756,7 +5756,7 @@
 							]
 						},
 						{
-							"id": 231,
+							"id": 235,
 							"name": "createSignedUrls",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5770,7 +5770,7 @@
 							],
 							"signatures": [
 								{
-									"id": 232,
+									"id": 236,
 									"name": "createSignedUrls",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5780,7 +5780,7 @@
 									},
 									"parameters": [
 										{
-											"id": 233,
+											"id": 237,
 											"name": "paths",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5797,7 +5797,7 @@
 											}
 										},
 										{
-											"id": 234,
+											"id": 238,
 											"name": "expiresIn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5811,7 +5811,7 @@
 											}
 										},
 										{
-											"id": 235,
+											"id": 239,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5821,14 +5821,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 236,
+													"id": 240,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 237,
+															"id": 241,
 															"name": "download",
 															"kind": 1024,
 															"kindString": "Property",
@@ -5863,7 +5863,7 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																237
+																241
 															]
 														}
 													]
@@ -5880,14 +5880,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 238,
+															"id": 242,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 239,
+																	"id": 243,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -5904,14 +5904,14 @@
 																		"elementType": {
 																			"type": "reflection",
 																			"declaration": {
-																				"id": 240,
+																				"id": 244,
 																				"name": "__type",
 																				"kind": 65536,
 																				"kindString": "Type literal",
 																				"flags": {},
 																				"children": [
 																					{
-																						"id": 241,
+																						"id": 245,
 																						"name": "error",
 																						"kind": 1024,
 																						"kindString": "Property",
@@ -5938,7 +5938,7 @@
 																						}
 																					},
 																					{
-																						"id": 242,
+																						"id": 246,
 																						"name": "path",
 																						"kind": 1024,
 																						"kindString": "Property",
@@ -5965,7 +5965,7 @@
 																						}
 																					},
 																					{
-																						"id": 243,
+																						"id": 247,
 																						"name": "signedUrl",
 																						"kind": 1024,
 																						"kindString": "Property",
@@ -5988,9 +5988,9 @@
 																						"title": "Properties",
 																						"kind": 1024,
 																						"children": [
-																							241,
-																							242,
-																							243
+																							245,
+																							246,
+																							247
 																						]
 																					}
 																				]
@@ -5999,7 +5999,7 @@
 																	}
 																},
 																{
-																	"id": 244,
+																	"id": 248,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6022,8 +6022,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		239,
-																		244
+																		243,
+																		248
 																	]
 																}
 															]
@@ -6032,14 +6032,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 245,
+															"id": 249,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 246,
+																	"id": 250,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6057,7 +6057,7 @@
 																	}
 																},
 																{
-																	"id": 247,
+																	"id": 251,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6071,7 +6071,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -6081,8 +6081,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		246,
-																		247
+																		250,
+																		251
 																	]
 																}
 															]
@@ -6099,7 +6099,7 @@
 							]
 						},
 						{
-							"id": 248,
+							"id": 252,
 							"name": "download",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6113,7 +6113,7 @@
 							],
 							"signatures": [
 								{
-									"id": 249,
+									"id": 253,
 									"name": "download",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6123,7 +6123,7 @@
 									},
 									"parameters": [
 										{
-											"id": 250,
+											"id": 254,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6137,7 +6137,7 @@
 											}
 										},
 										{
-											"id": 251,
+											"id": 255,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6147,14 +6147,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 252,
+													"id": 256,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 253,
+															"id": 257,
 															"name": "transform",
 															"kind": 1024,
 															"kindString": "Property",
@@ -6173,7 +6173,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 431,
+																"id": 435,
 																"name": "TransformOptions"
 															}
 														}
@@ -6183,7 +6183,7 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																253
+																257
 															]
 														}
 													]
@@ -6200,14 +6200,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 254,
+															"id": 258,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 255,
+																	"id": 259,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6227,7 +6227,7 @@
 																	}
 																},
 																{
-																	"id": 256,
+																	"id": 260,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6250,8 +6250,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		255,
-																		256
+																		259,
+																		260
 																	]
 																}
 															]
@@ -6260,14 +6260,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 257,
+															"id": 261,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 258,
+																	"id": 262,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6285,7 +6285,7 @@
 																	}
 																},
 																{
-																	"id": 259,
+																	"id": 263,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6299,7 +6299,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -6309,8 +6309,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		258,
-																		259
+																		262,
+																		263
 																	]
 																}
 															]
@@ -6327,7 +6327,7 @@
 							]
 						},
 						{
-							"id": 260,
+							"id": 264,
 							"name": "getPublicUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6341,7 +6341,7 @@
 							],
 							"signatures": [
 								{
-									"id": 261,
+									"id": 265,
 									"name": "getPublicUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6351,7 +6351,7 @@
 									},
 									"parameters": [
 										{
-											"id": 262,
+											"id": 266,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6365,7 +6365,7 @@
 											}
 										},
 										{
-											"id": 263,
+											"id": 267,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6375,14 +6375,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 264,
+													"id": 268,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 265,
+															"id": 269,
 															"name": "download",
 															"kind": 1024,
 															"kindString": "Property",
@@ -6414,7 +6414,7 @@
 															}
 														},
 														{
-															"id": 266,
+															"id": 270,
 															"name": "transform",
 															"kind": 1024,
 															"kindString": "Property",
@@ -6433,7 +6433,7 @@
 															],
 															"type": {
 																"type": "reference",
-																"id": 431,
+																"id": 435,
 																"name": "TransformOptions"
 															}
 														}
@@ -6443,8 +6443,8 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																265,
-																266
+																269,
+																270
 															]
 														}
 													]
@@ -6455,14 +6455,14 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 267,
+											"id": 271,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"children": [
 												{
-													"id": 268,
+													"id": 272,
 													"name": "data",
 													"kind": 1024,
 													"kindString": "Property",
@@ -6477,14 +6477,14 @@
 													"type": {
 														"type": "reflection",
 														"declaration": {
-															"id": 269,
+															"id": 273,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 270,
+																	"id": 274,
 																	"name": "publicUrl",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6507,7 +6507,7 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		270
+																		274
 																	]
 																}
 															]
@@ -6520,7 +6520,7 @@
 													"title": "Properties",
 													"kind": 1024,
 													"children": [
-														268
+														272
 													]
 												}
 											]
@@ -6530,7 +6530,7 @@
 							]
 						},
 						{
-							"id": 280,
+							"id": 284,
 							"name": "list",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6544,7 +6544,7 @@
 							],
 							"signatures": [
 								{
-									"id": 281,
+									"id": 285,
 									"name": "list",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6554,7 +6554,7 @@
 									},
 									"parameters": [
 										{
-											"id": 282,
+											"id": 286,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6570,7 +6570,7 @@
 											}
 										},
 										{
-											"id": 283,
+											"id": 287,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6579,12 +6579,12 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 422,
+												"id": 426,
 												"name": "SearchOptions"
 											}
 										},
 										{
-											"id": 284,
+											"id": 288,
 											"name": "parameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6593,7 +6593,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 427,
+												"id": 431,
 												"name": "FetchParameters"
 											}
 										}
@@ -6607,14 +6607,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 285,
+															"id": 289,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 286,
+																	"id": 290,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6630,13 +6630,13 @@
 																		"type": "array",
 																		"elementType": {
 																			"type": "reference",
-																			"id": 404,
+																			"id": 408,
 																			"name": "FileObject"
 																		}
 																	}
 																},
 																{
-																	"id": 287,
+																	"id": 291,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6659,8 +6659,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		286,
-																		287
+																		290,
+																		291
 																	]
 																}
 															]
@@ -6669,14 +6669,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 288,
+															"id": 292,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 289,
+																	"id": 293,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6694,7 +6694,7 @@
 																	}
 																},
 																{
-																	"id": 290,
+																	"id": 294,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6708,7 +6708,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -6718,8 +6718,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		289,
-																		290
+																		293,
+																		294
 																	]
 																}
 															]
@@ -6736,7 +6736,7 @@
 							]
 						},
 						{
-							"id": 191,
+							"id": 195,
 							"name": "move",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6750,7 +6750,7 @@
 							],
 							"signatures": [
 								{
-									"id": 192,
+									"id": 196,
 									"name": "move",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6760,7 +6760,7 @@
 									},
 									"parameters": [
 										{
-											"id": 193,
+											"id": 197,
 											"name": "fromPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6774,7 +6774,7 @@
 											}
 										},
 										{
-											"id": 194,
+											"id": 198,
 											"name": "toPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -6797,14 +6797,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 195,
+															"id": 199,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 196,
+																	"id": 200,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6819,14 +6819,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 197,
+																			"id": 201,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 198,
+																					"id": 202,
 																					"name": "message",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -6849,7 +6849,7 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						198
+																						202
 																					]
 																				}
 																			]
@@ -6857,7 +6857,7 @@
 																	}
 																},
 																{
-																	"id": 199,
+																	"id": 203,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6880,8 +6880,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		196,
-																		199
+																		200,
+																		203
 																	]
 																}
 															]
@@ -6890,14 +6890,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 200,
+															"id": 204,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 201,
+																	"id": 205,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6915,7 +6915,7 @@
 																	}
 																},
 																{
-																	"id": 202,
+																	"id": 206,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -6929,7 +6929,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -6939,8 +6939,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		201,
-																		202
+																		205,
+																		206
 																	]
 																}
 															]
@@ -6957,7 +6957,7 @@
 							]
 						},
 						{
-							"id": 271,
+							"id": 275,
 							"name": "remove",
 							"kind": 2048,
 							"kindString": "Method",
@@ -6971,7 +6971,7 @@
 							],
 							"signatures": [
 								{
-									"id": 272,
+									"id": 276,
 									"name": "remove",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -6981,7 +6981,7 @@
 									},
 									"parameters": [
 										{
-											"id": 273,
+											"id": 277,
 											"name": "paths",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7007,14 +7007,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 274,
+															"id": 278,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 275,
+																	"id": 279,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7030,13 +7030,13 @@
 																		"type": "array",
 																		"elementType": {
 																			"type": "reference",
-																			"id": 404,
+																			"id": 408,
 																			"name": "FileObject"
 																		}
 																	}
 																},
 																{
-																	"id": 276,
+																	"id": 280,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7059,8 +7059,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		275,
-																		276
+																		279,
+																		280
 																	]
 																}
 															]
@@ -7069,14 +7069,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 277,
+															"id": 281,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 278,
+																	"id": 282,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7094,7 +7094,7 @@
 																	}
 																},
 																{
-																	"id": 279,
+																	"id": 283,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7108,7 +7108,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -7118,8 +7118,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		278,
-																		279
+																		282,
+																		283
 																	]
 																}
 															]
@@ -7136,7 +7136,7 @@
 							]
 						},
 						{
-							"id": 178,
+							"id": 180,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7150,7 +7150,7 @@
 							],
 							"signatures": [
 								{
-									"id": 179,
+									"id": 181,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7160,7 +7160,7 @@
 									},
 									"parameters": [
 										{
-											"id": 180,
+											"id": 182,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7174,7 +7174,7 @@
 											}
 										},
 										{
-											"id": 181,
+											"id": 183,
 											"name": "fileBody",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7255,7 +7255,7 @@
 											}
 										},
 										{
-											"id": 182,
+											"id": 184,
 											"name": "fileOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7264,7 +7264,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 417,
+												"id": 421,
 												"name": "FileOptions"
 											}
 										}
@@ -7278,14 +7278,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 183,
+															"id": 185,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 184,
+																	"id": 186,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7300,15 +7300,33 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 185,
+																			"id": 187,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 186,
-																					"name": "path",
+																					"id": 190,
+																					"name": "fullPath",
+																					"kind": 1024,
+																					"kindString": "Property",
+																					"flags": {},
+																					"sources": [
+																						{
+																							"fileName": "src/packages/StorageFileApi.ts",
+																							"line": 285,
+																							"character": 42
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				},
+																				{
+																					"id": 188,
+																					"name": "id",
 																					"kind": 1024,
 																					"kindString": "Property",
 																					"flags": {},
@@ -7323,6 +7341,24 @@
 																						"type": "intrinsic",
 																						"name": "string"
 																					}
+																				},
+																				{
+																					"id": 189,
+																					"name": "path",
+																					"kind": 1024,
+																					"kindString": "Property",
+																					"flags": {},
+																					"sources": [
+																						{
+																							"fileName": "src/packages/StorageFileApi.ts",
+																							"line": 285,
+																							"character": 28
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
 																				}
 																			],
 																			"groups": [
@@ -7330,7 +7366,9 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						186
+																						190,
+																						188,
+																						189
 																					]
 																				}
 																			]
@@ -7338,7 +7376,7 @@
 																	}
 																},
 																{
-																	"id": 187,
+																	"id": 191,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7361,8 +7399,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		184,
-																		187
+																		186,
+																		191
 																	]
 																}
 															]
@@ -7371,14 +7409,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 188,
+															"id": 192,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 189,
+																	"id": 193,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7396,7 +7434,7 @@
 																	}
 																},
 																{
-																	"id": 190,
+																	"id": 194,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7410,7 +7448,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -7420,8 +7458,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		189,
-																		190
+																		193,
+																		194
 																	]
 																}
 															]
@@ -7499,7 +7537,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 417,
+												"id": 421,
 												"name": "FileOptions"
 											}
 										}
@@ -7542,8 +7580,26 @@
 																			"flags": {},
 																			"children": [
 																				{
+																					"id": 147,
+																					"name": "fullPath",
+																					"kind": 1024,
+																					"kindString": "Property",
+																					"flags": {},
+																					"sources": [
+																						{
+																							"fileName": "src/packages/StorageFileApi.ts",
+																							"line": 141,
+																							"character": 42
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				},
+																				{
 																					"id": 145,
-																					"name": "path",
+																					"name": "id",
 																					"kind": 1024,
 																					"kindString": "Property",
 																					"flags": {},
@@ -7558,6 +7614,24 @@
 																						"type": "intrinsic",
 																						"name": "string"
 																					}
+																				},
+																				{
+																					"id": 146,
+																					"name": "path",
+																					"kind": 1024,
+																					"kindString": "Property",
+																					"flags": {},
+																					"sources": [
+																						{
+																							"fileName": "src/packages/StorageFileApi.ts",
+																							"line": 141,
+																							"character": 28
+																						}
+																					],
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
 																				}
 																			],
 																			"groups": [
@@ -7565,7 +7639,9 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						145
+																						147,
+																						145,
+																						146
 																					]
 																				}
 																			]
@@ -7573,7 +7649,7 @@
 																	}
 																},
 																{
-																	"id": 146,
+																	"id": 148,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7597,7 +7673,7 @@
 																	"kind": 1024,
 																	"children": [
 																		143,
-																		146
+																		148
 																	]
 																}
 															]
@@ -7606,14 +7682,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 147,
+															"id": 149,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 148,
+																	"id": 150,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7631,7 +7707,7 @@
 																	}
 																},
 																{
-																	"id": 149,
+																	"id": 151,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7645,7 +7721,7 @@
 																	],
 																	"type": {
 																		"type": "reference",
-																		"id": 440,
+																		"id": 444,
 																		"name": "StorageError"
 																	}
 																}
@@ -7655,8 +7731,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		148,
-																		149
+																		150,
+																		151
 																	]
 																}
 															]
@@ -7673,7 +7749,7 @@
 							]
 						},
 						{
-							"id": 150,
+							"id": 152,
 							"name": "uploadToSignedUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -7687,7 +7763,7 @@
 							],
 							"signatures": [
 								{
-									"id": 151,
+									"id": 153,
 									"name": "uploadToSignedUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -7697,7 +7773,7 @@
 									},
 									"parameters": [
 										{
-											"id": 152,
+											"id": 154,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7711,7 +7787,7 @@
 											}
 										},
 										{
-											"id": 153,
+											"id": 155,
 											"name": "token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7725,7 +7801,7 @@
 											}
 										},
 										{
-											"id": 154,
+											"id": 156,
 											"name": "fileBody",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7739,7 +7815,7 @@
 											}
 										},
 										{
-											"id": 155,
+											"id": 157,
 											"name": "fileOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7748,7 +7824,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 417,
+												"id": 421,
 												"name": "FileOptions"
 											}
 										}
@@ -7762,14 +7838,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 156,
+															"id": 158,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 157,
+																	"id": 159,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7784,14 +7860,14 @@
 																	"type": {
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 158,
+																			"id": 160,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
 																			"flags": {},
 																			"children": [
 																				{
-																					"id": 160,
+																					"id": 162,
 																					"name": "fullPath",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -7810,7 +7886,7 @@
 																					"defaultValue": "data.Key"
 																				},
 																				{
-																					"id": 159,
+																					"id": 161,
 																					"name": "path",
 																					"kind": 1024,
 																					"kindString": "Property",
@@ -7834,8 +7910,8 @@
 																					"title": "Properties",
 																					"kind": 1024,
 																					"children": [
-																						160,
-																						159
+																						162,
+																						161
 																					]
 																				}
 																			]
@@ -7844,7 +7920,7 @@
 																	"defaultValue": "..."
 																},
 																{
-																	"id": 161,
+																	"id": 163,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7868,8 +7944,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		157,
-																		161
+																		159,
+																		163
 																	]
 																}
 															]
@@ -7878,14 +7954,14 @@
 													{
 														"type": "reflection",
 														"declaration": {
-															"id": 162,
+															"id": 164,
 															"name": "__type",
 															"kind": 65536,
 															"kindString": "Type literal",
 															"flags": {},
 															"children": [
 																{
-																	"id": 163,
+																	"id": 165,
 																	"name": "data",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7904,7 +7980,7 @@
 																	"defaultValue": "null"
 																},
 																{
-																	"id": 164,
+																	"id": 166,
 																	"name": "error",
 																	"kind": 1024,
 																	"kindString": "Property",
@@ -7920,8 +7996,8 @@
 																	"title": "Properties",
 																	"kind": 1024,
 																	"children": [
-																		163,
-																		164
+																		165,
+																		166
 																	]
 																}
 															]
@@ -7950,18 +8026,18 @@
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								203,
-								165,
-								215,
-								231,
-								248,
-								260,
-								280,
-								191,
-								271,
-								178,
+								207,
+								167,
+								219,
+								235,
+								252,
+								264,
+								284,
+								195,
+								275,
+								180,
 								137,
-								150
+								152
 							]
 						}
 					],

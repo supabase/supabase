@@ -26,7 +26,7 @@ Embeddings are generated using a language model, and embeddings are compared to 
 
 ## Embedding models
 
-There are many embedding models available today. Some can be accessed through third-party APIs like [OpenAI](https://platform.openai.com/docs/guides/embeddings), where you send your text in the request and receive an embedding vector in the response. Others can run locally on your own compute, such as through Transformers.js for JavaScript implementations. For more information on local implementation, see [Generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings).
+There are many embedding models available today. Supabase Edge Functions has [built in support](/docs/guides/functions/examples/semantic-search) for the `gte-small` model. Others can be accessed through third-party APIs like [OpenAI](https://platform.openai.com/docs/guides/embeddings), where you send your text in the request and receive an embedding vector in the response. Others can run locally on your own compute, such as through Transformers.js for JavaScript implementations. For more information on local implementation, see [Generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings).
 
 It's crucial to remember that when using embedding models with semantic search, you must use the same model for all embedding comparisons. Comparing embeddings created by different models will yield meaningless results.
 

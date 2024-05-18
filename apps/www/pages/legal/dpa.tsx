@@ -1,5 +1,4 @@
 import * as Yup from 'yup'
-import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 

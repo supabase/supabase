@@ -58,9 +58,10 @@
     "common-tags": "^1.8.2",
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
+    "input-otp": "^1.2.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.338.0",
-    "next-themes": "^0.2.1",
+    "next-themes": "^0.3.0",
     "openai": "^4.17.0",
     "postcss": "^8.4.31",
     "prop-types": "^15.7.2",
@@ -70,10 +71,12 @@
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.45.0",
     "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.8.2",
     "react-markdown": "^8.0.3",
     "react-resizable-panels": "^2.0.11",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
+    "react-use": "^17.5.0",
     "reactflow": "^11.10.1",
     "remark-gfm": "^3.0.1",
     "sse.js": "^2.2.0",
@@ -81,8 +84,9 @@
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
-    "yup": "^0.32.11",
-    "zod": "^3.22.3"
+    "yup": "^1.4.0",
+    "zod": "^3.22.3",
+    "react-accessible-treeview": "^2.8.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.21.4",
@@ -118,8 +122,9 @@
     "storybook-dark-mode": "^3.0.1",
     "style-dictionary": "^3.7.1",
     "ts-jest": "^29.1.1",
+    "tsconfig": "*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.3"
   },
   "peerDependencies": {
     "next": "*",

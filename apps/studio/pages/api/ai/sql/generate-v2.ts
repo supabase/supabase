@@ -5,13 +5,13 @@ import OpenAI from 'openai'
 
 export const runtime = 'edge'
 
-const openAiKey = process.env.OPENAI_KEY
+const openAiKey = process.env.OPENAI_API_KEY
 
 export default async function handler(req: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
-        error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
       }),
       {
         status: 500,

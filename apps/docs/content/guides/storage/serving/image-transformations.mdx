@@ -38,6 +38,17 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let url = try await supabase.storage.from("bucket")
+  .getPublicURL(
+    path: "image.jpg"
+    options: TransformOptions(with: 500, height: 600)
+  )
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -76,6 +87,21 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let url = try await supabase.storage.from("bucket")
+  .createSignedURL(
+    path: "image.jpg",
+    expiresIn: 60,
+    transform: TransformOptions(
+      width: 200,
+      height: 200
+    )
+  )
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -109,6 +135,20 @@ supabase.storage.from('bucket').download('image.jpg', {
     height: 300,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 800,
+      height: 300
+    )
+  )
 ```
 
 </TabPanel>
@@ -165,6 +205,21 @@ await storage.from('bucket').download('image.jpeg', {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 200,
+      height: 200,
+      format: "origin"
+    )
+  )
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -194,9 +249,7 @@ To get started, create a `supabase-image-loader.js` file in your Next.js project
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${
-    quality || 75
-  }`
+  return `https://${projectId}.supabase.co/storage/v1/object/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 
@@ -246,6 +299,19 @@ supabase.storage.from('bucket').download('image.jpg', {
     quality: 50,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      quality: 50
+    )
+  )
 ```
 
 </TabPanel>
@@ -301,6 +367,21 @@ supabase.storage.from('bucket').download('image.jpg', {
     resize: 'contain', // 'cover' | 'fill'
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let data = try await supabase.storage.from("bucket")
+  .download(
+    path: "image.jpg",
+    options: TransformOptions(
+      width: 800,
+      height: 300,
+      resize: "contain" // "cover" | "fill"
+    )
+  )
 ```
 
 </TabPanel>

@@ -3,10 +3,7 @@ import { cn } from 'ui'
 
 const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
-
 const maxWidthClassesColumn = 'min-w-[420px]'
-
-// lg: pt - 8
 
 const ScaffoldHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
@@ -31,7 +28,7 @@ const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
 
 const ScaffoldDivider = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn('w-full h-px bg-muted', className)} />
+    return <div ref={ref} {...props} className={cn('w-full h-px bg-border', className)} />
   }
 )
 

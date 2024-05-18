@@ -106,28 +106,20 @@ const BannedIPs = () => {
       </FormPanel>
 
       <ConfirmationModal
-        danger
+        variant="destructive"
         size="medium"
         loading={isUnbanning}
         visible={showUnban}
-        header="Confirm Unban IP"
-        buttonLabel="Confirm Unban"
-        buttonLoadingLabel="Unbanning..."
-        onSelectConfirm={onConfirmUnbanIP}
-        onSelectCancel={() => setShowUnban(false)}
-      >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Are you sure you want to unban this IP address {selectedIPToUnban}?
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
-        </Modal.Content>
-      </ConfirmationModal>
+        title="Confirm Unban IP"
+        confirmLabel="Confirm Unban"
+        confirmLabelLoading="Unbanning..."
+        onCancel={() => setShowUnban(false)}
+        onConfirm={onConfirmUnbanIP}
+        alert={{
+          title: 'This action cannot be undone',
+          description: `Are you sure you want to unban this IP address ${selectedIPToUnban}?`,
+        }}
+      />
     </div>
   )
 }

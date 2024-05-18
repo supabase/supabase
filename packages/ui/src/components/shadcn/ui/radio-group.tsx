@@ -101,7 +101,7 @@ const RadioGroupLargeItem = React.forwardRef<
             'text-xs transition-colors text-left',
             'text-light',
             'group-hover:text-foreground group-data-[state=checked]:text-foreground',
-            'cursor-pointer'
+            props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )}
         >
           {label}

@@ -5,7 +5,7 @@ import { startCase } from 'lodash'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogGridItem from '~/components/Blog/BlogGridItem'
-import PostTypes from '~/types/post'
+import type PostTypes from '~/types/post'
 
 export async function getStaticProps({ params }: any) {
   const posts = getSortedPosts({ directory: '_blog', limit: 0, categories: [params.category] })

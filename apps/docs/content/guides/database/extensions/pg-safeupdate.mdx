@@ -10,11 +10,12 @@ The `pg-safeupdate` extension is a useful tool for protecting data integrity and
 
 ## Enable the extension
 
-`pg-safeupdate` can be enabled on a per connection basis:
+`pg-safeupdate` can be enabled on a role basis (where `anon` is the role we want to modify in this example):
 
 {/* prettier-ignore */}
 ```sql
-load 'safeupdate';
+GRANT SET ON PARAMETER session_preload_libraries TO anon;
+ALTER ROLE anon SET session_preload_libraries = 'safeupdate';
 ```
 
 or for all connections:
@@ -30,8 +31,6 @@ Let's take a look at an example to see how pg-safeupdate works. Suppose we have 
 
 {/* prettier-ignore */}
 ```sql
-load 'safeupdate';
-
 update employees set date_of_birth = '1987-01-28';
 ```
 
@@ -52,3 +51,4 @@ update employees set date_of_birth = '1987-01-28' where id = 12345;
 ## Resources
 
 - Official [pg-safeupdate documentation](https://github.com/eradman/pg-safeupdate)
+- Using [pg-safeupdate with PostgREST](https://postgrest.org/en/v12/integrations/pg-safeupdate.html)

@@ -643,7 +643,7 @@ alter table
 -- Create a policy that only allows read if they user has signed in via MFA
 create policy "Users can view private_posts if they have signed in via MFA" on public.private_posts for
 select
-  to authenticated using (auth.jwt () - > > 'aal' = 'aal2');
+  to authenticated using ((select auth.jwt() - >> 'aal') = 'aal2');
 ```
 
 `aal` here stands for [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), and it will be `aal1` for users who have only signed in with 1 sign-in method, and `aal2` for users who have completed the MFA flow. Checking the `aal` inside RLS policy ensures that the data cannot be viewed by users unless they complete the entire MFA flow.

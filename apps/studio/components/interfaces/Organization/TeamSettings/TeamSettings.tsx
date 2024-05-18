@@ -143,18 +143,16 @@ const TeamSettings = () => {
 
       <ConfirmationModal
         visible={isLeaveTeamModalOpen}
-        header="Are you sure?"
-        buttonLabel="Leave"
-        onSelectCancel={() => setIsLeaveTeamModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Are you sure?"
+        confirmLabel="Leave"
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => {
           leaveTeam()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to leave this organization? This is permanent.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to leave this organization? This is permanent.
+        </p>
       </ConfirmationModal>
     </>
   )

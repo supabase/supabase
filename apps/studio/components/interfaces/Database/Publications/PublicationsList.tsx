@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -91,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database replications"
+                title="You need additional permissions to update database publications"
               />
             </div>
           )}
@@ -173,21 +173,19 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
-        header={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={() => setToggleListenEventValue(null)}
-        onSelectConfirm={() => {
+        title={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
+        confirmLabel="Confirm"
+        confirmLabelLoading="Updating"
+        onCancel={() => setToggleListenEventValue(null)}
+        onConfirm={() => {
           toggleListenEvent()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
-            {toggleListenEventValue?.publication.name}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
+          sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
+          {toggleListenEventValue?.publication.name}?
+        </p>
       </ConfirmationModal>
     </>
   )

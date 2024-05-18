@@ -36,7 +36,7 @@ const InformationBox = ({
     >
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
-          <div className="flex w-full space-x-3 lg:items-start">
+          <div className="flex w-full space-x-3 items-center">
             {icon && <span className="text-foreground-lighter">{icon}</span>}
             <div className="flex-grow">
               <h5 className="text-sm text-foreground">{title}</h5>

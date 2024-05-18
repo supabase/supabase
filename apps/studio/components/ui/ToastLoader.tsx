@@ -20,6 +20,7 @@ export const ToastLoader = ({ progress, message, description }: ToastLoaderProps
         barClass="bg-brand"
         labelBottom={message}
         labelTop={`${progress.toFixed(2)}%`}
+        labelTopClass="tabular-nums"
       />
       {description !== undefined && <p className="text-xs text-foreground-light">{description}</p>}
     </div>

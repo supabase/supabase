@@ -2,7 +2,8 @@ import { useRef } from 'react'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
-import SwiperCore, { Navigation, Pagination } from 'swiper'
+import SwiperCore from 'swiper'
+import { Navigation, Pagination } from 'swiper/modules'
 
 import Link from 'next/link'
 import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'

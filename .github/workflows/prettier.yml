@@ -19,9 +19,9 @@ jobs:
         with:
           sparse-checkout: apps
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |
@@ -42,9 +42,9 @@ jobs:
           sparse-checkout: |
             i18n
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |

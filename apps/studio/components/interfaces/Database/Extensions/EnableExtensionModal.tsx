@@ -197,7 +197,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
 
                     <AlertDescription_Shadcn_>
                       You can still enable the extension, but pg_cron jobs may not run due to the
-                      behaviour of Fly projects.
+                      behavior of Fly projects.
                     </AlertDescription_Shadcn_>
 
                     <AlertDescription_Shadcn_ className="mt-3">

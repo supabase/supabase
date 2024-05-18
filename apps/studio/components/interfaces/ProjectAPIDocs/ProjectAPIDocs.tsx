@@ -50,7 +50,7 @@ const ProjectAPIDocs = () => {
     : 'SUPABASE_CLIENT_ANON_KEY'
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+      ? `https://${customDomainData.customDomain?.hostname}`
       : `https://${data?.autoApiService.endpoint ?? ''}`
 
   return (

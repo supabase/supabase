@@ -18,10 +18,10 @@ import {
 } from 'ui'
 
 import Telemetry from 'lib/telemetry'
-import { ApplyConfigModal } from '../ApplyConfigModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -194,10 +194,14 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           </div>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
-      <ApplyConfigModal
+      <ConfirmationModal
+        title="Previously found messages will be lost"
+        variant="destructive"
+        confirmLabel="Confirm"
+        size="small"
         visible={applyConfigOpen}
-        onSelectCancel={() => setApplyConfigOpen(false)}
-        onSelectConfirm={() => {
+        onCancel={() => setApplyConfigOpen(false)}
+        onConfirm={() => {
           Telemetry.sendEvent(
             {
               category: 'realtime_inspector',
@@ -211,7 +215,12 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           setApplyConfigOpen(false)
           setOpen(false)
         }}
-      />
+      >
+        <p className="text-sm text-foreground-light">
+          The realtime inspector will clear currently collected messages and start listening for new
+          messages matching the updated filters.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

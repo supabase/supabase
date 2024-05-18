@@ -28,7 +28,7 @@ const CreditBalance = () => {
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
           <div className="flex items-center space-x-2">
-            <p className="text-base m-0">Credit balance</p>
+            <p className="text-foreground text-base m-0">Credit Balance</p>
             {isCredit && <Badge>You have credits available</Badge>}
             {isDebt && <Badge variant="destructive">Outstanding payments</Badge>}
           </div>

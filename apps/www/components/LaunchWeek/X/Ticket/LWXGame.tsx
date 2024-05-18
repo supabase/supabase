@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import { VALID_KEYS } from '~/components/LaunchWeek/hooks/useLwxGame'
+import { VALID_KEYS } from '~/components/LaunchWeek/hooks/useLwGame'
 
 const COMPLIMENTS = [
   'Congratulations!',

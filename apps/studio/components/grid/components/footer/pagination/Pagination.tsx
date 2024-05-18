@@ -190,34 +190,30 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
 
           <ConfirmationModal
             visible={isConfirmPreviousModalOpen}
-            header="Confirm moving to previous page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmPreviousModalOpen(false)}
-            onSelectConfirm={() => {
+            title="Confirm moving to previous page"
+            confirmLabel="Confirm"
+            onCancel={() => setIsConfirmPreviousModalOpen(false)}
+            onConfirm={() => {
               onConfirmPreviousPage()
             }}
           >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              The currently selected lines will be deselected, do you want to proceed?
+            </p>
           </ConfirmationModal>
 
           <ConfirmationModal
             visible={isConfirmNextModalOpen}
-            header="Confirm moving to next page"
-            buttonLabel="Confirm"
-            onSelectCancel={() => setIsConfirmNextModalOpen(false)}
-            onSelectConfirm={() => {
+            title="Confirm moving to next page"
+            confirmLabel="Confirm"
+            onCancel={() => setIsConfirmNextModalOpen(false)}
+            onConfirm={() => {
               onConfirmNextPage()
             }}
           >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                The currently selected lines will be deselected, do you want to proceed?
-              </p>
-            </Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              The currently selected lines will be deselected, do you want to proceed?
+            </p>
           </ConfirmationModal>
         </>
       )}

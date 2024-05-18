@@ -94,22 +94,19 @@ const PauseProjectButton = () => {
         ) : null}
       </Tooltip.Root>
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         visible={isModalOpen}
         loading={isPausing}
-        header="Pause this project?"
-        description=""
-        buttonLabel="Pause project"
-        buttonLoadingLabel="Pausing project"
-        onSelectCancel={() => setIsModalOpen(false)}
-        onSelectConfirm={requestPauseProject}
+        title="Pause this project?"
+        confirmLabel="Pause project"
+        confirmLabelLoading="Pausing project"
+        onCancel={() => setIsModalOpen(false)}
+        onConfirm={requestPauseProject}
       >
-        <Modal.Content className="py-4">
-          <p className="text-foreground-light text-sm">
-            Are you sure you want to pause this project? It will not be accessible until you unpause
-            it.
-          </p>
-        </Modal.Content>
+        <p className="text-foreground-light text-sm">
+          Are you sure you want to pause this project? It will not be accessible until you unpause
+          it.
+        </p>
       </ConfirmationModal>
     </>
   )

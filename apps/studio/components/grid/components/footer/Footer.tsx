@@ -38,7 +38,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
           width={75}
           options={['definition', 'data']}
           activeOption={selectedView}
-          borderOverride="border-gray-500"
+          borderOverride="border"
           onClickOption={setSelectedView}
         />
       </div>
