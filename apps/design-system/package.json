@@ -33,6 +33,7 @@
     "unist-util-visit": "^5.0.0",
     "ts-morph": "^22.0.0",
     "lodash.template": "4.5.0",
+    "react-inlinesvg": "^4.0.4",
     "ui": "*"
   },
   "devDependencies": {

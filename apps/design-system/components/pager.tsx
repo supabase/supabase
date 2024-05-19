@@ -23,19 +23,29 @@ export function DocsPager({ doc }: DocsPagerProps) {
       {pager?.prev?.href && (
         <Link
           href={pager.prev.href}
-          // className={buttonVariants({ type: 'outline' })}
+          className="flex gap-3 text-foreground-light hover:text-foreground group"
         >
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          {pager.prev.title}
+          <ChevronLeft className="mr-2 h-4 w-4 self-end mb-1 text-foreground-muted group-hover:text-foreground-lighter" />
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-mono uppercase tracking-wider text-foreground-muted group-hover:text-foreground-lighter">
+              Previous
+            </span>
+            {pager.prev.title}
+          </div>
         </Link>
       )}
       {pager?.next?.href && (
         <Link
           href={pager.next.href}
-          // className={cn(buttonVariants({ type: 'outline' }), 'ml-auto')}
+          className="flex gap-3 text-foreground-light hover:text-foreground group"
         >
-          {pager.next.title}
-          <ChevronRight className="ml-2 h-4 w-4" />
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-mono uppercase tracking-wider text-foreground-muted group-hover:text-foreground-lighter">
+              Next
+            </span>
+            {pager.next.title}
+          </div>
+          <ChevronRight className="ml-2 h-4 w-4 self-end mb-1 text-foreground-muted group-hover:text-foreground-lighter" />
         </Link>
       )}
     </div>

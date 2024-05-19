@@ -19,20 +19,15 @@ export default async function Layout({ children }: RootLayoutProps) {
 
   return (
     <html
-      className="deep-dark"
+      // className="dark"
       lang="en"
-      data-theme="deep-dark"
-      style={{ colorScheme: 'deep-dark' }}
+      // data-theme="dark"
+      // style={{ colorScheme: 'dark' }}
       suppressHydrationWarning
     >
       <head />
       <body className={inter.className}>
-        <ThemeProvider
-          themes={['dark', 'light']}
-          defaultTheme="system"
-          enableSystem
-          // forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
+        <ThemeProvider themes={['dark', 'light', 'deep-dark']} defaultTheme="system" enableSystem>
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
