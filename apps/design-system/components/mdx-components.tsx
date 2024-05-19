@@ -7,7 +7,7 @@ import { useMDXComponent } from 'next-contentlayer/hooks'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
 import { cn } from 'ui'
-// import { useConfig } from '@/hooks/use-config'
+import { useConfig } from '@/hooks/use-config'
 import { Callout } from '@/components/callout'
 import { CodeBlockWrapper } from '@/components/code-block-wrapper'
 import { ComponentExample } from '@/components/component-example'
@@ -38,7 +38,7 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { ComponentProps } from './component-props'
-// import { Style } from '@/registry/styles'
+import { Style } from '@/registry/styles'
 import { Colors } from '@/components/colors'
 
 const components = {
@@ -150,10 +150,10 @@ const components = {
       __withMeta__,
       __src__,
       // __event__,
-      // __style__,
+      __style__,
       ...props
     }: React.HTMLAttributes<HTMLPreElement> & {
-      // __style__?: Style['name']
+      __style__?: Style['name']
       __rawString__?: string
       __withMeta__?: boolean
       __src__?: string
@@ -162,12 +162,10 @@ const components = {
     // & NpmCommands
   ) => {
     return (
-      <StyleWrapper
-      // styleName={__style__}
-      >
+      <StyleWrapper styleName={__style__}>
         <pre
           className={cn(
-            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4',
+            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-black dark:bg-surface-75/75 py-4',
             className
           )}
           {...props}
@@ -274,9 +272,9 @@ interface MdxProps {
 }
 
 export function Mdx({ code }: MdxProps) {
-  // const [config] = useConfig()
+  const [config] = useConfig()
   const Component = useMDXComponent(code, {
-    // style: config.style,
+    style: config.style,
   })
 
   return (
