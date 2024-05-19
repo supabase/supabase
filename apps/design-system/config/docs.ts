@@ -72,6 +72,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
         },
+        {
+          title: 'Form Item Layout',
+          href: '/docs/fragments/form-item-layout',
+          items: [],
+        },
       ],
     },
     {

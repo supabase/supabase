@@ -883,4 +883,34 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/text-confirm-dialog-with-cancel-button.tsx'],
   },
+  {
+    name: 'form-item-layout-demo',
+    type: 'components:example',
+    files: ['example/form-item-layout-demo.tsx'],
+  },
+  {
+    name: 'form-item-layout-with-select',
+    type: 'components:example',
+    files: ['example/form-item-layout-with-select.tsx'],
+  },
+  {
+    name: 'form-item-layout-with-horizontal',
+    type: 'components:example',
+    files: ['example/form-item-layout-with-horizontal.tsx'],
+  },
+  {
+    name: 'form-item-layout-with-switch',
+    type: 'components:example',
+    files: ['example/form-item-layout-with-switch.tsx'],
+  },
+  {
+    name: 'form-item-layout-with-checkbox',
+    type: 'components:example',
+    files: ['example/form-item-layout-with-switch.tsx'],
+  },
+  {
+    name: 'form-item-layout-with-checkbox-list',
+    type: 'components:example',
+    files: ['example/form-item-layout-with-switch.tsx'],
+  },
 ]

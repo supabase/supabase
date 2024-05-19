@@ -1,11 +1,11 @@
 import { Underline } from 'lucide-react'
 
-import { Toggle } from 'ui'
+import { Toggle_Shadcn_ } from 'ui'
 
 export default function ToggleDisabled() {
   return (
-    <Toggle aria-label="Toggle underline" disabled>
+    <Toggle_Shadcn_ aria-label="Toggle underline" disabled>
       <Underline className="h-4 w-4" />
-    </Toggle>
+    </Toggle_Shadcn_>
   )
 }

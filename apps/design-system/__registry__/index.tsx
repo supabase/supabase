@@ -1941,5 +1941,71 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "form-item-layout-demo": {
+      name: "form-item-layout-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-demo")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-with-select": {
+      name: "form-item-layout-with-select",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-select")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-with-select.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-with-horizontal": {
+      name: "form-item-layout-with-horizontal",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-horizontal")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-with-horizontal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-with-switch": {
+      name: "form-item-layout-with-switch",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-switch")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-with-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-with-checkbox": {
+      name: "form-item-layout-with-checkbox",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-checkbox")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-with-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-with-checkbox-list": {
+      name: "form-item-layout-with-checkbox-list",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-checkbox-list")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-with-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
   },
 }

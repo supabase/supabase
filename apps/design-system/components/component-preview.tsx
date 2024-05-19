@@ -118,7 +118,7 @@ export function ComponentPreview({
 
   if (peekCode) {
     return (
-      <div className={cn('mt-4 mb-12')}>
+      <div className={cn('mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
             'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio overflow-hidden'

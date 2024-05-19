@@ -40,13 +40,13 @@ module.exports = {
   theme: {
     extend: {
       keyframes: {
-        "caret-blink": {
-          "0%,70%,100%": { opacity: "1" },
-          "20%,50%": { opacity: "0" },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
         },
       },
       animation: {
-        "caret-blink": "caret-blink 1.25s ease-out infinite",
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
     },
   },
@@ -83,13 +83,13 @@ module.exports = {
   theme: {
     extend: {
       keyframes: {
-        "caret-blink": {
-          "0%,70%,100%": { opacity: "1" },
-          "20%,50%": { opacity: "0" },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
         },
       },
       animation: {
-        "caret-blink": "caret-blink 1.25s ease-out infinite",
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
     },
   },
@@ -105,12 +105,7 @@ module.exports = {
 ## Usage
 
 ```tsx
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 ```
 
 ```tsx
@@ -191,80 +186,3 @@ You can use the `value` and `onChange` props to control the input value.
 ### Form
 
 <ComponentPreview name="input-otp-form" />
-
-## Changelog
-
-### 2024-03-19 Composition
-
-We've made some updates and replaced the render props pattern with composition. Here's how to update your code if you prefer the composition pattern.
-
-<Callout className="mt-6">
-  **Note:** You are not required to update your code if you are using the
-  `render` prop. It is still supported.
-</Callout>
-
-<Steps>
-
-<Step>Update to the latest version of `input-otp`.</Step>
-
-```bash
-npm install input-otp@latest
-```
-
-<Step>Update `input-otp.tsx`</Step>
-
-```diff showLineNumbers title="input-otp.tsx" {2,8-11}
-- import { OTPInput, SlotProps } from "input-otp"
-+ import { OTPInput, OTPInputContext } from "input-otp"
-
- const InputOTPSlot = React.forwardRef<
-   React.ElementRef<"div">,
--   SlotProps & React.ComponentPropsWithoutRef<"div">
--  >(({ char, hasFakeCaret, isActive, className, ...props }, ref) => {
-+   React.ComponentPropsWithoutRef<"div"> & { index: number }
-+  >(({ index, className, ...props }, ref) => {
-+   const inputOTPContext = React.useContext(OTPInputContext)
-+   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
-```
-
-<Step>Then replace the `render` prop in your code.</Step>
-
-```diff showLineNumbers {2-12}
-<InputOTP maxLength={6}>
-  <InputOTPGroup>
-    <InputOTPSlot index={0} />
-    <InputOTPSlot index={1} />
-    <InputOTPSlot index={2} />
-  </InputOTPGroup>
-  <InputOTPSeparator />
-  <InputOTPGroup>
-    <InputOTPSlot index={3} />
-    <InputOTPSlot index={4} />
-    <InputOTPSlot index={5} />
-  </InputOTPGroup>
-</InputOTP>
-```
-
-</Steps>
-
-### 2024-03-19 Disabled
-
-To add a disabled state to the input, update `<InputOTP />` as follows:
-
-```tsx showLineNumbers title="input-otp.tsx" {4,7-11}
-const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
-  React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
-  <OTPInput
-    ref={ref}
-    containerClassName={cn(
-      "flex items-center gap-2 has-[:disabled]:opacity-50",
-      containerClassName
-    )}
-    className={cn("disabled:cursor-not-allowed", className)}
-    {...props}
-  />
-))
-InputOTP.displayName = "InputOTP"
-```
