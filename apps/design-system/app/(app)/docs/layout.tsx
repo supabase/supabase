@@ -1,6 +1,4 @@
 import SideNavigation from '@/components/side-navigation'
-import TopNavigation from '@/components/top-navigation'
-import { ClickCounter } from '@/components/click-counter'
 import { ScrollArea } from 'ui'
 
 interface LayoutProps {
@@ -8,7 +6,7 @@ interface LayoutProps {
 }
 
 export default async function DocsLayout({ children }: LayoutProps) {
-  console.log('Docs Layout mounted or re-rendered')
+  // console.log('Docs Layout mounted or re-rendered')
 
   return (
     <div className="border-b">

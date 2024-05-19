@@ -15,7 +15,7 @@ interface RootLayoutProps {
 }
 
 export default async function Layout({ children }: RootLayoutProps) {
-  console.log('Root Layout mounted or re-rendered')
+  // console.log('Root Layout mounted or re-rendered')
 
   return (
     <html

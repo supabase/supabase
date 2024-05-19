@@ -456,6 +456,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "ConfirmationModal": {
+      name: "ConfirmationModal",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/ConfirmationModal")),
+      source: "",
+      files: ["registry/default//Dialogs/ConfirmationModal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "TextConfirmModal": {
+      name: "TextConfirmModal",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/TextConfirmModal")),
+      source: "",
+      files: ["registry/default//Dialogs/TextConfirmModal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "ConfirmDialog": {
+      name: "ConfirmDialog",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/ConfirmDialog")),
+      source: "",
+      files: ["registry/default//Dialogs/ConfirmDialog.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "accordion-demo": {
       name: "accordion-demo",
       type: "components:example",
@@ -1827,6 +1860,83 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/mode-toggle")),
       source: "",
       files: ["registry/default/example/mode-toggle.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-demo": {
+      name: "text-confirm-dialog-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-demo")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-info-alert": {
+      name: "text-confirm-dialog-with-info-alert",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-info-alert")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-info-alert.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-warning-alert": {
+      name: "text-confirm-dialog-with-warning-alert",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-warning-alert")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-warning-alert.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-destructive-alert": {
+      name: "text-confirm-dialog-with-destructive-alert",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-destructive-alert")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-destructive-alert.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-size": {
+      name: "text-confirm-dialog-with-size",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-size")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-size.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-children": {
+      name: "text-confirm-dialog-with-children",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-children")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-children.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "text-confirm-dialog-with-cancel-button": {
+      name: "text-confirm-dialog-with-cancel-button",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/text-confirm-dialog-with-cancel-button")),
+      source: "",
+      files: ["registry/default/example/text-confirm-dialog-with-cancel-button.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

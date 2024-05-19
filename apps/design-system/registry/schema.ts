@@ -26,11 +26,19 @@ export const registryEntrySchema = z.object({
   registryDependencies: z.array(z.string()).optional(),
   files: z.array(z.string()),
   source: z.string().optional(),
-  type: z.enum(['components:ui', 'components:component', 'components:example', 'components:block']),
+  type: z.enum([
+    'components:ui',
+    'components:fragment',
+    'components:component',
+    'components:example',
+    'components:block',
+  ]),
   category: z.string().optional(),
   backendProviders: z.array(z.string()).optional(),
   subcategory: z.string().optional(),
   chunks: z.array(blockChunkSchema).optional(),
+  // Optional path of file that is exported from a package
+  optionalPath: z.string().optional(),
 })
 
 export const registrySchema = z.array(registryEntrySchema)

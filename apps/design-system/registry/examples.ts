@@ -847,4 +847,40 @@ export const examples: Registry = [
   //   type: 'components:example',
   //   files: ['example/cards/cards.tsx'],
   // },
+  // fragments
+  {
+    name: 'text-confirm-dialog-demo',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-demo.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-info-alert',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-info-alert.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-warning-alert',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-warning-alert.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-destructive-alert',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-destructive-alert.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-size',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-size.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-children',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-children.tsx'],
+  },
+  {
+    name: 'text-confirm-dialog-with-cancel-button',
+    type: 'components:example',
+    files: ['example/text-confirm-dialog-with-cancel-button.tsx'],
+  },
 ]

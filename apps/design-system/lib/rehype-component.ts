@@ -38,7 +38,7 @@ export function rehypeComponent() {
           type?: string
         }) || {}
 
-      console.log(srcPath, componentName)
+      // console.log(srcPath, componentName)
 
       // inspectComponentProps(Column)
 
@@ -113,16 +113,16 @@ export function rehypeComponent() {
               src = srcPath
             } else {
               const component = Index[style.name][name]
-              console.log('got to ELSE STATEMENT')
-              console.log('filename', fileName)
-              console.log('name', name)
+              // console.log('got to ELSE STATEMENT')
+              // console.log('filename', fileName)
+              // console.log('name', name)
 
               src = fileName
                 ? component.files.find((file: string) => {
                     return file.endsWith(`${fileName}.tsx`) || file.endsWith(`${fileName}.ts`)
                   }) || component.files[0]
                 : component.files[0]
-              console.log('got to END of ELSE STATEMENT')
+              // console.log('got to END of ELSE STATEMENT')
             }
 
             // Read the source file.

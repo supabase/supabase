@@ -73,3 +73,13 @@
 .steps > h3 {
   @apply mt-8 mb-4 text-base font-semibold;
 }
+
+/* .preview-grid-background {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  background-image: linear-gradient(to right, #80808012 1px, transparent 1px),
+    linear-gradient(to bottom, #80808012 1px, transparent 1px);
+  background-size: 24px 24px;
+} */

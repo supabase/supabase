@@ -75,16 +75,11 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
-      title: 'Pattern Components',
+      title: 'Fragment Components',
       items: [
         {
-          title: 'Accordion',
-          href: '/docs/components/accordion',
-          items: [],
-        },
-        {
-          title: 'Alert',
-          href: '/docs/components/alert',
+          title: 'Text Confirm Dialog',
+          href: '/docs/fragments/text-confirm-dialog',
           items: [],
         },
       ],
