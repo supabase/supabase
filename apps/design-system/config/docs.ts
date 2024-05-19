@@ -38,13 +38,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Installation',
-          href: '/docs/installation',
-          items: [],
-        },
-        {
-          title: 'components.json',
-          href: '/docs/components-json',
+          title: 'Colors',
+          href: '/docs/colors',
           items: [],
         },
         {
@@ -53,13 +48,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Dark mode',
-          href: '/docs/dark-mode',
-          items: [],
-        },
-        {
-          title: 'Typography',
-          href: '/docs/components/typography',
+          title: 'Icons',
+          href: '/docs/icons',
           items: [],
         },
         {

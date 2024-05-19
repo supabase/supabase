@@ -39,6 +39,7 @@ import {
 } from 'ui'
 import { ComponentProps } from './component-props'
 // import { Style } from '@/registry/styles'
+import { Colors } from '@/components/colors'
 
 const components = {
   Accordion,
@@ -265,6 +266,7 @@ const components = {
       {...props}
     />
   ),
+  Colors,
 }
 
 interface MdxProps {
