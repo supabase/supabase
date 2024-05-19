@@ -1,0 +1,33 @@
+[data-theme='dark'],
+.dark {
+  --code-token-keyword: #bda4ff;
+  --code-foreground: #ffffff;
+  --code-token-constant: #3ecf8e;
+  --code-token-string: #ffffff;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: #ffffff;
+  --code-token-function: #3ecf8e;
+  --code-token-string-expression: #ffcda1;
+  --code-token-punctuation: #ffffff;
+  --code-token-link: #ffffff;
+  --code-token-number: #ffffff;
+  --code-token-property: #3ecf8e;
+  --code-highlight-color: #232323;
+}
+
+[data-theme='light'],
+.light {
+  --code-token-keyword: #6b35dc;
+  --code-foreground: #ededed;
+  --code-token-constant: #15593b;
+  --code-token-string: #ededed;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: #ededed;
+  --code-token-function: #15593b;
+  --code-token-string-expression: #f1a10d;
+  --code-token-punctuation: #ededed;
+  --code-token-link: #ededed;
+  --code-token-number: #ededed;
+  --code-token-property: #15593b;
+  --code-highlight-color: #1c1c1c;
+}

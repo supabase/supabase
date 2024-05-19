@@ -4,43 +4,43 @@
   "colors": {
     "editorLink.activeForeground": "#ca8a0488",
     "foreground": "#0008",
-    "button.background": "#000",
+    "button.background": "blue",
     "button.foreground": "#fff",
     "button.hoverBackground": "#000b",
-    "list.highlightForeground": "#000",
-    "textLink.foreground": "#000",
+    "list.highlightForeground": "blue",
+    "textLink.foreground": "blue",
     "scrollbar.shadow": "#fff",
     "textLink.activeForeground": "#0008",
     "editor.lineHighlightBackground": "#8881",
     "editor.lineHighlightBorder": "#8882",
-    "editorCursor.foreground": "#000",
+    "editorCursor.foreground": "blue",
     "editor.findMatchBackground": "#0008",
     "editor.findMatchHighlightBackground": "#0002",
-    "list.activeSelectionForeground": "#000",
-    "list.focusForeground": "#000",
-    "list.hoverForeground": "#000",
-    "list.inactiveSelectionForeground": "#000",
+    "list.activeSelectionForeground": "blue",
+    "list.focusForeground": "blue",
+    "list.hoverForeground": "blue",
+    "list.inactiveSelectionForeground": "blue",
     "list.inactiveSelectionBackground": "#fff",
     "list.focusBackground": "#fff",
     "list.focusAndSelectionOutline": "#fff",
-    "list.focusHighlightForeground": "#000",
+    "list.focusHighlightForeground": "blue",
     "list.hoverBackground": "#fff",
     "list.focusOutline": "#fff",
     "list.activeSelectionBackground": "#fff",
     "editorIndentGuide.background": "#0002",
     "editor.background": "#fff",
-    "editor.foreground": "#000",
+    "editor.foreground": "blue",
     "editor.foldBackground": "#fff",
     "editor.hoverHighlightBackground": "#fff",
     "editor.selectionBackground": "#8888",
     "editor.inactiveSelectionBackground": "#8882",
-    "gitDecoration.modifiedResourceForeground": "#000",
+    "gitDecoration.modifiedResourceForeground": "blue",
     "gitDecoration.untrackedResourceForeground": "#a7cb7b",
     "gitDecoration.conflictingResourceForeground": "#ca8a04",
     "gitDecoration.deletedResourceForeground": "#c97b89",
     "listFilterWidget.background": "#fff",
     "input.background": "#0001",
-    "titleBar.activeForeground": "#000",
+    "titleBar.activeForeground": "blue",
     "editorWidget.background": "#fff",
     "editorGutter.background": "#fff",
     "debugToolBar.background": "#fff",
@@ -81,42 +81,42 @@
       "foreground": "#0008"
     },
     "selfKeyword": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "method.declaration": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "method.definition": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "method": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": false
     },
     "function.declaration": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "function.definition": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "function": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": false
     },
     "property": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "enumMember": {
       "foreground": "#0008",
       "bold": false
     },
     "enum": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "boolean": {
@@ -126,23 +126,23 @@
       "foreground": "#0008"
     },
     "type": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "typeAlias": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "class": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "selfTypeKeyword": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "builtinType": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "interface": {
@@ -150,7 +150,7 @@
       "bold": false
     },
     "typeParameter": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     },
     "lifetime": {
@@ -159,37 +159,37 @@
       "bold": false
     },
     "namespace": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "macro": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": false
     },
     "decorator": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": false
     },
     "builtinAttribute": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": false
     },
     "generic.attribute": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "derive": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "operator": {
       "foreground": "#0008"
     },
     "variable": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "variable.readonly": {
       "foreground": "#0008"
     },
     "parameter": {
-      "foreground": "#000"
+      "foreground": "blue"
     },
     "variable.mutable": {
       "underline": true
@@ -204,7 +204,7 @@
       "foreground": "#0008"
     },
     "struct": {
-      "foreground": "#000",
+      "foreground": "blue",
       "bold": true
     }
   },
@@ -241,14 +241,14 @@
       "name": "Fallback JSON Properties",
       "scope": ["support.type.property-name.json"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
       "name": "Fallback string variables",
       "scope": ["string variable", "string meta.interpolation"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
@@ -269,7 +269,7 @@
       "name": "Fallback self/this",
       "scope": ["variable.language.this"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
@@ -283,7 +283,7 @@
         "entity.other.inherited-class"
       ],
       "settings": {
-        "foreground": "#000",
+        "foreground": "blue",
         "fontStyle": "bold"
       }
     },
@@ -291,7 +291,7 @@
       "name": "Fallback method calls",
       "scope": ["meta.method-call entity.name.function"],
       "settings": {
-        "foreground": "#000",
+        "foreground": "blue",
         "fontStyle": ""
       }
     },
@@ -303,7 +303,7 @@
         "meta.function.call entity.name.function"
       ],
       "settings": {
-        "foreground": "#000",
+        "foreground": "blue",
         "fontStyle": ""
       }
     },
@@ -322,7 +322,7 @@
         "entity.name.variable.parameter"
       ],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
@@ -334,18 +334,15 @@
         "entity.name.function meta.function-call meta.method-call"
       ],
       "settings": {
-        "foreground": "#000",
+        "foreground": "blue",
         "fontStyle": "bold"
       }
     },
     {
       "name": "HTML Tags",
-      "scope": [
-        "meta.tag entity.name.tag.html",
-        "entity.name.tag.template.html"
-      ],
+      "scope": ["meta.tag entity.name.tag.html", "entity.name.tag.template.html"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
@@ -359,14 +356,14 @@
       "name": "HTML Custom Tag",
       "scope": ["meta.tag.other.unrecognized.html entity.name.tag.html"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {
       "name": "HTML Keywords",
       "scope": ["text.html keyword"],
       "settings": {
-        "foreground": "#000"
+        "foreground": "blue"
       }
     },
     {

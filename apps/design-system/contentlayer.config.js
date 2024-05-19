@@ -125,9 +125,10 @@ export default makeSource({
       },
       [
         rehypePrettyCode,
+        // rehypePrettyCodeOptions,
         {
           getHighlighter: async () => {
-            const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/dark.json'))
+            const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/supabase.json'))
             return await getHighlighter({ theme })
           },
           onVisitLine(node) {

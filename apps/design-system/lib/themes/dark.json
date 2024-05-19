@@ -4,43 +4,43 @@
   "colors": {
     "editorLink.activeForeground": "#ca8a0488",
     "foreground": "#fff8",
-    "button.background": "#fff",
+    "button.background": "hsl(var(--foreground-default)/1)",
     "button.foreground": "#000",
     "button.hoverBackground": "#fffb",
-    "list.highlightForeground": "#fff",
-    "textLink.foreground": "#fff",
+    "list.highlightForeground": "hsl(var(--foreground-default)/1)",
+    "textLink.foreground": "hsl(var(--foreground-default)/1)",
     "scrollbar.shadow": "#000",
     "textLink.activeForeground": "#fff8",
     "editor.lineHighlightBackground": "#8881",
     "editor.lineHighlightBorder": "#8882",
-    "editorCursor.foreground": "#fff",
+    "editorCursor.foreground": "hsl(var(--foreground-default)/1)",
     "editor.findMatchBackground": "#fff8",
     "editor.findMatchHighlightBackground": "#fff2",
-    "list.activeSelectionForeground": "#fff",
-    "list.focusForeground": "#fff",
-    "list.hoverForeground": "#fff",
-    "list.inactiveSelectionForeground": "#fff",
+    "list.activeSelectionForeground": "hsl(var(--foreground-default)/1)",
+    "list.focusForeground": "hsl(var(--foreground-default)/1)",
+    "list.hoverForeground": "hsl(var(--foreground-default)/1)",
+    "list.inactiveSelectionForeground": "hsl(var(--foreground-default)/1)",
     "list.inactiveSelectionBackground": "#000",
     "list.focusBackground": "#000",
     "list.focusAndSelectionOutline": "#000",
-    "list.focusHighlightForeground": "#fff",
+    "list.focusHighlightForeground": "hsl(var(--foreground-default)/1)",
     "list.hoverBackground": "#000",
     "list.focusOutline": "#000",
     "list.activeSelectionBackground": "#000",
     "editorIndentGuide.background": "#fff2",
     "editor.background": "#000",
-    "editor.foreground": "#fff",
+    "editor.foreground": "hsl(var(--foreground-default)/1)",
     "editor.foldBackground": "#000",
     "editor.hoverHighlightBackground": "#000",
     "editor.selectionBackground": "#8888",
     "editor.inactiveSelectionBackground": "#8882",
-    "gitDecoration.modifiedResourceForeground": "#fff",
+    "gitDecoration.modifiedResourceForeground": "hsl(var(--foreground-default)/1)",
     "gitDecoration.untrackedResourceForeground": "#a7cb7b",
     "gitDecoration.conflictingResourceForeground": "#ca8a04",
     "gitDecoration.deletedResourceForeground": "#c97b89",
     "listFilterWidget.background": "#000",
     "input.background": "#fff1",
-    "titleBar.activeForeground": "#fff",
+    "titleBar.activeForeground": "hsl(var(--foreground-default)/1)",
     "editorWidget.background": "#000",
     "editorGutter.background": "#000",
     "debugToolBar.background": "#000",
@@ -81,42 +81,42 @@
       "foreground": "#fff8"
     },
     "selfKeyword": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "method.declaration": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "method.definition": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "method": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": false
     },
     "function.declaration": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "function.definition": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "function": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": false
     },
     "property": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "enumMember": {
       "foreground": "#fff8",
       "bold": false
     },
     "enum": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "boolean": {
@@ -126,23 +126,23 @@
       "foreground": "#fff8"
     },
     "type": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "typeAlias": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "class": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "selfTypeKeyword": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "builtinType": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "interface": {
@@ -150,7 +150,7 @@
       "bold": false
     },
     "typeParameter": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     },
     "lifetime": {
@@ -159,37 +159,37 @@
       "bold": false
     },
     "namespace": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "macro": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": false
     },
     "decorator": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": false
     },
     "builtinAttribute": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": false
     },
     "generic.attribute": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "derive": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "operator": {
       "foreground": "#fff8"
     },
     "variable": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "variable.readonly": {
       "foreground": "#fff8"
     },
     "parameter": {
-      "foreground": "#fff"
+      "foreground": "hsl(var(--foreground-default/1))"
     },
     "variable.mutable": {
       "underline": true
@@ -204,7 +204,7 @@
       "foreground": "#fff8"
     },
     "struct": {
-      "foreground": "#fff",
+      "foreground": "hsl(var(--foreground-default)/1)",
       "bold": true
     }
   },
@@ -241,14 +241,14 @@
       "name": "Fallback JSON Properties",
       "scope": ["support.type.property-name.json"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
       "name": "Fallback string variables",
       "scope": ["string variable", "string meta.interpolation"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
@@ -269,7 +269,7 @@
       "name": "Fallback self/this",
       "scope": ["variable.language.this"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
@@ -283,7 +283,7 @@
         "entity.other.inherited-class"
       ],
       "settings": {
-        "foreground": "#fff",
+        "foreground": "hsl(var(--foreground-default)/1)",
         "fontStyle": "bold"
       }
     },
@@ -291,7 +291,7 @@
       "name": "Fallback method calls",
       "scope": ["meta.method-call entity.name.function"],
       "settings": {
-        "foreground": "#fff",
+        "foreground": "hsl(var(--foreground-default)/1)",
         "fontStyle": ""
       }
     },
@@ -303,7 +303,7 @@
         "meta.function.call entity.name.function"
       ],
       "settings": {
-        "foreground": "#fff",
+        "foreground": "hsl(var(--foreground-default)/1)",
         "fontStyle": ""
       }
     },
@@ -322,7 +322,7 @@
         "entity.name.variable.parameter"
       ],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
@@ -334,18 +334,15 @@
         "entity.name.function meta.function-call meta.method-call"
       ],
       "settings": {
-        "foreground": "#fff",
+        "foreground": "hsl(var(--foreground-default)/1)",
         "fontStyle": "bold"
       }
     },
     {
       "name": "HTML Tags",
-      "scope": [
-        "meta.tag entity.name.tag.html",
-        "entity.name.tag.template.html"
-      ],
+      "scope": ["meta.tag entity.name.tag.html", "entity.name.tag.template.html"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
@@ -359,14 +356,14 @@
       "name": "HTML Custom Tag",
       "scope": ["meta.tag.other.unrecognized.html entity.name.tag.html"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
       "name": "HTML Keywords",
       "scope": ["text.html keyword"],
       "settings": {
-        "foreground": "#fff"
+        "foreground": "hsl(var(--foreground-default/1))"
       }
     },
     {
