@@ -3,4 +3,69 @@ title: Colors
 description: Colors system breakdown. Copy values and check a11y usage
 ---
 
-<Colors />
+Colors available in the Supabase Design System
+
+These are examples of using colors with shorthands.
+
+## Background
+
+<Colors definition={'background'} />
+
+### App backgrounds
+
+We use backgrounds in 2 different ways. In the ./www and ./docs sites, we use a darker background, so we have an extra background color we can use
+
+```jsx
+/**
+ * ./www background color
+ * ./docs background color
+ */
+<body className="bg">{children}</body>
+
+/**
+ * ./studio background color
+ */
+<body className="bg-studio">{children}</body>
+```
+
+### Surfaces
+
+We use surfaces in 2 different ways. In the ./www and ./docs sites, we use a darker background, so we have an extra surface color we can use
+
+```jsx
+<body className="bg">
+  <div className="bg-suface-75 border">
+    {children}
+    <span className="font-mono uppercase">Blog Post</span>
+  </div>
+</body>
+```
+
+For the studio (dashbaord) we can use 100, 200, 300
+
+```jsx
+<body className="bg-studio">
+  <div className="bg-suface-100 border rounded">{children}</div>
+</body>
+```
+
+### Overlays
+
+We use the `./bg-overlay` background color for overlays.
+This is not to be confused with `Dialogs`, they require to use the same app background color as the site.
+
+## Border
+
+<Colors definition={'border'} />
+
+## Text
+
+These can also be accessed with `foreground`. Like `text-foreground-light`.
+
+<Colors definition={'text'} />
+
+## Other Colors
+
+These can also be accessed with `foreground`. Like `text-foreground-light`.
+
+<Colors definition={'colors'} />

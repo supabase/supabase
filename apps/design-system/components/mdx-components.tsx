@@ -41,6 +41,7 @@ import { ComponentProps } from './component-props'
 import { Style } from '@/registry/styles'
 import { Colors } from '@/components/colors'
 import { Icons } from '@/components/icons'
+import { ThemeSettings } from '@/components/theme-settings'
 
 const components = {
   Accordion,
@@ -267,6 +268,7 @@ const components = {
   ),
   Colors,
   Icons,
+  ThemeSettings,
 }
 
 interface MdxProps {

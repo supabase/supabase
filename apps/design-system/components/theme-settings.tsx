@@ -3,13 +3,7 @@
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-import {
-  Label_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupLargeItem_Shadcn_,
-  singleThemes,
-  Theme,
-} from 'ui'
+import { RadioGroupLargeItem_Shadcn_, RadioGroup_Shadcn_, Theme, singleThemes } from 'ui'
 
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -30,7 +24,7 @@ const ThemeSettings = () => {
 
   function SingleThemeSelection() {
     return (
-      <form>
+      <form className="py-8">
         <RadioGroup_Shadcn_
           name="theme"
           onValueChange={setTheme}
@@ -51,21 +45,9 @@ const ThemeSettings = () => {
 
   return (
     <>
-      <div className="col-span-4 flex flex-col gap-5">
-        <Label_Shadcn_ htmlFor="theme" className="text-light">
-          Theme mode
-        </Label_Shadcn_>
-        <p className="text-sm text-foreground-light max-w-[220px]">
-          Choose how Supabase looks to you. Select a single theme, or sync with your system.
-        </p>
-      </div>
-
-      <div className="col-span-8 flex flex-col gap-4">
-        <p className="text-sm text-light">Supabase will use your selected theme</p>
-        <SingleThemeSelection />
-      </div>
+      <SingleThemeSelection />
     </>
   )
 }
 
-export default ThemeSettings
+export { ThemeSettings }

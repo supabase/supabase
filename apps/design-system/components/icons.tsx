@@ -8,38 +8,16 @@ import {
   DropdownMenuTrigger,
   IconCopy,
 } from 'ui'
+import { Grid, GridItem } from './grid'
 
 function Icons() {
   return (
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-l my-12">
+      <Grid>
         {Index.map((icon: any, i: number) => (
           <DropdownMenu key={i} modal={false}>
             <DropdownMenuTrigger asChild>
-              <div
-                key={i}
-                className="
-                    relative
-                    min-h-32 
-                    flex gap-3 flex-col items-center p-4 
-                    border-b border-r
-                    bg-surface-75/50 
-                    justify-center hover:bg-surface-100
-                    group
-                    cursor-pointer
-                "
-              >
-                <div
-                  className="
-                    absolute
-                    w-full h-full box-content
-                    transition 
-                    group-hover:border 
-                    group-hover:border-foreground-muted 
-                    group-data-[state=open]:border 
-                    group-data-[state=open]:border-foreground-muted 
-                "
-                ></div>
+              <GridItem>
                 <icon.component
                   strokeWidth={1.5}
                   size={21}
@@ -48,7 +26,7 @@ function Icons() {
                 <span className="font-mono text-sm text-foreground-lighter group-data-[state=open]:text-foreground">
                   {icon.name}
                 </span>
-              </div>
+              </GridItem>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
               <DropdownMenuGroup>
@@ -84,7 +62,7 @@ function Icons() {
             </DropdownMenuContent>
           </DropdownMenu>
         ))}
-      </div>
+      </Grid>
     </>
   )
 }

@@ -43,6 +43,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tailwind classes',
+          href: '/docs/tailwind-classes',
+          items: [],
+        },
+        {
           title: 'Theming',
           href: '/docs/theming',
           items: [],
