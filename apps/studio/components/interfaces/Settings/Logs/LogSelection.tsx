@@ -17,7 +17,7 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import { XIcon } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import toast from 'react-hot-toast'
 
@@ -198,7 +198,7 @@ const LogSelection = ({
               className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <XIcon size={14} strokeWidth={2} className="text-foreground-lighter" />
+              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
           <div className="h-px w-full bg-selection rounded " />

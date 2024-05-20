@@ -17,7 +17,10 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from 'data/read-replicas/replicas-status-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -80,7 +83,12 @@ const InstanceConfigurationUI = () => {
           REPLICA_STATUS.ACTIVE_UNHEALTHY,
           REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
         ]
-        const replicasInTransition = res.filter((db) => !fixedStatues.includes(db.status))
+        const replicasInTransition = res.filter((db) => {
+          const { status } = db.replicaInitializationStatus || {}
+          return (
+            !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+          )
+        })
         const hasTransientStatus = replicasInTransition.length > 0
 
         // If any replica's status has changed, refetch databases
@@ -107,7 +115,10 @@ const InstanceConfigurationUI = () => {
   const nodes = useMemo(
     () =>
       isSuccessReplicas && isSuccessLoadBalancers
-        ? generateNodes(primary, replicas, loadBalancers ?? [], {
+        ? generateNodes({
+            primary,
+            replicas,
+            loadBalancers: loadBalancers ?? [],
             onSelectRestartReplica: setSelectedReplicaToRestart,
             onSelectDropReplica: setSelectedReplicaToDrop,
           })

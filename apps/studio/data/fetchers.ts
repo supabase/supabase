@@ -1,9 +1,9 @@
+import * as Sentry from '@sentry/nextjs'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import type { paths } from './api' // generated from openapi-typescript
-import type { ResponseError } from 'types'
 
 const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
@@ -150,6 +150,23 @@ export const options: typeof _options = async (url, init) => {
   })
 }
 
-export const handleError = (error: ResponseError) => {
-  throw new Error(error.message)
+export const handleError = (error: any): never => {
+  if (error && error.msg) {
+    throw new Error(error.msg)
+  }
+
+  if (error && error.message) {
+    throw new Error(error.message)
+  }
+
+  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
+  // add handling for it.
+  console.error(error.stack)
+  Sentry.captureMessage(
+    `Unable to throw an object as error. The object has the following keys: ${Object.keys(error)}.`
+  )
+
+  // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
+  // up in the UI.
+  throw new Error('API error happened while trying to communicate with the server.')
 }
