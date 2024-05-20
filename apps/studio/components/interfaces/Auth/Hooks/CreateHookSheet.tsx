@@ -271,15 +271,14 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
               )}
             />
             {values.selectedType === 'postgres' ? (
-              <>
+              <div className="grid grid-cols-2 gap-8 px-8">
                 <FormField_Shadcn_
                   key="postgresValues.schema"
                   control={form.control}
                   name="postgresValues.schema"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Schema"
-                      className="px-8"
+                      label="Postgres Schema"
                       description="Postgres schema where the function is defined."
                     >
                       <FormControl_Shadcn_>
@@ -303,7 +302,6 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                   render={({ field }) => (
                     <FormItemLayout
                       label="Function name"
-                      className="px-8"
                       description="Postgres function which will be called by Supabase Auth each time the hook is triggered."
                     >
                       <FormControl_Shadcn_>
@@ -318,9 +316,9 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                     </FormItemLayout>
                   )}
                 />
-              </>
+              </div>
             ) : (
-              <>
+              <div className="flex flex-col px-8 gap-4">
                 <FormField_Shadcn_
                   key="httpsValues.url"
                   control={form.control}
@@ -328,8 +326,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                   render={({ field }) => (
                     <FormItemLayout
                       label="URL"
-                      className="px-8"
-                      description="Supabase Auth will send a HTTP POST request to this URL each time the hook is triggered."
+                      description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
                     >
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} />
@@ -344,7 +341,6 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                   render={({ field }) => (
                     <FormItemLayout
                       label="Secret"
-                      className="px-8"
                       description="It should be a base64 encoded hook secret with a prefix 'v1,whsec_'. 'v1' denotes the signature version, and 'whsec_' signifies a symmetric secret."
                     >
                       <FormControl_Shadcn_>
@@ -366,7 +362,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                     </FormItemLayout>
                   )}
                 />
-              </>
+              </div>
             )}
           </form>
         </Form_Shadcn_>
