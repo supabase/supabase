@@ -112,7 +112,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     console.error(error.stack)
-    Sentry.captureMessage(`Full page crash: ${error.message || 'Unknown error message'}`)
+    Sentry.captureMessage(`Full page crash: ${error.message || 'Unknown error message'}`, {
+      level: 'error',
+    })
   }
 
   useEffect(() => {
