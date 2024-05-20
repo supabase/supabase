@@ -47,6 +47,9 @@ const NestedProperties = defineNestedType(() => ({
     vaul: {
       type: 'boolean',
     },
+    inputOtp: {
+      type: 'boolean',
+    },
   },
 }))
 

@@ -89,6 +89,34 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
       }
     }
 
+    const InputOtp = () => {
+      if (doc.source?.inputOtp) {
+        return (
+          <div
+            className={cn(
+              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              props.className
+            )}
+            {...props}
+          >
+            <div className="flex items-center gap-2">
+              <Image
+                width={24}
+                height={24}
+                src="https://avatars.githubusercontent.com/u/10366880?s=48&v=4"
+                alt="inputOtp"
+                className="h-6 w-6 rounded-full"
+              />
+              <span className="hidden font-bold sm:inline-block">input-otp</span>
+            </div>
+            <span className="text-foreground-light text-sm">
+              This component is based on input-otp by guilhermerodz
+            </span>
+          </div>
+        )
+      }
+    }
+
     const RadixPanel = () => {
       if (doc.source?.radix) {
         return (
@@ -166,6 +194,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
       <div className="flex flex-col -space-y-px">
         <RadixPanel />
         <VaulPanel />
+        <InputOtp />
         {/* <ShadcnPanel /> */}
       </div>
     )
