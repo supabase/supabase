@@ -17,11 +17,9 @@ export const ProjectPausedAlert = ({
       <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       {projectRef && (
-        <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
-            <Link href={`/project/${projectRef}`}>Restore project</Link>
-          </Button>
-        </div>
+        <Button asChild type="default" className="mt-3">
+          <Link href={`/project/${projectRef}`}>Restore project</Link>
+        </Button>
       )}
     </Alert_Shadcn_>
   )
