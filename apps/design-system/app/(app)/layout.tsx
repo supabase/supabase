@@ -13,7 +13,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <>
       <TopNavigation />
       {/* main container */}
-      <div className="2xl:pl-20 2xl:pr-20">
+      <div className="">
         {/* main content */}
         <main className="flex-1 max-w-site mx-auto w-full border-l border-r">
           {/* {children} */}
