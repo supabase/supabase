@@ -166,7 +166,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
       <div className="flex flex-col -space-y-px">
         <RadixPanel />
         <VaulPanel />
-        <ShadcnPanel />
+        {/* <ShadcnPanel /> */}
       </div>
     )
   }
