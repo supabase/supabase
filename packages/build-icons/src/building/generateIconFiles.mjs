@@ -76,9 +76,9 @@ export const Index: Record<string, any> = [`
     registryIndex += `\n{`
     registryIndex += `
   name: "${iconName}",
-  componentName: componentName,
-  deprecated,
-  raw: output,
+  componentName: "${componentName}",
+  deprecated: ${deprecated},
+  raw: ${JSON.stringify(output)},
   component: React.lazy(() => import('icons/src/icons/${iconName}')),
   import: "import { ${componentName} } from 'icons'",
   svg: ${JSON.stringify(readSvg(`${iconName}.svg`, iconsDir))},
