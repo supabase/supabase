@@ -1,7 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { analyticsKeys } from './keys'
+import { get } from 'data/fetchers'
 
 export type WarehouseBackendsVariables = {
   projectRef: string
@@ -17,17 +16,18 @@ export async function getWarehouseBackends(
     throw new Error('projectRef is required')
   }
 
-  const response = await get<WarehouseBackendsResponse>(
-    `${API_URL}/projects/${projectRef}/analytics/warehouse/backends`,
-    {
-      signal,
-    }
-  )
-  if (response.error) {
-    throw response.error
-  }
+  // [Jordi] Commented out since its not needed for now and it will throw an error
 
-  return response
+  // const response = await get(`/platform/projects/{ref}/analytics/warehouse/backends`, {
+  //   params: { path: { ref: projectRef } },
+  //   signal,
+  // })
+
+  // if (response.error) {
+  //   throw response.error
+  // }
+
+  // return response
 }
 
 export type WarehouseBackendsData = Awaited<ReturnType<typeof getWarehouseBackends>>
