@@ -47,18 +47,55 @@ export function generateAuthHookSecret() {
 
 const FORM_ID = 'create-edit-auth-hook'
 
-const FormSchema = z.object({
-  hookType: z.string(),
-  selectedType: z.string(),
-  httpsValues: z.object({
-    url: z.string(),
-    secret: z.string(),
-  }),
-  postgresValues: z.object({
-    schema: z.string(),
-    functionName: z.string(),
-  }),
-})
+const FormSchema = z
+  .object({
+    hookType: z.string(),
+    enabled: z.boolean(),
+    selectedType: z.string(),
+    httpsValues: z.object({
+      url: z.string(),
+      secret: z.string(),
+    }),
+    postgresValues: z.object({
+      schema: z.string(),
+      functionName: z.string(),
+    }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.selectedType === 'https') {
+      if (!data.httpsValues.url.startsWith('https://')) {
+        ctx.addIssue({
+          path: ['httpsValues', 'url'],
+          code: z.ZodIssueCode.custom,
+          message: 'The URL must start with https://',
+        })
+      }
+      if (!data.httpsValues.secret) {
+        ctx.addIssue({
+          path: ['httpsValues', 'secret'],
+          code: z.ZodIssueCode.custom,
+          message: 'Missing secret value',
+        })
+      }
+    }
+    if (data.selectedType === 'postgres') {
+      if (!data.postgresValues.schema) {
+        ctx.addIssue({
+          path: ['postgresValues', 'schema'],
+          code: z.ZodIssueCode.custom,
+          message: 'You must select a schema',
+        })
+      }
+      if (!data.postgresValues.functionName) {
+        ctx.addIssue({
+          path: ['postgresValues', 'functionName'],
+          code: z.ZodIssueCode.custom,
+          message: 'You must select a Postgres function',
+        })
+      }
+    }
+    return true
+  })
 
 export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
