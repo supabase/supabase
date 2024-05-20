@@ -77,6 +77,15 @@ void main() async {
 
 /// Extract SupabaseClient instance in a handy variable
 final supabase = Supabase.instance.client;
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(title: 'Supabase Flutter');
+  }
+}
 ```
 
 Also, add [go_router](https://pub.dev/packages/go_router) to handle our routing and redirects.
