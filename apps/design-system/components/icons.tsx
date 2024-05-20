@@ -12,7 +12,7 @@ import {
 function Icons() {
   return (
     <>
-      <div className="grid grid-cols-4 border-t border-l my-12">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-l my-12">
         {Index.map((icon: any, i: number) => (
           <DropdownMenu key={i} modal={false}>
             <DropdownMenuTrigger asChild>
@@ -26,6 +26,7 @@ function Icons() {
                     bg-surface-75/50 
                     justify-center hover:bg-surface-100
                     group
+                    cursor-pointer
                 "
               >
                 <div
@@ -39,11 +40,17 @@ function Icons() {
                     group-data-[state=open]:border-foreground-muted 
                 "
                 ></div>
-                <icon.component strokeWidth={1.5} size={21} />
-                <span className="font-mono text-sm text-foreground-lighter">{icon.name}</span>
+                <icon.component
+                  strokeWidth={1.5}
+                  size={21}
+                  className="group-data-[state=open]:scale-125 transition-all"
+                />
+                <span className="font-mono text-sm text-foreground-lighter group-data-[state=open]:text-foreground">
+                  {icon.name}
+                </span>
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48 -mt-8">
+            <DropdownMenuContent className="w-48">
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className="flex items-center gap-2"
