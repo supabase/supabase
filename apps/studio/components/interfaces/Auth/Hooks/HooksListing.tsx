@@ -39,7 +39,7 @@ export const HooksListing = () => {
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const { mutateAsync: updateAuthConfig } = useAuthConfigUpdateMutation()
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   if (isError) {
@@ -160,16 +160,16 @@ export const HooksListing = () => {
       />
       <ConfirmationModal
         visible={!!selectedHookForDeletion}
-        variant={'destructive'}
+        variant="destructive"
         title="Confirm to delete"
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
         onCancel={() => setSelectedHookForDeletion(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!selectedHookForDeletion) {
             return
           }
-          updateAuthConfig({
+          await updateAuthConfig({
             projectRef: projectRef!,
             config: {
               [selectedHookForDeletion.enabledKey]: false,
