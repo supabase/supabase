@@ -580,6 +580,34 @@ functions:
           ```swift
           let identities = try await supabase.auth.userIdentities()
           ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider)
+          ```
+        description: |
+          Uses:
+            - `NSWorkspace.shared.open` in macOS
+            - `UIApplication.shared.open` in iOS, tvOS, visionOS, and macOS Catalyst
+            - `WKExtension.shared().openSystemURL` in watchOS
+      - id: link-identity-custom-urlopener
+        name: Link an identity to a user with custom URL opening logic
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.linkIdentity(provider: provider) { url in 
+            // custom URL opening logic
+          }
+          ```
   - id: unlink-identity
     title: 'unlinkIdentity()'
     notes: |
@@ -905,7 +933,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select()
             .execute()
@@ -953,7 +981,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select("name")
             .execute()
@@ -1005,7 +1033,7 @@ functions:
             let name: String
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select(
               """
@@ -1079,7 +1107,7 @@ functions:
               let name: String
             }
 
-            let users: [User] = try await supabase.database
+            let users: [User] = try await supabase
               .from("users")
               .select(
                 """
@@ -1179,7 +1207,7 @@ functions:
             let name: String
           }
 
-          let messages: [Message] = try await supabase.database
+          let messages: [Message] = try await supabase
             .from("messages")
             .select(
               """
@@ -1251,7 +1279,7 @@ functions:
             let name: String
           }
 
-          let cities: [City] = try await supabase.database
+          let cities: [City] = try await supabase
             .from("cities")
             .select("name, countries(*)")
             .eq("countries.name", value: "Estonia")
@@ -1317,7 +1345,7 @@ functions:
             let count: Int
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select("*, cities(count)")
             .execute()
@@ -1369,7 +1397,7 @@ functions:
         name: Querying with count option
         code: |
           ```swift
-          let count = try await supabase.database
+          let count = try await supabase
             .from("countries")
             .select("*", head: true, count: .exact)
             .execute()
@@ -1410,7 +1438,7 @@ functions:
             let city: String
           }
 
-          let users: [User] = try await supabase.database
+          let users: [User] = try await supabase
             .from("users")
             .select(
               """
@@ -1469,7 +1497,7 @@ functions:
             let cities: [City]
           }
 
-          let countries: [Country] = try await supabase.database
+          let countries: [Country] = try await supabase
             .from("countries")
             .select("name, cities!inner(name)")
             .eq("name", value: "united kingdom")
@@ -1545,7 +1573,7 @@ functions:
 
           let country = Country(id: 1, name: "Denmark")
 
-          try await supabase.database
+          try await supabase
             .from("countries")
             .insert(country)
             .execute()
@@ -1574,7 +1602,7 @@ functions:
             let name: String
           }
 
-          let country: Country = try await supabase.database
+          let country: Country = try await supabase
             .from("countries")
             .insert(Country(id: 1, name: "Denmark"))
             .select()
@@ -1617,7 +1645,7 @@ functions:
             Country(id: 1, name: "Vietnam"),
           ]
 
-          try await supabase.database
+          try await supabase
             .from("countries")
             .insert(countries)
             .execute()
@@ -1655,7 +1683,7 @@ functions:
         name: Updating your data
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .update(["name": "Australia"])
             .eq("id", value: 1)
@@ -1694,7 +1722,7 @@ functions:
             let name: String          
           }
 
-          let country: Country = try await supabase.database
+          let country: Country = try await supabase
             .from("countries")
             .update(["name": "Australia"])
             .eq("id", value: 1)
@@ -1748,7 +1776,7 @@ functions:
             let address: User.Address
           }
 
-          let users: [User] = try await supabase.database
+          let users: [User] = try await supabase
             .from("users")
             .update(
               UpdateUser(
@@ -1814,7 +1842,7 @@ functions:
             let id: Int
             let name: String
           }
-          try await supabase.database
+          try await supabase
             .from("countries")
             .upsert(Country(id: 1, name: "Albania"))
             .execute()
@@ -1853,7 +1881,7 @@ functions:
             let id: Int
             let name: String
           }
-          try await supabase.database
+          try await supabase
             .from("countries")
             .upsert([
               Country(id: 1, name: "Albania"),
@@ -1906,7 +1934,7 @@ functions:
             }
           }
 
-          try await supabase.database
+          try await supabase
             .from("users")
             .upsert(
               User(id: 42, handle: "saoirse", displayName: "Saoirse"),
@@ -1966,7 +1994,7 @@ functions:
         name: Delete records
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .delete()
             .eq("id", value: 1)
@@ -2009,7 +2037,7 @@ functions:
         name: Call a Postgres function without arguments
         code: |
           ```swift
-          let value: String = try await supabase.database
+          let value: String = try await supabase
             .rpc("hello_world")
             .execute()
             .value
@@ -2035,7 +2063,7 @@ functions:
         name: Call a Postgres function with arguments
         code: |
           ```swift
-          let response: String = try await supabase.database
+          let response: String = try await supabase
             .rpc("echo", params: ["say": "👋"])
             .execute()
             .value
@@ -2060,7 +2088,7 @@ functions:
         name: Bulk processing
         code: |
           ```swift
-          let response: [Int] = try await supabase.database
+          let response: [Int] = try await supabase
             .rpc("add_one_each", params: ["arr": [1, 2, 3]])
             .execute()
             .value
@@ -2097,7 +2125,7 @@ functions:
             let name: String
           }
 
-          let country: Country = await supabase.database
+          let country: Country = await supabase
             .rpc("list_stored_countries")
             .eq("id", value: 1)
             .single()
@@ -2158,12 +2186,12 @@ functions:
           [modifiers](/docs/reference/swift/using-modifiers).
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("cities")
             .select("name, country_id")
             .eq("name", value: "The Shire")    // Correct
 
-          try await supabase.database
+          try await supabase
             .from("citites")
             .eq("name", value: "The Shire")    // Incorrect
             .select("name, country_id")
@@ -2175,7 +2203,7 @@ functions:
           to query cities with population between 1,000 and 10,000:
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("cities")
             .select("name, country_id")
             .gte("population", value: 1000)
@@ -2191,7 +2219,7 @@ functions:
           let filterPopLow: Int? = 1000
           let filterPopHigh: Int? = 10000
 
-          var query = await supabase.database
+          var query = await supabase
             .from("cities")
             .select("name, country_id")
 
@@ -2214,7 +2242,7 @@ functions:
         name: Filter by values within a JSON column
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("users")
             .select()
             .eq("address->postcode", value: 90210)
@@ -2255,7 +2283,7 @@ functions:
         name: Filter Foreign Tables
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2324,7 +2352,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .or("id.eq.2,name.eq.Algeria")
@@ -2363,7 +2391,7 @@ functions:
         name: Use `or` with `and`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .or("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
@@ -2415,7 +2443,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select()
             .not("name", operator: .is, value: "")
@@ -2429,7 +2457,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .match(["id": 2, "name": "Albania"])
@@ -2476,7 +2504,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select()
             .filter("name", operator: .in, value: #"("Algeria","Japan")"#)
@@ -2513,7 +2541,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2587,7 +2615,7 @@ functions:
         name: With `upsert()`
         code: |
           ```swift
-            try await database.database
+            try await supabase
               .from("countries")
               .upsert(CountryModel(id: 1, name: "Algeria"))
               .select()
@@ -2628,7 +2656,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("id, name")
             .order("id", ascending: false)
@@ -2674,7 +2702,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-            try await supabase.database
+            try await supabase
               .from("countries")
               .select(
                 """
@@ -2748,7 +2776,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("id, name")
             .limit(1)
@@ -2785,7 +2813,7 @@ functions:
         name: On a foreign table
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2847,7 +2875,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select(
               """
@@ -2900,7 +2928,7 @@ functions:
         name: With `select()`
         code: |
           ```swift
-          try await supabase.database
+          try await supabase
             .from("countries")
             .select("name")
             .limit(1)
