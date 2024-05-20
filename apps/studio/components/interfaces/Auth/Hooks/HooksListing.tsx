@@ -26,7 +26,6 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import Link from 'next/link'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -98,10 +97,14 @@ export const HooksListing = () => {
                   <DropdownMenuLabel className="grid gap-1 bg-surface-200">
                     <p className="text-foreground-light">Enterprise plan required</p>
                     <p className="text-foreground-lighter text-xs">
-                      The following hooks are not availble on{' '}
-                      <Link href="#" className="underline">
+                      The following hooks are not available on{' '}
+                      <a
+                        target="_href"
+                        href="https://forms.supabase.com/enterprise"
+                        className="underline"
+                      >
                         your plan
-                      </Link>
+                      </a>
                       .
                     </p>
                   </DropdownMenuLabel>
