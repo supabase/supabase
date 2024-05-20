@@ -114,15 +114,19 @@ class _MFAEnrollPageState extends State<MFAEnrollPage> {
                       code: value,
                     );
                     await supabase.auth.refreshSession();
-                    if (mounted) {
+                    if (context.mounted) {
                       context.go(HomePage.route);
                     }
                   } on AuthException catch (error) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(error.message)));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(error.message)));
+                    }
                   } catch (error) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Unexpected error occurred')));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Unexpected error occurred')));
+                    }
                   }
                 },
               ),

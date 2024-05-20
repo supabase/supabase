@@ -55,15 +55,19 @@ class _LoginPageState extends State<LoginPage> {
                   email: email,
                   password: password,
                 );
-                if (mounted) {
+                if (context.mounted) {
                   context.go(MFAVerifyPage.route);
                 }
               } on AuthException catch (error) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(error.message)));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(error.message)));
+                }
               } catch (error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Unexpected error occurred')));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Unexpected error occurred')));
+                }
               }
             },
             child: const Text('Login'),

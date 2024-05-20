@@ -63,16 +63,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   emailRedirectTo:
                       'mfa-app://callback${MFAEnrollPage.route}', // redirect the user to setup MFA page after email confirmation
                 );
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Check your inbox.')));
                 }
               } on AuthException catch (error) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(error.message)));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(error.message)));
+                }
               } catch (error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Unexpected error occurred')));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Unexpected error occurred')));
+                }
               }
               if (mounted) {
                 setState(() {
