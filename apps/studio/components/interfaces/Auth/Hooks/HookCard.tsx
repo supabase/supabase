@@ -88,11 +88,6 @@ export const HookCard = ({
         </div>
       </div>
       <div className="p-4 flex-1">
-        <Toggle
-          checked={hook.enabled}
-          disabled={!canUpdateConfig}
-          onChange={() => onToggle(!hook.enabled)}
-        />
       </div>
     </div>
   )

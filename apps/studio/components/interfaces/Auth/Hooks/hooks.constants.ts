@@ -44,8 +44,10 @@ export const HOOKS_DEFINITIONS = [
   },
 ] as const
 
+export type HOOK_DEFINITION_TITLE = (typeof HOOKS_DEFINITIONS)[number]['title']
+
 export interface Hook {
-  title: string
+  title: HOOK_DEFINITION_TITLE
   subtitle: string
   enabled: boolean
   enabledKey: string

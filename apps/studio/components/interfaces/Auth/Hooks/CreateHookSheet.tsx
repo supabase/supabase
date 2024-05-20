@@ -9,11 +9,12 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { X } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Radio,
@@ -24,17 +25,18 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  Toggle,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import FunctionSelector from './FunctionSelector'
-import { HOOKS_DEFINITIONS } from './hooks.constants'
-import { extractMethod } from './hooks.utils'
+import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
+import { extractMethod, isValidHook } from './hooks.utils'
 
 interface CreateHookSheetProps {
   visible: boolean
   onClose: () => void
-  title: string | null
+  title: HOOK_DEFINITION_TITLE
   authConfig: AuthConfigResponse
 }
 
@@ -101,10 +103,28 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
+  const definition = useMemo(
+    () => HOOKS_DEFINITIONS.find((d) => d.title === title) || HOOKS_DEFINITIONS[0],
+    [title]
+  )
+
+  const hook: Hook = {
+    ...definition,
+    enabled: authConfig?.[definition.enabledKey] || false,
+    method: extractMethod(
+      authConfig?.[definition.uriKey] || '',
+      authConfig?.[definition.secretsKey] || ''
+    ),
+  }
+
+  // if the hook has all parameters, then it is not being created.
+  const isCreating = !isValidHook(hook)
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       hookType: title || '',
+      enabled: true,
       selectedType: 'postgres',
       httpsValues: {
         url: '',
@@ -119,7 +139,6 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
 
   useEffect(() => {
     if (visible) {
-      const definition = HOOKS_DEFINITIONS.find((d) => d.title === title)
       if (definition) {
         const values = extractMethod(
           authConfig?.[definition.uriKey] || '',
@@ -128,6 +147,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
 
         form.reset({
           hookType: definition.title,
+          enabled: authConfig?.[definition.enabledKey] || false,
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',
@@ -141,6 +161,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
       } else {
         form.reset({
           hookType: title || '',
+          enabled: true,
           selectedType: 'postgres',
           httpsValues: {
             url: '',
@@ -153,7 +174,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
         })
       }
     }
-  }, [visible])
+  }, [authConfig, title, visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     const definition = HOOKS_DEFINITIONS.find((d) => values.hookType === d.title)
@@ -174,7 +195,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
     }
 
     const payload = {
-      [enabledLabel]: true,
+      [enabledLabel]: values.enabled,
       [uriLabel]: url,
       [secretsLabel]: values.selectedType === 'https' ? values.httpsValues.secret : null,
     }
@@ -208,7 +229,9 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
               <X className="h-3 w-3" />
               <span className="sr-only">Close</span>
             </SheetClose>
-            <SheetTitle className="truncate">{`Update ${title}`}</SheetTitle>
+            <SheetTitle className="truncate">
+              {isCreating ? `Add ${title}` : `Update ${title}`}
+            </SheetTitle>
           </div>
         </SheetHeader>
         <Separator />
@@ -367,7 +390,8 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
           </form>
         </Form_Shadcn_>
         <SheetFooter>
-          <Button disabled={isUpdatingConfig} type="default">
+
+          <Button disabled={isUpdatingConfig} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button
@@ -376,7 +400,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
             disabled={isUpdatingConfig}
             loading={isUpdatingConfig}
           >
-            Confirm
+            {isCreating ? 'Create' : 'Update'}
           </Button>
         </SheetFooter>
       </SheetContent>
