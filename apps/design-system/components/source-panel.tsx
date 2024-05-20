@@ -71,14 +71,16 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
             )}
             {...props}
           >
-            <Image
-              width={24}
-              height={24}
-              src="https://avatars.githubusercontent.com/u/36730035?s=48&v=4"
-              alt="Vaul"
-              className="h-6 w-6 rounded-full"
-            />
-            <span className="hidden font-bold sm:inline-block">vaul</span>
+            <div className="flex items-center gap-2">
+              <Image
+                width={24}
+                height={24}
+                src="https://avatars.githubusercontent.com/u/36730035?s=48&v=4"
+                alt="Vaul"
+                className="h-6 w-6 rounded-full"
+              />
+              <span className="hidden font-bold sm:inline-block">vaul</span>
+            </div>
             <span className="text-foreground-light text-sm">
               This component is based on vaul by emilkowalski
             </span>
