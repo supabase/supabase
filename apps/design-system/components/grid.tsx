@@ -7,7 +7,10 @@ const Grid = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
       <div
         ref={ref}
         {...props}
-        className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-l my-12"
+        className={cn(
+          'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-t border-l my-12',
+          props.className
+        )}
       >
         {children}
       </div>
@@ -27,7 +30,7 @@ const GridItem = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement
           `
             relative
             min-h-32 
-            flex gap-3 flex-col items-center p-4 
+            flex gap-4 flex-col items-center p-4
             border-b border-r
             bg-surface-75/50 
             justify-center hover:bg-surface-100

@@ -38,8 +38,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Colors',
-          href: '/docs/colors',
+          title: 'Color usage',
+          href: '/docs/color-usage',
           items: [],
         },
         {

@@ -12,28 +12,32 @@ const Colors = ({
     switch (definition) {
       case 'background':
         return (
-          <div
-            className={cn(x, 'relative w-full h-12 border border-overlay shadow rounded-full')}
-          ></div>
+          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
         )
         break
 
       case 'border':
-        return <div className={cn(x, 'relative w-12 h-12 border-4')}></div>
+        return <div className={cn(x, 'relative w-full h-12 border-4 rounded-full')}></div>
         break
 
       case 'text':
         return (
-          <span className={cn(x, 'relative w-12 h-12 flex items-center justify-center')}>###</span>
+          <span className={cn(x, 'relative w-full h-12 flex items-center justify-center')}>
+            Postgres
+          </span>
         )
         break
 
       case 'colors':
-        return <div className={cn(x, 'relative w-12 h-12 border border-overlay shadow')}></div>
+        return (
+          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
+        )
         break
 
       case 'palletes':
-        return <div className={cn(x, 'relative w-12 h-12 border border-overlay shadow')}></div>
+        return (
+          <div className={cn(x, 'relative w-full h-12 border border-overlay rounded-full')}></div>
+        )
         break
 
       default:
@@ -46,9 +50,14 @@ const Colors = ({
       <Grid>
         {color[definition].map((x: string, i) => {
           return (
-            <GridItem key={i}>
+            <GridItem
+              key={i}
+              className={cn(x.includes('contrast') && 'bg-foreground hover:bg-foreground-light')}
+            >
               <Example x={x} />
-              <div className="font-mono text-sm bg-surface-100 px-2 py-0.5 rounded-full">{x}</div>
+              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground">
+                {x}
+              </span>
             </GridItem>
           )
         })}

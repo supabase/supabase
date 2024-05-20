@@ -23,7 +23,7 @@ function Icons() {
                   size={21}
                   className="group-data-[state=open]:scale-125 transition-all"
                 />
-                <span className="font-mono text-sm text-foreground-lighter group-data-[state=open]:text-foreground">
+                <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground">
                   {icon.name}
                 </span>
               </GridItem>
