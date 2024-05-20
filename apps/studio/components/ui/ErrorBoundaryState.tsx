@@ -29,11 +29,7 @@ export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps)
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             You may try to avoid using Google translate or disable certain browser extensions to
-            avoid running into the{' '}
-            <code className="text-xs">
-              'removeChild' on 'Node'
-            </code>{' '}
-            error.
+            avoid running into the <code className="text-xs">'removeChild' on 'Node'</code> error.
           </AlertDescription_Shadcn_>
           <AlertDescription_Shadcn_ className="mt-3">
             <Button asChild type="default" icon={<ExternalLink />}>
