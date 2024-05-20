@@ -48,7 +48,7 @@ final _router = GoRouter(
   ],
   redirect: (context, state) async {
     // Any users can visit the /auth route
-    if (state.location.contains('/auth') == true) {
+    if (state.pathParameters.containsValue('/auth') == true) {
       return null;
     }
 

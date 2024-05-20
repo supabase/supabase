@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   supabase_flutter: ^2.0.0
-  go_router: ^7.0.0
+  go_router: ^14.0.0
   flutter_svg: ^2.0.5
 
 dev_dependencies:
