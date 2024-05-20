@@ -31,7 +31,7 @@ export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps)
             You may try to avoid using Google translate or disable certain browser extensions to
             avoid running into the{' '}
             <code className="text-xs">
-              {isRemoveChildError ? `'removeChild' on 'Node'` : `'insertBefore' on 'Node'`}
+              'removeChild' on 'Node'
             </code>{' '}
             error.
           </AlertDescription_Shadcn_>
