@@ -63,9 +63,8 @@ class _GamePageState extends State<GamePage> {
   Future<void> _initialize() async {
     _game = MyGame(
       onGameStateUpdate: (position, health) async {
-        ChannelResponse response;
         do {
-          response = await _gameChannel!.sendBroadcastMessage(
+          await _gameChannel!.sendBroadcastMessage(
             event: 'game_state',
             payload: {'x': position.x, 'y': position.y, 'health': health},
           );
@@ -73,7 +72,7 @@ class _GamePageState extends State<GamePage> {
           // wait for a frame to avoid infinite rate limiting loops
           await Future.delayed(Duration.zero);
           setState(() {});
-        } while (response == ChannelResponse.rateLimited && health <= 0);
+        } while (health <= 0);
       },
       onGameOver: (playerWon) async {
         await showDialog(
