@@ -5,9 +5,9 @@ import {
   genDefaultQuery,
   LogsTableName,
   SQL_FILTER_TEMPLATES,
-} from 'components/interfaces/Settings/Logs';
-import dayjs from 'dayjs';
-import { isEqual } from 'lodash';
+} from 'components/interfaces/Settings/Logs'
+import dayjs from 'dayjs'
+import { isEqual } from 'lodash'
 
 // describe.each(Object.values(LogsTableName))('%s', (table) => {
 //   const templates = SQL_FILTER_TEMPLATES[ table ];
@@ -74,32 +74,32 @@ import { isEqual } from 'lodash';
 //   });
 // });
 
-const base = dayjs().subtract(2, 'day');
-const baseIso = base.toISOString();
+const base = dayjs().subtract(2, 'day')
+const baseIso = base.toISOString()
 test.skip.each([
   {
     case: 'next start is after initial start',
-    initial: [ base.subtract(1, 'day').toISOString(), baseIso ],
-    next: [ base.subtract(2, 'day').toISOString(), null ],
-    expected: [ base.subtract(2, 'day').toISOString(), baseIso ],
+    initial: [base.subtract(1, 'day').toISOString(), baseIso],
+    next: [base.subtract(2, 'day').toISOString(), null],
+    expected: [base.subtract(2, 'day').toISOString(), baseIso],
   },
   {
     case: 'next end is before initial start',
-    initial: [ base.subtract(1, 'day').toISOString(), baseIso ],
-    next: [ null, base.subtract(2, 'day').toISOString() ],
-    expected: [ base.subtract(3, 'day').toISOString(), base.subtract(2, 'day').toISOString() ],
+    initial: [base.subtract(1, 'day').toISOString(), baseIso],
+    next: [null, base.subtract(2, 'day').toISOString()],
+    expected: [base.subtract(3, 'day').toISOString(), base.subtract(2, 'day').toISOString()],
   },
   {
     case: 'next end is not before initial start',
-    initial: [ base.subtract(2, 'day').toISOString(), baseIso ],
-    next: [ null, base.subtract(1, 'day').toISOString() ],
-    expected: [ base.subtract(2, 'day').toISOString(), base.subtract(1, 'day').toISOString() ],
+    initial: [base.subtract(2, 'day').toISOString(), baseIso],
+    next: [null, base.subtract(1, 'day').toISOString()],
+    expected: [base.subtract(2, 'day').toISOString(), base.subtract(1, 'day').toISOString()],
   },
 ])('ensure no timestamp conflict: $case', ({ initial, next, expected }) => {
-  const result = ensureNoTimestampConflict(initial, next);
-  expect(result[ 0 ]).toEqual(expected[ 0 ]);
-  expect(result[ 1 ]).toEqual(expected[ 1 ]);
-});
+  const result = ensureNoTimestampConflict(initial, next)
+  expect(result[0]).toEqual(expected[0])
+  expect(result[1]).toEqual(expected[1])
+})
 
 // test for log trunc filling
 test.skip.each([
@@ -112,7 +112,7 @@ test.skip.each([
     ],
     // expected
     len: 3,
-    includes: [ { timestamp: '2023-04-26T17:19:00.000Z', count: 0 } ],
+    includes: [{ timestamp: '2023-04-26T17:19:00.000Z', count: 0 }],
   },
   // hourly truncation
   {
@@ -151,7 +151,7 @@ test.skip.each([
     len: 2,
     min: '2023-04-26T18:00:00.000Z',
     max: '2023-04-26T19:00:00.000Z',
-    valKey: [ 'count', 'other' ],
+    valKey: ['count', 'other'],
     includes: [
       { timestamp: '2023-04-26T18:00:00.000Z', count: 0, other: 0 },
       { timestamp: '2023-04-26T19:00:00.000Z', count: 0, other: 0 },
@@ -234,10 +234,10 @@ test.skip.each([
 ])(
   'fillTimeseries : $case',
   ({ data, len, includes, min, max, tsKey = 'timestamp', valKey = 'count', defaultVal = 0 }) => {
-    const result = fillTimeseries(data, tsKey, valKey, defaultVal, min, max);
-    expect(result.length).toEqual(len);
+    const result = fillTimeseries(data, tsKey, valKey, defaultVal, min, max)
+    expect(result.length).toEqual(len)
     for (const inc of includes) {
-      expect(result.find((d) => isEqual(d, inc))).toBeTruthy();
+      expect(result.find((d) => isEqual(d, inc))).toBeTruthy()
     }
   }
-);
+)
