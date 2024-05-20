@@ -66,7 +66,9 @@ export default function DrawerDemo() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button type="outline">Open Drawer</Button>
+        <Button type="default" size="small">
+          Open Drawer
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
@@ -108,7 +110,7 @@ export default function DrawerDemo() {
                     dataKey="goal"
                     style={
                       {
-                        fill: 'hsl(var(--foreground))',
+                        fill: 'hsl(var(--foreground-default))',
                         opacity: 0.9,
                       } as React.CSSProperties
                     }
