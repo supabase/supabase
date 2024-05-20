@@ -20,6 +20,7 @@ import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/Warehouse
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useParams } from 'common'
+import { GenericSkeletonLoader } from 'ui-patterns'
 interface LogsLayoutProps {
   title?: string
 }
@@ -86,11 +87,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                     <CreateWarehouseCollectionModal />
                     <div className="py-3">
                       {collectionsLoading ? (
-                        <div className="py-3 px-3 space-y-1.5">
-                          <ShimmeringLoader />
-                          <ShimmeringLoader className="w-3/4" />
-                          <ShimmeringLoader className="w-3/4" />
-                        </div>
+                        <GenericSkeletonLoader />
                       ) : (
                         collections?.map((item) => (
                           <WarehouseMenuItem item={item} key={item.id + '-collection-item'} />
