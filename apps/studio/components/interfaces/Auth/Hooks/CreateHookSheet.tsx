@@ -259,6 +259,7 @@ export const CreateHookSheet = ({
                       <Toggle
                         label={`Enable ${values.hookType}`}
                         {...field}
+                        checked={field.value}
                         onChange={() => field.onChange(!values.enabled)}
                       />
                     </FormControl_Shadcn_>
