@@ -20,37 +20,39 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted rounded-md flex items-center p-3 px-5 gap-6',
+              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-6 w-6">
-              <rect width="256" height="256" fill="none"></rect>
-              <line
-                x1="208"
-                y1="128"
-                x2="128"
-                y2="208"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              ></line>
-              <line
-                x1="192"
-                y1="40"
-                x2="40"
-                y2="192"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
-              ></line>
-            </svg>
-            <span className="hidden font-bold sm:inline-block">shadcn/ui</span>
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-6 w-6">
+                <rect width="256" height="256" fill="none"></rect>
+                <line
+                  x1="208"
+                  y1="128"
+                  x2="128"
+                  y2="208"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                ></line>
+                <line
+                  x1="192"
+                  y1="40"
+                  x2="40"
+                  y2="192"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="16"
+                ></line>
+              </svg>
+              <span className="hidden font-bold sm:inline-block">shadcn/ui</span>
+            </div>
             <span className="text-foreground-light text-sm">
               This component is based on ui.shadcn
             </span>
@@ -64,7 +66,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted rounded-md flex items-center p-3 px-5 gap-6',
+              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
@@ -90,7 +92,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted rounded-md flex items-center p-3 px-5 gap-6',
+              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
@@ -159,7 +161,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
     }
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col -space-y-px">
         <RadixPanel />
         <VaulPanel />
         <ShadcnPanel />
