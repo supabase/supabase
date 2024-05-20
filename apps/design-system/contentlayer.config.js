@@ -44,6 +44,9 @@ const NestedProperties = defineNestedType(() => ({
     shadcn: {
       type: 'boolean',
     },
+    vaul: {
+      type: 'boolean',
+    },
   },
 }))
 

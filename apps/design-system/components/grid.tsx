@@ -1,7 +1,7 @@
-import React from 'react'
+import { forwardRef } from 'react'
 import { cn } from 'ui'
 
-const Grid = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
+const Grid = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
   ({ children, ...props }, ref) => {
     return (
       <div
@@ -20,7 +20,7 @@ const Grid = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
 
 Grid.displayName = 'Grid'
 
-const GridItem = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
+const GridItem = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
   ({ children, ...props }, ref) => {
     return (
       <div
