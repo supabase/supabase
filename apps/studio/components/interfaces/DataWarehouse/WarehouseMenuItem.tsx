@@ -38,7 +38,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
   const [showDeleteDialog, setDeleteDialog] = React.useState(false)
   const [confirmDelete, setConfirmDelete] = React.useState(false)
 
-  const updateCollection = useUpdateCollection({ projectRef, collectionToken: item.token })
+  const updateCollection = useUpdateCollection()
   const deleteCollection = useDeleteCollectionMutation({
     onSuccess: () => {
       // If the current collection is deleted, redirect to default logs view
@@ -119,6 +119,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               const name = formData.get('name') as string
 
               await updateCollection.mutateAsync({
+                projectRef,
+                collectionToken: item.token,
                 name,
               })
 
