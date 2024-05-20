@@ -180,8 +180,9 @@ const LogSelection = ({
           <div className="flex flex-col gap-1">
             <h3 className="text-sm text-foreground">Select an Event</h3>
             <p className="text-xs text-foreground-lighter">
-              Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
-              view).
+              {queryType === 'warehouse'
+                ? 'Select an Event to view the complete JSON payload'
+                : 'Select an Event to view the code snippet (pretty view) or complete JSON payload (raw view).'}
             </p>
           </div>
         </div>

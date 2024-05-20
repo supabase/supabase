@@ -30,13 +30,13 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="grid grid-cols-12 group">
+    <div className="grid grid-cols-12 group items-center">
       <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
       <span
         title={value}
-        className="truncate text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+        className="truncate font-mono text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
       >
         {valueRender ?? value}
       </span>

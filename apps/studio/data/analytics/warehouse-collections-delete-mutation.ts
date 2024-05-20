@@ -1,32 +1,57 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
-import { del } from 'data/fetchers'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
-type DeleteCollectionArgs = {
+import { handleError, del } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { analyticsKeys } from './keys'
+
+export type DeleteCollectionArgs = {
   projectRef: string
   collectionToken: string
-  onSuccess: () => void
 }
-export function useDeleteCollection({
-  projectRef,
-  collectionToken,
+
+export async function deleteCollection({ projectRef, collectionToken }: DeleteCollectionArgs) {
+  const { data, error } = await del(
+    '/platform/projects/{ref}/analytics/warehouse/collections/{token}',
+    {
+      params: { path: { ref: projectRef, token: collectionToken } } as any,
+    }
+  )
+
+  if (error) handleError(error)
+  return data
+}
+
+type DeleteCollectionData = Awaited<ReturnType<typeof deleteCollection>>
+
+export const useDeleteCollectionMutation = ({
   onSuccess,
-}: DeleteCollectionArgs) {
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<DeleteCollectionData, ResponseError, DeleteCollectionArgs>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: async () => {
-      await del(`/platform/projects/{ref}/analytics/warehouse/collections/{token}`, {
-        params: {
-          path: { ref: projectRef, token: collectionToken },
-        } as any, // TODO: remove cast when openapi client generates correct types
-      })
 
-      const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
-      queryClient.invalidateQueries(keysToInvalidate)
-    },
-    mutationKey: analyticsKeys.warehouseCollections(projectRef),
-    onSuccess,
-  })
+  return useMutation<DeleteCollectionData, ResponseError, DeleteCollectionArgs>(
+    (vars) => deleteCollection(vars),
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
 
-  return mutation
+        await queryClient.invalidateQueries(analyticsKeys.warehouseCollections(projectRef))
+
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete collection: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }

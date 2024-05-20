@@ -17,9 +17,8 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
     isLoading,
     data: newCollection,
   } = useCreateCollection({
-    projectRef: ref || 'default',
     onSuccess: (data) => {
-      router.push(`/project/${ref}/logs/collections/${data.data?.token}`)
+      router.push(`/project/${ref}/logs/collections/${data?.token}`)
     },
   })
 
@@ -50,7 +49,14 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
               const values = {
                 name: formData.get('name') as string,
               }
-              await createCollection(values)
+              if (!ref) {
+                toast.error('Project ref not found')
+                return
+              }
+              await createCollection({
+                projectRef: ref,
+                name: values.name,
+              })
               toast.success(`Collection ${values.name} created`)
             } catch (error) {
               console.error(error)

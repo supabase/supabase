@@ -1,40 +1,54 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { analyticsKeys } from './keys'
-import { post } from 'data/fetchers'
 
-async function createCollection(ref: string, payload: { name: string }) {
-  // await post(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
-  //   params: {
-  //     path: { ref },
-  //   },
-  // })
-
-  const res = await post(`/platform/projects/{ref}/analytics/warehouse/collections`, {
-    params: {
-      path: { ref },
-    },
-    body: payload,
-  } as any) // TODO: Remove cast when openapi types get generated correctly
-
-  return res
-}
-
-type CreateCollectionArgs = {
+export type CreateCollectionArgs = {
   projectRef: string
-  onSuccess: (data: Awaited<ReturnType<typeof createCollection>>) => void
+  name: string
 }
 
-export function useCreateCollection({ projectRef, onSuccess }: CreateCollectionArgs) {
-  const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn: (payload: { name: string }) => createCollection(projectRef, payload),
-    mutationKey: analyticsKeys.warehouseCollections(projectRef),
-    onSuccess: (data) => {
-      onSuccess(data)
-      const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
-      queryClient.invalidateQueries(keysToInvalidate)
-    },
-  })
+export async function createCollection({ projectRef, name }: CreateCollectionArgs) {
+  const { data, error } = await post('/platform/projects/{ref}/analytics/warehouse/collections', {
+    params: { path: { ref: projectRef } },
+    body: { name },
+  } as any)
 
-  return mutation
+  if (error) handleError(error)
+  return data
+}
+
+type CreateCollectionData = Awaited<ReturnType<typeof createCollection>>
+
+export const useCreateCollection = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<CreateCollectionData, ResponseError, CreateCollectionArgs>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<CreateCollectionData, ResponseError, CreateCollectionArgs>(
+    (vars) => createCollection(vars),
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+
+        await queryClient.invalidateQueries(analyticsKeys.warehouseCollections(projectRef))
+
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create collection: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }

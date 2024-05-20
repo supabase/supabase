@@ -1,6 +1,6 @@
 import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
-import { useDeleteCollection } from 'data/analytics/warehouse-collections-delete-mutation'
+import { useDeleteCollectionMutation } from 'data/analytics/warehouse-collections-delete-mutation'
 import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
 import { EditIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -31,7 +31,7 @@ type Props = {
 
 export const WarehouseMenuItem = ({ item }: Props) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, collectionToken } = useParams()
   const projectRef = ref || 'default'
 
   const [showUpdateDialog, setShowUpdateDialog] = React.useState(false)
@@ -39,11 +39,12 @@ export const WarehouseMenuItem = ({ item }: Props) => {
   const [confirmDelete, setConfirmDelete] = React.useState(false)
 
   const updateCollection = useUpdateCollection({ projectRef, collectionToken: item.token })
-  const deleteCollection = useDeleteCollection({
-    projectRef,
-    collectionToken: item.token,
+  const deleteCollection = useDeleteCollectionMutation({
     onSuccess: () => {
-      router.push(`/project/${projectRef}/logs/explorer`)
+      // If the current collection is deleted, redirect to default logs view
+      if (item.token === collectionToken) {
+        router.push(`/project/${projectRef}/logs/explorer`)
+      }
     },
   })
 
@@ -168,7 +169,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           onSubmit={async (e) => {
             e.preventDefault()
             try {
-              await deleteCollection.mutateAsync()
+              await deleteCollection.mutateAsync({ projectRef, collectionToken: item.token })
               setDeleteDialog(false)
               toast.success('Collection deleted successfully')
             } catch (error) {
