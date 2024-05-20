@@ -36,6 +36,7 @@ import { extractMethod, isValidHook } from './hooks.utils'
 interface CreateHookSheetProps {
   visible: boolean
   onClose: () => void
+  onDelete: () => void
   title: HOOK_DEFINITION_TITLE
   authConfig: AuthConfigResponse
 }
@@ -99,7 +100,13 @@ const FormSchema = z
     return true
   })
 
-export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateHookSheetProps) => {
+export const CreateHookSheet = ({
+  visible,
+  onClose,
+  onDelete,
+  title,
+  authConfig,
+}: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
@@ -241,6 +248,26 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
             className="space-y-6 w-full py-8 flex-1"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            <div>
+              <FormField_Shadcn_
+                key="enabled"
+                control={form.control}
+                name="enabled"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="px-8">
+                    <FormControl_Shadcn_>
+                      <Toggle
+                        label={`Enable ${values.hookType}`}
+                        checked={field.value}
+                        disabled={field.disabled}
+                        onChange={() => field.onChange(!values.enabled)}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                )}
+              />
+            </div>
+            <Separator />
             <FormField_Shadcn_
               control={form.control}
               name="selectedType"
@@ -390,6 +417,13 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
           </form>
         </Form_Shadcn_>
         <SheetFooter>
+          {!isCreating && (
+            <div className="flex-1">
+              <Button type="danger" onClick={() => onDelete()}>
+                Delete hook
+              </Button>
+            </div>
+          )}
 
           <Button disabled={isUpdatingConfig} type="default" onClick={() => onClose()}>
             Cancel

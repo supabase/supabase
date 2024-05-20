@@ -139,9 +139,6 @@ export const HooksListing = () => {
                 onSelect={() => {
                   setSelectedHook(hook.title)
                 }}
-                onDelete={() => {
-                  setSelectedHookForDeletion(hook)
-                }}
               />
             )
           })}
@@ -149,6 +146,12 @@ export const HooksListing = () => {
       <CreateHookSheet
         title={selectedHook}
         visible={!!selectedHook}
+        onDelete={() => {
+          const hook = hooks.find((h) => h.title === selectedHook)
+          if (hook) {
+            setSelectedHookForDeletion(hook)
+          }
+        }}
         onClose={() => setSelectedHook(null)}
         authConfig={authConfig!}
       />
@@ -173,6 +176,7 @@ export const HooksListing = () => {
           })
           toast.success(`${selectedHookForDeletion.title} has been deleted.`)
           setSelectedHookForDeletion(null)
+          setSelectedHook(null)
         }}
       >
         <p className="py-4 text-sm text-foreground-light">

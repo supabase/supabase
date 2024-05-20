@@ -1,4 +1,5 @@
-import { Button, Input, Toggle } from 'ui'
+import { Check, Webhook } from 'lucide-react'
+import { Badge, Button, Input } from 'ui'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
@@ -6,16 +7,9 @@ interface HookCardProps {
   canUpdateConfig: boolean
   onToggle: (enabled: boolean) => void
   onSelect: () => void
-  onDelete: () => void
 }
 
-export const HookCard = ({
-  hook,
-  canUpdateConfig,
-  onToggle,
-  onSelect,
-  onDelete,
-}: HookCardProps) => {
+export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCardProps) => {
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row">
       <div className="flex flex-col flex-0 overflow-y-auto w-full">
@@ -81,9 +75,6 @@ export const HookCard = ({
         <div className="flex flex-row gap-2">
           <Button type="default" disabled={!canUpdateConfig} onClick={() => onSelect()}>
             Configure hook
-          </Button>
-          <Button type="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
-            Delete hook
           </Button>
         </div>
       </div>
