@@ -37,7 +37,7 @@ interface CreateHookSheetProps {
   visible: boolean
   onClose: () => void
   onDelete: () => void
-  title: HOOK_DEFINITION_TITLE
+  title: HOOK_DEFINITION_TITLE | null
   authConfig: AuthConfigResponse
 }
 

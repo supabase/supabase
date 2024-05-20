@@ -24,7 +24,7 @@ import { AlertCircle, ChevronDown } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
-import { HOOKS_DEFINITIONS, Hook } from './hooks.constants'
+import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
 
 export const HooksListing = () => {
@@ -36,7 +36,7 @@ export const HooksListing = () => {
     { enabled: IS_PLATFORM }
   )
 
-  const [selectedHook, setSelectedHook] = useState<string | null>(null)
+  const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
