@@ -4,12 +4,16 @@ description: Fast, composable, unstyled command menu for React.
 component: true
 links:
   doc: https://cmdk.paco.me
+source:
+  shadcn: true
 ---
 
 <ComponentPreview
   name="command-demo"
   align="start"
   className="[&_.preview>div]:max-w-[450px]"
+  peekCode
+  wide
 />
 
 ## About
@@ -67,7 +71,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 ```
 
 ```tsx
@@ -104,13 +108,13 @@ export function CommandMenu() {
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen((open) => !open)
       }
     }
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
+    document.addEventListener('keydown', down)
+    return () => document.removeEventListener('keydown', down)
   }, [])
 
   return (

@@ -5,9 +5,12 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/hover-card
   api: https://www.radix-ui.com/docs/primitives/components/hover-card#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="hover-card-demo" />
+<ComponentPreview name="hover-card-demo" peekCode wide />
 
 ## Installation
 
@@ -50,18 +53,12 @@ npm install @radix-ui/react-hover-card
 ## Usage
 
 ```tsx
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 ```
 
 ```tsx
 <HoverCard>
   <HoverCardTrigger>Hover</HoverCardTrigger>
-  <HoverCardContent>
-    The React Framework – created and maintained by @vercel.
-  </HoverCardContent>
+  <HoverCardContent>The React Framework – created and maintained by @vercel.</HoverCardContent>
 </HoverCard>
 ```

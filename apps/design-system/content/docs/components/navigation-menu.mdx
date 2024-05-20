@@ -5,9 +5,12 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/navigation-menu
   api: https://www.radix-ui.com/docs/primitives/components/navigation-menu#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="navigation-menu-demo" />
+<ComponentPreview name="navigation-menu-demo" peekCode wide />
 
 ## Installation
 
@@ -59,7 +62,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   NavigationMenuViewport,
-} from "@/components/ui/navigation-menu"
+} from '@/components/ui/navigation-menu'
 ```
 
 ```tsx
@@ -82,15 +85,13 @@ import {
 When using the Next.js `<Link />` component, you can use `navigationMenuTriggerStyle()` to apply the correct styles to the trigger.
 
 ```tsx
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 ```
 
 ```tsx {3-5}
 <NavigationMenuItem>
   <Link href="/docs" legacyBehavior passHref>
-    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-      Documentation
-    </NavigationMenuLink>
+    <NavigationMenuLink className={navigationMenuTriggerStyle()}>Documentation</NavigationMenuLink>
   </Link>
 </NavigationMenuItem>
 ```

@@ -3,6 +3,8 @@ title: React Hook Form
 description: Building forms with React Hook Form and Zod.
 links:
   doc: https://react-hook-form.com
+source:
+  shadcn: true
 ---
 
 Forms are tricky. They are one of the most common things you'll build in a web application, but also one of the most complex.
@@ -126,9 +128,9 @@ npm install @radix-ui/react-label @radix-ui/react-slot react-hook-form @hookform
 Define the shape of your form using a Zod schema. You can read more about using Zod in the [Zod documentation](https://zod.dev).
 
 ```tsx showLineNumbers {3,5-7}
-"use client"
+'use client'
 
-import { z } from "zod"
+import { z } from 'zod'
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -140,15 +142,15 @@ const formSchema = z.object({
 Use the `useForm` hook from `react-hook-form` to create a form.
 
 ```tsx showLineNumbers {3-4,14-20,22-27}
-"use client"
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const formSchema = z.object({
   username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+    message: 'Username must be at least 2 characters.',
   }),
 })
 
@@ -157,7 +159,7 @@ export function ProfileForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      username: '',
     },
   })
 
@@ -177,13 +179,13 @@ Since `FormField` is using a controlled component, you need to provide a default
 We can now use the `<Form />` components to build our form.
 
 ```tsx showLineNumbers {7-17,28-50}
-"use client"
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -192,12 +194,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 
 const formSchema = z.object({
   username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+    message: 'Username must be at least 2 characters.',
   }),
 })
 
@@ -216,9 +218,7 @@ export function ProfileForm() {
               <FormControl>
                 <Input placeholder="shadcn" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription>This is your public display name.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

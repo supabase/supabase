@@ -5,9 +5,11 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/toast
   api: https://www.radix-ui.com/docs/primitives/components/toast#api-reference
+source:
+  shadcn: true
 ---
 
-<ComponentPreview name="toast-demo" />
+<ComponentPreview name="toast-demo" peekCode wide />
 
 ## Installation
 
@@ -30,7 +32,7 @@ npx shadcn-ui@latest add toast
 <Step>Add the Toaster component</Step>
 
 ```tsx title="app/layout.tsx" {1,9}
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from '@/components/ui/toaster'
 
 export default function RootLayout({ children }) {
   return (
@@ -78,7 +80,7 @@ npm install @radix-ui/react-toast
 <Step>Add the Toaster component</Step>
 
 ```tsx title="app/layout.tsx" {1,9}
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from '@/components/ui/toaster'
 
 export default function RootLayout({ children }) {
   return (
@@ -104,7 +106,7 @@ export default function RootLayout({ children }) {
 The `useToast` hook returns a `toast` function that you can use to display a toast.
 
 ```tsx
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from '@/components/ui/use-toast'
 ```
 
 ```tsx {2,7-10}
@@ -115,8 +117,8 @@ export const ToastDemo = () => {
     <Button
       onClick={() => {
         toast({
-          title: "Scheduled: Catch up",
-          description: "Friday, February 10, 2023 at 5:57 PM",
+          title: 'Scheduled: Catch up',
+          description: 'Friday, February 10, 2023 at 5:57 PM',
         })
       }}
     >

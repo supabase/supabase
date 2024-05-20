@@ -6,9 +6,12 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/alert-dialog
   api: https://www.radix-ui.com/docs/primitives/components/alert-dialog#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="alert-dialog-demo" />
+<ComponentPreview name="alert-dialog-demo" peekCode wide />
 
 ## Installation
 
@@ -61,7 +64,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog'
 ```
 
 ```tsx
@@ -71,8 +74,8 @@ import {
     <AlertDialogHeader>
       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
       <AlertDialogDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
+        This action cannot be undone. This will permanently delete your account and remove your data
+        from our servers.
       </AlertDialogDescription>
     </AlertDialogHeader>
     <AlertDialogFooter>

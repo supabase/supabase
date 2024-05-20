@@ -2,9 +2,11 @@
 title: Badge
 description: Displays a badge or a component that looks like a badge.
 component: true
+source:
+  shadcn: true
 ---
 
-<ComponentPreview name="badge-demo" />
+<ComponentPreview name="badge-demo" peekCode wide />
 
 ## Installation
 
@@ -41,7 +43,7 @@ npx shadcn-ui@latest add badge
 ## Usage
 
 ```tsx
-import { Badge } from "@/components/ui/badge"
+import { Badge } from '@/components/ui/badge'
 ```
 
 ```tsx
@@ -53,18 +55,18 @@ import { Badge } from "@/components/ui/badge"
 You can use the `badgeVariants` helper to create a link that looks like a badge.
 
 ```tsx
-import { badgeVariants } from "@/components/ui/badge"
+import { badgeVariants } from '@/components/ui/badge'
 ```
 
 ```tsx
-<Link className={badgeVariants({ variant: "outline" })}>Badge</Link>
+<Link className={badgeVariants({ variant: 'outline' })}>Badge</Link>
 ```
 
 ## Examples
 
 ### Default
 
-<ComponentPreview name="badge-demo" />
+<ComponentPreview name="badge-demo" peekCode wide />
 
 ---
 

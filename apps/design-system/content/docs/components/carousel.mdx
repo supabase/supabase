@@ -7,7 +7,7 @@ links:
   api: https://www.embla-carousel.com/api
 ---
 
-<ComponentPreview name="carousel-demo" />
+<ComponentPreview name="carousel-demo" peekCode wide />
 
 ## About
 
@@ -61,7 +61,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
+} from '@/components/ui/carousel'
 ```
 
 ```tsx
@@ -165,7 +165,7 @@ You can pass options to the carousel using the `opts` prop. See the [Embla Carou
 ```tsx showLineNumbers {2-5}
 <Carousel
   opts={{
-    align: "start",
+    align: 'start',
     loop: true,
   }}
 >
@@ -184,7 +184,7 @@ Use a state and the `setApi` props to get an instance of the carousel API.
 <ComponentPreview name="carousel-api" />
 
 ```tsx showLineNumbers {1,4,22}
-import { type CarouselApi } from "@/components/ui/carousel"
+import { type CarouselApi } from '@/components/ui/carousel'
 
 export function Example() {
   const [api, setApi] = React.useState<CarouselApi>()
@@ -199,7 +199,7 @@ export function Example() {
     setCount(api.scrollSnapList().length)
     setCurrent(api.selectedScrollSnap() + 1)
 
-    api.on("select", () => {
+    api.on('select', () => {
       setCurrent(api.selectedScrollSnap() + 1)
     })
   }, [api])
@@ -221,7 +221,7 @@ export function Example() {
 You can listen to events using the api instance from `setApi`.
 
 ```tsx showLineNumbers {1,4-14,16}
-import { type CarouselApi } from "@/components/ui/carousel"
+import { type CarouselApi } from '@/components/ui/carousel'
 
 export function Example() {
   const [api, setApi] = React.useState<CarouselApi>()
@@ -231,7 +231,7 @@ export function Example() {
       return
     }
 
-    api.on("select", () => {
+    api.on('select', () => {
       // Do something on select.
     })
   }, [api])

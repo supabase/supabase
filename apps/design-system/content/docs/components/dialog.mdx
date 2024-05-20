@@ -6,9 +6,12 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/dialog
   api: https://www.radix-ui.com/docs/primitives/components/dialog#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="dialog-demo" />
+<ComponentPreview name="dialog-demo" peekCode wide />
 
 ## Installation
 
@@ -58,7 +61,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 ```
 
 ```tsx
@@ -68,8 +71,8 @@ import {
     <DialogHeader>
       <DialogTitle>Are you absolutely sure?</DialogTitle>
       <DialogDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
+        This action cannot be undone. This will permanently delete your account and remove your data
+        from our servers.
       </DialogDescription>
     </DialogHeader>
   </DialogContent>
@@ -105,8 +108,8 @@ To activate the `Dialog` component from within a `Context Menu` or `Dropdown Men
     <DialogHeader>
       <DialogTitle>Are you absolutely sure?</DialogTitle>
       <DialogDescription>
-        This action cannot be undone. Are you sure you want to permanently
-        delete this file from our servers?
+        This action cannot be undone. Are you sure you want to permanently delete this file from our
+        servers?
       </DialogDescription>
     </DialogHeader>
     <DialogFooter>

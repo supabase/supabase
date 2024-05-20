@@ -4,9 +4,11 @@ description: An opinionated toast component for React.
 component: true
 links:
   doc: https://sonner.emilkowal.ski
+source:
+  shadcn: true
 ---
 
-<ComponentPreview name="sonner-demo" />
+<ComponentPreview name="sonner-demo" peekCode wide />
 
 ## About
 
@@ -33,7 +35,7 @@ npx shadcn-ui@latest add sonner
 <Step>Add the Toaster component</Step>
 
 ```tsx title="app/layout.tsx" {1,9}
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from '@/components/ui/sonner'
 
 export default function RootLayout({ children }) {
   return (
@@ -69,7 +71,7 @@ npm install sonner next-themes
 <Step>Add the Toaster component</Step>
 
 ```tsx title="app/layout.tsx" {1,9}
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from '@/components/ui/sonner'
 
 export default function RootLayout({ children }) {
   return (
@@ -93,9 +95,9 @@ export default function RootLayout({ children }) {
 ## Usage
 
 ```tsx
-import { toast } from "sonner"
+import { toast } from 'sonner'
 ```
 
 ```tsx
-toast("Event has been created.")
+toast('Event has been created.')
 ```

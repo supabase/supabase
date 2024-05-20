@@ -5,9 +5,11 @@ component: true
 links:
   doc: https://github.com/bvaughn/react-resizable-panels
   api: https://github.com/bvaughn/react-resizable-panels/tree/main/packages/react-resizable-panels
+source:
+  shadcn: true
 ---
 
-<ComponentPreview name="resizable-demo" />
+<ComponentPreview name="resizable-demo" peekCode wide />
 
 ## About
 
@@ -54,11 +56,7 @@ npm install react-resizable-panels
 ## Usage
 
 ```tsx
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 ```
 
 ```tsx
@@ -78,11 +76,7 @@ Use the `direction` prop to set the direction of the resizable panels.
 <ComponentPreview name="resizable-vertical" />
 
 ```tsx showLineNumbers {9}
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 export default function Example() {
   return (
@@ -102,11 +96,7 @@ You can set or hide the handle by using the `withHandle` prop on the `ResizableH
 <ComponentPreview name="resizable-handle" />
 
 ```tsx showLineNumbers {11}
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable"
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 export default function Example() {
   return (

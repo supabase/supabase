@@ -6,9 +6,12 @@ featured: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/collapsible
   api: https://www.radix-ui.com/docs/primitives/components/collapsible#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="collapsible-demo" />
+<ComponentPreview name="collapsible-demo" peekCode wide />
 
 ## Installation
 
@@ -51,19 +54,14 @@ npm install @radix-ui/react-collapsible
 ## Usage
 
 ```tsx
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 ```
 
 ```tsx
 <Collapsible>
   <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>
   <CollapsibleContent>
-    Yes. Free to use for personal and commercial projects. No attribution
-    required.
+    Yes. Free to use for personal and commercial projects. No attribution required.
   </CollapsibleContent>
 </Collapsible>
 ```

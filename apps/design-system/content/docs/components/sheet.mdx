@@ -5,9 +5,12 @@ component: true
 links:
   doc: https://www.radix-ui.com/docs/primitives/components/dialog
   api: https://www.radix-ui.com/docs/primitives/components/dialog#api-reference
+source:
+  radix: true
+  shadcn: true
 ---
 
-<ComponentPreview name="sheet-demo" />
+<ComponentPreview name="sheet-demo" peekCode wide />
 
 ## Installation
 
@@ -57,7 +60,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from '@/components/ui/sheet'
 ```
 
 ```tsx
@@ -67,8 +70,8 @@ import {
     <SheetHeader>
       <SheetTitle>Are you absolutely sure?</SheetTitle>
       <SheetDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
+        This action cannot be undone. This will permanently delete your account and remove your data
+        from our servers.
       </SheetDescription>
     </SheetHeader>
   </SheetContent>
@@ -94,8 +97,8 @@ You can adjust the size of the sheet using CSS classes:
     <SheetHeader>
       <SheetTitle>Are you absolutely sure?</SheetTitle>
       <SheetDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
+        This action cannot be undone. This will permanently delete your account and remove your data
+        from our servers.
       </SheetDescription>
     </SheetHeader>
   </SheetContent>
