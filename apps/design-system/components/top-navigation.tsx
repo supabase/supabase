@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { DesignSystemMarks } from './design-system-marks'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 import { TopNavigationSearch } from './top-navigation-search'
+import { CommandMenu } from './command-menu'
 
 function TopNavigation() {
   return (
@@ -24,7 +25,8 @@ function TopNavigation() {
             </>
           ))} */}
           <div className="flex items-center gap-8">
-            <TopNavigationSearch />
+            {/* <TopNavigationSearch /> */}
+            <CommandMenu />
             <ThemeSwitcherDropdown />
           </div>
         </div>
