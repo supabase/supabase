@@ -1,9 +1,11 @@
 [data-theme='dark'],
-.dark {
+[data-theme='deep-dark'],
+.dark,
+.deep-dark {
   --code-token-keyword: #bda4ff;
   --code-foreground: #ffffff;
   --code-token-constant: #3ecf8e;
-  --code-token-string: #ffffff;
+  --code-token-string: #ffcda1;
   --code-token-comment: #7e7e7e;
   --code-token-parameter: #ffffff;
   --code-token-function: #3ecf8e;
@@ -18,16 +20,16 @@
 [data-theme='light'],
 .light {
   --code-token-keyword: #6b35dc;
-  --code-foreground: #ededed;
+  --code-foreground: hsl(var(--foreground-light) / 1);
   --code-token-constant: #15593b;
-  --code-token-string: #ededed;
+  --code-token-string: #f1a10d;
   --code-token-comment: #7e7e7e;
-  --code-token-parameter: #ededed;
+  --code-token-parameter: hsl(var(--foreground-light) / 1);
   --code-token-function: #15593b;
   --code-token-string-expression: #f1a10d;
-  --code-token-punctuation: #ededed;
-  --code-token-link: #ededed;
-  --code-token-number: #ededed;
+  --code-token-punctuation: hsl(var(--foreground-light) / 1);
+  --code-token-link: hsl(var(--foreground-light) / 1);
+  --code-token-number: hsl(var(--foreground-light) / 1);
   --code-token-property: #15593b;
   --code-highlight-color: #1c1c1c;
 }

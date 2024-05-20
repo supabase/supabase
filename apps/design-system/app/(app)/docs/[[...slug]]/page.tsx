@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { allDocs } from 'contentlayer/generated'
 
 import '@/styles/mdx.css'
+import '@/styles/code-block-variables.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 // import { ChevronRightIcon, ExternalLinkIcon } from '@radix-ui/react-icons'
