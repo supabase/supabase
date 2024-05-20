@@ -183,7 +183,7 @@ const LogsQueryPanel = ({
                       onClick={() => setShowReference(true)}
                       icon={<IconBookOpen strokeWidth={1.5} />}
                     >
-                      <div>Field Reference</div>
+                      <span>Field Reference</span>
                     </Button>
                   }
                 >
