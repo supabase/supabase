@@ -258,8 +258,7 @@ export const CreateHookSheet = ({
                     <FormControl_Shadcn_>
                       <Toggle
                         label={`Enable ${values.hookType}`}
-                        checked={field.value}
-                        disabled={field.disabled}
+                        {...field}
                         onChange={() => field.onChange(!values.enabled)}
                       />
                     </FormControl_Shadcn_>
@@ -358,9 +357,7 @@ export const CreateHookSheet = ({
                         <FunctionSelector
                           size="small"
                           schema={values.postgresValues.schema}
-                          selectedFunctionName={field.value}
-                          onSelectFunction={(name) => field.onChange(name)}
-                          disabled={field.disabled}
+                          {...field}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>

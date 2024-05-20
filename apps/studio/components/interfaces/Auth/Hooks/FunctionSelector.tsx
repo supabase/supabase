@@ -27,8 +27,8 @@ interface FunctionSelectorProps {
   size?: 'tiny' | 'small'
   showError?: boolean
   schema?: string
-  selectedFunctionName: string
-  onSelectFunction: (name: string) => void
+  value: string
+  onChange: (value: string) => void
   disabled?: boolean
 }
 
@@ -38,8 +38,8 @@ const FunctionSelector = ({
   showError = true,
   disabled = false,
   schema,
-  selectedFunctionName,
-  onSelectFunction,
+  value,
+  onChange,
 }: FunctionSelectorProps) => {
   const { project } = useProjectContext()
   const [open, setOpen] = useState(false)
@@ -94,9 +94,7 @@ const FunctionSelector = ({
             >
               <div className="w-full flex gap-1">
                 <p className="text-foreground-lighter">function:</p>
-                <p className="text-foreground">
-                  {selectedFunctionName === '*' ? 'All schemas' : selectedFunctionName}
-                </p>
+                <p className="text-foreground">{value}</p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
@@ -126,16 +124,16 @@ const FunctionSelector = ({
                         value={func.name.replaceAll('"', '')}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => {
-                          onSelectFunction(func.name)
+                          onChange(func.name)
                           setOpen(false)
                         }}
                         onClick={() => {
-                          onSelectFunction(func.name)
+                          onChange(func.name)
                           setOpen(false)
                         }}
                       >
                         <span>{func.name}</span>
-                        {selectedFunctionName === func.name && (
+                        {value === func.name && (
                           <IconCheck className="text-brand" strokeWidth={2} />
                         )}
                       </CommandItem_Shadcn_>
