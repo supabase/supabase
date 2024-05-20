@@ -20,7 +20,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
@@ -66,7 +66,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
@@ -94,7 +94,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
@@ -122,7 +122,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         return (
           <div
             className={cn(
-              'bg-surface-75/50 border border-muted flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
               props.className
             )}
             {...props}
