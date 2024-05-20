@@ -43,7 +43,7 @@ Sentry.init({
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
   ],
   // Allow for exception captures originating only from our own code.
-  allowUrls: ['app:///_next/'],
+  // allowUrls: ['app:///_next/'],
 })
 
 // Replace dynamic query param with a template text
