@@ -913,4 +913,19 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/form-item-layout-with-switch.tsx'],
   },
+  {
+    name: 'color-usage-surface-www-and-docs',
+    type: 'docs:example',
+    files: ['example/color-usage-surface-www-and-docs.tsx'],
+  },
+  {
+    name: 'color-usage-surface-studio',
+    type: 'docs:example',
+    files: ['example/color-usage-surface-studio.tsx'],
+  },
+  {
+    name: 'color-usage-surface-studio-frame',
+    type: 'docs:example',
+    files: ['example/color-usage-surface-studio-frame.tsx'],
+  },
 ]

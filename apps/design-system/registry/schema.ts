@@ -32,6 +32,7 @@ export const registryEntrySchema = z.object({
     'components:component',
     'components:example',
     'components:block',
+    'docs:example',
   ]),
   category: z.string().optional(),
   backendProviders: z.array(z.string()).optional(),

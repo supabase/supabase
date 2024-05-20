@@ -28,26 +28,28 @@ We use backgrounds in 2 different ways. In the ./www and ./docs sites, we use a 
 <body className="bg-studio">{children}</body>
 ```
 
-### Surfaces
+### Backgrounds and Surfaces
+
+#### `./apps/www` + `./apps/docs`
 
 We use surfaces in 2 different ways. In the ./www and ./docs sites, we use a darker background, so we have an extra surface color we can use
 
-```jsx
-<body className="bg">
-  <div className="bg-suface-75 border">
-    {children}
-    <span className="font-mono uppercase">Blog Post</span>
-  </div>
-</body>
-```
+<CodeFragment name="color-usage-surface-www-and-docs" />
 
-For the studio (dashbaord) we can use 100, 200, 300
+#### `./apps/studio`
 
-```jsx
-<body className="bg-studio">
-  <div className="bg-suface-100 border rounded">{children}</div>
-</body>
-```
+For the studio (dashbaord) we can use `bg-surface-100`, `bg-surface-200`, `bg-surface-300`
+
+<CodeFragment name="color-usage-surface-studio" />
+
+#### Data grid and frame space
+
+Data grids use an alternative background color for empty space to add depth to the layout.
+The background of the empty space is the same background as used in `./apps/docs` and `./apps/www` - although; the color has been mapped to `bg-alternative` so it works well across different themes.
+
+<CodeFragment name="color-usage-surface-studio-frame" />
+
+Dealing with large areas of emmpty space in data display should also be catered for. You can use the `bg-200` or `bg` class to fill the space.
 
 ### Overlays
 
@@ -69,3 +71,4 @@ These can also be accessed with `foreground`. Like `text-foreground-light`.
 These can also be accessed with `foreground`. Like `text-foreground-light`.
 
 <Colors definition={'colors'} />
+```

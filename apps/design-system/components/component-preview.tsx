@@ -83,7 +83,7 @@ export function ComponentPreview({
     }
 
     return <Component />
-  }, [name])
+  }, [name, config.style])
 
   const codeString = React.useMemo(() => {
     if (typeof Code?.props['data-rehype-pretty-code-fragment'] !== 'undefined') {
@@ -118,7 +118,7 @@ export function ComponentPreview({
         {/* </ThemeWrapper> */}
       </>
     )
-  }, [codeString])
+  }, [Preview, align])
 
   const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
 

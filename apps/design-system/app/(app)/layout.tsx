@@ -1,6 +1,6 @@
 import SideNavigation from '@/components/side-navigation'
 import { SiteFooter } from '@/components/site-footer'
-import ThemeSettings from '@/components/theme-settings'
+// import ThemeSettings from '@/components/theme-settings'
 import TopNavigation from '@/components/top-navigation'
 import { ScrollArea } from 'ui'
 

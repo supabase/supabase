@@ -5,7 +5,7 @@ import { fragments } from '@/registry/fragments'
 // import { blocks } from '@/registry/blocks'
 
 export const registry: Registry = [
-  ...ui,
+  // ...ui,
   ...fragments,
   ...examples,
   // ...blocks
