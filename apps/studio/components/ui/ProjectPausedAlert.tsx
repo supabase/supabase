@@ -1,7 +1,6 @@
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 export const ProjectPausedAlert = ({
   title = 'Project is paused',
@@ -15,7 +14,7 @@ export const ProjectPausedAlert = ({
   return (
     <Alert_Shadcn_ variant="warning">
       <AlertCircle />
-      <AlertTitle>{title}</AlertTitle>
+      <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       {projectRef && (
         <div className="mt-3 flex items-center space-x-2">
