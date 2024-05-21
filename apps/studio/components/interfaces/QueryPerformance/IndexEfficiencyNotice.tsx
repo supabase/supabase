@@ -11,6 +11,7 @@ interface IndexEfficiencyNoticeProps {
   isLoading: boolean
 }
 
+// [Joshen] Currently not used, might be deprecated - just double checking first
 export const IndexEfficiencyNotice = ({ isLoading }: IndexEfficiencyNoticeProps) => {
   const { ref: projectRef } = useParams()
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]

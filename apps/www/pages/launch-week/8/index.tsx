@@ -1,4 +1,4 @@
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'

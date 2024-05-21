@@ -10,7 +10,7 @@ import { NextSeo } from 'next-seo'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }

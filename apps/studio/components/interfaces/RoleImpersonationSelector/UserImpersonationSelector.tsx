@@ -17,6 +17,7 @@ const UserImpersonationSelector = () => {
   const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } = useUsersQuery(
     {
       projectRef: project?.ref,
+      connectionString: project?.connectionString,
       keywords: debouncedSearchText || undefined,
     },
     {

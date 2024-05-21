@@ -232,7 +232,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -568,10 +568,10 @@ functions:
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
@@ -632,7 +632,7 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```js
@@ -2503,9 +2503,11 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - When using `delete().in()`, specify an array of values to target multiple rows with a single query. This is particularly useful for batch deleting entries that share common criteria, such as deleting users by their IDs. Ensure that the array you provide accurately represents all records you intend to delete to avoid unintended data removal.
+
     examples:
       - id: delete-records
-        name: Delete records
+        name: Delete a single record
         code: |
           ```ts
           const { error } = await supabase
@@ -2534,6 +2536,36 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+      - id: delete-multiple-records
+        name: Delete multiple records
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .delete()
+            .in('id', [1, 2, 3])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: false
+        isSpotlight: false
+
   - id: rpc
     title: 'Postgres functions: rpc()'
     description: |
@@ -2545,6 +2577,8 @@ functions:
         select 'Hello world';
       $$ language sql;
       ```
+
+      To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
@@ -2658,6 +2692,28 @@ functions:
           ```
         description: |
           Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
+        hideCodeBlock: true
+      - id: call-a-read-only-postgres-function
+        name: Call a read-only Postgres function
+        code: |
+          ```ts
+          const { data, error } = await supabase.rpc('hello_world', { get: true })
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         hideCodeBlock: true
 
   - id: using-filters
@@ -4925,7 +4981,7 @@ functions:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
-      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behavior by passing in a `Content-Type` header of your own.
       - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
     examples:
       - id: basic-invocation
@@ -4991,6 +5047,36 @@ functions:
             method: 'DELETE'
           })
           ```
+      - id: regional-invocation
+        name: Invoking a Function in the UsEast1 region
+        description: |
+          Here are the available regions:
+          - `FunctionRegion.Any`
+          - `FunctionRegion.ApNortheast1`
+          - `FunctionRegion.ApNortheast2`
+          - `FunctionRegion.ApSouth1`
+          - `FunctionRegion.ApSoutheast1`
+          - `FunctionRegion.ApSoutheast2`
+          - `FunctionRegion.CaCentral1`
+          - `FunctionRegion.EuCentral1`
+          - `FunctionRegion.EuWest1`
+          - `FunctionRegion.EuWest2`
+          - `FunctionRegion.EuWest3`
+          - `FunctionRegion.SaEast1`
+          - `FunctionRegion.UsEast1`
+          - `FunctionRegion.UsWest1`
+          - `FunctionRegion.UsWest2`
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient, FunctionRegion } from '@supabase/supabase-js'
+
+          const { data, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' },
+            region: FunctionRegion.UsEast1
+          })
+          ```
+
       - id: calling-with-get-verb
         name: Calling with GET HTTP verb
         description: |

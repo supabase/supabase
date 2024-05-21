@@ -136,6 +136,28 @@ final data = await supabase.from('countries').select('id, name, cities(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Country: Codable {
+  let id: Int
+  let name: String
+  let cities: [City]
+
+  struct City: Codable {
+    let id: Int
+    let name: String
+  }
+}
+
+let countries: [Country] = try await supabase
+  .from("countries")
+  .select("id, name, cities(id, name)")
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -220,6 +242,38 @@ const { data, error } = await supabase.from('teams').select(`
 
 ```dart
 final data = await supabase.from('teams').select('id, team_name, users(id, name)');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Team: Codable {
+  let id: Int
+  let name: String
+  let users: [User]
+
+  struct User: Codable {
+    let id: Int
+    let name: String
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id, users
+    case name = "team_name"
+  }
+}
+let teams [Team] = try await supabase
+  .from("teams")
+  .select(
+    """
+      id,
+      team_name,
+      users ( id, name )
+    """
+  )
+  .execute()
+  .value
 ```
 
 </TabPanel>
@@ -313,6 +367,52 @@ const { data, error } = await supabase.from('shifts').select(
     )
   `
 )
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Shift: Codable {
+  let id: Int
+  let userId: Int
+  let attendanceStatus: String?
+
+  let scans: [Scan]
+
+  struct Scan: Codable {
+    let id: Int
+    let userId: Int
+    let badgeScanTime: TimeInterval
+
+    enum CodingKeys: String, CodingKey {
+      case id
+      case userId = "user_id"
+      case badgeScanTime = "badge_scan_time"
+    }
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case userId = "user_id"
+    case attendanceStatus = "attendance_status"
+  }
+}
+
+let shifts: [Shift] = try await supabase
+  .from("shifts")
+  .select(
+    """
+      *,
+      scans:scan_id_start (
+        id,
+        user_id,
+        badge_scan_time
+      )
+    """
+  )
+  .execute()
+  .value
 ```
 
 </TabPanel>

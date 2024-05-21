@@ -39,7 +39,7 @@ export const generateUpgradeReasons = (originalPlan?: string, upgradedPlan?: str
   if (originalPlan === 'free' && upgradedPlan === 'pro') {
     reasons.push('Need more compute')
     reasons.push(
-      'I want access to additional features like daily backups, cost control, Custom Domain and PITR'
+      'I want access to additional features like branching, daily backups, custom domain and PITR'
     )
   } else if (upgradedPlan === 'team') {
     reasons.push('I want access to SOC2 and HIPAA compliance')

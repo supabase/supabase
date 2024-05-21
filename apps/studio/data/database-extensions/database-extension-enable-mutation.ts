@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
@@ -49,7 +49,7 @@ export async function enableDatabaseExtension({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

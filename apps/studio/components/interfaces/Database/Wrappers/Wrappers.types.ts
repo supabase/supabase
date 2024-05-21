@@ -8,6 +8,7 @@ export type WrapperMeta = {
   server: Server
   tables: Table[]
   docsUrl: string
+  minimumExtensionVersion?: string
 }
 
 export type ServerOption = {

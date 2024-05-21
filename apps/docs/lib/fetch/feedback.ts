@@ -8,15 +8,23 @@ type SendFeedbackVariables = {
   message: string
   isHelpful: boolean
   pathname?: string
+  team?: string
 }
 
-export async function sendFeedback({ message, pathname, title, isHelpful }: SendFeedbackVariables) {
+export async function sendFeedback({
+  message,
+  pathname,
+  title,
+  isHelpful,
+  team,
+}: SendFeedbackVariables) {
   const { data, error } = await post('/platform/feedback/docs', {
     body: {
       page: pathname,
       isHelpful,
       title,
       feedback: message,
+      team,
     },
   })
   if (error) throw Error(`Couldn't send feedback`, { cause: error })

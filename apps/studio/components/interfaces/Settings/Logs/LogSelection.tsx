@@ -1,8 +1,9 @@
-import { Button, IconX } from 'ui'
+import { Button } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
 import { Loading } from 'components/ui/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   isDefaultLogPreviewFormat,
@@ -165,7 +166,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
               className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
+              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
           <div className="h-px w-full bg-selection rounded " />

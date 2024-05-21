@@ -169,7 +169,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     <div id="connection-string" className="w-full">
       <Panel
         className={cn(
-          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0',
+          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)]:!p-0',
           appearance === 'minimal' && 'border-0 shadow-none'
         )}
         bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
@@ -198,7 +198,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
               >
                 {readReplicasEnabled && <DatabaseSelector />}
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
+                  <a
+                    target="_blank"
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres"
+                  >
                     Documentation
                   </a>
                 </Button>

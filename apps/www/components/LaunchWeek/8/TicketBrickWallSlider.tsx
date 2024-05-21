@@ -1,11 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { cn } from 'ui'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 
+import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
-
-import 'swiper/swiper.min.css'
-import { cn } from 'ui'
 
 interface Props {
   users: UserData[]

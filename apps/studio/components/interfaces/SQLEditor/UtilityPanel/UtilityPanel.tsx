@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
 
-import { useContentQuery } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -15,10 +14,12 @@ import UtilityTabResults from './UtilityTabResults'
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isDebugging?: boolean
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  onDebug: () => void
 }
 
 const DEFAULT_CHART_CONFIG = {
@@ -31,14 +32,15 @@ const DEFAULT_CHART_CONFIG = {
 const UtilityPanel = ({
   id,
   isExecuting,
+  isDebugging,
   isDisabled,
   hasSelection,
   prettifyQuery,
   executeQuery,
+  onDebug,
 }: UtilityPanelProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
-  const { data } = useContentQuery(ref)
   const snippet = snap.snippets[id]?.snippet
 
   const queryKeys = contentKeys.list(ref)
@@ -111,15 +113,14 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between px-2">
-        <div>
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2">
+        <div className="flex gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             Results{' '}
             {!isExecuting &&
               (result?.rows ?? []).length > 0 &&
               `(${result.rows.length.toLocaleString()})`}
           </TabsTrigger_Shadcn_>
-
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             Chart
           </TabsTrigger_Shadcn_>
@@ -137,7 +138,13 @@ const UtilityPanel = ({
         </div>
       </TabsList_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
-        <UtilityTabResults id={id} isExecuting={isExecuting} />
+        <UtilityTabResults
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          onDebug={onDebug}
+          isDebugging={isDebugging}
+        />
       </TabsContent_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />

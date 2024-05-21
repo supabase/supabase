@@ -17,6 +17,11 @@ export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPo
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState<string>(value)
 
+  const applySearch = () => {
+    onSaveText(search)
+    setOpen(false)
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -40,6 +45,9 @@ export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPo
             rows={4}
             className="text-xs font-mono tracking-tight"
             placeholder="Search for a query"
+            onKeyDown={(event) => {
+              if (event.metaKey && event.code === 'Enter') applySearch()
+            }}
           />
         </div>
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
@@ -54,14 +62,8 @@ export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPo
           >
             Clear
           </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              onSaveText(search)
-              setOpen(false)
-            }}
-          >
-            Save
+          <Button type="primary" onClick={() => applySearch()}>
+            Apply search
           </Button>
         </div>
       </PopoverContent_Shadcn_>

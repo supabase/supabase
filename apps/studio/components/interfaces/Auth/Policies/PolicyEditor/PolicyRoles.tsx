@@ -43,7 +43,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
       </div>
       <div className="relative w-2/3">
         {isLoading && <ShimmeringLoader className="py-4" />}
-        {isError && <AlertError error={error} subject="Failed to retrieve database roles" />}
+        {isError && <AlertError error={error as any} subject="Failed to retrieve database roles" />}
         {isSuccess && (
           <MultiSelect
             options={formattedRoles}

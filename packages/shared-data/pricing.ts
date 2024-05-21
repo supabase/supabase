@@ -110,6 +110,16 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Branching',
+        plans: {
+          free: false,
+          pro: '$0.32 per branch, per day',
+          team: '$0.32 per branch, per day',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Bandwidth',
         tooltips: {
           main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',
@@ -151,6 +161,19 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
+      },
+      {
+        title: 'Anonymous Sign-ins',
+        tooltips: {
+          main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
       },
       {
         title: 'Social OAuth providers',

@@ -20,7 +20,8 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('launch-week') || pathname.includes('special-announcement')
+  const isLaunchWeek = pathname.includes('/launch-week')
+  const isGAWeek = pathname.includes('/ga-week')
   const forceDark = isLaunchWeek || pathname === '/'
 
   if (props.hideFooter) {
@@ -29,7 +30,12 @@ const Footer = (props: Props) => {
 
   return (
     <footer
-      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      className={cn(
+        'bg-alternative',
+        isLaunchWeek && 'bg-[#060809]',
+        isGAWeek && 'dark:bg-alternative',
+        props.className
+      )}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -61,16 +67,20 @@ const Footer = (props: Props) => {
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/" className="w-40">
               <Image
-                src={
-                  forceDark
-                    ? supabaseLogoWordmarkDark
-                    : resolvedTheme?.includes('dark')
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                }
+                src={supabaseLogoWordmarkLight}
                 width={160}
                 height={30}
-                alt="Supabase"
+                alt="Supabase Logo"
+                className="dark:hidden"
+                priority
+              />
+              <Image
+                src={supabaseLogoWordmarkDark}
+                width={160}
+                height={30}
+                alt="Supabase Logo"
+                className="hidden dark:block"
+                priority
               />
             </Link>
             <div className="flex space-x-5">

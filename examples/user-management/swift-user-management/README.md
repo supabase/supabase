@@ -1,8 +1,9 @@
 # Supabase Swift User Management
 
-This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.io/docs/guides/with-swift). 
+This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.io/docs/guides/with-swift).
 
 This repo will demonstrate how to:
+
 - Sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
 - Store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
 - Store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
@@ -39,11 +40,11 @@ create policy "Public profiles are viewable by everyone."
 
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 
 -- Set up Realtime!
 begin;

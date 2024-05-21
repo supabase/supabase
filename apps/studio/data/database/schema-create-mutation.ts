@@ -1,9 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { databaseKeys } from './keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { invalidateSchemasQuery } from './schemas-query'
 
 export type SchemaCreateVariables = {
   name: string
@@ -12,22 +13,14 @@ export type SchemaCreateVariables = {
 }
 
 export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await post('/platform/pg-meta/{ref}/schemas', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: { name, owner: 'postgres' },
-    headers: Object.fromEntries(headers),
+  const sql = pgMeta.schemas.create({ name, owner: 'postgres' }).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['schema', 'create'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type SchemaCreateData = Awaited<ReturnType<typeof createSchema>>
@@ -46,7 +39,7 @@ export const useSchemaCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseKeys.schemaList(projectRef))
+        await invalidateSchemasQuery(queryClient, projectRef)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

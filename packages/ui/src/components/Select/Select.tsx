@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'

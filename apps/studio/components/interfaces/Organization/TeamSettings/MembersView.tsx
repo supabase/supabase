@@ -1,6 +1,4 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Image from 'next/legacy/image'
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -8,35 +6,12 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
-import {
-  OrganizationMember,
-  useOrganizationMembersQuery,
-} from 'data/organizations/organization-members-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks'
-import { useProfile } from 'lib/profile'
-import {
-  Badge,
-  Button,
-  IconAlertCircle,
-  IconCheck,
-  IconLoader,
-  IconUser,
-  IconX,
-  Listbox,
-  Loading,
-  Modal,
-} from 'ui'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
-import MemberActions from './MemberActions'
+import { Button, IconAlertCircle, Loading, Modal } from 'ui'
+import { getUserDisplayName } from '../Organization.utils'
+import MemberRow, { SelectedMember } from './MemberRow'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-
-interface SelectedMember extends OrganizationMember {
-  oldRoleId: number
-  newRoleId: number
-}
 
 export interface MembersViewProps {
   searchString: string
@@ -44,10 +19,7 @@ export interface MembersViewProps {
 
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
 
-  const { profile } = useProfile()
-  const { data: permissions } = usePermissionsQuery()
   const {
     data: members,
     error: membersError,
@@ -75,11 +47,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const allMembers = members ?? []
   const roles = rolesData?.roles ?? []
-  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
-    roles,
-    permissions ?? []
-  )
 
   // [Joshen] Proactively adding this, can be removed once infra API changes are in
   const showMfaEnabledColumn = allMembers.some(
@@ -91,21 +58,23 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const filteredMembers = (
     !searchString
       ? allMembers
-      : allMembers.filter((x: any) => {
-          if (x.invited_at) {
-            return x.primary_email.includes(searchString)
+      : allMembers.filter((member) => {
+          if (member.invited_at) {
+            return member.primary_email?.includes(searchString)
           }
-          if (x.id || x.gotrue_id) {
-            return x.username.includes(searchString) || x.primary_email.includes(searchString)
+          if (member.gotrue_id) {
+            return (
+              member.username.includes(searchString) || member.primary_email?.includes(searchString)
+            )
           }
         })
   )
     .slice()
-    .sort((a: any, b: any) => a.username.localeCompare(b.username))
+    .sort((a, b) => a.username.localeCompare(b.username))
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
-    return roles.find((x: any) => x.id === id)?.name
+    return roles.find((member) => member.id === id)?.name
   }
 
   const handleRoleChange = async () => {
@@ -150,188 +119,17 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-action"></Table.th>,
               ]}
               body={[
-                ...filteredMembers.map((x, i: number) => {
-                  const [memberRoleId] = x.role_ids ?? []
-                  const role = (roles || []).find((role) => role.id === memberRoleId)
-                  const memberIsUser = x.primary_email == profile?.primary_email
-                  const memberIsPendingInvite = !!x.invited_id
-                  const canRemoveRole = rolesRemovable.includes(memberRoleId)
-                  const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
-                  const isEmailUser = x.username === x.primary_email
-
-                  const validateSelectedRoleToChange = (roleId: any) => {
-                    if (!role || role.id === roleId) return
-
-                    const selectedRole = (roles || []).find((role) => role.id === roleId)
-                    const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
-
-                    if (!canAddRole) {
-                      return toast.error(
-                        `You do not have permission to update this team member to ${
-                          selectedRole!.name
-                        }`
-                      )
-                    }
-
-                    setUserRoleChangeModalVisible(true)
-                    setSelectedMember({ ...x, oldRoleId: role.id, newRoleId: roleId })
-                  }
-
-                  return (
-                    <Fragment key={`member-row-${i}`}>
-                      <Table.tr>
-                        <Table.td>
-                          <div className="flex items-center space-x-4">
-                            <div>
-                              {x.invited_id ? (
-                                <span className="flex p-2 border-2 rounded-full border-strong">
-                                  <IconUser size={20} strokeWidth={2} />
-                                </span>
-                              ) : isEmailUser ? (
-                                <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
-                                  <IconUser strokeWidth={1.5} />
-                                </div>
-                              ) : (
-                                <Image
-                                  alt={x.username}
-                                  src={`https://github.com/${x.username}.png?size=80`}
-                                  width="40"
-                                  height="40"
-                                  className="border rounded-full"
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-foreground">{getUserDisplayName(x)}</p>
-                              {x.invited_id === undefined && (
-                                <p className="text-foreground-light">{x.primary_email}</p>
-                              )}
-                            </div>
-                          </div>
-                        </Table.td>
-
-                        <Table.td>
-                          {x.invited_id && x.invited_at && (
-                            <Badge
-                              variant={isInviteExpired(x.invited_at) ? 'destructive' : 'warning'}
-                            >
-                              {isInviteExpired(x.invited_at) ? 'Expired' : 'Invited'}
-                            </Badge>
-                          )}
-                        </Table.td>
-
-                        {showMfaEnabledColumn && (
-                          <Table.td>
-                            <div className="flex items-center justify-center">
-                              {x.mfa_enabled ? (
-                                <IconCheck className="text-brand" strokeWidth={2} />
-                              ) : (
-                                <IconX className="text-foreground-light" strokeWidth={1.5} />
-                              )}
-                            </div>
-                          </Table.td>
-                        )}
-
-                        <Table.td>
-                          {isLoadingRoles ? (
-                            <div className="w-[140px]">
-                              <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-                            </div>
-                          ) : role !== undefined ? (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger className="w-[140px]" asChild>
-                                <div>
-                                  <Listbox
-                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
-                                    disabled={disableRoleEdit}
-                                    value={role.id}
-                                    onChange={validateSelectedRoleToChange}
-                                  >
-                                    {roles.map((r: any) => (
-                                      <Listbox.Option
-                                        key={r.id}
-                                        value={r.id}
-                                        label={r.name}
-                                        disabled={disableRoleEdit}
-                                        className="w-36"
-                                      >
-                                        {r.name}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox>
-                                </div>
-                              </Tooltip.Trigger>
-                              {memberIsPendingInvite ? (
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        Role can only be changed after the user has accepted the
-                                        invite
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              ) : !memberIsUser && !canRemoveRole ? (
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        You need additional permissions to manage this team member
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              ) : (
-                                <></>
-                              )}
-                            </Tooltip.Root>
-                          ) : (
-                            <div className="flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light">Invalid role</p>
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <IconAlertCircle size={16} strokeWidth={1.5} />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        This user has an invalid role, please reach out to us via
-                                        support
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            </div>
-                          )}
-                        </Table.td>
-                        <Table.td>
-                          {!memberIsUser && <MemberActions member={x} roles={roles} />}
-                        </Table.td>
-                      </Table.tr>
-                    </Fragment>
-                  )
-                }),
+                ...filteredMembers.map((member) => (
+                  <MemberRow
+                    key={member.gotrue_id}
+                    member={member}
+                    roles={roles}
+                    isLoadingRoles={isLoadingRoles}
+                    showMfaEnabledColumn={showMfaEnabledColumn}
+                    setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
+                    setSelectedMember={setSelectedMember}
+                  />
+                )),
                 ...(searchString.length > 0 && filteredMembers.length === 0
                   ? [
                       <Table.tr key="no-results" className="bg-panel-secondary-light">

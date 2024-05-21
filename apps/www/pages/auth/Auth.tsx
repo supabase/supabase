@@ -17,6 +17,8 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 function AuthPage() {
   // base path for images
@@ -43,6 +45,7 @@ function AuthPage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
           icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}

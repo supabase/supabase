@@ -14,26 +14,28 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
+  schema: string
   tables: PostgresTable[]
   hasTables: boolean
   isLocked: boolean
+  onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
 }
 
 const Policies = ({
+  schema,
   tables,
   hasTables,
   isLocked,
+  onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
 }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
@@ -137,14 +139,15 @@ const Policies = ({
   return (
     <>
       <div className="flex flex-col gap-y-4 pb-4">
-        {isLocked && <ProtectedSchemaWarning schema={snap.selectedSchemaName} entity="policies" />}
+        {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
         {tables.length > 0 ? (
-          tables.map((table: any) => (
+          tables.map((table) => (
             <section key={table.id}>
               <PolicyTableRow
                 table={table}
                 isLocked={isLocked}
                 onSelectToggleRLS={onSelectToggleRLS}
+                onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
                 onSelectEditPolicy={onSelectEditPolicy}
                 onSelectDeletePolicy={onSelectDeletePolicy}
               />

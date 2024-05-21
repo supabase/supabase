@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/nextjs'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { useState } from 'react'

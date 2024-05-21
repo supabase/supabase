@@ -17,6 +17,8 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 function StoragePage() {
   // base path for images
@@ -43,6 +45,7 @@ function StoragePage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.STORAGE} />
         <ProductHeader
           icon={Solutions['storage'].icon}
           title={Solutions['storage'].name}

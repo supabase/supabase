@@ -101,7 +101,7 @@ We use Row Level Security in Supabase as a way to grant/restrict access on a row
 
 ```sql
 CREATE POLICY "Individuals can only write their own messages." ON messages FOR
-    INSERT WITH CHECK (auth.uid() = user_id);
+    INSERT WITH CHECK ((select auth.uid()) = user_id);
 
 -- auth.uid() is a function provided by Supabase which plucks the uid out
 --   of the JWT sent along with an API request more on this here:

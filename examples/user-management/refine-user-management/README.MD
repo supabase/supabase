@@ -2,19 +2,17 @@
 
 This repo is a quick sample of how you can get started building apps using [refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
-
-
 ## About refine
 
 [refine](https://github.com/refinedev/refine) is a React-based framework for building data-intensive applications in no time ✨
 
 refine offers lots of out-of-the box functionality for rapid development, without compromising extreme customizability. Use-cases include, but are not limited to admin panels, B2B applications and dashboards.
 
-
 - To learn more about **refine**, please check out the [Documentation](https://refine.dev/docs)
 - [Step up to refine tutorials.](https://refine.dev/docs/tutorial/introduction/index/)
 
 ## Available Scripts
+
 ### Running the development server.
 
 ```bash
@@ -26,7 +24,6 @@ npm run dev
 ```bash
 npm run build
 ```
-
 
 ## Build from scratch
 
@@ -92,10 +89,10 @@ create policy "Public profiles are viewable by everyone."
   using ( true );
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 -- Set up Realtime!
 begin;
   drop publication if exists supabase_realtime;
@@ -113,9 +110,6 @@ create policy "Anyone can upload an avatar."
   with check ( bucket_id = 'avatars' );
 ```
 
-
-
 ## License
 
 MIT
-
