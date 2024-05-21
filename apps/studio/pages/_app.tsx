@@ -23,7 +23,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
+import { ThemeProvider, useThemeSandbox, useUser } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -52,6 +52,7 @@ import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
+import { getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -145,6 +146,34 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const user = useUser()
+  useEffect(() => {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+    // don't set the sentry user id if
+    // - on self-hosted or CLI
+    // - the user has not consented to telemetry
+    // - the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
+    if (!IS_PLATFORM || consent !== 'true' || !user?.id) {
+      return
+    }
+
+    const setSentryId = async () => {
+      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
+
+      if (!sentryUserId) {
+        sentryUserId = await getAnonId(user?.id)
+        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
+      }
+      Sentry.setUser({ id: sentryUserId })
+    }
+
+    // if an error happens, continue without setting a sentry id
+    setSentryId().catch((e) => console.error(e))
+  }, [user?.id])
 
   useThemeSandbox()
 
