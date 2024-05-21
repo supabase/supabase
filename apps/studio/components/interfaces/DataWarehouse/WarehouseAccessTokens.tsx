@@ -221,7 +221,7 @@ const WarehouseAccessTokens = () => {
                   setTokenToDelete(null)
                 }}
               >
-                Yes, revoke access keys
+                Yes, revoke access token
               </Button>
             </DialogFooter>
           </DialogContent>
