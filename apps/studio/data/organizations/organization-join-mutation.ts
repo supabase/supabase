@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -14,7 +14,7 @@ export async function joinOrganization({ slug, token }: OrganizationJoinVariable
   const { data, error } = await post('/platform/organizations/{slug}/members/join', {
     params: { path: { slug }, query: { token } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

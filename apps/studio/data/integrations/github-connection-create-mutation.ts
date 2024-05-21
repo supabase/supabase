@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { GitHubConnectionCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
@@ -10,10 +10,8 @@ export async function createGitHubConnection({ connection }: GitHubConnectionCre
   const { data, error } = await post('/platform/integrations/github/connections', {
     body: connection,
   })
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 
