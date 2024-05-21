@@ -5,12 +5,12 @@ import { handleError, del } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { analyticsKeys } from './keys'
 
-export type DeleteCollectionArgs = {
+export type DeleteCollectionVariables = {
   projectRef: string
   collectionToken: string
 }
 
-export async function deleteCollection({ projectRef, collectionToken }: DeleteCollectionArgs) {
+export async function deleteCollection({ projectRef, collectionToken }: DeleteCollectionVariables) {
   const { data, error } = await del(
     '/platform/projects/{ref}/analytics/warehouse/collections/{token}',
     {
@@ -29,12 +29,12 @@ export const useDeleteCollectionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteCollectionData, ResponseError, DeleteCollectionArgs>,
+  UseMutationOptions<DeleteCollectionData, ResponseError, DeleteCollectionVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteCollectionData, ResponseError, DeleteCollectionArgs>(
+  return useMutation<DeleteCollectionData, ResponseError, DeleteCollectionVariables>(
     (vars) => deleteCollection(vars),
     {
       async onSuccess(data, variables, context) {
