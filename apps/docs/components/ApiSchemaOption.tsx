@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useState } from 'react'
+import { type FC, type PropsWithChildren, useState } from 'react'
 import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
