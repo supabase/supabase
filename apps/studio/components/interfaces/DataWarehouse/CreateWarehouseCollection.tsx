@@ -1,22 +1,17 @@
 import { useParams } from 'common'
 import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import React from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconPlus, Input, Modal } from 'ui'
+import { Button, Input, Modal } from 'ui'
 
-type Props = {}
-
-export const CreateWarehouseCollectionModal = (props: Props) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+export const CreateWarehouseCollectionModal = () => {
+  const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const { ref } = useParams()
 
-  const {
-    mutateAsync: createCollection,
-    isLoading,
-    data: newCollection,
-  } = useCreateCollection({
+  const { mutateAsync: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
       router.push(`/project/${ref}/logs/collections/${data?.token}`)
     },
@@ -27,7 +22,7 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
       <Button
         type="default"
         className="justify-start flex-grow w-full"
-        icon={<IconPlus size="tiny" />}
+        icon={<PlusIcon size="14" />}
         onClick={() => {
           setIsOpen(!isOpen)
         }}
