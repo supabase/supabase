@@ -10,7 +10,11 @@ import rewrites from './lib/rewrites.js'
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
-import { withContentlayer } from 'next-contentlayer2'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const { withContentlayer } = require('next-contentlayer2')
+
+// import { withContentlayer } from 'next-contentlayer2'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,

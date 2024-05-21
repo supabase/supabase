@@ -1,4 +1,5 @@
 import { defineDocumentType, makeSource } from 'contentlayer2/source-files'
+import { FILENAME_SUBSTRING } from './lib/posts'
 
 export const BlogPost = defineDocumentType(() => ({
   name: 'BlogPost',
@@ -23,7 +24,13 @@ export const BlogPost = defineDocumentType(() => ({
     youtubeHero: { type: 'string', required: false },
   },
   computedFields: {
-    url: { type: 'string', resolve: (post) => `/blog/${post._raw.flattenedPath}` },
+    url: {
+      type: 'string',
+      resolve: (post) => {
+        const slug = post._raw.flattenedPath.replace('.mdx', '').substring(FILENAME_SUBSTRING)
+        return `/blog/${slug}`
+      },
+    },
   },
 }))
 
