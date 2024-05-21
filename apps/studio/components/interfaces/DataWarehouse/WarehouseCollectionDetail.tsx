@@ -127,8 +127,7 @@ export const WarehouseCollectionDetail = () => {
               maxHeight="calc(100vh - 139px)"
               hideHeader={true}
               emptyState={
-                <div className="text-left space-y-4">
-                  <HardDriveUpload className="text-brand" />
+                <div className="rounded border bg-surface-100 p-6 shadow-md space-y-4">
                   <div>
                     <h1 className="text-lg text-foreground">Send your first event</h1>
                     <p className="text-sm text-foreground-lighter">
