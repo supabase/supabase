@@ -6,7 +6,7 @@ type CreateWarehouseProps = {
   onSubmit: (values: { description: string }) => Promise<void>
 }
 
-const CreateWarehouseAccessToken = (props: CreateWarehouseProps) => {
+const CreateWarehouseAccessToken = ({ onSubmit }: CreateWarehouseProps) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [description, setDescription] = useState('')
@@ -14,7 +14,7 @@ const CreateWarehouseAccessToken = (props: CreateWarehouseProps) => {
   async function onConfirm() {
     setLoading(true)
 
-    await props.onSubmit({
+    await onSubmit({
       description,
     })
     setDescription('')
