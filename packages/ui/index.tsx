@@ -239,6 +239,8 @@ export { Separator } from './src/components/shadcn/ui/separator'
 
 export * from './src/components/shadcn/ui/resizable'
 
+export * from './src/components/radio-group-stacked'
+
 // links
 
 export * from './src/components/TextLink'

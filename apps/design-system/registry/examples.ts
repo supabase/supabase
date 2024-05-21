@@ -504,6 +504,18 @@ export const examples: Registry = [
     files: ['example/radio-group-form.tsx'],
   },
   {
+    name: 'radio-group-stacked-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-stacked-demo.tsx'],
+  },
+  {
+    name: 'radio-group-stacked-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-stacked-form.tsx'],
+  },
+  {
     name: 'resizable-demo',
     type: 'components:example',
     registryDependencies: ['resizable'],

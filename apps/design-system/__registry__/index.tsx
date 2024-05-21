@@ -775,6 +775,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "radio-group-stacked-demo": {
+      name: "radio-group-stacked-demo",
+      type: "components:example",
+      registryDependencies: ["radio-group"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-stacked-demo")),
+      source: "",
+      files: ["registry/default/example/radio-group-stacked-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-stacked-form": {
+      name: "radio-group-stacked-form",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-stacked-form")),
+      source: "",
+      files: ["registry/default/example/radio-group-stacked-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "resizable-demo": {
       name: "resizable-demo",
       type: "components:example",
