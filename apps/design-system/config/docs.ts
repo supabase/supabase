@@ -1,33 +1,33 @@
 import { MainNavItem, SidebarNavItem } from 'types/nav'
 
 interface DocsConfig {
-  mainNav: MainNavItem[]
+  mainNav?: MainNavItem[]
   sidebarNav: SidebarNavItem[]
 }
 
 export const docsConfig: DocsConfig = {
-  mainNav: [
-    {
-      title: 'Documentation',
-      href: '/docs',
-    },
-    {
-      title: 'Components',
-      href: '/docs/components/accordion',
-    },
-    {
-      title: 'Themes',
-      href: '/themes',
-    },
-    {
-      title: 'Examples',
-      href: '/examples',
-    },
-    {
-      title: 'Blocks',
-      href: '/blocks',
-    },
-  ],
+  // mainNav: [
+  //   {
+  //     title: 'Documentation',
+  //     href: '/docs',
+  //   },
+  //   {
+  //     title: 'Components',
+  //     href: '/docs/components/accordion',
+  //   },
+  //   {
+  //     title: 'Themes',
+  //     href: '/themes',
+  //   },
+  //   {
+  //     title: 'Examples',
+  //     href: '/examples',
+  //   },
+  //   {
+  //     title: 'Blocks',
+  //     href: '/blocks',
+  //   },
+  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
