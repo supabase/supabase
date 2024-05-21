@@ -11,8 +11,7 @@ import {
 } from 'data/analytics'
 import Link from 'next/link'
 import { TestCollectionDialog } from './TestCollectionDialog'
-import { HardDriveUpload, RefreshCcw, Rewind } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { RefreshCcw, Rewind } from 'lucide-react'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
