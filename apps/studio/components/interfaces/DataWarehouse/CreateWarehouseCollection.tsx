@@ -61,7 +61,7 @@ export const CreateWarehouseCollectionModal = () => {
         >
           <div className="py-4">
             <Modal.Content>
-              <p className="pb-5 text-scale-1100 text-sm">
+              <p className="pb-5 text-foreground-light text-sm">
                 An event collection stores generic timeseries events and metadata in
                 Supabase-managed analytics infrastructure. Events can be then be queried using SQL,
                 without impacting transactional workloads.
