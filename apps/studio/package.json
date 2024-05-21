@@ -145,6 +145,7 @@
     "jest": "^29.7.0",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
     "storybook-dark-mode": "^3.0.1",
