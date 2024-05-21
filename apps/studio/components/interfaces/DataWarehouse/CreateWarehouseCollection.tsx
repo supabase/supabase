@@ -23,9 +23,7 @@ export const CreateWarehouseCollectionModal = () => {
         type="default"
         className="justify-start flex-grow w-full"
         icon={<PlusIcon size="14" />}
-        onClick={() => {
-          setIsOpen(!isOpen)
-        }}
+        onClick={() => setIsOpen(!isOpen)}
       >
         New collection
       </Button>
