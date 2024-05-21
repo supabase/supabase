@@ -1,5 +1,4 @@
-import { set } from 'lodash'
-import React from 'react'
+import { useState } from 'react'
 import { Button, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -8,9 +7,9 @@ type Props = {
 }
 
 const CreateWarehouseAccessToken = (props: Props) => {
-  const [open, setOpen] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
-  const [description, setDescription] = React.useState('')
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [description, setDescription] = useState('')
 
   async function onConfirm() {
     setLoading(true)
