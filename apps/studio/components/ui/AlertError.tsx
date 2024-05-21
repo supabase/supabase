@@ -10,7 +10,7 @@ import {
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export interface AlertErrorProps {
-  ref?: string
+  projectRef?: string
   subject?: string
   error?: ResponseError | null
   className?: string
@@ -18,11 +18,11 @@ export interface AlertErrorProps {
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
+const AlertError = ({ projectRef, subject, error, className }: AlertErrorProps) => {
   const subjectString = subject?.replace(/ /g, '%20')
   let href = `/support/new?category=dashboard_bug`
 
-  if (ref) href += `&ref=${ref}`
+  if (projectRef) href += `&ref=${projectRef}`
   if (subjectString) href += `&subject=${subjectString}`
   if (error) href += `&message=Error:%20${error.message}`
 
