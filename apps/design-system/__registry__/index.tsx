@@ -797,6 +797,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "radio-group-card-demo": {
+      name: "radio-group-card-demo",
+      type: "components:example",
+      registryDependencies: ["radio-group"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-demo")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-card-form": {
+      name: "radio-group-card-form",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-form")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-card-with-children": {
+      name: "radio-group-card-with-children",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-with-children")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-with-children.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "resizable-demo": {
       name: "resizable-demo",
       type: "components:example",

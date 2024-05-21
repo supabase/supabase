@@ -240,6 +240,7 @@ export { Separator } from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/resizable'
 
 export * from './src/components/radio-group-stacked'
+export * from './src/components/radio-group-card'
 
 // links
 

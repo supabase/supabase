@@ -255,6 +255,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Radio Group Card',
+          href: '/docs/components/radio-group-card',
+          items: [],
+        },
+        {
           title: 'Resizable',
           href: '/docs/components/resizable',
           items: [],
