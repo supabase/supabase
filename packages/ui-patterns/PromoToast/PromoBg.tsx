@@ -1,4 +1,4 @@
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui/src/lib/utils/cn'
 
 interface Props {
   className?: string
