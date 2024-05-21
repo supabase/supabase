@@ -118,9 +118,8 @@ export function TestCollectionDialog({
             />
           </FormItemLayout>
 
-          <div>
-            <CodeBlock className="p-1 language-bash prose" language="bash">
-              {`curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
+          <CodeBlock className="p-1 language-bash prose" language="bash">
+            {`curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-API-KEY: ${testAccessToken || 'ACCESS_TOKEN'}' \\
   -d $'{
@@ -139,8 +138,7 @@ export function TestCollectionDialog({
     }
   }'
 `}
-            </CodeBlock>
-          </div>
+          </CodeBlock>
         </DialogSection>
       </DialogContent>
     </Dialog>
