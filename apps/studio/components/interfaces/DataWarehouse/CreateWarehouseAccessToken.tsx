@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Button, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-type Props = {
+type CreateWarehouseProps = {
   onSubmit: (values: { description: string }) => Promise<void>
 }
 
-const CreateWarehouseAccessToken = (props: Props) => {
+const CreateWarehouseAccessToken = (props: CreateWarehouseProps) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [description, setDescription] = useState('')
