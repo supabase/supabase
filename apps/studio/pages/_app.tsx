@@ -112,6 +112,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+    if (!IS_PLATFORM || consent !== 'true') {
+      return
+    }
+
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
       Sentry.captureException(error)
