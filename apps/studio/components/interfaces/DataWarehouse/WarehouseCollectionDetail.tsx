@@ -1,7 +1,7 @@
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
@@ -23,11 +23,11 @@ export const WarehouseCollectionDetail = () => {
     { enabled: true }
   )
   const collection = (collections || []).find((c) => c.token === collectionToken)
-  const [params, setParams] = React.useState({
+  const [params, setParams] = useState({
     sql: `select current_timestamp() as 'time'`,
   })
 
-  const [pagination, setPagination] = React.useState({
+  const [pagination, setPagination] = useState({
     limit: 100,
     offset: 0,
   })
