@@ -11,7 +11,7 @@ import {
 } from 'data/analytics'
 import Link from 'next/link'
 import { TestCollectionDialog } from './TestCollectionDialog'
-import { RefreshCcw, Rewind } from 'lucide-react'
+import { HardDriveUpload, RefreshCcw, Rewind } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export const WarehouseCollectionDetail = () => {
@@ -19,6 +19,7 @@ export const WarehouseCollectionDetail = () => {
   const collectionToken = router.query.collectionToken as string
   const projectRef = router.query.ref as string
   const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
+  const [testDialogOpen, setTestDialogOpen] = useState(false)
 
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef },
@@ -109,6 +110,8 @@ export const WarehouseCollectionDetail = () => {
                   collectionToken={collectionToken}
                   projectRef={projectRef}
                   collections={collections || []}
+                  open={testDialogOpen}
+                  onOpenChange={setTestDialogOpen}
                 />
               </div>
             </div>
@@ -123,6 +126,18 @@ export const WarehouseCollectionDetail = () => {
               error={isError ? 'Error loading data' : undefined}
               maxHeight="calc(100vh - 139px)"
               hideHeader={true}
+              emptyState={
+                <div className="text-left space-y-4">
+                  <HardDriveUpload className="text-brand" />
+                  <div>
+                    <h1 className="text-lg text-foreground">Send your first event</h1>
+                    <p className="text-sm text-foreground-lighter">
+                      Events sent to this collection will appear here
+                    </p>
+                  </div>
+                  <Button onClick={() => setTestDialogOpen(true)}>Send your first event</Button>
+                </div>
+              }
             />
           </div>
         </LoadingOpacity>

@@ -73,7 +73,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     <>
       <Table.tr
         key={item.id}
-        className="expandable-tr [&>*]:flex [&>*]:items-center [&>*]:text-ellipsis [&>*]:overflow-hidden"
+        className="expandable-tr [&>*]:flex [&>*]:items-center [&>*]:truncate [&>*]:overflow-hidden"
       >
         <Table.td className="whitespace-nowrap">
           <div className="flex items-center gap-2">

@@ -56,6 +56,7 @@ interface Props {
   className?: string
   hideHeader?: boolean
   collectionName?: string // Used for warehouse queries
+  emptyState?: ReactNode
 }
 type LogMap = { [id: string]: LogData }
 
@@ -80,6 +81,7 @@ const LogTable = ({
   className,
   hideHeader = false,
   collectionName,
+  emptyState,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -336,18 +338,24 @@ const LogTable = ({
     )
   }
 
-  const renderNoResultAlert = () => (
-    <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
-      <div className="flex flex-col gap-1">
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-      </div>
-      <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-foreground">No results found</h3>
-        <p className="text-sm text-foreground-lighter">Try another search or adjust the filters</p>
-      </div>
-    </div>
-  )
+  const renderNoResultAlert = () => {
+    if (emptyState) return emptyState
+    else
+      return (
+        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+          <div className="flex flex-col gap-1">
+            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+          </div>
+          <div className="flex flex-col gap-1 px-5">
+            <h3 className="text-lg text-foreground">No results found</h3>
+            <p className="text-sm text-foreground-lighter">
+              Try another search or adjust the filters
+            </p>
+          </div>
+        </div>
+      )
+  }
 
   if (!data) return null
 

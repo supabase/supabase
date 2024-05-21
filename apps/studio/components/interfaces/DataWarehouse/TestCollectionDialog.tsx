@@ -23,11 +23,15 @@ export function TestCollectionDialog({
   accessTokens,
   collectionToken,
   collections,
+  open,
+  onOpenChange,
 }: {
   accessTokens: WarehouseAccessTokensData['data']
   collections: WarehouseCollectionsData
   collectionToken: string
   projectRef: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }) {
   const BASE_WAREHOUSE_URL = `https://api.warehouse.tech/api/events`
   const [testAccessToken, setTestAccessToken] = useState('')
@@ -47,7 +51,7 @@ export function TestCollectionDialog({
   const selectedCollectionName = collections?.find((col) => col.token === selectedCollection)?.name
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
           <DialogTrigger asChild>
@@ -76,9 +80,9 @@ export function TestCollectionDialog({
             <FormItemLayout label="Collection" isReactForm={false}>
               <Select value={selectedCollection} onValueChange={setSelectedCollection}>
                 <SelectTrigger>
-                  <span className="text-ellipsis">{selectedCollectionName || 'Collection'}</span>
+                  <span className="truncate">{selectedCollectionName || 'Collection'}</span>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[260px]">
                   {collections?.map((col) => (
                     <SelectItem key={col.id + '-collection'} value={col.token}>
                       {col.name || 'No name'}
@@ -90,11 +94,11 @@ export function TestCollectionDialog({
             <FormItemLayout label="Token" isReactForm={false}>
               <Select value={testAccessToken} onValueChange={setTestAccessToken}>
                 <SelectTrigger>
-                  <span className="text-ellipsis">
+                  <span className="truncate">
                     {selectedAccessToken?.description || 'Access token'}
                   </span>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[260px]">
                   {accessTokens?.map((token: any) => (
                     <SelectItem key={token.id + '-token'} value={token.token}>
                       {token.description || 'No description'}
