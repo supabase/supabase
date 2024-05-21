@@ -5,9 +5,23 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Pavel Borisov at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 12 Jul 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 01 May 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-pavel-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/pgvector-0-7-0</guid>
+  <title>What&apos;s new in pgvector v0.7.0</title>
+  <link>https://supabase.com/blog/pgvector-0-7-0</link>
+  <description>Exploring new features in pgvector v0.7.0</description>
+  <pubDate>Wed, 01 May 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-bloat</guid>
+  <title>Postgres Bloat Minimization</title>
+  <link>https://supabase.com/blog/postgres-bloat</link>
+  <description>Understanding and minimizing Postgres table bloat</description>
+  <pubDate>Thu, 25 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/pgvector-performance</guid>
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
