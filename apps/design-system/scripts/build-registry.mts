@@ -255,10 +255,10 @@ export const Index: Record<string, any> = {
   // ----------------------------------------------------------------------------
   // Build registry/index.json.
   // ----------------------------------------------------------------------------
-  const names = registry.filter((item) => item.type === 'components:ui')
-  const registryJson = JSON.stringify(names, null, 2)
-  rimraf.sync(path.join(REGISTRY_PATH, 'index.json'))
-  await fs.writeFile(path.join(REGISTRY_PATH, 'index.json'), registryJson, 'utf8')
+  // const names = registry.filter((item) => item.type === 'components:ui')
+  // const registryJson = JSON.stringify(names, null, 2)
+  // rimraf.sync(path.join(REGISTRY_PATH, 'index.json'))
+  // await fs.writeFile(path.join(REGISTRY_PATH, 'index.json'), registryJson, 'utf8')
 
   // Write style index.
   rimraf.sync(path.join(process.cwd(), '__registry__/index.tsx'))
@@ -616,7 +616,7 @@ try {
 
   await buildRegistry(result.data)
   // await buildStyles(result.data)
-  await buildThemes()
+  // await buildThemes()
 
   console.log('✅ Done!')
 } catch (error) {
