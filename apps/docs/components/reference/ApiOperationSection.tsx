@@ -214,7 +214,7 @@ const ApiOperationSection = (props) => {
               schema={operation.responseList[0].content['application/json'].schema}
             ></ApiSchema>
           ) : (
-            <ReactMarkdown className="text-foreground text-sm">[No content]</ReactMarkdown>
+            <span className="text-foreground text-sm">[No content]</span>
           )}
         </RefSubLayout.Examples>
       )}
