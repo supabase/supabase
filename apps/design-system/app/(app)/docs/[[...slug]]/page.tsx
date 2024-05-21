@@ -1,25 +1,18 @@
-import { notFound } from 'next/navigation'
-import { allDocs } from 'contentlayer/generated'
-
-import '@/styles/mdx.css'
-import '@/styles/code-block-variables.css'
-import type { Metadata } from 'next'
-import Link from 'next/link'
-// import { ChevronRightIcon, ExternalLinkIcon } from '@radix-ui/react-icons'
-import Balancer from 'react-wrap-balancer'
-
+import { Mdx } from '@/components/mdx-components'
+import { DocsPager } from '@/components/pager'
+import { SourcePanel } from '@/components/source-panel'
+import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
-import { Mdx } from '@/components/mdx-components'
-import { DocsPager } from '@/components/pager'
-import { DashboardTableOfContents } from '@/components/toc'
-import { ChevronRight, ExternalLink } from 'lucide-react'
-import { Button, ScrollArea, Separator } from 'ui'
-import { SourcePanel } from '@/components/source-panel'
-// import { badgeVariants } from 'ui/src/components/shadcn/ui/badge'
-// import { buttonVariants } from '@ui/components/Button/Button'
-// import { ScrollArea } from '@/registry/new-york/ui/scroll-area'
+import '@/styles/code-block-variables.css'
+import '@/styles/mdx.css'
+import { allDocs } from 'contentlayer/generated'
+import { ChevronRight } from 'lucide-react'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import Balancer from 'react-wrap-balancer'
+import { ScrollArea, Separator } from 'ui'
 
 interface DocPageProps {
   params: {
@@ -104,42 +97,6 @@ export default async function DocPage({ params }: DocPageProps) {
           )}
         </div>
         <Separator className="mb-6" />
-        {/* {doc.links ? (
-          <div className="flex items-center space-x-2 pt-4">
-            {doc.links?.doc && (
-              <Button
-                type="default"
-                icon={<ExternalLink className="h-3 w-3 text-foreground-muted" strokeWidth={1} />}
-              >
-                <Link
-                  href={doc.links.doc}
-                  target="_blank"
-                  rel="noreferrer"
-
-                  // className={cn(buttonVariants({ variant: 'default' }), 'gap-1')}
-                >
-                  Docs
-                </Link>
-              </Button>
-            )}
-            {doc.links?.api && (
-              <Button
-                type="default"
-                icon={<ExternalLink className="h-3 w-3 text-foreground-muted" strokeWidth={1} />}
-              >
-                <Link
-                  href={doc.links.api}
-                  target="_blank"
-                  rel="noreferrer"
-
-                  // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
-                >
-                  API Reference
-                </Link>
-              </Button>
-            )}
-          </div>
-        ) : null} */}
         <SourcePanel doc={doc} />
         <div className="pb-12">
           <Mdx code={doc.body.code} />
