@@ -111,8 +111,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
-    console.error(error.stack)
-    Sentry.captureException(error, { level: 'error' })
+    Sentry.withScope(function (scope) {
+      console.error(error.stack)
+      scope.setTag('globalErrorBoundary', true)
+      Sentry.captureException(error, { level: 'error' })
+    })
   }
 
   useEffect(() => {
