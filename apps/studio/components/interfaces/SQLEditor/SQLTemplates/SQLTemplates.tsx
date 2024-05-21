@@ -63,7 +63,7 @@ const SQLTemplates = () => {
             <span className="text-code">Run</span>.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 ">
           {sql.map((x) => (
             <SQLCard
               key={x.title}
