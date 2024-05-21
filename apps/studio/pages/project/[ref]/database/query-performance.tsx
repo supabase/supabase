@@ -33,7 +33,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
 
   const orderBy = sort !== undefined ? ({ column: sort, order } as QueryPerformanceSort) : undefined
-  const searchQuery = (search as string) || ''
+  const searchQuery = search ?? ''
   const roles = router?.query?.roles ?? []
   const preset =
     urlPreset !== undefined
