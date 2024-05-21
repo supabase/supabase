@@ -101,6 +101,6 @@ const nextConfig = {
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer, withContentlayer]
+  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
