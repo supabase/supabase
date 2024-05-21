@@ -2,9 +2,14 @@ import { useParams } from 'common'
 import { useCreateCollection } from 'data/analytics'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Input, Modal } from 'ui'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { FormMessage } from '@ui/components/shadcn/ui/form'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -15,6 +20,39 @@ export const CreateWarehouseCollectionModal = () => {
     onSuccess: (data) => {
       router.push(`/project/${ref}/logs/collections/${data?.token}`)
     },
+  })
+
+  const FormSchema = z.object({
+    name: z.string().min(1),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+  })
+
+  useEffect(() => {
+    if (!isOpen) {
+      form.reset()
+    }
+  }, [isOpen, form])
+
+  const onSubmit = form.handleSubmit(async (vals) => {
+    try {
+      if (!ref) {
+        toast.error('Project ref not found')
+        return
+      }
+      await createCollection({
+        projectRef: ref,
+        name: vals.name,
+      })
+      toast.success(`Collection ${vals.name} created`)
+    } catch (error) {
+      console.error(error)
+      toast.error(`Failed to create collection. Check the console for more details.`)
+    } finally {
+      setIsOpen(false)
+    }
   })
 
   return (
@@ -34,57 +72,40 @@ export const CreateWarehouseCollectionModal = () => {
         visible={isOpen}
         hideFooter
       >
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault()
-            try {
-              const formData = new FormData(e.target as HTMLFormElement)
-              const values = {
-                name: formData.get('name') as string,
-              }
-              if (!ref) {
-                toast.error('Project ref not found')
-                return
-              }
-              await createCollection({
-                projectRef: ref,
-                name: values.name,
-              })
-              toast.success(`Collection ${values.name} created`)
-            } catch (error) {
-              console.error(error)
-              toast.error(`Failed to create collection. Check the console for more details.`)
-            } finally {
-              setIsOpen(false)
-            }
-          }}
-        >
-          <Modal.Content className="py-4">
-            <p className="pb-5 text-foreground-light text-sm">
-              An event collection stores generic timeseries events and metadata in Supabase-managed
-              analytics infrastructure. Events can be then be queried using SQL, without impacting
-              transactional workloads.
-            </p>
+        <Form_Shadcn_ {...form}>
+          <form onSubmit={onSubmit}>
+            <Modal.Content className="py-4">
+              <p className="pb-5 text-foreground-light text-sm">
+                An event collection stores generic timeseries events and metadata in
+                Supabase-managed analytics infrastructure. Events can be then be queried using SQL,
+                without impacting transactional workloads.
+              </p>
 
-            <Input
-              required
-              layout="horizontal"
-              label="Collection name"
-              id="name"
-              name="name"
-              autoComplete="off"
-            />
-          </Modal.Content>
+              <FormField_Shadcn_
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout label="Collection name" layout="horizontal">
+                    <FormControl_Shadcn_>
+                      <Input {...field} placeholder="Events" />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
 
-          <Modal.Content className="py-4 border-t flex items-center justify-end gap-2">
-            <Button size="tiny" type="default" onClick={() => setIsOpen(!isOpen)}>
-              Cancel
-            </Button>
-            <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
-              Create table
-            </Button>
-          </Modal.Content>
-        </form>
+              <FormMessage />
+            </Modal.Content>
+
+            <Modal.Content className="py-4 border-t flex items-center justify-end gap-2">
+              <Button size="tiny" type="default" onClick={() => setIsOpen(!isOpen)}>
+                Cancel
+              </Button>
+              <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
+                Create table
+              </Button>
+            </Modal.Content>
+          </form>
+        </Form_Shadcn_>
       </Modal>
     </>
   )
