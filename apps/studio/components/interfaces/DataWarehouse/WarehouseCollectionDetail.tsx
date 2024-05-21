@@ -51,8 +51,8 @@ export const WarehouseCollectionDetail = () => {
   const {
     isLoading: queryLoading,
     data: queryData,
-    isError,
     refetch,
+    isError,
     isRefetching,
   } = useWarehouseQueryQuery(
     { ref: projectRef, sql: params.sql },
@@ -60,12 +60,6 @@ export const WarehouseCollectionDetail = () => {
       enabled: !!params.sql,
     }
   )
-
-  useEffect(() => {
-    if (isError) {
-      toast.error('Error loading collection data')
-    }
-  }, [isError])
 
   const formatResults = (results: any) => {
     if (!results || !results.length) {
