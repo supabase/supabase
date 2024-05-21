@@ -17,7 +17,14 @@ const deleteS3AccessKeyCredential = async ({ projectRef, id }: S3AccessKeyDelete
     params: { path: { ref: projectRef, id } },
   })
 
-  if (error) handleError(error)
+  if (error) {
+    // [Joshen] This is only temporary and should be removed once the issue on API (storage) is resolved
+    // Currently the API throws a 500 despite the secret getting removed correctly
+    if ((error as ResponseError).message !== 'Failed to delete project storage credential') {
+      handleError(error)
+    }
+  }
+
   return data
 }
 
