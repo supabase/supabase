@@ -59,37 +59,31 @@ export const CreateWarehouseCollectionModal = () => {
             }
           }}
         >
-          <div className="py-4">
-            <Modal.Content>
-              <p className="pb-5 text-foreground-light text-sm">
-                An event collection stores generic timeseries events and metadata in
-                Supabase-managed analytics infrastructure. Events can be then be queried using SQL,
-                without impacting transactional workloads.
-              </p>
-              <div className="space-y-6">
-                <Input
-                  required
-                  layout="horizontal"
-                  label="Collection name"
-                  id="name"
-                  name="name"
-                  autoComplete="off"
-                />
-              </div>
-            </Modal.Content>
-          </div>
-          <div className="py-3 border-t bg-surface-100">
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button size="tiny" type="default" onClick={() => setIsOpen(!isOpen)}>
-                  Cancel
-                </Button>
-                <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
-                  Create table
-                </Button>
-              </div>
-            </Modal.Content>
-          </div>
+          <Modal.Content className="py-4">
+            <p className="pb-5 text-foreground-light text-sm">
+              An event collection stores generic timeseries events and metadata in Supabase-managed
+              analytics infrastructure. Events can be then be queried using SQL, without impacting
+              transactional workloads.
+            </p>
+
+            <Input
+              required
+              layout="horizontal"
+              label="Collection name"
+              id="name"
+              name="name"
+              autoComplete="off"
+            />
+          </Modal.Content>
+
+          <Modal.Content className="py-4 border-t flex items-center justify-end gap-2">
+            <Button size="tiny" type="default" onClick={() => setIsOpen(!isOpen)}>
+              Cancel
+            </Button>
+            <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
+              Create table
+            </Button>
+          </Modal.Content>
         </form>
       </Modal>
     </>
