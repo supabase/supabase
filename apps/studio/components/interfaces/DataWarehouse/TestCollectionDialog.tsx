@@ -74,7 +74,7 @@ export function TestCollectionDialog({
         <DialogHeader>
           <DialogTitle>Send events to this collection</DialogTitle>
           <DialogDescription>
-            Use the following curl command to send events to this collection
+            Use the following cURL command to send events to this collection
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
