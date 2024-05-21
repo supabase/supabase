@@ -5,7 +5,7 @@ import { useUpdateCollection } from 'data/analytics/warehouse-collections-update
 import { EditIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
@@ -34,9 +34,9 @@ export const WarehouseMenuItem = ({ item }: Props) => {
   const { ref, collectionToken } = useParams()
   const projectRef = ref || 'default'
 
-  const [showUpdateDialog, setShowUpdateDialog] = React.useState(false)
-  const [showDeleteDialog, setDeleteDialog] = React.useState(false)
-  const [confirmDelete, setConfirmDelete] = React.useState(false)
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const [showDeleteDialog, setDeleteDialog] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const updateCollection = useUpdateCollection()
   const deleteCollection = useDeleteCollectionMutation({
