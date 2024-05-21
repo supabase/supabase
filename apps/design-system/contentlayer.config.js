@@ -1,6 +1,6 @@
 import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
-import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer/source-files'
+import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer2/source-files'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
@@ -11,7 +11,7 @@ import { visit } from 'unist-util-visit'
 import { rehypeComponent } from './lib/rehype-component'
 import { rehypeNpmCommand } from './lib/rehype-npm-command'
 
-/** @type {import('contentlayer/source-files').ComputedFields} */
+/** @type {import('contentlayer2/source-files').ComputedFields} */
 const computedFields = {
   slug: {
     type: 'string',

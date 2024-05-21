@@ -5,23 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm content:build && pnpm build:registry && next build",
+    "build": "npm run content:build && npm run build:registry && next build",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
     "lint": "next lint",
-    "content:build": "contentlayer build",
-    "typecheck": "contentlayer build && tsc --noEmit -p tsconfig.json"
+    "content:build": "contentlayer2 build",
+    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.0.5",
-    "contentlayer": "0.3.4",
+    "contentlayer2": "0.4.5",
     "fs": "^0.0.1-security",
     "jotai": "^2.8.0",
     "lodash.template": "4.5.0",
     "lucide-react": "^0.338.0",
     "markdown-wasm": "^1.2.0",
     "next": "^14.2.3",
-    "next-contentlayer": "^0.3.4",
+    "next-contentlayer2": "0.4.5",
     "react": "^18.2.0",
     "react-docgen": "^7.0.3",
     "react-dom": "^18.2.0",
@@ -32,7 +32,7 @@
     "rehype-slug": "^6.0.0",
     "remark": "^14.0.3",
     "remark-code-import": "^1.2.0",
-    "remark-gfm": "^3.0.1",
+    "remark-gfm": "^4.0.0",
     "ts-morph": "^22.0.0",
     "ui": "*",
     "unist-util-visit": "^5.0.0"
