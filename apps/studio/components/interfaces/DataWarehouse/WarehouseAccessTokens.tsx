@@ -94,20 +94,24 @@ const WarehouseAccessTokens = () => {
   const [tokenToDelete, setTokenToDelete] = useState<string | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  const deleteWarehouseAccessToken = useDeleteWarehouseAccessToken({
-    onSuccess: () => {
-      toast.success('Access token revoked')
-    },
-    onError: () => {
-      toast.error('Failed to revoke access token')
-    },
-  })
+  const { mutate: deleteWarehouseAccessToken, isLoading: deleteLoading } =
+    useDeleteWarehouseAccessToken({
+      onSuccess: () => {
+        toast.success('Access token revoked')
+      },
+      onError: () => {
+        toast.error('Failed to revoke access token')
+      },
+    })
 
-  const createWarehouseAccessToken = useCreateWarehouseAccessToken({
-    onSuccess: () => {
-      toast.success('Access token created')
-    },
-  })
+  const { mutate: createWarehouseAccessToken, isLoading: createLoading } =
+    useCreateWarehouseAccessToken({
+      onSuccess: () => {
+        toast.success('Access token created')
+      },
+    })
+
+  const isLoading = deleteLoading || createLoading
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
@@ -117,12 +121,12 @@ const WarehouseAccessTokens = () => {
           description="Manage your warehouse access tokens for this project."
           actions={
             <CreateWarehouseAccessToken
-              onSubmit={async ({ description }) => {
-                await createWarehouseAccessToken.mutateAsync({
+              onSubmit={async ({ description }) =>
+                createWarehouseAccessToken({
                   ref: projectRef,
                   description: description,
                 })
-              }}
+              }
             />
           }
         />
@@ -206,10 +210,10 @@ const WarehouseAccessTokens = () => {
               </Button>
               <Button
                 type="danger"
-                loading={deleteWarehouseAccessToken.isLoading}
+                loading={isLoading}
                 onClick={async () => {
                   if (!tokenToDelete) return
-                  await deleteWarehouseAccessToken.mutateAsync({
+                  deleteWarehouseAccessToken({
                     projectRef,
                     token: tokenToDelete,
                   })
