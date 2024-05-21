@@ -1,6 +1,4 @@
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,

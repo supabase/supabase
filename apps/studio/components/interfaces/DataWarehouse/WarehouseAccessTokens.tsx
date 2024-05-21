@@ -1,10 +1,7 @@
-import React from 'react'
 import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
 import { FormHeader } from 'components/ui/Forms'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -19,8 +16,7 @@ import {
   Input,
   cn,
 } from 'ui'
-import { AlertCircle, Link, MoreVertical, TrashIcon } from 'lucide-react'
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -28,9 +24,9 @@ import Table from 'components/to-be-cleaned/Table'
 import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
 import toast from 'react-hot-toast'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import { set } from 'lodash'
 import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
 import CopyButton from 'components/ui/CopyButton'
+import { useState } from 'react'
 
 const AccessTokenItem = ({
   token,
@@ -93,8 +89,8 @@ const WarehouseAccessTokens = () => {
 
   const accessTokensQuery = useWarehouseAccessTokensQuery({ projectRef })
   const hasAccessTokens = accessTokensQuery.isSuccess && accessTokensQuery.data.data.length > 0
-  const [tokenToDelete, setTokenToDelete] = React.useState<string | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
+  const [tokenToDelete, setTokenToDelete] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const deleteWarehouseAccessToken = useDeleteWarehouseAccessToken({
     onSuccess: () => {
