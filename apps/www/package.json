@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next --port 3000",
-    "build": "contentlayer build && next build",
+    "build": "contentlayer2 build && next build",
     "export": "next export",
     "start": "next start",
     "typecheck": "tsc --noEmit",
