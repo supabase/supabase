@@ -68,7 +68,6 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
 
   return isSuccess && organizations && organizations?.length > 0 ? (
     <>
-      <Button onClick={() => setError(true)}>Throw error</Button>
       {organizations?.map((organization) => {
         return (
           <OrganizationProjects
