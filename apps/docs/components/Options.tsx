@@ -60,20 +60,20 @@ const Option: FC<IOption> = (props) => {
           {props.name ?? 'no-name'}
         </span>
         {!props.isEnum && (
-          <span>
-            {props.isOptional ? (
-              <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
-                Optional
-              </div>
-            ) : (
-              <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                REQUIRED
-              </div>
-            )}
-          </span>
-        )}
-        {!props.isEnum && (
-          <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>
+          <>
+            <span>
+              {props.isOptional ? (
+                <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
+                  Optional
+                </div>
+              ) : (
+                <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
+                  REQUIRED
+                </div>
+              )}
+            </span>
+            <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>
+          </>
         )}
       </div>
 
