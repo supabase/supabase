@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -21,9 +17,7 @@
     "downlevelIteration": true,
     "incremental": true,
     "paths": {
-      "@ui/*": [
-        "./../../packages/ui/src/*"
-      ] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "useDefineForClassFields": true,
     "plugins": [
@@ -41,7 +35,5 @@
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

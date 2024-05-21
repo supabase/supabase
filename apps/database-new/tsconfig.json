@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,13 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ],
+      "@/*": ["./*"],
       // handle ui package paths
-      "@ui/*": [
-        "./../../packages/ui/src/*"
-      ]
+      "@ui/*": ["./../../packages/ui/src/*"]
     }
   },
   "include": [
@@ -39,7 +31,5 @@
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

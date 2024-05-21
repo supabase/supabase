@@ -2,15 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./*"
-      ],
-      "@ui/*": [
-        "./../../packages/ui/src/*"
-      ],
-      "@ui-patterns/*": [
-        "./../../packages/ui-patterns/*"
-      ]
+      "~/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"],
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "downlevelIteration": true,
     "target": "ES2021",
@@ -20,11 +14,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "noEmit": true,
     "moduleResolution": "node",
@@ -37,10 +27,7 @@
       }
     ]
   },
-  "exclude": [
-    "node_modules",
-    "supabase"
-  ],
+  "exclude": ["node_modules", "supabase"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
