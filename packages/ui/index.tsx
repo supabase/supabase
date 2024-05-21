@@ -243,6 +243,8 @@ export * from './src/components/shadcn/ui/resizable'
 
 export * from './src/components/TextLink'
 
+export * from './src/components/banners/Announcement'
+
 // config
 
 // export { default as Config } from './../ui.config'

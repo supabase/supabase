@@ -3,6 +3,6 @@
   "compilerOptions": {
     "resolveJsonModule": true
   },
-  "include": ["."],
+  "include": [".", "../ui/src/components/banners"],
   "exclude": ["dist", "build", "node_modules"]
 }

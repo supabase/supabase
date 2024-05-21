@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import CountdownComponent from 'ui-patterns/banners/LW11CountdownBanner/Countdown'
-import announcement from 'ui-patterns/banners/data/Announcement.json'
+import CountdownComponent from 'ui/src/components/banners/LW11CountdownBanner/Countdown'
+import announcement from 'ui/src/components/banners/data/Announcement.json'
 import { useTheme } from 'next-themes'
 
 const LW11BGDark =
