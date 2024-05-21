@@ -1,7 +1,6 @@
 import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
-import { useDeleteCollectionMutation } from 'data/analytics/warehouse-collections-delete-mutation'
-import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
+import { useDeleteCollectionMutation, useUpdateCollection } from 'data/analytics'
 import { EditIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

@@ -18,13 +18,15 @@ import {
 } from 'ui'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useParams } from 'common'
-import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import {
+  useWarehouseAccessTokensQuery,
+  useCreateWarehouseAccessToken,
+  useDeleteWarehouseAccessToken,
+} from 'data/analytics'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import Table from 'components/to-be-cleaned/Table'
-import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
 import toast from 'react-hot-toast'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
 import CopyButton from 'components/ui/CopyButton'
 import { useState } from 'react'
 

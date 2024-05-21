@@ -4,10 +4,12 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { LogTable } from '../Settings/Logs'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import {
+  useWarehouseQueryQuery,
+  useWarehouseCollectionsQuery,
+  useWarehouseAccessTokensQuery,
+} from 'data/analytics'
 import Link from 'next/link'
-import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { RefreshCcw, Rewind } from 'lucide-react'
 import toast from 'react-hot-toast'

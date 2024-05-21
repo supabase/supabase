@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
+import { useCreateCollection } from 'data/analytics'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
