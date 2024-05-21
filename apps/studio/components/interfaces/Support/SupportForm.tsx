@@ -45,9 +45,10 @@ const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
 export interface SupportFormProps {
   setSentCategory: (value: string) => void
+  setSelectedProject: (value: string) => void
 }
 
-const SupportForm = ({ setSentCategory }: SupportFormProps) => {
+const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) => {
   const { isReady } = useRouter()
   const { ref, slug, subject, category, message } = useParams()
 
@@ -79,6 +80,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     onSuccess: (res, variables) => {
       toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
+      setSelectedProject(variables.projectRef ?? 'no-project')
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
