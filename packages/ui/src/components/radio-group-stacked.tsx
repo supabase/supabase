@@ -40,8 +40,8 @@ const RadioGroupStackedItem = React.forwardRef<
       className={cn(
         'flex flex-col gap-2',
         'w-full',
-        'bg-overlay',
-        'border border-overlay',
+        'bg-overlay/50',
+        'border',
         'first-of-type:rounded-t-md last-of-type:rounded-b-md',
         'shadow-sm',
         'hover:bg-surface-300',
@@ -61,7 +61,7 @@ const RadioGroupStackedItem = React.forwardRef<
           <div
             className="
                 aspect-square h-4 w-4 
-                rounded-full border border-overlay group-data-[state=checked]:border-foreground-muted
+                rounded-full border group-data-[state=checked]:border-foreground-muted
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
                 ring-offset-background 

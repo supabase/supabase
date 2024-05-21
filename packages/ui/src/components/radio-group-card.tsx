@@ -31,14 +31,18 @@ const RadioGroupCardItem = React.forwardRef<
       className={cn(
         'flex flex-col gap-2',
         'w-48',
-        'bg-surface-200',
-        'rounded-md border border-strong',
+        'bg-overlay/50',
+        'rounded-md',
+        'border',
         'p-2',
         'shadow-sm',
-        'hover:border-stronger hover:bg-surface-300',
-        'data-[state=checked]:border-primary',
+        'hover:bg-surface-300',
+        'hover:border-foreground-muted',
+        'hover:z-[1] focus-visible:z-[1]',
+        'data-[state=checked]:z-[1]',
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-selection data-[state=checked]:border-foreground',
+        'data-[state=checked]:bg-surface-300',
+        'data-[state=checked]:border-foreground-muted',
         'transition-colors',
         'group',
         props.className
@@ -47,35 +51,10 @@ const RadioGroupCardItem = React.forwardRef<
       {props.children}
       <div className="flex gap-2 w-full">
         {showIndicator && (
-          // <div className="relative w-3 h-3 min-w-3 mt-0.5">
-          //   <RadioGroupPrimitive.Indicator
-          //     className={cn(
-          //       'absolute',
-          //       'w-[10px] h-[10px]',
-          //       'left-[1px] top-[1px]',
-          //       'border border-background-surface-300',
-          //       'rounded-full',
-          //       'data-[state=checked]:border-background-surface-300',
-          //       'data-[state=checked]:ring-foreground',
-          //       'data-[state=checked]:bg-foreground'
-          //     )}
-          //   />
-          //   <div
-          //     className={cn(
-          //       'absolute',
-          //       'w-3 h-3',
-          //       'border border-stronger',
-          //       'rounded-full',
-          //       'group-hover:border-foreground-light',
-          //       'group-data-[state=checked]:border-foreground',
-          //       'transition-colors'
-          //     )}
-          //   ></div>
-          // </div>
           <div
             className="
                 aspect-square h-4 w-4 
-                rounded-full border border-overlay group-data-[state=checked]:border-foreground-muted
+                rounded-full border group-data-[state=checked]:border-foreground-muted
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
                 ring-offset-background 
