@@ -22,6 +22,8 @@ export async function getWarehouseCollections(
   return response.data
 }
 
+export type WarehouseCollectionsData = Awaited<ReturnType<typeof getWarehouseCollections>>
+
 export const useWarehouseCollectionsQuery = (
   { projectRef }: WarehouseCollectionsVariables,
   { enabled }: { enabled: boolean }

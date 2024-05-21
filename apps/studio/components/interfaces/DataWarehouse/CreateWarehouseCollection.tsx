@@ -16,9 +16,13 @@ export const CreateWarehouseCollectionModal = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { mutateAsync: createCollection, isLoading } = useCreateCollection({
+  const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
+      setIsOpen(false)
       router.push(`/project/${ref}/logs/collections/${data?.token}`)
+    },
+    onError: (error) => {
+      toast.error(error.message)
     },
   })
 
@@ -37,22 +41,14 @@ export const CreateWarehouseCollectionModal = () => {
   }, [isOpen, form])
 
   const onSubmit = form.handleSubmit(async (vals) => {
-    try {
-      if (!ref) {
-        toast.error('Project ref not found')
-        return
-      }
-      await createCollection({
-        projectRef: ref,
-        name: vals.name,
-      })
-      toast.success(`Collection ${vals.name} created`)
-    } catch (error) {
-      console.error(error)
-      toast.error(`Failed to create collection. Check the console for more details.`)
-    } finally {
-      setIsOpen(false)
+    if (!ref) {
+      toast.error('Project ref not found')
+      return
     }
+    createCollection({
+      projectRef: ref,
+      name: vals.name,
+    })
   })
 
   return (

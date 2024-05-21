@@ -1,4 +1,5 @@
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
+import { WarehouseAccessTokensData, WarehouseCollectionsData } from 'data/analytics'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -23,16 +24,8 @@ export function TestCollectionDialog({
   collectionToken,
   collections,
 }: {
-  accessTokens: {
-    id: string
-    token: string
-    description?: string
-  }[]
-  collections: {
-    id: number
-    token: string
-    name: string
-  }[]
+  accessTokens: WarehouseAccessTokensData['data']
+  collections: WarehouseCollectionsData
   collectionToken: string
   projectRef: string
 }) {
@@ -51,7 +44,7 @@ export function TestCollectionDialog({
   }, [accessTokens])
 
   const selectedAccessToken = accessTokens.find((token) => token.token === testAccessToken)
-  const selectedCollectionName = collections.find((col) => col.token === selectedCollection)?.name
+  const selectedCollectionName = collections?.find((col) => col.token === selectedCollection)?.name
 
   return (
     <Dialog>
@@ -86,7 +79,7 @@ export function TestCollectionDialog({
                   <span className="text-ellipsis">{selectedCollectionName || 'Collection'}</span>
                 </SelectTrigger>
                 <SelectContent>
-                  {collections.map((col) => (
+                  {collections?.map((col) => (
                     <SelectItem key={col.id + '-collection'} value={col.token}>
                       {col.name || 'No name'}
                     </SelectItem>
