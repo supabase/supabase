@@ -85,7 +85,7 @@ export function TestCollectionDialog({
                 <SelectContent className="max-h-[260px]">
                   {collections?.map((col) => (
                     <SelectItem key={col.id} value={col.token}>
-                      {col.name || 'No name'}
+                      {col.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
