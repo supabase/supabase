@@ -62,7 +62,7 @@ The table contains 4 columns:
 - `id` is an auto-generated unique ID for the record. We'll use this later to match records when performing RRF.
 - `content` contains the actual text we will be searching over.
 - `fts` is an auto-generated `tsvector` column that is generated using the text in `content`. We will use this for [full text search](/docs/guides/database/full-text-search) (search by keyword).
-- `embedding` is a [vector column](/docs/guides/ai/vector-columns) that stores the vector generated from our embedding model. We will use this for [semantic search](/docs/guides/ai/semantic-search) (search by meaning). We chose 512 dimensions for this example, but adjust this to match the size of the embedding vectors generated from your preferred model.
+- `doc_vector` is a [vector column](/docs/guides/ai/vector-columns) that stores the vector generated from our embedding model. We will use this for [semantic search](/docs/guides/ai/semantic-search) (search by meaning). We chose 512 dimensions for this example, but adjust this to match the size of the embedding vectors generated from your preferred model.
 
 Next we'll create indexes on the `fts` and `embedding` columns so that their individual queries will remain fast at scale:
 
