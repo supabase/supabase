@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { components } from 'api-types'
 
@@ -20,7 +20,7 @@ export async function restartProject({ ref, identifier }: ProjectRestartVariable
     params: { path: { ref } },
     body: payload,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
