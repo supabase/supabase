@@ -27,7 +27,12 @@ const config = {
   testEnvironment: 'jsdom',
   testTimeout: 10000,
   testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',
-  setupFiles: ['jest-canvas-mock', './tests/setup/radix', './tests/setup/polyfills'],
+  setupFiles: [
+    'jest-canvas-mock',
+    './tests/setup/radix',
+    './tests/setup/polyfills',
+    './tests/setup/fetch-mock',
+  ],
 }
 
 export default createJestConfig(config)

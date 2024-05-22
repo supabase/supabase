@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import { type GetStaticPaths, type GetStaticProps, type InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 
@@ -23,7 +24,7 @@ export default function ApiGuide({
 
   return (
     <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId={MenuId.Api}>
-      <MDXRemote {...mdxSource} components={components} />
+      <MDXRemote {...mdxSource} components={components} scope={{ stripIndent }} />
     </Layout>
   )
 }
