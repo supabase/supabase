@@ -1,11 +1,6 @@
-import { CLIENT_LIBRARIES } from 'common/constants'
-import { HelpCircle } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-
+import * as Sentry from '@sentry/nextjs'
 import { useParams } from 'common'
+import { CLIENT_LIBRARIES } from 'common/constants'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -18,6 +13,12 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { canSendTelemetry } from 'lib/telemetry'
+import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,12 +26,6 @@ import {
   Button,
   Checkbox,
   Form,
-  IconAlertCircle,
-  IconExternalLink,
-  IconLoader,
-  IconMail,
-  IconPlus,
-  IconX,
   Input,
   Listbox,
   Separator,
@@ -84,6 +79,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
+      if (canSendTelemetry()) {
+        Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
+      }
       setIsSubmitting(false)
     },
   })
@@ -340,7 +338,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                     <div className="space-y-2">
                       <p className="text-sm prose">Which organization is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve organizations</p>
                       </div>
                     </div>
@@ -377,7 +375,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
               <div className="space-y-2">
                 <p className="text-sm prose">Which project is affected?</p>
                 <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                  <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                  <HelpCircle strokeWidth={2} className="text-foreground-light" />
                   <p className="text-sm prose">Failed to retrieve projects</p>
                 </div>
               </div>
@@ -415,7 +413,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                   </p>
                 ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                   <div className="flex items-center space-x-2 mt-2">
-                    <IconLoader size={14} className="animate-spin" />
+                    <Loader2 size={14} className="animate-spin" />
                     <p className="text-sm text-foreground-light">Checking project's plan</p>
                   </div>
                 ) : (
@@ -427,7 +425,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
             {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
-                  icon={<IconAlertCircle strokeWidth={2} />}
+                  icon={<AlertCircle size={18} strokeWidth={2} />}
                   defaultVisibility={true}
                   hideCollapse={true}
                   title={
@@ -475,7 +473,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               Upgrade project
                             </Link>
                           </Button>
-                          <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                          <Button asChild type="default" icon={<ExternalLink size={14} />}>
                             <Link
                               href="https://supabase.com/contact/enterprise"
                               target="_blank"
@@ -569,7 +567,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                 className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
                                 Github discussions
-                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                <ExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -637,7 +635,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                    icon={<ExternalLink size={14} strokeWidth={1.5} />}
                                   >
                                     <Link href={library.url} target="_blank" rel="noreferrer">
                                       View Github issues
@@ -663,7 +661,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               <Button
                                 asChild
                                 type="default"
-                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                icon={<ExternalLink size={14} strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/supabase/supabase"
@@ -720,7 +718,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               <Button
                                 asChild
                                 type="default"
-                                icon={<IconExternalLink strokeWidth={1.5} />}
+                                icon={<ExternalLink strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/orgs/supabase/discussions/17817"
@@ -779,7 +777,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               ].join(' ')}
                               onClick={() => removeUploadedFile(idx)}
                             >
-                              <IconX size={12} strokeWidth={2} />
+                              <X size={12} strokeWidth={2} />
                             </div>
                           </div>
                         ))}
@@ -793,7 +791,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                               if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
                             }}
                           >
-                            <IconPlus strokeWidth={2} size={20} />
+                            <Plus strokeWidth={2} size={20} />
                           </div>
                         )}
                       </div>
@@ -812,7 +810,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                         <Button
                           htmlType="submit"
                           size="small"
-                          icon={<IconMail />}
+                          icon={<Mail />}
                           disabled={isSubmitting}
                           loading={isSubmitting}
                         >

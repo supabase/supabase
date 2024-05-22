@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240408-6bf3b81
+    image: supabase/studio:20240422-5cf8f30
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.145.0
+    image: supabase/gotrue:v2.151.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -182,9 +182,14 @@ services:
       test:
         [
           "CMD",
-          "bash",
-          "-c",
-          "printf \\0 > /dev/tcp/localhost/4000"
+          "curl",
+          "-sSfL",
+          "--head",
+          "-o",
+          "/dev/null",
+          "-H",
+          "Authorization: Bearer ${ANON_KEY}",
+          "http://localhost:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
       interval: 5s
@@ -289,7 +294,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.43.2
+    image: supabase/edge-runtime:v1.45.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -354,7 +359,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.147
+    image: supabase/postgres:15.1.1.41
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

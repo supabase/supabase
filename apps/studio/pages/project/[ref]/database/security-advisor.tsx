@@ -78,7 +78,7 @@ const ProjectLints: NextPageWithLayout = () => {
       })
     }
 
-    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH <= 6) {
+    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH < 6) {
       clientLints.push({
         name: 'auth_otp_short_length',
         level: 'WARN',
@@ -146,7 +146,12 @@ const ProjectLints: NextPageWithLayout = () => {
         setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
-      <LinterPageFooter isLoading={isLoading} isRefetching={isRefetching} refetch={refetch} />
+      <LinterPageFooter
+        hideDbInspectCTA
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        refetch={refetch}
+      />
     </div>
   )
 }

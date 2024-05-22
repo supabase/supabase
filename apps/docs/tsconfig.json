@@ -5,7 +5,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"],
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],

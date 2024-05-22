@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { notificationKeys } from './keys'
 
@@ -12,7 +12,8 @@ export type NotificationsUpdateVariables = {
 export async function updateNotifications({ ids }: NotificationsUpdateVariables) {
   // @ts-ignore
   const { data, error } = await patch('/platform/notifications', { body: { ids } })
-  if (error) throw error
+
+  if (error) handleError(error)
   return data
 }
 
