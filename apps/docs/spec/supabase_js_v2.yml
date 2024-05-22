@@ -5106,20 +5106,19 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          supabase
-            .channel('room1')
-            .on('broadcast', { event: 'cursor-pos' }, payload => {
-              console.log('Cursor position received!', payload)
-            })
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                channel.send({
-                  type: 'broadcast',
-                  event: 'cursor-pos',
-                  payload: { x: Math.random(), y: Math.random() },
-                })
-              }
-            })
+          const channel = supabase.channel("room1")
+
+          channel.on("broadcast", { event: "cursor-pos" }, (payload) => {
+            console.log("Cursor position received!", payload);
+          }).subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              channel.send({
+                type: "broadcast",
+                event: "cursor-pos",
+                payload: { x: Math.random(), y: Math.random() },
+              });
+            }
+          });
           ```
       - id: listen-to-presence-sync
         name: Listen to presence sync
@@ -5289,6 +5288,10 @@ functions:
               }
             })
           ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
       - id: send-a-message-via-rest
         name: Send a message via REST
         isSpotlight: true
@@ -5361,6 +5364,26 @@ functions:
             .storage
             .listBuckets()
           ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "avatars",
+                "name": "avatars",
+                "owner": "",
+                "public": false,
+                "file_size_limit": 1024,
+                "allowed_mime_types": [
+                  "image/png"
+                ],
+                "created_at": "2024-05-22T22:26:05.100Z",
+                "updated_at": "2024-05-22T22:26:05.100Z"
+              }
+            ],
+            "error": null
+          }
+          ```
 
   - id: get-bucket
     title: getBucket()
@@ -5379,6 +5402,24 @@ functions:
           const { data, error } = await supabase
             .storage
             .getBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": "avatars",
+              "name": "avatars",
+              "owner": "",
+              "public": false,
+              "file_size_limit": 1024,
+              "allowed_mime_types": [
+                "image/png"
+              ],
+              "created_at": "2024-05-22T22:26:05.100Z",
+              "updated_at": "2024-05-22T22:26:05.100Z"
+            },
+            "error": null
+          }
           ```
 
   - id: create-bucket
@@ -5403,6 +5444,15 @@ functions:
               fileSizeLimit: 1024
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "avatars"
+            },
+            "error": null
+          }
+          ```
 
   - id: empty-bucket
     title: emptyBucket()
@@ -5421,6 +5471,15 @@ functions:
           const { data, error } = await supabase
             .storage
             .emptyBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully emptied"
+            },
+            "error": null
+          }
           ```
   - id: update-bucket
     title: updateBucket()
@@ -5444,6 +5503,15 @@ functions:
               fileSizeLimit: 1024
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully updated"
+            },
+            "error": null
+          }
+          ```
 
   - id: delete-bucket
     title: deleteBucket()
@@ -5462,6 +5530,15 @@ functions:
           const { data, error } = await supabase
             .storage
             .deleteBucket('avatars')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully deleted"
+            },
+            "error": null
+          }
           ```
 
   - id: from-upload
@@ -5488,6 +5565,14 @@ functions:
               upsert: false
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "avatars/public/avatar1.png"
+            },
+            "error": null
+          }
       - id: upload-file-using-arraybuffer-from-base64-file-data
         name: Upload file using `ArrayBuffer` from base64 file data
         code: |
@@ -5526,6 +5611,15 @@ functions:
               upsert: true
             })
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "avatars/public/avatar1.png"
+            },
+            "error": null
+          }
+          ```
       - id: update-file-using-arraybuffer-from-base64-file-data
         name: Update file using `ArrayBuffer` from base64 file data
         code: |
@@ -5559,6 +5653,15 @@ functions:
             .from('avatars')
             .move('public/avatar1.png', 'private/avatar2.png')
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "message": "Successfully moved"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-copy
     title: from.copy()
@@ -5579,6 +5682,15 @@ functions:
             .from('avatars')
             .copy('public/avatar1.png', 'private/avatar2.png')
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "avatars/private/avatar2.png"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-create-signed-url
     title: from.createSignedUrl()
@@ -5598,6 +5710,15 @@ functions:
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+            },
+            "error": null
+          }
           ```
       - id: create-signed-url-with-transformations
         name: Create a signed URL for an asset with transformations
@@ -5646,6 +5767,26 @@ functions:
             .from('avatars')
             .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
           ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "error": null,
+                "path": "folder/avatar1.png",
+                "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
+                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+              },
+              {
+                "error": null,
+                "path": "folder/avatar2.png",
+                "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
+                "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+              }
+            ],
+            "error": null
+          }
+          ```
 
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
@@ -5665,6 +5806,17 @@ functions:
             .storage
             .from('avatars')
             .createSignedUploadUrl('folder/cat.jpg')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+            },
+            "error": null
+          }
           ```
 
   - id: from-upload-to-signed-url
@@ -5686,6 +5838,16 @@ functions:
             .from('avatars')
             .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
           ```
+        response: |
+          ```json
+          {
+            "data": {
+              "path": "folder/cat.jpg",
+              "fullPath": "avatars/folder/cat.jpg"
+            },
+            "error": null
+          }
+          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -5706,6 +5868,14 @@ functions:
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+            }
+          }
           ```
       - id: transform-asset-in-public-bucket
         name: Returns the URL for an asset in a public bucket with transformations
@@ -5754,6 +5924,13 @@ functions:
             .from('avatars')
             .download('folder/avatar1.png')
           ```
+        response: |
+          ```json
+          {
+            "data": <BLOB>,
+            "error": null
+          }
+          ```
       - id: download-file-with-transformations
         name: Download file with transformations
         isSpotlight: true
@@ -5790,6 +5967,13 @@ functions:
             .from('avatars')
             .remove(['folder/avatar1.png'])
           ```
+        response: |
+          ```json
+          {
+            "data": [],
+            "error": null
+          }
+          ```
 
   - id: from-list
     title: from.list()
@@ -5813,6 +5997,30 @@ functions:
               offset: 0,
               sortBy: { column: 'name', order: 'asc' },
             })
+          ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "avatar1.png",
+                "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+                "updated_at": "2024-05-22T23:06:05.580Z",
+                "created_at": "2024-05-22T23:04:34.443Z",
+                "last_accessed_at": "2024-05-22T23:04:34.443Z",
+                "metadata": {
+                  "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                  "size": 32175,
+                  "mimetype": "image/png",
+                  "cacheControl": "max-age=3600",
+                  "lastModified": "2024-05-22T23:06:05.574Z",
+                  "contentLength": 32175,
+                  "httpStatusCode": 200
+                }
+              }
+            ],
+            "error": null
+          }
           ```
       - id: search-files-in-a-bucket
         name: Search files in a bucket
