@@ -208,7 +208,11 @@ const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentP
   memoizedUpdate(id)(id, projectRef, payload)
 
 if (typeof window !== 'undefined') {
-  devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
+  devtools(sqlEditorState, {
+    name: 'sqlEditorState',
+    // [Joshen] So that jest unit tests can ignore this
+    enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
+  })
 
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorStateSnapshot()

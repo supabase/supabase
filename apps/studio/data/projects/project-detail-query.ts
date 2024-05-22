@@ -1,9 +1,9 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import type { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
@@ -27,7 +27,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as Project
 }
 
