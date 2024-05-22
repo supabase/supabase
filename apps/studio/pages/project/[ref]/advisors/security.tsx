@@ -109,7 +109,6 @@ const ProjectLints: NextPageWithLayout = () => {
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
-  console.log(filteredLints)
 
   const filterOptions = lintInfoMap
     // only show filters for lint types which are present in the results and not ignored
