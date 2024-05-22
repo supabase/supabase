@@ -13,10 +13,6 @@ import {
   Plus,
   X,
 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
 
 import {
   DocsSearchResultType as PageType,
@@ -41,7 +37,6 @@ import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { canSendTelemetry } from 'lib/telemetry'
-import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
