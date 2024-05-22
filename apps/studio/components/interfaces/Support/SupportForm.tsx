@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-
+import * as Sentry from '@sentry/nextjs'
 import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -76,6 +76,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
+      Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
       setIsSubmitting(false)
     },
   })

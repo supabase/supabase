@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@har-sdk/openapi-sampler": "^2.2.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
@@ -88,6 +89,7 @@
     "@types/react": "^18.2.24",
     "@types/unist": "^2.0.6",
     "acorn": "^8.11.3",
+    "api-types": "*",
     "config": "*",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
@@ -97,7 +99,6 @@
     "openapi-types": "^12.1.3",
     "tsconfig": "*",
     "tsx": "^4.6.2",
-    "typescript": "^5.4.3",
-    "api-types": "*"
+    "typescript": "^5.4.3"
   }
 }

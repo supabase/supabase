@@ -1,11 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { IS_PLATFORM } from 'common'
 import type { components } from 'data/api'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { IS_PLATFORM } from 'common'
 
 export type ReadReplicasVariables = {
   projectRef?: string
@@ -21,7 +21,7 @@ export async function getReadReplicas({ projectRef }: ReadReplicasVariables, sig
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
