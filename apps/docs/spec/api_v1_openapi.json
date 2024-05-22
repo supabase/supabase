@@ -1,0 +1,3204 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/branches/{branch_id}": {
+      "get": {
+        "operationId": "v1-get-a-branch-config",
+        "summary": "Get database branch config",
+        "description": "Fetches configurations of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to retrieve database branch"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-a-branch-config",
+        "summary": "Update database branch config",
+        "description": "Updates the configuration of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBranchBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Failed to update database branch"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-delete-a-branch",
+        "summary": "Delete a database branch",
+        "description": "Deletes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to delete database branch"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/branches/{branch_id}/reset": {
+      "post": {
+        "operationId": "v1-reset-a-branch",
+        "summary": "Resets a database branch",
+        "description": "Resets the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to reset database branch"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "v1-v1-get-all-projects",
+        "summary": "List all projects",
+        "description": "Returns a list of all projects you've previously created.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-v1-create-a-project",
+        "summary": "Create a project",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V1CreateProjectBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1ProjectResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/organizations": {
+      "get": {
+        "operationId": "v1-list-all-organizations",
+        "summary": "List all organizations",
+        "description": "Returns a list of organizations that you currently belong to.",
+        "parameters": [],
+        "responses": {
+          "500": {
+            "description": "Unexpected error listing organizations"
+          }
+        },
+        "tags": [
+          "organizations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-create-an-organization",
+        "summary": "Create an organization",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationBodyV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Unexpected error creating an organization"
+          }
+        },
+        "tags": [
+          "organizations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/oauth/authorize": {
+      "get": {
+        "operationId": "v1-authorize-user",
+        "summary": "Authorize user through oauth",
+        "parameters": [],
+        "responses": {
+          "303": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "read"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "v1-exchange-oauth-token",
+        "summary": "Exchange auth code for user's access and refresh token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthTokenBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "write"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/snippets": {
+      "get": {
+        "operationId": "v1-list-all-snippets",
+        "summary": "Lists SQL snippets for the logged in user",
+        "parameters": [],
+        "responses": {
+          "500": {
+            "description": "Failed to list user's SQL snippets"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/snippets/{id}": {
+      "get": {
+        "operationId": "v1-get-a-snippet",
+        "summary": "Gets a specific SQL snippet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to retrieve SQL snippet"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/api-keys": {
+      "get": {
+        "operationId": "v1-get-project-api-keys",
+        "summary": "Get project api keys",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/branches": {
+      "get": {
+        "operationId": "v1-list-all-branches",
+        "summary": "List all database branches",
+        "description": "Returns all database branches of the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to retrieve database branches"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-create-a-branch",
+        "summary": "Create a database branch",
+        "description": "Creates a database branch from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBranchBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Failed to create database branch"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-delete-a-branch",
+        "summary": "Disables preview branching",
+        "description": "Disables preview branching for the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to disable preview branching"
+          }
+        },
+        "tags": [
+          "environments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname": {
+      "get": {
+        "operationId": "v1-get-hostname-config",
+        "summary": "Gets project's custom hostname config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's custom hostname config"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-Delete hostname config",
+        "summary": "Deletes a project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete project custom hostname configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/initialize": {
+      "post": {
+        "operationId": "v1-update-hostname-config",
+        "summary": "Updates project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomHostnameBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project custom hostname configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/reverify": {
+      "post": {
+        "operationId": "v1-verify-dns-config",
+        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to verify project custom hostname configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/custom-hostname/activate": {
+      "post": {
+        "operationId": "v1-activate-custom-hostname",
+        "summary": "Activates a custom hostname for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to activate project custom hostname configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-bans/retrieve": {
+      "post": {
+        "operationId": "v1-list-all-network-bans",
+        "summary": "Gets project's network bans",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's network bans"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-bans": {
+      "delete": {
+        "operationId": "v1-delete-network-bans",
+        "summary": "Remove network bans.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveNetworkBanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to remove network bans."
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions": {
+      "get": {
+        "operationId": "v1-get-network-restrictions",
+        "summary": "Gets project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's network restrictions"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/apply": {
+      "post": {
+        "operationId": "v1-update-network-restrictions",
+        "summary": "Updates project's network restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NetworkRestrictionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project network restrictions"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/pgsodium": {
+      "get": {
+        "operationId": "v1-get-pgsodium-config",
+        "summary": "Gets project's pgsodium config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's pgsodium config"
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "v1-update-pgsodium-config",
+        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePgsodiumConfigBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's pgsodium config"
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/postgrest": {
+      "get": {
+        "operationId": "v1-get-postgrest-service-config",
+        "summary": "Gets project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's postgrest config"
+          }
+        },
+        "tags": [
+          "rest"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-postgrest-service-config",
+        "summary": "Updates project's postgrest config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostgrestConfigBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's postgrest config"
+          }
+        },
+        "tags": [
+          "rest"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}": {
+      "delete": {
+        "operationId": "v1-Delete a project",
+        "summary": "Deletes the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/secrets": {
+      "get": {
+        "operationId": "v1-list-all-secrets",
+        "summary": "List all secrets",
+        "description": "Returns all secrets you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's secrets"
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-bulk-create-secrets",
+        "summary": "Bulk create secrets",
+        "description": "Creates multiple secrets and adds them to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateSecretBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's secrets"
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-bulk-delete-secrets",
+        "summary": "Bulk delete secrets",
+        "description": "Deletes all secrets with the given names from the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete secrets with given names"
+          }
+        },
+        "tags": [
+          "secrets"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/ssl-enforcement": {
+      "get": {
+        "operationId": "v1-get-ssl-enforcement-config",
+        "summary": "Get project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's SSL enforcement config"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "v1-update-ssl-enforcement-config",
+        "summary": "Update project's SSL enforcement configuration.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SslEnforcementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's SSL enforcement configuration."
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/types/typescript": {
+      "get": {
+        "operationId": "v1-generate-typescript-types",
+        "summary": "Generate TypeScript types",
+        "description": "Returns the TypeScript types of your schema for use with supabase-js.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "included_schemas",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to generate TypeScript types"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain": {
+      "get": {
+        "operationId": "v1-get-vanity-subdomain-config",
+        "summary": "Gets current vanity subdomain config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to get project vanity subdomain configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-deactive-vanity-subdomain-config",
+        "summary": "Deletes a project's vanity subdomain configuration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete project vanity subdomain configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/check-availability": {
+      "post": {
+        "operationId": "v1-check-vanity-subdomain-availability",
+        "summary": "Checks vanity subdomain availability",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VanitySubdomainBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to check project vanity subdomain configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/vanity-subdomain/activate": {
+      "post": {
+        "operationId": "v1-activate-vanity-subdomain-config",
+        "summary": "Activates a vanity subdomain for a project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VanitySubdomainBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to activate project vanity subdomain configuration"
+          }
+        },
+        "tags": [
+          "domains"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/upgrade": {
+      "post": {
+        "operationId": "v1-upgrade-postgres-version",
+        "summary": "Upgrades the project's Postgres version",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpgradeDatabaseBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to initiate project upgrade"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/upgrade/eligibility": {
+      "get": {
+        "operationId": "v1-get-postgrest-upgrade-eligibility",
+        "summary": "Returns the project's eligibility for upgrades",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to determine project upgrade eligibility"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/upgrade/status": {
+      "get": {
+        "operationId": "v1-get-postgrest-upgrade-status",
+        "summary": "Gets the latest status of the project's upgrade",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project upgrade status"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/readonly": {
+      "get": {
+        "operationId": "v1-get-readonly-mode-status",
+        "summary": "Returns project's readonly mode status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to get project readonly mode status"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/readonly/temporary-disable": {
+      "post": {
+        "operationId": "v1-disable-readonly-mode-temporarily",
+        "summary": "Disables project's readonly mode for the next 15 minutes",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to disable project's readonly mode"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/read-replicas/setup": {
+      "post": {
+        "operationId": "v1-setup-a-read-replica",
+        "summary": "Set up a read replica",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetUpReadReplicaBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Failed to set up read replica"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/read-replicas/remove": {
+      "post": {
+        "operationId": "v1-remove-a-read-replica",
+        "summary": "Remove a read replica",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveReadReplicaBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Failed to remove read replica"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/health": {
+      "get": {
+        "operationId": "v1-get-services-health",
+        "summary": "Gets project's service health status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "timeout_ms",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/V1ServiceHealthResponse"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project's service health status"
+          }
+        },
+        "tags": [
+          "projects"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/database/postgres": {
+      "get": {
+        "operationId": "get-postgres-config",
+        "summary": "Gets project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to retrieve project's Postgres config"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "update-postgres-config",
+        "summary": "Updates project's Postgres config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostgresConfigBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "500": {
+            "description": "Failed to update project's Postgres config"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "v1-get-project-pgbouncer-config",
+        "summary": "Get project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to retrieve project's pgbouncer config"
+          }
+        },
+        "tags": [
+          "database"
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth": {
+      "get": {
+        "operationId": "v1-get-auth-service-config",
+        "summary": "Gets project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's auth config"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-auth-service-config",
+        "summary": "Updates a project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAuthConfigBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's auth config"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth": {
+      "post": {
+        "operationId": "v1-create-third-party-auth-integration",
+        "summary": "Creates a new third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateThirdPartyAuthBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "v1-list-all-third-party-auth-integration",
+        "summary": "Lists all third-party auth integrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
+      "delete": {
+        "operationId": "v1-delete-third-party-auth-integration",
+        "summary": "Removes a third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "v1-get-a-third-party-integration",
+        "summary": "Get a third-party integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/query": {
+      "post": {
+        "operationId": "v1-run-a-query",
+        "summary": "Run sql query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V1RunQueryBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to run sql query"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/webhooks/enable": {
+      "post": {
+        "operationId": "v1-enable-database-webhook",
+        "summary": "Enables Database Webhooks on the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to enable Database Webhooks on the project"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions": {
+      "post": {
+        "operationId": "createFunction",
+        "summary": "Create a function",
+        "description": "Creates a function and adds it to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V1CreateFunctionBody"
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "$ref": "#/components/schemas/V1CreateFunctionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's function"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "v1-list-all-functions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's functions"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}": {
+      "get": {
+        "operationId": "v1-get-a-function",
+        "summary": "Retrieve a function",
+        "description": "Retrieves a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function with given slug"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-a-function",
+        "summary": "Update a function",
+        "description": "Updates a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V1UpdateFunctionBody"
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "$ref": "#/components/schemas/V1UpdateFunctionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update function with given slug"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-delete-a-function",
+        "summary": "Delete a function",
+        "description": "Deletes a function with the specified slug from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete function with given slug"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "v1-get-a-function-body",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function body with given slug"
+          }
+        },
+        "tags": [
+          "edge-functions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/storage/buckets": {
+      "get": {
+        "operationId": "v1-list-all-buckets",
+        "summary": "Lists all buckets",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to get list of buckets"
+          }
+        },
+        "tags": [
+          "storage"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/sso/providers": {
+      "post": {
+        "operationId": "createProviderForProject",
+        "summary": "Creates a new SSO provider",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProviderBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": "SAML 2.0 support is not enabled for this project"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listAllProviders",
+        "summary": "Lists all SSO providers",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": "SAML 2.0 support is not enabled for this project"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
+      "get": {
+        "operationId": "getProviderById",
+        "summary": "Gets a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateProviderById",
+        "summary": "Updates a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProviderBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "removeProviderById",
+        "summary": "Removes a SSO provider by its UUID",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/backups": {
+      "get": {
+        "operationId": "v1-list-all-backups",
+        "summary": "Lists all backups",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "Failed to get backups"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/backups/restore-pitr": {
+      "post": {
+        "operationId": "v1-restore-pitr-backup",
+        "summary": "Restores a PITR backup for a database",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V1RestorePitrBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/organizations/{slug}/members": {
+      "get": {
+        "operationId": "v1-list-organization-members",
+        "summary": "List members of an organization",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "organizations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/organizations/{slug}": {
+      "get": {
+        "operationId": "v1-get-an-organization",
+        "summary": "Gets information about the organization",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "organizations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Supabase API (v1)",
+    "description": "",
+    "version": "1.0.0",
+    "contact": {
+
+    }
+  },
+  "tags": [
+    {
+      "name": "organizations",
+      "description": "Organization endpoints"
+    },
+    {
+      "name": "projects",
+      "description": "Project endpoints"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "UpdateBranchBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "DesiredInstanceSize": {
+        "type": "string",
+        "enum": [
+          "micro",
+          "small",
+          "medium",
+          "large",
+          "xlarge",
+          "2xlarge",
+          "4xlarge",
+          "8xlarge",
+          "12xlarge",
+          "16xlarge"
+        ]
+      },
+      "V1CreateProjectBody": {
+        "type": "object",
+        "properties": {
+          "db_pass": {
+            "type": "string",
+            "description": "Database password"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of your project, should not contain dots"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Slug of your organization"
+          },
+          "plan": {
+            "type": "string",
+            "description": "Subscription plan is now set on organization level and is ignored in this request",
+            "example": "free",
+            "enum": [
+              "free",
+              "pro"
+            ],
+            "deprecated": true
+          },
+          "region": {
+            "type": "string",
+            "description": "Region you want your server to reside in",
+            "example": "us-east-1",
+            "enum": [
+              "us-east-1",
+              "us-west-1",
+              "us-west-2",
+              "ap-east-1",
+              "ap-southeast-1",
+              "ap-northeast-1",
+              "ap-northeast-2",
+              "ap-southeast-2",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-west-3",
+              "eu-central-1",
+              "ca-central-1",
+              "ap-south-1",
+              "sa-east-1"
+            ]
+          },
+          "kps_enabled": {
+            "type": "boolean",
+            "deprecated": true
+          },
+          "desired_instance_size": {
+            "$ref": "#/components/schemas/DesiredInstanceSize"
+          },
+          "template_url": {
+            "type": "string",
+            "description": "Template URL used to create the project from the CLI.",
+            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+          }
+        },
+        "required": [
+          "db_pass",
+          "name",
+          "organization_id",
+          "plan",
+          "region",
+          "kps_enabled",
+          "desired_instance_size",
+          "template_url"
+        ]
+      },
+      "V1DatabaseResponse": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "Database host"
+          },
+          "version": {
+            "type": "string",
+            "description": "Database version"
+          }
+        },
+        "required": [
+          "host",
+          "version"
+        ]
+      },
+      "V1ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of your project"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Slug of your organization"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of your project"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "database": {
+            "$ref": "#/components/schemas/V1DatabaseResponse"
+          }
+        },
+        "required": [
+          "id",
+          "organization_id",
+          "name",
+          "region",
+          "created_at"
+        ]
+      },
+      "CreateOrganizationBodyV1": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "OAuthTokenBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "CreateBranchBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "UpdateCustomHostnameBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "RemoveNetworkBanRequest": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "UpdatePostgrestConfigBody": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
+          "db_pool": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_rows",
+          "db_pool"
+        ]
+      },
+      "CreateSecretBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Secret name must not start with the SUPABASE_ prefix.",
+            "example": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SslEnforcementRequest": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "VanitySubdomainBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "UpgradeDatabaseBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "SetUpReadReplicaBody": {
+        "type": "object",
+        "properties": {
+          "read_replica_region": {
+            "type": "string",
+            "description": "Region you want your read replica to reside in",
+            "example": "us-east-1",
+            "enum": [
+              "us-east-1",
+              "us-west-1",
+              "us-west-2",
+              "ap-east-1",
+              "ap-southeast-1",
+              "ap-northeast-1",
+              "ap-northeast-2",
+              "ap-southeast-2",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-west-3",
+              "eu-central-1",
+              "ca-central-1",
+              "ap-south-1",
+              "sa-east-1"
+            ]
+          }
+        },
+        "required": [
+          "read_replica_region"
+        ]
+      },
+      "RemoveReadReplicaBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "AuthHealthResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "description"
+        ]
+      },
+      "RealtimeHealthResponse": {
+        "type": "object",
+        "properties": {
+          "healthy": {
+            "type": "boolean"
+          },
+          "db_connected": {
+            "type": "boolean"
+          },
+          "connected_cluster": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "healthy",
+          "db_connected",
+          "connected_cluster"
+        ]
+      },
+      "V1ServiceHealthResponse": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AuthHealthResponse"
+              },
+              {
+                "$ref": "#/components/schemas/RealtimeHealthResponse"
+              }
+            ]
+          }
+        },
+        "required": [
+          "info"
+        ]
+      },
+      "UpdatePostgresConfigBody": {
+        "type": "object",
+        "properties": {
+          "statement_timeout": {
+            "type": "string"
+          },
+          "effective_cache_size": {
+            "type": "string"
+          },
+          "maintenance_work_mem": {
+            "type": "string"
+          },
+          "max_connections": {
+            "type": "integer"
+          },
+          "max_locks_per_transaction": {
+            "type": "integer"
+          },
+          "max_parallel_maintenance_workers": {
+            "type": "integer"
+          },
+          "max_parallel_workers": {
+            "type": "integer"
+          },
+          "max_parallel_workers_per_gather": {
+            "type": "integer"
+          },
+          "max_standby_archive_delay": {
+            "type": "string"
+          },
+          "max_standby_streaming_delay": {
+            "type": "string"
+          },
+          "max_worker_processes": {
+            "type": "integer"
+          },
+          "shared_buffers": {
+            "type": "string"
+          },
+          "work_mem": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement_timeout",
+          "effective_cache_size",
+          "maintenance_work_mem",
+          "max_connections",
+          "max_locks_per_transaction",
+          "max_parallel_maintenance_workers",
+          "max_parallel_workers",
+          "max_parallel_workers_per_gather",
+          "max_standby_archive_delay",
+          "max_standby_streaming_delay",
+          "max_worker_processes",
+          "shared_buffers",
+          "work_mem"
+        ]
+      },
+      "UpdateAuthConfigBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "CreateThirdPartyAuthBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "V1RunQueryBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "V1CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "body"
+        ]
+      },
+      "V1UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateProviderBody": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "What type of provider will be created",
+            "enum": [
+              "saml"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "UpdateProviderBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "V1RestorePitrBody": {
+        "type": "object",
+        "properties": {
+
+        }
+      }
+    }
+  }
+}

@@ -19,7 +19,7 @@ init:
 download: download.api.v1 download.storage.v1 download.tsdoc.v2
 
 download.api.v1:
-	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
+	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v1_openapi.json
 
 
 # This flow needs to be updated, so we'l comment out for the moment
@@ -57,10 +57,10 @@ download.analytics.v0:
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
-transform: dereference.api.v0  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
+transform: dereference.api.v1  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
 
-dereference.api.v0:
-	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+dereference.api.v1:
+	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
 
 dereference.auth.v1:
 	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
@@ -118,6 +118,12 @@ combine-raw.tsdoc.v2:
 	$(REPO_DIR)/enrichments/tsdoc_v2/storage.json \
 	$(REPO_DIR)/enrichments/tsdoc_v2/functions.json \
 	> $(REPO_DIR)/enrichments/tsdoc_v2/combined_raw.json
+
+###############################################################################
+# Generate sections from OpenAPI 3.0
+###############################################################################
+
+generate.sections.api.v1
 
 ###############################################################################
 # Validate OpenAPI 3.0

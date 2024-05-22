@@ -6,7 +6,7 @@ import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
-import specFile from '~/spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
+import specFile from '~/spec/transforms/api_v1_openapi_deparsed.json' assert { type: 'json' }
 
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
