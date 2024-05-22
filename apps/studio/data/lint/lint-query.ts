@@ -39,7 +39,6 @@ index_ as (
         indisvalid
 )
 select
-    md5(fk.schema_name || fk.table_name || fk.fkey_name) AS id,
     'unindexed_foreign_keys' as name,
     'Unindexed foreign keys' as title,
     'INFO' as level,
@@ -54,7 +53,6 @@ select
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
     jsonb_build_object(
-        'id', md5(fk.schema_name || fk.table_name || fk.fkey_name),
         'schema', fk.schema_name,
         'name', fk.table_name,
         'type', 'table',
@@ -83,7 +81,6 @@ order by
 union all
 (
 select
-    md5(n.nspname || c.relname) AS id,
     'auth_users_exposed' as name,
     'Exposed Auth Users' as title,
     'ERROR' as level,
@@ -201,7 +198,6 @@ with policies as (
             and pa.polname = pb.policyname
 )
 select
-    md5(schema_name || table_name || policy_name) AS id,
     'auth_rls_initplan' as name,
     'Auth RLS Initialization Plan' as title,
     'WARN' as level,
@@ -266,7 +262,6 @@ where
 union all
 (
 select
-    md5(pgns.nspname || pgc.relname) AS id,
     'no_primary_key' as name,
     'No Primary Key' as title,
     'INFO' as level,
@@ -313,7 +308,6 @@ having
 union all
 (
 select
-    md5(psui.schemaname || psui.relname || psui.indexrelname) AS id,
     'unused_index' as name,
     'Unused Index' as title,
     'INFO' as level,
@@ -357,7 +351,6 @@ where
 union all
 (
 select
-    md5(n.nspname || c.relname || r.rolname || act.cmd) AS id,
     'multiple_permissive_policies' as name,
     'Multiple Permissive Policies' as title,
     'WARN' as level,
@@ -431,7 +424,6 @@ having
 union all
 (
 select
-    md5(n.nspname || c.relname) AS id,
     'policy_exists_rls_disabled' as name,
     'Policy Exists RLS Disabled' as title,
     'ERROR' as level,
@@ -478,7 +470,6 @@ group by
 union all
 (
 select
-    md5(n.nspname || c.relname),
     'rls_enabled_no_policy' as name,
     'RLS Enabled No Policy' as title,
     'INFO' as level,
@@ -525,7 +516,6 @@ group by
 union all
 (
 select
-    md5(n.nspname || c.relname || replace(pi.indexdef, pi.indexname, '')) AS id,
     'duplicate_index' as name,
     'Duplicate Index' as title,
     'WARN' as level,
@@ -581,7 +571,6 @@ having
 union all
 (
 select
-    md5(n.nspname || c.relname) AS id,
     'security_definer_view' as name,
     'Security Definer View' as title,
     'ERROR' as level,
@@ -634,7 +623,6 @@ where
 union all
 (
 select
-    md5(n.nspname || p.proname || md5(p.prosrc)) AS id,
     'function_search_path_mutable' as name,
     'Function Search Path Mutable' as title,
     'WARN' as level,
@@ -675,7 +663,6 @@ where
 union all
 (
 select
-    md5(n.nspname || c.relname) AS id,
     'rls_disabled_in_public' as name,
     'RLS Disabled in Public' as title,
     'ERROR' as level,
@@ -717,7 +704,6 @@ where
 union all
 (
 select
-    md5('public' || pe.extname) AS id,
     'extension_in_public' as name,
     'Extension in Public' as title,
     'WARN' as level,
@@ -770,7 +756,6 @@ with policies as (
             and pa.polname = pb.policyname
 )
 select
-    md5(schema_name || table_name || policy_name) AS id,
     'rls_references_user_metadata' as name,
     'RLS references user metadata' as title,
     'ERROR' as level,
@@ -808,7 +793,6 @@ where
 union all
 (
 select
-    md5(n.nspname || c.relname) AS id,
     'materialized_view_in_api' as name,
     'Materialized View in API' as title,
     'WARN' as level,
