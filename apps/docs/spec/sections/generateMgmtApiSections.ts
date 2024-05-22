@@ -32,8 +32,10 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
           for (const method in methods) {
             const tag = methods[method].tags[0];
             const operationId = methods[method].operationId;
-            if (!tag || !operationId) continue;
-            if(!isValidSlug(operationId)) continue;
+            // If operationId is not in the form of a slug ignore it.
+            // This is intentional because operationId is not defined under the swagger
+            // spec and is extracted automatically from the function name.
+            if (!tag || !isValidSlug(operationId)) continue;
 
             if (!categories.includes(tag)) {
               categories.push(tag)
