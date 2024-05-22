@@ -234,7 +234,7 @@ function Database() {
           </div>
         </Swiper>
 
-        <SectionContainer className="mb-48">
+        <SectionContainer>
           <APISection
             // @ts-ignore
             content={ApiExamplesData}
