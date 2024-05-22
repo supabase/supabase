@@ -152,15 +152,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const user = useUser()
   useEffect(() => {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
     // don't set the sentry user id if
     // - on self-hosted or CLI
     // - the user has not consented to telemetry
     // - the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
-    if (!IS_PLATFORM || consent !== 'true' || !user?.id) {
+    if (!canSendTelemetry() || !user?.id) {
       return
     }
 
