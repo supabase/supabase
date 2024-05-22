@@ -78,7 +78,7 @@ const ProjectLints: NextPageWithLayout = () => {
       })
     }
 
-    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH <= 6) {
+    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH < 6) {
       clientLints.push({
         name: 'auth_otp_short_length',
         level: 'WARN',

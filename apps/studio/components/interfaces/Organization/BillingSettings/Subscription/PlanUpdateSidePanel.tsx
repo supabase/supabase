@@ -547,10 +547,15 @@ const PlanUpdateSidePanel = () => {
             <div className="py-4 space-y-2">
               <p className="text-sm">
                 This organization is billed through our partner{' '}
-                {billingPartnerLabel(subscription?.billing_partner)} and you will be charged by them
-                directly.
+                {billingPartnerLabel(billingPartner)}.{' '}
+                {billingPartner === 'aws' ? (
+                  <>The organization's credit balance will be decreased accordingly.</>
+                ) : (
+                  <>You will be charged by them directly.</>
+                )}
               </p>
-              {subscriptionPreview?.billed_via_partner &&
+              {billingViaPartner &&
+                billingPartner === 'fly' &&
                 subscriptionPreview?.plan_change_type === 'downgrade' && (
                   <p className="text-sm">
                     Your organization will be downgraded at the end of your current billing cycle.

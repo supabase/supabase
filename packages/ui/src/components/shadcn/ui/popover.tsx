@@ -53,4 +53,11 @@ const PopoverContent = React.forwardRef<
 )
 PopoverContent.displayName = 'PopoverContent'
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+const PopoverSeparator = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, children, ...props }, ref) => (
+    <div ref={ref} {...props} className={cn('w-full h-px bg-border-overlay', className)} />
+  )
+)
+PopoverSeparator.displayName = 'PopoverSeparator'
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverSeparator }
