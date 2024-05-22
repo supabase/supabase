@@ -28,7 +28,6 @@ interface LinterDataGridProps {
   selectedLint: Lint | null
   setSelectedLint: (value: Lint | null) => void
   currentTab: LINTER_LEVELS
-  handleLintClick: (lint: Lint | null) => void
 }
 
 const LinterDataGrid = ({
@@ -37,7 +36,6 @@ const LinterDataGrid = ({
   selectedLint,
   setSelectedLint,
   currentTab,
-  handleLintClick,
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
@@ -149,8 +147,7 @@ const LinterDataGrid = ({
                   {...props}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
-                      // setSelectedLint(props.row)
-                      handleLintClick(props.row)
+                      setSelectedLint(props.row)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                     }
                   }}
@@ -176,7 +173,7 @@ const LinterDataGrid = ({
               className="absolute top-3 right-3 px-1"
               icon={<X size={14} />}
               onClick={() => {
-                handleLintClick(null)
+                setSelectedLint(null)
               }}
             />
 

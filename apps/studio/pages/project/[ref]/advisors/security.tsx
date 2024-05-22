@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -19,8 +19,7 @@ import { useRouter } from 'next/router'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset, id } = useParams()
-  const router = useRouter()
+  const { preset } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -66,7 +65,6 @@ const ProjectLints: NextPageWithLayout = () => {
   if (authConfig?.EXTERNAL_EMAIL_ENABLED) {
     if (authConfig.MAILER_OTP_EXP > 3600) {
       clientLints.push({
-        id: '5',
         name: 'auth_otp_long_expiry',
         level: 'WARN',
         facing: 'EXTERNAL',
@@ -85,7 +83,6 @@ const ProjectLints: NextPageWithLayout = () => {
 
     if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH < 6) {
       clientLints.push({
-        id: '6',
         name: 'auth_otp_short_length',
         level: 'WARN',
         facing: 'EXTERNAL',
@@ -106,14 +103,6 @@ const ProjectLints: NextPageWithLayout = () => {
     x.categories.includes('SECURITY')
   )
 
-  useEffect(() => {
-    if (selectedLint) return
-    if (id && activeLints.length > 0) {
-      setSelectedLint(activeLints.find((lint) => lint.id === id) || null)
-    }
-  }, [activeLints, id, selectedLint])
-
-  console.log({ selectedLint })
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
 
@@ -121,15 +110,6 @@ const ProjectLints: NextPageWithLayout = () => {
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
   console.log(filteredLints)
-
-  const handleLintClick = (lint: Lint | null) => {
-    console.log('lint click', lint)
-    setSelectedLint(lint)
-    const { id, ...rest } = router.query
-    lint
-      ? router.push({ ...router, query: { ...rest, id: lint.id } })
-      : router.push({ ...router, query: { ...rest } })
-  }
 
   const filterOptions = lintInfoMap
     // only show filters for lint types which are present in the results and not ignored
@@ -168,7 +148,6 @@ const ProjectLints: NextPageWithLayout = () => {
         currentTab={currentTab}
         selectedLint={selectedLint}
         setSelectedLint={setSelectedLint}
-        handleLintClick={handleLintClick}
         isLoading={isLoading}
       />
       <LinterPageFooter

@@ -857,7 +857,6 @@ export const LINT_TYPES = [
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
 
 export type Lint = {
-  id: string
   name: LINT_TYPES
   level: 'ERROR' | 'WARN' | 'INFO'
   facing: string
