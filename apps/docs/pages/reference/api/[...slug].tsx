@@ -20,7 +20,7 @@ export default function Config(props) {
       sections={sections}
       spec={generatedSpec}
       pageProps={props}
-      type="api"
+      type="mgmt-api"
     />
   )
 }
