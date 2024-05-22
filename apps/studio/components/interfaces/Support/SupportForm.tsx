@@ -1,11 +1,6 @@
-import { CLIENT_LIBRARIES } from 'common/constants'
-import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
 import * as Sentry from '@sentry/nextjs'
 import { useParams } from 'common'
+import { CLIENT_LIBRARIES } from 'common/constants'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -18,6 +13,12 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { canSendTelemetry } from 'lib/telemetry'
+import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -76,7 +77,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
-      Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
+      if (canSendTelemetry()) {
+        Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
+      }
       setIsSubmitting(false)
     },
   })
