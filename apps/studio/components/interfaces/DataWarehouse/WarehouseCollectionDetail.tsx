@@ -77,7 +77,7 @@ export const WarehouseCollectionDetail = () => {
 
   const results = formatResults(queryData?.data?.result)
 
-  function loadOlder() {
+  function loadMore() {
     setPagination({ ...pagination, offset: pagination.offset + pagination.limit })
   }
 
@@ -140,13 +140,13 @@ export const WarehouseCollectionDetail = () => {
               {results.length > 0 && (
                 <>
                   <Button
-                    onClick={loadOlder}
+                    onClick={loadMore}
                     icon={<Rewind />}
                     type="default"
                     loading={isLoading}
                     disabled={isLoading}
                   >
-                    Load older
+                    Load more
                   </Button>
                 </>
               )}
