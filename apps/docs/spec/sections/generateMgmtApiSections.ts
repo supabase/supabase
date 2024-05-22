@@ -59,6 +59,7 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
 
       // finalize sections
       sections.sort((a, b) => a.title.localeCompare(b.title));
+      sections.forEach((i) => i.items.sort((a, b) => a.title.localeCompare(b.title)));
       sections.unshift({
         "title": "Introduction",
         "id": "introduction",
