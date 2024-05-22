@@ -66,14 +66,9 @@ const DocView = observer(() => {
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error } = useProjectApiQuery({
-    projectRef,
-  })
-
+  const { data, error } = useProjectApiQuery({ projectRef })
   const apiService = data?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : undefined
+  const anonKey = apiService?.defaultApiKey ?? undefined
 
   const {
     data: jsonSchema,
@@ -82,15 +77,22 @@ const DocView = observer(() => {
   } = useProjectJsonSchemaQuery({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
+  const refreshDocs = async () => await refetch()
+
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain?.hostname}`
+      : `${data?.autoApiService.protocol ?? 'https'}://${data?.autoApiService.endpoint ?? '-'}`
+
+  const { paths, definitions } = PageState.jsonSchema || {}
+  const PAGE_KEY: any = resource || rpc || page || 'index'
+  const autoApiService = { ...(data?.autoApiService ?? {}), endpoint }
+
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
   }, [jsonSchema])
 
-  const refreshDocs = async () => {
-    await refetch()
-  }
-
-  if (error || jsonSchemaError)
+  if (error || jsonSchemaError) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-foreground-light">
@@ -99,27 +101,15 @@ const DocView = observer(() => {
         </p>
       </div>
     )
-  if (!data || !jsonSchema || !PageState.jsonSchema)
+  }
+
+  if (!data || !jsonSchema || !PageState.jsonSchema) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
-
-  const endpoint =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain?.hostname}`
-      : `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`
-
-  // Data Loaded
-  const autoApiService = {
-    ...data.autoApiService,
-    endpoint,
   }
-
-  const { paths, definitions } = PageState.jsonSchema
-
-  const PAGE_KEY: any = resource || rpc || page || 'index'
 
   return (
     <div className="w-full h-full overflow-y-auto Docs Docs--api-page" key={PAGE_KEY}>

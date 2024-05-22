@@ -160,7 +160,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_addMember']
+    get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
@@ -199,26 +199,33 @@ export interface paths {
     get: operations['OrgAuditLogsController_getAuditLogs']
   }
   '/platform/organizations/{slug}/members/invite': {
-    /** Gets invited users */
+    /**
+     * Gets invited users
+     * @deprecated
+     */
     get: operations['OrganizationInviteController_getInvitedUsers']
-    /** Invites user */
+    /**
+     * Invites user
+     * @deprecated
+     */
     post: operations['OrganizationInviteController_inviteUser']
-    /** Delete invited user */
+    /**
+     * Delete invited user
+     * @deprecated
+     */
     delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/platform/organizations/{slug}/members/join': {
-    /** Gets invite */
+    /**
+     * Gets invite
+     * @deprecated
+     */
     get: operations['JoinController_getInvite']
-    /** Joins organization */
+    /**
+     * Joins organization
+     * @deprecated
+     */
     post: operations['JoinController_joinOrganization']
-  }
-  '/platform/organizations/{slug}/members/leave': {
-    /** Leaves the given organization */
-    post: operations['MembersDeprecatedController_leaveOrganization']
-  }
-  '/platform/organizations/{slug}/members/remove': {
-    /** Leaves the given organization */
-    delete: operations['MembersDeprecatedController_removeMember']
   }
   '/platform/organizations/{slug}/members': {
     /** Gets organization's members */
@@ -227,12 +234,32 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
+  }
+  '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
+    /** Removes organization member */
+    delete: operations['MembersController_deleteMemberRole']
   }
   '/platform/organizations/{slug}/members/reached-free-project-limit': {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
+  }
+  '/platform/organizations/{slug}/members/invitations': {
+    /** Gets organization invitations */
+    get: operations['InvitationsController_getAllInvitations']
+    /** Creates organization invitation */
+    post: operations['InvitationsController_createInvitation']
+  }
+  '/platform/organizations/{slug}/members/invitations/{token}': {
+    /** Gets organization invitation by token */
+    get: operations['InvitationsController_getInvitationByToken']
+    /** Accepts organization invitation by token */
+    post: operations['InvitationsController_acceptInvitationByToken']
+  }
+  '/platform/organizations/{slug}/members/invitations/{id}': {
+    /** Deletes organization invitation with given id */
+    delete: operations['InvitationsController_deleteInvitation']
   }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
@@ -1153,20 +1180,35 @@ export interface paths {
   }
   '/v0/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_addMember']
+    get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/v0/organizations/{slug}/members/invite': {
-    /** Gets invited users */
+    /**
+     * Gets invited users
+     * @deprecated
+     */
     get: operations['OrganizationInviteController_getInvitedUsers']
-    /** Invites user */
+    /**
+     * Invites user
+     * @deprecated
+     */
     post: operations['OrganizationInviteController_inviteUser']
-    /** Delete invited user */
+    /**
+     * Delete invited user
+     * @deprecated
+     */
     delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/v0/organizations/{slug}/members/join': {
-    /** Gets invite */
+    /**
+     * Gets invite
+     * @deprecated
+     */
     get: operations['JoinController_getInvite']
-    /** Joins organization */
+    /**
+     * Joins organization
+     * @deprecated
+     */
     post: operations['JoinController_joinOrganization']
   }
   '/v0/organizations/{slug}/members': {
@@ -1176,8 +1218,12 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
+  }
+  '/v0/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
+    /** Removes organization member */
+    delete: operations['MembersController_deleteMemberRole']
   }
   '/v0/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -2557,9 +2603,21 @@ export interface components {
         stripeAccount?: string
       }
     }
-    Role: {
+    OrganizationRole: {
       id: number
       name: string
+      description: string
+    }
+    OrganizationRoleV2: {
+      id: number
+      name: string
+      description: string
+      project_ids: number[]
+      base_role_id: number
+    }
+    OrganizationRoleResponseV2: {
+      org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
+      project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
     TaxId: {
       id: string
@@ -2719,9 +2777,6 @@ export interface components {
       slug: string
       stripe_customer_id: string
     }
-    RemoveMemberBody: {
-      member_id: number
-    }
     Member: {
       gotrue_id: string
       primary_email: string | null
@@ -2732,10 +2787,36 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
+    UpdateMemberRoleBodyV2: {
+      role_id: number
+      role_scoped_projects?: string[]
+    }
     MemberWithFreeProjectLimit: {
       free_project_limit: number
       primary_email: string
       username: string
+    }
+    Invitation: {
+      id: number
+      invited_at: string
+      invited_email: string
+      role_id: number
+    }
+    InvitationResponse: {
+      invitations: components['schemas']['Invitation'][]
+    }
+    InvitationByTokenResponse: {
+      organization_name: string
+      invite_id?: number
+      token_does_not_exist: boolean
+      email_match: boolean
+      authorized_user: boolean
+      expired_token: boolean
+    }
+    CreateInvitationBody: {
+      email: string
+      role_id: number
+      role_scoped_projects?: string[]
     }
     Payment: {
       id: string
@@ -3923,6 +4004,7 @@ export interface components {
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
       identifier: string
+      replicaInitializationStatus?: Record<string, never>
     }
     UpdatePasswordBody: {
       password: string
@@ -6891,7 +6973,7 @@ export interface operations {
     }
   }
   /** Gets the given organization's roles */
-  OrganizationRolesController_addMember: {
+  OrganizationRolesController_getAllRolesV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6901,7 +6983,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['Role'][]
+          'application/json': components['schemas']['OrganizationRoleResponseV2']
         }
       }
       /** @description Failed to retrieve the organization's roles */
@@ -7160,7 +7242,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invited users */
+  /**
+   * Gets invited users
+   * @deprecated
+   */
   OrganizationInviteController_getInvitedUsers: {
     parameters: {
       path: {
@@ -7180,7 +7265,10 @@ export interface operations {
       }
     }
   }
-  /** Invites user */
+  /**
+   * Invites user
+   * @deprecated
+   */
   OrganizationInviteController_inviteUser: {
     parameters: {
       path: {
@@ -7205,7 +7293,10 @@ export interface operations {
       }
     }
   }
-  /** Delete invited user */
+  /**
+   * Delete invited user
+   * @deprecated
+   */
   OrganizationInviteController_deleteInvitedUser: {
     parameters: {
       query: {
@@ -7226,7 +7317,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invite */
+  /**
+   * Gets invite
+   * @deprecated
+   */
   JoinController_getInvite: {
     parameters: {
       query: {
@@ -7249,7 +7343,10 @@ export interface operations {
       }
     }
   }
-  /** Joins organization */
+  /**
+   * Joins organization
+   * @deprecated
+   */
   JoinController_joinOrganization: {
     parameters: {
       query: {
@@ -7267,51 +7364,6 @@ export interface operations {
         }
       }
       /** @description Failed to join organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Leaves the given organization */
-  MembersDeprecatedController_leaveOrganization: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Leaves the given organization */
-  MembersDeprecatedController_removeMember: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RemoveMemberBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
       500: {
         content: never
       }
@@ -7356,8 +7408,8 @@ export interface operations {
       }
     }
   }
-  /** Updates organization member */
-  MembersController_updateMember: {
+  /** Updates organization member role */
+  MembersController_updateMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7367,14 +7419,34 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateMemberBody']
+        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
       }
     }
     responses: {
       200: {
         content: never
       }
-      /** @description Failed to update organization member */
+      /** @description Failed to update organization member role */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes organization member */
+  MembersController_deleteMemberRole: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        gotrue_id: string
+        role_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to remove organization member */
       500: {
         content: never
       }
@@ -7395,6 +7467,108 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitations */
+  InvitationsController_getAllInvitations: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationResponse']
+        }
+      }
+      /** @description Failed to get organization invitations */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates organization invitation */
+  InvitationsController_createInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateInvitationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create organization invitation */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitation by token */
+  InvitationsController_getInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationByTokenResponse']
+        }
+      }
+      /** @description Failed to get organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Accepts organization invitation by token */
+  InvitationsController_acceptInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to accept organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes organization invitation with given id */
+  InvitationsController_deleteInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete organization invitation with given id */
       500: {
         content: never
       }
