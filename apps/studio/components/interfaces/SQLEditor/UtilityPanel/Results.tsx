@@ -60,7 +60,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const MAX_COLUMN_WIDTH = 500
 
   const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => {
-    const maxColumnValueLength = Math.max(...rows.map((row) => String(row[key]).length))
+    const maxColumnValueLength = rows
+      .map((row) => String(row[key]).length)
+      .reduce((a, b) => Math.max(a, b), 0)
+
     const columnWidth = Math.max(
       Math.min(maxColumnValueLength * EST_CHAR_WIDTH, MAX_COLUMN_WIDTH),
       MIN_COLUMN_WIDTH
