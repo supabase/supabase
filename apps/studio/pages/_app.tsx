@@ -52,7 +52,7 @@ import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { getAnonId } from 'lib/telemetry'
+import { canSendTelemetry, getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -112,18 +112,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
-    if (!IS_PLATFORM || consent !== 'true') {
-      return
+    if (canSendTelemetry()) {
+      Sentry.withScope(function (scope) {
+        scope.setTag('globalErrorBoundary', true)
+        Sentry.captureException(error)
+      })
     }
 
-    Sentry.withScope(function (scope) {
-      scope.setTag('globalErrorBoundary', true)
-      Sentry.captureException(error)
-    })
     console.error(error.stack)
   }
 
