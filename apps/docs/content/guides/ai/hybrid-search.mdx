@@ -108,7 +108,7 @@ with full_text as (
 semantic as (
   select
     id,
-    row_number() over (order by doc_vector <#> query_embedding) as rank_ix
+    row_number() over (order by embedding <#> query_embedding) as rank_ix
   from
     documents
   order by rank_ix
