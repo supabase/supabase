@@ -136,6 +136,53 @@ To use Google's pre-built signin buttons:
 
   </TabPanel>
 
+  <TabPanel id="swift" label="Swift">
+
+    ## Google sign-in for iOS
+
+    Google sign-in with Supabase is done through the [GoogleSignIn-iOS](https://github.com/google/GoogleSignIn-iOS) package.
+
+    When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
+
+    Follow the code sample below to implement native Google sign-in with Supabase in your iOS app.
+
+    ```swift
+    import GoogleSignIn
+
+    class GoogleSignInViewController: UIViewController {
+      ...
+
+      func googleSignIn() async throws {
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: self)
+
+        guard let idToken = result.user.idToken?.tokenString else {
+          print("No idToken found.")
+          return
+        }
+
+        let accessToken = result.user.accessToken.tokenString
+
+        try await supabase.auth.signInWithIdToken(
+          credentials: OpenIDConnectCredentials(
+            provider: .google,
+            idToken: idToken,
+            accessToken: accessToken
+          )
+        )
+      }
+      ...
+
+    }
+    ```
+
+    ### Configuration [#ios-configuration]
+
+    1. Follow the integration instructions on the [get started with Google Sign-In](https://developers.google.com/identity/sign-in/ios/start-integrating) for iOS guide.
+    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
+    3. Add only the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_. Enable the `Skip nonce check` option.
+
+  </TabPanel>
+
   <TabPanel id="android" label="Android (Kotlin)">
 
     ## Using Google sign-in on Android
