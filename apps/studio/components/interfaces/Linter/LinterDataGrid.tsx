@@ -143,6 +143,7 @@ const LinterDataGrid = ({
             renderRow(idx, props) {
               return (
                 <Row
+                  key={props.row.cache_key}
                   {...props}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {

@@ -1,13 +1,6 @@
-import { get } from 'lib/common/fetch'
-import { useRouter } from 'next/router'
 import { screen } from '@testing-library/react'
-import { render } from '../../helpers'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import userEvent from '@testing-library/user-event'
-beforeEach(() => {
-  // reset mocks between tests
-  get.mockReset()
-})
+import { render } from '../../helpers'
 
 test('static elements', async () => {
   render(<ReportWidget data={[]} title="Some chart" sql="select" renderer={() => 'something'} />)

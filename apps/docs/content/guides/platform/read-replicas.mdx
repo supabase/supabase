@@ -118,6 +118,12 @@ Observability and metrics for Read Replicas are not currently available in the S
 
 If you're ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can update [your scraping setup](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
 
+<Admonition type="caution">
+
+If you use a [custom domain](/docs/guides/platform/custom-domains), requests will not be routed through the load balancer. You should use the dedicated endpoints provided in the dashboard.
+
+</Admonition>
+
 ### Centralized configuration management
 
 All settings configured through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with the Primary database or with other Read Replicas.

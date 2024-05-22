@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
@@ -8,8 +8,8 @@ export async function getGitHubRepositories(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations/github/repositories', {
     signal,
   })
-  if (error) throw new Error((error as ResponseError).message)
 
+  if (error) handleError(error)
   // [Alaister]: temp fix until we have a proper response type
   return (data as any).repositories
 }

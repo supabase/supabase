@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
@@ -21,8 +21,8 @@ export async function updateConnection(
     signal,
     body: { workdir, supabase_changes_only: supabaseChangesOnly },
   })
-  if (error) throw error
 
+  if (error) handleError(error)
   return data
 }
 
