@@ -1,6 +1,6 @@
 REPO_DIR=$(shell pwd)
 
-run: download transform format
+run: download transform generate format
 
 
 ###############################################################################
@@ -122,6 +122,7 @@ combine-raw.tsdoc.v2:
 ###############################################################################
 # Generate sections from OpenAPI 3.0
 ###############################################################################
+generate: generate.sections.api.v1
 
 generate.sections.api.v1:
 	node $(REPO_DIR)/sections/generateMgmtApiSections.ts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
