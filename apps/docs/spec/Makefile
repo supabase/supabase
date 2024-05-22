@@ -123,7 +123,8 @@ combine-raw.tsdoc.v2:
 # Generate sections from OpenAPI 3.0
 ###############################################################################
 
-generate.sections.api.v1
+generate.sections.api.v1:
+	node $(REPO_DIR)/sections/generateMgmtApiSections.ts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
 
 ###############################################################################
 # Validate OpenAPI 3.0

@@ -240,7 +240,9 @@ export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { api
         ...operation,
         path: key,
         fullPath,
-        operationId: slugify(operation.summary!),
+        operationId: isValidSlug(operation.operationId)
+          ? operation.operationId
+          : slugify(operation.summary!),
 
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
@@ -277,6 +279,11 @@ const slugify = (text: string) => {
     .replace(/\-\-+/g, '-') // Replace multiple - with single -
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, '') // Trim - from end of text
+}
+
+function isValidSlug(slug: string): boolean {
+  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+  return slugRegex.test(slug)
 }
 
 // Uppercase the first letter of a string
