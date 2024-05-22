@@ -461,7 +461,7 @@ By default, views are accessed with their creator's permission ("security define
 ```sql
 -- alter a security_definer view to be security_invoker
 alter view <view name>
-set (security_inkoker = true);
+set (security_invoker = true);
 
 -- create a view with the security_invoker modifier
 create view <view name> with(security_invoker=true) as (
