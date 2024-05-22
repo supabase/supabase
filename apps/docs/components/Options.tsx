@@ -33,11 +33,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
         </div>
         {`${!open ? `Open` : `Close`} ${props.name ?? 'accepted values'}`}
       </button>
-      <div
-        className={['opacity-0', open ? 'opacity-100 h-auto' : 'invisible h-0'].join(
-          ' '
-        )}
-      >
+      <div className={['opacity-0', open ? 'opacity-100 h-auto' : 'invisible h-0'].join(' ')}>
         {props.children}
       </div>
     </div>
