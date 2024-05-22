@@ -21,15 +21,7 @@ export async function getWarehouseAccessTokens(
     signal,
   })
 
-  // TODO: remove cast when openapi client generates correct types
-  return response as any as {
-    data: {
-      id: string
-      token: string
-      inserted_at: string
-      description?: string
-    }[]
-  }
+  return response
 }
 
 export type WarehouseAccessTokensData = Awaited<ReturnType<typeof getWarehouseAccessTokens>>
