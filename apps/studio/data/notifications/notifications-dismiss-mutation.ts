@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { notificationKeys } from './keys'
 
@@ -11,7 +11,8 @@ export type NotificationsDismissVariables = {
 
 export async function dismissNotifications({ ids }: NotificationsDismissVariables) {
   const { data, error } = await del('/platform/notifications', { body: { ids } })
-  if (error) throw error
+
+  if (error) handleError(error)
   return data
 }
 
