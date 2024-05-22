@@ -45,8 +45,6 @@ export function BaseUrlDialog({ open, onOpenChange, defaultValue, onChange }: Ba
               const baseUrl = new URL(value)
               const newValue = (baseUrl.origin + baseUrl.pathname).replace(/\/+$/, '')
 
-              console.log(newValue)
-
               setValue(newValue)
               onChange?.(newValue)
               onOpenChange?.(false)
