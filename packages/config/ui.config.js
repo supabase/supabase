@@ -320,12 +320,12 @@ const uiConfig = {
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-        "[data-state='open'] .accordion-content-animation": {
-          animation: 'slideDown 200ms ease-out',
-        },
-        "[data-state='closed'] .accordion-content-animation": {
-          animation: 'slideUp 200ms ease-in',
-        },
+        // "[data-state='open'] .accordion-content-animation": {
+        //   animation: 'slideDown 200ms ease-out',
+        // }
+        // "[data-state='closed'] .accordion-content-animation": {
+        //   animation: 'slideUp 200ms ease-in',
+        // },
         '.text-code': {
           margin: '0 0.2em',
           padding: '0.2em 0.4em 0.1em',

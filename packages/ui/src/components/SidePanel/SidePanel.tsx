@@ -121,7 +121,9 @@ const SidePanel = ({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange} defaultOpen={defaultOpen}>
       {triggerElement && (
-        <Dialog.Trigger className={__styles.trigger}>{triggerElement}</Dialog.Trigger>
+        <Dialog.Trigger asChild className={__styles.trigger}>
+          {triggerElement}
+        </Dialog.Trigger>
       )}
 
       <Dialog.Portal>

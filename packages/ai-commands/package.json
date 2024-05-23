@@ -9,7 +9,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@gregnr/libpg-query": "^13.4.0-dev.12",
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "*",
     "ai": "^2.2.29",
@@ -17,6 +16,7 @@
     "config": "*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
+    "libpg-query": "^15.1.0",
     "openai": "^4.26.1"
   },
   "devDependencies": {
