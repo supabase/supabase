@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
+import { useRouter } from 'next/router'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -38,7 +39,8 @@ const LinterDataGrid = ({
   currentTab,
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
-  const { ref } = useParams()
+  const { ref, id } = useParams()
+  const router = useRouter()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
 
@@ -149,6 +151,8 @@ const LinterDataGrid = ({
                     if (typeof idx === 'number' && idx >= 0) {
                       setSelectedLint(props.row)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                      const { id, ...rest } = router.query
+                      router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
                     }
                   }}
                 />

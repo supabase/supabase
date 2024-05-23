@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -7,19 +7,16 @@ import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
-import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
-import { useRouter } from 'next/router'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset } = useParams()
+  const { preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -43,19 +40,10 @@ const ProjectLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const {
-    data: authConfig,
-    isLoading: isAuthConfigLoading,
-    refetch: refetchAuthConfigQuery,
-  } = useAuthConfigQuery({
-    projectRef: project?.ref,
-  })
-
-  const isLoading = areLintsLoading || isAuthConfigLoading
+  const isLoading = areLintsLoading
 
   const refetch = () => {
     refetchLintsQuery()
-    refetchAuthConfigQuery()
   }
 
   let clientLints: Lint[] = []
@@ -63,6 +51,15 @@ const ProjectLints: NextPageWithLayout = () => {
   const activeLints = [...(data ?? []), ...clientLints]?.filter((x) =>
     x.categories.includes('SECURITY')
   )
+
+  useEffect(() => {
+    // check the url for an id and set the selected lint
+    if (id) {
+      const lint = activeLints.find((lint) => lint.cache_key === id) ?? null
+      console.log({ lint })
+      setSelectedLint(lint)
+    }
+  }, [id, activeLints])
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
