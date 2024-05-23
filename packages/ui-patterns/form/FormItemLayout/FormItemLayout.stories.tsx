@@ -102,7 +102,6 @@ export const Primary: Story = {
     label: 'Username',
     description: 'this is the description',
     labelOptional: 'optional',
-    placeholder: 'shadcn',
   },
 }
 
@@ -162,7 +161,6 @@ export const withSelect: Story = {
     label: 'Username',
     description: 'this is the description',
     labelOptional: 'optional',
-    placeholder: 'shadcn',
   },
 }
 
@@ -215,7 +213,6 @@ export const withLayoutChange: Story = {
     label: 'Username',
     description: 'this is the description',
     labelOptional: 'optional',
-    placeholder: 'shadcn',
   },
 }
 
@@ -282,6 +279,5 @@ export const withCalendar: Story = {
     label: 'Date of birth',
     description: 'Your date of birth is used to calculate your age.',
     labelOptional: 'optional',
-    placeholder: 'shadcn',
   },
 }

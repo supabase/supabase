@@ -693,7 +693,7 @@ create trigger on_auth_user_created
 
 /**
 * CUSTOMERS
-* Note: this is a private table that contains a mapping of user IDs to Strip customer IDs.
+* Note: this is a private table that contains a mapping of user IDs to Stripe customer IDs.
 */
 create table customers (
   -- UUID from auth.users
