@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { analyticsKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type WarehouseQueryVariables = {
   ref: string
@@ -23,14 +24,14 @@ export async function getWarehouseQuery(
     signal,
   } as any)
 
-  if (response.error || !response.response.ok) {
-    throw response.error
+  if (response.error) {
+    handleError(response)
   }
 
   return {
     // TODO: Remove the type assertion once the generated OpenAPI client is typed
     data: response.data as unknown as any,
-    error: response.error,
+    error: response.error as unknown as ResponseError,
   }
 }
 

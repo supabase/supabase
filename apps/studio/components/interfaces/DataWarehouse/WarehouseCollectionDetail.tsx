@@ -12,6 +12,7 @@ import {
 import Link from 'next/link'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { RefreshCcw, Rewind } from 'lucide-react'
+import AlertError from 'components/ui/AlertError'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -84,97 +85,95 @@ export const WarehouseCollectionDetail = () => {
   const isLoading = queryLoading || collectionsLoading || isRefetching
 
   return (
-    <>
-      <div className="relative flex flex-col flex-grow h-full">
-        <ShimmerLine active={isLoading} />
-        <LoadingOpacity active={isLoading}>
-          <div className="flex flex-col w-full">
-            <div className="flex justify-between items-center pr-3">
-              <h2 className="p-3">{collection?.name}</h2>
-              <div className="flex items-center gap-2">
-                <Button asChild type={'text'}>
-                  <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
-                    Access tokens
-                  </Link>
-                </Button>
-
-                <TestCollectionDialog
-                  accessTokens={accessTokens.data?.data || []}
-                  collectionToken={collectionToken}
-                  projectRef={projectRef}
-                  collections={collections || []}
-                  open={testDialogOpen}
-                  onOpenChange={setTestDialogOpen}
-                />
-              </div>
-            </div>
-            <LogTable
-              collectionName={collection?.name}
-              queryType="warehouse"
-              hasEditorValue={false}
-              projectRef={projectRef}
-              isLoading={isLoading}
-              data={results}
-              params={params}
-              error={isError ? 'Error loading data' : undefined}
-              maxHeight="calc(100vh - 139px)"
-              hideHeader={true}
-              emptyState={
-                <div className="rounded border bg-surface-100 p-6 shadow-md space-y-4">
-                  <div>
-                    <h1 className="text-lg text-foreground">Send your first event</h1>
-                    <p className="text-sm text-foreground-lighter">
-                      Events sent to this collection will appear here
-                    </p>
-                  </div>
-                  <Button onClick={() => setTestDialogOpen(true)}>Send your first event</Button>
-                </div>
-              }
-            />
-          </div>
-        </LoadingOpacity>
-
-        {!isError && (
-          <div className="border-t flex flex-row justify-between p-2">
+    <div className="relative flex flex-col flex-grow h-full">
+      <ShimmerLine active={isLoading} />
+      <LoadingOpacity active={isLoading}>
+        <div className="flex flex-col w-full">
+          <div className="flex justify-between items-center pr-3">
+            <h2 className="p-3">{collection?.name}</h2>
             <div className="flex items-center gap-2">
-              {results.length > 0 && (
-                <>
-                  <Button
-                    onClick={loadMore}
-                    icon={<Rewind />}
-                    type="default"
-                    loading={isLoading}
-                    disabled={isLoading}
-                  >
-                    Load more
-                  </Button>
-                </>
-              )}
-              {pagination.offset !== 0 && (
-                <>
-                  <Button
-                    onClick={() => setPagination({ ...pagination, offset: 0 })}
-                    type="default"
-                    loading={isLoading}
-                    disabled={isLoading}
-                  >
-                    Load latest
-                  </Button>
-                </>
-              )}
+              <Button asChild type={'text'}>
+                <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
+                  Access tokens
+                </Link>
+              </Button>
+
+              <TestCollectionDialog
+                accessTokens={accessTokens.data?.data || []}
+                collectionToken={collectionToken}
+                projectRef={projectRef}
+                collections={collections || []}
+                open={testDialogOpen}
+                onOpenChange={setTestDialogOpen}
+              />
             </div>
-            <Button
-              onClick={() => refetch()}
-              icon={<RefreshCcw />}
-              type="default"
-              loading={isLoading}
-              disabled={isLoading}
-            >
-              Refresh
-            </Button>
           </div>
-        )}
-      </div>
-    </>
+          <LogTable
+            collectionName={collection?.name}
+            queryType="warehouse"
+            hasEditorValue={false}
+            projectRef={projectRef}
+            isLoading={isLoading}
+            data={results}
+            params={params}
+            maxHeight="calc(100vh - 139px)"
+            hideHeader={true}
+            emptyState={
+              <div className="rounded border bg-surface-100 p-6 shadow-md space-y-4">
+                <div>
+                  <h1 className="text-lg text-foreground">Send your first event</h1>
+                  <p className="text-sm text-foreground-lighter">
+                    Events sent to this collection will appear here
+                  </p>
+                </div>
+                <Button onClick={() => setTestDialogOpen(true)}>Send your first event</Button>
+              </div>
+            }
+          />
+        </div>
+      </LoadingOpacity>
+      {isError && <AlertError subject="Failed to load query results" />}
+
+      {!isError && (
+        <div className="border-t flex flex-row justify-between p-2">
+          <div className="flex items-center gap-2">
+            {results.length > 0 && (
+              <>
+                <Button
+                  onClick={loadMore}
+                  icon={<Rewind />}
+                  type="default"
+                  loading={isLoading}
+                  disabled={isLoading}
+                >
+                  Load more
+                </Button>
+              </>
+            )}
+            {pagination.offset !== 0 && (
+              <>
+                <Button
+                  onClick={() => setPagination({ ...pagination, offset: 0 })}
+                  type="default"
+                  loading={isLoading}
+                  disabled={isLoading}
+                >
+                  Load latest
+                </Button>
+              </>
+            )}
+          </div>
+          <Button
+            onClick={() => refetch()}
+            icon={<RefreshCcw />}
+            type="default"
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            Refresh
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }
