@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3003",
     "build": "npm run content:build && npm run build:registry && next build",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
