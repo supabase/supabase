@@ -73,6 +73,11 @@ export const docsConfig: DocsConfig = {
       title: 'Fragment Components',
       items: [
         {
+          title: 'Introduction',
+          href: '/docs/components/fragment-components',
+          items: [],
+        },
+        {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
@@ -87,6 +92,11 @@ export const docsConfig: DocsConfig = {
     {
       title: 'Atom Components',
       items: [
+        {
+          title: 'Introduction',
+          href: '/docs/components/atom-components',
+          items: [],
+        },
         {
           title: 'Accordion',
           href: '/docs/components/accordion',
