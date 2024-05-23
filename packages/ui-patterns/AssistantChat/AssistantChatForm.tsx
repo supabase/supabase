@@ -22,6 +22,8 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   icon?: React.ReactNode
   /* The function to handle the form submission */
   onSubmit: React.FormHTMLAttributes<HTMLFormElement>['onSubmit']
+  /* The placeholder of the textarea */
+  placeholder?: string
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
@@ -36,6 +38,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       onValueChange,
       setCommandsOpen,
       onSubmit,
+      placeholder,
       ...props
     },
     ref
@@ -98,10 +101,10 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           contentEditable
           aria-expanded={false}
           className={cn(
-            icon && 'pl-12',
+            icon ? 'pl-12' : '',
             'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
           )}
-          placeholder={props.placeholder}
+          placeholder={placeholder}
           spellCheck={false}
           value={value}
           onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
