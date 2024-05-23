@@ -429,7 +429,15 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'libpg-query',
+  ],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
