@@ -34,6 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".contentlayer/generated"
+    ".contentlayer/generated",
+    "./../../packages/ui/src/**/*.d.ts"
   ]
 }
