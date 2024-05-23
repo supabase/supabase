@@ -340,6 +340,7 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   postgrest_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `identifier = '${value}'`,
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
@@ -720,4 +721,5 @@ export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [
   '/project/[ref]/logs/edge-logs',
   '/project/[ref]/logs/pooler-logs',
   '/project/[ref]/logs/postgres-logs',
+  '/project/[ref]/logs/postgrest-logs',
 ]
