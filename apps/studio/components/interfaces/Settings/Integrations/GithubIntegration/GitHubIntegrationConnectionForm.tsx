@@ -95,14 +95,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
     supabaseChangesOnly: z
       .boolean()
       .default(connection.metadata?.supabaseConfig?.supabaseChangesOnly ?? false),
-    branchLimit: z.number().default(connection.metadata?.supabaseConfig?.branchLimit ?? 50),
+    branchLimit: z.string().default(String(connection.metadata?.supabaseConfig?.branchLimit ?? 50)),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       supabaseDirectory: connection?.metadata?.supabaseConfig?.supabaseDirectory,
       supabaseChangesOnly: connection?.metadata?.supabaseConfig?.supabaseChangesOnly,
-      branchLimit: connection?.metadata?.supabaseConfig?.branchLimit,
+      branchLimit: String(connection?.metadata?.supabaseConfig?.branchLimit),
     },
   })
 
@@ -113,7 +113,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
       organizationId: org?.id,
       workdir: data.supabaseDirectory,
       supabaseChangesOnly: data.supabaseChangesOnly,
-      branchLimit: data.branchLimit,
+      branchLimit: Number(data.branchLimit),
     })
   }
 
@@ -228,6 +228,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
                       }}
+                      type="number"
                     />
                     <RotateCcw
                       className={cn(
@@ -235,7 +236,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                         'w-4 h-4 absolute right-3 top-3',
                         'duration-150',
 
-                        field.value !== connection.metadata?.supabaseConfig?.branchLimit
+                        field.value !== String(connection.metadata?.supabaseConfig?.branchLimit)
                           ? 'opacity-100 transition'
                           : 'opacity-0'
                       )}
@@ -245,12 +246,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                       loading={isUpdatingConnection}
                       className={cn(
                         'duration-150 transition',
-                        field.value !== connection.metadata?.supabaseConfig?.branchLimit
+                        field.value !== String(connection.metadata?.supabaseConfig?.branchLimit)
                           ? 'opacity-100'
                           : 'opacity-0'
                       )}
                       htmlType="submit"
-                      disabled={field.value === connection.metadata?.supabaseConfig?.branchLimit}
+                      disabled={
+                        field.value === String(connection.metadata?.supabaseConfig?.branchLimit)
+                      }
                     >
                       Update
                     </Button>
