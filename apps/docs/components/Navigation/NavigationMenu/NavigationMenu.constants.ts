@@ -1011,27 +1011,27 @@ export const api: NavMenuConstant = {
       items: [
         {
           name: 'Managing tables, views, and data',
-          url: '/guides/api/data-apis#managing-tables-views-and-data',
+          url: '/guides/database/tables',
         },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/data-apis#querying-joins-and-nested-tables',
+          url: '/guides/database/joins-and-nesting',
         },
         {
           name: 'JSON and unstructured data',
-          url: '/guides/api/data-apis#json-and-unstructured-data',
+          url: '/guides/database/json',
         },
         {
           name: 'Managing database functions',
-          url: '/guides/api/data-apis#managing-database-functions',
+          url: '/guides/database/functions',
         },
         {
           name: 'Using full-text search',
-          url: '/guides/api/data-apis#using-full-text-search',
+          url: '/guides/database/full-text-search',
         },
         {
           name: 'Debugging performance issues',
-          url: '/guides/api/data-apis#debugging-performance-issues',
+          url: '/guides/database/debugging-performance',
         },
         {
           name: 'Using custom schemas',
