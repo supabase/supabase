@@ -84,6 +84,11 @@ export const Doc = defineDocumentType(() => ({
       default: false,
       required: false,
     },
+    fragment: {
+      type: 'boolean',
+      default: false,
+      required: false,
+    },
     toc: {
       type: 'boolean',
       default: true,
