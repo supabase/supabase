@@ -136,6 +136,7 @@ function Select({
           value={value}
           disabled={disabled}
           required={required}
+          // @ts-ignore
           placeholder={placeholder}
           {...props}
         >

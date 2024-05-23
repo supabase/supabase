@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/guides/append-test.js",
-    "jest.config.mjs"
+    "jest.config.mjs",
+    "./../../packages/ui/src/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }
