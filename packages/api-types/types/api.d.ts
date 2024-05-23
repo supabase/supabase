@@ -293,6 +293,16 @@ export interface paths {
     /** Gets the upcoming invoice */
     get: operations['OrgInvoicesController_getUpcomingInvoice']
   }
+  '/platform/organizations/{slug}/billing/invoices': {
+    /** Gets invoices for the given organization */
+    get: operations['OrgInvoicesController_getInvoices']
+    /** Gets the total count of invoices for the given organization */
+    head: operations['OrgInvoicesController_countInvoices']
+  }
+  '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
+    /** Gets invoice with the given invoice ID */
+    get: operations['OrgInvoicesController_getInvoice']
+  }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
     get: operations['ColumnPrivilegesController_getColumnPrivileges']
@@ -684,6 +694,16 @@ export interface paths {
     /** Lists project's warehouse queries from logflare */
     get: operations['WarehouseQueryController_runQuery']
   }
+  '/platform/projects/{ref}/billing/addons': {
+    /** Gets project addons */
+    get: operations['ProjectAddonController_getProjectAddons']
+    /** Updates project addon */
+    post: operations['ProjectAddonController_updateAddon']
+  }
+  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
+    /** Removes project addon */
+    delete: operations['ProjectAddonController_removeAddon']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -721,16 +741,6 @@ export interface paths {
     get: operations['SupavisorConfigController_getSupavisorConfig']
     /** Updates project's supavisor config */
     patch: operations['SupavisorConfigController_updateSupavisorConfig']
-  }
-  '/platform/projects/{ref}/billing/addons': {
-    /** Gets project addons */
-    get: operations['ProjectAddonController_getProjectAddons']
-    /** Updates project addon */
-    post: operations['ProjectAddonController_updateAddon']
-  }
-  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
-    /** Removes project addon */
-    delete: operations['ProjectAddonController_removeAddon']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -811,9 +821,15 @@ export interface paths {
     delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/platform/stripe/invoices': {
-    /** Gets invoices for the given customer */
+    /**
+     * Gets invoices for the given customer
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoices']
-    /** Gets the total count of invoices for the given customer */
+    /**
+     * Gets the total count of invoices for the given customer
+     * @deprecated
+     */
     head: operations['InvoicesController_countInvoices']
   }
   '/platform/stripe/invoices/overdue': {
@@ -821,7 +837,10 @@ export interface paths {
     get: operations['InvoicesController_getOverdueInvoices']
   }
   '/platform/stripe/invoices/{id}': {
-    /** Gets invoice with the given invoice ID */
+    /**
+     * Gets invoice with the given invoice ID
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoice']
   }
   '/platform/stripe/setup-intent': {
@@ -3110,6 +3129,15 @@ export interface components {
       plans: components['schemas']['PlanResponse'][]
     }
     UpcomingInvoice: Record<string, never>
+    Invoice: {
+      id: string
+      invoice_pdf: string
+      subscription: string | null
+      subtotal: number
+      number: string
+      period_end: number
+      status: string
+    }
     ColumnPrivilege: {
       grantor: string
       grantee: string
@@ -4004,6 +4032,7 @@ export interface components {
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
       identifier: string
+      replicaInitializationStatus?: Record<string, never>
     }
     UpdatePasswordBody: {
       password: string
@@ -4050,12 +4079,15 @@ export interface components {
         | 'function_search_path_mutable'
         | 'rls_disabled_in_public'
         | 'extension_in_public'
+        | 'rls_references_user_metadata'
+        | 'materialized_view_in_api'
+        | 'foreign_table_in_api'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
-        | 'rls_references_user_metadata'
       /** @enum {string} */
       level: 'ERROR' | 'WARN' | 'INFO'
       categories: ('PERFORMANCE' | 'SECURITY')[]
+      title: string
       facing: string
       description: string
       detail: string
@@ -4236,6 +4268,13 @@ export interface components {
     }
     LFUser: {
       token: string
+      email: string | null
+      bigquery_project_id: string | null
+      bigquery_dataset_location: string | null
+      bigquery_dataset_id: string | null
+      email_me_product: string | null
+      phone: string | null
+      company: string | null
       metadata: {
         project_ref?: string
       }
@@ -4244,6 +4283,12 @@ export interface components {
       token: string
       id: number
       name: string
+      favourite: boolean
+      webhook_notification_url: string | null
+      slack_hook_url: string | null
+      bigquery_table_ttl: number
+      public_token: string | null
+      custom_event_message_keys: string | null
     }
     LFAccessToken: {
       token: string
@@ -4264,6 +4309,20 @@ export interface components {
       proactive_requerying_seconds: number
       max_limit: number
       enable_auth: number
+    }
+    AvailableAddonResponse: {
+      type: components['schemas']['ProjectAddonType']
+      name: string
+      variants: components['schemas']['ProjectAddonVariantResponse'][]
+    }
+    ProjectAddonsResponse: {
+      ref: string
+      selected_addons: components['schemas']['SelectedAddonResponse'][]
+      available_addons: components['schemas']['AvailableAddonResponse'][]
+    }
+    UpdateAddonBody: {
+      addon_variant: components['schemas']['AddonVariantId']
+      addon_type: components['schemas']['ProjectAddonType']
     }
     PgbouncerConfigResponse: {
       default_pool_size?: number
@@ -4401,20 +4460,6 @@ export interface components {
       default_pool_size?: number
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    AvailableAddonResponse: {
-      type: components['schemas']['ProjectAddonType']
-      name: string
-      variants: components['schemas']['ProjectAddonVariantResponse'][]
-    }
-    ProjectAddonsResponse: {
-      ref: string
-      selected_addons: components['schemas']['SelectedAddonResponse'][]
-      available_addons: components['schemas']['AvailableAddonResponse'][]
-    }
-    UpdateAddonBody: {
-      addon_variant: components['schemas']['AddonVariantId']
-      addon_type: components['schemas']['ProjectAddonType']
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -4621,15 +4666,6 @@ export interface components {
       access_key: string
       secret_key: string
       description: string
-    }
-    Invoice: {
-      id: string
-      invoice_pdf: string
-      subscription: string
-      subtotal: number
-      number: string
-      period_end: number
-      status: string
     }
     OverdueInvoiceCount: {
       organization_id: number
@@ -4841,6 +4877,8 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
+      supabase_changes_only: boolean
+      branch_limit: number
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4853,6 +4891,7 @@ export interface components {
     UpdateGitHubConnectionsBody: {
       workdir?: string
       supabase_changes_only?: boolean
+      branch_limit?: number
     }
     CreateCliLoginSessionBody: {
       session_id: string
@@ -5109,6 +5148,7 @@ export interface components {
       is_default: boolean
       git_branch?: string
       pr_number?: number
+      latest_check_run_id?: number
       reset_on_push: boolean
       persistent: boolean
       /** @enum {string} */
@@ -5497,7 +5537,7 @@ export interface components {
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
-      mailer_otp_exp: number | null
+      mailer_otp_exp: number
       mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
@@ -5539,7 +5579,7 @@ export interface components {
       sms_messagebird_access_key: string | null
       sms_messagebird_originator: string | null
       sms_otp_exp: number | null
-      sms_otp_length: number | null
+      sms_otp_length: number
       sms_provider: string | null
       sms_template: string | null
       sms_test_otp: string | null
@@ -7783,6 +7823,82 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve upcoming invoice */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoices for the given organization */
+  OrgInvoicesController_getInvoices: {
+    parameters: {
+      query: {
+        limit: string
+        offset: string
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the total count of invoices for the given organization */
+  OrgInvoicesController_countInvoices: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: unknown
+        }
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve the total count of invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoice with the given invoice ID */
+  OrgInvoicesController_getInvoice: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        invoiceId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoice */
       500: {
         content: never
       }
@@ -10790,6 +10906,77 @@ export interface operations {
       }
     }
   }
+  /** Gets project addons */
+  ProjectAddonController_getProjectAddons: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectAddonsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project addons */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project addon */
+  ProjectAddonController_updateAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateAddonBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project addon */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes project addon */
+  ProjectAddonController_removeAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        addon_variant: components['schemas']['AddonVariantId']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to remove project addon */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's pgbouncer config */
   PgbouncerConfigController_getPgbouncerConfig: {
     parameters: {
@@ -11073,77 +11260,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to update project's supavisor config */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project addons */
-  ProjectAddonController_getProjectAddons: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectAddonsResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to get project addons */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates project addon */
-  ProjectAddonController_updateAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateAddonBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update project addon */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Removes project addon */
-  ProjectAddonController_removeAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        addon_variant: components['schemas']['AddonVariantId']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to remove project addon */
       500: {
         content: never
       }
@@ -11673,12 +11789,15 @@ export interface operations {
       }
     }
   }
-  /** Gets invoices for the given customer */
+  /**
+   * Gets invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_getInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
         limit: string
         offset: string
       }
@@ -11695,12 +11814,15 @@ export interface operations {
       }
     }
   }
-  /** Gets the total count of invoices for the given customer */
+  /**
+   * Gets the total count of invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_countInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
       }
     }
     responses: {
@@ -11727,7 +11849,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invoice with the given invoice ID */
+  /**
+   * Gets invoice with the given invoice ID
+   * @deprecated
+   */
   InvoicesController_getInvoice: {
     parameters: {
       path: {

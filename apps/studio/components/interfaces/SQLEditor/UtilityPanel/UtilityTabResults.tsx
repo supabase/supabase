@@ -7,6 +7,7 @@ import { useSelectedOrganization } from 'hooks'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import Results from './Results'
+import { Loader2 } from 'lucide-react'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -45,8 +46,9 @@ const UtilityTabResults = ({
 
   if (isExecuting) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
+      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <Loader2 size={14} className="animate-spin" />
+        <p className="m-0 border-0 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (result?.error) {

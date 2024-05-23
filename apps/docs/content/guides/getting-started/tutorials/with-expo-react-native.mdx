@@ -34,7 +34,7 @@ cd expo-user-management
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-elements react-native-url-polyfill
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed react-native-url-polyfill
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -83,7 +83,7 @@ These variables are safe to expose in your Expo app since Supabase has
 
     ```bash
     npm install @supabase/supabase-js
-    npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
+    npm install @rneui/themed @react-native-async-storage/async-storage react-native-url-polyfill
     npm install aes-js react-native-get-random-values
     npx expo install expo-secure-store
     ```
@@ -169,7 +169,7 @@ Users would be able to sign in with their email and password.
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View, AppState } from 'react-native'
 import { supabase } from '../lib/supabase'
-import { Button, Input } from 'react-native-elements'
+import { Button, Input } from '@rneui/themed'
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
@@ -281,7 +281,7 @@ Let's create a new component for that called `Account.tsx`.
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from 'react-native-elements'
+import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
 
 export default function Account({ session }: { session: Session }) {
