@@ -6,13 +6,13 @@ import {
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/MultiSelect/MultiSelect'
+} from 'ui-patterns/multi-select'
 
 export default function MultiSelectDemo() {
   const [value, setValue] = useState<string[]>([])
 
   return (
-    <MultiSelector values={value} onValuesChange={setValue}>
+    <MultiSelector values={value} onValuesChange={setValue} size="small">
       <MultiSelectorTrigger>
         <MultiSelectorInput placeholder="Select items" />
       </MultiSelectorTrigger>

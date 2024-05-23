@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from 'ui/src/components/shadcn/ui/badge'
+import { Badge } from 'ui'
 import {
   Command,
   CommandItem,
@@ -19,8 +19,14 @@ import React, {
   useState,
 } from 'react'
 import { CommandInput } from 'cmdk'
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
+import {
+  SIZE,
+  SIZE_VARIANTS,
+  SIZE_VARIANTS_DEFAULT,
+  SIZE_VARIANTS_INNER,
+} from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
+import { sizeVariants } from 'ui/src/lib/commonCva'
 
 const MultiSelectorVariants = cva('', {
   variants: {
@@ -49,6 +55,7 @@ interface MultiSelectContextProps {
   setInputValue: React.Dispatch<React.SetStateAction<string>>
   activeIndex: number
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
+  size: MultiSelectorProps['size']
 }
 
 const MultiSelectContext = createContext<MultiSelectContextProps | null>(null)
@@ -68,7 +75,7 @@ const MultiSelector = ({
   className,
   children,
   dir,
-  size,
+  size = 'small',
   ...props
 }: MultiSelectorProps) => {
   const [inputValue, setInputValue] = useState('')
@@ -146,6 +153,7 @@ const MultiSelector = ({
         setInputValue,
         activeIndex,
         setActiveIndex,
+        size: size || 'small',
       }}
     >
       <CommandPrimitive
@@ -160,9 +168,41 @@ const MultiSelector = ({
   )
 }
 
-const MultiSelectorTrigger = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+export interface ButtonVariantProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const MultiSelectorTriggerBadgeVariants = cva(
+  `
+  gap-2
+  w-content 
+  my-[3px] 
+  bg-overlay dark:bg-surface-300
+  border border-control
+  bg-opacity-100
+  rounded-lg 
+  items-center 
+  flex text-foreground-light
+  border
+  `,
+
+  {
+    variants: {
+      size: {
+        ...SIZE_VARIANTS_INNER,
+      },
+      active: {
+        true: 'ring-2 ring-muted-foreground',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      size: SIZE_VARIANTS_DEFAULT,
+    },
+  }
+)
+
+const MultiSelectorTrigger = forwardRef<HTMLDivElement, ButtonVariantProps>(
   ({ className, children, ...props }, ref) => {
-    const { value, onValueChange, activeIndex } = useMultiSelect()
+    const { value, onValueChange, activeIndex, size } = useMultiSelect()
 
     const mousePreventDefault = useCallback((e: React.MouseEvent) => {
       e.preventDefault()
@@ -173,21 +213,19 @@ const MultiSelectorTrigger = forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       <div
         ref={ref}
         className={cn(
-          'flex flex-wrap gap-1 bg-control border border-control border-muted rounded-lg',
+          'flex flex-wrap gap-1 border border-control bg-foreground/[.026] rounded-lg px-1',
           className
         )}
         {...props}
       >
         {value.map((item, index) => (
-          <Badge
+          <div
             key={item}
             className={cn(
-              'px-1 rounded-xl flex items-center gap-1',
-              activeIndex === index && 'ring-2 ring-muted-foreground '
+              MultiSelectorTriggerBadgeVariants({ size: size, active: activeIndex === index })
             )}
-            variant={'secondary'}
           >
-            <span className="text-xs">{item}</span>
+            <span>{item}</span>
             <button
               aria-label={`Remove ${item} option`}
               aria-roledescription="button to remove option"
@@ -196,9 +234,12 @@ const MultiSelectorTrigger = forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
               onClick={() => onValueChange(item)}
             >
               <span className="sr-only">Remove {item} option</span>
-              <RemoveIcon className="h-4 w-4 hover:stroke-destructive" />
+              <RemoveIcon
+                className="transition-colors h-3 w-3 text-foreground-muted hover:text-destructive"
+                strokeWidth={3}
+              />
             </button>
-          </Badge>
+          </div>
         ))}
         {children}
       </div>
@@ -208,11 +249,22 @@ const MultiSelectorTrigger = forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 
 MultiSelectorTrigger.displayName = 'MultiSelectorTrigger'
 
+const MultiSelectorInputVariants = cva('bg-control border', {
+  variants: {
+    size: {
+      ...SIZE_VARIANTS,
+    },
+  },
+  defaultVariants: {
+    size: SIZE_VARIANTS_DEFAULT,
+  },
+})
+
 const MultiSelectorInput = forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput>
 >(({ className, ...props }, ref) => {
-  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex } = useMultiSelect()
+  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size } = useMultiSelect()
   return (
     <CommandInput
       {...props}
@@ -223,7 +275,8 @@ const MultiSelectorInput = forwardRef<
       onFocus={() => setOpen(true)}
       onClick={() => setActiveIndex(-1)}
       className={cn(
-        'text-sm bg-transparent border-none outline-none placeholder:text-foreground-muted/50 flex-1',
+        MultiSelectorInputVariants({ size }),
+        'text-sm bg-transparent border-none outline-none placeholder:text-foreground-muted flex-1',
         className,
         activeIndex !== -1 && 'caret-transparent'
       )}
@@ -260,7 +313,7 @@ const MultiSelectorList = forwardRef<
     >
       {children}
       <CommandEmpty>
-        <span className="text-muted-foreground">No results found</span>
+        <span className="text-foreground-muted">No results found</span>
       </CommandEmpty>
     </CommandList>
   )
@@ -272,7 +325,7 @@ const MultiSelectorItem = forwardRef<
   React.ElementRef<typeof CommandItem>,
   { value: string } & React.ComponentPropsWithoutRef<typeof CommandItem>
 >(({ className, value, children, ...props }, ref) => {
-  const { value: Options, onValueChange, setInputValue } = useMultiSelect()
+  const { value: Options, onValueChange, setInputValue, size } = useMultiSelect()
 
   const mousePreventDefault = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -289,15 +342,23 @@ const MultiSelectorItem = forwardRef<
         setInputValue('')
       }}
       className={cn(
-        // 'rounded-md cursor-pointer px-2 py-1 transition-colors flex justify-between ',
+        'relative',
+        'text-foreground-light',
+        'hover:text-foreground',
+        'rounded-md cursor-pointer px-2 py-1 transition-colors flex justify-between',
+        size && SIZE.text[size],
         className,
-        isIncluded && 'opacity-50 cursor-default',
-        props.disabled && 'opacity-50 cursor-not-allowed'
+        isIncluded && 'cursor-default',
+        props.disabled && 'opacity-75 cursor-not-allowed'
       )}
       onMouseDown={mousePreventDefault}
     >
-      {children}
-      {isIncluded && <Check className="h-4 w-4" />}
+      <div className={cn(isIncluded && 'opacity-50')}>{children}</div>
+      {isIncluded && (
+        <div className="w-5 h-5 bg-foreground left-2 rounded-full flex items-center justify-center">
+          <Check className="h-3 w-3 text-background" strokeWidth={5} />
+        </div>
+      )}
     </CommandItem>
   )
 })

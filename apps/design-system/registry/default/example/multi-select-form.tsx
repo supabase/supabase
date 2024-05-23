@@ -7,7 +7,7 @@ import {
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/MultiSelect/MultiSelect'
+} from 'ui-patterns/multi-select'
 import {
   Form_Shadcn_,
   FormDescription_Shadcn_,
@@ -68,7 +68,7 @@ const MultiSelectZod = () => {
           render={({ field }) => (
             <FormItem_Shadcn_ className="w-full">
               <FormLabel_Shadcn_>Invite people</FormLabel_Shadcn_>
-              <MultiSelector onValuesChange={field.onChange} values={field.value}>
+              <MultiSelector onValuesChange={field.onChange} values={field.value} size={'small'}>
                 <MultiSelectorTrigger>
                   <MultiSelectorInput placeholder="Select people to invite" />
                 </MultiSelectorTrigger>
