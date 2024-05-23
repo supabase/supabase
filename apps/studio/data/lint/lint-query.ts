@@ -9,10 +9,7 @@ export type ProjectLintsVariables = {
   projectRef: string
 }
 
-const getProjectLints = async (
-  { projectRef }: ProjectLintsVariables,
-  signal?: AbortSignal
-) => {
+const getProjectLints = async ({ projectRef }: ProjectLintsVariables, signal?: AbortSignal) => {
   const { data, error } = await get('/platform/projects/{ref}/run-lints', {
     params: { path: { ref: projectRef } },
     signal,
@@ -31,8 +28,7 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
 ) =>
   useQuery<ProjectLintsData, ProjectLintsError, TData>(
     lintKeys.lint(projectRef),
-    ({ signal }) =>
-      getProjectLints({ projectRef }, signal),
+    ({ signal }) => getProjectLints({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
