@@ -30,4 +30,4 @@ jobs:
             *.ipynb
             ./i18n/README.*.md
             ./studio/public/monaco-editor/*
-            ./apps/design-system/*
+            ./apps/design-system/**/*
