@@ -455,7 +455,6 @@ select * from transcripts;
 
 ### View security
 
-
 By default, views are accessed with their creator's permission ("security definer"). If a privileged role creates a view, others accessing it will use that role's elevated permissions. To enforce row level security policies, define the view with the "security invoker" modifier.
 
 ```sql
@@ -468,7 +467,6 @@ create view <view name> with(security_invoker=true) as (
   select * from <some table>
 );
 ```
-
 
 ### When to use views
 
