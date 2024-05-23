@@ -227,7 +227,11 @@ export type enrichedOperation = OpenAPIV3.OperationObject & {
   tags?: []
 }
 
-export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { apiUrl: string }) {
+export function gen_v3(
+  spec: OpenAPIV3.Document,
+  dest: string,
+  { apiUrl, type }: { apiUrl: string; type?: 'client-lib' | 'cli' | 'api' | 'mgmt-api' }
+) {
   const specLayout = spec.tags || []
   const operations: enrichedOperation[] = []
 
@@ -236,14 +240,15 @@ export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { api
 
     toArrayWithKey(val!, 'operation').forEach((o) => {
       const operation = o as v3OperationWithPath
+      const operationId =
+        type === 'mgmt-api' && isValidSlug(operation.operationId)
+          ? operation.operationId
+          : slugify(operation.summary!)
       const enriched = {
         ...operation,
         path: key,
         fullPath,
-        operationId: isValidSlug(operation.operationId)
-          ? operation.operationId
-          : slugify(operation.summary!),
-
+        operationId,
         responseList: toArrayWithKey(operation.responses!, 'responseCode') || [],
       }
       // @ts-expect-error // missing 'responses', see OpenAPIV3.OperationObject.responses

@@ -9,7 +9,7 @@ import apiCommonSections from '~/spec/common-api-sections.json' assert { type: '
 import specFile from '~/spec/transforms/api_v1_openapi_deparsed.json' assert { type: 'json' }
 
 // @ts-ignore
-const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
+const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0', type: 'mgmt-api' })
 const sections = flattenSections(apiCommonSections)
 const libraryPath = '/api'
 
