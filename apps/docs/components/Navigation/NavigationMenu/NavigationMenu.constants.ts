@@ -1027,7 +1027,7 @@ export const api: NavMenuConstant = {
         },
         {
           name: 'Using full-text search',
-          url: '/guides/api/data-apis#debugging-performance-issues',
+          url: '/guides/api/data-apis#using-full-text-search',
         },
         {
           name: 'Debugging performance issues',
