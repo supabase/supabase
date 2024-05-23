@@ -76,33 +76,33 @@ const DowngradeModal = ({
             <Alert
               withIcon
               variant="warning"
-              title="Downgrading to the free plan will lead to reductions in your organization's quota"
+              title="Downgrading to the Free plan will lead to reductions in your organization's quota"
             >
               <p>
-                If you're already past the limits of the free plan, your projects could become
+                If you're already past the limits of the Free plan, your projects could become
                 unresponsive or enter read only mode.
               </p>
             </Alert>
 
-            {(previousProjectAddons.length ?? 0) > 0 ||
-              (hasInstancesOnMicro && downgradingToNano && (
-                <Alert title={`Projects affected by the downgrade`} variant="warning" withIcon>
-                  <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                    {previousProjectAddons.map((project) => (
-                      <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
-                    ))}
+            {((previousProjectAddons.length ?? 0) > 0 ||
+              (hasInstancesOnMicro && downgradingToNano)) && (
+              <Alert title={`Projects affected by the downgrade`} variant="warning" withIcon>
+                <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                  {previousProjectAddons.map((project) => (
+                    <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                  ))}
 
-                    {projects
-                      .filter((it) => it.infra_compute_size === 'micro')
-                      .map((project) => (
-                        <li className="list-disc ml-6" key={project.id}>
-                          {project.name}: Compute will be downgraded. Project will also{' '}
-                          <span className="font-bold">need to be restarted</span>.
-                        </li>
-                      ))}
-                  </ul>
-                </Alert>
-              ))}
+                  {projects
+                    .filter((it) => it.infra_compute_size === 'micro')
+                    .map((project) => (
+                      <li className="list-disc ml-6" key={project.id}>
+                        {project.name}: Compute will be downgraded. Project will also{' '}
+                        <span className="font-bold">need to be restarted</span>.
+                      </li>
+                    ))}
+                </ul>
+              </Alert>
+            )}
           </div>
 
           <ul className="mt-4 space-y-5 text-sm">
@@ -141,7 +141,7 @@ const DowngradeModal = ({
             </li>
           </ul>
 
-          {subscription?.billing_via_partner === true && (
+          {subscription?.billing_via_partner === true && subscription.billing_partner === 'fly' && (
             <p className="mt-4 text-sm">
               Your organization will be downgraded at the end of your current billing cycle.
             </p>
