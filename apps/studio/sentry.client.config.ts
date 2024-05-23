@@ -1,10 +1,23 @@
 import * as Sentry from '@sentry/nextjs'
+import { IS_PLATFORM } from 'common/constants/environment'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   tracesSampleRate: 0.01,
   debug: false,
+  beforeSend(event) {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+
+    if (IS_PLATFORM && consent === 'true') {
+      return event
+    }
+    return null
+  },
   integrations: [
     new Sentry.BrowserTracing({
       // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
