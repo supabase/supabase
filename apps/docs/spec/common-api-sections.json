@@ -16,11 +16,29 @@
         "type": "operation"
       },
       {
+        "id": "get-project-api-keys",
+        "title": "Get project api keys",
+        "slug": "get-project-api-keys",
+        "type": "operation"
+      },
+      {
         "id": "create-a-project",
         "title": "Create a project",
         "slug": "create-a-project",
         "type": "operation"
       },
+      {
+        "id": "deletes-the-given-project",
+        "title": "Delete a project",
+        "slug": "deletes-the-given-project",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Organizations",
+    "items": [
       {
         "id": "list-all-organizations",
         "title": "List all organizations",
@@ -28,9 +46,164 @@
         "type": "operation"
       },
       {
+        "id": "gets-information-about-the-organization",
+        "title": "Get an organization",
+        "slug": "gets-information-about-the-organization",
+        "type": "operation"
+      },
+      {
         "id": "create-an-organization",
         "title": "Create an organization",
         "slug": "create-an-organization",
+        "type": "operation"
+      },
+      {
+        "id": "list-members-of-an-organization",
+        "title": "List organization members",
+        "slug": "list-members-of-an-organization",
+        "type": "operation"
+      }]
+  },
+  {
+    "type": "category",
+    "title": "Services",
+    "items": [
+      {
+        "id": "gets-projects-service-health-status",
+        "title": "Get services health",
+        "slug": "gets-projects-service-health-status",
+        "type": "operation"
+      },
+      {
+        "id": "gets-projects-auth-config",
+        "title": "Get auth service config",
+        "slug": "gets-projects-auth-config",
+        "type": "operation"
+      },
+      {
+        "id": "updates-a-projects-auth-config",
+        "title": "Update auth service config",
+        "slug": "updates-a-projects-auth-config",
+        "type": "operation"
+      },
+      {
+        "id": "gets-projects-postgrest-config",
+        "title": "Get postgrest service config",
+        "slug": "gets-projects-postgrest-config",
+        "type": "operation"
+      },
+      {
+        "id": "updates-projects-postgrest-config",
+        "title": "Update postgrest service config",
+        "slug": "updates-projects-postgrest-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Database",
+    "items": [
+      {
+        "id": "gets-projects-postgres-config",
+        "title": "Get Postgres config",
+        "slug": "gets-projects-postgres-config",
+        "type": "operation"
+      },
+      {
+        "id": "updates-projects-postgres-config",
+        "title": "Update Postgres config",
+        "slug": "updates-projects-postgres-config",
+        "type": "operation"
+      },
+      {
+        "id": "returns-the-projects-eligibility-for-upgrades",
+        "title": "Get Postgres upgrade eligibility",
+        "slug": "returns-the-projects-eligibility-for-upgrades",
+        "type": "operation"
+      },
+      {
+        "id": "gets-the-latest-status-of-the-projects-upgrade",
+        "title": "Get Postgres upgrade status",
+        "slug": "gets-the-latest-status-of-the-projects-upgrade",
+        "type": "operation"
+      },
+      {
+        "id": "upgrades-the-projects-postgres-version",
+        "title": "Upgrade Postgres version",
+        "slug": "upgrades-the-projects-postgres-version",
+        "type": "operation"
+      },
+      {
+        "id": "returns-projects-readonly-mode-status",
+        "title": "Get readonly mode status",
+        "slug": "returns-projects-readonly-mode-status",
+        "type": "operation"
+      },
+      {
+        "id": "disables-projects-readonly-mode-for-the-next-15-minutes",
+        "title": "Disable readonly mode temporarily",
+        "slug": "disables-projects-readonly-mode-for-the-next-15-minutes",
+        "type": "operation"
+      },
+      {
+        "id": "run-sql-query",
+        "title": "Run a query",
+        "slug": "run-sql-query",
+        "type": "operation"
+      },
+      {
+        "id": "enables-database-webhooks-on-the-project",
+        "title": "Enable database webhook",
+        "slug": "enables-database-webhooks-on-the-project",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Database Branching",
+    "items": [
+      {
+        "id": "list-all-database-branches",
+        "title": "List all branches",
+        "slug": "list-all-database-branches",
+        "type": "operation"
+      },
+      {
+        "id": "get-database-branch-config",
+        "title": "Get a branch config",
+        "slug": "get-database-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "create-a-database-branch",
+        "title": "Create a branch",
+        "slug": "create-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "resets-a-database-branch",
+        "title": "Reset a branch",
+        "slug": "resets-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "update-database-branch-config",
+        "title": "Update a branch config",
+        "slug": "update-database-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "delete-a-database-branch",
+        "title": "Delete a branch",
+        "slug": "delete-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "disables-preview-branching",
+        "title": "Disable preview branching",
+        "slug": "disables-preview-branching",
         "type": "operation"
       }
     ]
@@ -115,6 +288,18 @@
   },
   {
     "type": "category",
+    "title": "Storage",
+    "items": [
+      {
+        "id": "lists-all-buckets",
+        "title": "List all buckets",
+        "slug": "lists-all-buckets",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Custom Hostname",
     "items": [
       {
@@ -145,6 +330,36 @@
         "id": "activates-a-custom-hostname-for-a-project",
         "title": "Activate custom hostname",
         "slug": "activates-a-custom-hostname-for-a-project",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Vanity Subdomain",
+    "items": [
+      {
+        "id": "gets-current-vanity-subdomain-config",
+        "title": "Get vanity subdomain config",
+        "slug": "gets-current-vanity-subdomain-config",
+        "type": "operation"
+      },
+      {
+        "id": "checks-vanity-subdomain-availability",
+        "title": "Check vanity subdomain availability",
+        "slug": "checks-vanity-subdomain-availability",
+        "type": "operation"
+      },
+      {
+        "id": "activates-a-vanity-subdomain-for-a-project",
+        "title": "Activate vanity subdomain config",
+        "slug": "activates-a-vanity-subdomain-for-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "deletes-a-projects-vanity-subdomain-configuration",
+        "title": "Deactive vanity subdomain config",
+        "slug": "deletes-a-projects-vanity-subdomain-configuration",
         "type": "operation"
       }
     ]
@@ -193,6 +408,132 @@
         "id": "updates-projects-network-restrictions",
         "title": "Update network restrictions",
         "slug": "updates-projects-network-restrictions",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Ssl enforcement",
+    "items": [
+      {
+        "id": "get-projects-ssl-enforcement-configuration",
+        "title": "Get ssl enforcement config",
+        "slug": "get-projects-ssl-enforcement-configuration",
+        "type": "operation"
+      },
+      {
+        "id": "update-projects-ssl-enforcement-configuration",
+        "title": "Update ssl enforcement config",
+        "slug": "update-projects-ssl-enforcement-configuration",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Single Sign-On",
+    "items": [
+      {
+        "id": "lists-all-sso-providers",
+        "title": "List all sso providers",
+        "slug": "lists-all-sso-providers",
+        "type": "operation"
+      },
+      {
+        "id": "gets-a-sso-provider-by-its-uuid",
+        "title": "Get a sso provider",
+        "slug": "gets-a-sso-provider-by-its-uuid",
+        "type": "operation"
+      },
+      {
+        "id": "creates-a-new-sso-provider",
+        "title": "Create a sso provider",
+        "slug": "creates-a-new-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "updates-a-sso-provider-by-its-uuid",
+        "title": "Update a sso provider",
+        "slug": "updates-a-sso-provider-by-its-uuid",
+        "type": "operation"
+      },
+      {
+        "id": "removes-a-sso-provider-by-its-uuid",
+        "title": "Delete a sso provider",
+        "slug": "removes-a-sso-provider-by-its-uuid",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Oauth",
+    "items": [
+      {
+        "id": "authorize-user-through-oauth",
+        "title": "Authorize user",
+        "slug": "authorize-user-through-oauth",
+        "type": "operation"
+      },
+      {
+        "id": "exchange-auth-code-for-users-access-and-refresh-token",
+        "title": "Exchange oauth token",
+        "slug": "exchange-auth-code-for-users-access-and-refresh-token",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Read replicas",
+    "items": [
+      {
+        "id": "set-up-a-read-replica",
+        "title": "Setup a read replica",
+        "slug": "set-up-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "remove-a-read-replica",
+        "title": "Remove a read replica",
+        "slug": "remove-a-read-replica",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Backups",
+    "items": [
+      {
+        "id": "lists-all-backups",
+        "title": "List all backups",
+        "slug": "lists-all-backups",
+        "type": "operation"
+      },
+      {
+        "id": "restores-a-pitr-backup-for-a-database",
+        "title": "Restores PITR backup",
+        "slug": "restores-a-pitr-backup-for-a-database",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Snippets",
+    "items": [
+      {
+        "id": "lists-sql-snippets-for-the-logged-in-user",
+        "title": "List all snippets",
+        "slug": "lists-sql-snippets-for-the-logged-in-user",
+        "type": "operation"
+      },
+      {
+        "id": "gets-a-specific-sql-snippet",
+        "title": "Get a snippet",
+        "slug": "gets-a-specific-sql-snippet",
         "type": "operation"
       }
     ]

@@ -12,13 +12,14 @@ import CliCommandSection from './CLICommandSection'
 import OldVersionAlert from './OldVersionAlert'
 import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
+import MgmtApiOperationSection from '~/components/reference/MgmtApiOperationSection'
 
 interface RefSectionHandlerProps {
   sections: ICommonSection[]
   spec?: ISpec | IAPISpec
   typeSpec?: TypeSpec
   pageProps: { docs: IRefStaticDoc[] }
-  type: 'client-lib' | 'cli' | 'api'
+  type: 'client-lib' | 'cli' | 'api' | 'mgmt-api'
   isOldVersion?: boolean
   menuId: MenuId
 }
@@ -54,6 +55,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
       case 'cli':
         return 'Supabase CLI reference'
       case 'api':
+      case 'mgmt-api':
         return 'Supabase API reference'
       default:
         return 'Supabase Docs'
@@ -113,14 +115,25 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
                   />
                 )
               case 'operation':
-                return (
-                  <ApiOperationSection
-                    key={section.id + i}
-                    funcData={section}
-                    commonFuncData={section}
-                    spec={props.spec}
-                  />
-                )
+                if (props.type === 'mgmt-api') {
+                  return (
+                    <MgmtApiOperationSection
+                      key={section.id + i}
+                      funcData={section}
+                      commonFuncData={section}
+                      spec={props.spec}
+                    />
+                  )
+                } else {
+                  return (
+                    <ApiOperationSection
+                      key={section.id + i}
+                      funcData={section}
+                      commonFuncData={section}
+                      spec={props.spec}
+                    />
+                  )
+                }
               default:
                 throw new Error(`Unknown common section type '${sectionType}'`)
             }

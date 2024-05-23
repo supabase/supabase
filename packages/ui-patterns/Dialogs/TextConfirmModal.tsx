@@ -37,7 +37,7 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
   alert?: {
     base?: React.ComponentProps<typeof Alert_Shadcn_>
     title?: string
@@ -159,7 +159,7 @@ const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button size="medium" block type="default" disabled={loading}>
+                  <Button size="medium" block type="default" disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}

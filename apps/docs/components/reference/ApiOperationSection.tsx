@@ -24,10 +24,10 @@ const ApiOperationSection = (props) => {
           <code className="text-md flex gap-4 text-md text-foreground-lighter break-all">
             <span
               className="
-                uppercase 
-                whitespace-nowrap 
-                bg-foreground text-background 
-                flex items-center justify-center 
+                uppercase
+                whitespace-nowrap
+                bg-foreground text-background
+                flex items-center justify-center
                 rounded-full font-mono font-medium text-xs px-2 py-0.5"
             >
               {operation.operation}
