@@ -1,7 +1,7 @@
 import { IconX } from 'ui'
 
 /**
- * @deprecated Use ./MultiSelect instead
+ * @deprecated Use ./multi-select instead
  */
 export const BadgeDisabled = ({ name }: { name: string }) => (
   <div
@@ -16,7 +16,7 @@ export const BadgeDisabled = ({ name }: { name: string }) => (
 )
 
 /**
- * @deprecated Use ./MultiSelect instead
+ * @deprecated Use ./multi-select instead
  */
 export const BadgeSelected = ({
   name,

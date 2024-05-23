@@ -34,7 +34,7 @@ interface MultiSelectProps {
 }
 
 /**
- * @deprecated Use ./MultiSelect instead
+ * @deprecated Use ./multi-select instead
  */
 export const MultiSelectV2 = ({
   options,
