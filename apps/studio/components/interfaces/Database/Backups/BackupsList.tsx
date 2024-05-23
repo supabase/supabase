@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { IconAlertCircle, IconClock, Modal } from 'ui'
+import { IconAlertCircle, IconClock, AlertDescription_Shadcn_, Alert_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -18,6 +18,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const BackupsList = () => {
   const router = useRouter()
@@ -88,6 +89,14 @@ const BackupsList = () => {
                 title="You need additional permissions to trigger a scheduled backup"
               />
             )}
+            <Alert_Shadcn_ variant="default">
+              <WarningIcon />
+              <AlertDescription_Shadcn_>
+                Database backups do not include objects stored via the Storage API, as the database
+                only includes metadata about these objects. Restoring an old backup does not restore
+                objects that have been deleted since then.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
             <Panel>
               {sortedBackups?.map((x, i: number) => {
                 return (

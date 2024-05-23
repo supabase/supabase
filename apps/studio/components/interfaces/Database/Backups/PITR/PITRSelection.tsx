@@ -38,6 +38,7 @@ import {
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -138,6 +139,14 @@ const PITRSelection = () => {
         title="Restore your database from a backup"
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
+      <Alert_Shadcn_ variant="default">
+        <WarningIcon />
+        <AlertDescription_Shadcn_>
+          Database backups do not include objects stored via the Storage API, as the database only
+          includes metadata about these objects. Restoring an old backup does not restore objects
+          that have been deleted since then.
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
       {hasNoBackupsAvailable ? (
         <BackupsEmpty />
       ) : (
