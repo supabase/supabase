@@ -1,26 +1,37 @@
 import { useState } from 'react'
-import { Button, Input, Modal } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+} from 'ui'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 type CreateWarehouseProps = {
-  onSubmit: (values: { description: string }) => Promise<void>
+  onSubmit: (values: { description: string }) => void
+  loading: boolean
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
-const CreateWarehouseAccessToken = ({ onSubmit }: CreateWarehouseProps) => {
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [description, setDescription] = useState('')
+const CreateWarehouseAccessToken = ({ onSubmit, loading, open, setOpen }: CreateWarehouseProps) => {
+  const FormSchema = z.object({
+    description: z.string().min(1, {
+      message: 'Description is required',
+    }),
+  })
 
-  async function onConfirm() {
-    setLoading(true)
-
-    await onSubmit({
-      description,
-    })
-    setDescription('')
-    setLoading(false)
-    setOpen(false)
-  }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      description: '',
+    },
+  })
 
   return (
     <>
@@ -36,29 +47,26 @@ const CreateWarehouseAccessToken = ({ onSubmit }: CreateWarehouseProps) => {
         visible={open}
         alignFooter="right"
         loading={loading}
-        onConfirm={onConfirm}
       >
         <Modal.Content className="py-4">
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault()
-              onConfirm()
-            }}
-          >
-            <FormItemLayout
-              label="Description"
-              description="A short description identifying this access token."
-              isReactForm={false}
+          <Form_Shadcn_ {...form}>
+            <form
+              id="create-access-token-form"
+              onSubmit={form.handleSubmit((data) => onSubmit(data))}
             >
-              <Input
-                placeholder="Description"
+              <FormField_Shadcn_
+                control={form.control}
                 name="description"
-                id="description"
-                onChange={(e) => setDescription(e.target.value)}
-                value={description}
+                render={({ field }) => (
+                  <FormItem_Shadcn_>
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ type="text" {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                )}
               />
-            </FormItemLayout>
-          </form>
+            </form>
+          </Form_Shadcn_>
         </Modal.Content>
       </Modal>
     </>

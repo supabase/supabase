@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 
 export type WarehouseAccessTokensVariables = {
   projectRef: string
@@ -20,6 +20,10 @@ export async function getWarehouseAccessTokens(
     params: { path: { ref: projectRef } },
     signal,
   })
+
+  if (response.error) {
+    handleError(response)
+  }
 
   return response
 }

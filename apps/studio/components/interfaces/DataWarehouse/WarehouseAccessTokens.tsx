@@ -38,10 +38,10 @@ const AccessTokenItem = ({
   inserted_at,
 }: {
   token: string
-  id: string
+  id: number
   description: string
   inserted_at: string
-  onDeleteClick: (id: string) => void
+  onDeleteClick: (id: number) => void
 }) => {
   const formattedInsertedAt = new Date(inserted_at).toLocaleString()
 
@@ -88,6 +88,7 @@ const WarehouseAccessTokens = () => {
   const isProjectActive = useIsProjectActive()
   const params = useParams()
   const projectRef = params.ref as string
+  const [open, setOpen] = useState(false)
 
   const accessTokensQuery = useWarehouseAccessTokensQuery({ projectRef })
   const hasAccessTokens = accessTokensQuery.isSuccess && accessTokensQuery.data.data.length > 0
@@ -108,6 +109,7 @@ const WarehouseAccessTokens = () => {
     useCreateWarehouseAccessToken({
       onSuccess: () => {
         toast.success('Access token created')
+        setOpen(false)
       },
     })
 
@@ -121,12 +123,15 @@ const WarehouseAccessTokens = () => {
           description="Manage your warehouse access tokens for this project."
           actions={
             <CreateWarehouseAccessToken
-              onSubmit={async ({ description }) =>
+              open={open}
+              setOpen={setOpen}
+              loading={createLoading}
+              onSubmit={({ description }) => {
                 createWarehouseAccessToken({
                   ref: projectRef,
                   description: description,
                 })
-              }
+              }}
             />
           }
         />
