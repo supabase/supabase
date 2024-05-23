@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 import React, { forwardRef } from 'react'
-import { cn } from '../../lib/utils/cn'
-import { Alert, AlertDescription, AlertTitle } from './../shadcn/ui/alert'
+import { cn } from 'ui/src/lib/utils/cn'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 
 export interface AdmonitionProps {
   type:
@@ -16,6 +16,7 @@ export interface AdmonitionProps {
   label?: string
   title?: string
   description?: string | React.ReactNode
+  showIcon?: boolean
 }
 
 const admonitionToAlertMapping: Record<
@@ -75,7 +76,7 @@ const admonitionSVG = cva('', {
 const admonitionBase = cva('', {
   variants: {
     type: {
-      default: `bg-surface-200/25 border`,
+      default: `bg-surface-200/25 border border-default`,
       warning: `bg-alternative border border-default ![&_p]:text-background-muted`,
       destructive: `bg-alternative border border-default`,
     },
@@ -85,7 +86,7 @@ const admonitionBase = cva('', {
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert>,
   React.ComponentPropsWithoutRef<typeof Alert> & AdmonitionProps
->(({ type = 'note', label, title, description, children, ...props }, ref) => {
+>(({ type = 'note', showIcon = true, label, title, description, children, ...props }, ref) => {
   const typeMapped = admonitionToAlertMapping[type]
 
   return (
@@ -100,7 +101,11 @@ export const Admonition = forwardRef<
         props.className
       )}
     >
-      {typeMapped === 'warning' || typeMapped === 'destructive' ? <WarningIcon /> : <InfoIcon />}
+      {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        <WarningIcon />
+      ) : (
+        <InfoIcon />
+      )}
       {label || title ? (
         <>
           <AlertTitle

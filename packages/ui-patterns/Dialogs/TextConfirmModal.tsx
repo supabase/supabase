@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ReactNode, forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Admonition,
   Alert_Shadcn_,
   Button,
   Dialog,
@@ -22,6 +21,7 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
+import { Admonition } from './../admonition'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
