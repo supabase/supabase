@@ -61,13 +61,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/auth</loc>
+    <loc>https://supabase.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/</loc>
+    <loc>https://supabase.com/auth</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

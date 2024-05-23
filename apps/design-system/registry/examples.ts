@@ -522,6 +522,36 @@ export const examples: Registry = [
     files: ['example/radio-group-form.tsx'],
   },
   {
+    name: 'radio-group-stacked-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-stacked-demo.tsx'],
+  },
+  {
+    name: 'radio-group-stacked-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-stacked-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-card-demo.tsx'],
+  },
+  {
+    name: 'radio-group-card-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-with-children',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-with-children.tsx'],
+  },
+  {
     name: 'resizable-demo',
     type: 'components:example',
     registryDependencies: ['resizable'],
