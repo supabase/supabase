@@ -323,13 +323,12 @@ export const ConnectionPooling = () => {
                           <div className="col-start-5 col-span-8">
                             <Alert_Shadcn_>
                               <AlertTitle_Shadcn_ className="text-foreground">
-                                Set to transaction mode to use both pooling modes concurrently
+                                Pool size is greater than 80% of the max connections (
+                                {maxConnData.maxConnections}) on your database
                               </AlertTitle_Shadcn_>
                               <AlertDescription_Shadcn_>
-                                Session mode can be used concurrently with transaction mode by using
-                                5432 for session and 6543 for transaction. However, by configuring
-                                the pooler mode to session here, you will not be able to use
-                                transaction mode at the same time.
+                                This may result in instability and unreliability with your database
+                                connections.
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </div>
