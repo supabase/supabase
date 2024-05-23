@@ -17,7 +17,8 @@ import {
   FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Radio,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Separator,
   Sheet,
   SheetClose,
@@ -258,9 +259,9 @@ export const CreateHookSheet = ({
                     <FormControl_Shadcn_>
                       <Toggle
                         label={`Enable ${values.hookType}`}
-                        {...field}
                         checked={field.value}
                         onChange={() => field.onChange(!values.enabled)}
+                        disabled={field.disabled}
                       />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
@@ -274,48 +275,25 @@ export const CreateHookSheet = ({
               render={({ field }) => (
                 <FormItemLayout label="Hook type" className="px-8">
                   <FormControl_Shadcn_>
-                    <Radio.Group
-                      type="cards"
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
+                    <RadioGroupStacked
+                      value={values.selectedType}
+                      onValueChange={(value) => field.onChange(value)}
                     >
-                      <Radio
-                        key="postgres"
-                        id="postgres"
+                      <RadioGroupStackedItem
                         value="postgres"
-                        label=""
-                        beforeLabel={
-                          <div className="flex items-center space-x-5">
-                            <div className="flex-col space-y-0">
-                              <div className="flex space-x-2">
-                                <p className="text-foreground">Postgres</p>
-                              </div>
-                              <p className="text-foreground-light">
-                                Used to call a Postgres function.
-                              </p>
-                            </div>
-                          </div>
-                        }
+                        id="postgres"
+                        key="postgres"
+                        label="Postgres"
+                        description="Used to call a Postgres function."
                       />
-                      <Radio
-                        key="https"
-                        id="https"
+                      <RadioGroupStackedItem
                         value="https"
-                        label=""
-                        beforeLabel={
-                          <div className="flex items-center space-x-5">
-                            <div className="flex-col space-y-0">
-                              <div className="flex space-x-2">
-                                <p className="text-foreground">HTTPS</p>
-                              </div>
-                              <p className="text-foreground-light">
-                                Used to call any HTTPS endpoint.
-                              </p>
-                            </div>
-                          </div>
-                        }
+                        id="https"
+                        key="https"
+                        label="HTTPS"
+                        description="Used to call any HTTPS endpoint."
                       />
-                    </Radio.Group>
+                    </RadioGroupStacked>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -336,10 +314,10 @@ export const CreateHookSheet = ({
                           size="small"
                           showError={false}
                           selectedSchemaName={field.value}
-                          disabled={field.disabled}
                           onSelectSchema={(name) => {
                             field.onChange(name)
                           }}
+                          disabled={field.disabled}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -358,7 +336,9 @@ export const CreateHookSheet = ({
                         <FunctionSelector
                           size="small"
                           schema={values.postgresValues.schema}
-                          {...field}
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={field.disabled}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
