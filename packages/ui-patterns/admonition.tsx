@@ -86,47 +86,54 @@ const admonitionBase = cva('', {
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert>,
   React.ComponentPropsWithoutRef<typeof Alert> & AdmonitionProps
->(({ type = 'note', showIcon = true, label, title, description, children, ...props }, ref) => {
-  const typeMapped = admonitionToAlertMapping[type]
+>(
+  (
+    { type = 'note', variant, showIcon = true, label, title, description, children, ...props },
+    ref
+  ) => {
+    const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
 
-  return (
-    <Alert
-      ref={ref}
-      variant={typeMapped}
-      {...props}
-      className={cn(
-        'mb-2',
-        admonitionSVG({ type: typeMapped }),
-        admonitionBase({ type: typeMapped }),
-        props.className
-      )}
-    >
-      {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
-        <WarningIcon />
-      ) : (
-        <InfoIcon />
-      )}
-      {label || title ? (
-        <>
-          <AlertTitle
-            className={cn(
-              'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
-              !label && 'flex-col'
+    return (
+      <Alert
+        ref={ref}
+        variant={typeMapped}
+        {...props}
+        className={cn(
+          'mb-2',
+          admonitionSVG({ type: typeMapped }),
+          admonitionBase({ type: typeMapped }),
+          props.className
+        )}
+      >
+        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+          <WarningIcon />
+        ) : (
+          <InfoIcon />
+        )}
+        {label || title ? (
+          <>
+            <AlertTitle
+              className={cn(
+                'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+                !label && 'flex-col'
+              )}
+            >
+              {label || title}
+            </AlertTitle>
+            {description && <AlertDescription>{description}</AlertDescription>}
+            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+            {children && (
+              <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">
+                {children}
+              </AlertDescription>
             )}
-          >
-            {label || title}
-          </AlertTitle>
-          {description && <AlertDescription>{description}</AlertDescription>}
-          {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-          {children && (
-            <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">{children}</AlertDescription>
-          )}
-        </>
-      ) : (
-        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
-          {children}
-        </div>
-      )}
-    </Alert>
-  )
-})
+          </>
+        ) : (
+          <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+            {children}
+          </div>
+        )}
+      </Alert>
+    )
+  }
+)
