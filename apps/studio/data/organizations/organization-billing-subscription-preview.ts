@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { post } from 'data/fetchers'
-import { organizationKeys } from './keys'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
 import type { SubscriptionTier } from 'data/subscriptions/types'
+import type { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationBillingSubscriptionPreviewVariables = {
   organizationSlug?: string
@@ -63,7 +63,7 @@ export async function previewOrganizationBillingSubscription({
     }
   )
 
-  if (error) throw error
+  if (error) handleError(error)
 
   return data as OrganizationBillingSubscriptionPreviewResponse
 }

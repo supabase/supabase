@@ -13,6 +13,7 @@ export type ProjectPostgrestConfigResponse = {
   db_schema: string
   db_anon_role: string
   db_extra_search_path: string
+  db_pool: number | null
   jwt_secret: string
 }
 

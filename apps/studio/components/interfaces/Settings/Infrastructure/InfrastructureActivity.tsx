@@ -157,10 +157,9 @@ const InfrastructureActivity = () => {
       ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
       : 0
 
-  const highestIoBudgetConsumption = Math.max(
-    ...(ioBudgetData?.data || []).map((x) => Number(x.disk_io_consumption) ?? 0),
-    0
-  )
+  const highestIoBudgetConsumption = (ioBudgetData?.data || [])
+    .map((x) => Number(x.disk_io_consumption) ?? 0)
+    .reduce((a, b) => Math.max(a, b), 0)
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {

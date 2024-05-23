@@ -277,12 +277,14 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `identifier = '${value}'`,
     'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `identifier = '${value}'`,
     'status_code.error': `response.status_code between 500 and 599`,
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
@@ -338,12 +340,14 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   postgrest_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `identifier = '${value}'`,
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
   },
   supavisor_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `m.project like '${value}%'`,
   },
 }
 
@@ -584,7 +588,7 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'info',
           label: 'Info',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that have info severity',
         },
       ],
     },
@@ -712,3 +716,10 @@ export const TIER_QUERY_LIMITS: {
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
+
+export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [
+  '/project/[ref]/logs/edge-logs',
+  '/project/[ref]/logs/pooler-logs',
+  '/project/[ref]/logs/postgres-logs',
+  '/project/[ref]/logs/postgrest-logs',
+]
