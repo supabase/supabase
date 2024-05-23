@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -26,23 +27,21 @@ import {
   Input_Shadcn_,
 } from 'ui'
 
-const DELETE_REQUEST_KEY = 'accountDeletionRequest'
-
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 30)
-  localStorage.setItem(DELETE_REQUEST_KEY, expiryDate.toString())
+  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
 }
 
 const hasActiveDeletionRequest = () => {
-  const expiryDateStr = localStorage.getItem(DELETE_REQUEST_KEY)
+  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
   if (!expiryDateStr) return false
 
   const expiryDate = new Date(expiryDateStr)
   const now = new Date()
 
   if (now > expiryDate) {
-    localStorage.removeItem(DELETE_REQUEST_KEY)
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
     return false
   }
 

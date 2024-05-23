@@ -52,6 +52,9 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
 
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+
+  // Key to track account deletion requests
+  ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
 }
 
 export const OPT_IN_TAGS = {
