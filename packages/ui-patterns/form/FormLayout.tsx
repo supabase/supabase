@@ -144,11 +144,7 @@ export const Page = () => {
               layout="flex"
             >
               <FormControl_Shadcn_>
-                <Switch
-                  placeholder="mildtomato"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl_Shadcn_>
             </FormItemLayout>
           )}
