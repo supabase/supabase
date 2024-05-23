@@ -48,7 +48,7 @@ const ConfirmationModal = forwardRef<
       cancelLabel = 'Cancel',
       confirmLabel = 'Submit',
       confirmLabelLoading,
-      alert,
+      alert = undefined,
       children,
       variant = 'default',
       disabled,
