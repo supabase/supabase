@@ -340,6 +340,7 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   postgrest_logs: {
     ..._SQL_FILTER_COMMON,
+    database: (value: string) => `identifier = '${value}'`,
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
