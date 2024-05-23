@@ -38,6 +38,7 @@ import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface GitHubIntegrationConnectionFormProps {
   connection: IntegrationProjectConnection
@@ -119,14 +120,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
 
   return (
     <div className="flex flex-col gap-6 px-6 py-4">
-      {isBranchingEnabled && (
+      {isBranchingEnabled ? (
         <div>
           <Label_Shadcn_ className="text-foreground">Production branch</Label_Shadcn_>
           <p className="text-xs text-foreground-light mb-3">
             All other branches will be treated as Preview branches
           </p>
 
-          <Alert_Shadcn_ className="mb-4 w-96">
+          <Alert_Shadcn_>
             <AlertTitle_Shadcn_ className="text-sm">
               Changing Git branch for Production Branch coming soon
             </AlertTitle_Shadcn_>
@@ -207,6 +208,18 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
+      ) : (
+        <Alert_Shadcn_ className="w-full mb-0" variant="warning">
+          <WarningIcon />
+          <div>
+            <AlertTitle_Shadcn_ className="text-sm">Braching is not enabled</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              This integration has no effect without Branching feature being active.
+              <br />
+              Make sure to enable it using "Enable branching" button at the top of the page first.
+            </AlertDescription_Shadcn_>
+          </div>
+        </Alert_Shadcn_>
       )}
 
       <Form_Shadcn_ {...form}>
