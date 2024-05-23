@@ -340,8 +340,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
               <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
                 View replication lag
@@ -349,20 +349,16 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
               onClick={() => onSelectRestartReplica()}
+              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
             >
               Restart replica
             </DropdownMenuItem>
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-              className="gap-x-2"
-              onClick={() => onSelectDropReplica()}
-            >
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
               Drop replica
             </DropdownMenuItem>
           </DropdownMenuContent>
