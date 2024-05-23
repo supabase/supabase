@@ -1,5 +1,5 @@
-import { section$new } from '../CommandSection'
-import { type ICommandsState, orderSectionFirst, initCommandsState } from './commandsState'
+import { type ICommandSection, section$new } from '../CommandSection'
+import { initCommandsState, orderSectionFirst, type ICommandsState } from './commandsState'
 
 describe('orderSectionFirst', () => {
   it('Orders newly created section first', () => {
@@ -51,9 +51,8 @@ describe('commandState', () => {
     expected[0].commands = commands
 
     commandsState.registerSection(sectionName, commands)
-    const actual = commandsState.commandSections
 
-    expect(actual).toEqual(expected)
+    expect(commandsState.commandSections).toEqual(expected)
   })
 
   it('Registers command in pre-existing section', () => {
@@ -76,8 +75,7 @@ describe('commandState', () => {
     expected[0].commands = expected[0].commands.concat(commandsToAdd)
 
     commandsState.registerSection('A', commandsToAdd)
-    const actual = commandsState.commandSections
-    expect(actual).toEqual(expected)
+    expect(commandsState.commandSections).toEqual(expected)
   })
 
   it('Reorders sections if orderSection is given', () => {
@@ -93,8 +91,7 @@ describe('commandState', () => {
     expected[0].commands = commands
 
     commandsState.registerSection('B', commands, { orderSection: orderSectionFirst })
-    const actual = commandsState.commandSections
-    expect(actual).toEqual(expected)
+    expect(commandsState.commandSections).toEqual(expected)
   })
 
   it('Reorders commands if orderCommands is given', () => {
@@ -115,18 +112,53 @@ describe('commandState', () => {
     expected[0].commands = [existingCommands[0], commandsToAdd[0], existingCommands[1]]
 
     commandsState.registerSection('Section', commandsToAdd, {
-      orderCommands: (oldCommands, newCommand) => {
+      orderCommands: (oldCommands, newCommands) => {
         const commands = [...oldCommands]
-        commands.splice(1, 0, ...commandsToAdd)
+        commands.splice(1, 0, ...newCommands)
         return commands
       },
     })
-    const actual = commandsState.commandSections
 
-    expect(actual).toEqual(expected)
+    expect(commandsState.commandSections).toEqual(expected)
   })
 
-  it('Unregisters commands when returned function is called', () => {})
+  it('Unregisters commands when returned function is called', () => {
+    const sectionName = 'Section'
+    const firstCommands = [{ id: 'command', name: 'Command', action: () => {} }]
+    const secondCommands = [{ id: 'second', name: 'Second', action: () => {} }]
 
-  it('Unregisters entire section if no commands remain', () => {})
+    const expected = [section$new(sectionName)]
+    expected[0].commands = [...firstCommands, ...secondCommands]
+
+    commandsState.registerSection(sectionName, firstCommands)
+    const unregister = commandsState.registerSection(sectionName, secondCommands)
+
+    expect(commandsState.commandSections).toEqual(expected)
+
+    const newExpected = [section$new(sectionName)]
+    newExpected[0].commands = firstCommands
+
+    unregister()
+    expect(commandsState.commandSections).toHaveLength(1)
+    expect(commandsState.commandSections[0].commands).toHaveLength(1)
+    expect(commandsState.commandSections).toEqual(newExpected)
+  })
+
+  it('Unregisters entire section if no commands remain', () => {
+    const sectionName = 'Section'
+    const commands = [{ id: 'command', name: 'Command', action: () => {} }]
+
+    const expected = [section$new(sectionName)]
+    expected[0].commands = commands
+
+    const unregister = commandsState.registerSection(sectionName, commands)
+
+    expect(commandsState.commandSections).toEqual(expected)
+
+    const newExpected: ICommandSection[] = []
+
+    unregister()
+    expect(commandsState.commandSections).toHaveLength(0)
+    expect(commandsState.commandSections).toEqual(newExpected)
+  })
 })
