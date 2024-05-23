@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
-import { canSendTelemetry } from 'lib/telemetry'
 import createClient from 'openapi-fetch'
 import type { paths } from './api' // generated from openapi-typescript
 
@@ -161,13 +160,9 @@ export const handleError = (error: any): never => {
   }
 
   console.error(error.stack)
-  if (canSendTelemetry()) {
-    // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
-    // add handling for it.
-    Sentry.captureMessage(
-      `Unable to throw an object as error. The object has the following keys: ${Object.keys(error)}.`
-    )
-  }
+  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
+  // add handling for it.
+  Sentry.captureException(error)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
