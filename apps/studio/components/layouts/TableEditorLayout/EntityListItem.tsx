@@ -50,7 +50,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const tableHasLints = checkEntityForLints(

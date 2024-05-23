@@ -38,7 +38,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const isTable = entityType?.type === ENTITY_TYPE.TABLE
