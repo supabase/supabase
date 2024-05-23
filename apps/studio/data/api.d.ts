@@ -262,6 +262,10 @@ export interface paths {
     /** Gets subscription plans */
     get: operations['OrgPlansController_getAvailablePlans']
   }
+  '/platform/organizations/{slug}/billing/invoices/upcoming': {
+    /** Gets the upcoming invoice */
+    get: operations['OrgInvoicesController_getUpcomingInvoice']
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -271,10 +275,6 @@ export interface paths {
   '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
     /** Gets invoice with the given invoice ID */
     get: operations['OrgInvoicesController_getInvoice']
-  }
-  '/platform/organizations/{slug}/billing/invoices/upcoming': {
-    /** Gets the upcoming invoice */
-    get: operations['OrgInvoicesController_getUpcomingInvoice']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -3047,6 +3047,7 @@ export interface components {
     PlansResponse: {
       plans: components['schemas']['PlanResponse'][]
     }
+    UpcomingInvoice: Record<string, never>
     Invoice: {
       id: string
       invoice_pdf: string
@@ -3056,7 +3057,6 @@ export interface components {
       period_end: number
       status: string
     }
-    UpcomingInvoice: Record<string, never>
     ColumnPrivilege: {
       grantor: string
       grantee: string
@@ -7631,6 +7631,29 @@ export interface operations {
       }
     }
   }
+  /** Gets the upcoming invoice */
+  OrgInvoicesController_getUpcomingInvoice: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpcomingInvoice']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve upcoming invoice */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets invoices for the given organization */
   OrgInvoicesController_getInvoices: {
     parameters: {
@@ -7702,29 +7725,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve invoice */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the upcoming invoice */
-  OrgInvoicesController_getUpcomingInvoice: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpcomingInvoice']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve upcoming invoice */
       500: {
         content: never
       }
