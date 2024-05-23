@@ -42,8 +42,6 @@ Sentry.init({
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
   ],
-  // Allow for exception captures originating only from our own code.
-  allowUrls: ['app:///_next/'],
 })
 
 // Replace dynamic query param with a template text
