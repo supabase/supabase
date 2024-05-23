@@ -1,6 +1,17 @@
-import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
-import { FormHeader } from 'components/ui/Forms'
+import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import CopyButton from 'components/ui/CopyButton'
+import { FormHeader } from 'components/ui/Forms'
+import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
+import {
+  useCreateWarehouseAccessToken,
+  useDeleteWarehouseAccessToken,
+  useWarehouseAccessTokensQuery,
+} from 'data/analytics'
+import { MoreVertical, TrashIcon } from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Button,
   Dialog,
@@ -16,19 +27,8 @@ import {
   Input,
   cn,
 } from 'ui'
-import { MoreVertical, TrashIcon } from 'lucide-react'
-import { useParams } from 'common'
-import {
-  useWarehouseAccessTokensQuery,
-  useCreateWarehouseAccessToken,
-  useDeleteWarehouseAccessToken,
-} from 'data/analytics'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import Table from 'components/to-be-cleaned/Table'
-import toast from 'react-hot-toast'
-import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import CopyButton from 'components/ui/CopyButton'
-import { useState } from 'react'
+import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
 
 const AccessTokenItem = ({
   token,

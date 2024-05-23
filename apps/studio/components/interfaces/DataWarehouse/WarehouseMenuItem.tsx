@@ -14,11 +14,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
-  Label_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
   Modal,
   cn,
 } from 'ui'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormMessage } from '@ui/components/shadcn/ui/form'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 type Props = {
   item: {
@@ -35,19 +43,43 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [showDeleteDialog, setDeleteDialog] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const updateCollection = useUpdateCollection()
+  const updateCollection = useUpdateCollection({
+    onSuccess: () => {
+      toast.success('Collection updated successfully')
+      setShowUpdateDialog(false)
+    },
+  })
   const deleteCollection = useDeleteCollectionMutation({
     onSuccess: () => {
       // If the current collection is deleted, redirect to default logs view
       if (item.token === collectionToken) {
         router.push(`/project/${projectRef}/logs/explorer`)
       }
+      setDeleteDialog(false)
+      toast.success('Collection deleted successfully')
     },
   })
 
   const isLoading = updateCollection.isLoading || deleteCollection.isLoading
+
+  const UpdateFormSchema = z.object({
+    name: z.string().min(1, {
+      message: 'Collection name is required',
+    }),
+  })
+
+  const updateForm = useForm<z.infer<typeof UpdateFormSchema>>({
+    resolver: zodResolver(UpdateFormSchema),
+  })
+
+  const DeleteFormSchema = z.object({
+    confirm: z.boolean(),
+  })
+
+  const deleteForm = useForm<z.infer<typeof DeleteFormSchema>>({
+    resolver: zodResolver(DeleteFormSchema),
+  })
 
   return (
     <>
@@ -108,55 +140,48 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         hideFooter
         header={`Update collection "${item.name}"`}
       >
-        <form
-          id="update-collection-form"
-          onSubmit={async (e) => {
-            e.preventDefault()
-            try {
-              const formData = new FormData(e.target as HTMLFormElement)
-
-              const name = formData.get('name') as string
-
-              await updateCollection.mutateAsync({
+        <Form_Shadcn_ {...updateForm}>
+          <form
+            id="update-collection-form"
+            onSubmit={updateForm.handleSubmit((data) =>
+              updateCollection.mutate({
                 projectRef,
                 collectionToken: item.token,
-                name,
+                name: data.name,
               })
-
-              toast.success('Collection updated successfully')
-              setShowUpdateDialog(false)
-            } catch (error) {
-              toast.error('Failed to update collection.')
-              console.error(error)
-            }
-          }}
-        >
-          <Modal.Content className="space-y-6 py-6">
-            <Input
-              required
-              layout="horizontal"
-              label={`Collection name`}
-              id="name"
-              name="name"
-              defaultValue={item.name}
-            />
-          </Modal.Content>
-          <div className="flex gap-2 justify-end p-3 border-t">
-            <Button
-              disabled={isLoading}
-              type="outline"
-              onClick={() => {
-                setShowUpdateDialog(false)
-              }}
-              htmlType="reset"
-            >
-              Cancel
-            </Button>
-            <Button htmlType="submit" loading={isLoading}>
-              Update collection
-            </Button>
-          </div>
-        </form>
+            )}
+          >
+            <Modal.Content className="space-y-6 py-6">
+              <FormField_Shadcn_
+                control={updateForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout label="Collection name">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ type="text" {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </Modal.Content>
+            <FormMessage />
+            <div className="flex gap-2 justify-end p-3 border-t">
+              <Button
+                disabled={isLoading}
+                type="outline"
+                onClick={() => {
+                  setShowUpdateDialog(false)
+                }}
+                htmlType="reset"
+              >
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isLoading}>
+                Update collection
+              </Button>
+            </div>
+          </form>
+        </Form_Shadcn_>
       </Modal>
       <Modal
         visible={showDeleteDialog}
@@ -165,55 +190,54 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         header={`Remove collection "${item.name}"`}
         size="small"
       >
-        <form
-          id="delete-collection-form"
-          onSubmit={async (e) => {
-            e.preventDefault()
-            try {
-              await deleteCollection.mutateAsync({ projectRef, collectionToken: item.token })
-              setDeleteDialog(false)
-              toast.success('Collection deleted successfully')
-            } catch (error) {
-              toast.error('Failed to delete collection.')
-              console.error(error)
-            }
-          }}
-        >
-          <div className="p-3 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete the selected collection?
-              <br /> This action cannot be undone.
-            </p>
-            <div className="flex items-center my-2">
-              <Checkbox_Shadcn_
-                required
-                onCheckedChange={(checked) => setConfirmDelete(!!checked)}
-                checked={confirmDelete}
-                id="confirm"
-                name="confirm"
-              />
-              <Label_Shadcn_ className="p-2" htmlFor="confirm">
-                Yes, I want to delete <span className="font-medium">{item.name}</span>.
-              </Label_Shadcn_>
+        <Form_Shadcn_ {...deleteForm}>
+          <form
+            id="delete-collection-form"
+            onSubmit={deleteForm.handleSubmit(() => {
+              deleteCollection.mutate({ projectRef, collectionToken: item.token })
+            })}
+          >
+            <div className="p-3 space-y-4">
+              <p className="text-sm text-foreground-light">
+                Are you sure you want to delete the selected collection?
+                <br /> This action cannot be undone.
+              </p>
+              <div className="flex items-center my-2">
+                <FormField_Shadcn_
+                  control={deleteForm.control}
+                  name="confirm"
+                  render={({ field }) => (
+                    <FormItemLayout>
+                      <FormControl_Shadcn_>
+                        <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl_Shadcn_>
+                      <FormLabel_Shadcn_ className="p-2">
+                        Yes, I want to delete <span className="font-medium">{item.name}</span>.
+                      </FormLabel_Shadcn_>
+                      <FormMessage />
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="flex gap-2 justify-end p-3 border-t">
-            <Button
-              disabled={isLoading}
-              type="outline"
-              onClick={() => {
-                setDeleteDialog(false)
-              }}
-              htmlType="reset"
-            >
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
-              Delete
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-2 justify-end p-3 border-t">
+              <Button
+                disabled={isLoading}
+                type="outline"
+                onClick={() => {
+                  setDeleteDialog(false)
+                }}
+                htmlType="reset"
+              >
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit" loading={isLoading}>
+                Delete
+              </Button>
+            </div>
+          </form>
+        </Form_Shadcn_>
       </Modal>
     </>
   )

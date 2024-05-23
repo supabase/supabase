@@ -44,8 +44,7 @@ export function useCreateWarehouseAccessToken({
     (payload: WarehouseAccessTokenCreateVariables) => createWarehouseAccessToken(payload),
     {
       async onSuccess(data, vars, context) {
-        const keysToInvalidate = analyticsKeys.warehouseAccessTokens(vars.ref)
-        await queryClient.invalidateQueries(keysToInvalidate)
+        await queryClient.invalidateQueries(analyticsKeys.warehouseAccessTokens(vars.ref))
         await onSuccess?.(data, vars, context)
       },
       async onError(data, variables, context) {

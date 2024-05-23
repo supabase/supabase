@@ -1,3 +1,4 @@
+import { cn } from 'ui'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight, SelectionDetailedRow } from '../LogsFormatters'
 
@@ -14,9 +15,10 @@ const DetailedJsonRow = ({
     <div className="grid grid-cols-12">
       <span className="text-foreground-lighter text-sm col-span-3">{label}</span>
       <span
-        className={`text-foreground text-sm col-span-9 overflow-x-auto ${
+        className={cn(
+          'text-foreground text-sm col-span-9 overflow-x-auto',
           code && 'text-xs font-mono'
-        }`}
+        )}
       >
         <pre
           dangerouslySetInnerHTML={{
