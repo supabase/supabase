@@ -51,6 +51,8 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
 
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
+  SENTRY_USER_ID: 'supabase-sentry-user-id',
 }
 
 export const OPT_IN_TAGS = {

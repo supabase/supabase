@@ -587,7 +587,7 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'info',
           label: 'Info',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that have info severity',
         },
       ],
     },
