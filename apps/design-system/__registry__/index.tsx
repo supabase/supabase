@@ -1556,6 +1556,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "form-item-layout-before-label": {
+      name: "form-item-layout-before-label",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-before-label")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-before-label.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-after-label": {
+      name: "form-item-layout-after-label",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-after-label")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-after-label.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "info-tooltip-demo": {
+      name: "info-tooltip-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/info-tooltip-demo")),
+      source: "",
+      files: ["registry/default/example/info-tooltip-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",

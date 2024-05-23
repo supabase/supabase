@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Info Tooltip',
+          href: '/docs/fragments/info-tooltip',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
