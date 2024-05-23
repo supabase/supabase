@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef } from 'react'
+import { ReactNode, forwardRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Admonition,
@@ -99,6 +99,10 @@ const TextConfirmModal = forwardRef<
       // ✅ This will be type-safe and validated.
       onConfirm()
     }
+
+    useEffect(() => {
+      if (visible) form.reset()
+    }, [visible])
 
     return (
       <Dialog
