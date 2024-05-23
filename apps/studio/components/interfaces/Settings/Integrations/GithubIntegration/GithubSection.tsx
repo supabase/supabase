@@ -149,7 +149,8 @@ const GitHubSection = () => {
                           name: connection.repository.name,
                           supabaseConfig: {
                             supabaseDirectory: connection.workdir,
-                            supabaseChangesOnly: (connection as any).supabase_changes_only, //[Joshen] potentially API codegen issue
+                            supabaseChangesOnly: connection.supabase_changes_only,
+                            branchLimit: connection.branch_limit,
                           },
                         } as any,
                       }}

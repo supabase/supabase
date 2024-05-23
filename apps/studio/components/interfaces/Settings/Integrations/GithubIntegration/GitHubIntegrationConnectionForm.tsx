@@ -95,12 +95,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
     supabaseChangesOnly: z
       .boolean()
       .default(connection.metadata?.supabaseConfig?.supabaseChangesOnly ?? false),
+    branchLimit: z.string().default(String(connection.metadata?.supabaseConfig?.branchLimit ?? 50)),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       supabaseDirectory: connection?.metadata?.supabaseConfig?.supabaseDirectory,
       supabaseChangesOnly: connection?.metadata?.supabaseConfig?.supabaseChangesOnly,
+      branchLimit: String(connection?.metadata?.supabaseConfig?.branchLimit),
     },
   })
 
@@ -111,6 +113,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
       organizationId: org?.id,
       workdir: data.supabaseDirectory,
       supabaseChangesOnly: data.supabaseChangesOnly,
+      branchLimit: Number(data.branchLimit),
     })
   }
 
@@ -208,6 +211,58 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
 
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <FormField_Shadcn_
+            control={form.control}
+            name="branchLimit"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="flex flex-col">
+                <FormLabel_Shadcn_ className="!text">Branch limit</FormLabel_Shadcn_>
+                <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
+                  Total number of branches that can be automatically created for this connection.
+                </FormDescription_Shadcn_>
+                <FormControl_Shadcn_ className="flex gap-3">
+                  <div className="relative">
+                    <Input_Shadcn_
+                      {...field}
+                      className="w-80"
+                      onKeyPress={(event) => {
+                        if (event.key === 'Escape') form.reset()
+                      }}
+                      type="number"
+                    />
+                    <RotateCcw
+                      className={cn(
+                        'text-foreground-lighter transition hover:text cursor-pointer',
+                        'w-4 h-4 absolute right-3 top-3',
+                        'duration-150',
+
+                        field.value !== String(connection.metadata?.supabaseConfig?.branchLimit)
+                          ? 'opacity-100 transition'
+                          : 'opacity-0'
+                      )}
+                      onClick={() => form.reset()}
+                    />
+                    <Button
+                      loading={isUpdatingConnection}
+                      className={cn(
+                        'duration-150 transition',
+                        field.value !== String(connection.metadata?.supabaseConfig?.branchLimit)
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                      htmlType="submit"
+                      disabled={
+                        field.value === String(connection.metadata?.supabaseConfig?.branchLimit)
+                      }
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </FormControl_Shadcn_>
+              </FormItem_Shadcn_>
+            )}
+          />
+
           <FormField_Shadcn_
             control={form.control}
             name="supabaseDirectory"

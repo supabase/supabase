@@ -10,16 +10,17 @@ type UpdateVariables = {
   organizationId: number
   workdir: string
   supabaseChangesOnly: boolean
+  branchLimit: number
 }
 
 export async function updateConnection(
-  { connectionId, workdir, supabaseChangesOnly }: UpdateVariables,
+  { connectionId, workdir, supabaseChangesOnly, branchLimit }: UpdateVariables,
   signal?: AbortSignal
 ) {
   const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
     params: { path: { connection_id: String(connectionId) } },
     signal,
-    body: { workdir, supabase_changes_only: supabaseChangesOnly },
+    body: { workdir, supabase_changes_only: supabaseChangesOnly, branch_limit: branchLimit },
   })
 
   if (error) handleError(error)
