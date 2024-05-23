@@ -87,6 +87,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/form-item-layout',
           items: [],
         },
+        {
+          title: 'Multi Select',
+          href: '/docs/fragments/multi-select',
+          items: [],
+        },
       ],
     },
     {
