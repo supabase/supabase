@@ -18,6 +18,7 @@
     "codegen": "openapi-typescript http://localhost:8080/api-json -o data/api.d.ts && prettier --write data/api.d.ts"
   },
   "dependencies": {
+    "@aws-crypto/sha256-browser": "^3.0.0",
     "@dagrejs/dagre": "^1.0.4",
     "@graphiql/react": "^0.19.4",
     "@graphiql/toolkit": "^0.9.1",
@@ -145,6 +146,7 @@
     "jest": "^29.7.0",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
     "storybook-dark-mode": "^3.0.1",

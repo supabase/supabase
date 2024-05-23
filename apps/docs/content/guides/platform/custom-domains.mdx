@@ -116,7 +116,7 @@ To prevent issues for your users, follow these steps:
      - `https://api.example.com/auth/v1/callback`
    - [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter) uses cookies bound to the project's domain. Make sure your frontend code uses the custom domain instead of the default project's domain.
 2. For each of your SAML identity providers:
-   - Contact your provider and ask them to update the metadata for the SAML application. They should use `https://api.example.com/auth/v1/...` instead of `https://abcdefghijklmnopqrst.supabase.co/auth/v1/callback`.
+   - Contact your provider and ask them to update the metadata for the SAML application. They should use `https://api.example.com/auth/v1/...` instead of `https://abcdefghijklmnopqrst.supabase.co/auth/v1/sso/saml/{metadata,acs,slo}`.
    - Once these changes are made, SAML Single Sign-On will likely stop working until the domain is activated. Plan for this ahead of time.
 
 ### Activate your domain
@@ -192,7 +192,7 @@ To prevent issues for your users, make sure you have gone through these steps:
      - `https://my-example-brand.supabase.co/auth/v1/callback`
    - [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter) uses cookies bound to the project's domain. In this case make sure your frontend code uses the subdomain instead of the default project's domain.
 2. Go through all of your SAML identity providers:
-   - You will need to reach out via email to all of your existing identity providers and ask them to update the metadata for the SAML application (your project). Use `https://example-brand.supabase.co/auth/v1/...` instead of `https://abcdefghijklmnopqrst.supabase.co/auth/v1/callback`.
+   - You will need to reach out via email to all of your existing identity providers and ask them to update the metadata for the SAML application (your project). Use `https://example-brand.supabase.co/auth/v1/...` instead of `https://abcdefghijklmnopqrst.supabase.co/auth/v1/sso/saml/{metadata,acs,slo}`.
    - Once these changes are made, SAML Single Sign-On will likely stop working until the domain is activated. Plan for this ahead of time.
 
 ### Activate a subdomain
