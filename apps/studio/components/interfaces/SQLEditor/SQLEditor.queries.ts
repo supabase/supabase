@@ -220,7 +220,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Central African Republic','CF','CAF','Centrafrique','Africa'),
   ('Chad','TD','TCD','Tchad/Tshad','Africa'),
   ('Chile','CL','CHL','Chile','South America'),
-  ('China','CN','CHN','Zhongquo','Asia'),
+  ('China','CN','CHN','Zhongguo','Asia'),
   ('Christmas Island','CX','CXR','Christmas Island','Oceania'),
   ('Cocos (Keeling) Islands','CC','CCK','Cocos (Keeling) Islands','Oceania'),
   ('Colombia','CO','COL','Colombia','South America'),

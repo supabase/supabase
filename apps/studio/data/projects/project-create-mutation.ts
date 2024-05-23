@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
@@ -54,7 +54,7 @@ export async function createProject({
     body,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

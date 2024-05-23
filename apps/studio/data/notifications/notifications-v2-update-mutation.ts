@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type NotificationsUpdateVariables = {
@@ -16,7 +16,7 @@ export async function updateNotifications({ ids, status }: NotificationsUpdateVa
     }),
     headers: { Version: '2' },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
