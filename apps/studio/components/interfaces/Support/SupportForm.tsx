@@ -13,7 +13,6 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { canSendTelemetry } from 'lib/telemetry'
 import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -79,9 +78,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
-      if (canSendTelemetry()) {
-        Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
-      }
+      Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
       setIsSubmitting(false)
     },
   })
