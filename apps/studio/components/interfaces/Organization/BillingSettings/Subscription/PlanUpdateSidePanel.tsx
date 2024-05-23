@@ -574,6 +574,7 @@ const PlanUpdateSidePanel = () => {
       <ExitSurveyModal
         visible={showExitSurvey}
         subscription={subscription}
+        projects={orgProjects}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
           if (success) onClose()
