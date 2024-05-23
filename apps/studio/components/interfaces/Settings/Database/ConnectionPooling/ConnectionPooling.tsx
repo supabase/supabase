@@ -338,7 +338,7 @@ export const ConnectionPooling = () => {
                         Number(form.getValues('default_pool_size') ?? 15) >
                           maxConnData.maxConnections * 0.8 && (
                           <div className="col-start-5 col-span-8">
-                            <Alert_Shadcn_>
+                            <Alert_Shadcn_ variant="warning">
                               <AlertTitle_Shadcn_ className="text-foreground">
                                 Pool size is greater than 80% of the max connections (
                                 {maxConnData.maxConnections}) on your database
