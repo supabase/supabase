@@ -110,23 +110,12 @@ const DocsAiPage = () => {
 
                       <>
                         {message.status === MessageStatus.Pending ? (
-                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-bounce"></div>
                         ) : (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={markdownComponents}
-                            linkTarget="_blank"
                             className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
                           >
                             {message.content}
                           </ReactMarkdown>

@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { IconAlertCircle, IconClock, Modal } from 'ui'
+import { IconAlertCircle, IconClock, AlertDescription_Shadcn_, Alert_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -18,6 +18,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
+import BackupsStorageAlert from './BackupsStorageAlert'
 
 const BackupsList = () => {
   const router = useRouter()
@@ -88,6 +89,7 @@ const BackupsList = () => {
                 title="You need additional permissions to trigger a scheduled backup"
               />
             )}
+            <BackupsStorageAlert />
             <Panel>
               {sortedBackups?.map((x, i: number) => {
                 return (
