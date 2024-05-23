@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
@@ -20,7 +20,8 @@ export async function getProjectLints({ projectRef }: ProjectLintsVariables, sig
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
+
   return data
 }
 
