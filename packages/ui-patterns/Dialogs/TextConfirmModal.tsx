@@ -101,8 +101,8 @@ const TextConfirmModal = forwardRef<
     }
 
     useEffect(() => {
-      if (visible) form.reset()
-    }, [visible])
+      if (confirmString) form.reset()
+    }, [confirmString])
 
     return (
       <Dialog
