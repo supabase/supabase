@@ -2,7 +2,7 @@ import { withContentlayer } from 'next-contentlayer2'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['ui', 'common', 'shared-data', 'icons'],
+  transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/design-system',
   images: {
     remotePatterns: [
