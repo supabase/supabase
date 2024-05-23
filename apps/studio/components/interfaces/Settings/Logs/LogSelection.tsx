@@ -203,7 +203,7 @@ const LogSelection = ({
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {isLoading || (warehouseLogQuery.isLoading && <Loading />)}
+        {(isLoading || warehouseLogQuery.isLoading) && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>
