@@ -1,6 +1,8 @@
+import { Sha256 } from '@aws-crypto/sha256-browser'
+import type { NextRouter } from 'next/router'
+
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import type { NextRouter } from 'next/router'
 import type { User } from 'types'
 
 export interface TelemetryProps {
@@ -110,6 +112,30 @@ const sendActivity = (
     ...(orgSlug && { orgSlug }),
   }
   return post(`${API_URL}/telemetry/activity`, properties)
+}
+
+/**
+ * Checks if the user has consented to sending telemetry data. Mainly used for Sentry reports.
+ */
+export const canSendTelemetry = () => {
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
+
+  return IS_PLATFORM && consent === 'true'
+}
+
+/**
+ * Generates a unique identifier for an anonymous user based on their gotrue id.
+ */
+export const getAnonId = async (id: string) => {
+  const hash = new Sha256()
+  hash.update(id)
+  const u8Array = await hash.digest()
+  const binString = Array.from(u8Array, (byte) => String.fromCodePoint(byte)).join('')
+  const b64encoded = btoa(binString)
+  return b64encoded
 }
 
 const Telemetry = {

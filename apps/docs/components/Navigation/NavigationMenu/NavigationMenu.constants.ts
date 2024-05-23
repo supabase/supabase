@@ -992,6 +992,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Tools',
+      url: '/guides/api',
+      items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
+    },
+    {
       name: 'Guides',
       url: '/guides/api',
       items: [
@@ -1284,12 +1289,7 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
-        {
-          name: 'Bring Your Own Database',
-          url: '/guides/realtime/bring-your-own-database',
-          items: [],
-        },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
     },
   ],

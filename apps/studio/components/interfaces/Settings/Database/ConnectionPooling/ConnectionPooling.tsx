@@ -267,20 +267,37 @@ export const ConnectionPooling = () => {
                         </FormDescription_Shadcn_>
                       )}
 
-                      {field.value === 'transaction' &&
-                        poolingConfiguration?.pool_mode === 'session' && (
-                          <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                            <Alert_Shadcn_>
-                              <AlertTitle_Shadcn_ className="text-foreground">
-                                Pool mode will be set to transaction permanently on port 6543
-                              </AlertTitle_Shadcn_>
-                              <AlertDescription_Shadcn_>
-                                This will take into effect once saved. You can use session mode by
-                                pointing the pooler connection to use port 5432.
-                              </AlertDescription_Shadcn_>
-                            </Alert_Shadcn_>
-                          </FormDescription_Shadcn_>
-                        )}
+                      {poolingConfiguration?.pool_mode === 'session' && (
+                        <>
+                          {field.value === 'transaction' ? (
+                            <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                              <Alert_Shadcn_>
+                                <AlertTitle_Shadcn_ className="text-foreground">
+                                  Pool mode will be set to transaction permanently on port 6543
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  This will take into effect once saved. You can use session mode by
+                                  pointing the pooler connection to use port 5432.
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            </FormDescription_Shadcn_>
+                          ) : (
+                            <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                              <Alert_Shadcn_>
+                                <AlertTitle_Shadcn_ className="text-foreground">
+                                  Set to transaction mode to use both pooling modes concurrently
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  Session mode can be used concurrently with transaction mode by
+                                  using 5432 for session and 6543 for transaction. However, by
+                                  configuring the pooler mode to session here, you will not be able
+                                  to use transaction mode at the same time.
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            </FormDescription_Shadcn_>
+                          )}
+                        </>
+                      )}
 
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                         <p>
@@ -321,15 +338,14 @@ export const ConnectionPooling = () => {
                         Number(form.getValues('default_pool_size') ?? 15) >
                           maxConnData.maxConnections * 0.8 && (
                           <div className="col-start-5 col-span-8">
-                            <Alert_Shadcn_>
+                            <Alert_Shadcn_ variant="warning">
                               <AlertTitle_Shadcn_ className="text-foreground">
-                                Set to transaction mode to use both pooling modes concurrently
+                                Pool size is greater than 80% of the max connections (
+                                {maxConnData.maxConnections}) on your database
                               </AlertTitle_Shadcn_>
                               <AlertDescription_Shadcn_>
-                                Session mode can be used concurrently with transaction mode by using
-                                5432 for session and 6543 for transaction. However, by configuring
-                                the pooler mode to session here, you will not be able to use
-                                transaction mode at the same time.
+                                This may result in instability and unreliability with your database
+                                connections.
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </div>

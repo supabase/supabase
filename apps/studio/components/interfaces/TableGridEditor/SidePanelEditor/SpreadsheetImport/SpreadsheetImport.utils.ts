@@ -97,7 +97,7 @@ export const revertSpreadsheet = (headers: string[], rows: any[]) => {
   return Papa.unparse(rows, { columns: headers })
 }
 
-const inferColumnType = (column: string, rows: object[]) => {
+export const inferColumnType = (column: string, rows: object[]) => {
   // General strategy is to check the first row first, before checking across all the rows
   // to ensure uniformity in data type. Thinking we do this as an optimization instead of
   // checking all the rows up front.

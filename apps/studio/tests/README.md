@@ -13,3 +13,7 @@ userEvent.click('Hello world')
 import clickDropdown from 'tests/helpers'
 clickDropdown('Hello world')
 ```
+
+### Rules
+
+- All tests should be run consistently (avoid situations whereby tests fails "sometimes")
