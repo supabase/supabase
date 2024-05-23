@@ -1,5 +1,3 @@
-'use client'
-
 import { ButtonHTMLAttributes, DetailedHTMLProps, PropsWithChildren, useRef } from 'react'
 import { useCommandMenu } from './CommandMenuProvider'
 

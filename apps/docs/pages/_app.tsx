@@ -6,7 +6,8 @@ import '../styles/prism-okaidia.scss'
 
 import Head from 'next/head'
 import { ThemeProvider } from 'common'
-import { PortalToast, PromoToast } from 'ui'
+import { PortalToast } from 'ui'
+import { PromoToast } from 'ui-patterns/PromoToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AuthContainer } from '~/features/auth/auth.client'

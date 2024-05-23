@@ -1,5 +1,3 @@
-'use client'
-
 import type OpenAI from 'openai'
 import {
   Dispatch,
@@ -395,10 +393,14 @@ const AiCommand = () => {
                         ) : (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
-                            linkTarget="_blank"
+                            components={{
+                              ...markdownComponents,
+                              a: (props) => (
+                                <a {...props} target="_blank" rel="noopener noreferrer" />
+                              ),
+                            }}
                             className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
+                            urlTransform={(href: string) => {
                               const supabaseUrl = new URL('https://supabase.com')
                               const linkUrl = new URL(href, 'https://supabase.com')
 

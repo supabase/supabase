@@ -1,7 +1,5 @@
-'use client'
-
 import { useParams } from 'common'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import * as React from 'react'
 
 import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'
@@ -167,7 +165,7 @@ const CommandMenu = () => {
               {site === 'docs' && (
                 <CommandGroup heading="Quickstarts">
                   {sharedItems.quickstarts.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router?.push(item.url)}>
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                       <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Start with <span className="font-bold"> {item.label}</span>
@@ -266,7 +264,7 @@ const CommandMenu = () => {
                         key={item.url}
                         type="link"
                         onSelect={() => {
-                          if (router) router.push(itemUrl)
+                          router.push(itemUrl)
                           setIsOpen(false)
                         }}
                       >
@@ -284,7 +282,7 @@ const CommandMenu = () => {
 
               <CommandGroup heading="Support">
                 {sharedItems.support.map((item) => (
-                  <CommandItem key={item.url} type="link" onSelect={() => router?.push(item.url)}>
+                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                     <IconLifeBuoy className="text-foreground-muted" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
@@ -296,7 +294,7 @@ const CommandMenu = () => {
               {site === 'docs' && (
                 <CommandGroup heading="General">
                   {sharedItems.docsGeneral.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router?.push(item.url)}>
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
                       {item?.icon && iconPicker[item.icon]}
                       <CommandLabel>{item.label}</CommandLabel>
                     </CommandItem>
