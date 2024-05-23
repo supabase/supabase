@@ -209,13 +209,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
           </Popover_Shadcn_>
         </div>
       ) : (
-        <Alert_Shadcn_>
+        <Alert_Shadcn_ className="w-full mb-0" variant="warning">
           <WarningIcon />
           <div>
             <AlertTitle_Shadcn_ className="text-sm">Braching is not enabled</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
-              This integration has no effect without Branching feature being active. Make sure to
-              enable it using "Enable branching" button at the top of the page first.
+              This integration has no effect without Branching feature being active.
+              <br />
+              Make sure to enable it using "Enable branching" button at the top of the page first.
             </AlertDescription_Shadcn_>
           </div>
         </Alert_Shadcn_>
