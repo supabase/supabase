@@ -14,8 +14,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write .",
-    "codegen": "openapi-typescript http://localhost:8080/api-json -o data/api.d.ts && prettier --write data/api.d.ts"
+    "prettier:write": "prettier --write ."
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "^3.0.0",
