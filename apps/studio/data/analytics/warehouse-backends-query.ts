@@ -1,12 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
 import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 
 export type WarehouseBackendsVariables = {
   projectRef: string
 }
-
-export type WarehouseBackendsResponse = any
 
 export async function getWarehouseBackends(
   { projectRef }: WarehouseBackendsVariables,
@@ -31,7 +30,7 @@ export async function getWarehouseBackends(
 }
 
 export type WarehouseBackendsData = Awaited<ReturnType<typeof getWarehouseBackends>>
-export type WarehouseBackendsError = unknown
+export type WarehouseBackendsError = ResponseError
 
 export const useWarehouseBackendsQuery = <TData = WarehouseBackendsData>(
   { projectRef }: WarehouseBackendsVariables,

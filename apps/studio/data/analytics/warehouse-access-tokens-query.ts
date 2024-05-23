@@ -7,8 +7,6 @@ export type WarehouseAccessTokensVariables = {
   projectRef: string
 }
 
-export type WarehouseAccessTokensResponse = any
-
 export async function getWarehouseAccessTokens(
   { projectRef }: WarehouseAccessTokensVariables,
   signal?: AbortSignal
