@@ -17,6 +17,10 @@ import { LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
+  const projectRef = project?.ref
+  if (projectRef === undefined) {
+    throw new Error('missing project ref')
+  }
   const { preset } = useParams()
 
   // need to maintain a list of filters for each tab
@@ -31,74 +35,9 @@ const ProjectLints: NextPageWithLayout = () => {
   )
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const {
-    data,
-    isLoading: areLintsLoading,
-    isRefetching,
-    refetch: refetchLintsQuery,
-  } = useProjectLintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({ projectRef })
 
-  const {
-    data: authConfig,
-    isLoading: isAuthConfigLoading,
-    refetch: refetchAuthConfigQuery,
-  } = useAuthConfigQuery({
-    projectRef: project?.ref,
-  })
-
-  const isLoading = areLintsLoading || isAuthConfigLoading
-
-  const refetch = () => {
-    refetchLintsQuery()
-    refetchAuthConfigQuery()
-  }
-
-  let clientLints: Lint[] = []
-
-  // [Alaister]: checking this client side for speed, but should be moved into the query if possible
-  if (authConfig?.EXTERNAL_EMAIL_ENABLED) {
-    if (authConfig.MAILER_OTP_EXP > 3600) {
-      clientLints.push({
-        name: 'auth_otp_long_expiry',
-        level: 'WARN',
-        facing: 'EXTERNAL',
-        categories: ['SECURITY'],
-        description: 'OTP expiry exceeds recommended threshold',
-        detail:
-          'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
-        cache_key: 'auth_otp_long_expiry',
-        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
-        metadata: {
-          type: 'auth',
-          entity: 'Auth',
-        },
-      })
-    }
-
-    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH <= 6) {
-      clientLints.push({
-        name: 'auth_otp_short_length',
-        level: 'WARN',
-        facing: 'EXTERNAL',
-        categories: ['SECURITY'],
-        description: 'OTP length is less than recommended threshold',
-        detail: 'We have detected that you have set the OTP length to less than 6 characters',
-        cache_key: 'auth_otp_short_length',
-        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
-        metadata: {
-          type: 'auth',
-          entity: 'Auth',
-        },
-      })
-    }
-  }
-
-  const activeLints = [...(data ?? []), ...clientLints]?.filter((x) =>
-    x.categories.includes('SECURITY')
-  )
+  const activeLints = data?.filter((x) => x.categories.includes('SECURITY')) ?? []
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]

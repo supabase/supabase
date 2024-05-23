@@ -16,6 +16,10 @@ import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
+  const projectRef = project?.ref
+  if (projectRef === undefined) {
+    throw new Error('missing project ref')
+  }
   const { preset } = useParams()
 
   // need to maintain a list of filters for each tab
@@ -30,10 +34,7 @@ const ProjectLints: NextPageWithLayout = () => {
   )
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({ projectRef })
 
   const activeLints = data?.filter((x) => x.categories.includes('PERFORMANCE')) || []
 
