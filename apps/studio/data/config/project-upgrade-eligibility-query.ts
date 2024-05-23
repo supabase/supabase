@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { useProjectByRef } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
@@ -30,7 +30,7 @@ export async function getProjectUpgradeEligibility(
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as ProjectUpgradeEligibilityResponse
 }
 

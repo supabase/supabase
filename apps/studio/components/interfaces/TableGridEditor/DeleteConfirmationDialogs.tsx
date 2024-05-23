@@ -327,9 +327,10 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
         title={
-          <span className="break-words">
-            Confirm to delete the selected row{numRows > 1 && 's'}
-          </span>
+          <p className="break-words">
+            <span>Confirm to delete the selected row</span>
+            <span>{numRows > 1 && 's'}</span>
+          </p>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
@@ -338,9 +339,12 @@ const DeleteConfirmationDialogs = ({
       >
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">
-            Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
-            {numRows > 1 && `${numRows} `}row
-            {numRows > 1 && 's'}? This action cannot be undone.
+            <span>Are you sure you want to delete </span>
+            <span>{isAllRowsSelected ? 'all' : 'the selected'} </span>
+            <span>{numRows > 1 && `${numRows} `}</span>
+            <span>row</span>
+            <span>{numRows > 1 && 's'}</span>
+            <span>? This action cannot be undone.</span>
           </p>
         </div>
       </ConfirmationModal>

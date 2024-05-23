@@ -185,4 +185,13 @@ For a more complete comparison of pgvector performance over the last year, check
 
 ### Using v0.7.0 in Supabase
 
-We're currently testing pgvector v0.7.0 in Supabase. Stay tuned - we expect to make this available some time next week.
+All new projects ship with pgvector v0.7.0 (or later). Be sure to enable the extension if you haven't already:
+
+```sql
+create extension if not exists vector
+with
+  schema extensions;
+```
+
+If you are unsure which version of pgvector your project is using, search for `vector` on the [Extensions page](https://supabase.com/dashboard/project/_/database/extensions). If you are using a previous version, you can upgrade
+by navigating to the **Service Versions** section on the [Infrastructure page](https://supabase.com/dashboard/project/_/settings/infrastructure) and upgrading your Postgres version to `15.1.1.47` or later.

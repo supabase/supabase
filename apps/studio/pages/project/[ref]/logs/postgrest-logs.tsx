@@ -11,10 +11,10 @@ export const LogPage: NextPageWithLayout = () => {
 
   return (
     <LogsPreviewer
-      projectRef={ref as string}
-      condensedLayout={true}
-      tableName={LogsTableName.POSTGREST}
+      condensedLayout
       queryType="postgrest"
+      projectRef={ref as string}
+      tableName={LogsTableName.POSTGREST}
     />
   )
 }
