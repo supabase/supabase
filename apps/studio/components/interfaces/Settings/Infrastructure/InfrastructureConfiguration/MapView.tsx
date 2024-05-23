@@ -305,14 +305,13 @@ const MapView = ({
 
                             <DropdownMenuItem
                               className="gap-x-2"
-                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                               onClick={() => onSelectRestartReplica(database)}
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                             >
                               Restart replica
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
-                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                               onClick={() => onSelectDropReplica(database)}
                             >
                               Drop replica

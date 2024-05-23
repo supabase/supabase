@@ -1,4 +1,4 @@
-import { parseQuery } from '@gregnr/libpg-query'
+import { parseQuery } from 'libpg-query'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import type { Code } from 'mdast-util-from-markdown/lib'
 import { format } from 'sql-formatter'
