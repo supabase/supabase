@@ -73,6 +73,11 @@ export const docsConfig: DocsConfig = {
       title: 'Fragment Components',
       items: [
         {
+          title: 'Introduction',
+          href: '/docs/components/fragment-components',
+          items: [],
+        },
+        {
           title: 'Admonition',
           href: '/docs/fragments/admonition',
           items: [],
@@ -92,6 +97,11 @@ export const docsConfig: DocsConfig = {
     {
       title: 'Atom Components',
       items: [
+        {
+          title: 'Introduction',
+          href: '/docs/components/atom-components',
+          items: [],
+        },
         {
           title: 'Accordion',
           href: '/docs/components/accordion',
