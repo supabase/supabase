@@ -1,3 +1,5 @@
+// AWS SDK issue: https://github.com/aws/aws-sdk-js-v3/issues/6134
+
 import {
   BedrockRuntimeClient,
   InvokeModelCommand,
