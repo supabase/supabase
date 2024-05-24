@@ -48,7 +48,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
   async function getTodos() {
     const { data: todos } = await supabase.from('todos').select()
-    countries.value = todos
+    todos.value = todos
   }
 
   onMounted(() => {
