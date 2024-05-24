@@ -115,18 +115,6 @@ const sendActivity = (
 }
 
 /**
- * Checks if the user has consented to sending telemetry data. Mainly used for Sentry reports.
- */
-export const canSendTelemetry = () => {
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-
-  return IS_PLATFORM && consent === 'true'
-}
-
-/**
  * Generates a unique identifier for an anonymous user based on their gotrue id.
  */
 export const getAnonId = async (id: string) => {

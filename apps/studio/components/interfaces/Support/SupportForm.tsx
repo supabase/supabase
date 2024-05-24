@@ -13,7 +13,6 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { canSendTelemetry } from 'lib/telemetry'
 import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -30,7 +29,7 @@ import {
   Listbox,
   Separator,
 } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
@@ -79,9 +78,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
-      if (canSendTelemetry()) {
-        Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
-      }
+      Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
       setIsSubmitting(false)
     },
   })
