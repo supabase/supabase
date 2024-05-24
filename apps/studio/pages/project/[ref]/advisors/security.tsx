@@ -53,14 +53,13 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 
   useEffect(() => {
-    // check the url for an id and set the selected lint
+    // check the URL for an ID and set the selected lint
     if (id) {
       const lint = activeLints.find((lint) => lint.cache_key === id) ?? null
-      console.log({ lint })
+
       setSelectedLint(lint)
     }
-  }, [id, activeLints])
-
+  }, [id])
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
 

@@ -39,7 +39,7 @@ const LinterDataGrid = ({
   currentTab,
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const router = useRouter()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -117,6 +117,12 @@ const LinterDataGrid = ({
     return result
   })
 
+  function handleSidepanelClose() {
+    setSelectedLint(null)
+    const { id, ...otherParams } = router.query
+    router.push({ query: otherParams })
+  }
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -176,9 +182,7 @@ const LinterDataGrid = ({
               type="text"
               className="absolute top-3 right-3 px-1"
               icon={<X size={14} />}
-              onClick={() => {
-                setSelectedLint(null)
-              }}
+              onClick={handleSidepanelClose}
             />
 
             <Tabs_Shadcn_
