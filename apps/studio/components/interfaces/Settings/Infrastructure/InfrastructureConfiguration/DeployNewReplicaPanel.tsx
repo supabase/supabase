@@ -151,7 +151,8 @@ const DeployNewReplicaPanel = ({
       disabled={!canDeployReplica}
       header="Deploy a new read replica"
     >
-      <SidePanel.Content className="flex flex-col py-4 gap-y-8">
+      <SidePanel.Content className="flex flex-col py-4 gap-y-4">
+        {/* !isAWSProvider */}
         {!isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -296,53 +297,55 @@ const DeployNewReplicaPanel = ({
           </>
         )}
 
-        <Listbox
-          size="small"
-          id="region"
-          name="region"
-          disabled={!canDeployReplica}
-          value={selectedRegion}
-          onChange={setSelectedRegion}
-          label="Select a region to deploy your read replica in"
-        >
-          {availableRegions.map((region) => (
-            <Listbox.Option
-              key={region.key}
-              label={region.name}
-              value={region.key}
-              addOnBefore={() => (
-                <img
-                  alt="region icon"
-                  className="w-5 rounded-sm"
-                  src={`${BASE_PATH}/img/regions/${region.key}.svg`}
-                />
-              )}
-            >
-              {region.name}
-            </Listbox.Option>
-          ))}
-        </Listbox>
+        <div className="flex flex-col gap-y-6 mt-2">
+          <Listbox
+            size="small"
+            id="region"
+            name="region"
+            disabled={!canDeployReplica}
+            value={selectedRegion}
+            onChange={setSelectedRegion}
+            label="Select a region to deploy your read replica in"
+          >
+            {availableRegions.map((region) => (
+              <Listbox.Option
+                key={region.key}
+                label={region.name}
+                value={region.key}
+                addOnBefore={() => (
+                  <img
+                    alt="region icon"
+                    className="w-5 rounded-sm"
+                    src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                  />
+                )}
+              >
+                {region.name}
+              </Listbox.Option>
+            ))}
+          </Listbox>
 
-        <div className="flex flex-col gap-y-2">
-          <p className="text-foreground-light text-sm">
-            Read replicas will be on the same compute size as your primary database. Deploying a
-            read replica incurs additional{' '}
-            <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
-            Pricing is still in early access and is subject to change.
-          </p>
+          <div className="flex flex-col gap-y-2">
+            <p className="text-foreground-light text-sm">
+              Read replicas will be on the same compute size as your primary database. Deploying a
+              read replica incurs additional{' '}
+              <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
+              Pricing is still in early access and is subject to change.
+            </p>
 
-          <p className="text-foreground-light text-sm">
-            Read more about{' '}
-            <Link
-              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-foreground transition"
-            >
-              usage-based billing
-            </Link>{' '}
-            for compute.
-          </p>
+            <p className="text-foreground-light text-sm">
+              Read more about{' '}
+              <Link
+                href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-foreground transition"
+              >
+                usage-based billing
+              </Link>{' '}
+              for compute.
+            </p>
+          </div>
         </div>
       </SidePanel.Content>
     </SidePanel>
