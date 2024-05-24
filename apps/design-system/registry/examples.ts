@@ -962,6 +962,16 @@ export const examples: Registry = [
     files: ['example/form-item-layout-with-switch.tsx'],
   },
   {
+    name: 'multi-select-demo',
+    type: 'components:example',
+    files: ['example/multi-select-demo.tsx'],
+  },
+  {
+    name: 'multi-select-form',
+    type: 'components:example',
+    files: ['example/multi-select-form.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],

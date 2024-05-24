@@ -29,7 +29,7 @@ import {
   Listbox,
   Separator,
 } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'

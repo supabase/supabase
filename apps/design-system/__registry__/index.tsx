@@ -1644,6 +1644,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-demo": {
+      name: "multi-select-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-demo")),
+      source: "",
+      files: ["registry/default/example/multi-select-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-form": {
+      name: "multi-select-form",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-form")),
+      source: "",
+      files: ["registry/default/example/multi-select-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",
