@@ -8,6 +8,24 @@ export const examples: Registry = [
     files: ['example/accordion-demo.tsx'],
   },
   {
+    name: 'admonition-demo',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-demo.tsx'],
+  },
+  {
+    name: 'admonition-warning',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-warning.tsx'],
+  },
+  {
+    name: 'admonition-destructive',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-destructive.tsx'],
+  },
+  {
     name: 'alert-demo',
     type: 'components:example',
     registryDependencies: ['alert'],

@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 import React, { forwardRef } from 'react'
-import { cn } from '../../lib/utils/cn'
-import { Alert, AlertDescription, AlertTitle } from './../shadcn/ui/alert'
+import { cn } from 'ui/src/lib/utils/cn'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 
 export interface AdmonitionProps {
   type:
@@ -16,6 +16,7 @@ export interface AdmonitionProps {
   label?: string
   title?: string
   description?: string | React.ReactNode
+  showIcon?: boolean
 }
 
 const admonitionToAlertMapping: Record<
@@ -75,7 +76,7 @@ const admonitionSVG = cva('', {
 const admonitionBase = cva('', {
   variants: {
     type: {
-      default: `bg-surface-200/25 border`,
+      default: `bg-surface-200/25 border border-default`,
       warning: `bg-alternative border border-default ![&_p]:text-background-muted`,
       destructive: `bg-alternative border border-default`,
     },
@@ -85,43 +86,54 @@ const admonitionBase = cva('', {
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert>,
   React.ComponentPropsWithoutRef<typeof Alert> & AdmonitionProps
->(({ type = 'note', label, title, description, children, ...props }, ref) => {
-  const typeMapped = admonitionToAlertMapping[type]
+>(
+  (
+    { type = 'note', variant, showIcon = true, label, title, description, children, ...props },
+    ref
+  ) => {
+    const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
 
-  return (
-    <Alert
-      ref={ref}
-      variant={typeMapped}
-      {...props}
-      className={cn(
-        'mb-2',
-        admonitionSVG({ type: typeMapped }),
-        admonitionBase({ type: typeMapped }),
-        props.className
-      )}
-    >
-      {typeMapped === 'warning' || typeMapped === 'destructive' ? <WarningIcon /> : <InfoIcon />}
-      {label || title ? (
-        <>
-          <AlertTitle
-            className={cn(
-              'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
-              !label && 'flex-col'
+    return (
+      <Alert
+        ref={ref}
+        variant={typeMapped}
+        {...props}
+        className={cn(
+          'mb-2',
+          admonitionSVG({ type: typeMapped }),
+          admonitionBase({ type: typeMapped }),
+          props.className
+        )}
+      >
+        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+          <WarningIcon />
+        ) : (
+          <InfoIcon />
+        )}
+        {label || title ? (
+          <>
+            <AlertTitle
+              className={cn(
+                'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+                !label && 'flex-col'
+              )}
+            >
+              {label || title}
+            </AlertTitle>
+            {description && <AlertDescription>{description}</AlertDescription>}
+            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+            {children && (
+              <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">
+                {children}
+              </AlertDescription>
             )}
-          >
-            {label || title}
-          </AlertTitle>
-          {description && <AlertDescription>{description}</AlertDescription>}
-          {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-          {children && (
-            <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">{children}</AlertDescription>
-          )}
-        </>
-      ) : (
-        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
-          {children}
-        </div>
-      )}
-    </Alert>
-  )
-})
+          </>
+        ) : (
+          <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+            {children}
+          </div>
+        )}
+      </Alert>
+    )
+  }
+)
