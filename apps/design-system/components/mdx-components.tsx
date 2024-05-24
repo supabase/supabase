@@ -43,6 +43,7 @@ import { Colors } from '@/components/colors'
 import { Icons } from '@/components/icons'
 import { ThemeSettings } from '@/components/theme-settings'
 import { CodeFragment } from '@/components/code-fragment'
+import { Admonition } from 'ui-patterns/admonition'
 
 const components = {
   Accordion,
@@ -271,6 +272,7 @@ const components = {
   Icons,
   ThemeSettings,
   CodeFragment,
+  Admonition,
 }
 
 interface MdxProps {

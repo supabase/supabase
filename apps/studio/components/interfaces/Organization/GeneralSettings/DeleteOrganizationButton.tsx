@@ -16,7 +16,12 @@ const DeleteOrganizationButton = () => {
   const [value, setValue] = useState('')
 
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutateAsync: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation()
+  const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted ${orgName}`)
+      router.push('/projects')
+    },
+  })
 
   const onValidate = (values: any) => {
     const errors: any = {}
@@ -35,12 +40,7 @@ const DeleteOrganizationButton = () => {
     }
     if (!orgSlug) return console.error('Org slug is required')
 
-    try {
-      await deleteOrganization({ slug: orgSlug })
-    } finally {
-      toast.success(`Successfully deleted ${orgName}`)
-      router.push('/projects')
-    }
+    deleteOrganization({ slug: orgSlug })
   }
 
   return (

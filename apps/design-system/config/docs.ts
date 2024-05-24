@@ -78,6 +78,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Admonition',
+          href: '/docs/fragments/admonition',
+          items: [],
+        },
+        {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
