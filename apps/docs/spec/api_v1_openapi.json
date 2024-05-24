@@ -395,7 +395,7 @@
           }
         },
         "tags": [
-          "auth"
+          "oauth"
         ],
         "security": [
           {
@@ -434,7 +434,7 @@
           }
         },
         "tags": [
-          "auth"
+          "oauth"
         ],
         "security": [
           {
@@ -928,7 +928,7 @@
     "/v1/projects/{ref}/network-bans/retrieve": {
       "post": {
         "operationId": "v1-list-all-network-bans",
-        "summary": "Gets project's network bans",
+        "summary": "[Beta] Gets project's network bans",
         "parameters": [
           {
             "name": "ref",
@@ -973,7 +973,7 @@
     "/v1/projects/{ref}/network-bans": {
       "delete": {
         "operationId": "v1-delete-network-bans",
-        "summary": "Remove network bans.",
+        "summary": "[Beta] Remove network bans.",
         "parameters": [
           {
             "name": "ref",
@@ -1021,7 +1021,7 @@
     "/v1/projects/{ref}/network-restrictions": {
       "get": {
         "operationId": "v1-get-network-restrictions",
-        "summary": "Gets project's network restrictions",
+        "summary": "[Beta] Gets project's network restrictions",
         "parameters": [
           {
             "name": "ref",
@@ -1066,7 +1066,7 @@
     "/v1/projects/{ref}/network-restrictions/apply": {
       "post": {
         "operationId": "v1-update-network-restrictions",
-        "summary": "Updates project's network restrictions",
+        "summary": "[Beta] Updates project's network restrictions",
         "parameters": [
           {
             "name": "ref",
@@ -1121,7 +1121,7 @@
     "/v1/projects/{ref}/pgsodium": {
       "get": {
         "operationId": "v1-get-pgsodium-config",
-        "summary": "Gets project's pgsodium config",
+        "summary": "[Beta] Gets project's pgsodium config",
         "parameters": [
           {
             "name": "ref",
@@ -1164,7 +1164,7 @@
       },
       "put": {
         "operationId": "v1-update-pgsodium-config",
-        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "parameters": [
           {
             "name": "ref",
@@ -1515,7 +1515,7 @@
     "/v1/projects/{ref}/ssl-enforcement": {
       "get": {
         "operationId": "v1-get-ssl-enforcement-config",
-        "summary": "Get project's SSL enforcement configuration.",
+        "summary": "[Beta] Get project's SSL enforcement configuration.",
         "parameters": [
           {
             "name": "ref",
@@ -1558,7 +1558,7 @@
       },
       "put": {
         "operationId": "v1-update-ssl-enforcement-config",
-        "summary": "Update project's SSL enforcement configuration.",
+        "summary": "[Beta] Update project's SSL enforcement configuration.",
         "parameters": [
           {
             "name": "ref",
@@ -1668,7 +1668,7 @@
     "/v1/projects/{ref}/vanity-subdomain": {
       "get": {
         "operationId": "v1-get-vanity-subdomain-config",
-        "summary": "Gets current vanity subdomain config",
+        "summary": "[Beta] Gets current vanity subdomain config",
         "parameters": [
           {
             "name": "ref",
@@ -1711,7 +1711,7 @@
       },
       "delete": {
         "operationId": "v1-deactive-vanity-subdomain-config",
-        "summary": "Deletes a project's vanity subdomain configuration",
+        "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "parameters": [
           {
             "name": "ref",
@@ -1749,7 +1749,7 @@
     "/v1/projects/{ref}/vanity-subdomain/check-availability": {
       "post": {
         "operationId": "v1-check-vanity-subdomain-availability",
-        "summary": "Checks vanity subdomain availability",
+        "summary": "[Beta] Checks vanity subdomain availability",
         "parameters": [
           {
             "name": "ref",
@@ -1804,7 +1804,7 @@
     "/v1/projects/{ref}/vanity-subdomain/activate": {
       "post": {
         "operationId": "v1-activate-vanity-subdomain-config",
-        "summary": "Activates a vanity subdomain for a project.",
+        "summary": "[Beta] Activates a vanity subdomain for a project.",
         "parameters": [
           {
             "name": "ref",
@@ -2081,7 +2081,7 @@
     "/v1/projects/{ref}/read-replicas/setup": {
       "post": {
         "operationId": "v1-setup-a-read-replica",
-        "summary": "Set up a read replica",
+        "summary": "[Beta] Set up a read replica",
         "parameters": [
           {
             "name": "ref",
@@ -2126,7 +2126,7 @@
     "/v1/projects/{ref}/read-replicas/remove": {
       "post": {
         "operationId": "v1-remove-a-read-replica",
-        "summary": "Remove a read replica",
+        "summary": "[Beta] Remove a read replica",
         "parameters": [
           {
             "name": "ref",
@@ -2469,203 +2469,10 @@
         ]
       }
     },
-    "/v1/projects/{ref}/config/auth/third-party-auth": {
-      "post": {
-        "operationId": "v1-create-third-party-auth-integration",
-        "summary": "Creates a new third-party auth integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateThirdPartyAuthBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "v1-list-all-third-party-auth-integration",
-        "summary": "Lists all third-party auth integrations",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ThirdPartyAuth"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
-      "delete": {
-        "operationId": "v1-delete-third-party-auth-integration",
-        "summary": "Removes a third-party auth integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "tpa_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "v1-get-a-third-party-integration",
-        "summary": "Get a third-party integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "tpa_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ThirdPartyAuth"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
-        "summary": "Run sql query",
+        "summary": "[Beta] Run sql query",
         "parameters": [
           {
             "name": "ref",
@@ -2856,7 +2663,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -2903,7 +2710,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -2959,7 +2766,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -3077,7 +2884,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -3124,7 +2931,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -3173,7 +2980,7 @@
           }
         },
         "tags": [
-          "edge-functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -6381,63 +6188,6 @@
             "type": "number"
           }
         }
-      },
-      "CreateThirdPartyAuthBody": {
-        "type": "object",
-        "properties": {
-          "oidc_issuer_url": {
-            "type": "string"
-          },
-          "jwks_url": {
-            "type": "string"
-          },
-          "custom_jwks": {
-            "type": "object"
-          }
-        }
-      },
-      "ThirdPartyAuth": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "oidc_issuer_url": {
-            "type": "string",
-            "nullable": true
-          },
-          "jwks_url": {
-            "type": "string",
-            "nullable": true
-          },
-          "custom_jwks": {
-            "type": "object",
-            "nullable": true
-          },
-          "resolved_jwks": {
-            "type": "object",
-            "nullable": true
-          },
-          "inserted_at": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "resolved_at": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "inserted_at",
-          "updated_at"
-        ]
       },
       "V1RunQueryBody": {
         "type": "object",

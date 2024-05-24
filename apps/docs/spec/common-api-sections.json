@@ -10,21 +10,9 @@
     "title": "auth",
     "items": [
       {
-        "id": "v1-authorize-user",
-        "title": "Authorize user",
-        "slug": "v1-authorize-user",
-        "type": "operation"
-      },
-      {
         "id": "v1-create-a-sso-provider",
         "title": "Create a sso provider",
         "slug": "v1-create-a-sso-provider",
-        "type": "operation"
-      },
-      {
-        "id": "v1-create-third-party-auth-integration",
-        "title": "Create third party auth integration",
-        "slug": "v1-create-third-party-auth-integration",
         "type": "operation"
       },
       {
@@ -34,27 +22,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-delete-third-party-auth-integration",
-        "title": "Delete third party auth integration",
-        "slug": "v1-delete-third-party-auth-integration",
-        "type": "operation"
-      },
-      {
-        "id": "v1-exchange-oauth-token",
-        "title": "Exchange oauth token",
-        "slug": "v1-exchange-oauth-token",
-        "type": "operation"
-      },
-      {
         "id": "v1-get-a-sso-provider",
         "title": "Get a sso provider",
         "slug": "v1-get-a-sso-provider",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-a-third-party-integration",
-        "title": "Get a third party integration",
-        "slug": "v1-get-a-third-party-integration",
         "type": "operation"
       },
       {
@@ -67,12 +37,6 @@
         "id": "v1-list-all-sso-provider",
         "title": "List all sso provider",
         "slug": "v1-list-all-sso-provider",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-third-party-auth-integration",
-        "title": "List all third party auth integration",
-        "slug": "v1-list-all-third-party-auth-integration",
         "type": "operation"
       },
       {
@@ -247,7 +211,7 @@
   },
   {
     "type": "category",
-    "title": "edge-functions",
+    "title": "edge functions",
     "items": [
       {
         "id": "v1-delete-a-function",
@@ -325,6 +289,24 @@
         "id": "v1-update-a-branch-config",
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "oauth",
+    "items": [
+      {
+        "id": "v1-authorize-user",
+        "title": "Authorize user",
+        "slug": "v1-authorize-user",
+        "type": "operation"
+      },
+      {
+        "id": "v1-exchange-oauth-token",
+        "title": "Exchange oauth token",
+        "slug": "v1-exchange-oauth-token",
         "type": "operation"
       }
     ]
