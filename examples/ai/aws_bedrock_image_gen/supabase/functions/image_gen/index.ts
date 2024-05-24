@@ -1,4 +1,8 @@
 // AWS SDK issue: https://github.com/aws/aws-sdk-js-v3/issues/6134
+// We need to mock the file system for the AWS SDK to work.
+import {
+  prepareVirtualFile,
+} from "https://deno.land/x/mock_file@v1.1.2/mod.ts";
 
 import {
   BedrockRuntimeClient,
@@ -10,6 +14,9 @@ import { decode } from "npm:base64-arraybuffer";
 console.log("Hello from Amazon Bedrock!");
 
 Deno.serve(async (req) => {
+  prepareVirtualFile("./aws/config");
+  prepareVirtualFile("./aws/credentials");
+
   const client = new BedrockRuntimeClient({
     region: "us-west-2",
     credentials: {
@@ -89,10 +96,4 @@ Deno.serve(async (req) => {
     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
     --header 'Content-Type: application/json' \
     --data '{"prompt":"A beautiful picture of a bird"}'
-
-    curl -i --location --request POST 'http://127.0.0.1:8000' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"prompt":"A beautiful picture of a bird"}'
-
 */
