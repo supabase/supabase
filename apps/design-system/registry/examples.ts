@@ -962,6 +962,21 @@ export const examples: Registry = [
     files: ['example/form-item-layout-with-switch.tsx'],
   },
   {
+    name: 'form-item-layout-before-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-before-label.tsx'],
+  },
+  {
+    name: 'form-item-layout-after-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-after-label.tsx'],
+  },
+  {
+    name: 'info-tooltip-demo',
+    type: 'components:example',
+    files: ['example/info-tooltip-demo.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
