@@ -505,7 +505,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         transition hover:bg-surface-100 
                         hover:cursor-pointer"
                       >
-                        <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
+                        <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">
                           {job.title}
                         </h2>
                         <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
