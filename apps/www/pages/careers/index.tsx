@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
-import { Badge, Button, IconCheck, Separator } from 'ui'
+import { Badge, Button, IconCheck, Separator, buttonVariants, cn } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -499,12 +499,16 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         key={i}
                         className="
                         first-of-type:rounded-t-md last-of-type:rounded-b-md
-                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7 sm:flex sm:items-center transition ease-out hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer"
+                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7 
+                        flex flex-col md:flex-row 
+                        md:items-center
+                        transition hover:bg-surface-100 
+                        hover:cursor-pointer"
                       >
                         <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                           {job.title}
                         </h2>
-                        <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
+                        <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
                           <div className="flex items-center space-x-4">
                             <Badge
                               className="bg-surface-200 bg-opacity-100 border-muted"
@@ -517,9 +521,14 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <span className="hidden md:block">{job.employment}</span>
                           </div>
                           <p className="hidden lg:block lg:text-sm">{job.description}</p>
-                          <Button className="rounded-full" type="default">
+                          <div
+                            className={cn(
+                              buttonVariants({ type: 'default', size: 'tiny' }),
+                              'rounded-full'
+                            )}
+                          >
                             Apply for position
-                          </Button>
+                          </div>
                         </div>
                       </Link>
                     )
