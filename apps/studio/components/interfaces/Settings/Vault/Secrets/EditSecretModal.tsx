@@ -47,44 +47,48 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
     if (!project) return console.error('Project is required')
 
-    const payload: Partial<VaultSecret> = {}
-    if (values.name !== selectedSecret?.name) payload.name = values.name
-    if (values.description !== selectedSecret?.description) payload.description = values.description
-    if (selectedKeyId !== selectedSecret?.key_id) {
-      let encryptionKeyId = selectedKeyId
-      if (values.keyId === 'create-new') {
-        const addKeyRes = await addKeyMutation({
-          projectRef: project?.ref!,
+    try {
+      const payload: Partial<VaultSecret> = {}
+      if (values.name !== selectedSecret?.name) payload.name = values.name
+      if (values.description !== selectedSecret?.description)
+        payload.description = values.description
+      if (selectedKeyId !== selectedSecret?.key_id) {
+        let encryptionKeyId = selectedKeyId
+        if (values.keyId === 'create-new') {
+          const addKeyRes = await addKeyMutation({
+            projectRef: project?.ref!,
+            connectionString: project?.connectionString,
+            name: values.keyName || undefined,
+          })
+          if (addKeyRes.error) {
+            return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+          } else {
+            encryptionKeyId = addKeyRes[0].id
+          }
+        }
+
+        payload.key_id = encryptionKeyId
+      }
+      payload.secret = values.secret
+
+      if (!isEmpty(payload) && selectedSecret) {
+        setSubmitting(true)
+        const res = await updateSecret({
+          projectRef: project.ref,
           connectionString: project?.connectionString,
-          name: values.keyName || undefined,
+          id: selectedSecret.id,
+          ...payload,
         })
-        if (addKeyRes.error) {
-          return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+        if (!res.error) {
+          toast.success('Successfully updated secret')
+          setSubmitting(false)
+          onClose()
         } else {
-          encryptionKeyId = addKeyRes[0].id
+          toast.error(`Failed to update secret: ${res.error.message}`)
+          setSubmitting(false)
         }
       }
-
-      payload.key_id = encryptionKeyId
-    }
-    payload.secret = values.secret
-
-    if (!isEmpty(payload) && selectedSecret) {
-      setSubmitting(true)
-      const res = await updateSecret({
-        projectRef: project.ref,
-        connectionString: project?.connectionString,
-        id: selectedSecret.id,
-        ...payload,
-      })
-      if (!res.error) {
-        toast.success('Successfully updated secret')
-        setSubmitting(false)
-        onClose()
-      } else {
-        toast.error(`Failed to update secret: ${res.error.message}`)
-        setSubmitting(false)
-      }
+    } finally {
     }
   }
 

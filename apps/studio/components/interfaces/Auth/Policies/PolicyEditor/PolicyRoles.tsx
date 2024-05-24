@@ -2,7 +2,7 @@ import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constan
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 
-import MultiSelect from 'ui-patterns/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { sortBy } from 'lodash'

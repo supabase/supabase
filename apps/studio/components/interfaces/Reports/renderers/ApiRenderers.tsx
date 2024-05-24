@@ -1,3 +1,8 @@
+import sumBy from 'lodash/sumBy'
+import { Fragment, useState } from 'react'
+import { ChevronRight } from 'lucide-react'
+
+import { useParams } from 'common'
 import {
   jsonSyntaxHighlight,
   TextFormatter,
@@ -5,12 +10,11 @@ import {
 import Table from 'components/to-be-cleaned/Table'
 import BarChart from 'components/ui/Charts/BarChart'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import sumBy from 'lodash/sumBy'
-import { Fragment, useState } from 'react'
-import { Button, Collapsible, IconChevronRight } from 'ui'
+import { Button, Collapsible } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import { useParams } from 'common/hooks'
+import AlertError from 'components/ui/AlertError'
+import { ResponseError } from 'types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -33,6 +37,14 @@ export const NetworkTrafficRenderer = (
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
   }
+
+  if (props.error !== null && props.error !== undefined) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve network traffic" error={error} />
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <BarChart
@@ -63,6 +75,7 @@ export const NetworkTrafficRenderer = (
     </div>
   )
 }
+
 export const TotalRequestsChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
@@ -80,6 +93,14 @@ export const TotalRequestsChartRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
+
+  if (props.error !== null && props.error !== undefined) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve total requests" error={error} />
+  }
+
   return (
     <BarChart
       size="small"
@@ -107,15 +128,17 @@ export const TopApiRoutesRenderer = (
   }>
 ) => {
   const { ref: projectRef } = useParams()
-
   const [showMore, setShowMore] = useState(false)
+
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
+  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
-  const cellClasses = '!text-xs !py-2'
 
   return (
     <Collapsible>
       <Table
+        className="rounded-t-none"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -128,10 +151,10 @@ export const TopApiRoutesRenderer = (
         body={
           <>
             {props.data.map((datum, index) => (
-              <Fragment key={datum.path + (datum.search || '')}>
+              <Fragment key={datum.method + datum.path + (datum.search || '')}>
                 <Table.tr
                   className={[
-                    'p-0 transition transform duration-700',
+                    'p-0 transition transform cursor-pointer hover:bg-surface-200',
                     showMore && index >= 3 ? 'w-full h-full opacity-100' : '',
                     !showMore && index >= 3 ? ' w-0 h-0 translate-y-10 opacity-0' : '',
                   ].join(' ')}
@@ -211,6 +234,13 @@ export const ErrorCountsChartRenderer = (
     props.params?.iso_timestamp_end
   )
 
+  if (props.error !== null && props.error !== undefined) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve request errors" error={error} />
+  }
+
   return (
     <BarChart
       size="small"
@@ -246,6 +276,14 @@ export const ResponseSpeedChartRenderer = (
   )
 
   const lastAvg = props.data[props.data.length - 1]?.avg
+
+  if (props.error !== null && props.error !== undefined) {
+    const error = (
+      typeof props.error === 'string' ? { message: props.error } : props.error
+    ) as ResponseError
+    return <AlertError subject="Failed to retrieve response speeds" error={error} />
+  }
+
   return (
     <BarChart
       size="small"
@@ -270,10 +308,10 @@ interface RouteTdContentProps {
 const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <Collapsible.Trigger asChild>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
           <span>
-            <IconChevronRight
+            <ChevronRight
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />

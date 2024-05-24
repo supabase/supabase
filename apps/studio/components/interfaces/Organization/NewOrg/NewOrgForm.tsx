@@ -75,10 +75,14 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     router.push({ query })
   }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
 
-  const { mutateAsync: createOrganization } = useOrganizationCreateMutation({
+  const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
       await invalidateOrganizationsQuery(queryClient)
       router.push(`/new/${org.slug}`)
+    },
+    onError: () => {
+      resetPaymentMethod()
+      setNewOrgLoading(false)
     },
   })
 
@@ -105,23 +109,19 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   async function createOrg(paymentMethodId?: string) {
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
-    try {
-      await createOrganization({
-        name: orgName,
-        kind: orgKind,
-        tier: ('tier_' + dbTier.toLowerCase()) as
-          | 'tier_payg'
-          | 'tier_pro'
-          | 'tier_free'
-          | 'tier_team'
-          | 'tier_enterprise',
-        ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
-        payment_method: paymentMethodId,
-      })
-    } catch (error) {
-      resetPaymentMethod()
-      setNewOrgLoading(false)
-    }
+
+    createOrganization({
+      name: orgName,
+      kind: orgKind,
+      tier: ('tier_' + dbTier.toLowerCase()) as
+        | 'tier_payg'
+        | 'tier_pro'
+        | 'tier_free'
+        | 'tier_team'
+        | 'tier_enterprise',
+      ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
+      payment_method: paymentMethodId,
+    })
   }
 
   const handleSubmit = async (event: any) => {
@@ -158,9 +158,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       const paymentMethodFromSetup = setupIntent.payment_method as PaymentMethod
 
       setPaymentMethod(paymentMethodFromSetup)
-      await createOrg(paymentMethodFromSetup.id)
+      createOrg(paymentMethodFromSetup.id)
     } else {
-      await createOrg(paymentMethod.id)
+      createOrg(paymentMethod.id)
     }
   }
 
@@ -170,66 +170,84 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   }
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <Panel
-          title={
-            <div key="panel-title">
-              <h4>Create a new organization</h4>
-            </div>
-          }
-          footer={
-            <div key="panel-footer" className="flex w-full items-center justify-between">
+    <form onSubmit={handleSubmit}>
+      <Panel
+        title={
+          <div key="panel-title">
+            <h4>Create a new organization</h4>
+          </div>
+        }
+        footer={
+          <div key="panel-footer" className="flex w-full items-center justify-between">
+            <Button
+              type="default"
+              disabled={newOrgLoading}
+              onClick={() => router.push('/projects')}
+            >
+              Cancel
+            </Button>
+            <div className="flex items-center space-x-3">
+              <p className="text-xs text-foreground-lighter">
+                You can rename your organization later
+              </p>
               <Button
-                type="default"
+                htmlType="submit"
+                type="primary"
+                loading={newOrgLoading}
                 disabled={newOrgLoading}
-                onClick={() => router.push('/projects')}
               >
-                Cancel
+                Create organization
               </Button>
-              <div className="flex items-center space-x-3">
-                <p className="text-xs text-foreground-lighter">
-                  You can rename your organization later
-                </p>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  loading={newOrgLoading}
-                  disabled={newOrgLoading}
-                >
-                  Create organization
-                </Button>
-              </div>
             </div>
-          }
-        >
-          <Panel.Content>
-            <p className="text-sm">This is your organization within Supabase.</p>
-            <p className="text-sm text-foreground-light">
-              For example, you can use the name of your company or department.
-            </p>
-          </Panel.Content>
-          <Panel.Content className="Form section-block--body has-inputs-centered">
-            <Input
-              autoFocus
-              label="Name"
-              type="text"
-              layout="horizontal"
-              placeholder="Organization name"
-              descriptionText="What's the name of your company or team?"
-              value={orgName}
-              onChange={onOrgNameChange}
-            />
-          </Panel.Content>
+          </div>
+        }
+      >
+        <Panel.Content>
+          <p className="text-sm">This is your organization within Supabase.</p>
+          <p className="text-sm text-foreground-light">
+            For example, you can use the name of your company or department.
+          </p>
+        </Panel.Content>
+        <Panel.Content className="Form section-block--body has-inputs-centered">
+          <Input
+            autoFocus
+            label="Name"
+            type="text"
+            layout="horizontal"
+            placeholder="Organization name"
+            descriptionText="What's the name of your company or team?"
+            value={orgName}
+            onChange={onOrgNameChange}
+          />
+        </Panel.Content>
+        <Panel.Content className="Form section-block--body has-inputs-centered">
+          <Listbox
+            label="Type of organization"
+            layout="horizontal"
+            value={orgKind}
+            onChange={onOrgKindChange}
+            descriptionText="What would best describe your organization?"
+          >
+            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
+              return (
+                <Listbox.Option key={k} label={v} value={k}>
+                  {v}
+                </Listbox.Option>
+              )
+            })}
+          </Listbox>
+        </Panel.Content>
+
+        {orgKind == 'COMPANY' ? (
           <Panel.Content className="Form section-block--body has-inputs-centered">
             <Listbox
-              label="Type of organization"
+              label="Company size"
               layout="horizontal"
-              value={orgKind}
-              onChange={onOrgKindChange}
-              descriptionText="What would best describe your organization?"
+              value={orgSize}
+              onChange={onOrgSizeChange}
+              descriptionText="How many people are in your company?"
             >
-              {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
+              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
                 return (
                   <Listbox.Option key={k} label={v} value={k}>
                     {v}
@@ -238,140 +256,120 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               })}
             </Listbox>
           </Panel.Content>
+        ) : (
+          <></>
+        )}
 
-          {orgKind == 'COMPANY' ? (
-            <Panel.Content className="Form section-block--body has-inputs-centered">
-              <Listbox
-                label="Company size"
+        <Panel.Content>
+          <Listbox
+            label="Pricing Plan"
+            layout="horizontal"
+            value={dbPricingTierKey}
+            // @ts-ignore
+            onChange={onDbPricingPlanChange}
+            // @ts-ignore
+            descriptionText={
+              <>
+                Select a plan that suits your needs.&nbsp;
+                <a
+                  className="underline"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://supabase.com/pricing"
+                >
+                  More details
+                </a>
+              </>
+            }
+          >
+            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
+              return (
+                <Listbox.Option key={k} label={v} value={k}>
+                  {v}
+                </Listbox.Option>
+              )
+            })}
+          </Listbox>
+        </Panel.Content>
+
+        {dbPricingTierKey === 'PRO' && (
+          <>
+            <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <Toggle
+                id="spend-cap"
                 layout="horizontal"
-                value={orgSize}
-                onChange={onOrgSizeChange}
-                descriptionText="How many people are in your company?"
-              >
-                {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
-                  return (
-                    <Listbox.Option key={k} label={v} value={k}>
-                      {v}
-                    </Listbox.Option>
-                  )
-                })}
-              </Listbox>
-            </Panel.Content>
-          ) : (
-            <></>
-          )}
-
-          <Panel.Content>
-            <Listbox
-              label="Pricing Plan"
-              layout="horizontal"
-              value={dbPricingTierKey}
-              // @ts-ignore
-              onChange={onDbPricingPlanChange}
-              // @ts-ignore
-              descriptionText={
-                <>
-                  Select a plan that suits your needs.&nbsp;
-                  <a
-                    className="underline"
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/pricing"
-                  >
-                    More details
-                  </a>
-                </>
-              }
-            >
-              {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
-                return (
-                  <Listbox.Option key={k} label={v} value={k}>
-                    {v}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
-          </Panel.Content>
-
-          {dbPricingTierKey === 'PRO' && (
-            <>
-              <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                <Toggle
-                  id="spend-cap"
-                  layout="horizontal"
-                  label={
-                    <div className="flex space-x-4">
-                      <span>Spend Cap</span>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="transition opacity-50 cursor-pointer hover:opacity-100"
-                        onClick={() => setShowSpendCapHelperModal(true)}
-                      />
-                    </div>
-                  }
-                  checked={isSpendCapEnabled}
-                  onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                  descriptionText={
-                    <div>
-                      <p>
-                        By default, Pro plan organizations have a spend cap to control costs. When
-                        enabled, usage is limited to the plan's quota, with restrictions when limits
-                        are exceeded. To scale beyond Pro limits without restrictions, disable the
-                        spend cap and pay for over-usage beyond the quota.
-                      </p>
-                    </div>
-                  }
-                />
-              </Panel.Content>
-
-              <SpendCapModal
-                visible={showSpendCapHelperModal}
-                onHide={() => setShowSpendCapHelperModal(false)}
-              />
-            </>
-          )}
-
-          {dbPricingTierKey !== 'FREE' && (
-            <Panel.Content>
-              {paymentMethod?.card !== undefined ? (
-                <div key={paymentMethod.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-8">
-                    <img
-                      alt="Card"
-                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                        .replace(' ', '-')
-                        .toLowerCase()}.png`}
-                      width="32"
+                label={
+                  <div className="flex space-x-4">
+                    <span>Spend Cap</span>
+                    <IconHelpCircle
+                      size={16}
+                      strokeWidth={1.5}
+                      className="transition opacity-50 cursor-pointer hover:opacity-100"
+                      onClick={() => setShowSpendCapHelperModal(true)}
                     />
-                    <Input
-                      readOnly
-                      className="w-64"
-                      size="small"
-                      value={`•••• •••• •••• ${paymentMethod.card.last4}`}
-                    />
-                    <p className="text-sm tabular-nums">
-                      Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+                  </div>
+                }
+                checked={isSpendCapEnabled}
+                onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                descriptionText={
+                  <div>
+                    <p>
+                      By default, Pro plan organizations have a spend cap to control costs. When
+                      enabled, usage is limited to the plan's quota, with restrictions when limits
+                      are exceeded. To scale beyond Pro limits without restrictions, disable the
+                      spend cap and pay for over-usage beyond the quota.
                     </p>
                   </div>
-                  <div>
-                    <Button
-                      type="outline"
-                      icon={<IconEdit2 />}
-                      onClick={() => resetPaymentMethod()}
-                      disabled={newOrgLoading}
-                      className="hover:border-muted"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <PaymentElement />
-              )}
+                }
+              />
             </Panel.Content>
-          )}
-        </Panel>
-      </form>
-    </>
+
+            <SpendCapModal
+              visible={showSpendCapHelperModal}
+              onHide={() => setShowSpendCapHelperModal(false)}
+            />
+          </>
+        )}
+
+        {dbPricingTierKey !== 'FREE' && (
+          <Panel.Content>
+            {paymentMethod?.card !== undefined ? (
+              <div key={paymentMethod.id} className="flex items-center justify-between">
+                <div className="flex items-center space-x-8">
+                  <img
+                    alt="Card"
+                    src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
+                      .replace(' ', '-')
+                      .toLowerCase()}.png`}
+                    width="32"
+                  />
+                  <Input
+                    readOnly
+                    className="w-64"
+                    size="small"
+                    value={`•••• •••• •••• ${paymentMethod.card.last4}`}
+                  />
+                  <p className="text-sm tabular-nums">
+                    Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+                  </p>
+                </div>
+                <div>
+                  <Button
+                    type="outline"
+                    icon={<IconEdit2 />}
+                    onClick={() => resetPaymentMethod()}
+                    disabled={newOrgLoading}
+                    className="hover:border-muted"
+                  />
+                </div>
+              </div>
+            ) : (
+              <PaymentElement />
+            )}
+          </Panel.Content>
+        )}
+      </Panel>
+    </form>
   )
 }
 
