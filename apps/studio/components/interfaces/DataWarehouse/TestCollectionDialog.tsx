@@ -1,8 +1,11 @@
+import { Label } from '@ui/components/shadcn/ui/label'
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
+import CopyButton from 'components/ui/CopyButton'
 import { WarehouseAccessTokensData, WarehouseCollectionsData } from 'data/analytics'
 import { useEffect, useState } from 'react'
 import {
   Button,
+  Checkbox_Shadcn_,
   CodeBlock,
   Dialog,
   DialogContent,
@@ -16,6 +19,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -36,6 +40,7 @@ export function TestCollectionDialog({
   const BASE_WAREHOUSE_URL = `https://api.warehouse.tech/api/events`
   const [testAccessToken, setTestAccessToken] = useState('')
   const [selectedCollection, setSelectedCollection] = useState(collectionToken || '')
+  const [showAccessToken, setShowAccessToken] = useState(false)
 
   useEffect(() => {
     setSelectedCollection(collectionToken)
@@ -49,6 +54,28 @@ export function TestCollectionDialog({
 
   const selectedAccessToken = accessTokens.find((token) => token.token === testAccessToken)
   const selectedCollectionName = collections?.find((col) => col.token === selectedCollection)?.name
+
+  function getcURL(accessToken: string) {
+    return `curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-API-KEY: ${accessToken}' \\
+  -d $'{
+    "event_message": "Test event message",
+    "metadata": {
+      "ip_address": "100.100.100.100",
+      "request_method": "POST",
+      "custom_user_data": {
+        "foo": "bar"
+      },
+      "datacenter": "aws",
+      "request_headers": {
+        "connection": "close",
+        "user_agent": "chrome"
+      }
+    }
+  }'
+`
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -118,27 +145,30 @@ export function TestCollectionDialog({
             />
           </FormItemLayout>
 
-          <CodeBlock className="p-1 language-bash prose" language="bash">
-            {`curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
-  -H 'Content-Type: application/json' \\
-  -H 'X-API-KEY: ${testAccessToken || 'ACCESS_TOKEN'}' \\
-  -d $'{
-    "event_message": "Test event message",
-    "metadata": {
-      "ip_address": "100.100.100.100",
-      "request_method": "POST",
-      "custom_user_data": {
-        "foo": "bar"
-      },
-      "datacenter": "aws",
-      "request_headers": {
-        "connection": "close",
-        "user_agent": "chrome"
-      }
-    }
-  }'
-`}
-          </CodeBlock>
+          <div className="flex gap-2 items-center">
+            <Checkbox_Shadcn_
+              name="showAccessToken"
+              id="showAccessToken"
+              checked={showAccessToken}
+              onCheckedChange={() => setShowAccessToken(!showAccessToken)}
+            />
+            <Label htmlFor="showAccessToken">Show access token</Label>
+          </div>
+
+          <div className="relative">
+            <CodeBlock
+              hideCopy
+              className={'p-1 language-bash prose transition-colors'}
+              language="bash"
+            >
+              {getcURL(showAccessToken ? testAccessToken : '********************')}
+            </CodeBlock>
+            <CopyButton
+              type="default"
+              text={getcURL(testAccessToken)}
+              className="absolute top-2 right-2"
+            />
+          </div>
         </DialogSection>
       </DialogContent>
     </Dialog>
