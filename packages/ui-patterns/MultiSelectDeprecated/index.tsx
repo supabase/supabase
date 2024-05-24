@@ -44,7 +44,7 @@ interface Props {
  */
 
 /**
- * @deprecated To be replaced with MultiSelectV2
+ * @deprecated Use ./multi-select instead
  */
 export default function MultiSelect({
   options,

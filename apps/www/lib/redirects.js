@@ -2533,4 +2533,9 @@ module.exports = [
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
     destination: '/docs/guides/auth/server-side',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/api/data-apis',
+    destination: '/docs/guides/api',
+  },
 ]
