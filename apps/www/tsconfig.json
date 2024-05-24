@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "contentlayer/generated": ["./.contentlayer/generated"],
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"],
       "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
@@ -33,6 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    ".contentlayer/generated",
     "./../../packages/ui/src/**/*.d.ts"
   ]
 }

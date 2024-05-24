@@ -504,6 +504,36 @@ export const examples: Registry = [
     files: ['example/radio-group-form.tsx'],
   },
   {
+    name: 'radio-group-stacked-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-stacked-demo.tsx'],
+  },
+  {
+    name: 'radio-group-stacked-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-stacked-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-card-demo.tsx'],
+  },
+  {
+    name: 'radio-group-card-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-with-children',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-with-children.tsx'],
+  },
+  {
     name: 'resizable-demo',
     type: 'components:example',
     registryDependencies: ['resizable'],
@@ -927,6 +957,16 @@ export const examples: Registry = [
     name: 'info-tooltip-demo',
     type: 'components:example',
     files: ['example/info-tooltip-demo.tsx'],
+  },
+  {
+    name: 'multi-select-demo',
+    type: 'components:example',
+    files: ['example/multi-select-demo.tsx'],
+  },
+  {
+    name: 'multi-select-form',
+    type: 'components:example',
+    files: ['example/multi-select-form.tsx'],
   },
   {
     name: 'color-usage-surface-www-and-docs',

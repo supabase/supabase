@@ -92,6 +92,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/form-item-layout',
           items: [],
         },
+        {
+          title: 'Multi Select',
+          href: '/docs/fragments/multi-select',
+          items: [],
+        },
       ],
     },
     {
@@ -262,6 +267,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Radio Group',
           href: '/docs/components/radio-group',
+          items: [],
+        },
+        {
+          title: 'Radio Group Stacked',
+          href: '/docs/components/radio-group-stacked',
+          items: [],
+        },
+        {
+          title: 'Radio Group Card',
+          href: '/docs/components/radio-group-card',
           items: [],
         },
         {
