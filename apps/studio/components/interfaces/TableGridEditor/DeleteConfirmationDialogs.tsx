@@ -1,20 +1,11 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Checkbox,
-  IconExternalLink,
-  Modal,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 
 import type { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
@@ -26,6 +17,7 @@ import type { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: TableLike
@@ -82,7 +74,7 @@ const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     },
   })
-  const { mutateAsync: deleteTable } = useTableDeleteMutation({
+  const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
       const tables = await getTables(snap.selectedSchemaName)
       onAfterDeleteTable(tables)
@@ -108,7 +100,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
+  const { mutate: deleteAllRows } = useTableRowDeleteAllMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -123,7 +115,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
+  const { mutate: truncateRows } = useTableRowTruncateMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -259,7 +251,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -299,25 +291,26 @@ const DeleteConfirmationDialogs = ({
             onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
           />
           {isDeleteWithCascade && (
-            <Alert
-              withIcon
-              variant="warning"
-              title="Warning: Dropping with cascade may result in unintended consequences"
-            >
-              <p className="mb-4">
+            <Alert_Shadcn_ variant="warning">
+              <AlertTitle_Shadcn_>
+                Warning: Dropping with cascade may result in unintended consequences
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
                 All dependent objects will be removed, as will any objects that depend on them,
                 recursively.
-              </p>
-              <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
-                <Link
-                  href="https://www.postgresql.org/docs/current/ddl-depend.html"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  About dependency tracking
-                </Link>
-              </Button>
-            </Alert>
+              </AlertDescription_Shadcn_>
+              <AlertDescription_Shadcn_ className="mt-4">
+                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
+                  <Link
+                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About dependency tracking
+                  </Link>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
           )}
         </div>
       </ConfirmationModal>

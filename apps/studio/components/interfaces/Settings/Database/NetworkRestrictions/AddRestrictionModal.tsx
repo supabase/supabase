@@ -69,8 +69,12 @@ const AddRestrictionModal = ({
       return errors
     }
 
-    const isPrivate = checkIfPrivate(type, ipAddress)
-    if (isPrivate) errors.ipAddress = 'Private IP addresses are not supported'
+    try {
+      const isPrivate = checkIfPrivate(type, ipAddress)
+      if (isPrivate) errors.ipAddress = 'Private IP addresses are not supported'
+    } catch (error: any) {
+      errors.ipAddress = error.message
+    }
 
     return errors
   }
