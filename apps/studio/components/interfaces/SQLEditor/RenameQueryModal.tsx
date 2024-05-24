@@ -95,7 +95,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 {!hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
-                    onClick={async () => titleSql({ sql: snippet.content.sql })}
+                    onClick={() => titleSql({ sql: snippet.content.sql })}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
                   >
