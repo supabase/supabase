@@ -152,7 +152,6 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
-        {/* !isAWSProvider */}
         {!isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
