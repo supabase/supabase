@@ -91,9 +91,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
       if (val.length > 0) {
         try {
-          if (!githubConnection?.id) {
-            throw new Error('No GitHub connection found')
-          }
+          if (!githubConnection?.id) throw new Error('No GitHub connection found')
 
           await checkGithubBranchValidity({
             connectionId: githubConnection.id,

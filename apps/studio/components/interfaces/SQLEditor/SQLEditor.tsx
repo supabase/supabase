@@ -222,9 +222,11 @@ const SQLEditor = () => {
    */
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
-      const { title } = await generateSqlTitle({ sql })
-
-      snap.renameSnippet(id, title)
+      try {
+        const { title } = await generateSqlTitle({ sql })
+        snap.renameSnippet(id, title)
+      } finally {
+      }
     },
     [generateSqlTitle, snap]
   )

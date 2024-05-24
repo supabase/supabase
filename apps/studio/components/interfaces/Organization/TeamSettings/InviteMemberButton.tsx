@@ -47,7 +47,7 @@ const InviteMemberButton = ({
     role: string().required('Role is required'),
   })
 
-  const { mutateAsync: inviteMember, isLoading: isInviting } =
+  const { mutate: inviteMember, isLoading: isInviting } =
     useOrganizationMemberInviteCreateMutation()
 
   const onInviteMember = async (values: any, { resetForm }: any) => {
@@ -68,21 +68,25 @@ const InviteMemberButton = ({
 
     const roleId = Number(values.role)
 
-    try {
-      const response = await inviteMember({
+    inviteMember(
+      {
         slug,
         invitedEmail: values.email.toLowerCase(),
         ownerId: userId,
         roleId,
-      })
-      if (isNil(response)) {
-        toast.error('Failed to add member')
-      } else {
-        toast.success('Successfully added new member')
-        setIsOpen(!isOpen)
-        resetForm({ initialValues: { ...initialValues, role: roleId } })
+      },
+      {
+        onSuccess: (data) => {
+          if (isNil(data)) {
+            toast.error('Failed to add member')
+          } else {
+            toast.success('Successfully added new member')
+            setIsOpen(!isOpen)
+            resetForm({ initialValues: { ...initialValues, role: roleId } })
+          }
+        },
       }
-    } catch (error) {}
+    )
   }
 
   return (

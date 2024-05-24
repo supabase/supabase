@@ -1,12 +1,12 @@
 import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
-import Link from 'next/link'
-import { useParams } from 'common'
 
 export const IndexAdvisorDisabledState = () => {
   const { ref } = useParams()
@@ -23,23 +23,27 @@ export const IndexAdvisorDisabledState = () => {
 
   const onEnableIndexAdvisor = async () => {
     if (project === undefined) return console.error('Project is required')
-    if (hypopgExtension?.installed_version === null) {
-      await enableExtension({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: hypopgExtension.name,
-        schema: hypopgExtension?.schema ?? 'extensions',
-        version: hypopgExtension.default_version,
-      })
-    }
-    if (indexAdvisorExtension?.installed_version === null) {
-      await enableExtension({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        name: indexAdvisorExtension.name,
-        schema: indexAdvisorExtension?.schema ?? 'extensions',
-        version: indexAdvisorExtension.default_version,
-      })
+
+    try {
+      if (hypopgExtension?.installed_version === null) {
+        await enableExtension({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: hypopgExtension.name,
+          schema: hypopgExtension?.schema ?? 'extensions',
+          version: hypopgExtension.default_version,
+        })
+      }
+      if (indexAdvisorExtension?.installed_version === null) {
+        await enableExtension({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: indexAdvisorExtension.name,
+          schema: indexAdvisorExtension?.schema ?? 'extensions',
+          version: indexAdvisorExtension.default_version,
+        })
+      }
+    } finally {
     }
   }
 
