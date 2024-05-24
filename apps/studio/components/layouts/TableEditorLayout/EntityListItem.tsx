@@ -28,8 +28,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { Lint } from '../../../data/lint/lint-query'
-import { checkEntityForLints } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 export interface EntityListItemProps {
   id: number
@@ -52,28 +51,29 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     projectRef: project?.ref,
   })
 
-  const tableHasLints = checkEntityForLints(
+  const tableHasLints: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
     snap.selectedSchemaName
-  )
+  ).hasLint
 
-  const viewHasLints = checkEntityForLints(
+  const viewHasLints: boolean = getEntityLintDetails(
     entity.name,
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
     snap.selectedSchemaName
-  )
-  const materializedViewHasLints = checkEntityForLints(
+  ).hasLint
+
+  const materializedViewHasLints: boolean = getEntityLintDetails(
     entity.name,
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
     snap.selectedSchemaName
-  )
+  ).hasLint
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -140,17 +140,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
-        if (tableHasLints.hasLint) {
+        if (tableHasLints) {
           tooltipContent = 'RLS Disabled'
         }
         break
       case ENTITY_TYPE.VIEW:
-        if (viewHasLints.hasLint) {
+        if (viewHasLints) {
           tooltipContent = 'Security Definer view'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewHasLints.hasLint) {
+        if (materializedViewHasLints) {
           tooltipContent = 'Security Definer view'
         }
 
