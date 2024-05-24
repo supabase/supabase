@@ -38,8 +38,6 @@ const EncryptionKeysManagement = () => {
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
-  const [isDeletingKey, setIsDeletingKey] = useState(false)
-
   const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
@@ -50,8 +48,18 @@ const EncryptionKeysManagement = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
-  const { mutateAsync: deleteKeyMutation } = usePgSodiumKeyDeleteMutation()
+  const { mutate: addKeyMutation, isLoading: isCreating } = usePgSodiumKeyCreateMutation({
+    onSuccess: () => {
+      toast.success('Successfully added new key')
+      setShowAddKeyModal(false)
+    },
+  })
+  const { mutate: deleteKeyMutation, isLoading: isDeleting } = usePgSodiumKeyDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted encryption key`)
+      setSelectedKeyToRemove(undefined)
+    },
+  })
 
   const allKeys = data || []
   const keys = sortBy(
@@ -74,38 +82,22 @@ const EncryptionKeysManagement = () => {
   const addKey = async (values: any, { setSubmitting }: any) => {
     if (!project) return console.error('Project is required')
 
-    setSubmitting(true)
-    const res = await addKeyMutation({
+    addKeyMutation({
       projectRef: project.ref,
       connectionString: project.connectionString,
       name: values.name,
     })
-    if (!res.error) {
-      toast.success('Successfully added new key')
-      setShowAddKeyModal(false)
-    } else {
-      toast.error(`Failed to add new key: ${res.error.message}`)
-    }
-    setSubmitting(false)
   }
 
   const confirmDeleteKey = async () => {
     if (!selectedKeyToRemove) return
     if (!project) return console.error('Project is required')
 
-    setIsDeletingKey(true)
-    const res = await deleteKeyMutation({
+    deleteKeyMutation({
       projectRef: project.ref,
       connectionString: project.connectionString,
       id: selectedKeyToRemove.id,
     })
-    if (!res.error) {
-      toast.success(`Successfully deleted encryption key`)
-      setSelectedKeyToRemove(undefined)
-    } else {
-      toast.error(`Failed to delete encryption key: ${res.error.message}`)
-    }
-    setIsDeletingKey(false)
   }
 
   return (
@@ -299,7 +291,7 @@ const EncryptionKeysManagement = () => {
         visible={selectedKeyToRemove !== undefined}
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
-        loading={isDeletingKey}
+        loading={isDeleting}
         header={<h5 className="text-sm text-foreground">Confirm to delete key</h5>}
       >
         <div className="py-4">
@@ -347,7 +339,7 @@ const EncryptionKeysManagement = () => {
           }}
           onSubmit={addKey}
         >
-          {({ isSubmitting }: any) => {
+          {() => {
             return (
               <div className="py-4">
                 <Modal.Content>
@@ -363,12 +355,12 @@ const EncryptionKeysManagement = () => {
                   <div className="flex items-center justify-end space-x-2">
                     <Button
                       type="default"
-                      disabled={isSubmitting}
+                      disabled={isCreating}
                       onClick={() => setShowAddKeyModal(false)}
                     >
                       Cancel
                     </Button>
-                    <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                    <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
                       Add key
                     </Button>
                   </div>
