@@ -1,50 +1,33 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { format } from 'sql-formatter'
 import { AiIconAnimation, Button } from 'ui'
 
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useSelectedOrganization } from 'hooks'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditor } from '../SQLEditor'
-import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
-import { DiffType } from '../SQLEditor.types'
 import Results from './Results'
+import { Loader2 } from 'lucide-react'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
+  isDisabled?: boolean
+  onDebug: () => void
+  isDebugging?: boolean
 }
 
-const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
+const UtilityTabResults = ({
+  id,
+  isExecuting,
+  isDisabled,
+  isDebugging,
+  onDebug,
+}: UtilityTabResultsProps) => {
   const { ref } = useParams()
   const snap = useSqlEditorStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
   const organization = useSelectedOrganization()
-
-  const { sqlDiff, setDebugSolution, setAiInput, setSqlDiff, setSelectedDiffType } = useSqlEditor()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
-  const { data } = useEntityDefinitionsQuery(
-    {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-    },
-    { enabled: includeSchemaMetadata }
-  )
-
-  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
@@ -63,8 +46,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
   if (isExecuting) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
+      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <Loader2 size={14} className="animate-spin" />
+        <p className="m-0 border-0 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (result?.error) {
@@ -140,41 +124,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             )}
             {!hasHipaaAddon && (
               <Button
-                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugSqlLoading} />}
-                disabled={!!sqlDiff || isDebugSqlLoading}
-                onClick={async () => {
-                  try {
-                    const { solution, sql } = await debugSql({
-                      sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                      errorMessage: result.error.message,
-                      entityDefinitions,
-                    })
-
-                    const formattedSql =
-                      sqlAiDisclaimerComment +
-                      '\n\n' +
-                      format(sql, {
-                        language: 'postgresql',
-                        keywordCase: 'lower',
-                      })
-                    setAiInput('')
-                    setDebugSolution(solution)
-                    setSqlDiff({
-                      original: snippet.snippet.content.sql,
-                      modified: formattedSql,
-                    })
-                    setSelectedDiffType(DiffType.Modification)
-                  } catch (error: unknown) {
-                    // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
-                    // that's not relevant for the user - so we prettify it here by avoiding to return the
-                    // entire error body from the assistant
-                    if (isError(error)) {
-                      toast.error(
-                        `Sorry, the assistant failed to debug your query! Please try again with a different one.`
-                      )
-                    }
-                  }
-                }}
+                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                disabled={!!isDisabled || isDebugging}
+                onClick={onDebug}
               >
                 Debug with Supabase AI
               </Button>

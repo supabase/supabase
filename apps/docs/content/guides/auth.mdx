@@ -3,147 +3,38 @@ id: 'auth'
 title: 'Auth'
 description: 'Use Supabase to Authenticate and Authorize your users.'
 subtitle: 'Use Supabase to authenticate and authorize your users.'
-video: 'https://www.youtube.com/v/6ow_jW4epf8'
+tocVideo: '6ow_jW4epf8'
 ---
 
-There are two parts to every Auth system:
+Supabase Auth makes it easy to implement authentication and authorization in your app. We provide client SDKs and API endpoints to help you create and manage users.
 
-- **Authentication:** should this person be allowed in? If yes, who are they?
-- **Authorization:** once they are in, what are they allowed to do?
+Your users can use many popular Auth methods, including password, magic link, one-time password (OTP), social login, and single sign-on (SSO).
 
-Supabase Auth is designed to work either as a standalone product, or deeply integrated with the other Supabase products.
-Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' built-in Auth functionality wherever possible.
+## About authentication and authorization
 
-Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
+Authentication and authorization are the core responsibilities of any Auth system.
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+- **Authentication** means checking that a user is who they say they are.
+- **Authorization** means checking what resources a user is allowed to access.
 
-## Authentication
+Supabase Auth uses [JSON Web Tokens (JWTs)](/docs/guides/auth/jwt) for authentication. Auth integrates with Supabase's database features, making it easy to use [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for authorization.
 
-You can authenticate your users in several ways:
+## The Supabase ecosystem
 
-- Password-based methods such as [email](/docs/guides/auth/auth-email) or [phone](/docs/guides/auth/phone-login) and password
-- Passwordless methods such as sending a magiclink or one-time password (OTP)
-- OAuth social providers
-- SAML SSO
-- [Anonymous Sign-ins](/docs/guides/auth/auth-anonymous)
+You can use Supabase Auth as a standalone product, but it's also built to integrate with the Supabase ecosystem.
 
-### Providers
+Auth uses your project's Postgres database under the hood, storing user data and other Auth information in a special schema. You can connect this data to your own tables using triggers and foreign key references.
 
-We provide a suite of Providers and login methods, as well as [Auth helpers](/docs/guides/auth/auth-helpers/).
+Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
 
-#### Social Auth
+## Providers
 
-<div className="container" style={{ padding: 0 }}>
-  <AuthProviders type="social" />
-</div>
+Supabase Auth works with many popular Auth methods, including Social and Phone Auth using third-party providers. See the following sections for a list of supported third-party providers.
 
-#### Phone Auth
+### Social Auth
 
-<div className="container" style={{ padding: 0 }}>
-  <AuthProviders type="phone" />
-</div>
+<AuthProviders type="social" />
 
-### Configure third-party providers
+### Phone Auth
 
-You can enable third-party providers with the click of a button by navigating to Authentication > Providers > Auth Providers and inputting your `Client ID` and `Secret` for each.
-
-![OAuth Logins.](/docs/img/supabase-oauth-logins.png)
-
-### Redirect URLs and wildcards
-
-We've moved the guide for setting up redirect URLs [here](/docs/guides/auth/concepts/redirect-urls).
-
-#### [Netlify preview URLs](/docs/guides/auth/concepts/redirect-urls#netlify-preview-urls)
-
-#### [Vercel preview URLs](/docs/guides/auth/concepts/redirect-urls#vercel-preview-urls)
-
-#### [Mobile deep linking URIs](/docs/guides/auth/concepts/redirect-urls#mobile-deep-linking-uris)
-
-## Authorization
-
-When you need granular authorization rules, nothing beats PostgreSQL's Row Level Security (RLS).
-
-Policies are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
-
-Get started with our [Row Level Security Guides](/docs/guides/auth/row-level-security).
-
-### Row Level Security
-
-Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/rls-zoom2.mp4"
-    type="video/mp4"
-  />
-</video>
-
-### Policies
-
-[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/policies-zoom2.mp4"
-    type="video/mp4"
-  />
-</video>
-
-With policies, your database becomes the rules engine. Instead of repetitively filtering your queries, like this ...
-
-```js
-const loggedInUserId = 'd0714948'
-const { data, error } = await supabase
-  .from('users')
-  .select('user_id, name')
-  .eq('user_id', loggedInUserId)
-
-// console.log(data)
-// => { id: 'd0714948', name: 'Jane' }
-```
-
-... you can simply define a rule on your database table, `(select auth.uid()) = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
-
-```js
-const { data, error } = await supabase.from('users').select('user_id, name')
-
-// console.log(data)
-// Still => { id: 'd0714948', name: 'Jane' }
-```
-
-### How it works
-
-1. A user signs up. Supabase creates a new user in the `auth.users` table.
-2. Supabase returns a new JWT, which contains the user's `UUID`.
-3. Every request to your database also sends the JWT.
-4. Postgres inspects the JWT to determine the user making the request.
-5. The user's UID can be used in policies to restrict access to rows.
-
-Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
-
-## User management
-
-Supabase provides multiple endpoints to authenticate and manage your users:
-
-- [Sign up](/docs/reference/javascript/auth-signup)
-- [Sign in with password](/docs/reference/javascript/auth-signinwithpassword)
-- [Sign in with passwordless / one-time password (OTP)](/docs/reference/javascript/auth-signinwithotp)
-- [Sign in with OAuth](/docs/reference/javascript/auth-signinwithoauth)
-- [Sign out](/docs/reference/javascript/auth-signout)
-
-When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing `id` in the `auth.users` table using a `user_id` field.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/auth-zoom2.mp4"
-    type="video/mp4"
-  />
-</video>
+<AuthProviders type="phone" />

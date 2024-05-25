@@ -2,9 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Input } from 'ui'
 import toast from 'react-hot-toast'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { Button, Input } from 'ui'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,6 +11,7 @@ import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -31,7 +31,24 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const [message, setMessage] = useState<string>('')
   const [selectedReasons, setSelectedReasons] = useState<string[]>([])
 
-  const { mutateAsync: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation()
+  const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
+    onSuccess: async () => {
+      if (!isFree) {
+        try {
+          await sendExitSurvey({
+            projectRef,
+            message,
+            reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+            exitAction: 'delete',
+          })
+        } finally {
+        }
+      }
+
+      toast.success(`Successfully deleted ${project?.name}`)
+      router.push(`/projects`)
+    },
+  })
   const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
   const isSubmitting = isDeleting || isSending
 
@@ -64,27 +81,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
 
   async function handleDeleteProject() {
     if (project === undefined) return
-
     if (!isFree && selectedReasons.length === 0) {
       return toast.error('Please select at least one reason for deleting your project')
     }
 
-    try {
-      await deleteProject({ projectRef: project.ref })
-
-      if (!isFree) {
-        await sendExitSurvey({
-          projectRef,
-          message,
-          reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-          exitAction: 'delete',
-        })
-      }
-
-      toast.success(`Successfully deleted ${project.name}`)
-      router.push(`/projects`)
-    } finally {
-    }
+    deleteProject({ projectRef: project.ref })
   }
 
   return (

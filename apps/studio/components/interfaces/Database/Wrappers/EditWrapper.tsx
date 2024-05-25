@@ -41,6 +41,7 @@ import {
   makeValidateRequired,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
@@ -182,14 +183,16 @@ const EditWrapper = () => {
           >
             <Link href={`/project/${ref}/database/wrappers`}>
               <div className="flex items-center space-x-2">
-                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>
               </div>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-foreground">Edit wrapper: {wrapper.name}</h3>
+          <h3 className="mb-2 text-xl text-foreground">
+            Edit {wrapperMeta.label} wrapper: {wrapper.name}
+          </h3>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.github.io/wrappers/stripe/"
                 target="_blank"
@@ -338,7 +341,8 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index].label
+                          const label = wrapperMeta.tables[table.index]?.label
+                          const target = table?.table ?? table.object
 
                           return (
                             <div
@@ -347,10 +351,13 @@ const EditWrapper = () => {
                             >
                               <div>
                                 <p className="text-sm">
-                                  {table.schema_name}.{table.table_name}
+                                  {table.schema_name}.{table.table_name}{' '}
+                                </p>
+                                <p className="text-sm text-foreground-light mt-1">
+                                  Target: {target}
                                 </p>
                                 <p className="text-sm text-foreground-light">
-                                  {label}:{' '}
+                                  Columns:{' '}
                                   {table.columns.map((column: any) => column.name).join(', ')}
                                 </p>
                               </div>

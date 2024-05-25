@@ -130,15 +130,27 @@ These variables will be exposed on the app, and that's completely fine since we 
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```dart lib/main.dart
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final supabase = Supabase.instance.client;
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(title: 'Supabase Flutter');
+  }
+}
 ```
 
 ### Set up splash screen
@@ -154,7 +166,7 @@ class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  _SplashPageState createState() => _SplashPageState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
@@ -206,7 +218,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -232,15 +244,19 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -309,7 +325,7 @@ class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
   @override
-  _AccountPageState createState() => _AccountPageState();
+  State<AccountPage> createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
@@ -331,15 +347,19 @@ class _AccountPageState extends State<AccountPage> {
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
     } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -371,15 +391,19 @@ class _AccountPageState extends State<AccountPage> {
         );
       }
     } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -393,15 +417,19 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/login');
@@ -470,12 +498,14 @@ Future<void> main() async {
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -569,7 +599,7 @@ class Avatar extends StatefulWidget {
   final void Function(String) onUpload;
 
   @override
-  _AvatarState createState() => _AvatarState();
+  State<Avatar> createState() => _AvatarState();
 }
 
 class _AvatarState extends State<Avatar> {
@@ -668,7 +698,7 @@ class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
   @override
-  _AccountPageState createState() => _AccountPageState();
+  State<AccountPage> createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
@@ -695,15 +725,19 @@ class _AccountPageState extends State<AccountPage> {
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -735,15 +769,19 @@ class _AccountPageState extends State<AccountPage> {
         );
       }
     } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -757,15 +795,19 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/login');
@@ -787,15 +829,19 @@ class _AccountPageState extends State<AccountPage> {
         );
       }
     } on PostgrestException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     }
     if (!mounted) {
       return;

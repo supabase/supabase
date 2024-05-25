@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -134,6 +136,7 @@ function Select({
           value={value}
           disabled={disabled}
           required={required}
+          // @ts-ignore
           placeholder={placeholder}
           {...props}
         >

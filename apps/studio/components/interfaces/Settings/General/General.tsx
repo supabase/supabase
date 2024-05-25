@@ -31,6 +31,7 @@ import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const General = () => {
   const { project } = useProjectContext()
@@ -58,15 +59,20 @@ const General = () => {
     },
   })
 
-  const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
+  const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
-    try {
-      const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
-      resetForm({ values: { name }, initialValues: { name } })
-      toast.success('Successfully saved settings')
-    } catch (error) {}
+
+    updateProject(
+      { ref: project.ref, name: values.name.trim() },
+      {
+        onSuccess: ({ name }) => {
+          resetForm({ values: { name }, initialValues: { name } })
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
 
   return (
@@ -75,7 +81,7 @@ const General = () => {
 
       {isBranch && (
         <Alert_Shadcn_ variant="default" className="mb-6">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             You are currently on a preview branch of your project
           </AlertTitle_Shadcn_>

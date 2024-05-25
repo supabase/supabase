@@ -1,28 +1,25 @@
+import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import { CodeBlock, IconDatabase, Tabs } from 'ui'
-
+import components from '~/components'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
-import components from '~/components'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
-
-  // gracefully return nothing if function does not exist
   if (!item) return <></>
 
   const hasTsRef = item['$ref'] || null
 
   const tsDefinition =
     hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
-  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params
+  const parameters =
+    item.overwriteParams ??
+    (hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params)
   const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment?.shortText : ''
 
   return (
@@ -102,7 +99,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
-                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
@@ -125,12 +121,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               : example?.code?.startsWith('```kotlin')
                                 ? 'kotlin'
                                 : 'js'
-                      //                     `
-                      // import { createClient } from '@supabase/supabase-js'
-
-                      // // Create a single supabase client for interacting with your database
-                      // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-                      // `
                       const staticExample = item.examples[exampleIndex]
 
                       const response = staticExample.response
