@@ -1,5 +1,5 @@
-import { parseQuery } from '@gregnr/libpg-query'
 import dayjs from 'dayjs'
+import { parseQuery } from 'libpg-query'
 import { compact } from 'lodash'
 import { z } from 'zod'
 import { PostgresColumn, PostgresTable } from './types'
@@ -110,7 +110,6 @@ const extractNameDefinition = (obj: z.infer<typeof NameDefinition>) => {
  */
 export async function parseTables(sql: string) {
   // Parse SQL using the real Postgres parser (compiled to WASM)
-  // See: https://github.com/pyramation/libpg-query-node/pull/34
 
   const result = await parseQuery(sql)
   const parsedSql = parseQueryResultSchema.safeParse(result)

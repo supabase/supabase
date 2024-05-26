@@ -17,13 +17,12 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
     <div className="mt-0">
       <button
         className={[
-          'px-5',
+          'px-5 py-1',
           'border-t border-l border-r border-default',
           'text-left text-sm text-foreground-light',
-          'hover:bg-surface-100 transition-all',
-
+          'hover:bg-surface-100',
           'flex items-center gap-2',
-          open ? 'w-full py-1.5 rounded-tl-lg rounded-tr-lg' : 'py-1 border-b rounded-full',
+          open ? 'w-full rounded-tl-lg rounded-tr-lg' : 'border-b rounded-full',
         ].join(' ')}
         onClick={() => setOpen(!open)}
       >
@@ -34,11 +33,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
         </div>
         {`${!open ? `Open` : `Close`} ${props.name ?? 'accepted values'}`}
       </button>
-      <div
-        className={['transition-all opacity-0', open ? 'opacity-100 h-auto' : 'invisible h-0'].join(
-          ' '
-        )}
-      >
+      <div className={['opacity-0', open ? 'opacity-100 h-auto' : 'invisible h-0'].join(' ')}>
         {props.children}
       </div>
     </div>

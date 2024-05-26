@@ -159,12 +159,10 @@ export const handleError = (error: any): never => {
     throw new Error(error.message)
   }
 
+  console.error(error.stack)
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
-  console.error(error.stack)
-  Sentry.captureMessage(
-    `Unable to throw an object as error. The object has the following keys: ${Object.keys(error)}.`
-  )
+  Sentry.captureException(error)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.

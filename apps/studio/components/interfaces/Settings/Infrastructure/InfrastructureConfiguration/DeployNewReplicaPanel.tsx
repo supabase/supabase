@@ -147,7 +147,38 @@ const DeployNewReplicaPanel = ({
       disabled={!canDeployReplica}
       header="Deploy a new read replica"
     >
-      <SidePanel.Content className="flex flex-col py-4 gap-y-8">
+      <SidePanel.Content className="flex flex-col py-4 gap-y-4">
+        {currentComputeAddon === undefined && (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Project required to at least be on a Small compute
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                This is to ensure that read replicas can keep up with the primary databases'
+                activities.
+              </span>
+              <div className="flex items-center gap-x-2 mt-3">
+                <Button asChild type="default">
+                  <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
+                    Change compute size
+                  </Link>
+                </Button>
+                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                  <a
+                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </a>
+                </Button>
+              </div>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+
         {!isWalgEnabled && (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -193,37 +224,6 @@ const DeployNewReplicaPanel = ({
                 </Button>
               </AlertDescription_Shadcn_>
             )}
-          </Alert_Shadcn_>
-        )}
-
-        {currentComputeAddon === undefined && (
-          <Alert_Shadcn_>
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              Project required to at least be on a Small compute
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <span>
-                This is to ensure that read replicas can keep up with the primary databases'
-                activities.
-              </span>
-              <div className="flex items-center gap-x-2 mt-3">
-                <Button asChild type="default">
-                  <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
-                    Change compute size
-                  </Link>
-                </Button>
-                <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                  <a
-                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </Button>
-              </div>
-            </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
 
@@ -276,53 +276,55 @@ const DeployNewReplicaPanel = ({
           </Alert_Shadcn_>
         )}
 
-        <Listbox
-          size="small"
-          id="region"
-          name="region"
-          disabled={!canDeployReplica}
-          value={selectedRegion}
-          onChange={setSelectedRegion}
-          label="Select a region to deploy your read replica in"
-        >
-          {availableRegions.map((region) => (
-            <Listbox.Option
-              key={region.key}
-              label={region.name}
-              value={region.key}
-              addOnBefore={() => (
-                <img
-                  alt="region icon"
-                  className="w-5 rounded-sm"
-                  src={`${BASE_PATH}/img/regions/${region.key}.svg`}
-                />
-              )}
-            >
-              {region.name}
-            </Listbox.Option>
-          ))}
-        </Listbox>
+        <div className="flex flex-col gap-y-8">
+          <Listbox
+            size="small"
+            id="region"
+            name="region"
+            disabled={!canDeployReplica}
+            value={selectedRegion}
+            onChange={setSelectedRegion}
+            label="Select a region to deploy your read replica in"
+          >
+            {availableRegions.map((region) => (
+              <Listbox.Option
+                key={region.key}
+                label={region.name}
+                value={region.key}
+                addOnBefore={() => (
+                  <img
+                    alt="region icon"
+                    className="w-5 rounded-sm"
+                    src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                  />
+                )}
+              >
+                {region.name}
+              </Listbox.Option>
+            ))}
+          </Listbox>
 
-        <div className="flex flex-col gap-y-2">
-          <p className="text-foreground-light text-sm">
-            Read replicas will be on the same compute size as your primary database. Deploying a
-            read replica incurs additional{' '}
-            <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
-            Pricing is still in early access and is subject to change.
-          </p>
+          <div className="flex flex-col gap-y-2">
+            <p className="text-foreground-light text-sm">
+              Read replicas will be on the same compute size as your primary database. Deploying a
+              read replica incurs additional{' '}
+              <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
+              Pricing is still in early access and is subject to change.
+            </p>
 
-          <p className="text-foreground-light text-sm">
-            Read more about{' '}
-            <Link
-              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-foreground transition"
-            >
-              usage-based billing
-            </Link>{' '}
-            for compute.
-          </p>
+            <p className="text-foreground-light text-sm">
+              Read more about{' '}
+              <Link
+                href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-foreground transition"
+              >
+                usage-based billing
+              </Link>{' '}
+              for compute.
+            </p>
+          </div>
         </div>
       </SidePanel.Content>
     </SidePanel>
