@@ -13,7 +13,7 @@ import {
 } from 'hooks'
 import { ProjectLayout } from '../'
 import { generateLogsMenu } from './LogsMenu.utils'
-import { Menu } from 'ui'
+import { Badge, Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
@@ -80,7 +80,16 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
               <div className="h-px w-full bg-overlay"></div>
               <div className="py-6">
                 <div className="px-6 uppercase font-mono">
-                  <Menu.Group title="Events" />
+                  <Menu.Group
+                    title={
+                      <div>
+                        Events
+                        <Badge variant="warning" size="small" className="ml-2">
+                          New
+                        </Badge>
+                      </div>
+                    }
+                  />
                 </div>
                 <div className="px-3 flex flex-col">
                   <div className="space-y-1">
