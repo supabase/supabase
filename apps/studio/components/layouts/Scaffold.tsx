@@ -11,7 +11,7 @@ const ScaffoldHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       <header
         {...props}
         ref={ref}
-        className={cn('w-full', 'flex-col gap-3 py-5', className)}
+        className={cn('w-full', 'flex-col gap-3 py-6', className)}
       ></header>
     )
   }
