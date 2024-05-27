@@ -2,10 +2,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "contentlayer/generated": ["./.contentlayer/generated"],
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"],
+      "contentlayer/generated": ["./.contentlayer/generated"]
     },
     "downlevelIteration": true,
     "target": "ES2021",
