@@ -306,7 +306,8 @@ const Wizard: NextPageWithLayout = () => {
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
-      dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
+      dbInstanceSize:
+        orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
