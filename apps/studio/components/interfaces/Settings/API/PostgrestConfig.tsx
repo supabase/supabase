@@ -18,6 +18,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
 import { AlertCircle, Info } from 'lucide-react'
 import {
+  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -122,7 +123,7 @@ const PostgrestConfig = () => {
           <>
             <FormPanel
               disabled={true}
-              header={<p>API settings</p>}
+              header={<p>Data API settings</p>}
               footer={
                 <div className="flex px-8 py-4">
                   <FormActions
@@ -180,36 +181,33 @@ const PostgrestConfig = () => {
                             </p>
 
                             {!isPublicSchemaEnabled && (
-                              <Alert_Shadcn_ variant="default">
-                                <Info className="h-4 w-4" />
-                                <AlertTitle_Shadcn_>
-                                  The public schema for this project is not exposed
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  <p>
-                                    You will not be able to query tables and views in the{' '}
-                                    <code>public</code> schema via supabase-js or HTTP clients.
-                                  </p>
-                                  {isGraphqlExtensionEnabled && (
-                                    <div className="grid gap-3 mt-2">
-                                      <div>
-                                        Tables in the <code>public</code> schema are still exposed
-                                        over our GraphQL endpoints.
-                                      </div>
-                                      <p>
-                                        <Button asChild type="default">
-                                          <Link
-                                            href={`/project/${projectRef}/database/extensions`}
-                                            className="!no-underline !hover:bg-surface-100 !text-foreground"
-                                          >
-                                            Disable the pg_graphql extension
-                                          </Link>
-                                        </Button>
-                                      </p>
+                              <Admonition
+                                type="default"
+                                title="The public schema for this project is not exposed"
+                              >
+                                <p>
+                                  You will not be able to query tables and views in the{' '}
+                                  <code>public</code> schema via supabase-js or HTTP clients.
+                                </p>
+                                {isGraphqlExtensionEnabled && (
+                                  <div className="grid gap-3 mt-2">
+                                    <div>
+                                      Tables in the <code>public</code> schema are still exposed
+                                      over our GraphQL endpoints.
                                     </div>
-                                  )}
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                                    <p>
+                                      <Button asChild type="default">
+                                        <Link
+                                          href={`/project/${projectRef}/database/extensions`}
+                                          className="!no-underline !hover:bg-surface-100 !text-foreground"
+                                        >
+                                          Disable the pg_graphql extension
+                                        </Link>
+                                      </Button>
+                                    </p>
+                                  </div>
+                                )}
+                              </Admonition>
                             )}
                           </div>
                         )}
