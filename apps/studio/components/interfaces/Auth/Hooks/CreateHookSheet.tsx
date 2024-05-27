@@ -8,6 +8,7 @@ import { useParams } from 'common'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useFlag } from 'hooks'
 import { X } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import {
@@ -110,6 +111,7 @@ export const CreateHookSheet = ({
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const httpsAuthHooksEnabled = useFlag('httpsAuthHooksEnabled')
 
   const definition = useMemo(
     () => HOOKS_DEFINITIONS.find((d) => d.title === title) || HOOKS_DEFINITIONS[0],
@@ -269,35 +271,37 @@ export const CreateHookSheet = ({
               />
             </div>
             <Separator />
-            <FormField_Shadcn_
-              control={form.control}
-              name="selectedType"
-              render={({ field }) => (
-                <FormItemLayout label="Hook type" className="px-8">
-                  <FormControl_Shadcn_>
-                    <RadioGroupStacked
-                      value={values.selectedType}
-                      onValueChange={(value) => field.onChange(value)}
-                    >
-                      <RadioGroupStackedItem
-                        value="postgres"
-                        id="postgres"
-                        key="postgres"
-                        label="Postgres"
-                        description="Used to call a Postgres function."
-                      />
-                      <RadioGroupStackedItem
-                        value="https"
-                        id="https"
-                        key="https"
-                        label="HTTPS"
-                        description="Used to call any HTTPS endpoint."
-                      />
-                    </RadioGroupStacked>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
+            {httpsAuthHooksEnabled && (
+              <FormField_Shadcn_
+                control={form.control}
+                name="selectedType"
+                render={({ field }) => (
+                  <FormItemLayout label="Hook type" className="px-8">
+                    <FormControl_Shadcn_>
+                      <RadioGroupStacked
+                        value={values.selectedType}
+                        onValueChange={(value) => field.onChange(value)}
+                      >
+                        <RadioGroupStackedItem
+                          value="postgres"
+                          id="postgres"
+                          key="postgres"
+                          label="Postgres"
+                          description="Used to call a Postgres function."
+                        />
+                        <RadioGroupStackedItem
+                          value="https"
+                          id="https"
+                          key="https"
+                          label="HTTPS"
+                          description="Used to call any HTTPS endpoint."
+                        />
+                      </RadioGroupStacked>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            )}
             {values.selectedType === 'postgres' ? (
               <div className="grid grid-cols-2 gap-8 px-8">
                 <FormField_Shadcn_
