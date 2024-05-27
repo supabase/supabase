@@ -155,7 +155,7 @@ const PostgrestConfig = () => {
         maxRows: config.max_rows,
         dbExtraSearchPath: config.db_extra_search_path,
         dbPool: config.db_pool,
-        enableDataApi: enableApi || dbSchema.length > 0 ? true : false,
+        enableDataApi: enableApi,
       })
     }
   }
