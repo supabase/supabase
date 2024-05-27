@@ -32,7 +32,22 @@ export const useCreateCollection = ({
   const queryClient = useQueryClient()
 
   return useMutation<CreateCollectionData, ResponseError, CreateCollectionArgs>(
-    (vars) => createCollection(vars),
+    (vars) => {
+      // temporal fix
+      // prevent users from creating collections with the same name
+      // this will be handled by the backend
+      // - jordi
+
+      const existingCollectionNames = queryClient
+        .getQueryData<CreateCollectionData[]>(analyticsKeys.warehouseCollections(vars.projectRef))
+        ?.map((c) => c.name)
+
+      if (existingCollectionNames?.includes(vars.name)) {
+        throw new Error(`Collection with the name ${vars.name} already exists`)
+      }
+
+      return createCollection(vars)
+    },
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
