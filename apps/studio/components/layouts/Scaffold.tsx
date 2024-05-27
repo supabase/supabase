@@ -8,7 +8,11 @@ const maxWidthClassesColumn = 'min-w-[420px]'
 const ScaffoldHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
-      <header {...props} ref={ref} className={cn('w-full', 'flex-col gap-3', className)}></header>
+      <header
+        {...props}
+        ref={ref}
+        className={cn('w-full', 'flex-col gap-3 py-5', className)}
+      ></header>
     )
   }
 )
@@ -17,7 +21,14 @@ const ScaffoldTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
-  return <h1 ref={ref} {...props} className={cn('text-3xl pt-6 pb-4', className)} />
+  return <h1 ref={ref} {...props} className={cn('text-2xl', className)} />
+})
+
+const ScaffoldDescription = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
+  return <span ref={ref} {...props} className={cn('text-sm text-foreground-light', className)} />
 })
 
 const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -120,6 +131,7 @@ const ScaffoldContainerLegacy = React.forwardRef<
 
 ScaffoldHeader.displayName = 'ScaffoldHeader'
 ScaffoldTitle.displayName = 'ScaffoldTitle'
+ScaffoldDescription.displayName = 'ScaffoldDescription'
 ScaffoldContainer.displayName = 'ScaffoldContainer'
 ScaffoldDivider.displayName = 'ScaffoldDivider'
 ScaffoldSection.displayName = 'ScaffoldSection'
@@ -134,6 +146,7 @@ ScaffoldContainerLegacy.displayName = 'ScaffoldContainerLegacy'
 export {
   ScaffoldHeader,
   ScaffoldTitle,
+  ScaffoldDescription,
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldSection,

@@ -6,6 +6,7 @@ import {
 } from 'components/interfaces/Settings/General'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 
@@ -16,16 +17,23 @@ const ProjectSettings: NextPageWithLayout = () => {
 
   // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-      <General />
-      {!isBranch ? (
-        <>
-          <CustomDomainConfig />
-          {projectTransferEnabled && <TransferProjectPanel />}
-          <DeleteProjectPanel />
-        </>
-      ) : null}
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Project Settings</ScaffoldTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer>
+        <General />
+        {!isBranch ? (
+          <>
+            <CustomDomainConfig />
+            {projectTransferEnabled && <TransferProjectPanel />}
+            <DeleteProjectPanel />
+          </>
+        ) : null}
+      </ScaffoldContainer>
+    </>
   )
 }
 
