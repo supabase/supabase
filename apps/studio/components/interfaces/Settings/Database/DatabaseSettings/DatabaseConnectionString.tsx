@@ -170,9 +170,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       <Panel
         className={cn(
           '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)]:!p-0',
-          appearance === 'minimal' && 'border-0 shadow-none'
+          appearance === 'minimal' && 'border-0 shadow-none bg-transparent'
         )}
-        bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
         titleClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
           <div

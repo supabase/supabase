@@ -30,7 +30,7 @@ const AuthSettings: NextPageWithLayout = () => {
           <ScaffoldDescription>Configure security and user session settings</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10">
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         {!isPermissionsLoaded ? (
           <GenericSkeletonLoader />
         ) : !canReadAuthSettings ? (

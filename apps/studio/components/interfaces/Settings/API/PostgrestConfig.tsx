@@ -34,6 +34,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { boolean } from 'yup'
 import { z } from 'zod'
 
 const formSchema = z
@@ -145,14 +146,17 @@ const PostgrestConfig = () => {
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
-  function resetForm() {
+  function resetForm(enableApi?: boolean) {
+    const dbSchema =
+      config?.db_schema && config?.db_schema ? config.db_schema.replace(/ /g, '').split(',') : []
+
     if (config) {
       form.reset({
-        dbSchema: config.db_schema ? config.db_schema.replace(/ /g, '').split(',') : [],
+        dbSchema: dbSchema,
         maxRows: config.max_rows,
         dbExtraSearchPath: config.db_extra_search_path,
         dbPool: config.db_pool,
-        enableDataApi: enableDataApi,
+        enableDataApi: enableApi,
       })
     }
   }
