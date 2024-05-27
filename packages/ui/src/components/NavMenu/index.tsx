@@ -12,7 +12,7 @@ export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
   ) => {
     return (
       <nav ref={forwardedRef} dir="ltr" {...props} className={cn('border-b', props.className)}>
-        <ul role="menu" className="flex gap-3">
+        <ul role="menu" className="flex gap-5">
           {props.children}
         </ul>
       </nav>

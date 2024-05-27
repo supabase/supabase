@@ -16,7 +16,6 @@ const ProjectInfrastructure: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Infrastructure</ScaffoldTitle>
-
           <ScaffoldDescription>
             General information regarding your server instance
           </ScaffoldDescription>
