@@ -19,7 +19,7 @@ const PageLayout: NextPageWithLayout = () => {
           </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
         <EdgeFunctionSecrets />
       </ScaffoldContainer>
     </>
