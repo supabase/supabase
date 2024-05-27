@@ -58,7 +58,7 @@ export const generateNodes = ({
     type: 'PRIMARY',
     data: {
       id: primary.identifier,
-      region: primaryRegion,
+      region: primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,
