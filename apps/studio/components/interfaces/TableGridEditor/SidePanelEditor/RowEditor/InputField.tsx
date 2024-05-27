@@ -137,11 +137,16 @@ const InputField = ({
           descriptionText={
             <>
               {field.comment && <p>{field.comment}</p>}
-              {isTruncated && <p>Note: Value is too large to be rendered in the dashboard</p>}
+              {isTruncated && (
+                <p>
+                  Note: Value is too large to be rendered in the dashboard. Please expand the editor
+                  to edit the value
+                </p>
+              )}
             </>
           }
           labelOptional={field.format}
-          disabled={!isEditable}
+          disabled={!isEditable || isTruncated}
           error={errors[field.name]}
           rows={5}
           value={field.value ?? ''}
@@ -188,7 +193,12 @@ const InputField = ({
         descriptionText={
           <>
             {field.comment && <p>{field.comment}</p>}
-            {isTruncated && <p>Note: Value is too large to be rendered in the dashboard</p>}
+            {isTruncated && (
+              <p>
+                Note: Value is too large to be rendered in the dashboard. Please expand the editor
+                to edit the value
+              </p>
+            )}
           </>
         }
         labelOptional={field.format}
