@@ -113,7 +113,7 @@ const JsonEdit = ({
               Viewing JSON Field: <code>{column}</code>
             </p>
           )}
-          {!isTruncated && (
+          {(!isTruncated || (isTruncated && isSuccess)) && (
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <Tooltip.Root delayDuration={0}>

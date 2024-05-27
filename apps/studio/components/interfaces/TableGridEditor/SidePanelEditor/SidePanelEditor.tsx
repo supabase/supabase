@@ -619,6 +619,8 @@ const SidePanelEditor = ({
       />
       <TextEditor
         visible={snap.sidePanel?.type === 'cell'}
+        column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
+        row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
         closePanel={onClosePanel}
         onSaveField={onSaveColumnValue}
       />

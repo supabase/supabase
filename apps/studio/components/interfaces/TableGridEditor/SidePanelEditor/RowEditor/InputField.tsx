@@ -1,7 +1,16 @@
 import { includes, noop } from 'lodash'
-import { Button, IconLink, Input, Listbox, Select } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+  Listbox,
+  Select,
+} from 'ui'
 
-import { Edit2 } from 'lucide-react'
+import { Edit, Edit2, Link } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { RowField } from './RowEditor.types'
@@ -12,6 +21,7 @@ export interface InputFieldProps {
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
+  onEditText?: (data: any) => void
   onSelectForeignKey?: () => void
 }
 
@@ -21,6 +31,7 @@ const InputField = ({
   isEditable = true,
   onUpdateField = noop,
   onEditJson = noop,
+  onEditText = noop,
   onSelectForeignKey = noop,
 }: InputFieldProps) => {
   if (field.enums.length > 0) {
@@ -104,7 +115,7 @@ const InputField = ({
             className="mr-1"
             htmlType="button"
             onClick={onSelectForeignKey}
-            icon={<IconLink />}
+            icon={<Link />}
           >
             Select record
           </Button>
@@ -136,17 +147,21 @@ const InputField = ({
                   : `NULL (Default: ${field.defaultValue})`
           }
           actions={
-            <div className="mr-1 mt-0.5">
-              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
-                <Button
-                  type="default"
-                  size="tiny"
-                  onClick={() => onUpdateField({ [field.name]: null })}
-                >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" icon={<Edit />} className="px-1.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
                   Set to NULL
-                </Button>
-              )}
-            </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onEditText({ column: field.name, value: field.value })}
+                >
+                  Expand editor
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           }
           onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -177,7 +192,7 @@ const InputField = ({
           <Button
             type="default"
             htmlType="button"
-            onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
+            onClick={() => onEditJson({ column: field.name, value: field.value })}
             icon={<Edit2 />}
           >
             Edit JSON
