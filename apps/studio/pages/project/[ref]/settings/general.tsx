@@ -15,7 +15,6 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
 
-  // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
     <>
       <ScaffoldContainer>
