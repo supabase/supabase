@@ -14,7 +14,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel, cn } from 'ui'
+import { Alert, Button, cn, IconExternalLink, Radio, SidePanel } from 'ui'
 
 const IPv4SidePanel = () => {
   const router = useRouter()
@@ -224,10 +224,13 @@ const IPv4SidePanel = () => {
             <>
               {selectedOption === 'ipv4_none' ||
               (selectedIPv4?.price ?? 0) < (subscriptionIpV4Option?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the add-on is removed immediately and won't be billed in
-                  the future.
-                </p>
+                subscription?.billing_via_partner === false && (
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the add-on is removed immediately and any unused time in
+                    the current billing cycle is added as prorated credits to your organization and
+                    used in subsequent billing cycles.
+                  </p>
+                )
               ) : (
                 <>
                   <Alert withIcon variant="info" title="Potential downtime">
@@ -245,9 +248,17 @@ const IPv4SidePanel = () => {
                       Read replicas
                     </Link>{' '}
                     are used, each replica also gets its own IPv4 address, with a corresponding{' '}
-                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
                     charge.
                   </p>
+                  {!subscription?.billing_via_partner && (
+                    <p className="text-sm text-foreground-light">
+                      Upon clicking confirm, the respective amount will be added to your monthly
+                      invoice. The addon is prepaid per month and in case of a downgrade, you get
+                      credits for the remaining time. For the current billing cycle you're
+                      immediately charged a prorated amount for the remaining days.
+                    </p>
+                  )}
                 </>
               )}
             </>

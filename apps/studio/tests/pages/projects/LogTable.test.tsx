@@ -72,6 +72,30 @@ test('can run if no queryType provided', async () => {
   // expect(mockRun).toBeCalled()
 })
 
+test('can run if no queryType provided', async () => {
+  const mockRun = jest.fn()
+
+  render(
+    <LogTable
+      data={[
+        {
+          id: 'some-uuid',
+          timestamp: 1621323232312,
+          event_message: 'some event happened',
+          metadata: {
+            my_key: 'something_value',
+          },
+        },
+      ]}
+      onRun={mockRun}
+    />
+  )
+
+  const run = await screen.findByText('Run')
+  userEvent.click(run)
+  // expect(mockRun).toBeCalled()
+})
+
 test('dedupes log lines with exact id', async () => {
   // chronological mode requires 4 columns
   render(
@@ -207,6 +231,14 @@ test.each([
     ...includes.map((text) => screen.findByText(text)),
     ...excludes.map((text) => expect(screen.findByText(text)).rejects.toThrow()),
   ])
+})
+
+test('toggle histogram', async () => {
+  const mockFn = jest.fn()
+  render(<LogTable onHistogramToggle={mockFn} isHistogramShowing={true} />)
+  const toggle = await screen.getByText(/Histogram/)
+  userEvent.click(toggle)
+  expect(mockFn).toBeCalled()
 })
 
 test('error message handling', async () => {

@@ -67,9 +67,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
       <div className="p-2">
         <NoDataPlaceholder
           size="normal"
-          message="
-          Execute a query and configure the chart options.
-        "
+          description="Execute a query and configure the chart options."
         />
       </div>
     )
