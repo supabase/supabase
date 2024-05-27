@@ -11,7 +11,6 @@ test.describe('Table Editor page', () => {
 
     await page.goto('/project/default/editor')
     await page.getByRole('button', { name: 'New table', exact: true }).click()
-    // need to wait for the panel animation
     await page
       .locator('.col-span-8 > div > .relative > .peer\\/input')
       .first()
@@ -25,7 +24,8 @@ test.describe('Table Editor page', () => {
     await page.getByText('textVariable-length character').click()
     await page.getByRole('button', { name: 'Save' }).waitFor({ state: 'visible' })
     await page.getByRole('button', { name: 'Save' }).click()
-    await page.locator('#toast').getByRole('button').click()
+    await dismissToast(page)
+
     await page.getByRole('button', { name }).click()
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
