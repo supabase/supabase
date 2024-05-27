@@ -16,28 +16,29 @@ import { FormHeader } from 'components/ui/Forms'
 import type { NextPageWithLayout } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
+const PRESET_MAP = {
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
+  [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
+} as const
+
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
+  const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
 
   const showReadReplicasUI = project?.is_read_replicas_enabled
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
-  const orderBy = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
-  const searchQuery = (router.query.search as string) || ''
-  const roles = router.query.roles || []
-  const presetMap = {
-    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
-    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
-    [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
-  } as const
+  const orderBy = sort !== undefined ? ({ column: sort, order } as QueryPerformanceSort) : undefined
+  const searchQuery = search ?? ''
+  const roles = router?.query?.roles ?? []
   const preset =
-    presetMap[router.query.preset as QUERY_PERFORMANCE_REPORT_TYPES] || 'mostTimeConsuming'
+    urlPreset !== undefined
+      ? PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+      : 'mostTimeConsuming'
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,

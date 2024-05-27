@@ -53,6 +53,7 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
         enabled &&
         project !== undefined &&
         project.status !== PROJECT_STATUS.INACTIVE &&
+        project.status !== PROJECT_STATUS.COMING_UP &&
         typeof projectRef !== 'undefined' &&
         IS_PLATFORM,
       ...options,

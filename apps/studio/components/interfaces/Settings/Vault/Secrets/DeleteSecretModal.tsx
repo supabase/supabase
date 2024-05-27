@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,30 +12,25 @@ interface DeleteSecretModalProps {
 
 const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
   const { project } = useProjectContext()
-
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  const { mutateAsync: deleteSecret } = useVaultSecretDeleteMutation()
+  const { mutate: deleteSecret, isLoading: isDeleting } = useVaultSecretDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
+      onClose()
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete secret: ${error.message}`)
+    },
+  })
 
   const onConfirmDeleteSecret = async () => {
     if (!project) return console.error('Project is required')
+    if (!selectedSecret) return
 
-    setIsDeleting(true)
-    if (!selectedSecret) {
-      return
-    }
-    const res = await deleteSecret({
+    deleteSecret({
       projectRef: project.ref,
       connectionString: project?.connectionString,
       id: selectedSecret.id,
     })
-    if (res.error) {
-      toast.error(`Failed to delete secret: ${res.error.message}`)
-    } else {
-      toast.success(`Successfully deleted secret ${selectedSecret.name}`)
-      onClose()
-    }
-    setIsDeleting(false)
   }
 
   return (

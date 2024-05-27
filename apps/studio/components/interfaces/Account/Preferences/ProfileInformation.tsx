@@ -31,23 +31,13 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
     defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
   })
 
-  const { mutateAsync: updateProfile, isLoading } = useProfileUpdateMutation({
-    onSuccess: () => {
-      toast.success('Successfully saved profile')
-    },
-    onError: (error) => {
-      toast.error("Couldn't update profile. Please try again later.")
-    },
+  const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
+    onSuccess: () => toast.success('Successfully saved profile'),
+    onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
-    try {
-      await updateProfile({
-        firstName: data.first_name || '',
-        lastName: data.last_name || '',
-      })
-    } finally {
-    }
+    updateProfile({ firstName: data.first_name || '', lastName: data.last_name || '' })
   }
 
   return (
