@@ -22,6 +22,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   Skeleton,
+  Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -35,17 +36,31 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-const formSchema = z.object({
-  dbSchema: z.array(z.string()),
-  dbExtraSearchPath: z.string(),
-  maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
-  dbPool: z
-    .number()
-    .min(0, 'Must be more than 0')
-    .max(1000, "Can't be more than 1000")
-    .optional()
-    .nullable(),
-})
+const formSchema = z
+  .object({
+    dbSchema: z.array(z.string()),
+    dbExtraSearchPath: z.string(),
+    maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
+    dbPool: z
+      .number()
+      .min(0, 'Must be more than 0')
+      .max(1000, "Can't be more than 1000")
+      .optional()
+      .nullable(),
+    enableDataApi: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (data.enableDataApi && data.dbSchema.length === 0) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'Must have at least one schema if Data API is enabled',
+      path: ['dbSchema'], // The field to attach the error message to
+    }
+  )
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
@@ -134,22 +149,26 @@ const PostgrestConfig = () => {
   console.log('default values', form.getValues())
   console.log('config', config)
 
-  function resetForm() {
+  function resetForm(enableDataApi = false) {
     if (config) {
       form.reset({
         dbSchema: config.db_schema ? config.db_schema.replace(/ /g, '').split(',') : [],
         maxRows: config.max_rows,
         dbExtraSearchPath: config.db_extra_search_path,
         dbPool: config.db_pool,
+        enableDataApi: enableDataApi,
       })
     }
   }
 
   useEffect(() => {
     if (schema && config) {
-      resetForm()
+      const enableDataApi = config.db_schema ? true : false
+      resetForm(enableDataApi)
     }
   }, [schema && config])
+
+  const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
   return (
     <Form_Shadcn_ {...form}>
@@ -180,6 +199,72 @@ const PostgrestConfig = () => {
             <>
               <FormField_Shadcn_
                 control={form.control}
+                name="enableDataApi"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="w-full">
+                    <FormItemLayout
+                      className="w-full px-8 py-8"
+                      layout="flex"
+                      label="Enable Data API"
+                      description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured below."
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          size="large"
+                          checked={field.value}
+                          onCheckedChange={(value) => {
+                            field.onChange(value)
+
+                            if (!value) {
+                              /**
+                               * reset the form to default values
+                               */
+                              resetForm(false)
+                              /**
+                               * remove all the schema values when disabling the Data API
+                               */
+                              form.setValue('dbSchema', [])
+                            } else {
+                              /**
+                               * reset the form to default values
+                               * when disabled the Data API
+                               */
+                              resetForm(true)
+                            }
+                          }}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                    {isGraphqlExtensionEnabled && field.value == false && (
+                      <div className="px-8 mb-6">
+                        <Admonition
+                          type="warning"
+                          title="Tables could still be exposed via GraphQl"
+                          className=""
+                        >
+                          <>
+                            <p>
+                              Tables in the <code className="text-xs">public</code> schema are still
+                              exposed over our GraphQL endpoints.
+                            </p>
+                            <Button asChild type="default">
+                              <Link
+                                href={`/project/${projectRef}/database/extensions`}
+                                // className="!no-underline !hover:bg-surface-100 !text-foreground"
+                              >
+                                Disable the pg_graphql extension
+                              </Link>
+                            </Button>
+                          </>
+                        </Admonition>
+                      </div>
+                    )}
+                  </FormItem_Shadcn_>
+                )}
+              />
+
+              <FormField_Shadcn_
+                control={form.control}
                 name="dbSchema"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="w-full">
@@ -199,6 +284,7 @@ const PostgrestConfig = () => {
                           onValuesChange={field.onChange}
                           values={field.value}
                           size={'small'}
+                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                         >
                           <MultiSelectorTrigger>
                             <MultiSelectorInput placeholder="Select schemas for Data API..." />
@@ -223,36 +309,38 @@ const PostgrestConfig = () => {
                         </MultiSelector>
                       )}
 
-                      {!field.value.includes('public') && (
-                        <Admonition
-                          type="default"
-                          title="The public schema for this project is not exposed"
-                          className="mt-2"
-                        >
-                          <>
-                            <p>
-                              You will not be able to query tables and views in the{' '}
-                              <code>public</code> schema via supabase-js or HTTP clients.
-                            </p>
-                            {isGraphqlExtensionEnabled && (
-                              <>
-                                <p>
-                                  Tables in the <code className="text-xs">public</code> schema are
-                                  still exposed over our GraphQL endpoints.
-                                </p>
-                                <Button asChild type="default">
-                                  <Link
-                                    href={`/project/${projectRef}/database/extensions`}
-                                    // className="!no-underline !hover:bg-surface-100 !text-foreground"
-                                  >
-                                    Disable the pg_graphql extension
-                                  </Link>
-                                </Button>
-                              </>
-                            )}
-                          </>
-                        </Admonition>
-                      )}
+                      {!field.value.includes('public') &&
+                        form.getValues('enableDataApi') !== false &&
+                        field.value.length > 0 && (
+                          <Admonition
+                            type="default"
+                            title="The public schema for this project is not exposed"
+                            className="mt-2"
+                          >
+                            <>
+                              <p>
+                                You will not be able to query tables and views in the{' '}
+                                <code>public</code> schema via supabase-js or HTTP clients.
+                              </p>
+                              {isGraphqlExtensionEnabled && (
+                                <>
+                                  <p>
+                                    Tables in the <code className="text-xs">public</code> schema are
+                                    still exposed over our GraphQL endpoints.
+                                  </p>
+                                  <Button asChild type="default">
+                                    <Link
+                                      href={`/project/${projectRef}/database/extensions`}
+                                      // className="!no-underline !hover:bg-surface-100 !text-foreground"
+                                    >
+                                      Disable the pg_graphql extension
+                                    </Link>
+                                  </Button>
+                                </>
+                              )}
+                            </>
+                          </Admonition>
+                        )}
                     </FormItemLayout>
                   </FormItem_Shadcn_>
                 )}
@@ -272,7 +360,7 @@ const PostgrestConfig = () => {
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
                           size="small"
-                          disabled={!canUpdatePostgrestConfig}
+                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                           {...field}
                         />
                       </FormControl_Shadcn_>
@@ -295,7 +383,7 @@ const PostgrestConfig = () => {
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
                           size="small"
-                          disabled={!canUpdatePostgrestConfig}
+                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                           {...field}
                           type="number"
                           {...form.register('maxRows', {
@@ -322,7 +410,7 @@ const PostgrestConfig = () => {
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
                           size="small"
-                          disabled={!canUpdatePostgrestConfig}
+                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                           {...field}
                           type="number"
                           placeholder="Configured automatically based on compute size"
