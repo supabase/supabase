@@ -17,7 +17,7 @@ const ApiSettings: NextPageWithLayout = () => {
           <ScaffoldTitle>API Services</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
         <ServiceList />
       </ScaffoldContainer>
     </>
