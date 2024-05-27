@@ -1,4 +1,9 @@
-import { expect, test } from '@playwright/test'
+import { Page, expect, test } from '@playwright/test'
+
+const dismissToast = async (page: Page) => {
+  await page.locator('#toast').getByRole('button').waitFor({ state: 'visible' })
+  await page.locator('#toast').getByRole('button').click()
+}
 
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
@@ -27,7 +32,7 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('NULL').click()
     await page.getByPlaceholder('NULL').fill('some text')
     await page.getByTestId('action-bar-save-row').click()
-    await page.locator('#toast').getByRole('button').click()
+    await dismissToast(page)
     await expect(page.getByRole('grid')).toContainText('some text')
   })
 })
