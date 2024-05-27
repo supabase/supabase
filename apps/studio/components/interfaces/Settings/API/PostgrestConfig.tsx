@@ -23,7 +23,6 @@ import {
   Input_Shadcn_,
   Skeleton,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -100,8 +99,10 @@ const PostgrestConfig = () => {
     updatePostgrestConfig({
       projectRef,
       dbSchema: values.dbSchema.join(', '),
+      // @ts-expect-error
       maxRows: values.maxRows,
       dbExtraSearchPath: values.dbExtraSearchPath,
+      // @ts-expect-error
       dbPool: values.dbPool ? values.dbPool : null,
     })
   }
