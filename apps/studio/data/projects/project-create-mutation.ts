@@ -50,6 +50,7 @@ export async function createProject({
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
     desired_instance_size: dbInstanceSize,
+    // @ts-expect-error
     data_api_exposed_schemas: dataApiExposedSchemas,
   }
 
