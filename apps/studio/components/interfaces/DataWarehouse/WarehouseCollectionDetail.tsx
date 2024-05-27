@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { TestCollectionDialog } from './TestCollectionDialog'
 import { RefreshCcw, Rewind } from 'lucide-react'
 import AlertError from 'components/ui/AlertError'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -108,31 +109,43 @@ export const WarehouseCollectionDetail = () => {
               />
             </div>
           </div>
-          <LogTable
-            collectionName={collection?.name}
-            queryType="warehouse"
-            hasEditorValue={false}
-            projectRef={projectRef}
-            isLoading={isLoading}
-            data={results}
-            params={params}
-            maxHeight="calc(100vh - 139px)"
-            hideHeader={true}
-            emptyState={
-              <div className="rounded border bg-surface-100 p-6 shadow-md space-y-4">
-                <div>
-                  <h1 className="text-lg text-foreground">Send your first event</h1>
-                  <p className="text-sm text-foreground-lighter">
-                    Events sent to this collection will appear here
-                  </p>
-                </div>
-                <Button onClick={() => setTestDialogOpen(true)}>Send your first event</Button>
-              </div>
-            }
-          />
+
+          {isError && (
+            <div className="p-4">
+              <AlertError subject="Failed to load query results" />
+            </div>
+          )}
+
+          {!isError && (
+            <LogTable
+              collectionName={collection?.name}
+              queryType="warehouse"
+              hasEditorValue={false}
+              projectRef={projectRef}
+              isLoading={isLoading}
+              data={results}
+              params={params}
+              maxHeight="calc(100vh - 139px)"
+              hideHeader={true}
+              emptyState={
+                <ProductEmptyState
+                  title="Send your first event"
+                  size="large"
+                  ctaButtonLabel="Send first event"
+                  infoButtonLabel="What Warehouse?"
+                  onClickCta={() => setTestDialogOpen(true)}
+                >
+                  <>
+                    <p>
+                      No data available for this collection. Send your first event to see data here.
+                    </p>
+                  </>
+                </ProductEmptyState>
+              }
+            />
+          )}
         </div>
       </LoadingOpacity>
-      {isError && <AlertError subject="Failed to load query results" />}
 
       {!isError && (
         <div className="border-t flex flex-row justify-between p-2">
