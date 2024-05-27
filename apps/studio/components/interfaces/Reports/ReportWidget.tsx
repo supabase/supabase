@@ -45,13 +45,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
   const projectRef = ref as string
 
   return (
-    <Panel
-      noMargin
-      noHideOverflow
-      className={cn('pb-0', props.className)}
-      bodyClassName="h-full"
-      wrapWithLoading={false}
-    >
+    <Panel noMargin noHideOverflow className={cn('pb-0', props.className)} wrapWithLoading={false}>
       <Panel.Content className="space-y-4">
         <div className="flex flex-row items-start justify-between">
           <div className="gap-2">
