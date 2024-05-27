@@ -34,7 +34,7 @@ export async function getCellValue({
 }: GetCellValueVariables) {
   const sql = getCellValueSql({ table, column, pkMatch })
   const { result } = await executeSql({ projectRef, connectionString, sql })
-  return result?.[0]
+  return result?.[0][column]
 }
 
 type TableRowCreateData = Awaited<ReturnType<typeof getCellValue>>

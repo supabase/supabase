@@ -192,6 +192,7 @@ const RowEditor = ({
             )}
             <JsonEditor
               visible={isEditingJson}
+              row={row}
               column={selectedValueForJsonEdit?.column ?? ''}
               jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}

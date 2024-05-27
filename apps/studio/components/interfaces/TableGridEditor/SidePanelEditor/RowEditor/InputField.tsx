@@ -1,6 +1,7 @@
 import { includes, noop } from 'lodash'
-import { Button, IconEdit2, IconLink, Input, Listbox, Select } from 'ui'
+import { Button, IconLink, Input, Listbox, Select } from 'ui'
 
+import { Edit2 } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { RowField } from './RowEditor.types'
@@ -154,14 +155,21 @@ const InputField = ({
   }
 
   if (includes(JSON_TYPES, field.format)) {
+    const isTruncated = field.value?.endsWith('...')
+
     return (
       <Input
         layout="horizontal"
         value={field.value ?? ''}
         label={field.name}
-        descriptionText={field.comment}
+        descriptionText={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            {isTruncated && <p>Note: Value is too large to be rendered in the dashboard</p>}
+          </>
+        }
         labelOptional={field.format}
-        disabled={!isEditable}
+        disabled={!isEditable || isTruncated}
         placeholder={field?.defaultValue ?? 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
@@ -170,7 +178,7 @@ const InputField = ({
             type="default"
             htmlType="button"
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
-            icon={<IconEdit2 />}
+            icon={<Edit2 />}
           >
             Edit JSON
           </Button>

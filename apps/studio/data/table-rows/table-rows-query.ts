@@ -6,6 +6,7 @@ import {
   JSON_TYPES,
   TEXT_TYPES,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
@@ -25,8 +26,8 @@ type GetTableRowsArgs = {
   impersonatedRole?: ImpersonationRole
 }
 
-// [Joshen] We can probably make this reasonably higher, but max aim to load 1kb
-export const MAX_CHARACTERS = 1000
+// [Joshen] We can probably make this reasonably high, but for now max aim to load 10kb
+export const MAX_CHARACTERS = 10 * KB
 
 export const fetchAllTableRows = async ({
   projectRef,

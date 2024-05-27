@@ -62,12 +62,41 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as string
   const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
-  const isTruncated = typeof initialValue === 'string' && initialValue.endsWith('...')
+  const isTruncated =
+    typeof initialValue === 'string' &&
+    initialValue.endsWith('...') &&
+    initialValue.length > MAX_CHARACTERS
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+
+  const loadFullValue = () => {
+    if (selectedTable === undefined || project === undefined) return
+    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+      return toast('Unable to load value as table has no primary keys')
+    }
+
+    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+      return { ...a, [b.name]: (row as any)[b.name] }
+    }, {})
+
+    getCellValue(
+      {
+        table: { schema: selectedTable.schema, name: selectedTable.name },
+        column: column.name as string,
+        pkMatch,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      },
+      {
+        onSuccess: (data) => {
+          setValue(JSON.stringify(data))
+        },
+      }
+    )
+  }
 
   const cancelChanges = useCallback(() => {
     if (isEditable) onRowChange(row, true)
@@ -138,42 +167,14 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               )}
             >
               <div className="flex flex-col gap-y-1">
-                <p>Cell value is larger than {MAX_CHARACTERS.toLocaleString()} characters</p>
+                <p>Value is larger than {MAX_CHARACTERS.toLocaleString()} characters</p>
                 <p className="text-foreground-light">
-                  You may try to render the entire cell value, but your browser may run into
-                  performance issues
+                  You may try to render the entire value, but your browser may run into performance
+                  issues
                 </p>
               </div>
-              <Button
-                type="default"
-                loading={isLoading}
-                onClick={() => {
-                  if (selectedTable === undefined || project === undefined) return
-                  if ((selectedTable as PostgresTable).primary_keys.length === 0) {
-                    return toast('Unable to load cell as table has no primary keys')
-                  }
-
-                  const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
-                    return { ...a, [b.name]: (row as any)[b.name] }
-                  }, {})
-
-                  getCellValue(
-                    {
-                      table: { schema: selectedTable.schema, name: selectedTable.name },
-                      column: column.name as string,
-                      pkMatch,
-                      projectRef: project?.ref,
-                      connectionString: project?.connectionString,
-                    },
-                    {
-                      onSuccess: (data) => {
-                        setValue(JSON.stringify(data))
-                      },
-                    }
-                  )
-                }}
-              >
-                Load cell
+              <Button type="default" loading={isLoading} onClick={loadFullValue}>
+                Load full value
               </Button>
             </div>
           </div>
