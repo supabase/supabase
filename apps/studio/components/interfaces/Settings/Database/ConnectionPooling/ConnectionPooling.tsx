@@ -113,7 +113,7 @@ export const ConnectionPooling = () => {
     },
   })
 
-  const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
+  const { mutate: updateConfiguration, isLoading: isUpdating } =
     usePoolingConfigurationUpdateMutation({
       onSuccess: (data) => {
         if (data) {
@@ -131,14 +131,11 @@ export const ConnectionPooling = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!poolingInfo) return console.error('Pooling info required')
 
-    try {
-      await updateConfiguration({
-        ref: projectRef,
-        default_pool_size: data.default_pool_size as number | undefined,
-        pool_mode: data.pool_mode,
-      })
-    } finally {
-    }
+    updateConfiguration({
+      ref: projectRef,
+      default_pool_size: data.default_pool_size as number | undefined,
+      pool_mode: data.pool_mode,
+    })
   }
 
   useEffect(() => {

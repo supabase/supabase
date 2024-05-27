@@ -33,6 +33,9 @@ interface MultiSelectProps {
   onChange?(x: string[]): void
 }
 
+/**
+ * @deprecated Use ./multi-select instead
+ */
 export const MultiSelectV2 = ({
   options,
   value,

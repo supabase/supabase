@@ -8,6 +8,24 @@ export const examples: Registry = [
     files: ['example/accordion-demo.tsx'],
   },
   {
+    name: 'admonition-demo',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-demo.tsx'],
+  },
+  {
+    name: 'admonition-warning',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-warning.tsx'],
+  },
+  {
+    name: 'admonition-destructive',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-destructive.tsx'],
+  },
+  {
     name: 'alert-demo',
     type: 'components:example',
     registryDependencies: ['alert'],
@@ -942,6 +960,31 @@ export const examples: Registry = [
     name: 'form-item-layout-with-checkbox-list',
     type: 'components:example',
     files: ['example/form-item-layout-with-switch.tsx'],
+  },
+  {
+    name: 'form-item-layout-before-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-before-label.tsx'],
+  },
+  {
+    name: 'form-item-layout-after-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-after-label.tsx'],
+  },
+  {
+    name: 'info-tooltip-demo',
+    type: 'components:example',
+    files: ['example/info-tooltip-demo.tsx'],
+  },
+  {
+    name: 'multi-select-demo',
+    type: 'components:example',
+    files: ['example/multi-select-demo.tsx'],
+  },
+  {
+    name: 'multi-select-form',
+    type: 'components:example',
+    files: ['example/multi-select-form.tsx'],
   },
   {
     name: 'color-usage-surface-www-and-docs',

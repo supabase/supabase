@@ -1141,7 +1141,7 @@ class StorageExplorerStore {
         return col
       })
     } else if (!res.error.message.includes('aborted')) {
-      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
+      toast.error(`Failed to retrieve more folder contents: ${res.error.message}`)
     }
   }
 

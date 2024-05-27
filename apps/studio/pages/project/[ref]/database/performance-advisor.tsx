@@ -32,7 +32,6 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const activeLints = data?.filter((x) => x.categories.includes('PERFORMANCE')) || []
