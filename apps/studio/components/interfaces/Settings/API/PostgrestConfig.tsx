@@ -149,6 +149,7 @@ const PostgrestConfig = () => {
   function resetForm(enableApi?: boolean) {
     const dbSchema =
       config?.db_schema && config?.db_schema ? config.db_schema.replace(/ /g, '').split(',') : []
+
     if (config) {
       form.reset({
         dbSchema: dbSchema,
