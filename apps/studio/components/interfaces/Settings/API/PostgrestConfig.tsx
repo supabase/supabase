@@ -145,11 +145,7 @@ const PostgrestConfig = () => {
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
-  console.log('schema', schema)
-  console.log('default values', form.getValues())
-  console.log('config', config)
-
-  function resetForm(enableDataApi = false) {
+  function resetForm() {
     if (config) {
       form.reset({
         dbSchema: config.db_schema ? config.db_schema.replace(/ /g, '').split(',') : [],
