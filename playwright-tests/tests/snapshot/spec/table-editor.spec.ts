@@ -2,12 +2,15 @@ import { expect, test } from '@playwright/test'
 
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
-    const name = 'TestTable' + Math.floor(Math.random() * 10)
+    const name = 'TestTable-' + Math.floor(Math.random() * 100)
 
     await page.goto('/project/default/editor')
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     // need to wait for the panel animation
-    await page.waitForTimeout(1000)
+    await page
+      .locator('.col-span-8 > div > .relative > .peer\\/input')
+      .first()
+      .waitFor({ state: 'visible' })
     await page.locator('.col-span-8 > div > .relative > .peer\\/input').first().click()
     await page.locator('.col-span-8 > div > .relative > .peer\\/input').first().fill(name)
     await page.getByRole('button', { name: 'Add column' }).click()
@@ -15,7 +18,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('textbox', { name: 'column_name' }).fill('textColumn')
     await page.getByRole('button', { name: '---' }).click()
     await page.getByText('textVariable-length character').click()
-    await page.waitForTimeout(1000)
+    await page.getByRole('button', { name: 'Save' }).waitFor({ state: 'visible' })
     await page.getByRole('button', { name: 'Save' }).click()
     await page.locator('#toast').getByRole('button').click()
     await page.getByRole('button', { name }).click()
