@@ -14,6 +14,7 @@ import { Edit, Edit2, Link } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { RowField } from './RowEditor.types'
+import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 
 export interface InputFieldProps {
   field: RowField
@@ -125,13 +126,20 @@ const InputField = ({
   }
 
   if (includes(TEXT_TYPES, field.format)) {
+    const isTruncated = field.value?.endsWith('...') && (field.value ?? '').length > MAX_CHARACTERS
+
     return (
       <div className="text-area-text-sm">
         <Input.TextArea
           layout="horizontal"
           label={field.name}
           className="text-sm"
-          descriptionText={field.comment}
+          descriptionText={
+            <>
+              {field.comment && <p>{field.comment}</p>}
+              {isTruncated && <p>Note: Value is too large to be rendered in the dashboard</p>}
+            </>
+          }
           labelOptional={field.format}
           disabled={!isEditable}
           error={errors[field.name]}
@@ -170,7 +178,7 @@ const InputField = ({
   }
 
   if (includes(JSON_TYPES, field.format)) {
-    const isTruncated = field.value?.endsWith('...')
+    const isTruncated = field.value?.endsWith('...') && (field.value ?? '').length > MAX_CHARACTERS
 
     return (
       <Input
