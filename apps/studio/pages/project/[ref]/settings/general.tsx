@@ -22,7 +22,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <ScaffoldTitle>Project Settings</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10">
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <General />
         {!isBranch ? (
           <>

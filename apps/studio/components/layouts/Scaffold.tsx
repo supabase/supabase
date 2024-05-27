@@ -31,11 +31,18 @@ const ScaffoldDescription = React.forwardRef<
   return <span ref={ref} {...props} className={cn('text-sm text-foreground-light', className)} />
 })
 
-const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn(maxWidthClasses, paddingClasses, className)} />
-  }
-)
+const ScaffoldContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { bottomPadding?: boolean }
+>(({ className, bottomPadding, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      {...props}
+      className={cn(maxWidthClasses, paddingClasses, bottomPadding && 'pb-16', className)}
+    />
+  )
+})
 
 const ScaffoldDivider = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
