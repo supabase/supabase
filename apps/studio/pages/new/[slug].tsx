@@ -40,8 +40,11 @@ import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -251,6 +254,7 @@ const Wizard: NextPageWithLayout = () => {
         })
         .min(1, 'Password is required.'),
       instanceSize: z.string(),
+      dataApi: z.boolean(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -275,6 +279,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
         ? PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region
         : '',
+      dataApi: true,
     },
   })
 
@@ -306,7 +311,8 @@ const Wizard: NextPageWithLayout = () => {
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
-      dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
+      dbInstanceSize:
+        orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -649,6 +655,45 @@ const Wizard: NextPageWithLayout = () => {
                             form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
                           />
+                        )}
+                      />
+                    </Panel.Content>
+
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="dataApi"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="What connections do you plan to use?"
+                            layout="horizontal"
+                          >
+                            <FormControl_Shadcn_>
+                              <RadioGroupStacked
+                                onValueChange={(value) => field.onChange(Boolean(value))}
+                                defaultValue={field.value.toString()}
+                              >
+                                <FormItem_Shadcn_ asChild>
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStackedItem
+                                      value={'true'}
+                                      label="Data API + Connection String"
+                                      description="For connecting from the browser, mobile and server."
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItem_Shadcn_>
+                                <FormItem_Shadcn_ asChild>
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStackedItem
+                                      label="Only Connection String"
+                                      value="false"
+                                      description="For connecting via server."
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItem_Shadcn_>
+                              </RadioGroupStacked>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
                         )}
                       />
                     </Panel.Content>
