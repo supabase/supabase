@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ToastLoader } from 'components/ui/ToastLoader'
@@ -246,11 +245,8 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [
             'table-definition',
@@ -260,6 +256,11 @@ const SidePanelEditor = ({
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
+
+      await queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      )
+
       setIsEdited(false)
       snap.closeSidePanel()
     }

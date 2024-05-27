@@ -1,17 +1,49 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import type { RenderEditCellProps } from 'react-data-grid'
+import { PostgresTable } from '@supabase/postgres-meta'
+import { isNil } from 'lodash'
+import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { IconMaximize, Popover } from 'ui'
+import type { RenderEditCellProps } from 'react-data-grid'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 import { useTrackedState } from 'components/grid/store'
-import { prettifyJSON, tryParseJson, removeJSONTrailingComma } from 'lib/helpers'
-import { isNil } from 'lodash'
+import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
+import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
+import { useSelectedProject } from 'hooks'
+import useTable from 'hooks/misc/useTable'
+import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
+import {
+  Button,
+  Popover,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
+
+const verifyJSON = (value: string) => {
+  try {
+    JSON.parse(value)
+    return true
+  } catch (err) {
+    return false
+  }
+}
 
 interface JsonEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
   isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
+}
+
+const tryFormatInitialValue = (value: string) => {
+  try {
+    const jsonValue = JSON.parse(value)
+    return JSON.stringify(jsonValue)
+  } catch (err) {
+    return value.replaceAll(`\"`, `"`)
+  }
 }
 
 export const JsonEditor = <TRow, TSummaryRow = unknown>({
@@ -22,13 +54,20 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
   const state = useTrackedState()
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
+  const { data: selectedTable } = useTable(id)
+  const project = useSelectedProject()
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-  const initialValue = row[column.key as keyof TRow] as unknown
-  const jsonString = prettifyJSON(!isNil(initialValue) ? JSON.stringify(initialValue) : '')
+  const initialValue = row[column.key as keyof TRow] as string
+  const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
+  const isTruncated = typeof initialValue === 'string' && initialValue.endsWith('...')
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
+
+  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
   const cancelChanges = useCallback(() => {
     if (isEditable) onRowChange(row, true)
@@ -79,61 +118,110 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       sideOffset={-35}
       className="rounded-none"
       overlay={
-        <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-          <MonacoEditor
-            width={`${gridColumn?.width || column.width}px`}
-            value={value ?? ''}
-            language="json"
-            readOnly={!isEditable}
-            onChange={onChange}
-          />
-          <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
-            {isEditable ? (
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
-                    <span className="text-[10px]">⏎</span>
-                  </div>
-                  <p className="text-xs text-foreground-light">Save changes</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
-                    <span className="text-[10px]">Esc</span>
-                  </div>
-                  <p className="text-xs text-foreground-light">Cancel changes</p>
-                </div>
+        isTruncated && !isSuccess ? (
+          <div
+            style={{ width: `${gridColumn?.width || column.width}px` }}
+            className="flex items-center justify-center flex-col relative"
+          >
+            <MonacoEditor
+              readOnly
+              onChange={() => {}}
+              width={`${gridColumn?.width || column.width}px`}
+              value={value ?? ''}
+              language="markdown"
+            />
+            <div
+              className={cn(
+                'absolute top-0 left-0 flex items-center justify-center flex-col gap-y-3',
+                'text-xs w-full h-full px-2 text-center',
+                'bg-default/80 backdrop-blur-[1px]'
+              )}
+            >
+              <div className="flex flex-col gap-y-1">
+                <p>Cell value is larger than {MAX_CHARACTERS.toLocaleString()} characters</p>
+                <p className="text-foreground-light">
+                  You may try to render the entire cell value, but your browser may run into
+                  performance issues
+                </p>
               </div>
-            ) : (
-              <div />
-            )}
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <div
-                  className={[
-                    'border border-strong rounded p-1 flex items-center justify-center',
-                    'transition cursor-pointer bg-selection hover:bg-border-strong',
-                  ].join(' ')}
-                  onClick={() => onSelectExpand()}
-                >
-                  <IconMaximize size={12} strokeWidth={2} />
+              <Button
+                type="default"
+                loading={isLoading}
+                onClick={() => {
+                  if (selectedTable === undefined || project === undefined) return
+                  if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+                    return toast('Unable to load cell as table has no primary keys')
+                  }
+
+                  const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+                    return { ...a, [b.name]: (row as any)[b.name] }
+                  }, {})
+
+                  getCellValue(
+                    {
+                      table: { schema: selectedTable.schema, name: selectedTable.name },
+                      column: column.name as string,
+                      pkMatch,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    },
+                    {
+                      onSuccess: (data) => {
+                        setValue(JSON.stringify(data))
+                      },
+                    }
+                  )
+                }}
+              >
+                Load cell
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
+            <MonacoEditor
+              width={`${gridColumn?.width || column.width}px`}
+              value={value ?? ''}
+              language="json"
+              readOnly={!isEditable}
+              onChange={onChange}
+            />
+            <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
+              {isEditable && (
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                      <span className="text-[10px]">⏎</span>
+                    </div>
+                    <p className="text-xs text-foreground-light">Save changes</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                      <span className="text-[10px]">Esc</span>
+                    </div>
+                    <p className="text-xs text-foreground-light">Cancel changes</p>
+                  </div>
                 </div>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+              )}
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <div
                     className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
+                      'border border-strong rounded p-1 flex items-center justify-center',
+                      'transition cursor-pointer bg-selection hover:bg-border-strong',
                     ].join(' ')}
+                    onClick={() => onSelectExpand()}
                   >
-                    <span className="text-xs text-foreground">Expand editor</span>
+                    <Maximize size={12} strokeWidth={2} />
                   </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </div>
-        </BlockKeys>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" align="center">
+                  <span>Expand editor</span>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+            </div>
+          </BlockKeys>
+        )
       }
     >
       <div
@@ -146,13 +234,4 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       </div>
     </Popover>
   )
-}
-
-const verifyJSON = (value: string) => {
-  try {
-    JSON.parse(value)
-    return true
-  } catch (err) {
-    return false
-  }
 }
