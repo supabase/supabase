@@ -11,9 +11,9 @@ interface HookCardProps {
 
 export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCardProps) => {
   return (
-    <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row">
-      <div className="px-3 pt-1">
-        <Webhook size={24} strokeWidth="0.5" />
+    <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+      <div className="">
+        <Webhook size={21} strokeWidth="1" />
       </div>
       <div className="flex flex-col flex-0 overflow-y-auto w-full">
         <span className="text-sm text-foreground">{hook.title}</span>
@@ -89,7 +89,7 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
           </Button>
         </div>
       </div>
-      <div className="p-4 flex-1">
+      <div className="flex-1">
         {hook.enabled ? (
           <Badge className="space-x-1" size="large" variant="brand">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
