@@ -18,7 +18,7 @@ const PageLayout: NextPageWithLayout = () => {
           <ScaffoldDescription>Configure your project's storage settings</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10">
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <StorageSettings />
         <S3Connection />
       </ScaffoldContainer>

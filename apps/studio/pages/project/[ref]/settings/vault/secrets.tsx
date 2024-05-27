@@ -36,7 +36,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
           <ScaffoldDescription>Application level encryption for your project</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
         {isLoading ? (
           <div className="border rounded border-default p-12 space-y-2">
             <ShimmeringLoader />

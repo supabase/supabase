@@ -22,7 +22,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <ScaffoldTitle>Database Settings</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
         <div className="space-y-10">
           <div className="flex flex-col gap-y-10">
             <DatabaseReadOnlyAlert />
