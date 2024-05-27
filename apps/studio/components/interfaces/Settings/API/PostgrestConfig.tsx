@@ -99,10 +99,8 @@ const PostgrestConfig = () => {
     updatePostgrestConfig({
       projectRef,
       dbSchema: values.dbSchema.join(', '),
-      // @ts-expect-error
       maxRows: values.maxRows,
       dbExtraSearchPath: values.dbExtraSearchPath,
-      // @ts-expect-error
       dbPool: values.dbPool ? values.dbPool : null,
     })
   }
@@ -130,10 +128,6 @@ const PostgrestConfig = () => {
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
-
-  console.log('schema', schema)
-  console.log('default values', form.getValues())
-  console.log('config', config)
 
   function resetForm() {
     if (config) {
