@@ -21,6 +21,7 @@ export type ProjectCreateVariables = {
   authSiteUrl?: string
   customSupabaseRequest?: object
   dbInstanceSize?: DbInstanceSize
+  dataApiExposedSchemas?: string[]
 }
 
 export async function createProject({
@@ -34,6 +35,7 @@ export async function createProject({
   authSiteUrl,
   customSupabaseRequest,
   dbInstanceSize,
+  dataApiExposedSchemas,
 }: ProjectCreateVariables) {
   const body: components['schemas']['CreateProjectBody'] = {
     cloud_provider: cloudProvider,
@@ -48,6 +50,7 @@ export async function createProject({
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
     desired_instance_size: dbInstanceSize,
+    data_api_exposed_schemas: dataApiExposedSchemas,
   }
 
   const { data, error } = await post(`/platform/projects`, {

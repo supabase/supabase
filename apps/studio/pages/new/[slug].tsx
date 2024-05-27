@@ -300,7 +300,8 @@ const Wizard: NextPageWithLayout = () => {
   const onClickNext = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize } = values
+    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize, dataApi } =
+      values
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -313,6 +314,7 @@ const Wizard: NextPageWithLayout = () => {
       // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+      dataApiExposedSchemas: !dataApi ? [] : undefined,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
