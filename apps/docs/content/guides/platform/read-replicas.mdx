@@ -139,12 +139,13 @@ In the SQL editor, you can choose if you want to run the query on a particular R
 ### Logging
 
 When a Read Replica is deployed, it emits logs from the following services:
+
 - [API](/dashboard/project/_/logs/edge-logs)
 - [Postgres](/dashboard/project/_/logs/postgres-logs)
 - [PostgREST](/dashboard/project/_/logs/postgrest-logs)
 - [Supavisor](/dashboard/project/_/logs/pooler-logs)
 
-Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Vieweing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page. 
+Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Vieweing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
 
 For API logs, logs can originate from the API Load Balancer as well. The upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
