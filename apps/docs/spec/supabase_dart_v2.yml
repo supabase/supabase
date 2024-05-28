@@ -2214,19 +2214,19 @@ functions:
             .listBuckets();
           ```
         response: |
-          ```json
+          ```dart
           [
             Bucket(
-              id: "avatars",
-              name: "avatars",
-              owner: "",
+              id: 'avatars',
+              name: 'avatars',
+              owner: '',
               public: false,
               file_size_limit: 1024,
               allowed_mime_types: [
-                "image/png"
+                'image/png'
               ],
-              created_at: "2024-05-22T22:26:05.100Z",
-              updated_at: "2024-05-22T22:26:05.100Z"
+              created_at: '2024-05-22T22:26:05.100Z',
+              updated_at: '2024-05-22T22:26:05.100Z'
             ),
           ]
           ```
@@ -2256,18 +2256,18 @@ functions:
             .getBucket('avatars');
           ```
         response: |
-          ```json
+          ```dart
           Bucket(
-            id: "avatars",
-            name: "avatars",
-            owner: "",
+            id: 'avatars',
+            name: 'avatars',
+            owner: '',
             public: false,
             file_size_limit: 1024,
             allowed_mime_types: [
-              "image/png"
+              'image/png'
             ],
-            created_at: "2024-05-22T22:26:05.100Z",
-            updated_at: "2024-05-22T22:26:05.100Z"
+            created_at: '2024-05-22T22:26:05.100Z',
+            updated_at: '2024-05-22T22:26:05.100Z'
           )
           ```
   - id: create-bucket
@@ -2312,8 +2312,8 @@ functions:
             .createBucket('avatars');
           ```
         response: |
-          ```json
-          "avatars"
+          ```dart
+          'avatars'
           ```
 
   - id: empty-bucket
@@ -2341,8 +2341,8 @@ functions:
             .emptyBucket('avatars');
           ```
         response: |
-          ```json
-          "Successfully emptied"
+          ```dart
+          'Successfully emptied'
           ```
   - id: update-bucket
     description: |
@@ -2386,8 +2386,8 @@ functions:
             .updateBucket('avatars', const BucketOptions(public: false));
           ```
         response: |
-          ```json
-          "Successfully updated"
+          ```dart
+          'Successfully updated'
           ```
 
   - id: delete-bucket
@@ -2415,8 +2415,8 @@ functions:
             .deleteBucket('avatars');
           ```
         response: |
-          ```json
-          "Successfully deleted"
+          ```dart
+          'Successfully deleted'
           ```
 
   - id: from-upload
@@ -2475,8 +2475,8 @@ functions:
               );
           ```
         response: |
-          ```json
-          "avatars/public/avatar1.png"
+          ```dart
+          'avatars/public/avatar1.png'
           ```
       - id: upload-file-on-web
         name: Upload file on web
@@ -2490,8 +2490,8 @@ functions:
               );
           ```
         response: |
-          ```json
-          "avatars/public/avatar1.png"
+          ```dart
+          'avatars/public/avatar1.png'
           ```
 
   - id: from-update
@@ -2550,8 +2550,8 @@ functions:
               );
           ```
         response: |
-          ```json
-          "avatars/public/avatar1.png"
+          ```dart
+          'avatars/public/avatar1.png'
           ```
       - id: update-file-on-web
         name: Update file on web
@@ -2565,8 +2565,8 @@ functions:
               );
           ```
         response: |
-          ```json
-          "avatars/public/avatar1.png"
+          ```dart
+          'avatars/public/avatar1.png'
           ```
 
   - id: from-move
@@ -2599,8 +2599,8 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png');
           ```
         response: |
-          ```json
-          "Successfully moved"
+          ```dart
+          'Successfully moved'
           ```
 
   - id: from-create-signed-url
@@ -2674,8 +2674,8 @@ functions:
             );
           ```
         response: |
-          ```json
-          "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+          ```dart
+          'https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>''
           ```
 
   - id: from-get-public-url
@@ -2730,8 +2730,8 @@ functions:
             .getPublicUrl('avatar1.png');
           ```
         response: |
-          ```json
-          "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+          ```dart
+          'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
           ```
       - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
         name: With transform
@@ -2750,8 +2750,8 @@ functions:
             );
           ```
         response: |
-          ```json
-          "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+          ```dart
+          'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
           ```
 
   - id: from-download
@@ -2805,7 +2805,7 @@ functions:
             .download('avatar1.png');
           ```
         response: |
-          ```json
+          ```dart
           <Blob>
           ```
       - id: download-file-with-transform
@@ -2825,7 +2825,7 @@ functions:
             );
           ```
         response: |
-          ```json
+          ```dart
           <Blob>
           ```
 
@@ -2855,22 +2855,24 @@ functions:
             .remove(['avatar1.png']);
           ```
         response: |
-          ```json
-          [FileObject(
-            name: "avatar1.png",
-            id: "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
-            updated_at: "2024-05-22T23:06:05.580Z",
-            created_at: "2024-05-22T23:04:34.443Z",
-            last_accessed_at: "2024-05-22T23:04:34.443Z",
+          ```dart
+          [
+            FileObject(
+            name: 'avatar1.png',
+            id: 'e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2',
+            updated_at: '2024-05-22T23:06:05.580Z',
+            created_at: '2024-05-22T23:04:34.443Z',
+            last_accessed_at: '2024-05-22T23:04:34.443Z',
             metadata: {
-              eTag: "\"c5e8c553235d9af30ef4f6e280790b92\"",
+              eTag: 'c5e8c553235d9af30ef4f6e280790b92',
               size: 32175,
-              mimetype: "image/png",
-              cacheControl: "max-age=3600",
-              lastModified: "2024-05-22T23:06:05.574Z",
+              mimetype: 'image/png',
+              cacheControl: 'max-age=3600',
+              lastModified: '2024-05-22T23:06:05.574Z',
               contentLength: 32175,
               httpStatusCode: 200
-          )]
+            ),
+          ]
           ```
 
   - id: from-list
@@ -2927,22 +2929,24 @@ functions:
             .list();
           ```
         response: |
-          ```json
-          [FileObject(
-            name: "avatar1.png",
-            id: "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
-            updated_at: "2024-05-22T23:06:05.580Z",
-            created_at: "2024-05-22T23:04:34.443Z",
-            last_accessed_at: "2024-05-22T23:04:34.443Z",
+          ```dart
+          [
+            FileObject(
+            name: 'avatar1.png',
+            id: 'e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2',
+            updated_at: '2024-05-22T23:06:05.580Z',
+            created_at: '2024-05-22T23:04:34.443Z',
+            last_accessed_at: '2024-05-22T23:04:34.443Z',
             metadata: {
-              eTag: "\"c5e8c553235d9af30ef4f6e280790b92\"",
+              eTag: 'c5e8c553235d9af30ef4f6e280790b92',
               size: 32175,
-              mimetype: "image/png",
-              cacheControl: "max-age=3600",
-              lastModified: "2024-05-22T23:06:05.574Z",
+              mimetype: 'image/png',
+              cacheControl: 'max-age=3600',
+              lastModified: '2024-05-22T23:06:05.574Z',
               contentLength: 32175,
               httpStatusCode: 200
-          )]
+            ),
+          ]
           ```
   - id: using-modifiers
     title: Using Modifiers
