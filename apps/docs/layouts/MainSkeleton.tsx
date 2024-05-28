@@ -1,7 +1,4 @@
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-import { type CSSProperties, type PropsWithChildren, memo, useEffect } from 'react'
+import { type PropsWithChildren, memo, useEffect } from 'react'
 
 import { cn } from 'ui'
 
@@ -12,14 +9,14 @@ import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
-  home: {
-    icon: 'home',
-    name: 'Home',
-  },
-  gettingstarted: {
-    icon: 'getting-started',
-    name: 'Getting Started',
-  },
+  // home: {
+  //   icon: 'home',
+  //   name: 'Home',
+  // },
+  // gettingstarted: {
+  //   icon: 'getting-started',
+  //   name: 'Getting Started',
+  // },
   database: {
     icon: 'database',
     name: 'Database',
@@ -193,7 +190,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
       </button>
       <div className={[].join(' ')}>
         <HomeMenuIconPicker
-          icon={menuLevel ? levelsData[menuLevel].icon : 'home'}
+          icon={menuLevel ? levelsData[menuLevel]?.icon : 'home'}
           className={[
             'transition-all duration-200',
             mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4',
@@ -210,7 +207,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         {mobileMenuOpen
           ? 'Close'
           : menuLevel
-            ? levelsData[menuLevel].name
+            ? levelsData[menuLevel]?.name
             : levelsData['home'].name}
       </span>
     </div>
@@ -246,24 +243,6 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
       ].join(' ')}
       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
     ></div>
-  )
-})
-
-const HeaderLogo = memo(function HeaderLogo() {
-  const { resolvedTheme } = useTheme()
-  return (
-    <Link href="/" className="px-10 flex items-center gap-2">
-      <Image
-        className="cursor-pointer"
-        src={
-          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-        }
-        width={96}
-        height={24}
-        alt="Supabase Logo"
-      />
-      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-    </Link>
   )
 })
 
@@ -326,15 +305,6 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         <div className="top-0 sticky z-10">
           <div>
             <div>
-              <div
-                className={[
-                  'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-background flex-col gap-8',
-                ].join(' ')}
-              >
-                <HeaderLogo />
-              </div>
-              <div className="h-4 bg-background w-full"></div>
               <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
             </div>
           </div>
@@ -360,29 +330,31 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
 
 function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
   return (
-    <div className="flex flex-row h-full">
-      <NavContainer menuId={menuId} />
-      <Container className="[--header-height:40px] lg:[--header-height:60px]">
-        <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-          <TopNavBar />
-        </div>
-        <div
-          className={[
-            'sticky transition-all top-0',
-            'z-10',
-            'backdrop-blur backdrop-filter bg-background',
-          ].join(' ')}
-        >
-          <div className={['lg:hidden', 'px-3.5', 'border-b z-10'].join(' ')}>
-            <MobileHeader menuId={menuId} />
+    <div className="flex flex-col h-full w-full">
+      <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10 overflow-hidden')}>
+        <TopNavBar />
+      </div>
+      <div className="flex flex-row h-full mt-[var(--header-height,90px)]">
+        <NavContainer menuId={menuId} />
+        <Container className="[--header-height:40px] lg:[--header-height:90px]">
+          <div
+            className={cn(
+              'sticky transition-all top-0',
+              'z-10',
+              'backdrop-blur backdrop-filter bg-background'
+            )}
+          >
+            <div className={cn('lg:hidden', 'px-3.5', 'border-b z-10')}>
+              <MobileHeader menuId={menuId} />
+            </div>
           </div>
-        </div>
-        <div className="grow">
-          {children}
-          <Footer />
-        </div>
-        <MobileMenuBackdrop />
-      </Container>
+          <div className="grow">
+            {children}
+            <Footer />
+          </div>
+          <MobileMenuBackdrop />
+        </Container>
+      </div>
     </div>
   )
 }

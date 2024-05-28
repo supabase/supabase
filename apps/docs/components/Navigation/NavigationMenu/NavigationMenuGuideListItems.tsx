@@ -144,21 +144,6 @@ const Content = (props) => {
 
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
-      <Link
-        href={`${menu.parent ?? '/'}`}
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <ChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Home</span>
-      </Link>
-
       <Link href={menu.url ?? ''}>
         <div className="flex items-center gap-3 my-3 text-brand-link">
           <HomeMenuIconPicker icon={menu.icon} />
