@@ -1,9 +1,6 @@
 import { useRouter } from 'next/router'
 
-type UseCurrentPathOptions = {
-  withQuery: boolean
-}
-export const useCurrentPath = (options?: UseCurrentPathOptions) => {
+export const useCurrentPath = () => {
   const router = useRouter()
 
   if (!router.isReady) {
