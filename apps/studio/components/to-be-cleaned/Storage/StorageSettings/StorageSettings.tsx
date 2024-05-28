@@ -30,7 +30,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { Clock, Files } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
