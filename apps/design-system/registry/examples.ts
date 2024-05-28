@@ -1007,6 +1007,11 @@ export const examples: Registry = [
     files: ['example/tree-view-multi-select.tsx'],
   },
   {
+    name: 'modal-demo',
+    type: 'components:example',
+    files: ['example/modal-demo.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],

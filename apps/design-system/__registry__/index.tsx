@@ -1743,6 +1743,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "modal-demo": {
+      name: "modal-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/modal-demo")),
+      source: "",
+      files: ["registry/default/example/modal-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",
