@@ -109,7 +109,11 @@ export const getTableRowsSqlQuery = ({
   // although possibly negligible risk.
   const truncatedColumns = table.columns
     .filter((column) => {
-      return TEXT_TYPES.includes(column.format) || JSON_TYPES.includes(column.format)
+      return (
+        ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') ||
+        TEXT_TYPES.includes(column.format) ||
+        JSON_TYPES.includes(column.format)
+      )
     })
     .map((column) => {
       if ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') {
@@ -121,7 +125,7 @@ export const getTableRowsSqlQuery = ({
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
-    .select(`*,${truncatedColumns.join(',')}`)
+    .select(truncatedColumns.length > 0 ? `*,${truncatedColumns.join(',')}` : '*')
 
   filters
     .filter((x) => x.value && x.value != '')
