@@ -49,6 +49,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-demo": {
+      name: "admonition-demo",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-demo")),
+      source: "",
+      files: ["registry/default/example/admonition-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-warning": {
+      name: "admonition-warning",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
+      source: "",
+      files: ["registry/default/example/admonition-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-destructive": {
+      name: "admonition-destructive",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-destructive")),
+      source: "",
+      files: ["registry/default/example/admonition-destructive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-demo": {
       name: "alert-demo",
       type: "components:example",
@@ -771,6 +804,61 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/radio-group-form")),
       source: "",
       files: ["registry/default/example/radio-group-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-stacked-demo": {
+      name: "radio-group-stacked-demo",
+      type: "components:example",
+      registryDependencies: ["radio-group"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-stacked-demo")),
+      source: "",
+      files: ["registry/default/example/radio-group-stacked-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-stacked-form": {
+      name: "radio-group-stacked-form",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-stacked-form")),
+      source: "",
+      files: ["registry/default/example/radio-group-stacked-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-card-demo": {
+      name: "radio-group-card-demo",
+      type: "components:example",
+      registryDependencies: ["radio-group"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-demo")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-card-form": {
+      name: "radio-group-card-form",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-form")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "radio-group-card-with-children": {
+      name: "radio-group-card-with-children",
+      type: "components:example",
+      registryDependencies: ["radio-group","form"],
+      component: React.lazy(() => import("@/registry/default/example/radio-group-card-with-children")),
+      source: "",
+      files: ["registry/default/example/radio-group-card-with-children.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1552,6 +1640,105 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/form-item-layout-with-checkbox-list")),
       source: "",
       files: ["registry/default/example/form-item-layout-with-switch.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-before-label": {
+      name: "form-item-layout-before-label",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-before-label")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-before-label.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "form-item-layout-after-label": {
+      name: "form-item-layout-after-label",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/form-item-layout-after-label")),
+      source: "",
+      files: ["registry/default/example/form-item-layout-after-label.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "info-tooltip-demo": {
+      name: "info-tooltip-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/info-tooltip-demo")),
+      source: "",
+      files: ["registry/default/example/info-tooltip-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-demo": {
+      name: "multi-select-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-demo")),
+      source: "",
+      files: ["registry/default/example/multi-select-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-form": {
+      name: "multi-select-form",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-form")),
+      source: "",
+      files: ["registry/default/example/multi-select-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-demo": {
+      name: "tree-view-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-demo")),
+      source: "",
+      files: ["registry/default/example/tree-view-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-edit": {
+      name: "tree-view-edit",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-edit")),
+      source: "",
+      files: ["registry/default/example/tree-view-edit.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-directories": {
+      name: "tree-view-directories",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-directories")),
+      source: "",
+      files: ["registry/default/example/tree-view-directories.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-multi-select": {
+      name: "tree-view-multi-select",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-multi-select")),
+      source: "",
+      files: ["registry/default/example/tree-view-multi-select.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

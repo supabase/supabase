@@ -8,6 +8,24 @@ export const examples: Registry = [
     files: ['example/accordion-demo.tsx'],
   },
   {
+    name: 'admonition-demo',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-demo.tsx'],
+  },
+  {
+    name: 'admonition-warning',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-warning.tsx'],
+  },
+  {
+    name: 'admonition-destructive',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-destructive.tsx'],
+  },
+  {
     name: 'alert-demo',
     type: 'components:example',
     registryDependencies: ['alert'],
@@ -504,6 +522,36 @@ export const examples: Registry = [
     files: ['example/radio-group-form.tsx'],
   },
   {
+    name: 'radio-group-stacked-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-stacked-demo.tsx'],
+  },
+  {
+    name: 'radio-group-stacked-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-stacked-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-demo',
+    type: 'components:example',
+    registryDependencies: ['radio-group'],
+    files: ['example/radio-group-card-demo.tsx'],
+  },
+  {
+    name: 'radio-group-card-form',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-form.tsx'],
+  },
+  {
+    name: 'radio-group-card-with-children',
+    type: 'components:example',
+    registryDependencies: ['radio-group', 'form'],
+    files: ['example/radio-group-card-with-children.tsx'],
+  },
+  {
     name: 'resizable-demo',
     type: 'components:example',
     registryDependencies: ['resizable'],
@@ -912,6 +960,51 @@ export const examples: Registry = [
     name: 'form-item-layout-with-checkbox-list',
     type: 'components:example',
     files: ['example/form-item-layout-with-switch.tsx'],
+  },
+  {
+    name: 'form-item-layout-before-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-before-label.tsx'],
+  },
+  {
+    name: 'form-item-layout-after-label',
+    type: 'components:example',
+    files: ['example/form-item-layout-after-label.tsx'],
+  },
+  {
+    name: 'info-tooltip-demo',
+    type: 'components:example',
+    files: ['example/info-tooltip-demo.tsx'],
+  },
+  {
+    name: 'multi-select-demo',
+    type: 'components:example',
+    files: ['example/multi-select-demo.tsx'],
+  },
+  {
+    name: 'multi-select-form',
+    type: 'components:example',
+    files: ['example/multi-select-form.tsx'],
+  },
+  {
+    name: 'tree-view-demo',
+    type: 'components:example',
+    files: ['example/tree-view-demo.tsx'],
+  },
+  {
+    name: 'tree-view-edit',
+    type: 'components:example',
+    files: ['example/tree-view-edit.tsx'],
+  },
+  {
+    name: 'tree-view-directories',
+    type: 'components:example',
+    files: ['example/tree-view-directories.tsx'],
+  },
+  {
+    name: 'tree-view-multi-select',
+    type: 'components:example',
+    files: ['example/tree-view-multi-select.tsx'],
   },
   {
     name: 'color-usage-surface-www-and-docs',

@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Button, Form, IconMail, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal } from 'ui'
 
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useCheckPermissions } from 'hooks'
@@ -15,7 +16,12 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
-  const { mutateAsync: inviteUser, isLoading: isInviting } = useUserInviteMutation()
+  const { mutate: inviteUser, isLoading: isInviting } = useUserInviteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Sent invite email to ${variables.email}`)
+      setVisible(false)
+    },
+  })
   const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const validate = (values: any) => {
@@ -34,10 +40,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
 
   const onInviteUser = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await inviteUser({ projectRef, email: values.email })
-    toast.success(`Sent invite email to ${values.email}`)
-    setVisible(false)
+    inviteUser({ projectRef, email: values.email })
   }
 
   return (
@@ -64,7 +67,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
                   id="email"
                   className="w-full"
                   label="User email"
-                  icon={<IconMail />}
+                  icon={<Mail />}
                   type="email"
                   name="email"
                   placeholder="User email"

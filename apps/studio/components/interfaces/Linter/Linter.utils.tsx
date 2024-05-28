@@ -158,6 +158,16 @@ export const lintInfoMap: LintInfo[] = [
     docsLink:
       'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0015_rls_references_user_metadata',
   },
+  {
+    name: 'materialized_view_in_api',
+    title: 'Materialized View in API',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: () =>
+      `https://supabase.com/docs/guides/database/database-advisors?lint=0016_materialized_view_in_api`,
+    linkText: 'View docs',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-advisors?lint=0016_materialized_view_in_api',
+  },
 ]
 
 export const LintCTA = ({

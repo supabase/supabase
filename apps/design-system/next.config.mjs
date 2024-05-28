@@ -14,7 +14,25 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+      },
     ],
+  },
+  async redirects() {
+    return [
+      ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
+        ? [
+            {
+              source: '/',
+              destination: process.env.NEXT_PUBLIC_BASE_PATH,
+              basePath: false,
+              permanent: false,
+            },
+          ]
+        : []),
+    ]
   },
 }
 

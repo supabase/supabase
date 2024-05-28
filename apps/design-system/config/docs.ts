@@ -78,13 +78,28 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Admonition',
+          href: '/docs/fragments/admonition',
+          items: [],
+        },
+        {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
         },
         {
+          title: 'Info Tooltip',
+          href: '/docs/fragments/info-tooltip',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
+          items: [],
+        },
+        {
+          title: 'Multi Select',
+          href: '/docs/fragments/multi-select',
           items: [],
         },
       ],
@@ -260,6 +275,16 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Radio Group Stacked',
+          href: '/docs/components/radio-group-stacked',
+          items: [],
+        },
+        {
+          title: 'Radio Group Card',
+          href: '/docs/components/radio-group-card',
+          items: [],
+        },
+        {
           title: 'Resizable',
           href: '/docs/components/resizable',
           items: [],
@@ -337,6 +362,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Tooltip',
           href: '/docs/components/tooltip',
+          items: [],
+        },
+        {
+          title: 'Tree View',
+          href: '/docs/components/tree-view',
           items: [],
         },
       ],

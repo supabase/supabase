@@ -7,7 +7,7 @@ type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
-const FILENAME_SUBSTRING = 11
+export const FILENAME_SUBSTRING = 11
 
 type GetSortedPostsParams = {
   directory: Directories
