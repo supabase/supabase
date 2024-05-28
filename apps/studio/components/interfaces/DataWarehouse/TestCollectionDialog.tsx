@@ -1,4 +1,3 @@
-import { Label } from '@ui/components/shadcn/ui/label'
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
 import CopyButton from 'components/ui/CopyButton'
 import { WarehouseAccessTokensData, WarehouseCollectionsData } from 'data/analytics'
@@ -16,10 +15,10 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
+  Label_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -152,7 +151,7 @@ export function TestCollectionDialog({
               checked={showAccessToken}
               onCheckedChange={() => setShowAccessToken(!showAccessToken)}
             />
-            <Label htmlFor="showAccessToken">Show access token</Label>
+            <Label_Shadcn_ htmlFor="showAccessToken">Show access token</Label_Shadcn_>
           </div>
 
           <div className="relative">
