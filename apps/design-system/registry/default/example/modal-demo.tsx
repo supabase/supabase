@@ -30,10 +30,12 @@ export default function ModalDemo() {
           </div>
         }
       >
-        <p>
-          Modal content is inserted here, if you need to insert anything into the Modal you can do
-          so via `children`.
-        </p>
+        <Modal.Content>
+          <p>
+            Modal content is inserted here, if you need to insert anything into the Modal you can do
+            so via `children`.
+          </p>
+        </Modal.Content>
       </Modal>
     </>
   )

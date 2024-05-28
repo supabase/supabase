@@ -16,7 +16,6 @@ export default function ModalVerticalCustomFooter() {
         onConfirm={() => setVisible(!visible)}
         title="This is the title of the modal"
         description="And i am the description"
-        hideFooter={true}
         size="medium"
         hideClose={false}
         header={
@@ -31,23 +30,23 @@ export default function ModalVerticalCustomFooter() {
           </div>
         }
         customFooter={
-          <>
-            <div className="flex items-center gap-3">
-              <div>
-                <Badge variant="destructive" dot size="small">
-                  Proceed with caution
-                </Badge>
-              </div>
-              <Button type="secondary">Cancel</Button>
-              <Button type="danger">Delete</Button>
+          <div className="flex items-center gap-3">
+            <div>
+              <Badge variant="destructive" dot size="small">
+                Proceed with caution
+              </Badge>
             </div>
-          </>
+            <Button type="secondary">Cancel</Button>
+            <Button type="danger">Delete</Button>
+          </div>
         }
       >
-        <p>
-          Modal content is inserted here, if you need to insert anything into the Modal you can do
-          so via `children`.
-        </p>
+        <Modal.Content>
+          <p>
+            Modal content is inserted here, if you need to insert anything into the Modal you can do
+            so via `children`.
+          </p>
+        </Modal.Content>
       </Modal>
     </>
   )

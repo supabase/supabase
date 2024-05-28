@@ -135,7 +135,7 @@ const Modal = forwardRef<
       <Dialog open={open} defaultOpen={defaultOpen} onOpenChange={handleOpenChange} modal={modal}>
         {triggerElement && <DialogTrigger>{triggerElement}</DialogTrigger>}
         <DialogContent ref={ref} hideClose={!showCloseButton} {...props}>
-          <DialogHeader className={cn('border-b')} padding={'small'}>
+          <DialogHeader className={cn('border-b')}>
             {header && <DialogTitle>{header}</DialogTitle>}
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>

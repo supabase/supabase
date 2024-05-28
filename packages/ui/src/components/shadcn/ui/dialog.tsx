@@ -186,12 +186,8 @@ DialogClose.displayName = DialogPrimitive.Close.displayName
 const DialogSection = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
->(({ className, children, padding, ...props }, ref) => (
-  <div
-    ref={ref}
-    {...props}
-    className={cn('px-5 py-3', DialogPaddingVariants({ padding }), className)}
-  >
+>(({ className, children, padding = 'default', ...props }, ref) => (
+  <div ref={ref} {...props} className={cn(DialogPaddingVariants({ padding }), className)}>
     {children}
   </div>
 ))
