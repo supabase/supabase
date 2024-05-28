@@ -42,7 +42,11 @@ const tryFormatInitialValue = (value: string) => {
     const jsonValue = JSON.parse(value)
     return JSON.stringify(jsonValue)
   } catch (err) {
-    return value.replaceAll(`\"`, `"`)
+    if (typeof value === 'string') {
+      return value.replaceAll(`\"`, `"`)
+    } else {
+      return JSON.stringify(value)
+    }
   }
 }
 
@@ -103,14 +107,16 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
     setIsPopoverOpen(false)
   }, [])
 
-  const saveChanges = useCallback((newValue: string | null) => {
-    const updatedValue = newValue !== null ? removeJSONTrailingComma(newValue) : newValue
-    if (updatedValue !== value) commitChange(newValue)
-  }, [])
+  const saveChanges = useCallback(
+    (newValue: string | null) => {
+      const updatedValue = newValue !== null ? removeJSONTrailingComma(newValue) : newValue
+      if (updatedValue !== value) commitChange(newValue)
+    },
+    [value]
+  )
 
   const onChange = (_value: string | undefined) => {
     if (!isEditable) return
-
     if (!_value || _value == '') setValue(null)
     else setValue(_value)
   }
