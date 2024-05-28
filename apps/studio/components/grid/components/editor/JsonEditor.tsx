@@ -163,7 +163,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               className={cn(
                 'absolute top-0 left-0 flex items-center justify-center flex-col gap-y-3',
                 'text-xs w-full h-full px-2 text-center',
-                'bg-default/80 backdrop-blur-[1px]'
+                'bg-default/80 backdrop-blur-[1.5px]'
               )}
             >
               <div className="flex flex-col gap-y-1">
