@@ -13,6 +13,11 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SelectContent_Shadcn_,
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
@@ -46,7 +51,6 @@ const StorageSettings = () => {
   const { fileSizeLimit, isFreeTier } = config || {}
   const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
   const [selectedUnit, _] = useState(unit)
-
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
   )} bytes`
@@ -73,6 +77,7 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: { fileSizeLimit: value, unit: selectedUnit },
   })
+  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
 
   useEffect(() => {
     form.setValue('unit', unit)
@@ -138,24 +143,30 @@ const StorageSettings = () => {
                             <FormItem_Shadcn_>
                               <FormLabel_Shadcn_ className="hidden">Unit</FormLabel_Shadcn_>
                               <FormControl_Shadcn_ className="col-span-8">
-                                <Listbox
+                                <Select_Shadcn_
                                   disabled={isFreeTier}
                                   value={field.value}
-                                  onChange={field.onChange}
+                                  onValueChange={field.onChange}
                                 >
-                                  {Object.values(StorageSizeUnits).map((unit: string) => (
-                                    <Listbox.Option
-                                      key={unit}
-                                      disabled={isFreeTier}
-                                      label={unit}
-                                      value={unit}
-                                    >
-                                      <div>{unit}</div>
-                                    </Listbox.Option>
-                                  ))}
-                                </Listbox>
+                                  <SelectTrigger_Shadcn_ className="w-[180px]">
+                                    <SelectValue_Shadcn_ placeholder="Choose a prefix">
+                                      {storageUnit}
+                                    </SelectValue_Shadcn_>
+                                  </SelectTrigger_Shadcn_>
+                                  <SelectContent_Shadcn_>
+                                    {Object.values(StorageSizeUnits).map((unit: string) => (
+                                      <SelectItem_Shadcn_
+                                        key={unit}
+                                        disabled={isFreeTier}
+                                        value={unit}
+                                      >
+                                        {unit}
+                                      </SelectItem_Shadcn_>
+                                    ))}
+                                  </SelectContent_Shadcn_>
+                                </Select_Shadcn_>
                               </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ className="" />
+                              <FormMessage_Shadcn_ />
                             </FormItem_Shadcn_>
                           )}
                         />
@@ -164,8 +175,8 @@ const StorageSettings = () => {
                     <p className="text-sm text-foreground-light">
                       {selectedUnit !== StorageSizeUnits.BYTES &&
                         `Equivalent to ${convertToBytes(
-                          form.getValues('fileSizeLimit'),
-                          selectedUnit
+                          limit,
+                          storageUnit
                         ).toLocaleString()} bytes. `}
                       Maximum size in bytes of a file that can be uploaded is 5 GB (
                       {formattedMaxSizeBytes}).
