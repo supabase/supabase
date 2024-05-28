@@ -1,11 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
-
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
   slug: string
@@ -23,10 +21,15 @@ export async function updateEdgeFunction({
 }: EdgeFunctionsUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await patch(`${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}`, payload)
-  if (response.error) throw response.error
+  const { data, error } = await patch(`/v1/projects/{ref}/functions/{function_slug}`, {
+    params: {
+      path: { ref: projectRef, function_slug: slug },
+    },
+    body: payload,
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type EdgeFunctionsUpdateData = Awaited<ReturnType<typeof updateEdgeFunction>>
