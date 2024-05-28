@@ -57,7 +57,7 @@ const LogSelection = ({
     },
     {
       onError: (error) => {
-        toast.error('Failed to fetch collection data')
+        toast.error(error.message)
       },
     }
   )
