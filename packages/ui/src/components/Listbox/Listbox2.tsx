@@ -38,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 }
 
 /**
- * @deprecated The component should not be used
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function Listbox({
   children,
@@ -280,6 +280,9 @@ type addOnBefore = {
   active: boolean
 }
 
+/**
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ */
 function SelectOption({
   id,
   value,

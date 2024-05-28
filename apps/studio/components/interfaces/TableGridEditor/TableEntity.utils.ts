@@ -1,6 +1,6 @@
 import { Lint } from '../../../data/lint/lint-query'
 
-export const checkEntityForLints = (
+export const getEntityLintDetails = (
   entityName: string,
   lintName: string,
   lintLevels: ('ERROR' | 'WARN')[],

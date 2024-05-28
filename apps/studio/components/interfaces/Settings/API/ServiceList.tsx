@@ -92,12 +92,10 @@ const ServiceList = () => {
 
   return (
     <div>
-      <h3 className="mb-6 text-xl text-foreground">API Settings</h3>
       {isLoading ? (
         <GenericSkeletonLoader />
       ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <div>
-          <h3 className="mb-6 text-xl text-foreground">API Settings</h3>
           <div className="flex items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <IconAlertCircle strokeWidth={1.5} />
             <p className="text-sm text-foreground-light ml-2">

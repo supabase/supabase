@@ -57,6 +57,7 @@ function Description({ children, ...props }: ComponentProps<typeof Typography.Te
  *
  * `Toast.toast('Message', { description: 'Description', actions: [<SomeButton />] })`
  */
+
 function Toast({
   id,
   visible,
