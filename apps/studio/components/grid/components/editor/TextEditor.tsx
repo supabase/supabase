@@ -77,10 +77,15 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     setIsPopoverOpen(false)
   }, [])
 
-  const saveChanges = useCallback((newValue: string | null) => {
-    if (isEditable) onRowChange({ ...row, [column.key]: newValue }, true)
-    setIsPopoverOpen(false)
-  }, [])
+  const saveChanges = useCallback(
+    (newValue: string | null) => {
+      if (isEditable && newValue !== value) {
+        onRowChange({ ...row, [column.key]: newValue }, true)
+      }
+      setIsPopoverOpen(false)
+    },
+    [isSuccess]
+  )
 
   const onSelectExpand = () => {
     cancelChanges()
@@ -120,7 +125,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               className={cn(
                 'absolute top-0 left-0 flex items-center justify-center flex-col gap-y-3',
                 'text-xs w-full h-full px-2 text-center',
-                'bg-default/80 backdrop-blur-[1px]'
+                'bg-default/80 backdrop-blur-[1.5px]'
               )}
             >
               <div className="flex flex-col gap-y-1">
