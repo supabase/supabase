@@ -30,7 +30,7 @@ export async function getWarehouseQuery(
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>
-export type WarehouseQueryError = unknown
+export type WarehouseQueryError = ResponseError
 
 export const useWarehouseQueryQuery = <TData = WarehouseQueryData>(
   { ref, sql }: WarehouseQueryVariables,
