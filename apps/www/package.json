@@ -5,11 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next --port 3000",
-<<<<<<< HEAD
     "build": "npm run content:build && next build && npm run content:tempFix",
-=======
-    "build": "npm run content:build && next build",
->>>>>>> parent of 6c44f27313 (temporarily fix contentLayer build bug)
     "export": "next export",
     "start": "next start",
     "typecheck": "npm run content:build && tsc --noEmit",
