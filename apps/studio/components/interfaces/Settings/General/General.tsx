@@ -77,8 +77,6 @@ const General = () => {
 
   return (
     <div>
-      <FormHeader title="Project Settings" description="" />
-
       {isBranch && (
         <Alert_Shadcn_ variant="default" className="mb-6">
           <WarningIcon />
