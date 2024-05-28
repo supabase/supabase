@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
-  IconClock,
-  Listbox,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -21,7 +19,6 @@ import {
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
@@ -33,6 +30,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
+import { Clock, Files } from 'lucide-react'
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
@@ -48,9 +46,23 @@ const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
-  const { fileSizeLimit, isFreeTier } = config || {}
-  const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-  const [selectedUnit, _] = useState(unit)
+  const { isFreeTier } = config || {}
+
+  const [initialValues, setInitialValues] = useState({
+    fileSizeLimit: 0,
+    unit: StorageSizeUnits.BYTES,
+  })
+
+  useEffect(() => {
+    if (isSuccess && config) {
+      const { fileSizeLimit } = config
+      const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
+      setInitialValues({ fileSizeLimit: value, unit: unit })
+      // Reset the form values when the config values load
+      form.reset({ fileSizeLimit: value, unit: unit })
+    }
+  }, [isSuccess, config])
+
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
   )} bytes`
@@ -75,13 +87,9 @@ const StorageSettings = () => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { fileSizeLimit: value, unit: selectedUnit },
+    defaultValues: initialValues,
   })
   const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
-
-  useEffect(() => {
-    form.setValue('unit', unit)
-  }, [config])
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -173,7 +181,7 @@ const StorageSettings = () => {
                       </div>
                     </div>
                     <p className="text-sm text-foreground-light">
-                      {selectedUnit !== StorageSizeUnits.BYTES &&
+                      {storageUnit !== StorageSizeUnits.BYTES &&
                         `Equivalent to ${convertToBytes(
                           limit,
                           storageUnit
@@ -187,7 +195,7 @@ const StorageSettings = () => {
               {isFreeTier && (
                 <div className="px-6 pb-6">
                   <UpgradeToPro
-                    icon={<IconClock size="large" />}
+                    icon={<Clock size="large" />}
                     organizationSlug={organizationSlug ?? ''}
                     primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                     projectRef={projectRef ?? ''}
