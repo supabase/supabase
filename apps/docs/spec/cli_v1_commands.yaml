@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.167.4
+  version: 1.169.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -509,7 +509,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -1681,7 +1681,33 @@ commands:
     links: []
     subcommands:
       - supabase-inspect-db
+      - supabase-inspect-report
     flags: []
+  - id: supabase-inspect-report
+    title: supabase inspect report
+    summary: Generate a CSV output for all inspect commands
+    tags: []
+    links: []
+    usage: supabase inspect report [flags]
+    subcommands: []
+    flags:
+      - id: output-dir
+        name: --output-dir <string>
+        description: Path to save CSV files in
+        default_value: ''
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
   - id: supabase-inspect-db
     title: supabase inspect db
     summary: Tools to inspect your Supabase database
