@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.163.6
+  version: 1.169.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -256,6 +256,14 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
+        default_value: 'false'
   - id: supabase-storage-mv
     title: supabase storage mv
     summary: Move objects from src to dst path
@@ -273,6 +281,14 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
+        default_value: 'false'
   - id: supabase-storage-ls
     title: supabase storage ls
     summary: List objects by path prefix
@@ -289,6 +305,14 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
+        default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
         default_value: 'false'
   - id: supabase-storage-cp
     title: supabase storage cp
@@ -318,6 +342,14 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
+        default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
         default_value: 'false'
   - id: supabase-stop
     title: supabase stop
@@ -477,7 +509,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -1280,6 +1312,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-migration-fetch
       - supabase-migration-list
       - supabase-migration-new
       - supabase-migration-repair
@@ -1525,6 +1558,27 @@ commands:
         name: -p, --password <string>
         description: Password to your remote Postgres database.
         default_value: ''
+  - id: supabase-migration-fetch
+    title: supabase migration fetch
+    summary: Fetch migration files from history table
+    tags: []
+    links: []
+    usage: supabase migration fetch [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Fetches migrations from the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Fetches migration history from the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Fetches migration history from the local database.
+        default_value: 'false'
   - id: supabase-logout
     title: supabase logout
     summary: Log out and delete access tokens locally
@@ -1627,7 +1681,33 @@ commands:
     links: []
     subcommands:
       - supabase-inspect-db
+      - supabase-inspect-report
     flags: []
+  - id: supabase-inspect-report
+    title: supabase inspect report
+    summary: Generate a CSV output for all inspect commands
+    tags: []
+    links: []
+    usage: supabase inspect report [flags]
+    subcommands: []
+    flags:
+      - id: output-dir
+        name: --output-dir <string>
+        description: Path to save CSV files in
+        default_value: ''
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
   - id: supabase-inspect-db
     title: supabase inspect db
     summary: Tools to inspect your Supabase database

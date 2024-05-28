@@ -1,23 +1,20 @@
-import { useParams } from 'common'
+import { useMemo } from 'react'
+
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import {
-  PRESET_CONFIG,
-  REPORTS_DATEPICKER_HELPERS,
-} from 'components/interfaces/Reports/Reports.constants'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
+import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
+import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ReportsLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { useStorageReport } from 'data/reports/storage-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
-import { useEffect, useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {
@@ -72,51 +69,6 @@ export const StorageReport: NextPageWithLayout = () => {
       />
     </ReportPadding>
   )
-}
-
-// hook to fetch data
-const useStorageReport = () => {
-  const { ref: projectRef } = useParams()
-
-  const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
-    PRESET_CONFIG.storage.queries,
-    projectRef ?? 'default'
-  )
-  const cacheHitRate = queryHooks.cacheHitRate()
-  const topCacheMisses = queryHooks.topCacheMisses()
-  const activeHooks = [cacheHitRate, topCacheMisses]
-
-  const handleRefresh = async () => {
-    activeHooks.forEach((hook) => hook.runQuery())
-  }
-  const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach((hook) => {
-      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
-    })
-  }
-  useEffect(() => {
-    if (cacheHitRate.changeQuery) {
-      cacheHitRate.changeQuery(PRESET_CONFIG.storage.queries.cacheHitRate.sql([]))
-    }
-
-    if (topCacheMisses.changeQuery) {
-      topCacheMisses.changeQuery(PRESET_CONFIG.storage.queries.topCacheMisses.sql([]))
-    }
-  }, [])
-  const isLoading = activeHooks.some((hook) => hook.isLoading)
-  return {
-    data: {
-      cacheHitRate: cacheHitRate.logData,
-      topCacheMisses: topCacheMisses.logData,
-    },
-    params: {
-      cacheHitRate: cacheHitRate.params,
-      topCacheMisses: topCacheMisses.params,
-    },
-    mergeParams: handleSetParams,
-    isLoading,
-    refresh: handleRefresh,
-  }
 }
 
 StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>

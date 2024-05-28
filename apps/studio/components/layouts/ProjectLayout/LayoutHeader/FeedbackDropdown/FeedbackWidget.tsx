@@ -46,7 +46,22 @@ const FeedbackWidget = ({
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
-  const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
+  const { mutate: submitFeedback } = useSendFeedbackMutation({
+    onSuccess: () => {
+      setFeedback('')
+      setScreenshot(undefined)
+      localStorage.removeItem(FEEDBACK_STORAGE_KEY)
+      localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
+      toast.success(
+        'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.'
+      )
+      setSending(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to submit feedback: ${error.message}`)
+      setSending(false)
+    },
+  })
 
   useEffect(() => {
     const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
@@ -136,23 +151,12 @@ const FeedbackWidget = ({
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
 
-      try {
-        await submitFeedback({
-          projectRef: ref,
-          organizationSlug: slug,
-          message: formattedFeedback,
-          pathname: router.asPath,
-        })
-        setFeedback('')
-        setScreenshot(undefined)
-        localStorage.removeItem(FEEDBACK_STORAGE_KEY)
-        localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-        toast.success(
-          'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.'
-        )
-      } finally {
-        setSending(false)
-      }
+      submitFeedback({
+        projectRef: ref,
+        organizationSlug: slug,
+        message: formattedFeedback,
+        pathname: router.asPath,
+      })
     }
 
     return onClose()

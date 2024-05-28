@@ -14,10 +14,12 @@ import UtilityTabResults from './UtilityTabResults'
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isDebugging?: boolean
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  onDebug: () => void
 }
 
 const DEFAULT_CHART_CONFIG = {
@@ -30,18 +32,22 @@ const DEFAULT_CHART_CONFIG = {
 const UtilityPanel = ({
   id,
   isExecuting,
+  isDebugging,
   isDisabled,
   hasSelection,
   prettifyQuery,
   executeQuery,
+  onDebug,
 }: UtilityPanelProps) => {
-  const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
+  const snap = useSqlEditorStateSnapshot()
+
   const snippet = snap.snippets[id]?.snippet
-
   const queryKeys = contentKeys.list(ref)
+  const result = snap.results[id]?.[0]
 
-  const upsertContent = useContentUpsertMutation({
+  const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
@@ -68,7 +74,6 @@ const UtilityPanel = ({
       toast.error(`Failed to update chart. Please try again.`)
     },
   })
-  const queryClient = useQueryClient()
 
   function getChartConfig() {
     if (!snippet || snippet.type !== 'sql') {
@@ -84,14 +89,10 @@ const UtilityPanel = ({
 
   const chartConfig = getChartConfig()
 
-  const result = snap.results[id]?.[0]
-
   function onConfigChange(config: ChartConfig) {
-    if (!ref || !snippet.id) {
-      return
-    }
+    if (!ref || !snippet.id) return
 
-    upsertContent.mutateAsync({
+    upsertContent({
       projectRef: ref,
       payload: {
         ...snippet,
@@ -134,7 +135,13 @@ const UtilityPanel = ({
         </div>
       </TabsList_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
-        <UtilityTabResults id={id} isExecuting={isExecuting} />
+        <UtilityTabResults
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          onDebug={onDebug}
+          isDebugging={isDebugging}
+        />
       </TabsContent_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />

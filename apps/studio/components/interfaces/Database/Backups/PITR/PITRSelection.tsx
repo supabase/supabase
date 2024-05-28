@@ -38,6 +38,7 @@ import {
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
+import BackupsStorageAlert from '../BackupsStorageAlert'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -138,6 +139,7 @@ const PITRSelection = () => {
         title="Restore your database from a backup"
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
+      <BackupsStorageAlert />
       {hasNoBackupsAvailable ? (
         <BackupsEmpty />
       ) : (

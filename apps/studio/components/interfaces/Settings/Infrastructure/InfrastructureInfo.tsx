@@ -71,17 +71,6 @@ const InfrastructureInfo = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-6">
-          <div>
-            <p className="text-xl">Infrastructure</p>
-            <p className="text-sm text-foreground-light">
-              General information regarding your server instance
-            </p>
-          </div>
-        </div>
-      </ScaffoldContainer>
-
       <ScaffoldDivider />
 
       {showReadReplicasUI && (

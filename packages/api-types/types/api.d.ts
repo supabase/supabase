@@ -136,16 +136,6 @@ export interface paths {
     /** Enables Database Webhooks on the project */
     post: operations['HooksController_enableHooks']
   }
-  '/platform/database/{ref}/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['OwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['OwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['OwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['OwnerController_finaliseOwnerReassign']
-  }
   '/platform/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
@@ -275,6 +265,16 @@ export interface paths {
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
     get: operations['OrgInvoicesController_getUpcomingInvoice']
+  }
+  '/platform/organizations/{slug}/billing/invoices': {
+    /** Gets invoices for the given organization */
+    get: operations['OrgInvoicesController_getInvoices']
+    /** Gets the total count of invoices for the given organization */
+    head: operations['OrgInvoicesController_countInvoices']
+  }
+  '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
+    /** Gets invoice with the given invoice ID */
+    get: operations['OrgInvoicesController_getInvoice']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -555,6 +555,10 @@ export interface paths {
     /** Restarts project */
     post: operations['RestartController_restartProject']
   }
+  '/platform/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['ProjectRunLintsController_runProjectLints']
+  }
   '/platform/projects/{ref}': {
     /** Gets a specific project that belongs to the authenticated user */
     get: operations['ProjectsRefController_getProject']
@@ -663,6 +667,16 @@ export interface paths {
     /** Lists project's warehouse queries from logflare */
     get: operations['WarehouseQueryController_runQuery']
   }
+  '/platform/projects/{ref}/billing/addons': {
+    /** Gets project addons */
+    get: operations['ProjectAddonController_getProjectAddons']
+    /** Updates project addon */
+    post: operations['ProjectAddonController_updateAddon']
+  }
+  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
+    /** Removes project addon */
+    delete: operations['ProjectAddonController_removeAddon']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -700,16 +714,6 @@ export interface paths {
     get: operations['SupavisorConfigController_getSupavisorConfig']
     /** Updates project's supavisor config */
     patch: operations['SupavisorConfigController_updateSupavisorConfig']
-  }
-  '/platform/projects/{ref}/billing/addons': {
-    /** Gets project addons */
-    get: operations['ProjectAddonController_getProjectAddons']
-    /** Updates project addon */
-    post: operations['ProjectAddonController_updateAddon']
-  }
-  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
-    /** Removes project addon */
-    delete: operations['ProjectAddonController_removeAddon']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -790,9 +794,15 @@ export interface paths {
     delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/platform/stripe/invoices': {
-    /** Gets invoices for the given customer */
+    /**
+     * Gets invoices for the given customer
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoices']
-    /** Gets the total count of invoices for the given customer */
+    /**
+     * Gets the total count of invoices for the given customer
+     * @deprecated
+     */
     head: operations['InvoicesController_countInvoices']
   }
   '/platform/stripe/invoices/overdue': {
@@ -800,7 +810,10 @@ export interface paths {
     get: operations['InvoicesController_getOverdueInvoices']
   }
   '/platform/stripe/invoices/{id}': {
-    /** Gets invoice with the given invoice ID */
+    /**
+     * Gets invoice with the given invoice ID
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoice']
   }
   '/platform/stripe/setup-intent': {
@@ -927,16 +940,6 @@ export interface paths {
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['SystemAuthTemplateController_getTemplate']
-  }
-  '/system/database/{ref}/owner/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['DatabaseOwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['DatabaseOwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['DatabaseOwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['DatabaseOwnerController_finaliseOwnerReassign']
   }
   '/system/database/{ref}/password': {
     /** Updates the database password */
@@ -2489,16 +2492,6 @@ export interface components {
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
     }
-    OwnerResponse: {
-      project_ref: string
-      /** @enum {string} */
-      current: 'unmigrated' | 'temp_role' | 'migrated'
-      /** @enum {string} */
-      desired: 'unmigrated' | 'temp_role' | 'migrated'
-      created_at: string
-      modified_at: string
-      migrated_at: string | null
-    }
     OrganizationResponse: {
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
@@ -3055,6 +3048,15 @@ export interface components {
       plans: components['schemas']['PlanResponse'][]
     }
     UpcomingInvoice: Record<string, never>
+    Invoice: {
+      id: string
+      invoice_pdf: string
+      subscription: string | null
+      subtotal: number
+      number: string
+      period_end: number
+      status: string
+    }
     ColumnPrivilege: {
       grantor: string
       grantee: string
@@ -3742,10 +3744,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3758,10 +3763,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3781,10 +3789,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3805,10 +3816,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3864,8 +3878,10 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
       project_id: number
@@ -3935,6 +3951,7 @@ export interface components {
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
       identifier: string
+      replicaInitializationStatus?: Record<string, never>
     }
     UpdatePasswordBody: {
       password: string
@@ -3952,6 +3969,50 @@ export interface components {
     Buffer: Record<string, never>
     ResizeBody: {
       volume_size_gb: number
+    }
+    RestartProjectInfo: {
+      database_identifier?: string
+    }
+    ProjectLintMetadata: {
+      /** @enum {string} */
+      type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
+      schema?: string
+      name?: string
+      entity?: string
+      fkey_name?: string
+      fkey_columns?: number[]
+    }
+    ProjectLintResponse: {
+      /** @enum {string} */
+      name:
+        | 'unindexed_foreign_keys'
+        | 'auth_users_exposed'
+        | 'auth_rls_initplan'
+        | 'no_primary_key'
+        | 'unused_index'
+        | 'multiple_permissive_policies'
+        | 'policy_exists_rls_disabled'
+        | 'rls_enabled_no_policy'
+        | 'duplicate_index'
+        | 'security_definer_view'
+        | 'function_search_path_mutable'
+        | 'rls_disabled_in_public'
+        | 'extension_in_public'
+        | 'rls_references_user_metadata'
+        | 'materialized_view_in_api'
+        | 'foreign_table_in_api'
+        | 'auth_otp_long_expiry'
+        | 'auth_otp_short_length'
+      /** @enum {string} */
+      level: 'ERROR' | 'WARN' | 'INFO'
+      categories: ('PERFORMANCE' | 'SECURITY')[]
+      title: string
+      facing: string
+      description: string
+      detail: string
+      remediation: Record<string, never>
+      metadata: components['schemas']['ProjectLintMetadata'] | null
+      cache_key: string
     }
     ServiceVersions: {
       gotrue: string
@@ -4037,6 +4098,7 @@ export interface components {
       )[]
       source_notification_id?: string
       region: string
+      database_identifier?: string
     }
     RestartServicesBody: {
       restartRequest: components['schemas']['RestartServiceRequest']
@@ -4125,6 +4187,13 @@ export interface components {
     }
     LFUser: {
       token: string
+      email: string | null
+      bigquery_project_id: string | null
+      bigquery_dataset_location: string | null
+      bigquery_dataset_id: string | null
+      email_me_product: string | null
+      phone: string | null
+      company: string | null
       metadata: {
         project_ref?: string
       }
@@ -4133,6 +4202,19 @@ export interface components {
       token: string
       id: number
       name: string
+      favourite: boolean
+      webhook_notification_url: string | null
+      slack_hook_url: string | null
+      bigquery_table_ttl: number
+      public_token: string | null
+      custom_event_message_keys: string | null
+    }
+    LFAccessToken: {
+      token: string
+      id: number
+      inserted_at: string
+      scopes: string
+      description: string | null
     }
     LFEndpoint: {
       token: string
@@ -4146,6 +4228,20 @@ export interface components {
       proactive_requerying_seconds: number
       max_limit: number
       enable_auth: number
+    }
+    AvailableAddonResponse: {
+      type: components['schemas']['ProjectAddonType']
+      name: string
+      variants: components['schemas']['ProjectAddonVariantResponse'][]
+    }
+    ProjectAddonsResponse: {
+      ref: string
+      selected_addons: components['schemas']['SelectedAddonResponse'][]
+      available_addons: components['schemas']['AvailableAddonResponse'][]
+    }
+    UpdateAddonBody: {
+      addon_variant: components['schemas']['AddonVariantId']
+      addon_type: components['schemas']['ProjectAddonType']
     }
     PgbouncerConfigResponse: {
       default_pool_size?: number
@@ -4283,20 +4379,6 @@ export interface components {
       default_pool_size?: number
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    AvailableAddonResponse: {
-      type: components['schemas']['ProjectAddonType']
-      name: string
-      variants: components['schemas']['ProjectAddonVariantResponse'][]
-    }
-    ProjectAddonsResponse: {
-      ref: string
-      selected_addons: components['schemas']['SelectedAddonResponse'][]
-      available_addons: components['schemas']['AvailableAddonResponse'][]
-    }
-    UpdateAddonBody: {
-      addon_variant: components['schemas']['AddonVariantId']
-      addon_type: components['schemas']['ProjectAddonType']
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -4503,15 +4585,6 @@ export interface components {
       access_key: string
       secret_key: string
       description: string
-    }
-    Invoice: {
-      id: string
-      invoice_pdf: string
-      subscription: string
-      subtotal: number
-      number: string
-      period_end: number
-      status: string
     }
     OverdueInvoiceCount: {
       organization_id: number
@@ -4723,6 +4796,8 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
+      supabase_changes_only: boolean
+      branch_limit: number
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4735,6 +4810,7 @@ export interface components {
     UpdateGitHubConnectionsBody: {
       workdir?: string
       supabase_changes_only?: boolean
+      branch_limit?: number
     }
     CreateCliLoginSessionBody: {
       session_id: string
@@ -4921,9 +4997,18 @@ export interface components {
       restriction_data?: components['schemas']['RestrictionData']
       message?: string
     }
+    AwsPartnerBillingBody: {
+      aws_customer_id: string
+      aws_customer_account_id: string
+      aws_product_code: string
+      aws_private_offer_id: string
+      aws_subscription_start: string
+      aws_subscription_end: string
+    }
     CreateAwsPartnerOrganizationBody: {
       primary_email: string
       name: string
+      partner_billing: components['schemas']['AwsPartnerBillingBody']
     }
     AwsPartnerOrganizationResponse: {
       id: number
@@ -4982,6 +5067,7 @@ export interface components {
       is_default: boolean
       git_branch?: string
       pr_number?: number
+      latest_check_run_id?: number
       reset_on_push: boolean
       persistent: boolean
       /** @enum {string} */
@@ -5370,7 +5456,7 @@ export interface components {
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
-      mailer_otp_exp: number | null
+      mailer_otp_exp: number
       mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
@@ -5412,7 +5498,7 @@ export interface components {
       sms_messagebird_access_key: string | null
       sms_messagebird_originator: string | null
       sms_otp_exp: number | null
-      sms_otp_length: number | null
+      sms_otp_length: number
       sms_provider: string | null
       sms_template: string | null
       sms_test_otp: string | null
@@ -6707,104 +6793,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the status of owner reassignment */
-  OwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  OwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  OwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  OwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets user's organizations */
   OrganizationsController_getOrganizations: {
     responses: {
@@ -7662,6 +7650,82 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve upcoming invoice */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoices for the given organization */
+  OrgInvoicesController_getInvoices: {
+    parameters: {
+      query: {
+        limit: string
+        offset: string
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the total count of invoices for the given organization */
+  OrgInvoicesController_countInvoices: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: unknown
+        }
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve the total count of invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoice with the given invoice ID */
+  OrgInvoicesController_getInvoice: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        invoiceId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoice */
       500: {
         content: never
       }
@@ -9920,6 +9984,7 @@ export interface operations {
           | 'disk_io_consumption'
           | 'ram_usage'
           | 'swap_usage'
+          | 'physical_replication_lag_physical_replica_lag_seconds'
         startDate: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -9991,6 +10056,11 @@ export interface operations {
         ref: string
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RestartProjectInfo']
+      }
+    }
     responses: {
       201: {
         content: never
@@ -10000,6 +10070,25 @@ export interface operations {
       }
       /** @description Failed to restart project */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  ProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }
@@ -10507,7 +10596,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['LFSource'][]
+          'application/json': components['schemas']['LFAccessToken'][]
         }
       }
       403: {
@@ -10524,7 +10613,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['LFSource']
+          'application/json': components['schemas']['LFAccessToken']
         }
       }
       403: {
@@ -10540,9 +10629,7 @@ export interface operations {
   AccessTokenController_deleteAccessToken: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
+        content: never
       }
       403: {
         content: never
@@ -10641,6 +10728,77 @@ export interface operations {
         content: never
       }
       /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project addons */
+  ProjectAddonController_getProjectAddons: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectAddonsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project addons */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project addon */
+  ProjectAddonController_updateAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateAddonBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project addon */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes project addon */
+  ProjectAddonController_removeAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        addon_variant: components['schemas']['AddonVariantId']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to remove project addon */
       500: {
         content: never
       }
@@ -10929,77 +11087,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to update project's supavisor config */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project addons */
-  ProjectAddonController_getProjectAddons: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectAddonsResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to get project addons */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates project addon */
-  ProjectAddonController_updateAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateAddonBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update project addon */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Removes project addon */
-  ProjectAddonController_removeAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        addon_variant: components['schemas']['AddonVariantId']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to remove project addon */
       500: {
         content: never
       }
@@ -11529,12 +11616,15 @@ export interface operations {
       }
     }
   }
-  /** Gets invoices for the given customer */
+  /**
+   * Gets invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_getInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
         limit: string
         offset: string
       }
@@ -11551,12 +11641,15 @@ export interface operations {
       }
     }
   }
-  /** Gets the total count of invoices for the given customer */
+  /**
+   * Gets the total count of invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_countInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
       }
     }
     responses: {
@@ -11583,7 +11676,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invoice with the given invoice ID */
+  /**
+   * Gets invoice with the given invoice ID
+   * @deprecated
+   */
   InvoicesController_getInvoice: {
     parameters: {
       path: {
@@ -12236,104 +12332,6 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve GoTrue template */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the status of owner reassignment */
-  DatabaseOwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  DatabaseOwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  DatabaseOwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  DatabaseOwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
       500: {
         content: never
       }
