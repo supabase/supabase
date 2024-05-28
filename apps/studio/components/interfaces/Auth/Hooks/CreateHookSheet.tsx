@@ -15,7 +15,6 @@ import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
@@ -27,7 +26,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Toggle,
+  Switch,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -56,7 +55,7 @@ const FormSchema = z
   .object({
     hookType: z.string(),
     enabled: z.boolean(),
-    selectedType: z.string(),
+    selectedType: z.union([z.literal('https'), z.literal('postgres')]),
     httpsValues: z.object({
       url: z.string(),
       secret: z.string(),
@@ -251,25 +250,22 @@ export const CreateHookSheet = ({
             className="space-y-6 w-full py-8 flex-1"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <div>
-              <FormField_Shadcn_
-                key="enabled"
-                control={form.control}
-                name="enabled"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="px-8">
-                    <FormControl_Shadcn_>
-                      <Toggle
-                        label={`Enable ${values.hookType}`}
-                        checked={field.value}
-                        onChange={() => field.onChange(!values.enabled)}
-                        disabled={field.disabled}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
-                )}
-              />
-            </div>
+            <FormField_Shadcn_
+              key="enabled"
+              control={form.control}
+              name="enabled"
+              render={({ field }) => (
+                <FormItemLayout className="px-8" label={`Enable ${values.hookType}`} layout="flex">
+                  <FormControl_Shadcn_>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={field.disabled}
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
             <Separator />
             {httpsAuthHooksEnabled && (
               <FormField_Shadcn_
