@@ -1,10 +1,9 @@
 import { useParams } from 'common'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
@@ -17,7 +16,7 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset } = useParams()
+  const { preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -35,7 +34,17 @@ const ProjectLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const activeLints = data?.filter((x) => x.categories.includes('PERFORMANCE')) || []
+  let clientLints: Lint[] = []
+
+  const activeLints = useMemo(() => {
+    return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('PERFORMANCE'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  useEffect(() => {
+    // check the URL for an ID and set the selected lint
+    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  }, [id, activeLints])
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]

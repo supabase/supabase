@@ -224,13 +224,13 @@ const LinterDataGrid = ({
                       <div>
                         <h3 className="text-sm">Issue</h3>
                         <ReactMarkdown className="leading-6 text-sm">
-                          {selectedLint.detail}
+                          {selectedLint.detail.replace(/\\`/g, '`')}
                         </ReactMarkdown>
                       </div>
                       <div>
                         <h3 className="text-sm">Description</h3>
                         <ReactMarkdown className="text-sm">
-                          {selectedLint.description}
+                          {selectedLint.description.replace(/\\`/g, '`')}
                         </ReactMarkdown>
                       </div>
 
