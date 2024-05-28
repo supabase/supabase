@@ -1813,12 +1813,8 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```json
-          {
-            "data": "Hello world",
-            "status": 200,
-            "statusText": "OK"
-          }
+          ```dart
+          'Hello world'
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1837,13 +1833,9 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```json
-            {
-              "data": "👋",
-              "status": 200,
-              "statusText": "OK"
-            }
-            ```
+          ```dart
+          '👋' 
+          ```
         hideCodeBlock: true
       - id: bulk-processing
         name: Bulk processing
@@ -1860,16 +1852,12 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```json
-          {
-            "data": [
-              2,
-              3,
-              4
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
+          ```dart
+          [
+            2,
+            3,
+            4,
+          ]
           ```
         description: |
           You can process large payloads by passing in an array as an argument.
@@ -1900,14 +1888,10 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```json
+          ```dart
           {
-            "data": {
-              "id": 1,
-              "name": "France"
-            },
-            "status": 200,
-            "statusText": "OK"
+            'id': 1,
+            'name': 'France'
           }
           ```
         description: |
@@ -2691,7 +2675,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           null
           ```
         hideCodeBlock: true
@@ -2877,15 +2861,15 @@ functions:
               (2, 'Jane', null);
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "name": "Michael",
-              "address": {
-                "postcode": 90210
+              'id': 1,
+              'name': 'Michael',
+              'address': {
+                'postcode': 90210
               }
-            }
+            },
           ]
           ```
         code: |
@@ -2933,18 +2917,18 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-            ```json
-            [
-              {
-                "name": "Indonesia",
-                "cities": [
-                  {
-                    "name": "Bali"
-                  }
-                ]
-              }
-            ]
-            ```
+          ```dart
+          [
+            {
+              'name': 'Indonesia',
+              'cities': [
+                {
+                  'name': 'Bali'
+                }
+              ]
+            },
+          ]
+          ```
         description: |
           You can filter on referenced tables in your `select()` query using dot
           notation.
@@ -3022,13 +3006,13 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "name": "Germany",
-              "cities": [
+              'name': 'Germany',
+              'cities': [
                 {
-                  "name": "Munich"
+                  'name': 'Munich'
                 }
               ]
             }
@@ -3135,10 +3119,10 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "name": "Albania"
+              'name': 'Albania'
             }
           ]
           ```
@@ -3182,12 +3166,12 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 2,
-              "name": "Albania"
-            }
+              'id': 2,
+              'name': 'Albania'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3230,16 +3214,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "name": "Afghanistan"
+              'id': 1,
+              'name': 'Afghanistan'
             },
             {
-              "id": 3,
-              "name": "Algeria"
-            }
+              'id': 3,
+              'name': 'Algeria'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3282,12 +3266,12 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 3,
-              "name": "Algeria"
-            }
+              'id': 3,
+              'name': 'Algeria'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3330,16 +3314,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 2,
-              "name": "Albania"
+              'id': 2,
+              'name': 'Albania'
             },
             {
-              "id": 3,
-              "name": "Algeria"
-            }
+              'id': 3,
+              'name': 'Algeria'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3382,12 +3366,12 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "name": "Afghanistan"
-            }
+              'id': 1,
+              'name': 'Afghanistan'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3430,16 +3414,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "name": "Afghanistan"
+              'id': 1,
+              'name': 'Afghanistan'
             },
             {
-              "id": 2,
-              "name": "Albania"
-            }
+              'id': 2,
+              'name': 'Albania'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3482,12 +3466,12 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 2,
-              "name": "Albania"
-            }
+              'id': 2,
+              'name': 'Albania'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3529,15 +3513,15 @@ functions:
               (2, 'Albania'),
               (3, 'Algeria');
             ```
-          response: |
-            ```json
-            [
-              {
-                "id": 2,
-                "name": "Albania"
-              }
-            ]
-            ```
+        response: |
+          ```dart
+          [
+            {
+              'id': 2,
+              'name': 'Albania'
+            },
+          ]
+          ```
         hideCodeBlock: true
         isSpotlight: true
 
@@ -3577,12 +3561,12 @@ functions:
               (2, null);
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "name": "null"
-            }
+              'id': 1,
+              'name': 'null'
+            },
           ]
           ```
         description: |
@@ -3631,16 +3615,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 2,
-              "name": "Albania"
+              'id': 2,
+              'name': 'Albania'
             },
             {
-              "id": 3,
-              "name": "Algeria"
-            }
+              'id': 3,
+              'name': 'Algeria'
+            },
           ]
           ```
         description: |
@@ -3690,13 +3674,13 @@ functions:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "title": "Cache invalidation is not working",
-              "tags": ["is:open", "severity:high", "priority:low"]
-            }
+              'id': 1,
+              'title': 'Cache invalidation is not working',
+              'tags': ['is:open', 'severity:high', 'priority:low']
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3726,13 +3710,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -3767,11 +3751,11 @@ functions:
               (2, 'Jane', '{"postcode": 90210}');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "name": "Michael"
-            }
+              'name': 'Michael'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3817,11 +3801,11 @@ functions:
               (2, 'History', array['monday', 'wednesday', 'thursday']);
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "name": "Chemistry"
-            }
+              'name': 'Chemistry'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -3851,13 +3835,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -3892,11 +3876,11 @@ functions:
               (2, 'Jane', '{"postcode": 90210}');
             ```
         response: |
-          ```json
+          ```dart
             [
               {
-                "name": "Jane"
-              }
+                'name': 'Jane'
+              },
             ]
             ```
         hideCodeBlock: true
@@ -3941,13 +3925,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -3998,15 +3982,15 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
-            [
-              {
-                "id": 2,
-                "room_name": "Topaz",
-                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-              }
-            ]
-            ```
+          ```dart
+          [
+            {
+              'id': 2,
+              'room_name': 'Topaz',
+              'during': '["2000-01-02 09:00:00","2000-01-02 10:00:00")'
+            }
+          ]
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -4055,15 +4039,15 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
-            [
-              {
-                "id": 2,
-                "room_name": "Topaz",
-                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
-              }
-            ]
-            ```
+          ```dart
+          [
+            {
+              'id': 2,
+              'room_name': 'Topaz',
+              'during': '["2000-01-02 09:00:00","2000-01-02 10:00:00")''
+            },
+          ]
+          ```
         description: |
           Postgres supports a number of [range
           types](https://www.postgresql.org/docs/current/rangetypes.html). You
@@ -4112,13 +4096,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -4169,13 +4153,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -4226,11 +4210,11 @@ functions:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "title": "Cache invalidation is not working"
-            }
+              'title': 'Cache invalidation is not working'
+            },
           ]
           ```
         hideCodeBlock: true
@@ -4261,13 +4245,13 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "id": 1,
-              "room_name": "Emerald",
-              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
-            }
+              'id': 1,
+              'room_name': 'Emerald',
+              'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'
+            },
           ]
           ```
         description: |
@@ -4455,16 +4439,16 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```json
+          ```dart
           [
             {
-              "name": "Indonesia",
-              "cities": [
+              'name': 'Indonesia',
+              'cities': [
                 {
-                  "name": "Bali"
+                  'name': 'Bali'
                 }
               ]
-            }
+            },
           ]
           ```
         hideCodeBlock: true
