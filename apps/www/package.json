@@ -10,6 +10,7 @@
     "start": "next start",
     "typecheck": "npm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build",
+    "content:tempFix": "sed -i '' -e 's/path.join(cwd, _)/path.join(cwd, _.replace(\"..\\/\", \".\\/\"))/g' node_modules/@contentlayer2/core/dist/getConfig/index.js",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
