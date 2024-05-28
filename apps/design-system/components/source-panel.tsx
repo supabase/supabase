@@ -9,12 +9,6 @@ import Image from 'next/image'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {
-    const label = {
-      radix: 'Radix UI',
-      vaul: 'Vaul',
-      shadcn: 'ui.shadcn',
-    }
-
     const ShadcnPanel = () => {
       if (doc.source?.shadcn) {
         return (
@@ -83,6 +77,34 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
             </div>
             <span className="text-foreground-light text-sm">
               This component is based on vaul by emilkowalski
+            </span>
+          </div>
+        )
+      }
+    }
+
+    const ReactAccesibleTreeViewPanel = () => {
+      if (doc.source?.reactAccessibleTreeview) {
+        return (
+          <div
+            className={cn(
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md',
+              props.className
+            )}
+            {...props}
+          >
+            <div className="flex items-center gap-2">
+              <Image
+                width={24}
+                height={24}
+                src="https://avatars.githubusercontent.com/u/14020024?v=4"
+                alt="dgreene1"
+                className="h-6 w-6 rounded-full"
+              />
+              <span className="hidden font-bold sm:inline-block">react-accessible-treeview</span>
+            </div>
+            <span className="text-foreground-light text-sm">
+              This component is based on react-accessible-treeview by dgreene1
             </span>
           </div>
         )
@@ -195,6 +217,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         <RadixPanel />
         <VaulPanel />
         <InputOtp />
+        <ReactAccesibleTreeViewPanel />
         {/* <ShadcnPanel /> */}
       </div>
     )
