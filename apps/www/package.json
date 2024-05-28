@@ -10,8 +10,9 @@
     "start": "next start",
     "typecheck": "npm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build",
+    "content:tempFix": "sed -i '' -e 's/path.join(cwd, _)/path.join(cwd, _.replace(\"..\\/\", \".\\/\"))/g' n_modules/@contentlayer2/core/dist/getConfig/index.js",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
-    "postbuild": "node ./internals/generate-sitemap.mjs"
+    "postbuild": "npm run content:tempFix && node ./internals/generate-sitemap.mjs"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
@@ -33,7 +34,7 @@
     "cobe": "^0.6.2",
     "common": "*",
     "config": "*",
-    "contentlayer2": "0.4.5",
+    "contentlayer2": "^0.4.5",
     "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
     "framer-motion": "^11.0.3",
