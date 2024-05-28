@@ -1,15 +1,14 @@
 import { useParams } from 'common/hooks'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+import { Button } from 'ui'
 
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import type { Commands } from './Functions.types'
-import { Maximize2, Minimize2, Terminal } from 'lucide-react'
 
 interface TerminalInstructionsProps {
   closable?: boolean
@@ -132,23 +131,19 @@ const TerminalInstructions = ({
             </p>
           </div>
           <div className="flex gap-2">
-            <Button asChild type="default" iconRight={<IconBookOpen />}>
-              <Link
-                href="https://supabase.com/docs/guides/functions"
-                target="_blank"
-                rel="noreferrer"
-              >
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href="https://supabase.com/docs/guides/functions" target="_blank" rel="noreferrer">
                 Documentation
-              </Link>
+              </a>
             </Button>
-            <Button asChild type="default" iconRight={<IconCode />}>
-              <Link
+            <Button asChild type="default" icon={<Code />}>
+              <a
                 href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
                 target="_blank"
                 rel="noreferrer"
               >
                 Examples
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

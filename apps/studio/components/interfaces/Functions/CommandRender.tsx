@@ -1,6 +1,5 @@
 import { Check, Clipboard } from 'lucide-react'
 import { useState } from 'react'
-import { IconCheck, IconClipboard } from 'ui'
 
 const CommandRender = ({ commands }: any) => {
   return (

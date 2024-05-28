@@ -23,18 +23,8 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import {
-  Alert,
-  Button,
-  Form,
-  IconExternalLink,
-  IconMaximize2,
-  IconMinimize2,
-  IconTerminal,
-  Input,
-  Modal,
-  Toggle,
-} from 'ui'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { Alert, Button, Form, Input, Modal, Toggle } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
@@ -196,11 +186,7 @@ const EdgeFunctionDetails = () => {
                           explicit import URLs
                         </p>
                         <div className="!mt-4">
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
+                          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                             <Link
                               href="https://supabase.com/docs/guides/functions/import-maps"
                               target="_blank"
@@ -226,15 +212,15 @@ const EdgeFunctionDetails = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
-                <IconTerminal strokeWidth={2} />
+                <Terminal size={18} strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
             </div>
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
               {showInstructions ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
+                <Minimize2 size={14} strokeWidth={1.5} />
               ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
+                <Maximize2 size={14} strokeWidth={1.5} />
               )}
             </div>
           </div>
