@@ -1,5 +1,5 @@
 import { KJUR } from 'jsrsasign'
-import { ChangeEvent, useState } from 'react'
+import { useState, ChangeEvent } from 'react'
 import { Button, CodeBlock, Input, Select } from 'ui'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
