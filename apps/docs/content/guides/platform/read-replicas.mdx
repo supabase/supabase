@@ -81,7 +81,7 @@ Read Replicas offer the following features:
 
 For Read Replicas deployed before May 24, 2024, there is a known bug that results in the [PostgREST schema cache](https://postgrest.org/en/v12/references/schema_cache.html) on Read Replicas not being reloaded correctly on DDL changes. A stale schema cache can result in PostgREST on Read Replicas not knowing about newly created functions, tables, changes to their structure, etc.
 
-A fix for this issue has already been deployed for newer Read Replicas but not fully applied for older ones as it requires a restart of the API service. You can perform a one-time restart of the service by [saving any trivial configuration change](https://supabase.com/dashboard/project/_/settings/api) to your PostgREST configuration (For exmample, changing the `Max Rows` by 1), which will result in the service being restarted.
+A fix for this issue has already been deployed for newer Read Replicas but not fully applied for older ones as it requires a restart of the API service. You can perform a one-time restart of the service by [saving any trivial configuration change](https://supabase.com/dashboard/project/_/settings/api) to your PostgREST configuration (For example, changing the `Max Rows` by 1), which will result in the service being restarted.
 
 </Admonition>
 
@@ -145,7 +145,7 @@ When a Read Replica is deployed, it emits logs from the following services:
 - [PostgREST](/dashboard/project/_/logs/postgrest-logs)
 - [Supavisor](/dashboard/project/_/logs/pooler-logs)
 
-Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Vieweing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
+Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Viewing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
 
 For API logs, logs can originate from the API Load Balancer as well. The upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
