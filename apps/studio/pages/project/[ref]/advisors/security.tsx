@@ -50,6 +50,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const activeLints = useMemo(() => {
     return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('SECURITY'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   useEffect(() => {
