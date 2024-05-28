@@ -97,10 +97,6 @@ const StorageSettings = () => {
 
   return (
     <div>
-      <FormHeader
-        title="Storage Settings"
-        description="Configure your project's storage settings."
-      />
       <Form_Shadcn_ {...form}>
         {isLoading && <GenericSkeletonLoader />}
         {isError && (
