@@ -11,6 +11,7 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useFlag } from 'hooks'
 import { X } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
+import ReactMarkdown from 'react-markdown'
 import {
   Button,
   FormControl_Shadcn_,
@@ -369,7 +370,12 @@ export const CreateHookSheet = ({
                   render={({ field }) => (
                     <FormItemLayout
                       label="Secret"
-                      description="It should be a base64 encoded hook secret with a prefix 'v1,whsec_'. 'v1' denotes the signature version, and 'whsec_' signifies a symmetric secret."
+                      description={
+                        <ReactMarkdown>
+                          It should be a base64 encoded hook secret with a prefix `v1,whsec_`. `v1`
+                          denotes the signature version, and `whsec_` signifies a symmetric secret.
+                        </ReactMarkdown>
+                      }
                     >
                       <FormControl_Shadcn_>
                         <div className="flex flex-row">
@@ -380,7 +386,7 @@ export const CreateHookSheet = ({
                             className="rounded-l-none h-[38px]"
                             onClick={() => {
                               const authHookSecret = generateAuthHookSecret()
-                              field.onChange(authHookSecret)
+                              form.setValue('httpsValues.secret', authHookSecret)
                             }}
                           >
                             Generate secret
