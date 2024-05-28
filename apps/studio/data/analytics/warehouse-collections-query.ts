@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { analyticsKeys } from './keys'
 
 type WarehouseCollectionsVariables = {
@@ -14,12 +14,14 @@ export async function getWarehouseCollections(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`/platform/projects/{ref}/analytics/warehouse/collections`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/collections`, {
     params: { path: { ref: projectRef } },
     signal,
   })
 
-  return response.data
+  if (error) handleError(error)
+
+  return data
 }
 
 export type WarehouseCollectionsData = Awaited<ReturnType<typeof getWarehouseCollections>>
