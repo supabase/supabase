@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
@@ -48,18 +48,15 @@ const ProjectLints: NextPageWithLayout = () => {
 
   let clientLints: Lint[] = []
 
-  const activeLints = [...(data ?? []), ...clientLints]?.filter((x) =>
-    x.categories.includes('SECURITY')
-  )
+  const activeLints = useMemo(() => {
+    return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('SECURITY'))
+  }, [data])
 
   useEffect(() => {
     // check the URL for an ID and set the selected lint
-    if (id) {
-      const lint = activeLints.find((lint) => lint.cache_key === id) ?? null
+    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  }, [id, activeLints])
 
-      setSelectedLint(lint)
-    }
-  }, [id])
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
 
