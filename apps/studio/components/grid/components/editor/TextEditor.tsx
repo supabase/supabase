@@ -77,10 +77,15 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     setIsPopoverOpen(false)
   }, [])
 
-  const saveChanges = useCallback((newValue: string | null) => {
-    if (isEditable) onRowChange({ ...row, [column.key]: newValue }, true)
-    setIsPopoverOpen(false)
-  }, [])
+  const saveChanges = useCallback(
+    (newValue: string | null) => {
+      if (isEditable && newValue !== value) {
+        onRowChange({ ...row, [column.key]: newValue }, true)
+      }
+      setIsPopoverOpen(false)
+    },
+    [isSuccess]
+  )
 
   const onSelectExpand = () => {
     cancelChanges()
