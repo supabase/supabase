@@ -1,5 +1,4 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { API_URL } from 'lib/constants'
 import { analyticsKeys } from './keys'
 import { get, handleError } from 'data/fetchers'
 
@@ -29,7 +28,7 @@ export async function getWarehouseTenant(
 }
 
 export type WarehouseTenantData = Awaited<ReturnType<typeof getWarehouseTenant>>
-export type WarehouseTenantError = unknown
+export type WarehouseTenantError = ResponseError
 
 export const useWarehouseTenantQuery = <TData = WarehouseTenantData>(
   { projectRef }: WarehouseTenantVariables,
