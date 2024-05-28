@@ -1,43 +1,48 @@
 import { HTMLAttributes, PropsWithChildren, forwardRef } from 'react'
 import { cn } from '../../lib/utils/cn'
+import { Slot } from '@radix-ui/react-slot'
+import { tabsTriggerVariants } from '../shadcn/ui/tabs'
 
-interface NavMenuProps extends HTMLAttributes<HTMLDivElement> {}
+interface NavMenuProps extends HTMLAttributes<HTMLUListElement> {
+  asChild?: boolean
+}
 
-export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
-  (
-    props: PropsWithChildren<{
-      className?: string
-    }>,
-    forwardedRef
-  ) => {
+const NavMenu = forwardRef<HTMLUListElement, NavMenuProps>(({ children, ...props }, ref) => {
+  const Comp = props.asChild ? Slot : 'ul'
+  return (
+    <Comp role="menu" ref={ref} {...props} className={cn('flex gap-5', props.className)}>
+      {children}
+    </Comp>
+  )
+})
+interface NavMenuItemProps extends HTMLAttributes<HTMLLIElement> {
+  asChild?: boolean
+}
+
+const NavMenuItem = forwardRef<HTMLLIElement, NavMenuItemProps>(({ children, ...props }, ref) => {
+  const Comp = props.asChild ? Slot : 'li'
+
+  return (
+    <Comp ref={ref} {...props}>
+      {children}
+    </Comp>
+  )
+})
+
+interface NavMenuLinkProps extends HTMLAttributes<HTMLAnchorElement> {
+  asChild?: boolean
+}
+
+const NavMenuLink = forwardRef<HTMLAnchorElement, NavMenuLinkProps>(
+  ({ children, ...props }, ref) => {
+    const Comp = props.asChild ? Slot : 'a'
+
     return (
-      <nav ref={forwardedRef} dir="ltr" {...props} className={cn('border-b', props.className)}>
-        <ul role="menu" className="flex gap-5">
-          {props.children}
-        </ul>
-      </nav>
+      <Comp ref={ref} role="menuitem" {...props} className={cn(tabsTriggerVariants)}>
+        {children}
+      </Comp>
     )
   }
 )
 
-export const NavMenuItem = ({
-  children,
-  className,
-  active,
-  ...props
-}: PropsWithChildren<{
-  className?: string
-  active: boolean
-}>) => (
-  <li
-    aria-selected={active ? 'true' : 'false'}
-    data-state={active ? 'active' : 'inactive'}
-    className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground text-foreground-lighter hover:text-foreground data-[state=active]:border-foreground border-b-2 border-transparent *:py-1.5',
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </li>
-)
+export { NavMenu, NavMenuItem, NavMenuLink }
