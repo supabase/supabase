@@ -16,17 +16,17 @@ export async function getWarehouseQuery(
     throw new Error('SQL must be provided')
   }
 
-  const response = await get(`/platform/projects/{ref}/analytics/warehouse/query`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/query`, {
     params: { path: { ref: ref }, query: { bq_sql: sql } },
     signal,
   } as any)
 
-  if (response.error) {
-    handleError(response)
+  if (error) {
+    handleError(error)
   }
 
   // TODO!: Remove type assertion when we have a proper type for the response
-  return response as any
+  return data as any
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>
