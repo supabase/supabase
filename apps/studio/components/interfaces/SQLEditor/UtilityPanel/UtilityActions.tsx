@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
+import { useLocalStorageQuery } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -38,7 +38,6 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
 
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -82,7 +81,7 @@ const UtilityActions = ({
             type="text"
             onClick={() => prettifyQuery()}
             className="px-1"
-            icon={<AlignLeft size="tiny" strokeWidth={2} className="text-gray-1100" />}
+            icon={<AlignLeft size="tiny" strokeWidth={2} />}
           />
         </TooltipTrigger_Shadcn_>
         <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>

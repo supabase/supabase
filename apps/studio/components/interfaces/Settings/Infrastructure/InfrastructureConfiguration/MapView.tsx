@@ -99,7 +99,7 @@ const MapView = ({
                   geography={geo}
                   strokeWidth={0.3}
                   pointerEvents="none"
-                  className="fill-gray-300 stroke-gray-200"
+                  className="fill-gray-800 stroke-gray-900 dark:fill-gray-300 dark:stroke-gray-200"
                 />
               ))
             }
@@ -132,9 +132,8 @@ const MapView = ({
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)

@@ -15,9 +15,12 @@ import {
   Button,
   Checkbox_Shadcn_,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Label_Shadcn_,
   Separator,
 } from 'ui'
 
@@ -66,9 +69,9 @@ export const UsePoolerCheckbox = ({
         <div className="-mt-[2px] flex flex-col gap-y-1 w-full">
           <div className="flex items-center gap-x-4">
             <div className="flex items-center gap-x-2">
-              <label htmlFor={`use-pooler-${id}`} className="text-sm cursor-pointer">
+              <Label_Shadcn_ htmlFor={`use-pooler-${id}`} className="text-sm cursor-pointer">
                 Display connection pooler
-              </label>
+              </Label_Shadcn_>
               {checked && (
                 <>
                   <div className="flex items-center gap-x-2">
@@ -79,39 +82,34 @@ export const UsePoolerCheckbox = ({
                           <DropdownMenuTrigger asChild>
                             <Button
                               type="outline"
-                              className="py-0.5 pr-1.5"
+                              className="py-0.5 pr-1.5 capitalize"
                               iconRight={<ChevronDown strokeWidth={1} />}
                             >
-                              <span className="capitalize">Mode: {poolingMode}</span>
+                              Mode: {poolingMode}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="start" className="w-[280px]">
-                            <DropdownMenuItem
+                            <DropdownMenuCheckboxItem
                               key="session"
-                              className="flex items-center justify-between"
+                              checked={poolingMode === 'session'}
                               onClick={() => onSelectOption('session')}
                             >
-                              <span>Session mode</span>
-                              {poolingMode === 'session' && (
-                                <Check size={16} className="text-brand" />
-                              )}
-                            </DropdownMenuItem>
+                              Session mode
+                            </DropdownMenuCheckboxItem>
+
                             {poolingConfiguration?.pool_mode === 'transaction' && (
-                              <DropdownMenuItem
+                              <DropdownMenuCheckboxItem
                                 key="transaction"
-                                className="flex items-center justify-between"
+                                checked={poolingMode === 'transaction'}
                                 onClick={() => onSelectOption('transaction')}
                               >
-                                <span>Transaction mode</span>
-                                {poolingMode === 'transaction' && (
-                                  <Check size={16} className="text-brand" />
-                                )}
-                              </DropdownMenuItem>
+                                Transaction mode
+                              </DropdownMenuCheckboxItem>
                             )}
 
                             {poolingConfiguration?.pool_mode === 'session' && (
                               <>
-                                <Separator className="my-1" />
+                                <DropdownMenuSeparator className="my-1" />
                                 <div className="px-2 text-xs flex flex-col gap-y-2">
                                   <p>
                                     To use transaction mode, change the pool mode in the{' '}
