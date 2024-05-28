@@ -5,8 +5,7 @@
       "contentlayer/generated": ["./.contentlayer/generated"],
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/*"],
-      "n_modules": ["../../node_modules"]
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "downlevelIteration": true,
     "target": "ES2021",
