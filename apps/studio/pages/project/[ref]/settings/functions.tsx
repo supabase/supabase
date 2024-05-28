@@ -1,12 +1,28 @@
 import EdgeFunctionSecrets from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
 import { SettingsLayout } from 'components/layouts'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-      <EdgeFunctionSecrets />
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Edge Function Secrets Management</ScaffoldTitle>
+          <ScaffoldDescription>
+            Manage the secrets for your project's edge functions
+          </ScaffoldDescription>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <EdgeFunctionSecrets />
+      </ScaffoldContainer>
+    </>
   )
 }
 

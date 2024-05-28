@@ -6,6 +6,12 @@ import {
   AdvancedAuthSettingsForm,
 } from 'components/interfaces/Auth'
 import { SettingsLayout } from 'components/layouts'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -17,24 +23,27 @@ const AuthSettings: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-      <FormHeader
-        className="!mb-0"
-        title="Auth Settings"
-        description="Configure security and user session settings."
-      />
-      {!isPermissionsLoaded ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAuthSettings ? (
-        <NoPermission isFullPage resourceText="access your project's authentication settings" />
-      ) : (
-        <>
-          <BasicAuthSettingsForm />
-          <SmtpForm />
-          <AdvancedAuthSettingsForm />
-        </>
-      )}
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Auth settings</ScaffoldTitle>
+          <ScaffoldDescription>Configure security and user session settings</ScaffoldDescription>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        {!isPermissionsLoaded ? (
+          <GenericSkeletonLoader />
+        ) : !canReadAuthSettings ? (
+          <NoPermission isFullPage resourceText="access your project's authentication settings" />
+        ) : (
+          <>
+            <BasicAuthSettingsForm />
+            <SmtpForm />
+            <AdvancedAuthSettingsForm />
+          </>
+        )}
+      </ScaffoldContainer>
+    </>
   )
 }
 
