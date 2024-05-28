@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -15,7 +15,6 @@ import {
   Button,
   Checkbox_Shadcn_,
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -23,6 +22,10 @@ import {
   Label_Shadcn_,
   Separator,
 } from 'ui'
+import {
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from 'ui/src/components/shadcn/ui/dropdown-menu'
 
 interface UsePoolerCheckboxInterface {
   id: string
@@ -89,23 +92,21 @@ export const UsePoolerCheckbox = ({
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="start" className="w-[280px]">
-                            <DropdownMenuCheckboxItem
-                              key="session"
-                              checked={poolingMode === 'session'}
-                              onClick={() => onSelectOption('session')}
+                            <DropdownMenuRadioGroup
+                              value={poolingMode}
+                              onValueChange={(value) =>
+                                onSelectOption(value as 'session' | 'transaction')
+                              }
                             >
-                              Session mode
-                            </DropdownMenuCheckboxItem>
-
-                            {poolingConfiguration?.pool_mode === 'transaction' && (
-                              <DropdownMenuCheckboxItem
-                                key="transaction"
-                                checked={poolingMode === 'transaction'}
-                                onClick={() => onSelectOption('transaction')}
-                              >
-                                Transaction mode
-                              </DropdownMenuCheckboxItem>
-                            )}
+                              <DropdownMenuRadioItem value="session">
+                                Session mode
+                              </DropdownMenuRadioItem>
+                              {poolingConfiguration?.pool_mode === 'transaction' && (
+                                <DropdownMenuRadioItem value="transaction">
+                                  Transaction mode
+                                </DropdownMenuRadioItem>
+                              )}
+                            </DropdownMenuRadioGroup>
 
                             {poolingConfiguration?.pool_mode === 'session' && (
                               <>
