@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",
