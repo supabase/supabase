@@ -46,10 +46,21 @@ const LogSelection = ({
   )
   const [sql, setSql] = useState('')
 
-  const warehouseLogQuery = useWarehouseQueryQuery({
-    ref: projectRef,
-    sql,
-  })
+  const {
+    refetch: refetchWarehouseData,
+    data: warehouseQueryData,
+    isLoading: warehouseQueryLoading,
+  } = useWarehouseQueryQuery(
+    {
+      ref: projectRef,
+      sql,
+    },
+    {
+      onError: (error) => {
+        toast.error('Failed to fetch collection data', error?.message)
+      },
+    }
+  )
 
   useEffect(() => {
     const newSql = `select id, timestamp, event_message, metadata from \`${collectionName}\`
@@ -59,20 +70,14 @@ const LogSelection = ({
   }, [collectionName, partialLog?.id])
 
   useEffect(() => {
-    warehouseLogQuery.refetch()
-  }, [warehouseLogQuery, collectionName, projectRef, partialLog?.id])
-
-  useEffect(() => {
-    if (warehouseLogQuery.isError) {
-      toast.error('Error loading collection data')
-    }
-  }, [warehouseLogQuery.isError])
+    refetchWarehouseData()
+  }, [warehouseQueryData, collectionName, projectRef, partialLog?.id, refetchWarehouseData])
 
   const Formatter = () => {
     switch (queryType) {
       case 'warehouse':
-        if (!warehouseLogQuery.data) return null
-        return <DefaultPreviewSelectionRenderer log={warehouseLogQuery.data.data.result[0]} />
+        if (!warehouseQueryData) return null
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.data.result[0]} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -203,7 +208,7 @@ const LogSelection = ({
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {(isLoading || warehouseLogQuery.isLoading) && <Loading />}
+        {(isLoading || warehouseQueryLoading) && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>

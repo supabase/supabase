@@ -12,9 +12,6 @@ export async function getWarehouseQuery(
   { ref, sql }: WarehouseQueryVariables,
   signal?: AbortSignal
 ) {
-  if (!ref) {
-    throw new Error('ref is required')
-  }
   if (!sql) {
     throw new Error('SQL must be provided')
   }
@@ -28,11 +25,8 @@ export async function getWarehouseQuery(
     handleError(response)
   }
 
-  return {
-    // TODO: Remove the type assertion once the generated OpenAPI client is typed
-    data: response.data as unknown as any,
-    error: response.error as unknown as ResponseError,
-  }
+  // TODO!: Remove type assertion when we have a proper type for the response
+  return response as any
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>
