@@ -1,25 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { Button, Form, Input, Listbox } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
-  const organizationSlug = organization?.slug
-
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const {
@@ -173,10 +170,8 @@ const StorageSettings = () => {
                   {isFreeTier && (
                     <div className="px-6 pb-6">
                       <UpgradeToPro
-                        icon={<IconClock size="large" />}
-                        organizationSlug={organizationSlug ?? ''}
+                        icon={<Clock size={20} />}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                        projectRef={projectRef ?? ''}
                         secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                       />
                     </div>

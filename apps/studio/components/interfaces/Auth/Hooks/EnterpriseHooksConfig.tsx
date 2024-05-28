@@ -1,17 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  IconAlertCircle,
-  Toggle,
-} from 'ui'
 import { boolean, object, string } from 'yup'
 
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -25,6 +17,8 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Form, Toggle } from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -91,8 +85,8 @@ const EnterpriseHooksConfig = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
@@ -139,11 +133,9 @@ const EnterpriseHooksConfig = () => {
             >
               {!isTeamsEnterprisePlan && organization !== undefined && (
                 <UpgradeToPro
+                  buttonText="Upgrade"
                   primaryText="Upgrade plan"
                   secondaryText="Configuring Enterprise Hooks requires a Teams or Enterprise plan."
-                  projectRef={projectRef!}
-                  organizationSlug={organization.slug}
-                  buttonText="Upgrade"
                 />
               )}
               <div className={isTeamsEnterprisePlan ? '' : 'opacity-50'}>
