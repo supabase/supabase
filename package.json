@@ -7,10 +7,9 @@
   "private": true,
   "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
   "scripts": {
-    "build": "turbo run content:fix && turbo run build",
+    "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
-    "content:tempFix": "sed -i '' -e 's/path.join(cwd, _)/path.join(cwd, _.replace(\"..\\/\", \".\\/\"))/g' node_modules/@contentlayer2/core/dist/getConfig/index.js",
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
