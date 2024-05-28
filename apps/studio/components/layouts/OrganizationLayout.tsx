@@ -9,10 +9,12 @@ import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } fro
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 import Link from 'next/link'
 import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const currentPath = useCurrentPath()
   const { slug } = useParams()
 
   const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
@@ -80,7 +82,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
           </ScaffoldTitle>
           <NavMenu className="border-none" aria-label="Organization menu navigation">
             {filteredNavMenuItems.map((item) => (
-              <NavMenuItem key={item.label} active={item.href === router.asPath}>
+              <NavMenuItem key={item.label} active={currentPath === item.href}>
                 <Link href={item.href}>{item.label}</Link>
               </NavMenuItem>
             ))}
