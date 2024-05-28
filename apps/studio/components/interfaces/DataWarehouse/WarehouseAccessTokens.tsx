@@ -116,123 +116,115 @@ const WarehouseAccessTokens = () => {
   const isLoading = deleteLoading || createLoading
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
-      <section>
-        <FormHeader
-          title="Warehouse access tokens"
-          description="Manage your warehouse access tokens for this project."
-          actions={
-            <CreateWarehouseAccessToken
-              open={open}
-              setOpen={setOpen}
-              loading={createLoading}
-              onSubmit={({ description }) => {
-                createWarehouseAccessToken({
-                  ref: projectRef,
-                  description: description,
-                })
+    <section className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
+      <FormHeader
+        title="Warehouse access tokens"
+        description="Manage your warehouse access tokens for this project."
+        actions={
+          <CreateWarehouseAccessToken
+            open={open}
+            setOpen={setOpen}
+            loading={createLoading}
+            onSubmit={({ description }) => {
+              createWarehouseAccessToken({
+                ref: projectRef,
+                description: description,
+              })
+            }}
+          />
+        }
+      />
+      <div className={cn(['bg-surface-100', 'overflow-hidden', 'rounded-md shadow'])}>
+        {!isProjectActive ? (
+          <ProjectPausedAlert
+            projectRef={projectRef}
+            description="Restore your project to manage your warehouse access tokens"
+          />
+        ) : (
+          <>
+            {accessTokensQuery.isLoading ? (
+              <div className="p-4">
+                <GenericSkeletonLoader />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table
+                  head={[
+                    <Table.th key="description">Description</Table.th>,
+                    <Table.th key="token">Created at</Table.th>,
+                    <Table.th key="token">Token</Table.th>,
+                    <Table.th key="actions" />,
+                  ]}
+                  body={
+                    hasAccessTokens ? (
+                      accessTokensQuery.data.data.map((accessToken) => (
+                        <AccessTokenItem
+                          key={accessToken.id + '-wh-access-token'}
+                          token={accessToken.token}
+                          id={accessToken.id}
+                          inserted_at={accessToken.inserted_at}
+                          description={accessToken.description || 'No description'}
+                          onDeleteClick={() => {
+                            setShowDeleteDialog(true)
+                            setTokenToDelete(accessToken.token)
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <Table.tr>
+                        <Table.td colSpan={4}>
+                          <p className="text-sm text-foreground">No access tokens created</p>
+                          <p className="text-sm text-foreground-light">
+                            There are no access tokens associated with your project yet
+                          </p>
+                        </Table.td>
+                      </Table.tr>
+                    )
+                  }
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revoke warehouse access token</DialogTitle>
+            <DialogDescription>
+              This action is irreversible and requests made with these access tokens will stop
+              working.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="outline"
+              onClick={() => {
+                setShowDeleteDialog(false)
+                setTokenToDelete(null)
               }}
-            />
-          }
-        />
-        <div
-          className={cn([
-            'bg-surface-100',
-            'overflow-hidden border-muted',
-            'rounded-md border shadow',
-          ])}
-        >
-          {!isProjectActive ? (
-            <ProjectPausedAlert
-              projectRef={projectRef}
-              description="Restore your project to manage your warehouse access tokens"
-            />
-          ) : (
-            <>
-              {accessTokensQuery.isLoading ? (
-                <div className="p-4">
-                  <GenericSkeletonLoader />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table
-                    head={[
-                      <Table.th key="description">Description</Table.th>,
-                      <Table.th key="token">Created at</Table.th>,
-                      <Table.th key="token">Token</Table.th>,
-                      <Table.th key="actions" />,
-                    ]}
-                    body={
-                      hasAccessTokens ? (
-                        accessTokensQuery.data.data.map((accessToken) => (
-                          <AccessTokenItem
-                            key={accessToken.id + '-wh-access-token'}
-                            token={accessToken.token}
-                            id={accessToken.id}
-                            inserted_at={accessToken.inserted_at}
-                            description={accessToken.description || 'No description'}
-                            onDeleteClick={() => {
-                              setShowDeleteDialog(true)
-                              setTokenToDelete(accessToken.token)
-                            }}
-                          />
-                        ))
-                      ) : (
-                        <Table.tr>
-                          <Table.td colSpan={4}>
-                            <p className="text-sm text-foreground">No access tokens created</p>
-                            <p className="text-sm text-foreground-light">
-                              There are no access tokens associated with your project yet
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }
-                  />
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Revoke warehouse access token</DialogTitle>
-              <DialogDescription>
-                This action is irreversible and requests made with these access tokens will stop
-                working.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                type="outline"
-                onClick={() => {
-                  setShowDeleteDialog(false)
-                  setTokenToDelete(null)
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="danger"
-                loading={isLoading}
-                onClick={async () => {
-                  if (!tokenToDelete) return
-                  deleteWarehouseAccessToken({
-                    projectRef,
-                    token: tokenToDelete,
-                  })
-                  setShowDeleteDialog(false)
-                  setTokenToDelete(null)
-                }}
-              >
-                Yes, revoke access token
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </section>
-    </div>
+            >
+              Cancel
+            </Button>
+            <Button
+              type="danger"
+              loading={isLoading}
+              onClick={async () => {
+                if (!tokenToDelete) return
+                deleteWarehouseAccessToken({
+                  projectRef,
+                  token: tokenToDelete,
+                })
+                setShowDeleteDialog(false)
+                setTokenToDelete(null)
+              }}
+            >
+              Yes, revoke access token
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </section>
   )
 }
 
