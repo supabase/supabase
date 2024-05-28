@@ -9,6 +9,7 @@ import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { Commands } from './Functions.types'
+import { Maximize2, Minimize2, Terminal } from 'lucide-react'
 
 interface TerminalInstructionsProps {
   closable?: boolean
@@ -28,11 +29,8 @@ const TerminalInstructions = ({
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : '[YOUR ANON KEY]'
+  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
-
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`
@@ -95,25 +93,23 @@ const TerminalInstructions = ({
     >
       <div className="px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-x-3">
             <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
-              <IconTerminal strokeWidth={2} />
+              <Terminal strokeWidth={2} />
             </div>
             <h4>Create your first Edge Function via the CLI</h4>
           </div>
           {closable && (
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
               {showInstructions ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
+                <Minimize2 size={16} strokeWidth={1.5} />
               ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
+                <Maximize2 size={16} strokeWidth={1.5} />
               )}
             </div>
           )}
         </div>
-        <div>
-          <CommandRender commands={commands} />
-        </div>
+        <CommandRender commands={commands} />
       </div>
       {tokens && tokens.length === 0 ? (
         <div className="px-8 py-6 space-y-3 border-t">

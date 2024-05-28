@@ -60,9 +60,7 @@ const EdgeFunctionDetails = () => {
 
   // Get the API service
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : '[YOUR ANON KEY]'
+  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
   const functionUrl =
