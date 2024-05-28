@@ -1012,6 +1012,21 @@ export const examples: Registry = [
     files: ['example/modal-demo.tsx'],
   },
   {
+    name: 'modal-aligned-footer',
+    type: 'components:example',
+    files: ['example/modal-aligned-footer.tsx'],
+  },
+  {
+    name: 'modal-custom-footer',
+    type: 'components:example',
+    files: ['example/modal-custom-footer.tsx'],
+  },
+  {
+    name: 'modal-hide-footer',
+    type: 'components:example',
+    files: ['example/modal-hide-footer.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],

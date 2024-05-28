@@ -25,7 +25,6 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   hideFooter?: boolean
   alignFooter?: 'right' | 'left'
   layout?: 'horizontal' | 'vertical'
-  icon?: React.ReactNode
   loading?: boolean
   onCancel?: any
   cancelText?: string
@@ -74,7 +73,6 @@ const Modal = forwardRef<
       confirmText = 'Confirm',
       showCloseButton = false,
       footerBackground,
-      icon,
       variant = 'success',
       visible = false,
       size = 'large',

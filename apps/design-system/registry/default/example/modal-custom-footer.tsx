@@ -1,8 +1,8 @@
 import { Link2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Badge, Button, Modal } from 'ui'
 
-export default function ModalDemo() {
+export default function ModalVerticalCustomFooter() {
   const [visible, setVisible] = useState(false)
 
   return (
@@ -16,6 +16,7 @@ export default function ModalDemo() {
         onConfirm={() => setVisible(!visible)}
         title="This is the title of the modal"
         description="And i am the description"
+        hideFooter={true}
         size="medium"
         hideClose={false}
         header={
@@ -28,6 +29,19 @@ export default function ModalDemo() {
               <span className="text-xs text-foreground-muted">This is the title</span>
             </div>
           </div>
+        }
+        customFooter={
+          <>
+            <div className="flex items-center gap-3">
+              <div>
+                <Badge variant="destructive" dot size="small">
+                  Proceed with caution
+                </Badge>
+              </div>
+              <Button type="secondary">Cancel</Button>
+              <Button type="danger">Delete</Button>
+            </div>
+          </>
         }
       >
         <p>

@@ -2,7 +2,7 @@ import { Link2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
 
-export default function ModalDemo() {
+export default function ModalVerticalAlignedFooter() {
   const [visible, setVisible] = useState(false)
 
   return (
@@ -16,6 +16,7 @@ export default function ModalDemo() {
         onConfirm={() => setVisible(!visible)}
         title="This is the title of the modal"
         description="And i am the description"
+        alignFooter="right"
         size="medium"
         hideClose={false}
         header={

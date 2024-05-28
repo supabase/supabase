@@ -83,8 +83,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Dialog',
-          href: '/docs/fragments/dialog',
+          title: 'Modal',
+          href: '/docs/fragments/modal',
           items: [],
         },
         {
