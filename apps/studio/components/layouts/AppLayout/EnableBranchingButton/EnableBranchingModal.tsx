@@ -138,7 +138,7 @@ const EnableBranchingModal = () => {
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg !max-w-[40rem]"
-        size="xlarge"
+        size="medium"
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -251,29 +251,27 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            <Modal.Content className="px-7">
-              <div className="flex items-center space-x-2 py-2 pb-4">
-                <Button
-                  size="medium"
-                  block
-                  disabled={isCreating}
-                  type="default"
-                  onClick={() => snap.setShowEnableBranchingModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  block
-                  size="medium"
-                  form={formId}
-                  disabled={!isSuccess || isCreating || !canSubmit}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  I understand, enable branching
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center gap-3">
+              <Button
+                size="medium"
+                block
+                disabled={isCreating}
+                type="default"
+                onClick={() => snap.setShowEnableBranchingModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                block
+                size="medium"
+                form={formId}
+                disabled={!isSuccess || isCreating || !canSubmit}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                I understand, enable branching
+              </Button>
             </Modal.Content>
           </form>
         </Form_Shadcn_>

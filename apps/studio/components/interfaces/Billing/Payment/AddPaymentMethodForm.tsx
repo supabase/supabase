@@ -63,15 +63,13 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
         </div>
       </Modal.Content>
       <Modal.Separator />
-      <Modal.Content>
-        <div className="flex items-center space-x-2 pt-2">
-          <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
-            Save
-          </Button>
-          <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
-            Cancel
-          </Button>
-        </div>
+      <Modal.Content className="flex items-center space-x-2">
+        <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
+          Save
+        </Button>
+        <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
+          Cancel
+        </Button>
       </Modal.Content>
     </form>
   )

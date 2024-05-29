@@ -134,13 +134,15 @@ const Modal = forwardRef<
     return (
       <Dialog open={open} defaultOpen={defaultOpen} onOpenChange={handleOpenChange} modal={modal}>
         {triggerElement && <DialogTrigger>{triggerElement}</DialogTrigger>}
-        <DialogContent ref={ref} hideClose={!showCloseButton} {...props}>
-          <DialogHeader className={cn('border-b')}>
-            {header && <DialogTitle>{header}</DialogTitle>}
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
+        <DialogContent ref={ref} hideClose={!showCloseButton} {...props} size={size}>
+          {header || description ? (
+            <DialogHeader className={cn('border-b')} padding={'small'}>
+              {header && <DialogTitle>{header}</DialogTitle>}
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
+          ) : null}
           {children}
-          {!hideFooter && <DialogFooter className={__styles.footer}>{footerContent}</DialogFooter>}
+          {!hideFooter && <DialogFooter>{footerContent}</DialogFooter>}
         </DialogContent>
       </Dialog>
     )
@@ -151,7 +153,7 @@ const Content = forwardRef<
   React.ElementRef<typeof DialogSection>,
   React.ComponentPropsWithoutRef<typeof DialogSection>
 >(({ ...props }, ref) => {
-  return <DialogSection ref={ref} {...props} />
+  return <DialogSection ref={ref} {...props} padding="small" className={cn(props.className)} />
 })
 
 const Separator = forwardRef<
