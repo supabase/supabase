@@ -49,7 +49,7 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     const type = inferColumnType('metadata', mockData)
     expect(type).toBe('jsonb')
   })
-  test.only('should infer date type correctly', () => {
+  test('should infer date type correctly', () => {
     const mockData4 = [
       { event: 'christmas', date: '2022-12-25 17:45:23 UTC' },
       { event: 'christmas', date: '2022-12-25' },

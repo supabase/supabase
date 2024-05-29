@@ -356,7 +356,7 @@ Postgres allows you to specify whether you want the function to be executed as t
 create function hello_world()
 returns text
 language plpgsql
-security definer set search_path = public
+security definer set search_path = ''
 as $$
 begin
   select 'hello world';

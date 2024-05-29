@@ -136,16 +136,6 @@ export interface paths {
     /** Enables Database Webhooks on the project */
     post: operations['HooksController_enableHooks']
   }
-  '/platform/database/{ref}/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['OwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['OwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['OwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['OwnerController_finaliseOwnerReassign']
-  }
   '/platform/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
@@ -275,6 +265,16 @@ export interface paths {
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
     get: operations['OrgInvoicesController_getUpcomingInvoice']
+  }
+  '/platform/organizations/{slug}/billing/invoices': {
+    /** Gets invoices for the given organization */
+    get: operations['OrgInvoicesController_getInvoices']
+    /** Gets the total count of invoices for the given organization */
+    head: operations['OrgInvoicesController_countInvoices']
+  }
+  '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
+    /** Gets invoice with the given invoice ID */
+    get: operations['OrgInvoicesController_getInvoice']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -472,16 +472,40 @@ export interface paths {
     get: operations['ProjectsController_getProjectByFlyExtensionId']
   }
   '/platform/projects/{ref}/content': {
-    /** Gets project's content */
+    /**
+     * Gets project's content
+     * @deprecated
+     */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContent']
+    put: operations['ContentController_updateWholeContentV2']
     /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post: operations['ContentController_createContentV2']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
-    /** Updates project's content */
+    /**
+     * Updates project's content
+     * @deprecated
+     */
     patch: operations['ContentController_updateContent']
+  }
+  '/platform/projects/{ref}/content/item/{id}': {
+    /** Gets project's content by the given id */
+    get: operations['ContentController_getContentById']
+  }
+  '/platform/projects/{ref}/content/folders': {
+    /** Gets project's content root folder */
+    get: operations['ContentFoldersController_getRootFolder']
+    /** Creates project's content folder */
+    post: operations['ContentFoldersController_createFolder']
+    /** Deletes project's content folders */
+    delete: operations['ContentFoldersController_DeleteFolder']
+  }
+  '/platform/projects/{ref}/content/folders/{id}': {
+    /** Gets project's content folder */
+    get: operations['ContentFoldersController_getFolder']
+    /** Updates project's content folder */
+    patch: operations['ContentFoldersController_updateFolder']
   }
   '/platform/projects/{ref}/daily-stats': {
     /** Gets daily project stats */
@@ -530,6 +554,10 @@ export interface paths {
   '/platform/projects/{ref}/restart': {
     /** Restarts project */
     post: operations['RestartController_restartProject']
+  }
+  '/platform/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['ProjectRunLintsController_runProjectLints']
   }
   '/platform/projects/{ref}': {
     /** Gets a specific project that belongs to the authenticated user */
@@ -639,6 +667,16 @@ export interface paths {
     /** Lists project's warehouse queries from logflare */
     get: operations['WarehouseQueryController_runQuery']
   }
+  '/platform/projects/{ref}/billing/addons': {
+    /** Gets project addons */
+    get: operations['ProjectAddonController_getProjectAddons']
+    /** Updates project addon */
+    post: operations['ProjectAddonController_updateAddon']
+  }
+  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
+    /** Removes project addon */
+    delete: operations['ProjectAddonController_removeAddon']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -676,16 +714,6 @@ export interface paths {
     get: operations['SupavisorConfigController_getSupavisorConfig']
     /** Updates project's supavisor config */
     patch: operations['SupavisorConfigController_updateSupavisorConfig']
-  }
-  '/platform/projects/{ref}/billing/addons': {
-    /** Gets project addons */
-    get: operations['ProjectAddonController_getProjectAddons']
-    /** Updates project addon */
-    post: operations['ProjectAddonController_updateAddon']
-  }
-  '/platform/projects/{ref}/billing/addons/{addon_variant}': {
-    /** Removes project addon */
-    delete: operations['ProjectAddonController_removeAddon']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -766,9 +794,15 @@ export interface paths {
     delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/platform/stripe/invoices': {
-    /** Gets invoices for the given customer */
+    /**
+     * Gets invoices for the given customer
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoices']
-    /** Gets the total count of invoices for the given customer */
+    /**
+     * Gets the total count of invoices for the given customer
+     * @deprecated
+     */
     head: operations['InvoicesController_countInvoices']
   }
   '/platform/stripe/invoices/overdue': {
@@ -776,7 +810,10 @@ export interface paths {
     get: operations['InvoicesController_getOverdueInvoices']
   }
   '/platform/stripe/invoices/{id}': {
-    /** Gets invoice with the given invoice ID */
+    /**
+     * Gets invoice with the given invoice ID
+     * @deprecated
+     */
     get: operations['InvoicesController_getInvoice']
   }
   '/platform/stripe/setup-intent': {
@@ -796,11 +833,11 @@ export interface paths {
     post: operations['TelemetryPageController_sendServerPage']
   }
   '/platform/telemetry/activity': {
-    /** Sends mixpanel server activity */
+    /** Sends server activity */
     post: operations['TelemetryActivityController_sendServerActivity']
   }
   '/platform/telemetry/pageview': {
-    /** Send mixpanel page event */
+    /** Send pageview event */
     post: operations['TelemetryPageviewController_sendServerPageViewed']
   }
   '/platform/vercel/token': {
@@ -904,16 +941,6 @@ export interface paths {
     /** Gets GoTrue template */
     get: operations['SystemAuthTemplateController_getTemplate']
   }
-  '/system/database/{ref}/owner/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['DatabaseOwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['DatabaseOwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['DatabaseOwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['DatabaseOwnerController_finaliseOwnerReassign']
-  }
   '/system/database/{ref}/password': {
     /** Updates the database password */
     patch: operations['DatabasePasswordController_updatePassword']
@@ -923,6 +950,11 @@ export interface paths {
     post: operations['GithubSecretAlertController_resetJwt']
   }
   '/system/projects/{ref}/functions/{function_slug}': {
+    /**
+     * Delete a function
+     * @description Deletes a function with the specified slug from the specified project.
+     */
+    delete: operations['SystemFunctionSlugController_deleteFunction']
     /**
      * Update a function
      * @description Updates a function with the specified slug and project.
@@ -1328,16 +1360,26 @@ export interface paths {
     get: operations['V0ProjectsMetricsController_getProjectsMetrics']
   }
   '/v0/projects/{ref}/content': {
-    /** Gets project's content */
+    /**
+     * Gets project's content
+     * @deprecated
+     */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContent']
+    put: operations['ContentController_updateWholeContentV2']
     /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post: operations['ContentController_createContentV2']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
-    /** Updates project's content */
+    /**
+     * Updates project's content
+     * @deprecated
+     */
     patch: operations['ContentController_updateContent']
+  }
+  '/v0/projects/{ref}/content/item/{id}': {
+    /** Gets project's content by the given id */
+    get: operations['ContentController_getContentById']
   }
   '/v0/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
@@ -2450,16 +2492,6 @@ export interface components {
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
     }
-    OwnerResponse: {
-      project_ref: string
-      /** @enum {string} */
-      current: 'unmigrated' | 'temp_role' | 'migrated'
-      /** @enum {string} */
-      desired: 'unmigrated' | 'temp_role' | 'migrated'
-      created_at: string
-      modified_at: string
-      migrated_at: string | null
-    }
     OrganizationResponse: {
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
@@ -3016,6 +3048,15 @@ export interface components {
       plans: components['schemas']['PlanResponse'][]
     }
     UpcomingInvoice: Record<string, never>
+    Invoice: {
+      id: string
+      invoice_pdf: string
+      subscription: string | null
+      subtotal: number
+      number: string
+      period_end: number
+      status: string
+    }
     ColumnPrivilege: {
       grantor: string
       grantee: string
@@ -3703,21 +3744,40 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
-      last_updated_by: number
+      last_updated_by?: number
     }
     GetUserContentResponse: {
       data: components['schemas']['GetUserContentObject'][]
     }
-    CreateContentParams: {
+    GetUserContentByIdResponse: {
+      folder_id?: string
       id: string
+      inserted_at: string
+      updated_at: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
-      description: string
+      description?: string
+      content: Record<string, never>
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+    }
+    CreateContentBody: {
+      id?: string
+      name: string
+      description?: string
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -3729,27 +3789,46 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
-      last_updated_by: number
+      last_updated_by?: number
     }
-    UpsertContentParams: {
-      id: string
+    CreateContentBodyV2: {
+      id?: string
       name: string
-      description: string
+      description?: string
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
       content?: Record<string, never>
       owner_id?: number
-      project_id: number
+      folder_id?: string
     }
-    UpdateContentParams: {
+    UserContentObjectV2: {
+      id: string
+      inserted_at: string
+      updated_at: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+      name: string
+      description?: string
+      content: Record<string, never>
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+      folder_id?: string
+    }
+    UpdateContentBody: {
       id?: string
       name?: string
       description?: string
@@ -3760,8 +3839,75 @@ export interface components {
       content?: Record<string, never>
       owner_id?: number
     }
+    UpsertContentBody: {
+      id?: string
+      name: string
+      description?: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+      content?: Record<string, never>
+      owner_id?: number
+      project_id: number
+    }
+    UpsertContentBodyV2: {
+      id?: string
+      name: string
+      description?: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+      content?: Record<string, never>
+      owner_id?: number
+      project_id: number
+      folder_id?: string
+    }
     BulkDeleteUserContentResponse: {
       id: string
+    }
+    UserContentFolder: {
+      id: string
+      name: string
+      project_id: number
+      owner_id: number
+      parent_id?: string | null
+    }
+    UserContentObjectMeta: {
+      id: string
+      inserted_at: string
+      updated_at: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+      name: string
+      description?: string
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+      folder_id?: string
+    }
+    GetUserContentFolderResponse: {
+      data: {
+        folders?: components['schemas']['UserContentFolder'][]
+        contents?: components['schemas']['UserContentObjectMeta'][]
+      }
+    }
+    CreateContentFolderBody: {
+      name: string
+      parent_id?: string
+    }
+    CreateUserContentFolderResponse: {
+      id: string
+      name: string
+      project_id: number
+      owner_id: number
+      parent_id?: string | null
+    }
+    UpdateContentFolderBody: {
+      name: string
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
@@ -3805,6 +3951,7 @@ export interface components {
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
       identifier: string
+      replicaInitializationStatus?: Record<string, never>
     }
     UpdatePasswordBody: {
       password: string
@@ -3822,6 +3969,50 @@ export interface components {
     Buffer: Record<string, never>
     ResizeBody: {
       volume_size_gb: number
+    }
+    RestartProjectInfo: {
+      database_identifier?: string
+    }
+    ProjectLintMetadata: {
+      /** @enum {string} */
+      type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
+      schema?: string
+      name?: string
+      entity?: string
+      fkey_name?: string
+      fkey_columns?: number[]
+    }
+    ProjectLintResponse: {
+      /** @enum {string} */
+      name:
+        | 'unindexed_foreign_keys'
+        | 'auth_users_exposed'
+        | 'auth_rls_initplan'
+        | 'no_primary_key'
+        | 'unused_index'
+        | 'multiple_permissive_policies'
+        | 'policy_exists_rls_disabled'
+        | 'rls_enabled_no_policy'
+        | 'duplicate_index'
+        | 'security_definer_view'
+        | 'function_search_path_mutable'
+        | 'rls_disabled_in_public'
+        | 'extension_in_public'
+        | 'rls_references_user_metadata'
+        | 'materialized_view_in_api'
+        | 'foreign_table_in_api'
+        | 'auth_otp_long_expiry'
+        | 'auth_otp_short_length'
+      /** @enum {string} */
+      level: 'ERROR' | 'WARN' | 'INFO'
+      categories: ('PERFORMANCE' | 'SECURITY')[]
+      title: string
+      facing: string
+      description: string
+      detail: string
+      remediation: Record<string, never>
+      metadata: components['schemas']['ProjectLintMetadata'] | null
+      cache_key: string
     }
     ServiceVersions: {
       gotrue: string
@@ -3907,6 +4098,7 @@ export interface components {
       )[]
       source_notification_id?: string
       region: string
+      database_identifier?: string
     }
     RestartServicesBody: {
       restartRequest: components['schemas']['RestartServiceRequest']
@@ -3995,6 +4187,13 @@ export interface components {
     }
     LFUser: {
       token: string
+      email: string | null
+      bigquery_project_id: string | null
+      bigquery_dataset_location: string | null
+      bigquery_dataset_id: string | null
+      email_me_product: string | null
+      phone: string | null
+      company: string | null
       metadata: {
         project_ref?: string
       }
@@ -4003,6 +4202,19 @@ export interface components {
       token: string
       id: number
       name: string
+      favourite: boolean
+      webhook_notification_url: string | null
+      slack_hook_url: string | null
+      bigquery_table_ttl: number
+      public_token: string | null
+      custom_event_message_keys: string | null
+    }
+    LFAccessToken: {
+      token: string
+      id: number
+      inserted_at: string
+      scopes: string
+      description: string | null
     }
     LFEndpoint: {
       token: string
@@ -4016,6 +4228,20 @@ export interface components {
       proactive_requerying_seconds: number
       max_limit: number
       enable_auth: number
+    }
+    AvailableAddonResponse: {
+      type: components['schemas']['ProjectAddonType']
+      name: string
+      variants: components['schemas']['ProjectAddonVariantResponse'][]
+    }
+    ProjectAddonsResponse: {
+      ref: string
+      selected_addons: components['schemas']['SelectedAddonResponse'][]
+      available_addons: components['schemas']['AvailableAddonResponse'][]
+    }
+    UpdateAddonBody: {
+      addon_variant: components['schemas']['AddonVariantId']
+      addon_type: components['schemas']['ProjectAddonType']
     }
     PgbouncerConfigResponse: {
       default_pool_size?: number
@@ -4153,20 +4379,6 @@ export interface components {
       default_pool_size?: number
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    AvailableAddonResponse: {
-      type: components['schemas']['ProjectAddonType']
-      name: string
-      variants: components['schemas']['ProjectAddonVariantResponse'][]
-    }
-    ProjectAddonsResponse: {
-      ref: string
-      selected_addons: components['schemas']['SelectedAddonResponse'][]
-      available_addons: components['schemas']['AvailableAddonResponse'][]
-    }
-    UpdateAddonBody: {
-      addon_variant: components['schemas']['AddonVariantId']
-      addon_type: components['schemas']['ProjectAddonType']
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -4374,15 +4586,6 @@ export interface components {
       secret_key: string
       description: string
     }
-    Invoice: {
-      id: string
-      invoice_pdf: string
-      subscription: string
-      subtotal: number
-      number: string
-      period_end: number
-      status: string
-    }
     OverdueInvoiceCount: {
       organization_id: number
       overdue_invoice_count: number
@@ -4557,7 +4760,7 @@ export interface components {
       env_sync_error?: components['schemas']['SyncVercelEnvError']
     }
     UpdateVercelConnectionsBody: {
-      metadata: Record<string, never>
+      env_sync_targets?: ('production' | 'preview' | 'development')[]
     }
     DeleteVercelConnectionResponse: {
       id: string
@@ -4593,6 +4796,8 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
+      supabase_changes_only: boolean
+      branch_limit: number
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4605,6 +4810,7 @@ export interface components {
     UpdateGitHubConnectionsBody: {
       workdir?: string
       supabase_changes_only?: boolean
+      branch_limit?: number
     }
     CreateCliLoginSessionBody: {
       session_id: string
@@ -4791,9 +4997,18 @@ export interface components {
       restriction_data?: components['schemas']['RestrictionData']
       message?: string
     }
+    AwsPartnerBillingBody: {
+      aws_customer_id: string
+      aws_customer_account_id: string
+      aws_product_code: string
+      aws_private_offer_id: string
+      aws_subscription_start: string
+      aws_subscription_end: string
+    }
     CreateAwsPartnerOrganizationBody: {
       primary_email: string
       name: string
+      partner_billing: components['schemas']['AwsPartnerBillingBody']
     }
     AwsPartnerOrganizationResponse: {
       id: number
@@ -4852,6 +5067,7 @@ export interface components {
       is_default: boolean
       git_branch?: string
       pr_number?: number
+      latest_check_run_id?: number
       reset_on_push: boolean
       persistent: boolean
       /** @enum {string} */
@@ -5240,7 +5456,7 @@ export interface components {
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
-      mailer_otp_exp: number | null
+      mailer_otp_exp: number
       mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
@@ -5282,7 +5498,7 @@ export interface components {
       sms_messagebird_access_key: string | null
       sms_messagebird_originator: string | null
       sms_otp_exp: number | null
-      sms_otp_length: number | null
+      sms_otp_length: number
       sms_provider: string | null
       sms_template: string | null
       sms_test_otp: string | null
@@ -5663,7 +5879,7 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
       name: string
-      description: string | null
+      description?: string
       project: components['schemas']['SnippetProject']
       owner: components['schemas']['SnippetUser']
       updated_by: components['schemas']['SnippetUser']
@@ -5685,7 +5901,7 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
       name: string
-      description: string | null
+      description?: string
       project: components['schemas']['SnippetProject']
       owner: components['schemas']['SnippetUser']
       updated_by: components['schemas']['SnippetUser']
@@ -6577,104 +6793,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the status of owner reassignment */
-  OwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  OwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  OwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  OwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets user's organizations */
   OrganizationsController_getOrganizations: {
     responses: {
@@ -7532,6 +7650,82 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve upcoming invoice */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoices for the given organization */
+  OrgInvoicesController_getInvoices: {
+    parameters: {
+      query: {
+        limit: string
+        offset: string
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the total count of invoices for the given organization */
+  OrgInvoicesController_countInvoices: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: unknown
+        }
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve the total count of invoices */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoice with the given invoice ID */
+  OrgInvoicesController_getInvoice: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        invoiceId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoice */
       500: {
         content: never
       }
@@ -9350,7 +9544,10 @@ export interface operations {
       }
     }
   }
-  /** Gets project's content */
+  /**
+   * Gets project's content
+   * @deprecated
+   */
   ContentController_getContent: {
     parameters: {
       path: {
@@ -9371,17 +9568,15 @@ export interface operations {
     }
   }
   /** Updates project's content */
-  ContentController_updateWholeContent: {
+  ContentController_updateWholeContentV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpsertContentParams']
+        'application/json': components['schemas']['UpsertContentBodyV2']
       }
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['UserContentObject']
-        }
+        content: never
       }
       /** @description Failed to update project's content */
       500: {
@@ -9390,7 +9585,7 @@ export interface operations {
     }
   }
   /** Creates project's content */
-  ContentController_createContent: {
+  ContentController_createContentV2: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -9399,13 +9594,13 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentParams']
+        'application/json': components['schemas']['CreateContentBodyV2']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['UserContentObject'][]
+          'application/json': components['schemas']['UserContentObjectV2']
         }
       }
       /** @description Failed to create project's content */
@@ -9437,7 +9632,10 @@ export interface operations {
       }
     }
   }
-  /** Updates project's content */
+  /**
+   * Updates project's content
+   * @deprecated
+   */
   ContentController_updateContent: {
     parameters: {
       query: {
@@ -9446,7 +9644,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentParams']
+        'application/json': components['schemas']['UpdateContentBody']
       }
     }
     responses: {
@@ -9456,6 +9654,140 @@ export interface operations {
         }
       }
       /** @description Failed to update project's content */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's content by the given id */
+  ContentController_getContentById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content id */
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetUserContentByIdResponse']
+        }
+      }
+      /** @description Failed to retrieve project's content by the given id */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's content root folder */
+  ContentFoldersController_getRootFolder: {
+    parameters: {
+      query?: {
+        type?: 'sql' | 'report' | 'log_sql'
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to retrieve project's content root folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project's content folder */
+  ContentFoldersController_createFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateContentFolderBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to create project's content folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes project's content folders */
+  ContentFoldersController_DeleteFolder: {
+    parameters: {
+      query: {
+        ids: string[]
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete project's content folders */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's content folder */
+  ContentFoldersController_getFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content folder id */
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to retrieve project's content folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's content folder */
+  ContentFoldersController_updateFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content folder id */
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateContentFolderBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to update project's content folder */
       500: {
         content: never
       }
@@ -9652,6 +9984,7 @@ export interface operations {
           | 'disk_io_consumption'
           | 'ram_usage'
           | 'swap_usage'
+          | 'physical_replication_lag_physical_replica_lag_seconds'
         startDate: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -9723,6 +10056,11 @@ export interface operations {
         ref: string
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RestartProjectInfo']
+      }
+    }
     responses: {
       201: {
         content: never
@@ -9732,6 +10070,25 @@ export interface operations {
       }
       /** @description Failed to restart project */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  ProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }
@@ -10239,7 +10596,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['LFSource'][]
+          'application/json': components['schemas']['LFAccessToken'][]
         }
       }
       403: {
@@ -10256,7 +10613,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['LFSource']
+          'application/json': components['schemas']['LFAccessToken']
         }
       }
       403: {
@@ -10272,9 +10629,7 @@ export interface operations {
   AccessTokenController_deleteAccessToken: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
+        content: never
       }
       403: {
         content: never
@@ -10373,6 +10728,77 @@ export interface operations {
         content: never
       }
       /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project addons */
+  ProjectAddonController_getProjectAddons: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectAddonsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project addons */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project addon */
+  ProjectAddonController_updateAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateAddonBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project addon */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes project addon */
+  ProjectAddonController_removeAddon: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        addon_variant: components['schemas']['AddonVariantId']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to remove project addon */
       500: {
         content: never
       }
@@ -10661,77 +11087,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to update project's supavisor config */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project addons */
-  ProjectAddonController_getProjectAddons: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectAddonsResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to get project addons */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates project addon */
-  ProjectAddonController_updateAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateAddonBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update project addon */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Removes project addon */
-  ProjectAddonController_removeAddon: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        addon_variant: components['schemas']['AddonVariantId']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to remove project addon */
       500: {
         content: never
       }
@@ -11261,12 +11616,15 @@ export interface operations {
       }
     }
   }
-  /** Gets invoices for the given customer */
+  /**
+   * Gets invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_getInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
         limit: string
         offset: string
       }
@@ -11283,12 +11641,15 @@ export interface operations {
       }
     }
   }
-  /** Gets the total count of invoices for the given customer */
+  /**
+   * Gets the total count of invoices for the given customer
+   * @deprecated
+   */
   InvoicesController_countInvoices: {
     parameters: {
       query: {
-        customer: string
-        slug?: string
+        customer?: string
+        slug: string
       }
     }
     responses: {
@@ -11315,7 +11676,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invoice with the given invoice ID */
+  /**
+   * Gets invoice with the given invoice ID
+   * @deprecated
+   */
   InvoicesController_getInvoice: {
     parameters: {
       path: {
@@ -11404,7 +11768,7 @@ export interface operations {
       }
     }
   }
-  /** Sends mixpanel server activity */
+  /** Sends server activity */
   TelemetryActivityController_sendServerActivity: {
     requestBody: {
       content: {
@@ -11415,13 +11779,13 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel server activity */
+      /** @description Failed to send server activity */
       500: {
         content: never
       }
     }
   }
-  /** Send mixpanel page event */
+  /** Send pageview event */
   TelemetryPageviewController_sendServerPageViewed: {
     requestBody: {
       content: {
@@ -11432,7 +11796,7 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel page event */
+      /** @description Failed to send pageview event */
       500: {
         content: never
       }
@@ -11743,7 +12107,7 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       /** @description Failed to update Vercel connection */
@@ -11973,104 +12337,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the status of owner reassignment */
-  DatabaseOwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  DatabaseOwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  DatabaseOwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  DatabaseOwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Updates the database password */
   DatabasePasswordController_updatePassword: {
     parameters: {
@@ -12115,6 +12381,32 @@ export interface operations {
         content: never
       }
       /** @description Failed to reset JWT */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Delete a function
+   * @description Deletes a function with the specified slug from the specified project.
+   */
+  SystemFunctionSlugController_deleteFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Function slug */
+        function_slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete function with given slug */
       500: {
         content: never
       }

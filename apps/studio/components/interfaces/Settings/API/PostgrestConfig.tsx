@@ -26,7 +26,7 @@ import {
   Input,
   InputNumber,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'

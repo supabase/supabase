@@ -17,3 +17,7 @@ export const HIDDEN_EXTENSIONS = [
   'xml2',
   'pg_tle',
 ]
+
+export const SEARCH_TERMS: Record<string, string[]> = {
+  vector: ['pgvector', 'pg_vector'],
+}

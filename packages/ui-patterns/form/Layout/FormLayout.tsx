@@ -307,10 +307,10 @@ export const FormLayout = React.forwardRef<
             id={id + '-before'}
             data-formlayout-id={'beforeLabel'}
           >
-            {beforeLabel}
+            <span>{beforeLabel}</span>
           </span>
         )}
-        {label}
+        <span>{label}</span>
         {afterLabel && (
           <span
             className={cn(LabelAfterVariants({ size }))}

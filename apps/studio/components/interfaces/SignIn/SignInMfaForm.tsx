@@ -33,11 +33,7 @@ const SignInMfaForm = () => {
     isSuccess: isSuccessFactors,
     isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
-  const {
-    mutateAsync: mfaChallengeAndVerify,
-    isLoading,
-    isSuccess,
-  } = useMfaChallengeAndVerifyMutation()
+  const { mutate: mfaChallengeAndVerify, isLoading, isSuccess } = useMfaChallengeAndVerifyMutation()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const signOut = useSignOut()
 
@@ -61,7 +57,7 @@ const SignInMfaForm = () => {
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = toast.loading('Signing in...')
     if (selectedFactor) {
-      await mfaChallengeAndVerify(
+      mfaChallengeAndVerify(
         { factorId: selectedFactor.id, code, refreshFactors: false },
         {
           onSuccess: async () => {
