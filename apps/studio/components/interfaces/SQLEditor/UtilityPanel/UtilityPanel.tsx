@@ -10,6 +10,8 @@ import { ChartConfig } from './ChartConfig'
 import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
+import SavingIndicator from './SavingIndicator'
+import { IS_PLATFORM } from 'lib/constants'
 
 export type UtilityPanelProps = {
   id: string
@@ -111,19 +113,21 @@ const UtilityPanel = ({
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-2">
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            Results{' '}
-            {!isExecuting &&
-              (result?.rows ?? []).length > 0 &&
-              `(${result.rows.length.toLocaleString()})`}
+            <span className="translate-y-[1px]">
+              Results{' '}
+              {!isExecuting &&
+                (result?.rows ?? []).length > 0 &&
+                `(${result.rows.length.toLocaleString()})`}
+            </span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            Chart
+            <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
+          {result?.rows && <ResultsDropdown id={id} />}
         </div>
         <div className="flex gap-1 h-full items-center">
-          {result && result.rows && <ResultsDropdown id={id} />}
           <UtilityActions
             id={id}
             isExecuting={isExecuting}

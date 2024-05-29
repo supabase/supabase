@@ -68,7 +68,7 @@ const UtilityActions = ({
             }}
           >
             <p>Intellisense enabled</p>
-            {intellisenseEnabled && <Check className="text-brand" />}
+            {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
