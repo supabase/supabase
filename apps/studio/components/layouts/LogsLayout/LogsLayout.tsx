@@ -44,7 +44,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const { data: tenant } = useWarehouseTenantQuery(
     { projectRef },
     {
-      enabled: showWarehouse && !!projectRef,
+      enabled: showWarehouse,
     }
   )
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
