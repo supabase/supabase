@@ -11,6 +11,7 @@ test.describe('Table Editor page', () => {
 
     await page.goto('/project/default/editor')
 
+    await page.waitForLoadState('domcontentloaded')
     await page.waitForResponse(
       'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types'
     )
