@@ -81,6 +81,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -163,6 +164,18 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
               )
             } else {
               return (

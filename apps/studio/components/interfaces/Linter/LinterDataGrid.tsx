@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
+import { useRouter } from 'next/router'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -39,6 +40,7 @@ const LinterDataGrid = ({
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
+  const router = useRouter()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
 
@@ -115,6 +117,12 @@ const LinterDataGrid = ({
     return result
   })
 
+  function handleSidepanelClose() {
+    setSelectedLint(null)
+    const { id, ...otherParams } = router.query
+    router.push({ query: otherParams })
+  }
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -149,6 +157,8 @@ const LinterDataGrid = ({
                     if (typeof idx === 'number' && idx >= 0) {
                       setSelectedLint(props.row)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                      const { id, ...rest } = router.query
+                      router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
                     }
                   }}
                 />
@@ -172,9 +182,7 @@ const LinterDataGrid = ({
               type="text"
               className="absolute top-3 right-3 px-1"
               icon={<X size={14} />}
-              onClick={() => {
-                setSelectedLint(null)
-              }}
+              onClick={handleSidepanelClose}
             />
 
             <Tabs_Shadcn_
@@ -216,13 +224,13 @@ const LinterDataGrid = ({
                       <div>
                         <h3 className="text-sm">Issue</h3>
                         <ReactMarkdown className="leading-6 text-sm">
-                          {selectedLint.detail}
+                          {selectedLint.detail.replace(/\\`/g, '`')}
                         </ReactMarkdown>
                       </div>
                       <div>
                         <h3 className="text-sm">Description</h3>
                         <ReactMarkdown className="text-sm">
-                          {selectedLint.description}
+                          {selectedLint.description.replace(/\\`/g, '`')}
                         </ReactMarkdown>
                       </div>
 

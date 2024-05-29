@@ -1234,8 +1234,20 @@ $$;
     id: 24,
     type: 'template',
     title: 'Install dbdev',
-    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    description:
+      'dbdev is a client for installing Trusted Language Extensions (TLE) into your database.',
     sql: `
+/*---------------------
+---- install dbdev ----
+-----------------------
+Requires:
+  - pg_tle: https://github.com/aws/pg_tle
+  - pgsql-http: https://github.com/pramsey/pgsql-http
+
+Warning:
+Restoring a logical backup of a database with a TLE installed can fail.
+For this reason, dbdev should only be used with databases with physical backups enabled.
+*/
 create extension if not exists http with schema extensions;
 create extension if not exists pg_tle;
 select pgtle.uninstall_extension_if_exists('supabase-dbdev');

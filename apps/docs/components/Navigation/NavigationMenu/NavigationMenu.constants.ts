@@ -1011,27 +1011,27 @@ export const api: NavMenuConstant = {
       items: [
         {
           name: 'Managing tables, views, and data',
-          url: '/guides/api/data-apis#managing-tables-views-and-data',
+          url: '/guides/database/tables',
         },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/data-apis#querying-joins-and-nested-tables',
+          url: '/guides/database/joins-and-nesting',
         },
         {
           name: 'JSON and unstructured data',
-          url: '/guides/api/data-apis#json-and-unstructured-data',
+          url: '/guides/database/json',
         },
         {
           name: 'Managing database functions',
-          url: '/guides/api/data-apis#managing-database-functions',
+          url: '/guides/database/functions',
         },
         {
           name: 'Using full-text search',
-          url: '/guides/api/data-apis#using-full-text-search',
+          url: '/guides/database/full-text-search',
         },
         {
           name: 'Debugging performance issues',
-          url: '/guides/api/data-apis#debugging-performance-issues',
+          url: '/guides/database/debugging-performance',
         },
         {
           name: 'Using custom schemas',
@@ -1578,7 +1578,7 @@ export const ai = {
 }
 
 export const supabase_cli: NavMenuConstant = {
-  icon: 'reference-cli',
+  icon: 'dev-cli',
   title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
@@ -2116,21 +2116,21 @@ export const reference_api = {
 }
 
 export const reference_self_hosting_auth = {
-  icon: 'reference-auth',
+  icon: 'self-hosting',
   title: 'Self-Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
-  icon: 'reference-storage',
+  icon: 'self-hosting',
   title: 'Self-Hosting Storage',
   url: '/guides/reference/self-hosting/storage',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
-  icon: 'reference-realtime',
+  icon: 'self-hosting',
   title: 'Self-Hosting Realtime',
   url: '/guides/reference/self-hosting/realtime',
   parent: '/reference',
