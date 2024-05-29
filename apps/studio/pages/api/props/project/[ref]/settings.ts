@@ -30,7 +30,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       db_port: 5432,
       db_ssl: false,
       db_user: 'postgres',
-      jwt_secret: '-',
+      jwt_secret:
+        process.env.SUPABASE_AUTH_JWT_SECRET ??
+        'super-secret-jwt-token-with-at-least-32-characters-long',
     },
     services: [
       {
