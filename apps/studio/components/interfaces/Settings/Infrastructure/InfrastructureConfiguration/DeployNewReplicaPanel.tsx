@@ -176,6 +176,27 @@ const DeployNewReplicaPanel = ({
               </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
+        ) : currentPgVersion < 15 ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas can only be deployed with projects on Postgres version 15 and above
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to use read replicas, please contact us via support
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-2">
+              <Button type="default">
+                <Link
+                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Contact support
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <>
             {!isWalgEnabled && (
@@ -267,29 +288,6 @@ const DeployNewReplicaPanel = ({
                 <AlertDescription_Shadcn_>
                   If you'd like to spin up another read replica, please drop an existing replica
                   first.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-
-            {currentPgVersion < 15 && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  Read replicas can only be deployed with projects on Postgres version 15 and above
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  If you'd like to use read replicas, please contact us via support
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_ className="mt-2">
-                  <Button type="default">
-                    <Link
-                      href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Contact support
-                    </Link>
-                  </Button>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
