@@ -4102,7 +4102,7 @@ functions:
         name: Delete a single record
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .eq('id', 1)
@@ -4168,7 +4168,7 @@ functions:
         name: Delete multiple records
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .in('id', [1, 2, 3])
