@@ -87,6 +87,7 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
+  | 'warehouse'
 
 export type Mode = 'simple' | 'custom'
 
