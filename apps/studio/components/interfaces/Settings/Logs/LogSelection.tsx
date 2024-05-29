@@ -56,6 +56,7 @@ const LogSelection = ({
       sql,
     },
     {
+      enabled: queryType === 'warehouse',
       onError: (error) => {
         toast.error(error.message)
       },
