@@ -140,7 +140,7 @@ const PostgrestConfig = () => {
       <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
         <FormPanel
           disabled={true}
-          header={<p>API Settings</p>}
+          header={<p>Data API Settings</p>}
           footer={
             <div className="flex px-8 py-4">
               <FormActions
