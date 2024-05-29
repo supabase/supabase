@@ -123,7 +123,7 @@ const ServiceStatus = () => {
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
-                  allServicesOperational ? 'bg-brand' : 'bg-amber-900'
+                  allServicesOperational ? 'bg-brand' : 'bg-warning'
                 }`}
               />
             )
@@ -153,7 +153,7 @@ const ServiceStatus = () => {
             ) : service.isSuccess ? (
               <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             ) : (
-              <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
+              <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
             )}
           </div>
         ))}

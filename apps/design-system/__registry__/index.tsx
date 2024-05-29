@@ -1699,6 +1699,50 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "tree-view-demo": {
+      name: "tree-view-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-demo")),
+      source: "",
+      files: ["registry/default/example/tree-view-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-edit": {
+      name: "tree-view-edit",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-edit")),
+      source: "",
+      files: ["registry/default/example/tree-view-edit.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-directories": {
+      name: "tree-view-directories",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-directories")),
+      source: "",
+      files: ["registry/default/example/tree-view-directories.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "tree-view-multi-select": {
+      name: "tree-view-multi-select",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/tree-view-multi-select")),
+      source: "",
+      files: ["registry/default/example/tree-view-multi-select.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",

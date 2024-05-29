@@ -4,13 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
-import { Badge, Button, IconCheck } from 'ui'
+import { Badge, Button, IconCheck, Separator, buttonVariants, cn } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useTheme } from 'next-themes'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
+import { GlobeAltIcon } from '@heroicons/react/outline'
 
 export async function getStaticProps() {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
@@ -378,7 +379,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
 
           <SectionContainer>
             <div className="xl:flex lg:items-start xl:gap-10 justify-between">
-              <div className="xl:min-w-[300px] xl:max-w-[360px]">
+              <div className="xl:min-w-[300px] xl:max-w-[400px]">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-1.5px]">
                   Great people deserve great benefits
                 </h2>
@@ -388,7 +389,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
                       <div
-                        className="h-full bg-alternative drop-shadow-sm border-muted border-[1px] p-6 rounded-lg flex items-start space-x-6 w-full"
+                        className="h-full bg-surface-75 drop-shadow-sm border border-muted p-6 rounded-lg flex items-start space-x-6 w-full"
                         key={i}
                       >
                         <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
@@ -469,10 +470,18 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             </div>
           </SectionContainer>
 
-          <div id="positions" className="positions">
+          <Separator />
+
+          <div id="positions" className="max-w-6xl mx-auto">
             <SectionContainer>
-              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">Open positions</h2>
-              <div className="mt-10 space-y-4">
+              <h2 className="text-xl sm:text-3xl xl:text-3xl tracking-[-1.5px] mb-3">
+                Open positions
+              </h2>
+              <p className="max-w-xl text-foreground-lighter">
+                Want to build the best developer platform?
+                <br /> We’d love to talk to you.
+              </p>
+              <div className="mt-10 -space-y-px">
                 {jobs.map(
                   (
                     job: {
@@ -485,33 +494,43 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     i: number
                   ) => {
                     return (
-                      <div className="cursor-pointer md:cursor-default" key={i}>
-                        <Link href={job.absolute_url}>
-                          <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
-                            <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
-                              {job.title}
-                            </h2>
-                            <div className="flex items-center justify-between justify-[normal] pt-2 sm:pt-0 sm:w-full">
-                              <div className="flex items-center space-x-4">
-                                <Badge className="rounded-full flex items-center lg:text-sm">
-                                  <div className="w-3 h-3">
-                                    <img
-                                      src="/images/career/icons/globe-dark.svg"
-                                      alt="globe icon"
-                                      width="100%"
-                                      height="100%"
-                                    />
-                                  </div>
-                                  <span className="ml-1">{job.location.name}</span>
-                                </Badge>
-                                <span className="hidden md:block">{job.employment}</span>
-                              </div>
-                              <p className="hidden lg:block lg:text-sm">{job.description}</p>
-                              <Button className="text-white">Apply for position</Button>
-                            </div>
+                      <Link
+                        href={job.absolute_url}
+                        key={i}
+                        className="
+                        first-of-type:rounded-t-md last-of-type:rounded-b-md
+                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7 
+                        flex flex-col md:flex-row 
+                        md:items-center
+                        transition hover:bg-surface-100 
+                        hover:cursor-pointer"
+                      >
+                        <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">
+                          {job.title}
+                        </h2>
+                        <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
+                          <div className="flex items-center space-x-4">
+                            <Badge
+                              className="bg-surface-200 bg-opacity-100 border-muted"
+                              variant={'default'}
+                            >
+                              <GlobeAltIcon className="w-3 h-3" />
+
+                              <span className="ml-1">{job.location.name}</span>
+                            </Badge>
+                            <span className="hidden md:block">{job.employment}</span>
                           </div>
-                        </Link>
-                      </div>
+                          <p className="hidden lg:block lg:text-sm">{job.description}</p>
+                          <div
+                            className={cn(
+                              buttonVariants({ type: 'default', size: 'tiny' }),
+                              'rounded-full'
+                            )}
+                          >
+                            Apply for position
+                          </div>
+                        </div>
+                      </Link>
                     )
                   }
                 )}
