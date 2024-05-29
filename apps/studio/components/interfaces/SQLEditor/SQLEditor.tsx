@@ -169,8 +169,8 @@ const SQLEditor = () => {
   }, [chatMessages])
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess(data) {
-      if (id) snap.addResult(id, data.result)
+    onSuccess(data, vars) {
+      if (id) snap.addResult(id, data.result, vars.autoLimit)
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
@@ -311,13 +311,30 @@ const SQLEditor = () => {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
+        // Remove lines and whitespaces
+        const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
+        // Check if need to auto limit rows
+        const appendAutoLimit =
+          snap.limit > 0 &&
+          cleanedSql.toLowerCase().startsWith('select') &&
+          !cleanedSql.endsWith('limit') &&
+          !cleanedSql.endsWith('limit;') &&
+          !!!cleanedSql.match('limit [0-9]*[;]?$')
+        // Append the limit prefix if needed
+        const formattedSql = appendAutoLimit
+          ? cleanedSql.endsWith(';')
+            ? cleanedSql.replace(/.$/, ` limit ${snap.limit};`)
+            : `${cleanedSql} limit ${snap.limit};`
+          : cleanedSql
+
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(sql, {
+          sql: wrapWithRoleImpersonation(formattedSql, {
             projectRef: project.ref,
             role: impersonatedRole,
           }),
+          autoLimit: appendAutoLimit ? snap.limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
           handleError: (error) => {
             throw error

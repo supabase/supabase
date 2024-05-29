@@ -14,6 +14,7 @@ export type ExecuteSqlVariables = {
   connectionString?: string
   sql: string
   queryKey?: QueryKey
+  autoLimit?: number
   handleError?: (error: { code: number; message: string; requestId: string }) => any
   isRoleImpersonationEnabled?: boolean
 }
