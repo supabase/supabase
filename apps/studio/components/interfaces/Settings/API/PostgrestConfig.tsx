@@ -235,10 +235,7 @@ const PostgrestConfig = () => {
                               exposed over our GraphQL endpoints.
                             </p>
                             <Button asChild type="default">
-                              <Link
-                                href={`/project/${projectRef}/database/extensions`}
-                                // className="!no-underline !hover:bg-surface-100 !text-foreground"
-                              >
+                              <Link href={`/project/${projectRef}/database/extensions`}>
                                 Disable the pg_graphql extension
                               </Link>
                             </Button>
@@ -316,10 +313,7 @@ const PostgrestConfig = () => {
                                     still exposed over our GraphQL endpoints.
                                   </p>
                                   <Button asChild type="default">
-                                    <Link
-                                      href={`/project/${projectRef}/database/extensions`}
-                                      // className="!no-underline !hover:bg-surface-100 !text-foreground"
-                                    >
+                                    <Link href={`/project/${projectRef}/database/extensions`}>
                                       Disable the pg_graphql extension
                                     </Link>
                                   </Button>
