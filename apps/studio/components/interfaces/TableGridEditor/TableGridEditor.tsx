@@ -274,7 +274,7 @@ const TableGridEditor = ({
         onImportData={snap.onImportData}
         onError={onError}
         onExpandJSONEditor={(column, row) => {
-          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+          snap.onExpandJSONEditor({ column, row, value: JSON.stringify(row[column]) || '' })
         }}
         onExpandTextEditor={(column, row) => {
           snap.onExpandTextEditor(column, row)

@@ -38,13 +38,6 @@ const EdgeFunctionSecrets = () => {
 
   return (
     <>
-      <div>
-        <h3 className="mb-2 text-xl text-foreground">Edge Function Secrets Management</h3>
-        <div className="text-sm text-foreground-lighter">
-          Manage the secrets for your project's edge functions
-        </div>
-      </div>
-
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}

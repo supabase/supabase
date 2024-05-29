@@ -364,6 +364,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/components/tooltip',
           items: [],
         },
+        {
+          title: 'Tree View',
+          href: '/docs/components/tree-view',
+          items: [],
+        },
       ],
     },
   ],

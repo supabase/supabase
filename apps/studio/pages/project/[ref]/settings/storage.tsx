@@ -1,14 +1,28 @@
 import { SettingsLayout } from 'components/layouts'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import { StorageSettings } from 'components/to-be-cleaned/Storage'
 import { S3Connection } from 'components/to-be-cleaned/Storage/StorageSettings/S3Connection'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
-      <StorageSettings />
-      <S3Connection />
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Storage Settings</ScaffoldTitle>
+          <ScaffoldDescription>Configure your project's storage settings</ScaffoldDescription>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        <StorageSettings />
+        <S3Connection />
+      </ScaffoldContainer>
+    </>
   )
 }
 
