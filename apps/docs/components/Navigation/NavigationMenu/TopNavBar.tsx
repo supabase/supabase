@@ -34,7 +34,7 @@ const TopNavBar: FC = () => {
   return (
     <nav
       aria-label="top bar"
-      className="w-full flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+      className="w-full fixed z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
     >
       <div className="w-full px-5 flex justify-between h-[var(--header-height,60px)]">
         <div className="hidden px-5 lg:flex h-full items-center bg-background flex-col gap-8">
@@ -42,7 +42,7 @@ const TopNavBar: FC = () => {
         </div>
         <div className="max-w-7xl flex gap-3 justify-between items-center h-full">
           <div className="lg:hidden">
-            <Link href="/" className=" flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <Image
                 className="cursor-pointer"
                 src={

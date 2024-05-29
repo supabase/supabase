@@ -17,34 +17,34 @@ const GlobalNavigationMenu = () => {
     <div className="h-[30px] px-10 flex relative gap-2 justify-start items-end w-full">
       <NavigationMenu
         delayDuration={0}
-        skipDelayDuration={0}
         className="hidden sm:space-x-4 lg:flex justify-start"
-        viewportClassName="rounded-xl bg-background justify-start z-50"
-        orientation="vertical"
+        viewportClassName="rounded-xl bg-background justify-start"
       >
         <NavigationMenuList>
           {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
             section[0].menuItems ? (
-              <NavigationMenuItem className="text-sm relative" key={section[0].label}>
+              <NavigationMenuItem className="text-sm" key={section[0].label}>
                 <NavigationMenuTrigger className="bg-transparent font-normal text-foreground-lighter hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
                   {section[0].label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="top-10 rounded bg-overlay">
+                <NavigationMenuContent className="rounded-xl">
                   {section[0].menuItems?.map((menuItem) =>
-                    menuItem.map((item) =>
-                      !item.href ? (
-                        <div className="font-mono text-foreground-muted text-xs">{item.label}</div>
-                      ) : (
-                        <NavigationMenuLink asChild>
+                    menuItem.map((item) => (
+                      <NavigationMenuLink asChild>
+                        {!item.href ? (
+                          <div className="font-mono text-foreground-muted text-xs">
+                            {item.label}
+                          </div>
+                        ) : (
                           <MenuItem
                             href={item.href}
                             title={item.label}
                             className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
                             hoverColor="brand"
                           />
-                        </NavigationMenuLink>
-                      )
-                    )
+                        )}
+                      </NavigationMenuLink>
+                    ))
                   )}
                 </NavigationMenuContent>
               </NavigationMenuItem>
