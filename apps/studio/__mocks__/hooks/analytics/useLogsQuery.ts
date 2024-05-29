@@ -1,4 +1,6 @@
-const useLogsQuery = jest.fn().mockReturnValue({
+import { vi } from 'vitest'
+
+const useLogsQuery = vi.fn().mockReturnValue({
   logData: [],
   params: {
     iso_timestamp_start: '',
