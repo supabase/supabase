@@ -60,7 +60,7 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
   sorts.forEach((sort) => {
-    queryChains = queryChains.order(sort.column, sort.ascending, sort.nullsFirst)
+    queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
   })
 
   // Starting from page 0, fetch 500 records per call
@@ -134,7 +134,7 @@ export const getTableRowsSqlQuery = ({
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
   sorts.forEach((x) => {
-    queryChains = queryChains.order(x.column, x.ascending, x.nullsFirst)
+    queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
   })
 
   // getPagination is expecting to start from 0
