@@ -1,16 +1,6 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  Input,
-} from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -24,18 +14,23 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks'
-import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Badge,
+  Button,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
-import {
-  AWS_REGIONS_VALUES,
-  FLY_REGIONS_VALUES,
-} from './InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const router = useRouter()
-  const { project, isLoading } = useProjectContext()
+  const { project } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -55,66 +50,19 @@ const InfrastructureInfo = () => {
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
-  const showReadReplicasUI = project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
-
-  const [regionKey] =
-    project?.cloud_provider === 'AWS'
-      ? Object.entries(AWS_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
-      : Object.entries(FLY_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
-  const region =
-    project?.cloud_provider === 'AWS'
-      ? AWS_REGIONS[regionKey as keyof typeof AWS_REGIONS]
-      : FLY_REGIONS[regionKey as keyof typeof FLY_REGIONS]
 
   return (
     <>
       <ScaffoldDivider />
 
-      {showReadReplicasUI && (
-        <>
-          <InstanceConfiguration />
-          <ScaffoldDivider />
-        </>
-      )}
+      <InstanceConfiguration />
+
+      <ScaffoldDivider />
 
       <ScaffoldContainer>
-        {!showReadReplicasUI && (
-          <ScaffoldSection>
-            <ScaffoldSectionDetail>
-              <p>Configuration</p>
-              <p className="text-foreground-light text-sm">Information on your server provider</p>
-            </ScaffoldSectionDetail>
-            <ScaffoldSectionContent>
-              {isLoading ? (
-                <GenericSkeletonLoader />
-              ) : (
-                <>
-                  <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-                  <Input
-                    readOnly
-                    disabled
-                    icon={
-                      regionKey !== undefined ? (
-                        <img
-                          alt="region icon"
-                          className="w-5 rounded-sm"
-                          src={`${router.basePath}/img/regions/${regionKey}.svg`}
-                        />
-                      ) : null
-                    }
-                    value={
-                      region !== undefined ? `${region} (${project?.region})` : project?.region
-                    }
-                    label="Region"
-                  />
-                </>
-              )}
-            </ScaffoldSectionContent>
-          </ScaffoldSection>
-        )}
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
@@ -161,29 +109,16 @@ const InfrastructureInfo = () => {
                       label="Postgres version"
                       actions={[
                         isOnLatestVersion && (
-                          <Tooltip.Root key="tooltip-latest" delayDuration={0}>
-                            <Tooltip.Trigger>
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_>
                               <Badge variant="brand" className="mr-1">
                                 Latest
                               </Badge>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background w-[200px]',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    Project is on the latest version of Postgres that Supabase
-                                    supports
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
+                              Project is on the latest version of Postgres that Supabase supports
+                            </TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
                         ),
                       ]}
                     />
@@ -250,13 +185,13 @@ const InfrastructureInfo = () => {
                           </p>
                           <div>
                             <Button size="tiny" type="default" asChild>
-                              <Link
+                              <a
                                 href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
                                 target="_blank"
                                 rel="noreferrer"
                               >
                                 View docs
-                              </Link>
+                              </a>
                             </Button>
                           </div>
                         </AlertDescription_Shadcn_>
