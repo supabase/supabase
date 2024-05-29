@@ -1,36 +1,40 @@
+import { cn } from 'ui'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight, SelectionDetailedRow } from '../LogsFormatters'
 
-const DefaultExplorerSelectionRenderer = ({ log }: any) => {
-  const DetailedJsonRow = ({
-    label,
-    value,
-    code,
-  }: {
-    label: string
-    value: Object
-    code?: boolean
-  }) => {
-    return (
-      <div className="grid grid-cols-12">
-        <span className="text-foreground-lighter text-sm col-span-3">{label}</span>
-        <span
-          className={`text-foreground text-sm col-span-9 overflow-x-auto ${
-            code && 'text-xs font-mono'
-          }`}
-        >
-          <pre
-            dangerouslySetInnerHTML={{
-              __html: jsonSyntaxHighlight(value),
-            }}
-          />
-        </span>
-      </div>
-    )
-  }
+const DetailedJsonRow = ({
+  label,
+  value,
+  code,
+}: {
+  label: string
+  value: Object
+  code?: boolean
+}) => {
+  return (
+    <div className="grid grid-cols-12">
+      <span className="text-foreground-lighter text-sm col-span-3">{label}</span>
+      <span
+        className={cn(
+          'text-foreground text-sm col-span-9 overflow-x-auto',
+          code && 'text-xs font-mono'
+        )}
+      >
+        <pre
+          dangerouslySetInnerHTML={{
+            __html: jsonSyntaxHighlight(value),
+          }}
+        />
+      </span>
+    </div>
+  )
+}
 
+export const WarehouseSelectionRenderer = ({ log }: any) => {
   return (
     <div className="overflow-hidden overflow-x-auto space-y-6">
+      <pre>{JSON.stringify(log, null, 2)}</pre>
+      <hr />
       {Object.entries(log).map(([key, value], index) => {
         return (
           <div
@@ -48,5 +52,3 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
     </div>
   )
 }
-
-export default DefaultExplorerSelectionRenderer
