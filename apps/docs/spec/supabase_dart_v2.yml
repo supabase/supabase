@@ -152,7 +152,7 @@ functions:
         description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-up
-        name: Sign up.
+        name: Sign up with an email and password
         isSpotlight: true
         code: |
           ```dart
@@ -162,6 +162,94 @@ functions:
           );
           final Session? session = res.session;
           final User? user = res.user;
+          ```
+        response: |
+          ```json
+          // Some fields may be null if "confirm email" is enabled.
+          AuthResponse(
+            user: const User(
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                emailConfirmedAt: '2024-01-01T00:00:00Z',
+                phone: '',
+                lastSignInAt: '2024-01-01T00:00:00Z',
+                appMetadata: {
+                  'provider': 'email',
+                  'providers': ['email']
+                },
+                userMetadata: {},
+                identities: [
+                  UserIdentity(
+                    identityId: '22222222-2222-2222-2222-222222222222',
+                    id: '11111111-1111-1111-1111-111111111111',
+                    userId: '11111111-1111-1111-1111-111111111111',
+                    identityData: {
+                      'email': 'example@email.com',
+                      'email_verified': false,
+                      'phone_verified': false,
+                      'sub': '11111111-1111-1111-1111-111111111111'
+                    },
+                    provider: 'email',
+                    lastSignInAt: '2024-01-01T00:00:00Z',
+                    createdAt: '2024-01-01T00:00:00Z',
+                    updatedAt: '2024-01-01T00:00:00Z',
+                  ),
+                ],
+                createdAt: '2024-01-01T00:00:00Z',
+                updatedAt: '2024-01-01T00:00:00Z'),
+            session: Session(
+              accessToken: '<ACCESS_TOKEN>',
+              tokenType: 'bearer',
+              expiresIn: 3600,
+              // : 1700000000,
+              refreshToken: '<REFRESH_TOKEN>',
+              user: const User(
+                  id: '11111111-1111-1111-1111-111111111111',
+                  aud: 'authenticated',
+                  role: 'authenticated',
+                  email: 'example@email.com',
+                  emailConfirmedAt: '2024-01-01T00:00:00Z',
+                  phone: '',
+                  lastSignInAt: '2024-01-01T00:00:00Z',
+                  appMetadata: {
+                    'provider': 'email',
+                    'providers': ['email']
+                  },
+                  userMetadata: {},
+                  identities: [
+                    UserIdentity(
+                      identityId: '22222222-2222-2222-2222-222222222222',
+                      id: '11111111-1111-1111-1111-111111111111',
+                      userId: '11111111-1111-1111-1111-111111111111',
+                      identityData: {
+                        'email': 'example@email.com',
+                        'email_verified': false,
+                        'phone_verified': false,
+                        'sub': '11111111-1111-1111-1111-111111111111'
+                      },
+                      provider: 'email',
+                      lastSignInAt: '2024-01-01T00:00:00Z',
+                      createdAt: '2024-01-01T00:00:00Z',
+                      updatedAt: '2024-01-01T00:00:00Z',
+                    )
+                  ],
+                  createdAt: '2024-01-01T00:00:00Z',
+                  updatedAt: '2024-01-01T00:00:00Z'),
+            ),
+          );
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            phone: '123456789',
+            password: 'example-password',
+            channel: OtpChannel.sms,
+          );
           ```
       - id: sign-up-with-metadata
         name: Sign up with additional metadata
@@ -179,6 +267,8 @@ functions:
       - id: sign-up-with-redirect-url
         name: Sign up with redirect URL
         isSpotlight: true
+        description: |
+          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```dart
           final AuthResponse res = await supabase.auth.signUp(
@@ -880,6 +970,27 @@ functions:
           final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
             final AuthChangeEvent event = data.event;
             final Session? session = data.session;
+
+            print('event: $event, session: $session');
+
+            switch (event) {
+              case AuthChangeEvent.initialSession:
+              // handle initial session
+              case AuthChangeEvent.signedIn:
+              // handle signed in
+              case AuthChangeEvent.signedOut:
+              // handle signed out
+              case AuthChangeEvent.passwordRecovery:
+              // handle password recovery
+              case AuthChangeEvent.tokenRefreshed:
+              // handle token refreshed
+              case AuthChangeEvent.userUpdated:
+              // handle user updated
+              case AuthChangeEvent.userDeleted:
+              // handle user deleted
+              case AuthChangeEvent.mfaChallengeVerified:
+              // handle mfa challenge verified
+            }
           });
           ```
       - id: listen-to-a-specific-event
@@ -1813,7 +1924,7 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```dart
+          ```json
           'Hello world'
           ```
         hideCodeBlock: true
@@ -1833,8 +1944,8 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```dart
-          '👋' 
+          ```json
+          '👋'
           ```
         hideCodeBlock: true
       - id: bulk-processing
@@ -1852,7 +1963,7 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```dart
+          ```json
           [
             2,
             3,
@@ -1888,7 +1999,7 @@ functions:
             $$ language sql;
             ```
         response: |
-          ```dart
+          ```json
           {
             'id': 1,
             'name': 'France'
@@ -2675,7 +2786,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           null
           ```
         hideCodeBlock: true
@@ -2861,7 +2972,7 @@ functions:
               (2, 'Jane', null);
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -2917,7 +3028,7 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Indonesia',
@@ -3006,7 +3117,7 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Germany',
@@ -3119,7 +3230,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Albania'
@@ -3166,7 +3277,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -3214,7 +3325,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3266,7 +3377,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 3,
@@ -3314,7 +3425,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -3366,7 +3477,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3414,7 +3525,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3466,7 +3577,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -3514,7 +3625,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -3561,7 +3672,7 @@ functions:
               (2, null);
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3615,7 +3726,7 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -3674,7 +3785,7 @@ functions:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3710,7 +3821,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3751,7 +3862,7 @@ functions:
               (2, 'Jane', '{"postcode": 90210}');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Michael'
@@ -3801,7 +3912,7 @@ functions:
               (2, 'History', array['monday', 'wednesday', 'thursday']);
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Chemistry'
@@ -3835,7 +3946,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3876,7 +3987,7 @@ functions:
               (2, 'Jane', '{"postcode": 90210}');
             ```
         response: |
-          ```dart
+          ```json
             [
               {
                 'name': 'Jane'
@@ -3925,7 +4036,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -3982,7 +4093,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -4039,7 +4150,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 2,
@@ -4096,7 +4207,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -4153,7 +4264,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -4210,7 +4321,7 @@ functions:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'title': 'Cache invalidation is not working'
@@ -4245,7 +4356,7 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'id': 1,
@@ -4439,7 +4550,7 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```dart
+          ```json
           [
             {
               'name': 'Indonesia',
