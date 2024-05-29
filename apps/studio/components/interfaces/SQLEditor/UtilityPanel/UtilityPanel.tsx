@@ -39,13 +39,15 @@ const UtilityPanel = ({
   executeQuery,
   onDebug,
 }: UtilityPanelProps) => {
-  const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
+  const snap = useSqlEditorStateSnapshot()
+
   const snippet = snap.snippets[id]?.snippet
-
   const queryKeys = contentKeys.list(ref)
+  const result = snap.results[id]?.[0]
 
-  const upsertContent = useContentUpsertMutation({
+  const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
@@ -72,7 +74,6 @@ const UtilityPanel = ({
       toast.error(`Failed to update chart. Please try again.`)
     },
   })
-  const queryClient = useQueryClient()
 
   function getChartConfig() {
     if (!snippet || snippet.type !== 'sql') {
@@ -88,14 +89,10 @@ const UtilityPanel = ({
 
   const chartConfig = getChartConfig()
 
-  const result = snap.results[id]?.[0]
-
   function onConfigChange(config: ChartConfig) {
-    if (!ref || !snippet.id) {
-      return
-    }
+    if (!ref || !snippet.id) return
 
-    upsertContent.mutateAsync({
+    upsertContent({
       projectRef: ref,
       payload: {
         ...snippet,

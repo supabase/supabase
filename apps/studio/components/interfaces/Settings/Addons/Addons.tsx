@@ -120,15 +120,6 @@ const Addons = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-6">
-          <div>
-            <p className="text-xl">Add ons</p>
-            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
-          </div>
-        </div>
-      </ScaffoldContainer>
-
       <ScaffoldDivider />
 
       {isBranch && (
