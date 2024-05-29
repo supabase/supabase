@@ -10,7 +10,8 @@
   ],
   "compilerOptions": {
     "types": [
-      "./test/extensions.d.ts"
+      "./test/extensions.d.ts",
+      "./types/libpg-query/index.d.ts"
     ]
   }
 }
