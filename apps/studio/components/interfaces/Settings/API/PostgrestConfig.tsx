@@ -16,6 +16,8 @@ import toast from 'react-hot-toast'
 import {
   Admonition,
   Button,
+  CollapsibleContent_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -23,6 +25,7 @@ import {
   Input_Shadcn_,
   Skeleton,
   Switch,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -159,7 +162,7 @@ const PostgrestConfig = () => {
   }
 
   useEffect(() => {
-    if (schema && config) {
+    if (config) {
       /**
        * Checks if enableDataApi should be enabled or disabled
        * based on the db_schema value being empty string
@@ -172,7 +175,7 @@ const PostgrestConfig = () => {
     }
     // ignore dep array warning, as cant have resetForm as a dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema, config])
+  }, [config])
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
@@ -241,189 +244,227 @@ const PostgrestConfig = () => {
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
-                    {isGraphqlExtensionEnabled && field.value == false && (
-                      <div className="px-8 mb-6">
-                        <Admonition
-                          type="warning"
-                          title="Tables could still be exposed via GraphQl"
-                          className=""
-                        >
-                          <>
-                            <p>
-                              Tables in the <code className="text-xs">public</code> schema are still
-                              exposed over our GraphQL endpoints.
-                            </p>
-                            <Button asChild type="default">
-                              <Link href={`/project/${projectRef}/database/extensions`}>
-                                Disable the pg_graphql extension
-                              </Link>
-                            </Button>
-                          </>
-                        </Admonition>
-                      </div>
-                    )}
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="dbSchema"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full">
-                    <FormItemLayout
-                      label="Exposed schemas"
-                      description="The schemas to expose in your API. Tables, views and stored procedures in
-                          these schemas will get API endpoints."
-                      layout="horizontal"
-                      className="px-8 py-8"
-                    >
-                      {isLoadingSchemas ? (
-                        <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
-                          <Skeleton className="w-full h-[38px]" />
-                        </div>
-                      ) : (
-                        <MultiSelector
-                          onValuesChange={field.onChange}
-                          values={field.value}
-                          size={'small'}
-                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                        >
-                          <MultiSelectorTrigger>
-                            <MultiSelectorInput placeholder="Select schemas for Data API..." />
-                          </MultiSelectorTrigger>
-                          <MultiSelectorContent>
-                            {schema.length <= 0 ? (
-                              <MultiSelectorList>
-                                <MultiSelectorItem key={'empty'} value={'no'}>
-                                  no
-                                </MultiSelectorItem>
-                              </MultiSelectorList>
-                            ) : (
-                              <MultiSelectorList>
-                                {schema.map((x, i) => (
-                                  <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
-                                    {x.name}
-                                  </MultiSelectorItem>
-                                ))}
-                              </MultiSelectorList>
-                            )}
-                          </MultiSelectorContent>
-                        </MultiSelector>
-                      )}
-
-                      {!field.value.includes('public') &&
-                        form.getValues('enableDataApi') !== false &&
-                        field.value.length > 0 && (
+                    {!field.value && (
+                      <>
+                        <div className="flex items-stretch px-8 mb-6 -space-x-px">
                           <Admonition
                             type="default"
-                            title="The public schema for this project is not exposed"
-                            className="mt-2"
-                          >
-                            <>
-                              <p>
-                                You will not be able to query tables and views in the{' '}
-                                <code>public</code> schema via supabase-js or HTTP clients.
-                              </p>
-                              {isGraphqlExtensionEnabled && (
+                            className="
+                                mb-0
+                                flex-grow
+                                rounded-l-none rounded-r-none
+                                first-of-type:rounded-l-md last-of-type:rounded-r-md
+                              "
+                            title="No schemas can be queried"
+                            description={
+                              <>
+                                <p>
+                                  With this setting disabled, you will not be able to query any
+                                  schemas via the Data API.
+                                </p>
+                                <p>
+                                  You will see errors from the Postgrest endpoint
+                                  <code className="text-xs">/rest/v1/</code>.
+                                </p>
+                              </>
+                            }
+                          />
+
+                          {isGraphqlExtensionEnabled && (
+                            <Admonition
+                              type="warning"
+                              className="
+                                mb-0
+                                flex-grow
+                                rounded-l-none rounded-r-none
+                                first-of-type:rounded-l-md last-of-type:rounded-r-md
+                              "
+                              title="Tables could still be exposed via GraphQl"
+                              description={
                                 <>
                                   <p>
                                     Tables in the <code className="text-xs">public</code> schema are
                                     still exposed over our GraphQL endpoints.
                                   </p>
-                                  <Button asChild type="default">
+                                  <Button asChild type="default" className="mt-3">
                                     <Link href={`/project/${projectRef}/database/extensions`}>
                                       Disable the pg_graphql extension
                                     </Link>
                                   </Button>
                                 </>
-                              )}
-                            </>
-                          </Admonition>
-                        )}
-                    </FormItemLayout>
+                              }
+                            />
+                          )}
+                        </div>
+                      </>
+                    )}
                   </FormItem_Shadcn_>
                 )}
               />
+              <Collapsible_Shadcn_ open={form.getValues('enableDataApi')}>
+                <CollapsibleContent_Shadcn_ className="divide-y transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="dbSchema"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormItemLayout
+                          label="Exposed schemas"
+                          description="The schemas to expose in your API. Tables, views and stored procedures in
+                          these schemas will get API endpoints."
+                          layout="horizontal"
+                          className="px-8 py-8"
+                        >
+                          {isLoadingSchemas ? (
+                            <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                              <Skeleton className="w-full h-[38px]" />
+                            </div>
+                          ) : (
+                            <MultiSelector
+                              onValuesChange={field.onChange}
+                              values={field.value}
+                              size={'small'}
+                              disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                            >
+                              <MultiSelectorTrigger>
+                                <MultiSelectorInput placeholder="Select schemas for Data API..." />
+                              </MultiSelectorTrigger>
+                              <MultiSelectorContent>
+                                {schema.length <= 0 ? (
+                                  <MultiSelectorList>
+                                    <MultiSelectorItem key={'empty'} value={'no'}>
+                                      no
+                                    </MultiSelectorItem>
+                                  </MultiSelectorList>
+                                ) : (
+                                  <MultiSelectorList>
+                                    {schema.map((x, i) => (
+                                      <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
+                                        {x.name}
+                                      </MultiSelectorItem>
+                                    ))}
+                                  </MultiSelectorList>
+                                )}
+                              </MultiSelectorContent>
+                            </MultiSelector>
+                          )}
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="dbExtraSearchPath"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full">
-                    <FormItemLayout
-                      className="w-full px-8 py-8"
-                      layout="horizontal"
-                      label="Extra search path"
-                      description="Extra schemas to add to the search path of every request. Multiple schemas must be comma-separated."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          size="small"
-                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                          {...field}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  </FormItem_Shadcn_>
-                )}
-              />
+                          {!field.value.includes('public') &&
+                            form.getValues('enableDataApi') !== false &&
+                            field.value.length > 0 && (
+                              <Admonition
+                                type="default"
+                                title="The public schema for this project is not exposed"
+                                className="mt-2"
+                              >
+                                <>
+                                  <p>
+                                    You will not be able to query tables and views in the{' '}
+                                    <code>public</code> schema via supabase-js or HTTP clients.
+                                  </p>
+                                  {isGraphqlExtensionEnabled && (
+                                    <>
+                                      <p>
+                                        Tables in the <code className="text-xs">public</code> schema
+                                        are still exposed over our GraphQL endpoints.
+                                      </p>
+                                      <Button asChild type="default">
+                                        <Link href={`/project/${projectRef}/database/extensions`}>
+                                          Disable the pg_graphql extension
+                                        </Link>
+                                      </Button>
+                                    </>
+                                  )}
+                                </>
+                              </Admonition>
+                            )}
+                        </FormItemLayout>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="maxRows"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full">
-                    <FormItemLayout
-                      className="w-full px-8 py-8"
-                      layout="horizontal"
-                      label="Max rows"
-                      description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          size="small"
-                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                          {...field}
-                          type="number"
-                          {...form.register('maxRows', {
-                            valueAsNumber: true, // Ensure the value is handled as a number
-                          })}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  </FormItem_Shadcn_>
-                )}
-              />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="dbExtraSearchPath"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormItemLayout
+                          className="w-full px-8 py-8"
+                          layout="horizontal"
+                          label="Extra search path"
+                          description="Extra schemas to add to the search path of every request. Multiple schemas must be comma-separated."
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              size="small"
+                              disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                              {...field}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="dbPool"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full">
-                    <FormItemLayout
-                      className="w-full px-8 py-8"
-                      layout="horizontal"
-                      label="Pool size"
-                      description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          size="small"
-                          disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
-                          {...field}
-                          type="number"
-                          placeholder="Configured automatically based on compute size"
-                          onChange={(e) =>
-                            field.onChange(e.target.value === '' ? null : Number(e.target.value))
-                          }
-                          value={field.value === null ? '' : field.value}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  </FormItem_Shadcn_>
-                )}
-              />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="maxRows"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormItemLayout
+                          className="w-full px-8 py-8"
+                          layout="horizontal"
+                          label="Max rows"
+                          description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              size="small"
+                              disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                              {...field}
+                              type="number"
+                              {...form.register('maxRows', {
+                                valueAsNumber: true, // Ensure the value is handled as a number
+                              })}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="dbPool"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormItemLayout
+                          className="w-full px-8 py-8"
+                          layout="horizontal"
+                          label="Pool size"
+                          description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              size="small"
+                              disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
+                              {...field}
+                              type="number"
+                              placeholder="Configured automatically based on compute size"
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === '' ? null : Number(e.target.value)
+                                )
+                              }
+                              value={field.value === null ? '' : field.value}
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
             </>
           )}
         </FormPanel>
