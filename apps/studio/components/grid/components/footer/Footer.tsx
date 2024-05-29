@@ -27,7 +27,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
 
   return (
     <div className="flex min-h-9 overflow-hidden items-center px-5 w-full border-t">
-      {selectedView === 'data' && <Pagination isLoading={isLoading} />}
+      {selectedView === 'data' && <Pagination />}
 
       <div className="ml-auto flex items-center gap-2">
         {selectedTable && selectedView === 'data' && (
