@@ -47,7 +47,7 @@ const EdgeFunctionDetails = () => {
   const { data: settings } = useProjectApiQuery({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
-  const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
@@ -80,15 +80,19 @@ const EdgeFunctionDetails = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
-    try {
-      await updateEdgeFunction({
+    updateEdgeFunction(
+      {
         projectRef,
         slug: selectedFunction.slug,
         payload: values,
-      })
-      resetForm({ values, initialValues: values })
-      toast.success(`Successfully updated edge function`)
-    } catch (error) {}
+      },
+      {
+        onSuccess: () => {
+          resetForm({ values, initialValues: values })
+          toast.success(`Successfully updated edge function`)
+        },
+      }
+    )
   }
 
   const onConfirmDelete = async () => {

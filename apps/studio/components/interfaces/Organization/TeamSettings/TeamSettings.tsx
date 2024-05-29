@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -16,7 +17,7 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Button, IconSearch, Input, Modal } from 'ui'
+import { Button, Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -52,22 +53,25 @@ const TeamSettings = () => {
   const canAddMembers = rolesAddable.length > 0
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
-  const { mutateAsync: deleteMember } = useOrganizationMemberDeleteMutation()
+  const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
+    onSuccess: () => {
+      setIsLeaving(false)
+      setIsLeaveTeamModalOpen(false)
+      window?.location.replace('/') // Force reload to clear Store
+    },
+    onError: (error) => {
+      setIsLeaving(false)
+      toast.error(`Failed to leave organization: ${error?.message}`)
+    },
+  })
 
   const [isLeaveTeamModalOpen, setIsLeaveTeamModalOpen] = useState(false)
 
   const leaveTeam = async () => {
+    if (!slug) return console.error('Org slug is required')
+
     setIsLeaving(true)
-    try {
-      if (!slug) return console.error('Org slug is required')
-      await deleteMember({ slug, gotrueId: profile!.gotrue_id })
-      setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
-    } catch (error: any) {
-      toast.error(`Failed to leave organization: ${error?.message}`)
-    } finally {
-      setIsLeaving(false)
-    }
+    deleteMember({ slug, gotrueId: profile!.gotrue_id })
   }
 
   return (
@@ -76,7 +80,7 @@ const TeamSettings = () => {
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="justify-between">
             <Input
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size={12} />}
               size="small"
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
