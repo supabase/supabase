@@ -10,6 +10,10 @@ test.describe('Table Editor page', () => {
     const name = 'TestTable-' + Math.floor(Math.random() * 100)
 
     await page.goto('/project/default/editor')
+
+    await page.waitForResponse(
+      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types'
+    )
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await page
       .locator('.col-span-8 > div > .relative > .peer\\/input')
