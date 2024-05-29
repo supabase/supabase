@@ -24,7 +24,6 @@ import {
   Skeleton,
   Switch,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -34,7 +33,6 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { boolean } from 'yup'
 import { z } from 'zod'
 
 const formSchema = z
@@ -72,11 +70,7 @@ const PostgrestConfig = () => {
     connectionString: project?.connectionString,
   })
 
-  const {
-    data: config,
-    isLoading: isLoadingPostgrestConfigQuery,
-    isError,
-  } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
 
   console.log('config', config)
 
