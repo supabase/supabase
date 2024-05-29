@@ -197,21 +197,13 @@ const PostgrestConfig = () => {
                             <MultiSelectorInput placeholder="Select schemas for Data API..." />
                           </MultiSelectorTrigger>
                           <MultiSelectorContent>
-                            {schema.length <= 0 ? (
-                              <MultiSelectorList>
-                                <MultiSelectorItem key={'empty'} value={'no'}>
-                                  no
+                            <MultiSelectorList>
+                              {schema.map((x, i) => (
+                                <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
+                                  {x.name}
                                 </MultiSelectorItem>
-                              </MultiSelectorList>
-                            ) : (
-                              <MultiSelectorList>
-                                {schema.map((x, i) => (
-                                  <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
-                                    {x.name}
-                                  </MultiSelectorItem>
-                                ))}
-                              </MultiSelectorList>
-                            )}
+                              ))}
+                            </MultiSelectorList>
                           </MultiSelectorContent>
                         </MultiSelector>
                       )}
