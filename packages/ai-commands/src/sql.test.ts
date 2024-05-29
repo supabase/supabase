@@ -4,6 +4,8 @@ import OpenAI from 'openai'
 import {
   assertAndUnwrapNode,
   assertDefined,
+  assertEitherSideOfExpression,
+  assertNodeType,
   getPolicies,
   getPolicyInfo,
   unwrapNode,
@@ -172,34 +174,25 @@ describe('rls chat', () => {
       'Expected USING to contain an expression'
     )
 
-    assertDefined(usingExpression.lexpr, 'Expected left side of USING expression to exist')
-    assertDefined(usingExpression.rexpr, 'Expected right side of USING expression to exist')
+    assertEitherSideOfExpression(usingExpression, (node) => {
+      const functionCall = unwrapNode(node, 'FuncCall')
 
-    const leftFunctionCall = unwrapNode(usingExpression.lexpr, 'FuncCall')
-    const rightFunctionCall = unwrapNode(usingExpression.lexpr, 'FuncCall')
+      if (functionCall) {
+        throw new Error('Expected function call to be wrapped in a select sub-query')
+      }
 
-    if (leftFunctionCall || rightFunctionCall) {
-      throw new Error('Expected function call to be wrapped in a select sub-query')
-    }
+      const subQuery = unwrapNode(node, 'SubLink')
 
-    const leftSubQuery = unwrapNode(usingExpression.lexpr, 'SubLink')
-    const rightSubQuery = unwrapNode(usingExpression.rexpr, 'SubLink')
-
-    if (!leftSubQuery && !rightSubQuery) {
-      throw new Error('Expected a sub-query wrapping the function')
-    }
-
-    const hasFunctionWrappedSubQuery = [leftSubQuery, rightSubQuery].some((subQuery) => {
       if (!subQuery) {
-        return false
+        throw new Error('Expected a sub-query wrapping the function')
       }
 
       assertDefined(subQuery.subselect, 'Expected SubLink to contain a subselect')
-      const selectStatement = unwrapNode(subQuery.subselect, 'SelectStmt')
-
-      if (!selectStatement) {
-        return false
-      }
+      const selectStatement = assertAndUnwrapNode(
+        subQuery.subselect,
+        'SelectStmt',
+        'Expected subselect to contain a SELECT statement'
+      )
 
       assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
 
@@ -207,16 +200,10 @@ describe('rls chat', () => {
         assertAndUnwrapNode(node, 'ResTarget', 'Expected every select target to be a ResTarget')
       )
 
-      if (!target) {
-        return false
-      }
-
+      assertDefined(target, 'Expected select sub-query to have a function target')
       assertDefined(target.val, 'Expected ResTarget to have a val')
-
-      return unwrapNode(target.val, 'FuncCall') !== undefined
+      assertNodeType(target.val, 'FuncCall', 'Expected sub-query to contain a function call')
     })
-
-    expect(hasFunctionWrappedSubQuery).toBe(true)
   })
 
   test('splits multiple operations into separate policies', async () => {

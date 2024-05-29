@@ -82,6 +82,32 @@ export function unwrapNode<T extends Node, U extends ExtractKeys<Node>>(
 }
 
 /**
+ * Asserts that either the left or right side of the
+ * expression is processed through `fn` without throwing
+ * any errors.
+ *
+ * If both sides throw errors, the assertion fails and the
+ * error from the left side will be thrown.
+ */
+export function assertEitherSideOfExpression<U>(
+  expression: A_Expr,
+  fn: (node: Node, side: 'left' | 'right') => U
+): U {
+  assertDefined(expression.lexpr, 'Expected left side of expression to exist')
+  assertDefined(expression.rexpr, 'Expected right side of expression to exist')
+
+  try {
+    return fn(expression.lexpr, 'left')
+  } catch (leftError) {
+    try {
+      return fn(expression.rexpr, 'right')
+    } catch (rightError) {
+      throw leftError
+    }
+  }
+}
+
+/**
  * Extracts all the `CREATE POLICY` statements
  * from a SQL string as parsed ASTs.
  */
