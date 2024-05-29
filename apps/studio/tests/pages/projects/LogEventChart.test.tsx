@@ -7,7 +7,7 @@ import { render } from '../../helpers'
 const { ResizeObserver } = window
 
 beforeEach(() => {
-  delete window.ResizeObserver
+  delete (window as any).ResizeObserver
   window.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
@@ -24,7 +24,10 @@ test('renders chart', async () => {
   const tsMicro = new Date().getTime() * 1000
   render(
     <LogEventChart
-      data={[{ timestamp: tsMicro }, { timestamp: tsMicro + 1 }]}
+      data={[
+        { timestamp: tsMicro.toString(), count: 1 },
+        { timestamp: (tsMicro + 1).toString(), count: 2 },
+      ]}
       onBarClick={mockFn}
     />
   )
