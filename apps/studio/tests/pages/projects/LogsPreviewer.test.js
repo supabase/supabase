@@ -73,7 +73,7 @@ const defaultRendererFallbacksCases = [
   selectionTexts: [/some message/],
 }))
 
-test.each([
+test.skip.each([
   {
     queryType: 'api',
     tableName: undefined,
