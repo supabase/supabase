@@ -6,17 +6,19 @@ export const getEntityLintDetails = (
   lintLevels: ('ERROR' | 'WARN')[],
   lints: Lint[],
   schema: string
-): { hasLint: boolean; count: number } => {
-  const matchingLints = lints?.filter(
-    (lint) =>
-      lint?.metadata?.name === entityName &&
-      lint?.metadata?.schema === schema &&
-      lint?.name === lintName &&
-      lintLevels.includes(lint?.level as 'ERROR' | 'WARN')
-  )
+): { hasLint: boolean; count: number; matchingLint: Lint | null } => {
+  const matchingLint =
+    lints?.find(
+      (lint) =>
+        lint?.metadata?.name === entityName &&
+        lint?.metadata?.schema === schema &&
+        lint?.name === lintName &&
+        lintLevels.includes(lint?.level as 'ERROR' | 'WARN')
+    ) || null
 
   return {
-    hasLint: matchingLints.length > 0,
-    count: matchingLints.length,
+    hasLint: matchingLint !== null,
+    count: matchingLint ? 1 : 0,
+    matchingLint,
   }
 }

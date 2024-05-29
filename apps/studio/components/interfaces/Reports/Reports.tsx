@@ -37,7 +37,6 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
-  const hasReadReplicasEnabled = project?.is_read_replicas_enabled
 
   const [config, setConfig] = useState<any>(undefined)
   const [startDate, setStartDate] = useState<any>(null)
@@ -284,8 +283,7 @@ const Reports = () => {
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           )}
-
-          {hasReadReplicasEnabled && <DatabaseSelector />}
+          <DatabaseSelector />
         </div>
       </div>
 
