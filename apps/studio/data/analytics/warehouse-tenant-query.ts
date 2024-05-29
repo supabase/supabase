@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
 import { get, handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
 
 export type WarehouseTenantVariables = {
   projectRef: string
