@@ -260,14 +260,10 @@ const TableGridEditor = ({
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <GridHeaderActions
-              table={selectedTable as PostgresTable}
-              canEditViaTableEditor={canEditViaTableEditor}
-              isViewSelected={isViewSelected}
-              isTableSelected={isTableSelected}
-            />
-          ) : null
+          <GridHeaderActions
+            table={selectedTable as TableLike}
+            canEditViaTableEditor={canEditViaTableEditor}
+          />
         }
         onAddColumn={snap.onAddColumn}
         onEditColumn={onSelectEditColumn}
@@ -278,7 +274,7 @@ const TableGridEditor = ({
         onImportData={snap.onImportData}
         onError={onError}
         onExpandJSONEditor={(column, row) => {
-          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+          snap.onExpandJSONEditor({ column, row, value: JSON.stringify(row[column]) || '' })
         }}
         onExpandTextEditor={(column, row) => {
           snap.onExpandTextEditor(column, row)

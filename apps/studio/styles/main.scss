@@ -254,3 +254,7 @@ div[data-radix-portal]:not(.portal--toast) {
 [data-radix-popper-content-wrapper] {
   @apply z-50 #{!important};
 }
+
+.settings-container {
+  @apply mx-auto max-w-4xl xl:max-w-6xl;
+}

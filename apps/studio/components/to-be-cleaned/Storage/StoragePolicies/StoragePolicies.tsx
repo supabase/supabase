@@ -106,21 +106,24 @@ const StoragePolicies = () => {
       return true
     }
 
-    return await Promise.all(
-      payloads.map(async (payload) => {
-        try {
-          await createDatabasePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            payload,
-          })
-          return false
-        } catch (error: any) {
-          toast.error(`Error adding policy: ${error.message}`)
-          return true
-        }
-      })
-    )
+    try {
+      return await Promise.all(
+        payloads.map(async (payload) => {
+          try {
+            await createDatabasePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              payload,
+            })
+            return false
+          } catch (error: any) {
+            toast.error(`Error adding policy: ${error.message}`)
+            return true
+          }
+        })
+      )
+    } finally {
+    }
   }
 
   const onCreatePolicy = async (payload: any) => {
