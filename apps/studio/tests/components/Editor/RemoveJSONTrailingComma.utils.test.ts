@@ -1,4 +1,4 @@
-import { removeJSONTrailingComma } from 'lib/helpers.ts'
+import { removeJSONTrailingComma } from 'lib/helpers'
 
 describe('removeJSONTrailingComma', () => {
   it('should handle an empty object', () => {

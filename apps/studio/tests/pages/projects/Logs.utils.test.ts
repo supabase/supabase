@@ -76,30 +76,30 @@ import { isEqual } from 'lodash'
 
 const base = dayjs().subtract(2, 'day')
 const baseIso = base.toISOString()
-test.skip.each([
-  {
-    case: 'next start is after initial start',
-    initial: [base.subtract(1, 'day').toISOString(), baseIso],
-    next: [base.subtract(2, 'day').toISOString(), null],
-    expected: [base.subtract(2, 'day').toISOString(), baseIso],
-  },
-  {
-    case: 'next end is before initial start',
-    initial: [base.subtract(1, 'day').toISOString(), baseIso],
-    next: [null, base.subtract(2, 'day').toISOString()],
-    expected: [base.subtract(3, 'day').toISOString(), base.subtract(2, 'day').toISOString()],
-  },
-  {
-    case: 'next end is not before initial start',
-    initial: [base.subtract(2, 'day').toISOString(), baseIso],
-    next: [null, base.subtract(1, 'day').toISOString()],
-    expected: [base.subtract(2, 'day').toISOString(), base.subtract(1, 'day').toISOString()],
-  },
-])('ensure no timestamp conflict: $case', ({ initial, next, expected }) => {
-  const result = ensureNoTimestampConflict(initial, next)
-  expect(result[0]).toEqual(expected[0])
-  expect(result[1]).toEqual(expected[1])
-})
+// test.skip.each([
+//   {
+//     case: 'next start is after initial start',
+//     initial: [base.subtract(1, 'day').toISOString(), baseIso],
+//     next: [base.subtract(2, 'day').toISOString(), null],
+//     expected: [base.subtract(2, 'day').toISOString(), baseIso],
+//   },
+//   {
+//     case: 'next end is before initial start',
+//     initial: [base.subtract(1, 'day').toISOString(), baseIso],
+//     next: [null, base.subtract(2, 'day').toISOString()],
+//     expected: [base.subtract(3, 'day').toISOString(), base.subtract(2, 'day').toISOString()],
+//   },
+//   {
+//     case: 'next end is not before initial start',
+//     initial: [base.subtract(2, 'day').toISOString(), baseIso],
+//     next: [null, base.subtract(1, 'day').toISOString()],
+//     expected: [base.subtract(2, 'day').toISOString(), base.subtract(1, 'day').toISOString()],
+//   },
+// ])('ensure no timestamp conflict: $case', ({ initial, next, expected }) => {
+//   const result = ensureNoTimestampConflict(initial, next)
+//   expect(result[0]).toEqual(expected[0])
+//   expect(result[1]).toEqual(expected[1])
+// })
 
 // test for log trunc filling
 test.skip.each([

@@ -2,7 +2,7 @@ import { inferColumnType } from 'components/interfaces/TableGridEditor/SidePanel
 
 describe('SpreadsheedImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {
-    const mockData = []
+    const mockData: any[] = []
     const type = inferColumnType('id', mockData)
     expect(type).toBe('text')
   })

@@ -259,15 +259,13 @@ const LogTable = ({
       </div>
 
       <div className="flex items-center gap-2">
-        {onHistogramToggle && (
-          <Button
-            type="default"
-            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-            onClick={onHistogramToggle}
-          >
-            Histogram
-          </Button>
-        )}
+        <Button
+          type="default"
+          icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+          onClick={onHistogramToggle}
+        >
+          Histogram
+        </Button>
       </div>
 
       <div className="space-x-2">

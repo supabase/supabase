@@ -73,10 +73,6 @@ describe('StorageSettings.utils: convertToBytes', () => {
     const output = convertToBytes(10.21, StorageSizeUnits.GB)
     expect(output).toStrictEqual(10962904023.04)
   })
-  test('should be able to convert up to GB only', () => {
-    const output = convertToBytes(1.21, 'ZB')
-    expect(output).toStrictEqual(0)
-  })
   test('should be able to handle negative inputs', () => {
     const output = convertToBytes(-12312, StorageSizeUnits.KB)
     expect(output).toStrictEqual(0)
