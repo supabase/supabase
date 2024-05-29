@@ -1,13 +1,14 @@
+import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import dynamic from 'next/dynamic';
 
-// Rename the dynamic import to DynamicJwtGenerator
-const DynamicJwtGenerator = dynamic(() => import('./JwtGenerator'), { ssr: false });
+const DynamicJwtGenerator = dynamic(() => import('./JwtGenerator'), { ssr: false })
 
-export function MyComponent() {
+const JwtGenerator = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DynamicJwtGenerator />
     </Suspense>
   )
 }
+
+export { JwtGenerator }
