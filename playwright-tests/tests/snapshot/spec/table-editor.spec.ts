@@ -1,7 +1,7 @@
 import { Page, expect, test } from '@playwright/test'
 
 const dismissToast = async (page: Page) => {
-  await page.locator('#toast').waitFor({ state: 'visible' })
+  await page.locator('#toast').getByRole('button').waitFor({ state: 'visible' })
   await page.locator('#toast').getByRole('button').click()
 }
 
