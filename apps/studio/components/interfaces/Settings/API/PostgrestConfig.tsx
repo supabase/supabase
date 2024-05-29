@@ -72,8 +72,6 @@ const PostgrestConfig = () => {
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
 
-  console.log('config', config)
-
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
