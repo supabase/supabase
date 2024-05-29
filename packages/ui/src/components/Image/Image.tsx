@@ -11,14 +11,10 @@ interface Props {
   responsive?: boolean
 }
 
-export default function Image({
-  source,
-  style,
-  className,
-  type,
-  alt,
-  responsive,
-}: Props) {
+/**
+ * @deprecated Use Next/Image instead
+ */
+export default function Image({ source, style, className, type, alt, responsive }: Props) {
   // let classes = [ImageStyles['sbui-image-normal']]
   // classes.push(type === 'rounded' && ImageStyles['sbui-image-rounded'])
   // classes.push(type === 'circle' && ImageStyles['sbui-image-circle'])

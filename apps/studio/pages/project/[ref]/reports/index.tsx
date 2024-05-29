@@ -34,7 +34,7 @@ export const UserReportPage: NextPageWithLayout = () => {
   })
 
   return (
-    <div className="mx-auto my-32 w-full max-w-7xl flex-grow space-y-16">
+    <div className="h-full w-full">
       {isLoading ? (
         <Loading />
       ) : (

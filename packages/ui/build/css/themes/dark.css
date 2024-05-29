@@ -29,6 +29,7 @@
   --destructive-400: 6.7deg 60% 20.6%;
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
+  --background-surface-75: 0deg 0% 12.5%;
   --background-200: 0deg 0% 11%;
   --foreground-contrast: 0deg 0% 11%;
   --border-button-hover: var(--colors-gray-dark-800);
@@ -49,7 +50,6 @@
   --background-surface-300: var(--colors-gray-dark-500);
   --background-surface-200: var(--colors-gray-dark-400);
   --background-surface-100: var(--colors-gray-dark-300);
-  --background-surface-75: var(--colors-gray-dark-200);
   --background-control: var(--colors-gray-dark-300);
   --background-selection: var(--colors-gray-dark-600);
   --background-alternative-default: var(--colors-gray-dark-100);
