@@ -63,7 +63,7 @@ To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/proje
 
 ### Deploying a Read Replica
 
-A Read Replica is deployed by using a physical backup as a starting point, and a combination of WAL file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete. The duration of restoring from a physical backup is roughly dependent and directly related to the database size of your project. As for catching up with WAL file archives and direct replication, this would be dependent on the amount of WAL files and transactions to be replayed. These are then dependent on the activity of the Primary database. The more active it is, the more WAL files and transactions are generated.
+A Read Replica is deployed by using a physical backup as a starting point, and a combination of WAL file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete. The duration of restoring from a physical backup is roughly dependent and directly related to the database size of your project. The time taken to catch up to the primary using WAL archives and direct replication is dependent on the level of activity on the Primary database; a more active database will produce a larger number of WAL files that will need to be processed.
 
 Along with the progress of the deployment, the dashboard displays rough estimates for each component.
 
