@@ -34,7 +34,6 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
   "devDependencies": {
-    "@vitest/ui": "^1.6.0",
     "eslint": "^8.57.0",
     "eslint-config-custom": "*",
     "next-router-mock": "^0.9.13",
