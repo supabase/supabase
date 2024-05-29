@@ -1,22 +1,22 @@
-import { useParams } from 'common'
-import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { DatabaseLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks'
-import { useState } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { LoadingLine } from 'ui'
+import { useEffect, useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
+import { FormHeader } from 'components/ui/Forms'
+import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSelectedProject } from 'hooks'
+import type { NextPageWithLayout } from 'types'
+import { LoadingLine } from 'ui'
+import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset } = useParams()
+  const { preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -28,13 +28,35 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
+
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
+  const {
+    data,
+    isLoading: areLintsLoading,
+    isRefetching,
+    refetch: refetchLintsQuery,
+  } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
-  const activeLints = data?.filter((x) => x.categories.includes('PERFORMANCE')) || []
+  const isLoading = areLintsLoading
+
+  const refetch = () => {
+    refetchLintsQuery()
+  }
+
+  let clientLints: Lint[] = []
+
+  const activeLints = useMemo(() => {
+    return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('SECURITY'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  useEffect(() => {
+    // check the URL for an ID and set the selected lint
+    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  }, [id, activeLints])
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
@@ -57,7 +79,7 @@ const ProjectLints: NextPageWithLayout = () => {
     <div className="h-full flex flex-col">
       <FormHeader
         className="py-4 px-6 !mb-0"
-        title="Performance Advisor"
+        title="Security Advisor"
         docsUrl="https://supabase.com/docs/guides/database/database-linter"
       />
       <LintPageTabs
@@ -82,11 +104,16 @@ const ProjectLints: NextPageWithLayout = () => {
         setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
-      <LinterPageFooter isLoading={isLoading} isRefetching={isRefetching} refetch={refetch} />
+      <LinterPageFooter
+        hideDbInspectCTA
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        refetch={refetch}
+      />
     </div>
   )
 }
 
-ProjectLints.getLayout = (page) => <DatabaseLayout title="Linter">{page}</DatabaseLayout>
+ProjectLints.getLayout = (page) => <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
 
 export default ProjectLints

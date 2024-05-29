@@ -138,11 +138,6 @@ const PostgrestConfig = () => {
         }
       }) ?? []
 
-  const isPublicSchemaEnabled = config?.db_schema
-    .split(',')
-    .map((name) => name.trim())
-    .includes('public')
-
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
