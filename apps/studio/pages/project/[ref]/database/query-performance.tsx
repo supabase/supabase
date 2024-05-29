@@ -27,7 +27,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
 
-  const showReadReplicasUI = project?.is_read_replicas_enabled
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
@@ -53,7 +52,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         className="py-4 px-6 !mb-0"
         title="Query Performance"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        actions={showReadReplicasUI ? <DatabaseSelector /> : null}
+        actions={<DatabaseSelector />}
       />
       <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
     </div>

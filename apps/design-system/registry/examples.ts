@@ -987,6 +987,26 @@ export const examples: Registry = [
     files: ['example/multi-select-form.tsx'],
   },
   {
+    name: 'tree-view-demo',
+    type: 'components:example',
+    files: ['example/tree-view-demo.tsx'],
+  },
+  {
+    name: 'tree-view-edit',
+    type: 'components:example',
+    files: ['example/tree-view-edit.tsx'],
+  },
+  {
+    name: 'tree-view-directories',
+    type: 'components:example',
+    files: ['example/tree-view-directories.tsx'],
+  },
+  {
+    name: 'tree-view-multi-select',
+    type: 'components:example',
+    files: ['example/tree-view-multi-select.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],

@@ -1,9 +1,9 @@
-import { Keyboard } from 'lucide-react'
+import { AlignLeft, Check, Command, CornerDownLeft, Keyboard, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
+import { useLocalStorageQuery } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -13,11 +13,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlignLeft,
-  IconCheck,
-  IconCommand,
-  IconCornerDownLeft,
-  IconLoader,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -43,9 +38,7 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
-  const showReadReplicasUI = project?.is_read_replicas_enabled
 
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -75,7 +68,7 @@ const UtilityActions = ({
             }}
           >
             <p>Intellisense enabled</p>
-            {intellisenseEnabled && <IconCheck className="text-brand" />}
+            {intellisenseEnabled && <Check className="text-brand" />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -88,7 +81,7 @@ const UtilityActions = ({
             type="text"
             onClick={() => prettifyQuery()}
             className="px-1"
-            icon={<IconAlignLeft size="tiny" strokeWidth={2} className="text-gray-1100" />}
+            icon={<AlignLeft size="tiny" strokeWidth={2} />}
           />
         </TooltipTrigger_Shadcn_>
         <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
@@ -96,16 +89,8 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
-          {showReadReplicasUI && (
-            <DatabaseSelector
-              variant="connected-on-right"
-              onSelectId={() => snap.resetResult(id)}
-            />
-          )}
-          <RoleImpersonationPopover
-            serviceRoleLabel="postgres"
-            variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
-          />
+          <DatabaseSelector variant="connected-on-right" onSelectId={() => snap.resetResult(id)} />
+          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
@@ -113,15 +98,15 @@ const UtilityActions = ({
             size="tiny"
             iconRight={
               isExecuting ? (
-                <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
+                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
               ) : (
                 <div className="flex items-center space-x-1">
                   {os === 'macos' ? (
-                    <IconCommand size={10} strokeWidth={1.5} />
+                    <Command size={10} strokeWidth={1.5} />
                   ) : (
                     <p className="text-xs text-foreground-light">CTRL</p>
                   )}
-                  <IconCornerDownLeft size={10} strokeWidth={1.5} />
+                  <CornerDownLeft size={10} strokeWidth={1.5} />
                 </div>
               )
             }
