@@ -259,7 +259,6 @@ const LogTable = ({
       </div>
 
       <div className="flex items-center gap-2">
-        aaaaa
         <Button
           type="default"
           icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
