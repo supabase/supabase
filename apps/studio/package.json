@@ -151,6 +151,7 @@
     "common": "*",
     "config": "*",
     "eslint-config-next": "^14.2.3",
+    "msw": "^2.3.0",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
     "storybook-dark-mode": "^3.0.1",

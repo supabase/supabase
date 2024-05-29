@@ -55,8 +55,5 @@
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "volta": {
     "node": "20.11.1"
-  },
-  "dependencies": {
-    "msw": "^2.3.0"
   }
 }
