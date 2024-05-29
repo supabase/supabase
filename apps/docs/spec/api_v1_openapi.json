@@ -312,7 +312,7 @@
     "/v1/oauth/authorize": {
       "get": {
         "operationId": "v1-authorize-user",
-        "summary": "Authorize user through oauth",
+        "summary": "[Beta] Authorize user through oauth",
         "parameters": [
           {
             "name": "client_id",
@@ -409,7 +409,7 @@
     "/v1/oauth/token": {
       "post": {
         "operationId": "v1-exchange-oauth-token",
-        "summary": "Exchange auth code for user's access and refresh token",
+        "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -702,7 +702,7 @@
     "/v1/projects/{ref}/custom-hostname": {
       "get": {
         "operationId": "v1-get-hostname-config",
-        "summary": "Gets project's custom hostname config",
+        "summary": "[Beta] Gets project's custom hostname config",
         "parameters": [
           {
             "name": "ref",
@@ -745,7 +745,7 @@
       },
       "delete": {
         "operationId": "v1-Delete hostname config",
-        "summary": "Deletes a project's custom hostname configuration",
+        "summary": "[Beta] Deletes a project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -783,7 +783,7 @@
     "/v1/projects/{ref}/custom-hostname/initialize": {
       "post": {
         "operationId": "v1-update-hostname-config",
-        "summary": "Updates project's custom hostname configuration",
+        "summary": "[Beta] Updates project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -838,7 +838,7 @@
     "/v1/projects/{ref}/custom-hostname/reverify": {
       "post": {
         "operationId": "v1-verify-dns-config",
-        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -883,7 +883,7 @@
     "/v1/projects/{ref}/custom-hostname/activate": {
       "post": {
         "operationId": "v1-activate-custom-hostname",
-        "summary": "Activates a custom hostname for a project.",
+        "summary": "[Beta] Activates a custom hostname for a project.",
         "parameters": [
           {
             "name": "ref",
@@ -1859,7 +1859,7 @@
     "/v1/projects/{ref}/upgrade": {
       "post": {
         "operationId": "v1-upgrade-postgres-version",
-        "summary": "Upgrades the project's Postgres version",
+        "summary": "[Beta] Upgrades the project's Postgres version",
         "parameters": [
           {
             "name": "ref",
@@ -1914,7 +1914,7 @@
     "/v1/projects/{ref}/upgrade/eligibility": {
       "get": {
         "operationId": "v1-get-postgrest-upgrade-eligibility",
-        "summary": "Returns the project's eligibility for upgrades",
+        "summary": "[Beta] Returns the project's eligibility for upgrades",
         "parameters": [
           {
             "name": "ref",
@@ -1959,7 +1959,7 @@
     "/v1/projects/{ref}/upgrade/status": {
       "get": {
         "operationId": "v1-get-postgrest-upgrade-status",
-        "summary": "Gets the latest status of the project's upgrade",
+        "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
             "name": "ref",
@@ -2527,7 +2527,7 @@
     "/v1/projects/{ref}/database/webhooks/enable": {
       "post": {
         "operationId": "v1-enable-database-webhook",
-        "summary": "Enables Database Webhooks on the project",
+        "summary": "[Beta] Enables Database Webhooks on the project",
         "parameters": [
           {
             "name": "ref",
@@ -3578,6 +3578,9 @@
           "pr_number": {
             "type": "number"
           },
+          "latest_check_run_id": {
+            "type": "number"
+          },
           "reset_on_push": {
             "type": "boolean"
           },
@@ -3772,7 +3775,8 @@
           },
           "kps_enabled": {
             "type": "boolean",
-            "deprecated": true
+            "deprecated": true,
+            "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
             "$ref": "#/components/schemas/DesiredInstanceSize"
@@ -5252,8 +5256,7 @@
             "nullable": true
           },
           "mailer_otp_exp": {
-            "type": "number",
-            "nullable": true
+            "type": "number"
           },
           "mailer_otp_length": {
             "type": "number",
@@ -5420,8 +5423,7 @@
             "nullable": true
           },
           "sms_otp_length": {
-            "type": "number",
-            "nullable": true
+            "type": "number"
           },
           "sms_provider": {
             "type": "string",
