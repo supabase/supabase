@@ -36,7 +36,6 @@
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-custom": "*",
-    "next-router-mock": "^0.9.13",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
     "sass": "^1.72.0",
