@@ -89,7 +89,10 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
   expect(mockFn).toBeCalled()
 
   const call = mockFn.mock.calls[0][0]
-  // Adjust the expectation to match the received value
-  expect(call.to).toMatch(dayjs().date(21).hour(15).toISOString()) // Adjusted expectation
-  expect(call.from).toMatch(dayjs().date(20).hour(0).toISOString())
+  console.log(mockFn.mock.calls)
+
+  expect(call).toMatchObject({
+    from: dayjs().date(20).hour(0).minute(0).second(0).millisecond(0).toISOString(),
+    to: dayjs().date(21).hour(12).minute(59).second(59).millisecond(0).toISOString(),
+  })
 })

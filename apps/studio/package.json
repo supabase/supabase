@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest --run",
-    "test:watch": "vitest --watch",
+    "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "test:update": "vitest --run --update",
     "test:update:watch": "vitest --watch --update",
