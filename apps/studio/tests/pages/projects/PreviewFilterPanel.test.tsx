@@ -6,14 +6,14 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import { render } from '../../helpers'
 import { clickDropdown } from 'tests/helpers'
 
-// test('filter input change and submit', async () => {
-//   const mockFn = vi.fn()
-//   render(<PreviewFilterPanel  onSearch={mockFn} queryUrl={'/'} />)
-//   expect(mockFn).not.toBeCalled()
-//   const search = screen.getByPlaceholderText(/Search/)
-//   userEvent.type(search, '12345{enter}')
-//   expect(mockFn).toBeCalled()
-// })
+test.skip('filter input change and submit', async () => {
+  const mockFn = vi.fn()
+  // render(<PreviewFilterPanel  onSearch={mockFn} queryUrl={'/'} />)
+  expect(mockFn).not.toBeCalled()
+  const search = screen.getByPlaceholderText(/Search/)
+  userEvent.type(search, '12345{enter}')
+  expect(mockFn).toBeCalled()
+})
 
 // test('filter input value', async () => {
 //   render(<PreviewFilterPanel defaultSearchValue={'1234'} queryUrl={'/'} />)

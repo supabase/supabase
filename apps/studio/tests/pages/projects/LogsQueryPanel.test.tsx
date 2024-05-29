@@ -7,6 +7,18 @@ import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 test('run and clear', async () => {
   const mockRun = vi.fn()
   const mockClear = vi.fn()
-  render(<LogsQueryPanel warnings={[]} onRun={mockRun} onClear={mockClear} hasEditorValue />)
+  render(
+    <LogsQueryPanel
+      defaultFrom=""
+      defaultTo=""
+      isLoading={false}
+      onDateChange={() => {}}
+      onSelectSource={() => {}}
+      onSelectTemplate={() => {}}
+      warnings={[]}
+      onClear={mockClear}
+      hasEditorValue
+    />
+  )
   await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()
 })
