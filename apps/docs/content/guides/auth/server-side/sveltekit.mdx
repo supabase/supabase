@@ -118,7 +118,7 @@ const supabase: Handle = async ({ event, resolve }) => {
     return { session, user }
   }
 
-  return resolve(event, {
+  return await resolve(event, {
     filterSerializedResponseHeaders(name) {
       /**
        * Supabase libraries use the `content-range` and `x-supabase-api-version`
@@ -142,7 +142,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
     return redirect(303, '/private')
   }
 
-  return resolve(event)
+  return await resolve(event)
 }
 
 export const handle: Handle = sequence(supabase, authGuard)

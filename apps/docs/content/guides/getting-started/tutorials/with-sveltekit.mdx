@@ -109,7 +109,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     return { session, user }
   }
 
-  return resolve(event, {
+  return await resolve(event, {
     filterSerializedResponseHeaders(name) {
       return name === 'content-range' || name === 'x-supabase-api-version'
     },
