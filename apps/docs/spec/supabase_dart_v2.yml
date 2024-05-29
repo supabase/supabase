@@ -2214,7 +2214,7 @@ functions:
             .listBuckets();
           ```
         response: |
-          ```dart
+          ```json
           [
             Bucket(
               id: 'avatars',
@@ -2256,7 +2256,7 @@ functions:
             .getBucket('avatars');
           ```
         response: |
-          ```dart
+          ```json
           Bucket(
             id: 'avatars',
             name: 'avatars',
@@ -2312,7 +2312,7 @@ functions:
             .createBucket('avatars');
           ```
         response: |
-          ```dart
+          ```json
           'avatars'
           ```
 
@@ -2341,7 +2341,7 @@ functions:
             .emptyBucket('avatars');
           ```
         response: |
-          ```dart
+          ```json
           'Successfully emptied'
           ```
   - id: update-bucket
@@ -2386,7 +2386,7 @@ functions:
             .updateBucket('avatars', const BucketOptions(public: false));
           ```
         response: |
-          ```dart
+          ```json
           'Successfully updated'
           ```
 
@@ -2415,7 +2415,7 @@ functions:
             .deleteBucket('avatars');
           ```
         response: |
-          ```dart
+          ```json
           'Successfully deleted'
           ```
 
@@ -2475,7 +2475,7 @@ functions:
               );
           ```
         response: |
-          ```dart
+          ```json
           'avatars/public/avatar1.png'
           ```
       - id: upload-file-on-web
@@ -2490,7 +2490,7 @@ functions:
               );
           ```
         response: |
-          ```dart
+          ```json
           'avatars/public/avatar1.png'
           ```
 
@@ -2550,7 +2550,7 @@ functions:
               );
           ```
         response: |
-          ```dart
+          ```json
           'avatars/public/avatar1.png'
           ```
       - id: update-file-on-web
@@ -2565,7 +2565,7 @@ functions:
               );
           ```
         response: |
-          ```dart
+          ```json
           'avatars/public/avatar1.png'
           ```
 
@@ -2599,7 +2599,7 @@ functions:
             .move('public/avatar1.png', 'private/avatar2.png');
           ```
         response: |
-          ```dart
+          ```json
           'Successfully moved'
           ```
 
@@ -2674,7 +2674,7 @@ functions:
             );
           ```
         response: |
-          ```dart
+          ```json
           'https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>''
           ```
 
@@ -2730,7 +2730,7 @@ functions:
             .getPublicUrl('avatar1.png');
           ```
         response: |
-          ```dart
+          ```json
           'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
           ```
       - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
@@ -2750,7 +2750,7 @@ functions:
             );
           ```
         response: |
-          ```dart
+          ```json
           'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
           ```
 
@@ -2805,7 +2805,7 @@ functions:
             .download('avatar1.png');
           ```
         response: |
-          ```dart
+          ```json
           <Blob>
           ```
       - id: download-file-with-transform
@@ -2825,7 +2825,7 @@ functions:
             );
           ```
         response: |
-          ```dart
+          ```json
           <Blob>
           ```
 
@@ -2855,7 +2855,7 @@ functions:
             .remove(['avatar1.png']);
           ```
         response: |
-          ```dart
+          ```json
           [
             FileObject(
             name: 'avatar1.png',
@@ -2929,7 +2929,7 @@ functions:
             .list();
           ```
         response: |
-          ```dart
+          ```json
           [
             FileObject(
             name: 'avatar1.png',
