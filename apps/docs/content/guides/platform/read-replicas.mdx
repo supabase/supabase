@@ -69,7 +69,13 @@ Along with the progress of the deployment, the dashboard displays rough estimate
 
 ### What does it mean when "Init failed" is observed?
 
-The status `Init failed` indicates that the Read Replica has failed to deploy. It is safe to drop this failed Read Replica, and attempt to spin up another one. If however spinning up Read Replicas for your project consistently fails, open a support ticket [here](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
+The status `Init failed` indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica may have failed to be deployed:
+- Underlying instance failed to come up. 
+- Network issue leading to inability to connect to the Primary database.
+- Possible incompatible database settings between the Primary and Read Replica databases.
+- Platform issues.
+
+It is safe to drop this failed Read Replica, and in the event of a transient issue, attempt to spin up another one. If however spinning up Read Replicas for your project consistently fails, do check out our [status page](https://status.supabase.com) for any ongoing incidents, or open a support ticket [here](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
 
 ## Features
 
