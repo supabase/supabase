@@ -1,10 +1,8 @@
-import { Button } from 'ui'
-
+import { Button, cn } from 'ui'
 import CopyButton from 'components/ui/CopyButton'
 import { Loading } from 'components/ui/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
-import { X } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   isDefaultLogPreviewFormat,
   isUnixMicro,
@@ -19,6 +17,9 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import { X } from 'lucide-react'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import toast from 'react-hot-toast'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -26,6 +27,7 @@ export interface LogSelectionProps {
   queryType?: QueryType
   projectRef: string
   params: Partial<LogsEndpointParams>
+  collectionName?: string
 }
 
 const LogSelection = ({
@@ -34,6 +36,7 @@ const LogSelection = ({
   onClose,
   queryType,
   params = {},
+  collectionName,
 }: LogSelectionProps) => {
   const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
@@ -41,8 +44,40 @@ const LogSelection = ({
     params,
     partialLog?.id
   )
+  const [sql, setSql] = useState('')
+
+  const {
+    refetch: refetchWarehouseData,
+    data: warehouseQueryData,
+    isLoading: warehouseQueryLoading,
+  } = useWarehouseQueryQuery(
+    {
+      ref: projectRef,
+      sql,
+    },
+    {
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    }
+  )
+
+  useEffect(() => {
+    const newSql = `select id, timestamp, event_message, metadata from \`${collectionName}\`
+    where id = '${partialLog?.id}' and timestamp > '2024-01-01' limit 1`
+
+    setSql(newSql)
+  }, [collectionName, partialLog?.id])
+
+  useEffect(() => {
+    refetchWarehouseData()
+  }, [warehouseQueryData, collectionName, projectRef, partialLog?.id, refetchWarehouseData])
+
   const Formatter = () => {
     switch (queryType) {
+      case 'warehouse':
+        if (!warehouseQueryData) return null
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.data.result[0]} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -83,33 +118,34 @@ const LogSelection = ({
   const selectionText = useMemo(() => {
     if (fullLog && queryType) {
       return `Log ID
-${fullLog.id}\n
-Log Timestamp (UTC)
-${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
-Log Event Message
-${fullLog.event_message}\n
-Log Metadata
-${JSON.stringify(fullLog.metadata, null, 2)}
-`
+  ${fullLog.id}\n
+  Log Timestamp (UTC)
+  ${isUnixMicro(fullLog.timestamp) ? unixMicroToIsoTimestamp(fullLog.timestamp) : fullLog.timestamp}\n
+  Log Event Message
+  ${fullLog.event_message}\n
+  Log Metadata
+  ${JSON.stringify(fullLog.metadata, null, 2)}
+  `
     }
 
     return JSON.stringify(fullLog || partialLog, null, 2)
-  }, [fullLog])
+  }, [fullLog, partialLog, queryType])
 
   return (
     <div
-      className={[
-        'relative flex h-full flex-grow flex-col border border-l',
-        'border-overlay',
-        'overflow-y-scroll bg-studio',
-      ].join(' ')}
+      className={cn(
+        'relative flex h-full flex-grow flex-col border border-l border-overlay',
+        'overflow-y-scroll bg-studio'
+      )}
     >
       <div
-        className={
-          `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all ` +
-          (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
-        }
+        className={cn(
+          'absolute flex h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all',
+          {
+            'z-0 opacity-0': partialLog,
+            'z-10 opacity-100': !partialLog,
+          }
+        )}
       >
         <div
           className={
@@ -149,8 +185,9 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           <div className="flex flex-col gap-1">
             <h3 className="text-sm text-foreground">Select an Event</h3>
             <p className="text-xs text-foreground-lighter">
-              Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
-              view).
+              {queryType === 'warehouse'
+                ? 'Select an Event to view the complete JSON payload'
+                : 'Select an Event to view the code snippet (pretty view) or complete JSON payload (raw view).'}
             </p>
           </div>
         </div>
@@ -171,7 +208,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {isLoading && <Loading />}
+        {(isLoading || warehouseQueryLoading) && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>

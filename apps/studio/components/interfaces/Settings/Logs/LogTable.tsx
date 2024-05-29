@@ -17,6 +17,7 @@ import {
   IconDownload,
   IconEye,
   IconEyeOff,
+  cn,
 } from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
@@ -35,6 +36,7 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { motion } from 'framer-motion'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -50,6 +52,11 @@ interface Props {
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
+  maxHeight?: string
+  className?: string
+  hideHeader?: boolean
+  collectionName?: string // Used for warehouse queries
+  emptyState?: ReactNode
 }
 type LogMap = { [id: string]: LogData }
 
@@ -70,6 +77,11 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
+  maxHeight,
+  className,
+  hideHeader = false,
+  collectionName,
+  emptyState,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -124,6 +136,9 @@ const LogTable = ({
     columns
   } else {
     switch (queryType) {
+      case 'warehouse':
+        columns = DEFAULT_COLUMNS
+        break
       case 'api':
         columns = DatabaseApiColumnRender
         break
@@ -167,7 +182,7 @@ const LogTable = ({
     }, {}) as LogMap
 
     return [deduped, map]
-  }, [stringData])
+  }, [data, hasId])
 
   useEffect(() => {
     if (!data) return
@@ -176,10 +191,11 @@ const LogTable = ({
       // close selection panel if not found in dataset
       setFocusedLog(null)
     }
-  }, [stringData])
+  }, [data, focusedLog, stringData])
 
   // [Joshen] Hmm quite hacky now, but will do
-  const maxHeight = !queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
+  const _maxHeight =
+    maxHeight || (!queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)')
 
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
@@ -187,7 +203,7 @@ const LogTable = ({
     } else {
       return dedupedData
     }
-  }, [stringData])
+  }, [dedupedData, hasId, hasTimestamp, logMap])
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
@@ -208,7 +224,13 @@ const LogTable = ({
   }
 
   const LogsExplorerTableHeader = () => (
-    <div className="flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2">
+    <div
+      className={cn(
+        'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
+        className,
+        { hidden: hideHeader }
+      )}
+    >
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -316,23 +338,32 @@ const LogTable = ({
     )
   }
 
-  const renderNoResultAlert = () => (
-    <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
-      <div className="flex flex-col gap-1">
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-      </div>
-      <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-foreground">No results found</h3>
-        <p className="text-sm text-foreground-lighter">Try another search or adjust the filters</p>
-      </div>
-    </div>
-  )
+  const renderNoResultAlert = () => {
+    if (emptyState) return emptyState
+    else
+      return (
+        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+          <div className="flex flex-col gap-1">
+            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+          </div>
+          <div className="flex flex-col gap-1 px-5">
+            <h3 className="text-lg text-foreground">No results found</h3>
+            <p className="text-sm text-foreground-lighter">
+              Try another search or adjust the filters
+            </p>
+          </div>
+        </div>
+      )
+  }
 
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
+    <section
+      className={'flex w-full flex-col h-full' + (!queryType ? '' : '')}
+      style={{ maxHeight }}
+    >
       {!queryType && <LogsExplorerTableHeader />}
       <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
         <DataGrid
@@ -388,6 +419,7 @@ const LogTable = ({
               log={focusedLog}
               queryType={queryType}
               params={params}
+              collectionName={collectionName}
             />
           </div>
         ) : null}

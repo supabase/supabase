@@ -11,6 +11,28 @@ The Supabase team regularly monitors the status of backups. In case of any issue
 
 </Admonition>
 
+## Types of backups
+
+Database backups can be categorized into two types: **logical** and **physical**. You can learn more about them [here](https://supabase.com/blog/postgresql-physical-logical-backups).
+
+As a general rule of thumb, projects will either have logical or physical backups based on plan, database size, and add-ons:
+
+| Plan       | Database Size (0-40GB) | [Database Size (>40GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
+| ---------- | ---------------------- | ------------------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
+| Pro        | logical                | physical                                                     | physical                        |                                                |
+| Team       | logical                | physical                                                     | physical                        | physical                                       |
+| Enterprise | physical               | physical                                                     | physical                        | physical                                       |
+
+<Admonition type="note">
+
+Once a project satisfies at least one of the requirements for physical backups then logical backups will no longer be taken. However, your project may revert back to logical backups if add-ons are removed.
+
+</Admonition>
+
+You can confirm your project's backup type by navigating to [Database Backups > Scheduled backups](https://supabase.com/dashboard/project/_/backups/scheduled) and if you can download a backup then it is logical, otherwise it is physical.
+
+However, if your project has the Point-in-Time Recovery (PITR) add-on then the backups are physical and you can view them in [Database Backups > Point in time](https://supabase.com/dashboard/project/_/database/backups/pitr).
+
 ## Frequency of backups
 
 When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery (PITR). The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
@@ -71,7 +93,7 @@ Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter i
 
 <Admonition type="note">
 
-This feature is available to all Enterprise plan projects. Pro plan projects can enable PITR as an add-on.
+This feature is available to all Enterprise plan projects. Pro and Team plan projects can enable PITR as an add-on.
 
 Projects interested in PITR will also need to use at least a Small compute add-on, in order to ensure smooth functioning.
 
