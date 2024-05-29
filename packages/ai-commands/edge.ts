@@ -1,2 +1,5 @@
 export * from './src/errors'
-export * from './src/sql.edge'
+
+export { clippy } from './src/docs'
+export { chatRlsPolicy } from './src/rls'
+export { chatSql } from './src/sql'

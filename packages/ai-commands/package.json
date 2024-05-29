@@ -4,6 +4,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "license": "MIT",
+  "sideEffects": false,
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "jest",
