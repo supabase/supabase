@@ -37,8 +37,6 @@ import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 
-import { canSendTelemetry } from 'lib/telemetry'
-
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -53,6 +51,9 @@ import {
   Input,
   Listbox,
   Separator,
+  Command_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
 } from 'ui'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -60,13 +61,7 @@ import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.c
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 import { useCommandMenu } from 'ui-patterns/Cmdk'
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandLabel,
-  TextHighlighter,
-} from 'ui-patterns/Cmdk/Command.utils'
+import { CommandLabel, TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -708,21 +703,20 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                       <div className="py-4 px-6 border rounded-md mx-6 ">
                         <h2 className="text-sm text-foreground-light">Suggested resources</h2>
                         {docsResults.slice(0, 5).map((page, i) => (
-                          <Command key={page.id}>
-                            <CommandGroup
+                          <Command_Shadcn_ key={page.id}>
+                            <CommandGroup_Shadcn_
                               key={`${page.path}-group`}
                               heading=""
                               value={`${encodeURIComponent(page.title)}-group-index-${i}`}
                               forceMount={true}
                               className="p-2"
                             >
-                              <CommandItem
+                              <CommandItem_Shadcn_
                                 key={`${page.path}-item`}
                                 value={`${encodeURIComponent(page.title)}-item-index-${i}`}
-                                type="block-link"
                                 onSelect={() => openLink(page.type, formatPageUrl(page))}
                                 forceMount={true}
-                                className="hover:cursor-pointer hover:bg-overlay-hover p-2 text-sm"
+                                className="hover:cursor-pointer hover:!bg-muted p-2 text-sm"
                               >
                                 <div className="grow flex gap-3 items-center">
                                   <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -741,12 +735,12 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                   </div>
                                 </div>
                                 <ChevronArrow />
-                              </CommandItem>
+                              </CommandItem_Shadcn_>
 
                               {page.sections.length > 0 && (
                                 <div className="border-l border-default ml-3 pt-3">
                                   {page.sections.map((section: PageSection, index: number) => (
-                                    <CommandItem
+                                    <CommandItem_Shadcn_
                                       className="ml-3 mb-3 hover:cursor-pointer p-2 text-sm"
                                       onSelect={() =>
                                         openLink(page.type, formatSectionUrl(page, section))
@@ -754,7 +748,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                       key={`${page.path}__${section.heading}-item-${index}`}
                                       value={`${encodeURIComponent(page.title)}__${encodeURIComponent(section.heading)}-item-index-${page.id}`}
                                       forceMount={true}
-                                      type="block-link"
                                     >
                                       <div className="grow flex gap-3 items-center">
                                         <IconContainer>{getPageSectionIcon(page)}</IconContainer>
@@ -777,12 +770,12 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                                         </div>
                                       </div>
                                       <ChevronArrow />
-                                    </CommandItem>
+                                    </CommandItem_Shadcn_>
                                   ))}
                                 </div>
                               )}
-                            </CommandGroup>
-                          </Command>
+                            </CommandGroup_Shadcn_>
+                          </Command_Shadcn_>
                         ))}
                       </div>
                     )}
