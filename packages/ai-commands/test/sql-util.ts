@@ -1,4 +1,5 @@
-import { parseQuery, A_Expr, CreatePolicyStmt, Node } from 'libpg-query'
+import chalk from 'chalk'
+import { A_Expr, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
 
 export type PolicyInfo = {
   name: string
@@ -167,4 +168,26 @@ export async function getPolicyInfo(createPolicyStatement: CreatePolicyStmt) {
   }
 
   return policyInfo
+}
+
+/**
+ * Prints the provided metadata along with any assertion errors.
+ *
+ * Useful for providing extra context for failed tests.
+ */
+export function withMetadata(metadata: Record<string, string>, fn: () => void) {
+  try {
+    fn()
+  } catch (err) {
+    // Prepend metadata to stack trace
+    if (err instanceof Error && err.stack) {
+      const formattedMetadata = Object.entries(metadata).map(
+        ([key, value]) => `${chalk.bold.dim(key)}:\n\n${chalk.green.dim(value)}`
+      )
+      err.stack = `${formattedMetadata.join('\n\n')}\n\n${err.stack}`
+    }
+
+    // Re-throw the error
+    throw err
+  }
 }

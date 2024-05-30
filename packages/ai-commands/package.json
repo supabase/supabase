@@ -28,6 +28,7 @@
     "@types/common-tags": "^1.8.4",
     "babel-jest": "^29.7.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
+    "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
     "jest": "^29.7.0",
     "libpg-query": "^15.1.2",

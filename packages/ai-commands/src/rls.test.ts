@@ -9,6 +9,7 @@ import {
   getPolicies,
   getPolicyInfo,
   unwrapNode,
+  withMetadata,
 } from '../test/sql-util'
 import { collectStream, extractMarkdownSql } from '../test/util'
 import { chatRlsPolicy } from './rls'
@@ -66,7 +67,9 @@ describe('rls chat', () => {
     const [policy] = await getPolicies(sql)
     const { roles } = await getPolicyInfo(policy)
 
-    expect(roles).toStrictEqual(['authenticated'])
+    withMetadata({ sql }, () => {
+      expect(roles).toStrictEqual(['authenticated'])
+    })
   })
 
   test('uses anon + authenticated roles when table viewable by anyone', async () => {
@@ -85,7 +88,9 @@ describe('rls chat', () => {
     const [policy] = await getPolicies(sql)
     const { roles } = await getPolicyInfo(policy)
 
-    expect(roles.sort()).toStrictEqual(['anon', 'authenticated'].sort())
+    withMetadata({ sql }, () => {
+      expect(roles.sort()).toStrictEqual(['anon', 'authenticated'].sort())
+    })
   })
 
   test('wraps every function in select', async () => {
@@ -105,42 +110,44 @@ describe('rls chat', () => {
     const [policy] = await getPolicies(sql)
     const { usingNode } = await getPolicyInfo(policy)
 
-    assertDefined(usingNode, 'Expected USING expression')
-    const usingExpression = assertAndUnwrapNode(
-      usingNode,
-      'A_Expr',
-      'Expected USING to contain an expression'
-    )
-
-    assertEitherSideOfExpression(usingExpression, (node) => {
-      const functionCall = unwrapNode(node, 'FuncCall')
-
-      if (functionCall) {
-        throw new Error('Expected function call to be wrapped in a select sub-query')
-      }
-
-      const subQuery = unwrapNode(node, 'SubLink')
-
-      if (!subQuery) {
-        throw new Error('Expected a sub-query wrapping the function')
-      }
-
-      assertDefined(subQuery.subselect, 'Expected SubLink to contain a subselect')
-      const selectStatement = assertAndUnwrapNode(
-        subQuery.subselect,
-        'SelectStmt',
-        'Expected subselect to contain a SELECT statement'
+    withMetadata({ sql }, () => {
+      assertDefined(usingNode, 'Expected USING expression')
+      const usingExpression = assertAndUnwrapNode(
+        usingNode,
+        'A_Expr',
+        'Expected USING to contain an expression'
       )
 
-      assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
+      assertEitherSideOfExpression(usingExpression, (node) => {
+        const functionCall = unwrapNode(node, 'FuncCall')
 
-      const [target] = selectStatement.targetList.map((node) =>
-        assertAndUnwrapNode(node, 'ResTarget', 'Expected every select target to be a ResTarget')
-      )
+        if (functionCall) {
+          throw new Error('Expected function call to be wrapped in a select sub-query')
+        }
 
-      assertDefined(target, 'Expected select sub-query to have a function target')
-      assertDefined(target.val, 'Expected ResTarget to have a val')
-      assertNodeType(target.val, 'FuncCall', 'Expected sub-query to contain a function call')
+        const subQuery = unwrapNode(node, 'SubLink')
+
+        if (!subQuery) {
+          throw new Error('Expected a sub-query wrapping the function')
+        }
+
+        assertDefined(subQuery.subselect, 'Expected SubLink to contain a subselect')
+        const selectStatement = assertAndUnwrapNode(
+          subQuery.subselect,
+          'SelectStmt',
+          'Expected subselect to contain a SELECT statement'
+        )
+
+        assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
+
+        const [target] = selectStatement.targetList.map((node) =>
+          assertAndUnwrapNode(node, 'ResTarget', 'Expected every select target to be a ResTarget')
+        )
+
+        assertDefined(target, 'Expected select sub-query to have a function target')
+        assertDefined(target.val, 'Expected ResTarget to have a val')
+        assertNodeType(target.val, 'FuncCall', 'Expected sub-query to contain a function call')
+      })
     })
   })
 
@@ -160,7 +167,9 @@ describe('rls chat', () => {
     const [sql] = extractMarkdownSql(responseText)
     const [policy] = await getPolicies(sql)
 
-    expect(policy.cmd_name).toBe('select')
+    withMetadata({ sql }, () => {
+      expect(policy.cmd_name).toBe('select')
+    })
   })
 
   test('insert policy', async () => {
@@ -179,7 +188,9 @@ describe('rls chat', () => {
     const [sql] = extractMarkdownSql(responseText)
     const [policy] = await getPolicies(sql)
 
-    expect(policy.cmd_name).toBe('insert')
+    withMetadata({ sql }, () => {
+      expect(policy.cmd_name).toBe('insert')
+    })
   })
 
   test('update policy', async () => {
@@ -198,7 +209,9 @@ describe('rls chat', () => {
     const [sql] = extractMarkdownSql(responseText)
     const [policy] = await getPolicies(sql)
 
-    expect(policy.cmd_name).toBe('update')
+    withMetadata({ sql }, () => {
+      expect(policy.cmd_name).toBe('update')
+    })
   })
 
   test('delete policy', async () => {
@@ -217,7 +230,9 @@ describe('rls chat', () => {
     const [sql] = extractMarkdownSql(responseText)
     const [policy] = await getPolicies(sql)
 
-    expect(policy.cmd_name).toBe('delete')
+    withMetadata({ sql }, () => {
+      expect(policy.cmd_name).toBe('delete')
+    })
   })
 
   test('splits multiple operations into separate policies', async () => {
@@ -236,14 +251,16 @@ describe('rls chat', () => {
     const [sql] = extractMarkdownSql(responseText)
     const policies = await getPolicies(sql)
 
-    const selectPolicy = policies.find((policy) => policy.cmd_name === 'select')
-    const insertPolicy = policies.find((policy) => policy.cmd_name === 'insert')
-    const updatePolicy = policies.find((policy) => policy.cmd_name === 'update')
-    const deletePolicy = policies.find((policy) => policy.cmd_name === 'delete')
+    withMetadata({ sql }, () => {
+      const selectPolicy = policies.find((policy) => policy.cmd_name === 'select')
+      const insertPolicy = policies.find((policy) => policy.cmd_name === 'insert')
+      const updatePolicy = policies.find((policy) => policy.cmd_name === 'update')
+      const deletePolicy = policies.find((policy) => policy.cmd_name === 'delete')
 
-    expect(selectPolicy).not.toBeUndefined()
-    expect(insertPolicy).not.toBeUndefined()
-    expect(updatePolicy).not.toBeUndefined()
-    expect(deletePolicy).not.toBeUndefined()
+      expect(selectPolicy).not.toBeUndefined()
+      expect(insertPolicy).not.toBeUndefined()
+      expect(updatePolicy).not.toBeUndefined()
+      expect(deletePolicy).not.toBeUndefined()
+    })
   })
 })
