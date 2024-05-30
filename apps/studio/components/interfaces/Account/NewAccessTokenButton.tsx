@@ -140,7 +140,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                   className="w-full"
                 />
               </Modal.Content>
-              <DialogFooter padding={'small'}>
+              <DialogFooter>
                 <div className="flex items-center space-x-2 justify-end">
                   <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
                     Cancel
