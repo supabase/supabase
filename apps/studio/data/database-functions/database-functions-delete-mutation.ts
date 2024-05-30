@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { del, handleError } from 'data/fetchers'
+import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
@@ -49,7 +49,7 @@ export const useDatabaseFunctionDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
+        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

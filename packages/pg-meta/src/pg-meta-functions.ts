@@ -160,4 +160,84 @@ function retrieve({
   }
 }
 
-export default { list, retrieve, pgFunctionZod }
+const pgFunctionCreateZod = z.object({
+  name: z.string(),
+  definition: z.string(),
+  args: z.array(z.string()).optional(),
+  behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']).optional(),
+  config_params: z.record(z.string(), z.string()).optional(),
+  schema: z.string().optional(),
+  language: z.string().optional(),
+  return_type: z.string().optional(),
+  security_definer: z.boolean().optional(),
+})
+
+type PGFunctionCreate = z.infer<typeof pgFunctionCreateZod>
+
+function _generateCreateFunctionSql(
+  {
+    name,
+    schema,
+    args,
+    definition,
+    return_type,
+    language,
+    behavior,
+    security_definer,
+    config_params,
+  }: PGFunctionCreate,
+  { replace = false } = {}
+): string {
+  return `
+    CREATE ${replace ? 'OR REPLACE' : ''} FUNCTION ${ident(schema!)}.${ident(name!)}(${
+      args?.join(', ') || ''
+    })
+    RETURNS ${return_type}
+    AS ${literal(definition)}
+    LANGUAGE ${language}
+    ${behavior}
+    CALLED ON NULL INPUT
+    ${security_definer ? 'SECURITY DEFINER' : 'SECURITY INVOKER'}
+    ${
+      config_params
+        ? Object.entries(config_params)
+            .map(
+              ([param, value]: string[]) =>
+                `SET ${param} ${value[0] === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + value}`
+            )
+            .join('\n')
+        : ''
+    };
+  `
+}
+
+function create({
+  name,
+  schema = 'public',
+  args = [],
+  definition,
+  return_type = 'void',
+  language = 'sql',
+  behavior = 'VOLATILE',
+  security_definer = false,
+  config_params = {},
+}: PGFunctionCreate) {
+  const sql = _generateCreateFunctionSql({
+    name,
+    schema,
+    args,
+    definition,
+    return_type,
+    language,
+    behavior,
+    security_definer,
+    config_params,
+  })
+
+  return {
+    sql,
+    zod: pgFunctionZod,
+  }
+}
+
+export default { list, retrieve, create, pgFunctionZod, pgFunctionCreateZod }

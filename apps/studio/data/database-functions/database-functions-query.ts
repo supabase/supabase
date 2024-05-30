@@ -1,6 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { UseQueryOptions } from '@tanstack/react-query'
-import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import { z } from 'zod'
 
 export type DatabaseFunctionsVariables = {
@@ -19,10 +19,7 @@ export const useDatabaseFunctionsQuery = <
   TData extends DatabaseFunctionsData = DatabaseFunctionsData,
 >(
   { projectRef, connectionString }: DatabaseFunctionsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
+  options: UseQueryOptions<ExecuteSqlData, DatabaseFunctionsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
@@ -33,7 +30,7 @@ export const useDatabaseFunctionsQuery = <
     },
     {
       select(data) {
-        return data.result
+        return (data as any)?.result ?? []
       },
       ...options,
     }

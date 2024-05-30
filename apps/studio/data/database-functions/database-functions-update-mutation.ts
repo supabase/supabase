@@ -3,8 +3,8 @@ import { toast } from 'react-hot-toast'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
+import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
@@ -53,7 +53,7 @@ export const useDatabaseFunctionUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
+        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
