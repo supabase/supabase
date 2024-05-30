@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
+  DialogClose,
 } from '../shadcn/ui/dialog'
 
 export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
@@ -71,7 +72,7 @@ const Modal = forwardRef<
       onConfirm = () => {},
       onCancel = () => {},
       confirmText = 'Confirm',
-      showCloseButton = false,
+      showCloseButton = true,
       footerBackground,
       variant = 'success',
       visible = false,
@@ -142,7 +143,7 @@ const Modal = forwardRef<
             </DialogHeader>
           ) : null}
           {children}
-          {!hideFooter && <DialogFooter>{footerContent}</DialogFooter>}
+          {!hideFooter && <DialogFooter padding={'small'}>{footerContent}</DialogFooter>}
         </DialogContent>
       </Dialog>
     )

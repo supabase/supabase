@@ -86,9 +86,9 @@ const PageLayout: NextPageWithLayout = () => {
           </div>
         }
       >
-        <div className="py-4">
+        <Modal.Content>
           <TerminalInstructions removeBorder />
-        </div>
+        </Modal.Content>
       </Modal>
     </>
   )
