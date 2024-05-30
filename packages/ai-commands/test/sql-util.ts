@@ -117,7 +117,7 @@ export async function getPolicies(sql: string) {
 
   assertDefined(result.stmts, 'Expected parse result to contain statements')
 
-  return result.stmts?.reduce<CreatePolicyStmt[]>((filtered, stmt) => {
+  return result.stmts.reduce<CreatePolicyStmt[]>((filtered, stmt) => {
     assertDefined(stmt.stmt, 'Expected statement to exist')
 
     const createPolicyStatement = unwrapNode(stmt.stmt, 'CreatePolicyStmt')
