@@ -85,4 +85,6 @@ const GlobalNavigationMenuDesktop = () => (
   </NavigationMenu>
 )
 
+GlobalNavigationMenuDesktop.displayName = 'GlobalNavigationMenuDesktop'
+
 export default GlobalNavigationMenuDesktop

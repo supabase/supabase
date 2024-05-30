@@ -75,4 +75,6 @@ const GlobalNavigationMenuMobile = () => (
   </div>
 )
 
+GlobalNavigationMenuMobile.displayName = 'GlobalNavigationMenuMobile'
+
 export default GlobalNavigationMenuMobile

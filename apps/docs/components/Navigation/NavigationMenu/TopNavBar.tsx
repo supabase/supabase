@@ -130,4 +130,7 @@ const TopNavBar: FC = () => {
     </nav>
   )
 }
+
+TopNavBar.displayName = 'TopNavBar'
+
 export default TopNavBar
