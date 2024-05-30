@@ -18,7 +18,7 @@ export async function createDatabaseFunction({
   connectionString,
   payload,
 }: DatabaseFunctionCreateVariables) {
-  const { sql } = pgMeta.functions.create(payload)
+  const { sql, zod } = pgMeta.functions.create(payload)
 
   const { result } = await executeSql({
     projectRef,
@@ -27,7 +27,7 @@ export async function createDatabaseFunction({
     queryKey: ['functions', 'create'],
   })
 
-  return result
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionCreateData = Awaited<ReturnType<typeof createDatabaseFunction>>

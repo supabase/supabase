@@ -1,10 +1,10 @@
 import { ident, literal } from 'pg-format'
-import { FUNCTIONS_SQL } from './sql/functions'
 import { z } from 'zod'
-import { filterByList } from './helpers'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
+import { filterByList } from './helpers'
+import { FUNCTIONS_SQL } from './sql/functions'
 
-const pgFunctionZod = z.object({
+export const pgFunctionZod = z.object({
   id: z.number(),
   schema: z.string(),
   name: z.string(),
@@ -36,10 +36,12 @@ const pgFunctionZod = z.object({
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
 })
 
-const pgFunctionArrayZod = z.array(pgFunctionZod)
-const pgFunctionOptionalZod = z.optional(pgFunctionZod)
+export const pgFunctionArrayZod = z.array(pgFunctionZod)
+export const pgFunctionOptionalZod = z.optional(pgFunctionZod)
 
-function list({
+export type PGFunction = z.infer<typeof pgFunctionZod>
+
+export function list({
   includeSystemSchemas = false,
   includedSchemas,
   excludedSchemas,
@@ -84,15 +86,23 @@ function list({
   }
 }
 
-function retrieve({ id }: { id: number }): {
+export function retrieve({ id }: { id: number }): {
   sql: string
   zod: typeof pgFunctionOptionalZod
 }
-function retrieve({ name, schema, args }: { name: string; schema: string; args: string[] }): {
+export function retrieve({
+  name,
+  schema,
+  args,
+}: {
+  name: string
+  schema: string
+  args: string[]
+}): {
   sql: string
   zod: typeof pgFunctionOptionalZod
 }
-function retrieve({
+export function retrieve({
   id,
   name,
   schema = 'public',
@@ -160,7 +170,7 @@ function retrieve({
   }
 }
 
-const pgFunctionCreateZod = z.object({
+export const pgFunctionCreateZod = z.object({
   name: z.string(),
   definition: z.string(),
   args: z.array(z.string()).optional(),
@@ -172,7 +182,7 @@ const pgFunctionCreateZod = z.object({
   security_definer: z.boolean().optional(),
 })
 
-type PGFunctionCreate = z.infer<typeof pgFunctionCreateZod>
+export type PGFunctionCreate = z.infer<typeof pgFunctionCreateZod>
 
 function _generateCreateFunctionSql(
   {
@@ -188,7 +198,7 @@ function _generateCreateFunctionSql(
   }: PGFunctionCreate,
   { replace = false } = {}
 ): string {
-  return `
+  return /* SQL */ `
     CREATE ${replace ? 'OR REPLACE' : ''} FUNCTION ${ident(schema!)}.${ident(name!)}(${
       args?.join(', ') || ''
     })
@@ -211,7 +221,7 @@ function _generateCreateFunctionSql(
   `
 }
 
-function create({
+export function create({
   name,
   schema = 'public',
   args = [],
@@ -236,8 +246,94 @@ function create({
 
   return {
     sql,
-    zod: pgFunctionZod,
+    zod: z.void(),
   }
 }
 
-export default { list, retrieve, create, pgFunctionZod, pgFunctionCreateZod }
+export const pgFunctionUpdateZod = z.object({
+  name: z.string().optional(),
+  schema: z.string().optional(),
+  definition: z.string().optional(),
+})
+
+export type PGFunctionUpdate = z.infer<typeof pgFunctionUpdateZod>
+
+export function update(currentFunc: PGFunction, { name, schema, definition }: PGFunctionUpdate) {
+  const args = currentFunc.argument_types.split(', ')
+  const identityArgs = currentFunc.identity_argument_types
+
+  const updateDefinitionSql =
+    typeof definition === 'string'
+      ? _generateCreateFunctionSql(
+          {
+            ...currentFunc!,
+            definition,
+            args,
+            config_params: currentFunc!.config_params ?? {},
+          },
+          { replace: true }
+        )
+      : ''
+
+  const updateNameSql =
+    name && name !== currentFunc!.name
+      ? `ALTER FUNCTION ${ident(currentFunc!.schema)}.${ident(
+          currentFunc!.name
+        )}(${identityArgs}) RENAME TO ${ident(name)};`
+      : ''
+
+  const updateSchemaSql =
+    schema && schema !== currentFunc!.schema
+      ? `ALTER FUNCTION ${ident(currentFunc!.schema)}.${ident(
+          name || currentFunc!.name
+        )}(${identityArgs})  SET SCHEMA ${ident(schema)};`
+      : ''
+
+  const sql = /* SQL */ `
+    DO LANGUAGE plpgsql $$
+    BEGIN
+      IF ${typeof definition === 'string' ? 'TRUE' : 'FALSE'} THEN
+        ${updateDefinitionSql}
+
+        IF (
+          SELECT id
+          FROM (${FUNCTIONS_SQL}) AS f
+          WHERE f.schema = ${literal(currentFunc!.schema)}
+          AND f.name = ${literal(currentFunc!.name)}
+          AND f.identity_argument_types = ${literal(identityArgs)}
+        ) != ${currentFunc.id} THEN
+          RAISE EXCEPTION 'Cannot find function "${currentFunc!.schema}"."${
+            currentFunc!.name
+          }"(${identityArgs})';
+        END IF;
+      END IF;
+
+      ${updateNameSql}
+
+      ${updateSchemaSql}
+    END;
+    $$;
+  `
+
+  return {
+    sql,
+    zod: z.void(),
+  }
+}
+
+export const pgFunctionDeleteZod = z.object({
+  cascade: z.boolean().default(false).optional(),
+})
+
+export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>
+
+export function remove(func: PGFunction, { cascade = false }: PGFunctionDelete = {}) {
+  const sql = /* SQL */ `DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
+  (${func.identity_argument_types})
+  ${cascade ? 'CASCADE' : 'RESTRICT'};`
+
+  return {
+    sql,
+    zod: z.void(),
+  }
+}

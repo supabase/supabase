@@ -1,39 +1,36 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import { z } from 'zod'
 
-import type { components } from 'data/api'
-import { handleError, patch } from 'data/fetchers'
+import pgMeta from '@supabase/pg-meta'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
+import type { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string
-  id: number
-  payload: components['schemas']['UpdateFunctionBody']
+  func: DatabaseFunction
+  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }
 
 export async function updateDatabaseFunction({
   projectRef,
   connectionString,
-  id,
+  func,
   payload,
 }: DatabaseFunctionUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql, zod } = pgMeta.functions.update(func, payload)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/functions', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['functions', 'update', func.id.toString()],
   })
 
-  if (error) handleError(error)
-  return data
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionUpdateData = Awaited<ReturnType<typeof updateDatabaseFunction>>
