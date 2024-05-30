@@ -99,7 +99,7 @@ const SQLEditor = () => {
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
+  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
@@ -319,7 +319,7 @@ const SQLEditor = () => {
           cleanedSql.toLowerCase().startsWith('select') &&
           !cleanedSql.endsWith('limit') &&
           !cleanedSql.endsWith('limit;') &&
-          !!!cleanedSql.match('limit [0-9]*[;]?$')
+          !cleanedSql.match('limit [0-9]*[;]?$')
         // Append the limit prefix if needed
         const formattedSql = appendAutoLimit
           ? cleanedSql.endsWith(';')
