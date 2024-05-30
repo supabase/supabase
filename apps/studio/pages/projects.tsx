@@ -38,7 +38,6 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <AlertError subject="Failed to retrieve organizations" />
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
