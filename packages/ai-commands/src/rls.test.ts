@@ -144,6 +144,82 @@ describe('rls chat', () => {
     })
   })
 
+  test('select policy', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'All published reviews can be seen publicly',
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    expect(policy.cmd_name).toBe('select')
+  })
+
+  test('insert policy', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'Users can only create their own reviews',
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    expect(policy.cmd_name).toBe('insert')
+  })
+
+  test('update policy', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: "You can't edit other people's reviews",
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    expect(policy.cmd_name).toBe('update')
+  })
+
+  test('delete policy', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: "You can't delete someone else's review",
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    expect(policy.cmd_name).toBe('delete')
+  })
+
   test('splits multiple operations into separate policies', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
