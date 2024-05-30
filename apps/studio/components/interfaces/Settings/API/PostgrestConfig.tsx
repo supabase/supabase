@@ -30,6 +30,7 @@ import {
   FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  Separator,
   Skeleton,
   Switch,
 } from 'ui'
@@ -227,24 +228,28 @@ const PostgrestConfig = () => {
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
+
                       {!field.value && (
-                        <Admonition
-                          type="default"
-                          className="mb-0"
-                          title="No schemas can be queried"
-                          description={
-                            <>
-                              <p>
-                                With this setting disabled, you will not be able to query any
-                                schemas via the Data API.
-                              </p>
-                              <p>
-                                You will see errors from the Postgrest endpoint
-                                <code className="text-xs">/rest/v1/</code>.
-                              </p>
-                            </>
-                          }
-                        />
+                        <>
+                          <Separator />
+                          <Admonition
+                            type="default"
+                            className="mb-0 border-none rounded-none mx-5"
+                            title="No schemas can be queried"
+                            description={
+                              <>
+                                <p>
+                                  With this setting disabled, you will not be able to query any
+                                  schemas via the Data API.
+                                </p>
+                                <p>
+                                  You will see errors from the Postgrest endpoint
+                                  <code className="text-xs">/rest/v1/</code>.
+                                </p>
+                              </>
+                            }
+                          />
+                        </>
                       )}
                     </FormItem_Shadcn_>
                   )}
