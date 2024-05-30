@@ -7,15 +7,16 @@ const dismissToast = async (page: Page) => {
 
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
+    test.setTimeout(60000)
+
     const tableResponsePromise = page.waitForResponse(
       'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
-      { timeout: 60000 }
+      { timeout: 0 }
     )
     const name = 'TestTable-' + Math.floor(Math.random() * 100)
 
     await page.goto('/project/default/editor')
 
-    await page.waitForLoadState('domcontentloaded')
     await tableResponsePromise
 
     // The page has been loaded with the table data, we can now interact with the page
