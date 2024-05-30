@@ -139,6 +139,7 @@ const EnableBranchingModal = () => {
         onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg !max-w-[40rem]"
         size="medium"
+        hideClose
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -207,14 +208,14 @@ const EnableBranchingModal = () => {
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
                 )}
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+                <Modal.Content className="py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
                     Please keep in mind the following:
                   </p>
                   <div className="flex flex-row gap-4">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <IconDollarSign className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -230,8 +231,8 @@ const EnableBranchingModal = () => {
                   </div>
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <IconFileText className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
