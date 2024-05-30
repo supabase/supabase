@@ -41,9 +41,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      // 'z-50 fixed h-full w-full left-0 top-0',
-      // 'bg-alternative/90 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      'bg-alternative/90 backdrop-blur-sm',
+      'bg-black/40 backdrop-blur-sm',
       'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide',
       className
     )}
@@ -61,7 +59,7 @@ const DialogContentVariants = cva(
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
     'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
-    'bg-studio'
+    'bg-dialog'
   ),
   {
     variants: {
