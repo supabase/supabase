@@ -133,7 +133,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const [{ sort, filter }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
-  const sorts = formatSortURLParams(sort as string[])
+  const sorts = formatSortURLParams(props.table.name, sort as string[] | undefined)
   const filters = formatFilterURLParams(filter as string[])
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
