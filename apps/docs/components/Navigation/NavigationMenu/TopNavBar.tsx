@@ -62,19 +62,19 @@ const TopNavBar: FC = () => {
             <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
               <div
                 className="
-                  flex
-                  group
-                  items-center
-                  justify-between
-                  bg-surface-100
-                  bg-opacity-75
-                  hover:bg-surface-200
-                  hover:bg-opacity-100
-                  border
-                  transition
-                  pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
-                  text-foreground-lighter
-                "
+              flex
+              group
+              items-center
+              justify-between
+              bg-surface-100
+              bg-opacity-75
+              hover:bg-surface-200
+              hover:bg-opacity-100
+              border
+              transition
+              pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
+              text-foreground-lighter
+              "
               >
                 <div className="flex items-center space-x-2">
                   <IconSearch size={18} strokeWidth={2} />
