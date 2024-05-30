@@ -158,7 +158,7 @@ const MultiSelector = ({
     >
       <CommandPrimitive
         onKeyDown={handleKeyDown}
-        className={cn('overflow-visible bg-transparent flex flex-col', className)}
+        className={cn('relative overflow-visible bg-transparent flex flex-col', className)}
         dir={dir}
         {...props}
       >
