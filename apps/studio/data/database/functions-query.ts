@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type DatabaseFunction = {
   schema: string
@@ -39,7 +39,7 @@ export type FunctionsVariables = {
 }
 
 export type FunctionsData = { result: DatabaseFunction[] }
-export type FunctionsError = unknown
+export type FunctionsError = ExecuteSqlError
 
 export const useFunctionsQuery = <TData extends FunctionsData = FunctionsData>(
   { projectRef, connectionString }: FunctionsVariables,

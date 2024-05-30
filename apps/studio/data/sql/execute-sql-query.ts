@@ -8,14 +8,12 @@ import {
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
 
-export type Error = { code: number; message: string; requestId: string }
-
 export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string
   sql: string
   queryKey?: QueryKey
-  handleError?: (error: { code: number; message: string; requestId: string }) => any
+  handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
 }
 
@@ -86,7 +84,7 @@ export async function executeSql(
     }
 
     if (handleError !== undefined) return handleError(error as any)
-    else handleErrorFetchers(error as any)
+    else handleErrorFetchers(error)
   }
 
   if (
