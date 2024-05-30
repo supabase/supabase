@@ -170,7 +170,7 @@ const Connect = () => {
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className={cn('sm:max-w-5xl p-0 bg-surface-100')}>
+        <DialogContent className={cn('sm:max-w-5xl p-0')}>
           <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
