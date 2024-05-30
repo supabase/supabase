@@ -233,8 +233,8 @@ const PostgrestConfig = () => {
                         <>
                           <Separator />
                           <Admonition
-                            type="default"
-                            className="mb-0 border-none rounded-none mx-5"
+                            type="warning"
+                            className="mb-0 border-none rounded-none [&_svg]:left-[2rem] ![&_h5]:left-[6rem]"
                             title="No schemas can be queried"
                             description={
                               <>
@@ -248,6 +248,14 @@ const PostgrestConfig = () => {
                                 </p>
                               </>
                             }
+                            childProps={{
+                              title: {
+                                className: '!pl-[3.5rem]',
+                              },
+                              description: {
+                                className: '!pl-[3.5rem]',
+                              },
+                            }}
                           />
                         </>
                       )}
