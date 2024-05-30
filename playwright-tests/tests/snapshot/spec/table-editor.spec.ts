@@ -7,14 +7,17 @@ const dismissToast = async (page: Page) => {
 
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
+    const tableResponsePromise = page.waitForResponse(
+      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types'
+    )
     const name = 'TestTable-' + Math.floor(Math.random() * 100)
 
     await page.goto('/project/default/editor')
 
     await page.waitForLoadState('domcontentloaded')
-    await page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types'
-    )
+    await tableResponsePromise
+
+    // The page has been loaded with the table data, we can now interact with the page
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await page
       .locator('.col-span-8 > div > .relative > .peer\\/input')
@@ -38,6 +41,7 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('NULL').fill('some text')
     await page.getByTestId('action-bar-save-row').click()
     await dismissToast(page)
+
     await expect(page.getByRole('grid')).toContainText('some text')
   })
 })
