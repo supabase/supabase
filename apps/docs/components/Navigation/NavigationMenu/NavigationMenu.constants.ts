@@ -1164,8 +1164,8 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Error codes',
-          url: '/guides/functions/error-codes',
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
         },
         {
           name: 'Limits',
