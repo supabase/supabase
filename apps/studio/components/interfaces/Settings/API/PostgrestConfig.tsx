@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
-  FormPanel,
   FormPanelContainer,
   FormPanelContent,
   FormPanelFooter,
@@ -12,12 +11,13 @@ import {
 } from 'components/ui/Forms'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
 import { indexOf } from 'lodash'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
@@ -32,8 +32,8 @@ import {
   Input_Shadcn_,
   Skeleton,
   Switch,
-  cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -75,13 +75,15 @@ const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
 
+  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
@@ -89,15 +91,14 @@ const PostgrestConfig = () => {
       },
     })
 
+  const formId = 'project-postgres-config'
+  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
-
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const isGraphqlExtensionEnabled =
+    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -110,23 +111,6 @@ const PostgrestConfig = () => {
     },
   })
 
-  const formId = 'project-postgres-config'
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!projectRef) return console.error('Project ref is required') // is this needed ?
-
-    console.log('submit', values)
-
-    updatePostgrestConfig({
-      projectRef,
-      dbSchema: values.dbSchema.join(', '),
-      maxRows: values.maxRows,
-      dbExtraSearchPath: values.dbExtraSearchPath,
-      dbPool: values.dbPool ? values.dbPool : null,
-    })
-  }
-
-  const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
     schemas
       ?.filter((x) => {
@@ -141,9 +125,6 @@ const PostgrestConfig = () => {
           disabled: false,
         }
       }) ?? []
-
-  const isGraphqlExtensionEnabled =
-    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
   function resetForm(values?: Partial<z.infer<typeof formSchema>>) {
     const dbSchema =
@@ -166,6 +147,18 @@ const PostgrestConfig = () => {
         ...defaultValues,
       })
     }
+  }
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!projectRef) return console.error('Project ref is required') // is this needed ?
+
+    updatePostgrestConfig({
+      projectRef,
+      dbSchema: values.dbSchema.join(', '),
+      maxRows: values.maxRows,
+      dbExtraSearchPath: values.dbExtraSearchPath,
+      dbPool: values.dbPool ? values.dbPool : null,
+    })
   }
 
   useEffect(() => {
@@ -235,58 +228,23 @@ const PostgrestConfig = () => {
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                       {!field.value && (
-                        <>
-                          <div className="flex items-stretch px-8 mb-6 -space-x-px">
-                            <Admonition
-                              type="default"
-                              className="
-                                mb-0
-                                flex-grow
-                                rounded-l-none rounded-r-none
-                                first-of-type:rounded-l-md last-of-type:rounded-r-md
-                              "
-                              title="No schemas can be queried"
-                              description={
-                                <>
-                                  <p>
-                                    With this setting disabled, you will not be able to query any
-                                    schemas via the Data API.
-                                  </p>
-                                  <p>
-                                    You will see errors from the Postgrest endpoint
-                                    <code className="text-xs">/rest/v1/</code>.
-                                  </p>
-                                </>
-                              }
-                            />
-
-                            {isGraphqlExtensionEnabled && (
-                              <Admonition
-                                type="warning"
-                                className="
-                                mb-0
-                                flex-grow
-                                rounded-l-none rounded-r-none
-                                first-of-type:rounded-l-md last-of-type:rounded-r-md
-                              "
-                                title="Tables could still be exposed via GraphQl"
-                                description={
-                                  <>
-                                    <p>
-                                      Tables in the <code className="text-xs">public</code> schema
-                                      are still exposed over our GraphQL endpoints.
-                                    </p>
-                                    <Button asChild type="default" className="mt-3">
-                                      <Link href={`/project/${projectRef}/database/extensions`}>
-                                        Disable the pg_graphql extension
-                                      </Link>
-                                    </Button>
-                                  </>
-                                }
-                              />
-                            )}
-                          </div>
-                        </>
+                        <Admonition
+                          type="default"
+                          className="mb-0"
+                          title="No schemas can be queried"
+                          description={
+                            <>
+                              <p>
+                                With this setting disabled, you will not be able to query any
+                                schemas via the Data API.
+                              </p>
+                              <p>
+                                You will see errors from the Postgrest endpoint
+                                <code className="text-xs">/rest/v1/</code>.
+                              </p>
+                            </>
+                          }
+                        />
                       )}
                     </FormItem_Shadcn_>
                   )}
@@ -339,14 +297,12 @@ const PostgrestConfig = () => {
                               </MultiSelector>
                             )}
 
-                            {!field.value.includes('public') &&
-                              form.getValues('enableDataApi') !== false &&
-                              field.value.length > 0 && (
-                                <Admonition
-                                  type="default"
-                                  title="The public schema for this project is not exposed"
-                                  className="mt-2"
-                                >
+                            {!field.value.includes('public') && field.value.length > 0 && (
+                              <Admonition
+                                type="default"
+                                title="The public schema for this project is not exposed"
+                                className="mt-2"
+                                description={
                                   <>
                                     <p>
                                       You will not be able to query tables and views in the{' '}
@@ -366,8 +322,9 @@ const PostgrestConfig = () => {
                                       </>
                                     )}
                                   </>
-                                </Admonition>
-                              )}
+                                }
+                              />
+                            )}
                           </FormItemLayout>
                         </FormItem_Shadcn_>
                       )}
