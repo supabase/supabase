@@ -2202,6 +2202,7 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `select`
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -2212,6 +2213,23 @@ functions:
             .storage
             .listBuckets();
           ```
+        response: |
+          ```json
+          [
+            Bucket(
+              id: 'avatars',
+              name: 'avatars',
+              owner: '',
+              public: false,
+              file_size_limit: 1024,
+              allowed_mime_types: [
+                'image/png'
+              ],
+              created_at: '2024-05-22T22:26:05.100Z',
+              updated_at: '2024-05-22T22:26:05.100Z'
+            ),
+          ]
+          ```
 
   - id: get-bucket
     description: |
@@ -2221,6 +2239,12 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `select`
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The unique identifier of the bucket you would like to retrieve.
     examples:
       - id: get-bucket
         name: Get bucket
@@ -2231,7 +2255,21 @@ functions:
             .storage
             .getBucket('avatars');
           ```
-
+        response: |
+          ```json
+          Bucket(
+            id: 'avatars',
+            name: 'avatars',
+            owner: '',
+            public: false,
+            file_size_limit: 1024,
+            allowed_mime_types: [
+              'image/png'
+            ],
+            created_at: '2024-05-22T22:26:05.100Z',
+            updated_at: '2024-05-22T22:26:05.100Z'
+          )
+          ```
   - id: create-bucket
     description: |
       Creates a new Storage bucket
@@ -2240,6 +2278,29 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `insert`
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: A unique identifier for the bucket you are creating.
+      - name: bucketOptions
+        isOptional: true
+        type: BucketOptions
+        description: A parameter to optionally make the bucket public.
+        subContent:
+          - name: public
+            isOptional: false
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
+          - name: fileSizeLimit
+            isOptional: true
+            type: String
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
+          - name: allowedMimeTypes
+            isOptional: true
+            type: List<String>
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
     examples:
       - id: create-bucket
         name: Create bucket
@@ -2250,6 +2311,10 @@ functions:
             .storage
             .createBucket('avatars');
           ```
+        response: |
+          ```json
+          'avatars'
+          ```
 
   - id: empty-bucket
     description: |
@@ -2259,15 +2324,25 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `select`
         - `objects` permissions: `select` and `delete`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: A unique identifier for the bucket you are emptying.
     examples:
       - id: empty-bucket
         name: Empty bucket
         isSpotlight: true
         code: |
           ```dart
-          final String result = await supabase
+          final String res = await supabase
             .storage
             .emptyBucket('avatars');
+          ```
+        response: |
+          ```json
+          'Successfully emptied'
           ```
   - id: update-bucket
     description: |
@@ -2277,15 +2352,42 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `update`
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: A unique identifier for the bucket you are updating.
+      - name: bucketOptions
+        isOptional: false
+        type: BucketOptions
+        description: A parameter to optionally make the bucket public.
+        subContent:
+          - name: public
+            isOptional: false
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
+          - name: fileSizeLimit
+            isOptional: true
+            type: String
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
+          - name: allowedMimeTypes
+            isOptional: true
+            type: List<String>
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
     examples:
       - id: update-bucket
         name: Update bucket
         isSpotlight: true
         code: |
           ```dart
-          final res = await supabase
+          final String res = await supabase
             .storage
             .updateBucket('avatars', const BucketOptions(public: false));
+          ```
+        response: |
+          ```json
+          'Successfully updated'
           ```
 
   - id: delete-bucket
@@ -2296,15 +2398,25 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: `select` and `delete`
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: A unique identifier for the bucket you are deleting.
     examples:
       - id: delete-bucket
         name: Delete bucket
         isSpotlight: true
         code: |
           ```dart
-          final String result = await supabase
+          final String res = await supabase
             .storage
             .deleteBucket('avatars');
+          ```
+        response: |
+          ```json
+          'Successfully deleted'
           ```
 
   - id: from-upload
@@ -2315,6 +2427,40 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `insert`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The relative file path. Should be of the format folder/subfolder/filename.png. The bucket must already exist before attempting to update.
+      - name: file
+        isOptional: false
+        type: File or Uint8List
+        description: File object to be stored in the bucket.
+      - name: fileOptions
+        isOptional: true
+        type: FileOptions
+        subContent:
+          - name: cacheControl
+            isOptional: true
+            type: String
+            description: The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control` header as `max-age=<seconds>`. Defaults to 3600 seconds.
+          - name: upsert
+            isOptional: true
+            type: bool
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
+          - name: contentType
+            isOptional: true
+            type: String
+            description: The `Content-Type` header value. Gets parsed with MediaType.parse(mime). Throws a FormatError if the media type is invalid.
+      - name: retryAttempts
+        isOptional: true
+        type: int
+        description: Sets the retryAttempts parameter set across the storage client. Defaults to 10.
+      - name: retryController
+        isOptional: true
+        type: StorageRetryController
+        description: Pass a RetryController instance and call `cancel()` to cancel the retry attempts.
     examples:
       - id: upload-file
         name: Upload file
@@ -2322,22 +2468,30 @@ functions:
         code: |
           ```dart
           final avatarFile = File('path/to/file');
-          final String path = await supabase.storage.from('avatars').upload(
+          final String fullPath = await supabase.storage.from('avatars').upload(
                 'public/avatar1.png',
                 avatarFile,
                 fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
               );
           ```
+        response: |
+          ```json
+          'avatars/public/avatar1.png'
+          ```
       - id: upload-file-on-web
         name: Upload file on web
         code: |
           ```dart
-          final avatarFile = chosenFile.bytes;
-          final String path = await supabase.storage.from('avatars').uploadBinary(
+          final Uint8List avatarFile = file.bytes;
+          final String fullPath = await supabase.storage.from('avatars').uploadBinary(
                 'public/avatar1.png',
                 avatarFile,
                 fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
               );
+          ```
+        response: |
+          ```json
+          'avatars/public/avatar1.png'
           ```
 
   - id: from-update
@@ -2348,6 +2502,40 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The relative file path. Should be of the format folder/subfolder/filename.png. The bucket must already exist before attempting to update.
+      - name: file
+        isOptional: false
+        type: File or Uint8List
+        description: File object to be stored in the bucket.
+      - name: fileOptions
+        isOptional: true
+        type: FileOptions
+        subContent:
+          - name: cacheControl
+            isOptional: true
+            type: String
+            description: The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control` header as `max-age=<seconds>`. Defaults to 3600 seconds.
+          - name: upsert
+            isOptional: true
+            type: bool
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
+          - name: contentType
+            isOptional: true
+            type: String
+            description: The `Content-Type` header value. Gets parsed with MediaType.parse(mime). Throws a FormatError if the media type is invalid.
+      - name: retryAttempts
+        isOptional: true
+        type: int
+        description: Sets the retryAttempts parameter set across the storage client. Defaults to 10.
+      - name: retryController
+        isOptional: true
+        type: StorageRetryController
+        description: Pass a RetryController instance and call `cancel()` to cancel the retry attempts.
     examples:
       - id: update-file
         name: Update file
@@ -2361,6 +2549,25 @@ functions:
                 fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
               );
           ```
+        response: |
+          ```json
+          'avatars/public/avatar1.png'
+          ```
+      - id: update-file-on-web
+        name: Update file on web
+        code: |
+          ```dart
+          final Uint8List avatarFile = file.bytes;
+          final String path = await supabase.storage.from('avatars').updateBinary(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
+        response: |
+          ```json
+          'avatars/public/avatar1.png'
+          ```
 
   - id: from-move
     description: |
@@ -2370,6 +2577,16 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: fromPath
+        isOptional: false
+        type: String
+        description: The original file path, including the current file name. For example folder/image.png.
+      - name: toPath
+        isOptional: false
+        type: String
+        description: The new file path, including the new file name. For example folder/image-new.png.
     examples:
       - id: move-file
         name: Move file
@@ -2381,6 +2598,10 @@ functions:
             .from('avatars')
             .move('public/avatar1.png', 'private/avatar2.png');
           ```
+        response: |
+          ```json
+          'Successfully moved'
+          ```
 
   - id: from-create-signed-url
     description: |
@@ -2390,6 +2611,41 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the file name. For example folder/image.png.
+      - name: expiresIn
+        isOptional: false
+        type: int
+        description: The number of seconds until the signed URL expires. For example, 60 for a URL which is valid for one minute.
+      - name: transform
+        isOptional: true
+        type: TransformOptions
+        description: Transform the asset before serving it to the client.
+        subContent:
+          - name: width
+            isOptional: true
+            type: int
+            description: The width of the image in pixels.
+          - name: height
+            isOptional: true
+            type: int
+            description: The height of the image in pixels.
+          - name: resize
+            isOptional: true
+            type: ResizeMode
+            description: Specifies how image cropping should be handled when performing image transformations. Defaults to `ResizeMode.cover`.
+          - name: quality
+            isOptional: true
+            type: int
+            description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80
+          - name: format
+            isOptional: true
+            type: RequestImageFormat
+            description: Specify the format of the image requested. When using 'origin' we force the format to be the same as the original image. When this option is not passed in, images are optimized to modern image formats like Webp.
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -2417,6 +2673,10 @@ functions:
               ),
             );
           ```
+        response: |
+          ```json
+          'https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>''
+          ```
 
   - id: from-get-public-url
     description: |
@@ -2427,6 +2687,37 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path and name of the file to generate the public URL for. For example folder/image.png.
+      - name: transform
+        isOptional: true
+        type: TransformOptions
+        description: Transform the asset before serving it to the client.
+        subContent:
+          - name: width
+            isOptional: true
+            type: int
+            description: The width of the image in pixels.
+          - name: height
+            isOptional: true
+            type: int
+            description: The height of the image in pixels.
+          - name: resize
+            isOptional: true
+            type: ResizeMode
+            description: Specifies how image cropping should be handled when performing image transformations. Defaults to `ResizeMode.cover`.
+          - name: quality
+            isOptional: true
+            type: int
+            description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80
+          - name: format
+            isOptional: true
+            type: RequestImageFormat
+            description: Specify the format of the image requested. When using 'origin' we force the format to be the same as the original image. When this option is not passed in, images are optimized to modern image formats like Webp.
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -2437,6 +2728,10 @@ functions:
             .storage
             .from('public-bucket')
             .getPublicUrl('avatar1.png');
+          ```
+        response: |
+          ```json
+          'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
           ```
       - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
         name: With transform
@@ -2454,6 +2749,10 @@ functions:
               ),
             );
           ```
+        response: |
+          ```json
+          'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
+          ```
 
   - id: from-download
     description: |
@@ -2463,6 +2762,37 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The full path and file name of the file to be downloaded. For example folder/image.png.
+      - name: transform
+        isOptional: true
+        type: TransformOptions
+        description: Transform the asset before serving it to the client.
+        subContent:
+          - name: width
+            isOptional: true
+            type: int
+            description: The width of the image in pixels.
+          - name: height
+            isOptional: true
+            type: int
+            description: The height of the image in pixels.
+          - name: resize
+            isOptional: true
+            type: ResizeMode
+            description: Specifies how image cropping should be handled when performing image transformations. Defaults to `ResizeMode.cover`.
+          - name: quality
+            isOptional: true
+            type: int
+            description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80
+          - name: format
+            isOptional: true
+            type: RequestImageFormat
+            description: Specify the format of the image requested. When using 'origin' we force the format to be the same as the original image. When this option is not passed in, images are optimized to modern image formats like Webp.
     examples:
       - id: download-file
         name: Download file
@@ -2473,6 +2803,10 @@ functions:
             .storage
             .from('avatars')
             .download('avatar1.png');
+          ```
+        response: |
+          ```json
+          <Blob>
           ```
       - id: download-file-with-transform
         name: With transform
@@ -2490,6 +2824,10 @@ functions:
               ),
             );
           ```
+        response: |
+          ```json
+          <Blob>
+          ```
 
   - id: from-remove
     description: |
@@ -2499,6 +2837,12 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `delete` and `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: List<String>
+        description: A list of files to delete, including the path and file name. For example ['folder/image.png'].
     examples:
       - id: delete-file
         name: Delete file
@@ -2510,6 +2854,26 @@ functions:
             .from('avatars')
             .remove(['avatar1.png']);
           ```
+        response: |
+          ```json
+          [
+            FileObject(
+            name: 'avatar1.png',
+            id: 'e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2',
+            updated_at: '2024-05-22T23:06:05.580Z',
+            created_at: '2024-05-22T23:04:34.443Z',
+            last_accessed_at: '2024-05-22T23:04:34.443Z',
+            metadata: {
+              eTag: 'c5e8c553235d9af30ef4f6e280790b92',
+              size: 32175,
+              mimetype: 'image/png',
+              cacheControl: 'max-age=3600',
+              lastModified: '2024-05-22T23:06:05.574Z',
+              contentLength: 32175,
+              httpStatusCode: 200
+            ),
+          ]
+          ```
 
   - id: from-list
     description: |
@@ -2519,6 +2883,40 @@ functions:
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The folder path.
+      - name: searchOptions
+        isOptional: true
+        type: SearchOptions
+        description: Options for the search operations such as limit and offset.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: int
+            description: The number of files you want to be returned.
+          - name: offset
+            isOptional: true
+            type: int
+            description: The starting position.
+          - name: sortBy
+            isOptional: true
+            type: SortBy
+            description: The column to sort by. Can be any column inside a FileObject.
+            subContent:
+              - name: column
+                isOptional: true
+                type: String
+              - name: order
+                isOptional: true
+                type: String
+          - name: search
+            isOptional: true
+            type: String
+            description: The search string to filter files by.
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket
@@ -2529,6 +2927,26 @@ functions:
             .storage
             .from('avatars')
             .list();
+          ```
+        response: |
+          ```json
+          [
+            FileObject(
+            name: 'avatar1.png',
+            id: 'e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2',
+            updated_at: '2024-05-22T23:06:05.580Z',
+            created_at: '2024-05-22T23:04:34.443Z',
+            last_accessed_at: '2024-05-22T23:04:34.443Z',
+            metadata: {
+              eTag: 'c5e8c553235d9af30ef4f6e280790b92',
+              size: 32175,
+              mimetype: 'image/png',
+              cacheControl: 'max-age=3600',
+              lastModified: '2024-05-22T23:06:05.574Z',
+              contentLength: 32175,
+              httpStatusCode: 200
+            ),
+          ]
           ```
   - id: using-modifiers
     title: Using Modifiers
