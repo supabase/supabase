@@ -91,8 +91,6 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
 
-  const showReadReplicasUI = project?.is_read_replicas_enabled
-
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
     projectRef: ref,
@@ -222,9 +220,11 @@ const SQLEditor = () => {
    */
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
-      const { title } = await generateSqlTitle({ sql })
-
-      snap.renameSnippet(id, title)
+      try {
+        const { title } = await generateSqlTitle({ sql })
+        snap.renameSnippet(id, title)
+      } finally {
+      }
     },
     [generateSqlTitle, snap]
   )
@@ -304,10 +304,9 @@ const SQLEditor = () => {
         }
 
         const impersonatedRole = getImpersonatedRole()
-        const connectionString = !showReadReplicasUI
-          ? project.connectionString
-          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
-              ?.connectionString
+        const connectionString = databases?.find(
+          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+        )?.connectionString
         if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }

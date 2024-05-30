@@ -99,7 +99,7 @@ const MapView = ({
                   geography={geo}
                   strokeWidth={0.3}
                   pointerEvents="none"
-                  className="fill-gray-300 stroke-gray-200"
+                  className="fill-gray-800 stroke-gray-900 dark:fill-gray-300 dark:stroke-gray-200"
                 />
               ))
             }
@@ -280,14 +280,20 @@ const MapView = ({
                             <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-40" side="bottom" align="end">
-                            <DropdownMenuItem className="gap-x-2">
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                            >
                               <Link
                                 href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
                               >
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-x-2">
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                            >
                               <Link
                                 href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
                               >
@@ -300,6 +306,7 @@ const MapView = ({
                             <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectRestartReplica(database)}
+                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                             >
                               Restart replica
                             </DropdownMenuItem>

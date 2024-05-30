@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { documentKeys } from './keys'
 
@@ -21,8 +21,8 @@ export async function getDocument({ orgSlug, docType }: DocumentVariables, signa
         signal,
       }
     )
-    if (error) throw error
 
+    if (error) handleError(error)
     return data as { fileUrl: string }
   }
 

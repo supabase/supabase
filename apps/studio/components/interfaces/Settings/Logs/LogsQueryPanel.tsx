@@ -178,11 +178,12 @@ const LogsQueryPanel = ({
                   hideFooter
                   triggerElement={
                     <Button
+                      asChild // ?: we don't want a button inside a button
                       type="default"
                       onClick={() => setShowReference(true)}
                       icon={<IconBookOpen strokeWidth={1.5} />}
                     >
-                      Field Reference
+                      <span>Field Reference</span>
                     </Button>
                   }
                 >

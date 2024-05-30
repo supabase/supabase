@@ -17,7 +17,10 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from 'data/read-replicas/replicas-status-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from 'data/read-replicas/replicas-status-query'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -31,12 +34,14 @@ import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './Instan
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { SmoothstepEdge } from './Edge'
+import { useSelectedProject } from 'hooks'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
+  const project = useSelectedProject()
   const snap = useSubscriptionPageStateSnapshot()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
@@ -80,7 +85,12 @@ const InstanceConfigurationUI = () => {
           REPLICA_STATUS.ACTIVE_UNHEALTHY,
           REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
         ]
-        const replicasInTransition = res.filter((db) => !fixedStatues.includes(db.status))
+        const replicasInTransition = res.filter((db) => {
+          const { status } = db.replicaInitializationStatus || {}
+          return (
+            !fixedStatues.includes(db.status) || status === ReplicaInitializationStatus.InProgress
+          )
+        })
         const hasTransientStatus = replicasInTransition.length > 0
 
         // If any replica's status has changed, refetch databases
@@ -107,7 +117,10 @@ const InstanceConfigurationUI = () => {
   const nodes = useMemo(
     () =>
       isSuccessReplicas && isSuccessLoadBalancers
-        ? generateNodes(primary, replicas, loadBalancers ?? [], {
+        ? generateNodes({
+            primary,
+            replicas,
+            loadBalancers: loadBalancers ?? [],
             onSelectRestartReplica: setSelectedReplicaToRestart,
             onSelectDropReplica: setSelectedReplicaToDrop,
           })
@@ -202,48 +215,52 @@ const InstanceConfigurationUI = () => {
               <div className="flex items-center justify-center">
                 <Button
                   type="default"
-                  className="rounded-r-none"
+                  className={replicas.length > 0 ? 'rounded-r-none' : ''}
                   onClick={() => setShowNewReplicaPanel(true)}
                 >
                   Deploy a new replica
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="default"
-                      icon={<ChevronDown size={16} />}
-                      className="px-1 rounded-l-none border-l-0"
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                    <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
-                      <div>Resize databases</div>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
-                      <div>Remove all replicas</div>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {replicas.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        icon={<ChevronDown size={16} />}
+                        className="px-1 rounded-l-none border-l-0"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52 *:space-x-2">
+                      <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
+                        <div>Resize databases</div>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
+                        <div>Remove all replicas</div>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
-              <div className="flex items-center justify-center">
-                <Button
-                  type="default"
-                  icon={<Network size={15} />}
-                  className={`rounded-r-none transition ${
-                    view === 'flow' ? 'opacity-100' : 'opacity-50'
-                  }`}
-                  onClick={() => setView('flow')}
-                />
-                <Button
-                  type="default"
-                  icon={<Globe2 size={15} />}
-                  className={`rounded-l-none transition ${
-                    view === 'map' ? 'opacity-100' : 'opacity-50'
-                  }`}
-                  onClick={() => setView('map')}
-                />
-              </div>
+              {project?.cloud_provider === 'AWS' && (
+                <div className="flex items-center justify-center">
+                  <Button
+                    type="default"
+                    icon={<Network size={15} />}
+                    className={`rounded-r-none transition ${
+                      view === 'flow' ? 'opacity-100' : 'opacity-50'
+                    }`}
+                    onClick={() => setView('flow')}
+                  />
+                  <Button
+                    type="default"
+                    icon={<Globe2 size={15} />}
+                    className={`rounded-l-none transition ${
+                      view === 'map' ? 'opacity-100' : 'opacity-50'
+                    }`}
+                    onClick={() => setView('map')}
+                  />
+                </div>
+              )}
             </div>
             {view === 'flow' ? (
               <ReactFlow
