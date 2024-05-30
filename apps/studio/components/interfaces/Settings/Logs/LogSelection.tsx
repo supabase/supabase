@@ -199,7 +199,7 @@ const LogSelection = ({
       </div>
       <div className="relative flex-grow flex flex-col bg-surface-100">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col">
-          <TabsList_Shadcn_ className="px-2 pt-4">
+          <TabsList_Shadcn_ className="px-2 pt-2">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
               Details
             </TabsTrigger_Shadcn_>
@@ -208,7 +208,7 @@ const LogSelection = ({
             </TabsTrigger_Shadcn_>
             <Button
               type="text"
-              className="ml-auto absolute top-3 right-3 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
+              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
               <X size={14} strokeWidth={2} className="text-foreground-lighter" />
