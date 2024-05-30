@@ -176,6 +176,27 @@ const DeployNewReplicaPanel = ({
               </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
+        ) : currentPgVersion < 15 ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas can only be deployed with projects on Postgres version 15 and above
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to use read replicas, please contact us via support
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-2">
+              <Button type="default">
+                <Link
+                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Contact support
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <>
             {!isWalgEnabled && (
@@ -270,29 +291,6 @@ const DeployNewReplicaPanel = ({
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
-
-            {currentPgVersion < 15 && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  Read replicas can only be deployed with projects on Postgres version 15 and above
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  If you'd like to use read replicas, please contact us via support
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_ className="mt-2">
-                  <Button type="default">
-                    <Link
-                      href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Contact support
-                    </Link>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
           </>
         )}
 
@@ -327,9 +325,8 @@ const DeployNewReplicaPanel = ({
           <div className="flex flex-col gap-y-2">
             <p className="text-foreground-light text-sm">
               Read replicas will be on the same compute size as your primary database. Deploying a
-              read replica incurs additional{' '}
-              <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
-              Pricing is still in early access and is subject to change.
+              read replica on the {selectedComputeMeta?.name} size incurs additional{' '}
+              <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
             </p>
 
             <p className="text-foreground-light text-sm">

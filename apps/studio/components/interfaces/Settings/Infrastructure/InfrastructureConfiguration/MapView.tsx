@@ -99,7 +99,7 @@ const MapView = ({
                   geography={geo}
                   strokeWidth={0.3}
                   pointerEvents="none"
-                  className="fill-gray-300 stroke-gray-200"
+                  className="fill-gray-800 stroke-gray-900 dark:fill-gray-300 dark:stroke-gray-200"
                 />
               ))
             }
