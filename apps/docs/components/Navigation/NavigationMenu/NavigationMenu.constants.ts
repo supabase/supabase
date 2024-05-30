@@ -384,7 +384,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Changelog',
             icon: 'changelog',
             hasLightIcon: true,
-            href: 'https://supabase.com/partners/integrations',
+            href: 'https://supabase.com/changelog',
             level: 'changelog',
           },
           {

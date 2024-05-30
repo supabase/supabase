@@ -7,20 +7,21 @@ import { cn } from '../../../lib/utils/cn'
 
 interface NavigationMenuProps
   extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
+  hasViewport?: boolean | undefined
   viewportClassName?: string | undefined
 }
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   NavigationMenuProps
->(({ className, viewportClassName, children, ...props }, ref) => (
+>(({ className, hasViewport = true, viewportClassName, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
     className={cn('relative z-10 flex flex-1 items-center justify-center', className)}
     {...props}
   >
     {children}
-    {/* <NavigationMenuViewport className={viewportClassName} /> */}
+    {hasViewport && <NavigationMenuViewport className={viewportClassName} />}
   </NavigationMenuPrimitive.Root>
 ))
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
