@@ -49,10 +49,12 @@ import {
 } from './SQLEditor.types'
 import {
   checkDestructiveQuery,
+  checkIfAppendLimitRequired,
   compareAsAddition,
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
+  prefixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
@@ -311,21 +313,8 @@ const SQLEditor = () => {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
-        // Remove lines and whitespaces
-        const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
-        // Check if need to auto limit rows
-        const appendAutoLimit =
-          snap.limit > 0 &&
-          cleanedSql.toLowerCase().startsWith('select') &&
-          !cleanedSql.endsWith('limit') &&
-          !cleanedSql.endsWith('limit;') &&
-          !cleanedSql.match('limit [0-9]*[;]?$')
-        // Append the limit prefix if needed
-        const formattedSql = appendAutoLimit
-          ? cleanedSql.endsWith(';')
-            ? cleanedSql.replace(/.$/, ` limit ${snap.limit};`)
-            : `${cleanedSql} limit ${snap.limit};`
-          : cleanedSql
+        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, snap.limit)
+        const formattedSql = prefixWithLimit(sql, snap.limit)
 
         execute({
           projectRef: project.ref,

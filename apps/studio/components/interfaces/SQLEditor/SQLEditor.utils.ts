@@ -109,3 +109,27 @@ export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
     modified: sqlDiff.modified,
   }
 }
+
+// [Joshen] Broke up the following 2 functions so that they can be unit-tested
+export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
+  // Remove lines and whitespaces to use for checking
+  const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
+  // Check if need to auto limit rows
+  const appendAutoLimit =
+    limit > 0 &&
+    cleanedSql.toLowerCase().startsWith('select') &&
+    !cleanedSql.endsWith('limit') &&
+    !cleanedSql.endsWith('limit;') &&
+    !cleanedSql.match('limit [0-9]*[;]?$')
+  return { cleanedSql, appendAutoLimit }
+}
+
+export const prefixWithLimit = (sql: string, limit: number = 0) => {
+  const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+  const formattedSql = appendAutoLimit
+    ? cleanedSql.endsWith(';')
+      ? sql.replace(/[;]+$/, ` limit ${limit};`)
+      : `${sql} limit ${limit};`
+    : sql
+  return formattedSql
+}
