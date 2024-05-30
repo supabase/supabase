@@ -1,10 +1,11 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import type { Filter } from 'components/grid/types'
+import { compact } from 'lodash'
+import type { Dictionary } from 'types'
+import { FilterOperatorOptions } from './components/header/filter'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-import type { Dictionary } from 'types'
-import { FilterOperatorOptions } from './components/header/filter'
-import type { Filter } from 'components/grid/types'
 
 /**
  * Ensure that if editable is false, we should remove all editing actions
@@ -26,19 +27,18 @@ export function cleanupProps(props: SupabaseGridProps) {
   }
 }
 
-export function formatSortURLParams(sort?: string[]) {
-  return (
-    Array.isArray(sort)
-      ? sort
-          .map((s) => {
-            const [column, order] = s.split(':')
-            // Reject any possible malformed sort param
-            if (!column || !order) return undefined
-            else return { column, ascending: order === 'asc' }
-          })
-          .filter((s) => s !== undefined)
-      : []
-  ) as Sort[]
+export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+  if (Array.isArray(sort)) {
+    return compact(
+      sort.map((s) => {
+        const [column, order] = s.split(':')
+        // Reject any possible malformed sort param
+        if (!column || !order) return undefined
+        else return { table: tableName, column, ascending: order === 'asc' }
+      })
+    )
+  }
+  return []
 }
 
 export function formatFilterURLParams(filter?: string[]): Filter[] {
