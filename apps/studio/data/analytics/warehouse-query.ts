@@ -34,16 +34,13 @@ export type WarehouseQueryError = ResponseError
 
 export const useWarehouseQueryQuery = <TData = WarehouseQueryData>(
   { ref, sql }: WarehouseQueryVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseQueryOptions<WarehouseQueryData, WarehouseQueryError, TData> = {}
+  { enabled, ...options }: UseQueryOptions<WarehouseQueryData, WarehouseQueryError, TData> = {}
 ) =>
   useQuery<WarehouseQueryData, WarehouseQueryError, TData>(
     analyticsKeys.warehouseQuery(ref, sql),
     ({ signal }) => getWarehouseQuery({ ref, sql }, signal),
     {
-      enabled: enabled && typeof ref !== 'undefined',
+      enabled,
       staleTime: Infinity,
       cacheTime: 15 * 60 * 1000, // 15 mins cache time
       refetchOnMount: false,

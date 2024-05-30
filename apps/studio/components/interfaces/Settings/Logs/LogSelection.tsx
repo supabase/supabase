@@ -56,6 +56,7 @@ const LogSelection = ({
       sql,
     },
     {
+      enabled: queryType === 'warehouse',
       onError: (error) => {
         toast.error(error.message)
       },
@@ -70,7 +71,9 @@ const LogSelection = ({
   }, [collectionName, partialLog?.id])
 
   useEffect(() => {
-    refetchWarehouseData()
+    if (queryType === 'warehouse') {
+      refetchWarehouseData()
+    }
   }, [warehouseQueryData, collectionName, projectRef, partialLog?.id, refetchWarehouseData])
 
   const Formatter = () => {
@@ -208,7 +211,7 @@ const LogSelection = ({
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {(isLoading || warehouseQueryLoading) && <Loading />}
+        {isLoading && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>
