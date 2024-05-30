@@ -1081,11 +1081,11 @@ export const functions: NavMenuConstant = {
       url: '/guides/functions',
     },
     {
-      name: 'Quickstart',
+      name: 'Getting started',
       url: undefined,
       items: [
         {
-          name: 'Getting started',
+          name: 'Create an Edge Function',
           url: '/guides/functions/quickstart',
         },
         {
