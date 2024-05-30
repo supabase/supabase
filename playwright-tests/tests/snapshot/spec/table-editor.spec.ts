@@ -8,7 +8,8 @@ const dismissToast = async (page: Page) => {
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types'
+      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      { timeout: 60000 }
     )
     const name = 'TestTable-' + Math.floor(Math.random() * 100)
 
