@@ -1,10 +1,9 @@
 import { cn, CodeBlock } from 'ui'
 import { PreviewLogData } from '..'
-import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, SelectionDetailedTimestampRow } from '../LogsFormatters'
+import { SelectionDetailedTimestampRow } from '../LogsFormatters'
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (
-  <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-6`}>
+  <div className={`space-y-6 py-4 px-5`}>
     {log?.timestamp && <SelectionDetailedTimestampRow value={log.timestamp} />}
     <div className="flex flex-col gap-3">
       <h3 className="text-foreground-lighter text-sm">Event Message</h3>
