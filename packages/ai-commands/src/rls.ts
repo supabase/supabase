@@ -30,8 +30,10 @@ export async function chatRlsPolicy(
         - You can add short explanations to your messages.
         - The result should be a valid markdown. The SQL code should be wrapped in \`\`\` (including sql language tag).
         - Always use "auth.uid()" instead of "current_user".
-        - You can't use "USING" expression on INSERT policies.
-        - Only use "WITH CHECK" expression on INSERT or UPDATE policies.
+        - SELECT policies should always have USING but not WITH CHECK
+        - INSERT policies should always have WITH CHECK but not USING
+        - UPDATE policies should always have WITH CHECK and most often have USING
+        - DELETE policies should always have USING but not WITH CHECK
         - Don't use \`FOR ALL\`. Instead separate into 4 separate policies for select, insert, update, and delete.
         - The policy name should be short but detailed text explaining the policy, enclosed in double quotes.
         - Always put explanations as separate text. Never use inline SQL comments. 
