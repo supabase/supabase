@@ -1,10 +1,11 @@
 import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { post, handleError as handleErrorFetchers } from 'data/fetchers'
+import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
+import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
 
 export type Error = { code: number; message: string; requestId: string }
@@ -100,7 +101,7 @@ export async function executeSql(
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
-export type ExecuteSqlError = unknown
+export type ExecuteSqlError = ResponseError
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {

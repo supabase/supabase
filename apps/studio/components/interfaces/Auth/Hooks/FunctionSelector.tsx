@@ -72,15 +72,10 @@ const FunctionSelector = ({
             Failed to load functions
           </AlertTitle_Shadcn_>
 
-          {Boolean(error) &&
-            typeof error === 'object' &&
-            error !== null &&
-            'message' in error &&
-            typeof error.message === 'string' && (
-              <AlertDescription_Shadcn_ className="text-xs mb-2">
-                Error: {error.message}
-              </AlertDescription_Shadcn_>
-            )}
+          <AlertDescription_Shadcn_ className="text-xs mb-2">
+            Error: {error.message}
+          </AlertDescription_Shadcn_>
+
           <Button type="default" size="tiny" onClick={() => refetch()}>
             Reload functions
           </Button>
