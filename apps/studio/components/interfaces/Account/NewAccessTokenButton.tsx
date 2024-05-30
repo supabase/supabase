@@ -106,7 +106,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           validate={validate}
         >
           {() => (
-            <div className="space-y-4">
+            <>
               {tokenScope === 'V0' && (
                 <Modal.Content>
                   <Alert
@@ -150,7 +150,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                   </Button>
                 </div>
               </DialogFooter>
-            </div>
+            </>
           )}
         </Form>
       </Modal>
