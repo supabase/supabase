@@ -260,15 +260,36 @@ describe('rls chat', () => {
     const policies = await getPolicies(sql)
 
     withMetadata({ sql }, () => {
+      const allPolicy = policies.find((policy) => policy.cmd_name === 'all')
       const selectPolicy = policies.find((policy) => policy.cmd_name === 'select')
       const insertPolicy = policies.find((policy) => policy.cmd_name === 'insert')
       const updatePolicy = policies.find((policy) => policy.cmd_name === 'update')
       const deletePolicy = policies.find((policy) => policy.cmd_name === 'delete')
 
+      expect(allPolicy).toBeUndefined()
       expect(selectPolicy).not.toBeUndefined()
       expect(insertPolicy).not.toBeUndefined()
       expect(updatePolicy).not.toBeUndefined()
       expect(deletePolicy).not.toBeUndefined()
     })
+  })
+
+  test.concurrent('discourages restrictive policies', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'Can I make a policy restrict access instead of give access?',
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+
+    await expect(responseText).toMatchCriteria(
+      'Discourages restrictive policies and provides reasons why'
+    )
   })
 })

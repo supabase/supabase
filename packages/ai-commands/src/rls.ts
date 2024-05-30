@@ -39,6 +39,7 @@ export async function chatRlsPolicy(
         - Always put explanations as separate text. Never use inline SQL comments. 
         - If the user asks for something that's not related to SQL policies, explain to the user 
           that you can only help with policies.
+        - Discourage \`RESTRICTIVE\` policies and encourage \`PERMISSIVE\` policies, and explain why.
         
         The output should look like this:
         \`\`\`sql
