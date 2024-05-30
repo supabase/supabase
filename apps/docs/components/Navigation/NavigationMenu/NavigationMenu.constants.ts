@@ -1153,6 +1153,10 @@ export const functions: NavMenuConstant = {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
       ],
     },
     {
