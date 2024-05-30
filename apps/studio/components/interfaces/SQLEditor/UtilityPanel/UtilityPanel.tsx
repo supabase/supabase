@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -10,8 +10,6 @@ import { ChartConfig } from './ChartConfig'
 import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
-import SavingIndicator from './SavingIndicator'
-import { IS_PLATFORM } from 'lib/constants'
 
 export type UtilityPanelProps = {
   id: string
@@ -122,16 +120,14 @@ const UtilityPanel = ({
           </TabsTrigger_Shadcn_>
           {result?.rows && <ResultsDropdown id={id} />}
         </div>
-        <div className="flex gap-1 h-full items-center">
-          <UtilityActions
-            id={id}
-            isExecuting={isExecuting}
-            isDisabled={isDisabled}
-            hasSelection={hasSelection}
-            prettifyQuery={prettifyQuery}
-            executeQuery={executeQuery}
-          />
-        </div>
+        <UtilityActions
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          hasSelection={hasSelection}
+          prettifyQuery={prettifyQuery}
+          executeQuery={executeQuery}
+        />
       </TabsList_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
         <UtilityTabResults

@@ -85,7 +85,7 @@ const UtilityActions = ({
                 )
               }}
             >
-              <p>Intellisense enabled</p>
+              Intellisense enabled
               {intellisenseEnabled && <Check className="text-brand" size={16} />}
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -108,8 +108,8 @@ const UtilityActions = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button asChild type="outline" iconRight={<ChevronDown size={14} />}>
-            <span>{ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snap.limit)?.label}</span>
+          <Button type="default" iconRight={<ChevronDown size={14} />}>
+            {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snap.limit)?.label}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-42">
