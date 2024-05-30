@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import { AuthLayout } from 'components/layouts'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'

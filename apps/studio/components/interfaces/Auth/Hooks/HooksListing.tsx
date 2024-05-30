@@ -3,19 +3,17 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import AlertError from 'components/ui/AlertError'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
