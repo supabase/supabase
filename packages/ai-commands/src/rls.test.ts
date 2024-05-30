@@ -51,7 +51,7 @@ const tableDefs = [
 ]
 
 describe('rls chat', () => {
-  test('defaults to authenticated role', async () => {
+  test.concurrent('defaults to authenticated role', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -72,7 +72,7 @@ describe('rls chat', () => {
     })
   })
 
-  test('uses anon + authenticated roles when table viewable by anyone', async () => {
+  test.concurrent('uses anon + authenticated roles when table viewable by anyone', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -93,7 +93,7 @@ describe('rls chat', () => {
     })
   })
 
-  test('wraps every function in select', async () => {
+  test.concurrent('wraps every function in select', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -151,7 +151,7 @@ describe('rls chat', () => {
     })
   })
 
-  test('select policy', async () => {
+  test.concurrent('select policy has USING but not WITH CHECK', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -169,10 +169,12 @@ describe('rls chat', () => {
 
     withMetadata({ sql }, () => {
       expect(policy.cmd_name).toBe('select')
+      expect(policy.qual).not.toBeUndefined()
+      expect(policy.with_check).toBeUndefined()
     })
   })
 
-  test('insert policy', async () => {
+  test.concurrent('insert policy has WITH CHECK but not USING', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -190,10 +192,12 @@ describe('rls chat', () => {
 
     withMetadata({ sql }, () => {
       expect(policy.cmd_name).toBe('insert')
+      expect(policy.qual).toBeUndefined()
+      expect(policy.with_check).not.toBeUndefined()
     })
   })
 
-  test('update policy', async () => {
+  test.concurrent('update policy has USING and WITH CHECK', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -211,10 +215,12 @@ describe('rls chat', () => {
 
     withMetadata({ sql }, () => {
       expect(policy.cmd_name).toBe('update')
+      expect(policy.qual).not.toBeUndefined()
+      expect(policy.with_check).not.toBeUndefined()
     })
   })
 
-  test('delete policy', async () => {
+  test.concurrent('delete policy has USING but not WITH CHECK', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
@@ -232,10 +238,12 @@ describe('rls chat', () => {
 
     withMetadata({ sql }, () => {
       expect(policy.cmd_name).toBe('delete')
+      expect(policy.qual).not.toBeUndefined()
+      expect(policy.with_check).toBeUndefined()
     })
   })
 
-  test('splits multiple operations into separate policies', async () => {
+  test.concurrent('splits multiple operations into separate policies', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
       [
