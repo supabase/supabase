@@ -159,9 +159,9 @@ export const sqlEditorState = proxy({
       sqlEditorState.results[id].unshift({ rows: results, autoLimit })
     }
   },
-  addResultError: (id: string, error: any) => {
+  addResultError: (id: string, error: any, autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id].unshift({ rows: [], error })
+      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
     }
   },
   addFavorite: (id: string) => {

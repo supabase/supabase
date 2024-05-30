@@ -177,7 +177,7 @@ const SQLEditor = () => {
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
     },
-    onError(error: any) {
+    onError(error: any, vars) {
       if (id) {
         if (error.position && monacoRef.current) {
           const editor = editorRef.current
@@ -210,7 +210,7 @@ const SQLEditor = () => {
           }
         }
 
-        snap.addResultError(id, error)
+        snap.addResultError(id, error, vars.autoLimit)
       }
     },
   })

@@ -91,15 +91,19 @@ const UtilityTabResults = ({
                   </pre>
                 ))
               ) : (
-                <>
-                  <p className="font-mono text-sm">Error: {result.error?.message}</p>
-                  {readReplicaError && (
-                    <p className="text-sm text-foreground-light">
-                      Note: Read replicas are for read only queries. Run write queries on the
-                      primary database instead.
-                    </p>
-                  )}
-                </>
+                <p className="font-mono text-sm">Error: {result.error?.message}</p>
+              )}
+              {result.autoLimit && (
+                <p className="text-sm text-foreground-light">
+                  Note: A limit of {result.autoLimit} was applied to your query. If this was the
+                  cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                </p>
+              )}
+              {readReplicaError && (
+                <p className="text-sm text-foreground-light">
+                  Note: Read replicas are for read only queries. Run write queries on the primary
+                  database instead.
+                </p>
               )}
             </div>
           )}
