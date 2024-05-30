@@ -6,20 +6,20 @@ import type {
 } from '../Navigation.types'
 
 export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
-  [
-    {
-      label: 'Home',
-      icon: 'home',
-      href: '/',
-      level: 'home',
-    },
-    {
-      label: 'Getting Started',
-      icon: 'getting-started',
-      href: '/guides/getting-started',
-      level: 'gettingstarted',
-    },
-  ],
+  // [
+  //   {
+  //     label: 'Home',
+  //     icon: 'home',
+  //     href: '/',
+  //     level: 'home',
+  //   },
+  //   {
+  //     label: 'Getting Started',
+  //     icon: 'getting-started',
+  //     href: '/guides/getting-started',
+  //     level: 'gettingstarted',
+  //   },
+  // ],
   [
     {
       label: 'Product',
@@ -296,7 +296,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'API & CLI',
+      label: 'API Reference',
       menuItems: [
         [
           {

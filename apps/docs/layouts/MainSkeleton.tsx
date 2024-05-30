@@ -331,7 +331,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
 function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
   return (
     <div className="flex flex-col h-full w-full">
-      <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10 overflow-hidden')}>
+      <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10')}>
         <TopNavBar />
       </div>
       <div className="flex flex-row h-full mt-[var(--header-height,90px)]">

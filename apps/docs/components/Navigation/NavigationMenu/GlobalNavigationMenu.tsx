@@ -33,7 +33,7 @@ export const MenuItem = React.forwardRef<
       {children ?? (
         <>
           {icon && <HomeMenuIconPicker icon={icon} />}
-          <span className="flex-1 whitespace-nowrap no-wrap flex-nowrap">{title}</span>
+          {title}
           {community && <Badge size="small">Community</Badge>}
         </>
       )}
