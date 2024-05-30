@@ -146,7 +146,7 @@ const EnableBranchingModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
-            <Modal.Content className="px-7 py-5 flex items-center justify-between space-x-4">
+            <Modal.Content className="flex items-center justify-between space-x-4">
               <div className="flex items-center gap-x-4">
                 <IconGitBranch strokeWidth={2} size={20} />
                 <div>

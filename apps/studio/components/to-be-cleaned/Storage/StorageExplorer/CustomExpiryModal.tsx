@@ -58,7 +58,7 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
       >
         {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
           <>
-            <div className="pt-4 pb-2">
+            <div className="">
               <Modal.Content>
                 <p className="text-sm text-foreground-light mb-2">
                   Enter the duration for which the URL will be valid for:
@@ -89,20 +89,18 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
               </Modal.Content>
             </div>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end space-x-2 pt-1 pb-3">
-                <Button type="default" onClick={() => onClose()}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={values.expiresIn === '' || isSubmitting}
-                  loading={isSubmitting}
-                  htmlType="submit"
-                  type="primary"
-                >
-                  Get signed URL
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end space-x-2">
+              <Button type="default" onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button
+                disabled={values.expiresIn === '' || isSubmitting}
+                loading={isSubmitting}
+                htmlType="submit"
+                type="primary"
+              >
+                Get signed URL
+              </Button>
             </Modal.Content>
           </>
         )}

@@ -236,26 +236,19 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-default !mt-0" />
-              <Modal.Content>
-                <div className="flex items-center space-x-2 justify-end">
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    disabled={isCreating}
-                    onClick={() => onClose()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isCreating}
-                    disabled={isCreating}
-                  >
-                    Save
-                  </Button>
-                </div>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center space-x-2 justify-end">
+                <Button
+                  type="default"
+                  htmlType="button"
+                  disabled={isCreating}
+                  onClick={() => onClose()}
+                >
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isCreating} disabled={isCreating}>
+                  Save
+                </Button>
               </Modal.Content>
             </>
           )
