@@ -1160,6 +1160,20 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
+        },
+      ],
+    },
+    {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
