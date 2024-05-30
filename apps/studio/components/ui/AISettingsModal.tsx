@@ -6,7 +6,6 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
-  Switch,
   Toggle,
 } from 'ui'
 
@@ -40,8 +39,8 @@ const AISettingsModal = () => {
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
       <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
-        <div className="flex justify-between gap-x-3 mr-8 my-4">
-          <Switch
+        <div className="flex justify-between gap-x-5 mr-8 my-4">
+          <Toggle
             disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
             onChange={handleOptInToggle}
