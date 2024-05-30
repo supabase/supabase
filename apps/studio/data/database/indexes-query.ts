@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
-import type { ResponseError } from 'types'
 
 // [Joshen] Future refactor to move to pg-meta once available
 

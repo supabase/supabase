@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { Plus } from 'lucide-react'
+import { MoreVertical, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -16,7 +16,16 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { ResponseError } from 'types'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
@@ -32,7 +41,7 @@ import {
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
-const SideBarContent = () => {
+export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: () => void }) => {
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -198,14 +207,27 @@ const SideBarContent = () => {
     <>
       <div className="mt-6">
         <div className="flex flex-col gap-4">
-          <Button
-            type="default"
-            className="justify-start mx-4"
-            onClick={() => handleNewQuery()}
-            icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
-          >
-            New query
-          </Button>
+          <div className="mx-4 flex items-center gap-x-2">
+            <Button
+              block
+              type="default"
+              className="justify-start"
+              onClick={() => handleNewQuery()}
+              icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+            >
+              New query
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="px-1" type="default" icon={<MoreVertical />} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-52" align="end">
+                <DropdownMenuItem onClick={onViewOngoingQueries}>
+                  View running queries
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <div className="px-2">
             <InnerSideMenuItem
@@ -369,5 +391,3 @@ const SideBarContent = () => {
     </>
   )
 }
-
-export default SideBarContent

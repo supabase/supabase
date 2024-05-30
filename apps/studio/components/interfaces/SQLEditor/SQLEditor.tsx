@@ -611,6 +611,7 @@ const SQLEditor = () => {
           executeQuery(true)
         }}
       />
+
       <div className="flex h-full">
         <ResizablePanelGroup
           className="h-full relative"
@@ -741,6 +742,7 @@ const SQLEditor = () => {
             )}
           </ResizablePanel>
         </ResizablePanelGroup>
+
         {isAiOpen && (
           <AiAssistantPanel
             messages={messages}

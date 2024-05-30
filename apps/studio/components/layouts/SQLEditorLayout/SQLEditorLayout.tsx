@@ -1,7 +1,8 @@
 import { withAuth } from 'hooks'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import { ProjectLayout } from '../'
-import SQLEditorMenu from './SQLEditorMenu'
+import { SQLEditorMenu } from './SQLEditorMenu'
+import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 
 export interface SQLEditorLayoutProps {
   title: string
@@ -9,7 +10,18 @@ export interface SQLEditorLayoutProps {
 }
 
 const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
-  const productMenu = useMemo(() => <SQLEditorMenu key="sql-editor-menu" />, [])
+  const [showOngoingQueries, setShowOngoingQueries] = useState(false)
+  const productMenu = useMemo(
+    () => (
+      <SQLEditorMenu
+        key="sql-editor-menu"
+        onViewOngoingQueries={() => setShowOngoingQueries(true)}
+      />
+    ),
+    []
+  )
+
+  console.log({ showOngoingQueries })
 
   return (
     <ProjectLayout
@@ -20,6 +32,10 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
       resizableSidebar
     >
       {children}
+      <OngoingQueriesPanel
+        visible={showOngoingQueries}
+        onClose={() => setShowOngoingQueries(false)}
+      />
     </ProjectLayout>
   )
 }
