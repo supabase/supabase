@@ -14,6 +14,7 @@ import { TestCollectionDialog } from './TestCollectionDialog'
 import { RefreshCcw, Rewind } from 'lucide-react'
 import AlertError from 'components/ui/AlertError'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useFlag } from 'hooks'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -21,10 +22,11 @@ export const WarehouseCollectionDetail = () => {
   const projectRef = router.query.ref as string
   const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
   const [testDialogOpen, setTestDialogOpen] = useState(false)
+  const hasWarehouse = useFlag('warehouse')
 
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef },
-    { enabled: true }
+    { enabled: hasWarehouse }
   )
   const collection = (collections || []).find((c) => c.token === collectionToken)
   const [params, setParams] = useState({
@@ -58,7 +60,7 @@ export const WarehouseCollectionDetail = () => {
   } = useWarehouseQueryQuery(
     { ref: projectRef, sql: params.sql },
     {
-      enabled: !!params.sql,
+      enabled: !!params.sql && hasWarehouse,
     }
   )
 

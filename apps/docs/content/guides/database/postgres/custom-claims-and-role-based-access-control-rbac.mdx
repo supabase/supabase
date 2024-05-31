@@ -215,22 +215,26 @@ To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth
 To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
 
 ```sql supabase/migrations/init.sql
-create function public.authorize(
+create or replace function public.authorize(
   requested_permission app_permission
 )
 returns boolean as $$
 declare
   bind_permissions int;
+  user_role public.app_role;
 begin
+  -- Fetch user role once and store it to reduce number of calls
+  select (auth.jwt() ->> 'user_role')::public.app_role into user_role;
+
   select count(*)
+  into bind_permissions
   from public.role_permissions
-  where role_permissions.permission = authorize.requested_permission
-    and (role_permissions.role = (select (auth.jwt() ->> 'user_role')::public.app_role))
-  into bind_permissions;
+  where role_permissions.permission = requested_permission
+    and role_permissions.role = user_role;
 
   return bind_permissions > 0;
 end;
-$$ language plpgsql security definer set search_path = '';
+$$ language plpgsql stable security definer set search_path = '';
 ```
 
 <Admonition type="note">
@@ -242,8 +246,8 @@ You can read more about using functions in RLS policies in the [RLS guide](/docs
 You can then use the `authorize` method within your RLS policies. For example, to enable the desired delete access, you would add the following policies:
 
 ```sql
-create policy "Allow authorized delete access" on public.channels for delete using ( authorize('channels.delete') );
-create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete') );
+create policy "Allow authorized delete access" on public.channels for delete using ( (SELECT authorize('channels.delete')) );
+create policy "Allow authorized delete access" on public.messages for delete using ( (SELECT authorize('messages.delete')) );
 ```
 
 ## Accessing custom claims in your application

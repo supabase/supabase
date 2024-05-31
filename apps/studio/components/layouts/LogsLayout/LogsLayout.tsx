@@ -41,7 +41,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const { ref } = useParams()
   const projectRef = ref || 'default'
 
-  const { data: tenant } = useWarehouseTenantQuery({ projectRef })
+  const { data: tenant } = useWarehouseTenantQuery(
+    { projectRef },
+    {
+      enabled: showWarehouse,
+    }
+  )
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     {
       projectRef: !tenant ? 'undefined' : projectRef,
