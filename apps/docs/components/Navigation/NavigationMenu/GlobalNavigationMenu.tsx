@@ -30,7 +30,7 @@ export const MenuItem = React.forwardRef<
       ref={ref}
       className={cn(
         'group/menu-item flex items-center gap-2',
-        'flex items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'w-full flex items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
       {...props}
@@ -38,7 +38,7 @@ export const MenuItem = React.forwardRef<
       {children ?? (
         <>
           {icon && <HomeMenuIconPicker icon={icon} />}
-          {title}
+          <span className="flex-1">{title}</span>
           {community && <Badge size="small">Community</Badge>}
         </>
       )}
