@@ -1,16 +1,21 @@
-import Link from 'next/link'
 import React from 'react'
+import Link from 'next/link'
 import { Badge, cn } from 'ui'
+import { useBreakpoint } from 'common'
+
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import GlobalNavigationMenuDesktop from './GlobalNavigationMenuDesktop'
 import GlobalNavigationMenuMobile from './GlobalNavigationMenuMobile'
 
-const GlobalNavigationMenu = () => (
-  <div className="h-[30px] flex relative gap-2 justify-start items-end w-full">
-    <GlobalNavigationMenuDesktop />
-    <GlobalNavigationMenuMobile />
-  </div>
-)
+const GlobalNavigationMenu = () => {
+  const isTablet = useBreakpoint()
+
+  return (
+    <nav className="h-[30px] flex relative gap-2 justify-start items-end w-full">
+      {!isTablet ? <GlobalNavigationMenuDesktop /> : <GlobalNavigationMenuMobile />}
+    </nav>
+  )
+}
 
 export const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,

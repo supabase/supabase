@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import {
   cn,
   Menubar,
@@ -9,14 +10,14 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from 'ui'
+
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 import { MenuItem } from './GlobalNavigationMenu'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
-import Link from 'next/link'
 
 const GlobalNavigationMenuMobile = () => (
-  <div className="flex overflow-x-scroll no-scrollbar">
-    <Menubar className="z-50 space-x-0 flex lg:hidden border-none justify-start px-5">
+  <div className="lg:hidden flex overflow-x-scroll no-scrollbar">
+    <Menubar className="z-50 space-x-0 flex border-none justify-start px-5">
       {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
         section[0].menuItems ? (
           <MenubarMenu key={`mobile-docs-menu-section-${section[0].label}`}>
@@ -28,6 +29,7 @@ const GlobalNavigationMenuMobile = () => (
               />
             </MenubarTrigger>
             <MenubarContent
+              hideWhenDetached
               sideOffset={4}
               className="z-50 right-5 mx-2 min-w-[14rem] overflow-hidden rounded-md border border-overlay bg-overlay p-1 text-foreground-light shadow-md !duration-0 w-64"
             >

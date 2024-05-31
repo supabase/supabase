@@ -9,14 +9,14 @@ import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
-  // home: {
-  //   icon: 'home',
-  //   name: 'Home',
-  // },
-  // gettingstarted: {
-  //   icon: 'getting-started',
-  //   name: 'Getting Started',
-  // },
+  home: {
+    icon: 'home',
+    name: 'Home',
+  },
+  gettingstarted: {
+    icon: 'getting-started',
+    name: 'Getting Started',
+  },
   database: {
     icon: 'database',
     name: 'Database',
@@ -334,7 +334,8 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
       <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10')}>
         <TopNavBar />
       </div>
-      <div className="flex flex-row h-full mt-[var(--header-height,90px)]">
+      <div className="flex flex-row h-full !pt-[90px]">
+        {/* <div className="flex flex-row h-full mt-[var(--header-height,90px)]"> */}
         <NavContainer menuId={menuId} />
         <Container className="[--header-height:40px] lg:[--header-height:90px]">
           <div

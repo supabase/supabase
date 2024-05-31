@@ -1,7 +1,7 @@
+import { FC, memo } from 'react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { FC, memo } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
 import { SearchButton } from 'ui-patterns/Cmdk'
 import { useIsLoggedIn, useIsUserLoading } from 'common'

@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react'
+import Link from 'next/link'
 import {
   cn,
   MenubarSeparator,
@@ -9,6 +10,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui'
+
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 import { MenuItem } from './GlobalNavigationMenu'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
@@ -65,7 +67,8 @@ const GlobalNavigationMenuDesktop = () => (
             className="text-sm"
           >
             <NavigationMenuLink asChild>
-              <span
+              <Link
+                href={section[0].href}
                 className={cn(
                   'flex-1 whitespace-nowrap flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
                   sectionIndex === 0 && 'pl-0'
@@ -76,7 +79,7 @@ const GlobalNavigationMenuDesktop = () => (
                 ) : (
                   section[0].label
                 )}
-              </span>
+              </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
         )
