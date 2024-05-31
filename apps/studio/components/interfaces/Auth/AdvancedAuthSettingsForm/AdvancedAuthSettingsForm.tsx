@@ -1,18 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  IconAlertCircle,
-  InputNumber,
-  Toggle,
-} from 'ui'
 import { boolean, number, object } from 'yup'
 
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -21,12 +12,21 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Form,
+  InputNumber,
+  Toggle,
+} from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const schema = object({
   JWT_EXP: number()
@@ -105,7 +105,7 @@ const AdvancedAuthSettingsForm = () => {
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
@@ -207,8 +207,6 @@ const AdvancedAuthSettingsForm = () => {
                       primaryText="Upgrade to Teams or Enterprise"
                       secondaryText="Max Direct Database Connections settings are only available on the Teams plan and up."
                       buttonText="Upgrade to Teams"
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
                     />
                   )}
 
@@ -230,8 +228,6 @@ const AdvancedAuthSettingsForm = () => {
                       primaryText="Upgrade to Teams or Enterprise"
                       secondaryText="Max Request Duration settings are only available on the Teams plan and up."
                       buttonText="Upgrade to Teams"
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
                     />
                   )}
 
