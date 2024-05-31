@@ -2,12 +2,16 @@ import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 import {
+  assertAndRenderColumn,
   assertAndUnwrapNode,
   assertDefined,
+  assertEachSideOfExpression,
   assertEitherSideOfExpression,
   assertNodeType,
   getPolicies,
   getPolicyInfo,
+  renderFields,
+  renderTargets,
   unwrapNode,
 } from '../test/sql-util'
 import { collectStream, extractMarkdownSql, withMetadata } from '../test/util'
@@ -18,6 +22,11 @@ const openai = new OpenAI({ apiKey: openAiKey })
 
 const tableDefs = [
   codeBlock`
+    create table libraries (
+      id bigint primary key generated always as identity,
+      name text not null
+    );
+
     create table authors (
       id bigint primary key generated always as identity,
       name text not null
@@ -29,6 +38,7 @@ const tableDefs = [
       description text not null,
       genre text not null,
       author_id bigint references authors (id) not null,
+      library_id bigint references libraries (id) not null,
       published_at timestamp with time zone not null
     );
 
@@ -45,6 +55,12 @@ const tableDefs = [
       id bigint primary key generated always as identity,
       user_id uuid references auth.users (id) not null,
       book_id bigint references books (id) not null
+    );
+
+    create table library_memberships (
+      id bigint primary key generated always as identity,
+      user_id uuid references auth.users (id) not null,
+      library_id bigint references libraries (id) not null
     );
   `,
 ]
@@ -290,5 +306,108 @@ describe('rls chat', () => {
     await expect(responseText).toMatchCriteria(
       'Discourages restrictive policies and provides reasons why'
     )
+  })
+
+  test.concurrent('user id is on joined table and joins are minimized', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'Users can only see books from libraries they are a member of',
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    withMetadata({ sql }, () => {
+      // Check that USING is a <column> IN <sub-query> expression
+      assertDefined(policy.qual, 'Expected a USING statement')
+      const sublink = assertAndUnwrapNode(policy.qual, 'SubLink', 'Expected USING to be a sublink')
+      expect(sublink.subLinkType).toBe('ANY_SUBLINK')
+
+      // Validate column
+      assertDefined(sublink.testexpr, 'Expected sublink to have a test expression')
+      const columnName = assertAndRenderColumn(
+        sublink.testexpr,
+        'Expected sublink test expression to be a column'
+      )
+      expect(columnName).toBe('library_id')
+
+      // Validate sub-query
+      assertDefined(sublink.subselect, 'Expected sublink to have a subselect')
+      const selectStatement = assertAndUnwrapNode(
+        sublink.subselect,
+        'SelectStmt',
+        'Expected sublink subselect to be a SELECT statement'
+      )
+
+      assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
+      const columns = renderTargets(selectStatement.targetList, (target) =>
+        assertAndRenderColumn(target, 'Expected target list to contain columns')
+      )
+      expect(columns).toContain('library_id')
+
+      assertDefined(selectStatement.fromClause, 'Expected SELECT statement to have a FROM clause')
+      const [fromNode] = selectStatement.fromClause
+
+      const fromRangeVar = assertAndUnwrapNode(
+        fromNode,
+        'RangeVar',
+        'Expected FROM clause to contain a RangeVar'
+      )
+      expect(fromRangeVar.relname).toBe('library_memberships')
+
+      assertDefined(selectStatement.whereClause, 'Expected SELECT statement to have a WHERE clause')
+      const whereClause = assertAndUnwrapNode(
+        selectStatement.whereClause,
+        'A_Expr',
+        'Expected WHERE clause to be an expression'
+      )
+
+      assertEachSideOfExpression(
+        whereClause,
+        (node) => {
+          const columnName = assertAndRenderColumn(
+            node,
+            'Expected one side of WHERE clause to have a column'
+          )
+          expect(columnName).toBe('user_id')
+        },
+        (node) => {
+          const sublink = assertAndUnwrapNode(
+            node,
+            'SubLink',
+            'Expected one side of WHERE clause to contain a sub-query selecting auth.uid()'
+          )
+
+          assertDefined(sublink.subselect, 'Expected sublink to contain a subselect')
+          const selectStatement = assertAndUnwrapNode(
+            sublink.subselect,
+            'SelectStmt',
+            'Expected subselect to contain a SELECT statement'
+          )
+
+          assertDefined(
+            selectStatement.targetList,
+            'Expected SELECT statement to contain a target list'
+          )
+          const [functionCall] = renderTargets(selectStatement.targetList, (target) => {
+            const funcCall = assertAndUnwrapNode(
+              target,
+              'FuncCall',
+              'Expected SELECT statement to contain a function call'
+            )
+            assertDefined(funcCall.funcname, 'Expected function call to have a name')
+            return renderFields(funcCall.funcname)
+          })
+          expect(functionCall).toBe('auth.uid')
+        }
+      )
+    })
   })
 })

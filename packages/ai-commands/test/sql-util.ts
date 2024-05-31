@@ -1,4 +1,4 @@
-import { A_Expr, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
+import { A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
 
 export type PolicyInfo = {
   name: string
@@ -21,6 +21,26 @@ type NodeValue<T extends Node, U extends ExtractKeys<Node>> = T extends Record<U
   ? V
   : never
 
+export class AssertionError extends Error {
+  constructor(message: string) {
+    super(message)
+
+    // Pop the top line from the stack trace so that
+    // debug tools will reference the code calling the
+    // assertion function and not this error within it
+    if (this.stack) {
+      // Capture the current stack trace and split it into lines
+      const stackLines = this.stack.split('\n')
+
+      // Remove the second line which is the current constructor
+      stackLines.splice(1, 1)
+
+      // Reassign the modified stack trace back to the error object
+      this.stack = stackLines.join('\n')
+    }
+  }
+}
+
 /**
  * Asserts that a value is defined.
  *
@@ -28,7 +48,7 @@ type NodeValue<T extends Node, U extends ExtractKeys<Node>> = T extends Record<U
  */
 export function assertDefined<T>(value: T | undefined, errorMessage: string): asserts value is T {
   if (value === undefined) {
-    throw new Error(errorMessage)
+    throw new AssertionError(errorMessage)
   }
 }
 
@@ -43,7 +63,7 @@ export function assertNodeType<T extends Node>(
   errorMessage: string
 ): asserts node is T {
   if (!(type in node)) {
-    throw new Error(errorMessage)
+    throw new AssertionError(errorMessage)
   }
 }
 
@@ -60,7 +80,7 @@ export function assertAndUnwrapNode<T extends Node, U extends ExtractKeys<Node>>
   errorMessage: string
 ): NodeValue<T, U> {
   if (!(type in node)) {
-    throw new Error(errorMessage)
+    throw new AssertionError(errorMessage)
   }
   return (node as any)[type]
 }
@@ -104,6 +124,62 @@ export function assertEitherSideOfExpression<U>(
     } catch (rightError) {
       throw leftError
     }
+  }
+}
+/**
+ * Asserts that both sides of the expression are processed
+ * without throwing any errors.
+ *
+ * Order doesn't matter. As long as `firstFn` and `secondFn`
+ * pass separately on either side of the expression, the assertion
+ * will pass. Otherwise if `firstFn` and `secondFn` both fail
+ * after trying on both sides separately, the assertion will fail.
+ */
+export function assertEachSideOfExpression<U>(
+  expression: A_Expr,
+  firstFn: (node: Node) => void,
+  secondFn: (node: Node) => void
+): void {
+  assertDefined(expression.lexpr, 'Expected left side of expression to exist')
+  assertDefined(expression.rexpr, 'Expected right side of expression to exist')
+
+  let firstSide: Node
+  let secondSide: Node
+
+  try {
+    // Try `firstFn` on the left first
+    firstSide = expression.lexpr
+    secondSide = expression.rexpr
+    firstFn(firstSide)
+  } catch (firstError) {
+    // Otherwise try `firstFn` on the right
+    firstSide = expression.rexpr
+    secondSide = expression.lexpr
+    try {
+      firstFn(firstSide)
+    } catch (secondError) {
+      // `firstFn` failed on both sides, so we
+      // need to throw an error not matter what
+
+      // Perform one more test using `secondFn`
+      // to help determine which error to show
+      // for `firstFn`
+      try {
+        secondFn(secondSide)
+      } catch (_) {
+        throw firstError
+      }
+      throw secondError
+    }
+  }
+
+  try {
+    // `firstFn` passed on one of the sides, so
+    // try `secondFn` on the opposite side
+    secondFn(secondSide)
+  } catch (err) {
+    // `secondFn` failed, so we need to throw an error
+    throw err
   }
 }
 
@@ -167,4 +243,47 @@ export async function getPolicyInfo(createPolicyStatement: CreatePolicyStmt) {
   }
 
   return policyInfo
+}
+
+export function renderTargets<T>(targets: Node[], renderTarget: (target: Node) => T): T[] {
+  return targets.map((node) => {
+    const target = assertAndUnwrapNode(
+      node,
+      'ResTarget',
+      'Expected target list to contain ResTargets'
+    )
+
+    assertDefined(target.val, 'Expected ResTarget to have a val')
+    return renderTarget(target.val)
+  })
+}
+
+export function renderColumn(column: ColumnRef) {
+  assertDefined(column.fields, 'Expected column to have fields')
+  return renderFields(column.fields)
+}
+
+export function assertAndRenderColumn(node: Node, errorMessage: string) {
+  const column = assertAndUnwrapNode(node, 'ColumnRef', errorMessage)
+  return renderColumn(column)
+}
+
+export function renderFields(fields: Node[]) {
+  const nameSegments = fields
+    .map((field) => {
+      const stringField = unwrapNode(field, 'String')
+      const starField = unwrapNode(field, 'A_Star')
+
+      if (stringField !== undefined) {
+        return stringField.sval
+      } else if (starField !== undefined) {
+        return '*'
+      } else {
+        const [internalType] = Object.keys(field)
+        throw new Error(`Unsupported internal type '${internalType}' for fields`)
+      }
+    })
+    .filter((name): name is string => name !== undefined)
+
+  return nameSegments.join('.')
 }
