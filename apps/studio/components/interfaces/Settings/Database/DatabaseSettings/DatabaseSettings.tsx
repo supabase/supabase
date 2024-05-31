@@ -16,7 +16,11 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { IPv4AddonDirectConnectionNotice, IPv4DeprecationNotice } from '../IPv4ConnectionNotices'
+import {
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
 
@@ -62,6 +66,7 @@ const DatabaseSettings = () => {
     (db) => db.identifier === state.selectedDatabaseId
   )
   const primaryConfig = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = primaryConfig?.pool_mode
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
   const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
@@ -138,6 +143,9 @@ const DatabaseSettings = () => {
                     onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}
                   />
+                  {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                    <DefaultSessionModeNotice />
+                  )}
                   {ipv4Addon !== undefined &&
                     poolingMode === 'session' &&
                     snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}

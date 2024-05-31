@@ -16,8 +16,8 @@ export const IPv4DeprecationNotice = () => {
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-3">
         <p>
-          We strongly recommend using <span className="text-foreground">connection pooling</span> to
-          connect to your database because it's compatible with both IPv4 and IPv6 networks.
+          We strongly recommend using connection pooling to connect to your database because it's
+          compatible with both IPv4 and IPv6 networks.
         </p>
         <p>
           You'll only need to change the connection credentials that you're using in your
@@ -61,6 +61,27 @@ export const IPv4AddonDirectConnectionNotice = () => {
             Learn more
           </a>
         </Button>
+      </AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
+  )
+}
+
+export const DefaultSessionModeNotice = () => {
+  return (
+    <Alert_Shadcn_ variant="warning">
+      <IconAlertTriangle strokeWidth={2} />
+      <AlertTitle_Shadcn_>You are not yet in Transaction mode.</AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_ className="space-y-3">
+        <p>
+          You need to set your <span className="text-foreground">Pool Mode</span> to{' '}
+          <span className="text-foreground">Transaction</span> in the{' '}
+          <span className="text-foreground">Connection pooling configuration</span> section below in
+          order to use transaction mode on port 6543.
+        </p>
+        <p>
+          Otherwise, port 6543 will continue to connect in{' '}
+          <span className="text-foreground">Session</span> mode.
+        </p>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

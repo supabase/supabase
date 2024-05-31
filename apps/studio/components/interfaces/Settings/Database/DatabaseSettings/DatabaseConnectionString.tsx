@@ -30,7 +30,11 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { IPv4AddonDirectConnectionNotice, IPv4DeprecationNotice } from '../IPv4ConnectionNotices'
+import {
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
   constructConnStringSyntax,
@@ -72,6 +76,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     projectRef,
   })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = poolingConfiguration?.pool_mode
 
   const {
     data: databases,
@@ -223,6 +228,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
+              {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                <DefaultSessionModeNotice />
+              )}
               {isSuccessAddons &&
                 poolingMode === 'session' &&
                 ipv4Addon !== undefined &&
