@@ -101,6 +101,8 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
               message,
               exitAction: 'downgrade',
             })
+          } catch (error) {
+            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
           } finally {
             toast.success(
               willPlanDowngradeHappenImmediately
