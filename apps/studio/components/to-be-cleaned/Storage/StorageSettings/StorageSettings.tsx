@@ -1,7 +1,19 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -11,32 +23,17 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
+  SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  SelectContent_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
-
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, SubmitHandler } from 'react-hook-form'
-import { Clock } from 'lucide-react'
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
-  const organizationSlug = organization?.slug
-
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const {
@@ -196,9 +193,7 @@ const StorageSettings = () => {
                 <div className="px-6 pb-6">
                   <UpgradeToPro
                     icon={<Clock size="large" />}
-                    organizationSlug={organizationSlug ?? ''}
                     primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                    projectRef={projectRef ?? ''}
                     secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                   />
                 </div>
