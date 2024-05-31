@@ -12,8 +12,7 @@ export const IPv4DeprecationNotice = () => {
     <Alert_Shadcn_ variant="warning">
       <IconAlertTriangle strokeWidth={2} />
       <AlertTitle_Shadcn_>
-        Direct database access is only available via IPv6-compatible networks or if your project has
-        the IPv4 add on.
+        Direct database access is only available via IPv6-compatible networks.
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-3">
         <p>
@@ -27,6 +26,35 @@ export const IPv4DeprecationNotice = () => {
         <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
           <a
             href="https://github.com/orgs/supabase/discussions/17817"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </a>
+        </Button>
+      </AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
+  )
+}
+
+export const IPv4AddonDirectConnectionNotice = () => {
+  return (
+    <Alert_Shadcn_ variant="default">
+      <AlertTitle_Shadcn_>
+        Direct database connections is recommended if you're connecting with session mode.
+      </AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_ className="space-y-3">
+        <p>
+          We strongly recommend you connect directly to your database instead of connection pooling
+          when you're using session mode for lower latency.
+        </p>
+        <p>
+          If you remove the IPv4 add on you'll need to switch back to connection pooling for session
+          mode unless your network supports IPv6.
+        </p>
+        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <a
+            href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
             target="_blank"
             rel="noreferrer"
           >

@@ -2,19 +2,21 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams, useTelemetryProps } from 'common'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
+import { IPv4AddonDirectConnectionNotice, IPv4DeprecationNotice } from '../IPv4ConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
 
@@ -44,15 +46,23 @@ const DatabaseSettings = () => {
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
-  const error = readReplicasError || poolingInfoError
-  const isLoading = isLoadingReadReplicas || isLoadingPoolingInfo
-  const isError = isErrorReadReplicas || isErrorPoolingInfo
-  const isSuccess = isSuccessReadReplicas && isSuccessPoolingInfo
+  const {
+    data: addons,
+    error: addOnsError,
+    isLoading: isLoadingAddons,
+    isError: isErrorAddons,
+    isSuccess: isSuccessAddons,
+  } = useProjectAddonsQuery({ projectRef })
+  const error = readReplicasError || poolingInfoError || addOnsError
+  const isLoading = isLoadingReadReplicas || isLoadingPoolingInfo || isLoadingAddons
+  const isError = isErrorReadReplicas || isErrorPoolingInfo || isErrorAddons
+  const isSuccess = isSuccessReadReplicas && isSuccessPoolingInfo && isSuccessAddons
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
   const primaryConfig = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
   const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
@@ -128,7 +138,12 @@ const DatabaseSettings = () => {
                     onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}
                   />
-                  {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
+                  {ipv4Addon !== undefined &&
+                    poolingMode === 'session' &&
+                    snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
+                  {ipv4Addon === undefined && !snap.usePoolerConnection && (
+                    <IPv4DeprecationNotice />
+                  )}
                   {isMd5 && (
                     <Alert_Shadcn_>
                       <WarningIcon />
