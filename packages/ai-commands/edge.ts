@@ -1,5 +1,5 @@
 export * from './src/errors'
 
-export { clippy } from './src/docs'
-export { chatRlsPolicy } from './src/rls'
-export { chatSql } from './src/sql'
+export * from './src/docs'
+export * from './src/sql/rls'
+export * from './src/sql/chat'

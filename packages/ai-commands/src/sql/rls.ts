@@ -1,8 +1,8 @@
 import { OpenAIStream } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import OpenAI from 'openai'
-import { ContextLengthError } from './errors'
-import { Message } from './types'
+import { ContextLengthError } from '../errors'
+import { Message } from '../types'
 
 /**
  * Responds to a conversation about building an RLS policy.
