@@ -9,9 +9,8 @@ import {
   getPolicies,
   getPolicyInfo,
   unwrapNode,
-  withMetadata,
 } from '../test/sql-util'
-import { collectStream, extractMarkdownSql } from '../test/util'
+import { collectStream, extractMarkdownSql, withMetadata } from '../test/util'
 import { chatRlsPolicy } from './rls'
 
 const openAiKey = process.env.OPENAI_API_KEY
