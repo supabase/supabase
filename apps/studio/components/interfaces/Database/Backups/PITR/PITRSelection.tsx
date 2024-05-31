@@ -400,7 +400,7 @@ const PITRSelection = () => {
           <Alert
             withIcon
             variant="warning"
-            title="This action cannot be undone, not cancelled once started"
+            title="This action cannot be undone, not canceled once started"
           >
             Any changes made to your database after this point in time will be lost. This includes
             any changes to your project's storage and authentication.
