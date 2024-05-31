@@ -132,10 +132,10 @@ const Modal = forwardRef<
 
     function handleOpenChange(open: boolean) {
       if (visible !== undefined && !open) {
-        // controlled component behaviour
+        // controlled component behavior
         onCancel()
       } else {
-        // un-controlled component behaviour
+        // un-controlled component behavior
         setOpen(open)
       }
     }
