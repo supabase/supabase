@@ -113,5 +113,43 @@ test.describe('Table Editor page', () => {
     await expect(page.getByRole('grid')).not.toContainText('100')
   })
 
-  test('should check the auth schema', () => {})
+  test('should check the auth schema', async ({ page }) => {
+    const tableResponsePromise = page.waitForResponse(
+      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      { timeout: 0 }
+    )
+
+    await page.getByRole('button', { name: 'schema: public' }).click()
+    await page.getByRole('option', { name: 'auth' }).click()
+
+    // wait for the table data to load for the auth schema
+    await tableResponsePromise
+
+    // extract the tables names from the sidebar
+    const tables = await page
+      .getByTestId('tables-list')
+      .innerText()
+      .then((text) => text.split('\n'))
+
+    // expect the tables list to contain the following tables (additional tables may be present)
+    expect(tables).toEqual(
+      expect.arrayContaining([
+        'audit_log_entries',
+        'flow_state',
+        'identities',
+        'instances',
+        'mfa_amr_claims',
+        'mfa_challenges',
+        'mfa_factors',
+        'refresh_tokens',
+        'saml_providers',
+        'saml_relay_states',
+        'schema_migrations',
+        'sessions',
+        'sso_domains',
+        'sso_providers',
+        'users',
+      ])
+    )
+  })
 })
