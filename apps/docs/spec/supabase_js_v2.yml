@@ -6252,6 +6252,8 @@ functions:
   - id: abort-signal
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
+    notes: |
+      You can use this to set a timeout for the request.
     examples:
       - id: aborting-requests-in-flight
         name: Aborting requests in-flight
@@ -6264,16 +6266,6 @@ functions:
             .select()
             .abortSignal(ac.signal)
           ```
-        data:
-          sql: |
-            ```ts
-            const ac = new AbortController()
-            ac.abort()
-            const { data, error } = await supabase
-              .from('very_big_table')
-              .select()
-              .abortSignal(ac.signal)
-            ```
         response: |
           ```json
             {
@@ -6292,6 +6284,29 @@ functions:
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
+      - id: set-a-timeout
+        name: Set a timeout
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(AbortSignal.timeout(1000 /* ms */))
+          ```
+        response: |
+          ```json
+            {
+              "error": {
+                "message": "FetchError: The user aborted a request.",
+                "details": "",
+                "hint": "",
+                "code": ""
+              },
+              "status": 400,
+              "statusText": "Bad Request"
+            }
+            ```
+        hideCodeBlock: true
   - id: single
     title: single()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
