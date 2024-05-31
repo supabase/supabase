@@ -40,6 +40,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
 
 export const ColLayout = (props: any) => <div>{props.children}</div>
 
+/**
+ * @deprecated Use ./Select_shadcn_ instead
+ */
 function Select({
   autoComplete,
   autofocus,
@@ -168,6 +171,9 @@ function Select({
   )
 }
 
+/**
+ * @deprecated Use ./SelectItem_Shadcn_ instead
+ */
 export function Option({ value, children, selected }: OptionProps) {
   return (
     <option value={value} selected={selected}>
@@ -176,6 +182,9 @@ export function Option({ value, children, selected }: OptionProps) {
   )
 }
 
+/**
+ * @deprecated Use ./SelectGroup_Shadcn_ instead
+ */
 export function OptGroup({ label, children }: OptGroupProps) {
   return <optgroup label={label}>{children}</optgroup>
 }

@@ -2,6 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './Textarea.css'
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 const Textarea = ({
   className = '',
   isError = false,

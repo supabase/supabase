@@ -9,12 +9,6 @@ import Image from 'next/image'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {
-    const label = {
-      radix: 'Radix UI',
-      vaul: 'Vaul',
-      shadcn: 'ui.shadcn',
-    }
-
     const ShadcnPanel = () => {
       if (doc.source?.shadcn) {
         return (
@@ -79,11 +73,79 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 alt="Vaul"
                 className="h-6 w-6 rounded-full"
               />
-              <span className="hidden font-bold sm:inline-block">vaul</span>
+              <span className="hidden font-bold text-xs sm:inline-block">vaul</span>
             </div>
-            <span className="text-foreground-light text-sm">
+            <span className="text-foreground-light text-xs">
               This component is based on vaul by emilkowalski
             </span>
+          </div>
+        )
+      }
+    }
+
+    const ReactAccesibleTreeViewPanel = () => {
+      if (doc.source?.reactAccessibleTreeview) {
+        return (
+          <div
+            className={cn(
+              'bg-surface-75/50 border flex items-center p-3 px-5 gap-6 first:rounded-t-md last:rounded-b-md justify-between',
+              props.className
+            )}
+            {...props}
+          >
+            <div className="flex items-center gap-2">
+              <Image
+                width={24}
+                height={24}
+                src="https://avatars.githubusercontent.com/u/14020024?v=4"
+                alt="dgreene1"
+                className="h-6 w-6 rounded-full"
+              />
+              <span className="hidden text-xs font-bold sm:inline-block">
+                react-accessible-treeview
+              </span>
+              <span className="text-foreground-light text-xs">
+                Component based on react-accessible-treeview by dgreene1
+              </span>
+            </div>
+            {doc.links ? (
+              <div className="flex items-center gap-2 justify-end">
+                {doc.links?.doc && (
+                  <Button
+                    type="outline"
+                    className="rounded-full"
+                    icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
+                  >
+                    <Link
+                      href={doc.links.doc}
+                      target="_blank"
+                      rel="noreferrer"
+
+                      // className={cn(buttonVariants({ variant: 'default' }), 'gap-1')}
+                    >
+                      Docs
+                    </Link>
+                  </Button>
+                )}
+                {doc.links?.api && (
+                  <Button
+                    type="outline"
+                    className="rounded-full"
+                    icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
+                  >
+                    <Link
+                      href={doc.links.api}
+                      target="_blank"
+                      rel="noreferrer"
+
+                      // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
+                    >
+                      API Reference
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            ) : null}
           </div>
         )
       }
@@ -107,9 +169,9 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 alt="inputOtp"
                 className="h-6 w-6 rounded-full"
               />
-              <span className="hidden font-bold sm:inline-block">input-otp</span>
+              <span className="hidden font-bold text-xs sm:inline-block">input-otp</span>
             </div>
-            <span className="text-foreground-light text-sm">
+            <span className="text-foreground-light text-xs">
               This component is based on input-otp by guilhermerodz
             </span>
           </div>
@@ -145,7 +207,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               <path d="M11.5 7C13.433 7 15 5.433 15 3.5C15 1.567 13.433 0 11.5 0C9.56704 0 8 1.567 8 3.5C8 5.433 9.56704 7 11.5 7Z"></path>
             </svg>
             <div className="flex flex-row items-center justify-between text-sm w-full">
-              <span className="text-foreground-light text-sm">This component uses Radix UI</span>
+              <span className="text-foreground-light text-xs">This component uses Radix UI</span>
               {doc.links ? (
                 <div className="flex items-center gap-2 justify-end">
                   {doc.links?.doc && (
@@ -195,6 +257,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
         <RadixPanel />
         <VaulPanel />
         <InputOtp />
+        <ReactAccesibleTreeViewPanel />
         {/* <ShadcnPanel /> */}
       </div>
     )

@@ -11,6 +11,9 @@ interface Props {
   type?: 'vertical' | 'horizontal'
 }
 
+/**
+ * @deprecated Use ./Separator instead
+ */
 export default function Divider({
   children,
   className,
