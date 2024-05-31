@@ -10,7 +10,7 @@
   ],
   "compilerOptions": {
     "types": [
-      "./test/extensions.d.ts",
+      "./test/extensions.d.ts"
     ]
   }
 }
