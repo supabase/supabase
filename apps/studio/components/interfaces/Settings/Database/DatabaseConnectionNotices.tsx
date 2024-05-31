@@ -34,16 +34,17 @@ export const IPv4AddonDirectConnectionNotice = () => {
   return (
     <Alert_Shadcn_ variant="default">
       <AlertTitle_Shadcn_>
-        Direct database connections is recommended if you're connecting with session mode.
+        Direct database connections are recommended if you're connecting with session mode.
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-3">
         <p>
-          We strongly recommend you connect directly to your database instead of connection pooling
-          when you're using session mode for lower latency.
+          If you are not connecting to the database from serverless environments, we strongly
+          recommend you connect to the database directly instead of using connection pooling for
+          lower latency.
         </p>
         <p>
-          If you remove the IPv4 add on you'll need to switch back to connection pooling for session
-          mode unless your network supports IPv6.
+          Since your project has the IPv4 add on, you are not required to use the connection pooler
+          even if your network only supports IPv4.
         </p>
         <Button asChild type="default" icon={<ExternalLink />}>
           <a
