@@ -33,7 +33,7 @@ const RestartServerButton = () => {
   const projectRef = project?.ref ?? ''
   const projectRegion = project?.region ?? ''
 
-  const projectRestartEnabled = useFlag('projectRestart')
+  const projectRestartDisabled = useFlag('disableProjectRestarts')
   const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
@@ -94,13 +94,13 @@ const RestartServerButton = () => {
                 project === undefined ||
                 !canRestartProject ||
                 !isProjectActive ||
-                !projectRestartEnabled
+                projectRestartDisabled
               }
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
             </Button>
-            {canRestartProject && isProjectActive && projectRestartEnabled && (
+            {canRestartProject && isProjectActive && !projectRestartDisabled && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -152,7 +152,7 @@ const RestartServerButton = () => {
             </Tooltip.Content>
           </Tooltip.Portal>
         )}
-        {!projectRestartEnabled && (
+        {projectRestartDisabled && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
