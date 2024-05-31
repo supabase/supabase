@@ -8,7 +8,7 @@ const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
 describe('debug', () => {
-  test('fix order of operations', async () => {
+  test.concurrent('fix order of operations', async () => {
     const { sql } = await debugSql(
       openai,
       'relation "departments" does not exist',
@@ -30,7 +30,7 @@ describe('debug', () => {
     expect(formatSql(sql)).toMatchSnapshot()
   })
 
-  test('fix typos', async () => {
+  test.concurrent('fix typos', async () => {
     const { sql, solution } = await debugSql(
       openai,
       'syntax error at or near "fromm"',
