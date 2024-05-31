@@ -1,4 +1,6 @@
-export const useStorageReport = jest.fn().mockReturnValue({
+import { vi } from 'vitest'
+
+export const useStorageReport = vi.fn().mockReturnValue({
   data: {
     cacheHitRate: [
       { hit_count: 15, miss_count: 0, timestamp: 1715230800000000 },
@@ -26,6 +28,6 @@ export const useStorageReport = jest.fn().mockReturnValue({
   },
   filters: [],
   isLoading: false,
-  mergeParams: jest.fn(),
-  refresh: jest.fn(),
+  mergeParams: vi.fn(),
+  refresh: vi.fn(),
 })

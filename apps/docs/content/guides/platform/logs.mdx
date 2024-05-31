@@ -21,14 +21,16 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://supabase.com/dashboard/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
+[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
+
+When viewing logs originating from the API Load Balancer endpoint, the upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
 ![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
+[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases. Logs for a specific database can be toggled with the `Source` button on the upper-right section of the dashboard.
 
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 

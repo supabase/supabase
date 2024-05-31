@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import { AlertCircle, Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { IconAlertCircle, IconClock, AlertDescription_Shadcn_, Alert_Shadcn_ } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
@@ -16,6 +15,7 @@ import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
 import BackupsStorageAlert from './BackupsStorageAlert'
@@ -64,12 +64,10 @@ const BackupsList = () => {
   if (planKey === 'FREE') {
     return (
       <UpgradeToPro
-        icon={<IconClock size="large" />}
-        primaryText="Free Plan does not include project backups."
-        projectRef={projectRef}
-        organizationSlug={organization!.slug}
-        secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
         addon="pitr"
+        icon={<Clock size={20} />}
+        primaryText="Free Plan does not include project backups."
+        secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
       />
     )
   }
@@ -85,7 +83,7 @@ const BackupsList = () => {
           <>
             {!canTriggerScheduledBackups && (
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                icon={<AlertCircle size={16} className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to trigger a scheduled backup"
               />
             )}

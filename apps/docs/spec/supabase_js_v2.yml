@@ -4102,7 +4102,7 @@ functions:
         name: Delete a single record
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .eq('id', 1)
@@ -4128,11 +4128,47 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+      - id: delete-records-and-return-it
+        name: Delete a record and return it
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .eq('id', 1)
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Spain"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
       - id: delete-multiple-records
         name: Delete multiple records
         code: |
           ```ts
-          const { error } = await supabase
+          const response = await supabase
             .from('countries')
             .delete()
             .in('id', [1, 2, 3])
@@ -4155,8 +4191,7 @@ functions:
             "statusText": "No Content"
           }
           ```
-        hideCodeBlock: false
-        isSpotlight: false
+        hideCodeBlock: true
 
   - id: rpc
     title: 'Postgres functions: rpc()'
@@ -6252,6 +6287,8 @@ functions:
   - id: abort-signal
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
+    notes: |
+      You can use this to set a timeout for the request.
     examples:
       - id: aborting-requests-in-flight
         name: Aborting requests in-flight
@@ -6264,16 +6301,6 @@ functions:
             .select()
             .abortSignal(ac.signal)
           ```
-        data:
-          sql: |
-            ```ts
-            const ac = new AbortController()
-            ac.abort()
-            const { data, error } = await supabase
-              .from('very_big_table')
-              .select()
-              .abortSignal(ac.signal)
-            ```
         response: |
           ```json
             {
@@ -6292,6 +6319,29 @@ functions:
           Note that `status` and `statusText` don't mean anything for aborted requests as the request wasn't fulfilled.
         hideCodeBlock: true
         isSpotlight: true
+      - id: set-a-timeout
+        name: Set a timeout
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(AbortSignal.timeout(1000 /* ms */))
+          ```
+        response: |
+          ```json
+            {
+              "error": {
+                "message": "FetchError: The user aborted a request.",
+                "details": "",
+                "hint": "",
+                "code": ""
+              },
+              "status": 400,
+              "statusText": "Bad Request"
+            }
+            ```
+        hideCodeBlock: true
   - id: single
     title: single()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
