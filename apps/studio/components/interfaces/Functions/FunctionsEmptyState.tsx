@@ -1,5 +1,7 @@
+import { Code, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { Button, IconBookOpen, IconCode } from 'ui'
+
+import { Button } from 'ui'
 import TerminalInstructions from './TerminalInstructions'
 
 const FunctionsEmptyState = () => {
@@ -16,7 +18,7 @@ const FunctionsEmptyState = () => {
             Supabase project with third-parties.
           </p>
           <div className="flex gap-2">
-            <Button asChild type="default" iconRight={<IconBookOpen />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/functions"
                 target="_blank"
@@ -25,7 +27,7 @@ const FunctionsEmptyState = () => {
                 Documentation
               </Link>
             </Button>
-            <Button asChild type="default" iconRight={<IconCode />}>
+            <Button asChild type="default" icon={<Code />}>
               <Link
                 href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
                 target="_blank"
