@@ -16,12 +16,12 @@ export const DIALOG_PADDING_X = 'px-7'
 const DialogPaddingVariants = cva('', {
   variants: {
     padding: {
-      default: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
+      medium: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
       small: `${DIALOG_PADDING_Y_SMALL} ${DIALOG_PADDING_X_SMALL}`,
     },
   },
   defaultVariants: {
-    padding: 'default',
+    padding: 'small',
   },
 })
 
@@ -107,7 +107,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 const DialogHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
->(({ className, padding = 'default', ...props }, ref) => (
+>(({ className, padding, ...props }, ref) => (
   <div
     ref={ref}
     {...props}
@@ -184,7 +184,7 @@ DialogClose.displayName = DialogPrimitive.Close.displayName
 const DialogSection = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
->(({ className, children, padding = 'default', ...props }, ref) => (
+>(({ className, children, padding, ...props }, ref) => (
   <div ref={ref} {...props} className={cn(DialogPaddingVariants({ padding }), className)}>
     {children}
   </div>
