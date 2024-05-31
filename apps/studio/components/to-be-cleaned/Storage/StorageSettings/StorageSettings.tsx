@@ -183,7 +183,7 @@ const StorageSettings = () => {
                           limit,
                           storageUnit
                         ).toLocaleString()} bytes. `}
-                      Maximum size in bytes of a file that can be uploaded is 5 GB (
+                      Maximum size in bytes of a file that can be uploaded is 50 GB (
                       {formattedMaxSizeBytes}).
                     </p>
                   </div>
@@ -192,9 +192,9 @@ const StorageSettings = () => {
               {isFreeTier && (
                 <div className="px-6 pb-6">
                   <UpgradeToPro
-                    icon={<Clock size="large" />}
+                    icon={<Clock size={16} />}
                     primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                    secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
+                    secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 50 GB."
                   />
                 </div>
               )}
