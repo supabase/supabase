@@ -235,9 +235,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 poolingMode === 'session' &&
                 ipv4Addon !== undefined &&
                 snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
-              {isSuccessAddons
-                ? ipv4Addon === undefined && !snap.usePoolerConnection && <IPv4DeprecationNotice />
-                : !snap.usePoolerConnection && <IPv4DeprecationNotice />}
+              {ipv4Addon === undefined && !snap.usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
                 copy
                 readOnly

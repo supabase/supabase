@@ -1,29 +1,22 @@
-import {
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-  Button,
-  IconExternalLink,
-} from 'ui'
+import { ExternalLink } from 'lucide-react'
+
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export const IPv4DeprecationNotice = () => {
   return (
     <Alert_Shadcn_ variant="warning">
-      <IconAlertTriangle strokeWidth={2} />
+      <WarningIcon />
       <AlertTitle_Shadcn_>
         Direct database access is only available via IPv6-compatible networks.
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-3">
         <p>
           We strongly recommend using connection pooling to connect to your database because it's
-          compatible with both IPv4 and IPv6 networks.
+          compatible with both IPv4 and IPv6 networks. You'll only need to change the connection
+          credentials that you're using in your application to the pooler's connection credentials.
         </p>
-        <p>
-          You'll only need to change the connection credentials that you're using in your
-          application to the pooler's connection credentials.
-        </p>
-        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+        <Button asChild type="default" icon={<ExternalLink />}>
           <a
             href="https://github.com/orgs/supabase/discussions/17817"
             target="_blank"
@@ -52,7 +45,7 @@ export const IPv4AddonDirectConnectionNotice = () => {
           If you remove the IPv4 add on you'll need to switch back to connection pooling for session
           mode unless your network supports IPv6.
         </p>
-        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+        <Button asChild type="default" icon={<ExternalLink />}>
           <a
             href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
             target="_blank"
@@ -69,7 +62,7 @@ export const IPv4AddonDirectConnectionNotice = () => {
 export const DefaultSessionModeNotice = () => {
   return (
     <Alert_Shadcn_ variant="warning">
-      <IconAlertTriangle strokeWidth={2} />
+      <WarningIcon />
       <AlertTitle_Shadcn_>You are not yet in Transaction mode.</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-3">
         <p>
