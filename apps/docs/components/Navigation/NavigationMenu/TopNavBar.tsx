@@ -31,6 +31,8 @@ const TopNavBar: FC = () => {
     )
   })
 
+  HeaderLogo.displayName = 'HeaderLogo'
+
   return (
     <nav
       aria-label="top bar"

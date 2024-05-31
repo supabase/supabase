@@ -42,5 +42,6 @@ export const MenuItem = React.forwardRef<
 })
 
 GlobalNavigationMenu.displayName = 'GlobalNavigationMenu'
+MenuItem.displayName = 'MenuItem'
 
 export default GlobalNavigationMenu
