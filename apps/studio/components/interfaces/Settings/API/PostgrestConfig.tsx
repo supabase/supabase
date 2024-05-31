@@ -17,11 +17,14 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
 import { indexOf } from 'lodash'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
   Admonition,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   CollapsibleContent_Shadcn_,
   Collapsible_Shadcn_,
@@ -35,6 +38,7 @@ import {
   Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -232,31 +236,25 @@ const PostgrestConfig = () => {
                       {!field.value && (
                         <>
                           <Separator />
-                          <Admonition
-                            type="warning"
-                            className="mb-0 border-none rounded-none [&_svg]:left-[2rem] ![&_h5]:left-[6rem]"
-                            title="No schemas can be queried"
-                            description={
-                              <>
-                                <p>
-                                  With this setting disabled, you will not be able to query any
-                                  schemas via the Data API.
-                                </p>
-                                <p>
-                                  You will see errors from the Postgrest endpoint
-                                  <code className="text-xs">/rest/v1/</code>.
-                                </p>
-                              </>
-                            }
-                            childProps={{
-                              title: {
-                                className: '!pl-[3.5rem]',
-                              },
-                              description: {
-                                className: '!pl-[3.5rem]',
-                              },
-                            }}
-                          />
+                          <Alert_Shadcn_
+                            variant="warning"
+                            className="mb-0 border-none rounded-none"
+                          >
+                            <WarningIcon className="!left-[2rem]" />
+                            <AlertTitle_Shadcn_ className="!pl-[3.5rem] !left-[6rem]">
+                              No schemas can be queried
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_ className="!pl-[3.5rem]">
+                              <p>
+                                With this setting disabled, you will not be able to query any
+                                schemas via the Data API.
+                              </p>
+                              <p>
+                                You will see errors from the Postgrest endpoint
+                                <code className="text-xs">/rest/v1/</code>.
+                              </p>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
                         </>
                       )}
                     </FormItem_Shadcn_>
