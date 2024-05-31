@@ -20,7 +20,7 @@
   "paths": {
     "/v1/branches/{branch_id}": {
       "get": {
-        "operationId": "getBranchDetails",
+        "operationId": "v1-get-a-branch-config",
         "summary": "Get database branch config",
         "description": "Fetches configurations of the specified database branch",
         "parameters": [
@@ -96,7 +96,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -105,7 +105,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateBranch",
+        "operationId": "v1-update-a-branch-config",
         "summary": "Update database branch config",
         "description": "Updates the configuration of the specified database branch",
         "parameters": [
@@ -172,6 +172,9 @@
                     "pr_number": {
                       "type": "number"
                     },
+                    "latest_check_run_id": {
+                      "type": "number"
+                    },
                     "reset_on_push": {
                       "type": "boolean"
                     },
@@ -217,7 +220,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -226,7 +229,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteBranch",
+        "operationId": "v1-delete-a-branch",
         "summary": "Delete a database branch",
         "description": "Deletes the specified database branch",
         "parameters": [
@@ -264,7 +267,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -275,7 +278,7 @@
     },
     "/v1/branches/{branch_id}/reset": {
       "post": {
-        "operationId": "resetBranch",
+        "operationId": "v1-reset-a-branch",
         "summary": "Resets a database branch",
         "description": "Resets the specified database branch",
         "parameters": [
@@ -313,7 +316,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -324,7 +327,7 @@
     },
     "/v1/projects": {
       "get": {
-        "operationId": "getProjects",
+        "operationId": "v1-get-all-projects",
         "summary": "List all projects",
         "description": "Returns a list of all projects you've previously created.",
         "parameters": [],
@@ -418,7 +421,7 @@
         ]
       },
       "post": {
-        "operationId": "createProject",
+        "operationId": "v1-create-a-project",
         "summary": "Create a project",
         "parameters": [],
         "requestBody": {
@@ -474,7 +477,8 @@
                   },
                   "kps_enabled": {
                     "type": "boolean",
-                    "deprecated": true
+                    "deprecated": true,
+                    "description": "This field is deprecated and is ignored in this request"
                   },
                   "desired_instance_size": {
                     "type": "string",
@@ -596,7 +600,7 @@
     },
     "/v1/organizations": {
       "get": {
-        "operationId": "getOrganizations",
+        "operationId": "v1-list-all-organizations",
         "summary": "List all organizations",
         "description": "Returns a list of organizations that you currently belong to.",
         "parameters": [],
@@ -640,7 +644,7 @@
         ]
       },
       "post": {
-        "operationId": "createOrganization",
+        "operationId": "v1-create-an-organization",
         "summary": "Create an organization",
         "parameters": [],
         "requestBody": {
@@ -700,8 +704,8 @@
     },
     "/v1/oauth/authorize": {
       "get": {
-        "operationId": "authorize",
-        "summary": "Authorize user through oauth",
+        "operationId": "v1-authorize-user",
+        "summary": "[Beta] Authorize user through oauth",
         "parameters": [
           {
             "name": "client_id",
@@ -784,7 +788,7 @@
           }
         },
         "tags": [
-          "oauth (beta)"
+          "oauth"
         ],
         "security": [
           {
@@ -797,8 +801,8 @@
     },
     "/v1/oauth/token": {
       "post": {
-        "operationId": "token",
-        "summary": "Exchange auth code for user's access and refresh token",
+        "operationId": "v1-exchange-oauth-token",
+        "summary": "[Beta] Exchange auth code for user's access and refresh token",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -878,7 +882,7 @@
           }
         },
         "tags": [
-          "oauth (beta)"
+          "oauth"
         ],
         "security": [
           {
@@ -891,7 +895,7 @@
     },
     "/v1/snippets": {
       "get": {
-        "operationId": "listSnippets",
+        "operationId": "v1-list-all-snippets",
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
           {
@@ -932,13 +936,13 @@
                             ]
                           },
                           "visibility": {
-                            "type": "string",
                             "enum": [
                               "user",
                               "project",
                               "org",
                               "public"
-                            ]
+                            ],
+                            "type": "string"
                           },
                           "name": {
                             "type": "string"
@@ -1018,7 +1022,7 @@
           }
         },
         "tags": [
-          "snippets"
+          "database"
         ],
         "security": [
           {
@@ -1029,7 +1033,7 @@
     },
     "/v1/snippets/{id}": {
       "get": {
-        "operationId": "getSnippet",
+        "operationId": "v1-get-a-snippet",
         "summary": "Gets a specific SQL snippet",
         "parameters": [
           {
@@ -1165,7 +1169,7 @@
           }
         },
         "tags": [
-          "snippets"
+          "database"
         ],
         "security": [
           {
@@ -1176,7 +1180,7 @@
     },
     "/v1/projects/{ref}/api-keys": {
       "get": {
-        "operationId": "getProjectApiKeys",
+        "operationId": "v1-get-project-api-keys",
         "summary": "Get project api keys",
         "parameters": [
           {
@@ -1222,7 +1226,7 @@
           }
         },
         "tags": [
-          "projects"
+          "secrets"
         ],
         "security": [
           {
@@ -1233,7 +1237,7 @@
     },
     "/v1/projects/{ref}/branches": {
       "get": {
-        "operationId": "getBranches",
+        "operationId": "v1-list-all-branches",
         "summary": "List all database branches",
         "description": "Returns all database branches of the specified project.",
         "parameters": [
@@ -1278,6 +1282,9 @@
                         "type": "string"
                       },
                       "pr_number": {
+                        "type": "number"
+                      },
+                      "latest_check_run_id": {
                         "type": "number"
                       },
                       "reset_on_push": {
@@ -1326,7 +1333,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -1335,7 +1342,7 @@
         ]
       },
       "post": {
-        "operationId": "createBranch",
+        "operationId": "v1-create-a-branch",
         "summary": "Create a database branch",
         "description": "Creates a database branch from the specified project.",
         "parameters": [
@@ -1404,6 +1411,9 @@
                     "pr_number": {
                       "type": "number"
                     },
+                    "latest_check_run_id": {
+                      "type": "number"
+                    },
                     "reset_on_push": {
                       "type": "boolean"
                     },
@@ -1449,7 +1459,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -1458,7 +1468,7 @@
         ]
       },
       "delete": {
-        "operationId": "disableBranch",
+        "operationId": "v1-disable-preview-branching",
         "summary": "Disables preview branching",
         "description": "Disables preview branching for the specified project",
         "parameters": [
@@ -1483,7 +1493,7 @@
           }
         },
         "tags": [
-          "database branches (beta)"
+          "environments"
         ],
         "security": [
           {
@@ -1494,8 +1504,8 @@
     },
     "/v1/projects/{ref}/custom-hostname": {
       "get": {
-        "operationId": "getCustomHostnameConfig",
-        "summary": "Gets project's custom hostname config",
+        "operationId": "v1-get-hostname-config",
+        "summary": "[Beta] Gets project's custom hostname config",
         "parameters": [
           {
             "name": "ref",
@@ -1551,7 +1561,7 @@
           }
         },
         "tags": [
-          "custom hostname (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -1560,8 +1570,8 @@
         ]
       },
       "delete": {
-        "operationId": "removeCustomHostnameConfig",
-        "summary": "Deletes a project's custom hostname configuration",
+        "operationId": "v1-Delete hostname config",
+        "summary": "[Beta] Deletes a project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -1587,7 +1597,7 @@
           }
         },
         "tags": [
-          "custom hostname (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -1598,8 +1608,8 @@
     },
     "/v1/projects/{ref}/custom-hostname/initialize": {
       "post": {
-        "operationId": "createCustomHostnameConfig",
-        "summary": "Updates project's custom hostname configuration",
+        "operationId": "v1-update-hostname-config",
+        "summary": "[Beta] Updates project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -1673,7 +1683,7 @@
           }
         },
         "tags": [
-          "custom hostname (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -1684,8 +1694,8 @@
     },
     "/v1/projects/{ref}/custom-hostname/reverify": {
       "post": {
-        "operationId": "reverify",
-        "summary": "Attempts to verify the DNS configuration for project's custom hostname configuration",
+        "operationId": "v1-verify-dns-config",
+        "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
         "parameters": [
           {
             "name": "ref",
@@ -1741,7 +1751,7 @@
           }
         },
         "tags": [
-          "custom hostname (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -1752,8 +1762,8 @@
     },
     "/v1/projects/{ref}/custom-hostname/activate": {
       "post": {
-        "operationId": "activate",
-        "summary": "Activates a custom hostname for a project.",
+        "operationId": "v1-activate-custom-hostname",
+        "summary": "[Beta] Activates a custom hostname for a project.",
         "parameters": [
           {
             "name": "ref",
@@ -1809,7 +1819,7 @@
           }
         },
         "tags": [
-          "custom hostname (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -1820,8 +1830,8 @@
     },
     "/v1/projects/{ref}/network-bans/retrieve": {
       "post": {
-        "operationId": "getNetworkBans",
-        "summary": "Gets project's network bans",
+        "operationId": "v1-list-all-network-bans",
+        "summary": "[Beta] Gets project's network bans",
         "parameters": [
           {
             "name": "ref",
@@ -1865,7 +1875,7 @@
           }
         },
         "tags": [
-          "network bans (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -1876,8 +1886,8 @@
     },
     "/v1/projects/{ref}/network-bans": {
       "delete": {
-        "operationId": "removeNetworkBan",
-        "summary": "Remove network bans.",
+        "operationId": "v1-delete-network-bans",
+        "summary": "[Beta] Remove network bans.",
         "parameters": [
           {
             "name": "ref",
@@ -1924,7 +1934,7 @@
           }
         },
         "tags": [
-          "network bans (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -1935,8 +1945,8 @@
     },
     "/v1/projects/{ref}/network-restrictions": {
       "get": {
-        "operationId": "getNetworkRestrictions",
-        "summary": "Gets project's network restrictions",
+        "operationId": "v1-get-network-restrictions",
+        "summary": "[Beta] Gets project's network restrictions",
         "parameters": [
           {
             "name": "ref",
@@ -2024,7 +2034,7 @@
           }
         },
         "tags": [
-          "network restrictions (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -2035,8 +2045,8 @@
     },
     "/v1/projects/{ref}/network-restrictions/apply": {
       "post": {
-        "operationId": "applyNetworkRestrictions",
-        "summary": "Updates project's network restrictions",
+        "operationId": "v1-update-network-restrictions",
+        "summary": "[Beta] Updates project's network restrictions",
         "parameters": [
           {
             "name": "ref",
@@ -2148,7 +2158,7 @@
           }
         },
         "tags": [
-          "network restrictions (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -2159,8 +2169,8 @@
     },
     "/v1/projects/{ref}/pgsodium": {
       "get": {
-        "operationId": "getPgsodiumConfig",
-        "summary": "Gets project's pgsodium config",
+        "operationId": "v1-get-pgsodium-config",
+        "summary": "[Beta] Gets project's pgsodium config",
         "parameters": [
           {
             "name": "ref",
@@ -2201,7 +2211,7 @@
           }
         },
         "tags": [
-          "pgsodium (beta)"
+          "secrets"
         ],
         "security": [
           {
@@ -2210,8 +2220,8 @@
         ]
       },
       "put": {
-        "operationId": "updatePgsodiumConfig",
-        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "operationId": "v1-update-pgsodium-config",
+        "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "parameters": [
           {
             "name": "ref",
@@ -2270,7 +2280,7 @@
           }
         },
         "tags": [
-          "pgsodium (beta)"
+          "secrets"
         ],
         "security": [
           {
@@ -2281,7 +2291,7 @@
     },
     "/v1/projects/{ref}/postgrest": {
       "get": {
-        "operationId": "getPostgRESTConfig",
+        "operationId": "v1-get-postgrest-service-config",
         "summary": "Gets project's postgrest config",
         "parameters": [
           {
@@ -2340,7 +2350,7 @@
           }
         },
         "tags": [
-          "services"
+          "rest"
         ],
         "security": [
           {
@@ -2349,7 +2359,7 @@
         ]
       },
       "patch": {
-        "operationId": "updatePostgRESTConfig",
+        "operationId": "v1-update-postgrest-service-config",
         "summary": "Updates project's postgrest config",
         "parameters": [
           {
@@ -2433,7 +2443,7 @@
           }
         },
         "tags": [
-          "services"
+          "rest"
         ],
         "security": [
           {
@@ -2444,7 +2454,7 @@
     },
     "/v1/projects/{ref}": {
       "delete": {
-        "operationId": "deleteProject",
+        "operationId": "v1-Delete a project",
         "summary": "Deletes the given project",
         "parameters": [
           {
@@ -2502,7 +2512,7 @@
     },
     "/v1/projects/{ref}/secrets": {
       "get": {
-        "operationId": "getSecrets",
+        "operationId": "v1-list-all-secrets",
         "summary": "List all secrets",
         "description": "Returns all secrets you've previously added to the specified project.",
         "parameters": [
@@ -2561,7 +2571,7 @@
         ]
       },
       "post": {
-        "operationId": "createSecrets",
+        "operationId": "v1-bulk-create-secrets",
         "summary": "Bulk create secrets",
         "description": "Creates multiple secrets and adds them to the specified project.",
         "parameters": [
@@ -2628,7 +2638,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteSecrets",
+        "operationId": "v1-bulk-delete-secrets",
         "summary": "Bulk delete secrets",
         "description": "Deletes all secrets with the given names from the specified project",
         "parameters": [
@@ -2687,8 +2697,8 @@
     },
     "/v1/projects/{ref}/ssl-enforcement": {
       "get": {
-        "operationId": "getSslEnforcementConfig",
-        "summary": "Get project's SSL enforcement configuration.",
+        "operationId": "v1-get-ssl-enforcement-config",
+        "summary": "[Beta] Get project's SSL enforcement configuration.",
         "parameters": [
           {
             "name": "ref",
@@ -2741,7 +2751,7 @@
           }
         },
         "tags": [
-          "ssl enforcement (beta)"
+          "database"
         ],
         "security": [
           {
@@ -2750,8 +2760,8 @@
         ]
       },
       "put": {
-        "operationId": "updateSslEnforcementConfig",
-        "summary": "Update project's SSL enforcement configuration.",
+        "operationId": "v1-update-ssl-enforcement-config",
+        "summary": "[Beta] Update project's SSL enforcement configuration.",
         "parameters": [
           {
             "name": "ref",
@@ -2830,7 +2840,7 @@
           }
         },
         "tags": [
-          "ssl enforcement (beta)"
+          "database"
         ],
         "security": [
           {
@@ -2841,7 +2851,7 @@
     },
     "/v1/projects/{ref}/types/typescript": {
       "get": {
-        "operationId": "getTypescriptTypes",
+        "operationId": "v1-generate-typescript-types",
         "summary": "Generate TypeScript types",
         "description": "Returns the TypeScript types of your schema for use with supabase-js.",
         "parameters": [
@@ -2893,7 +2903,7 @@
           }
         },
         "tags": [
-          "projects"
+          "database"
         ],
         "security": [
           {
@@ -2904,8 +2914,8 @@
     },
     "/v1/projects/{ref}/vanity-subdomain": {
       "get": {
-        "operationId": "getVanitySubdomainConfig",
-        "summary": "Gets current vanity subdomain config",
+        "operationId": "v1-get-vanity-subdomain-config",
+        "summary": "[Beta] Gets current vanity subdomain config",
         "parameters": [
           {
             "name": "ref",
@@ -2954,7 +2964,7 @@
           }
         },
         "tags": [
-          "vanity subdomain (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -2963,8 +2973,8 @@
         ]
       },
       "delete": {
-        "operationId": "removeVanitySubdomainConfig",
-        "summary": "Deletes a project's vanity subdomain configuration",
+        "operationId": "v1-deactive-vanity-subdomain-config",
+        "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "parameters": [
           {
             "name": "ref",
@@ -2990,7 +3000,7 @@
           }
         },
         "tags": [
-          "vanity subdomain (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -3001,8 +3011,8 @@
     },
     "/v1/projects/{ref}/vanity-subdomain/check-availability": {
       "post": {
-        "operationId": "checkVanitySubdomainAvailability",
-        "summary": "Checks vanity subdomain availability",
+        "operationId": "v1-check-vanity-subdomain-availability",
+        "summary": "[Beta] Checks vanity subdomain availability",
         "parameters": [
           {
             "name": "ref",
@@ -3061,7 +3071,7 @@
           }
         },
         "tags": [
-          "vanity subdomain (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -3072,8 +3082,8 @@
     },
     "/v1/projects/{ref}/vanity-subdomain/activate": {
       "post": {
-        "operationId": "activateVanitySubdomainPlease",
-        "summary": "Activates a vanity subdomain for a project.",
+        "operationId": "v1-activate-vanity-subdomain-config",
+        "summary": "[Beta] Activates a vanity subdomain for a project.",
         "parameters": [
           {
             "name": "ref",
@@ -3132,7 +3142,7 @@
           }
         },
         "tags": [
-          "vanity subdomain (beta)"
+          "domains"
         ],
         "security": [
           {
@@ -3143,8 +3153,8 @@
     },
     "/v1/projects/{ref}/upgrade": {
       "post": {
-        "operationId": "upgradeProject",
-        "summary": "Upgrades the project's Postgres version",
+        "operationId": "v1-upgrade-postgres-version",
+        "summary": "[Beta] Upgrades the project's Postgres version",
         "parameters": [
           {
             "name": "ref",
@@ -3203,7 +3213,7 @@
           }
         },
         "tags": [
-          "database version upgrade (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -3214,8 +3224,8 @@
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
       "get": {
-        "operationId": "upgradeEligibilityInformation",
-        "summary": "Returns the project's eligibility for upgrades",
+        "operationId": "v1-get-postgrest-upgrade-eligibility",
+        "summary": "[Beta] Returns the project's eligibility for upgrades",
         "parameters": [
           {
             "name": "ref",
@@ -3308,7 +3318,7 @@
           }
         },
         "tags": [
-          "database version upgrade (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -3319,8 +3329,8 @@
     },
     "/v1/projects/{ref}/upgrade/status": {
       "get": {
-        "operationId": "getUpgradeStatus",
-        "summary": "Gets the latest status of the project's upgrade",
+        "operationId": "v1-get-postgrest-upgrade-status",
+        "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
             "name": "ref",
@@ -3355,7 +3365,6 @@
                               "type": "number"
                             },
                             "error": {
-                              "type": "string",
                               "enum": [
                                 "1_upgraded_instance_launch_failed",
                                 "2_volume_detachchment_from_upgraded_instance_failed",
@@ -3365,10 +3374,10 @@
                                 "6_volume_detachchment_from_original_instance_failed",
                                 "7_volume_attachment_to_upgraded_instance_failed",
                                 "8_upgrade_completion_failed"
-                              ]
+                              ],
+                              "type": "string"
                             },
                             "progress": {
-                              "type": "string",
                               "enum": [
                                 "0_requested",
                                 "1_started",
@@ -3380,15 +3389,16 @@
                                 "7_detached_volume_from_original_instance",
                                 "8_attached_volume_to_upgraded_instance",
                                 "9_completed_upgrade"
-                              ]
+                              ],
+                              "type": "string"
                             },
                             "status": {
-                              "type": "number",
                               "enum": [
                                 0,
                                 1,
                                 2
-                              ]
+                              ],
+                              "type": "number"
                             }
                           },
                           "required": [
@@ -3415,7 +3425,7 @@
           }
         },
         "tags": [
-          "database version upgrade (beta)"
+          "projects"
         ],
         "security": [
           {
@@ -3426,7 +3436,7 @@
     },
     "/v1/projects/{ref}/readonly": {
       "get": {
-        "operationId": "getReadOnlyModeStatus",
+        "operationId": "v1-get-readonly-mode-status",
         "summary": "Returns project's readonly mode status",
         "parameters": [
           {
@@ -3473,7 +3483,7 @@
           }
         },
         "tags": [
-          "database readonly mode"
+          "database"
         ],
         "security": [
           {
@@ -3484,7 +3494,7 @@
     },
     "/v1/projects/{ref}/readonly/temporary-disable": {
       "post": {
-        "operationId": "temporarilyDisableReadonlyMode",
+        "operationId": "v1-disable-readonly-mode-temporarily",
         "summary": "Disables project's readonly mode for the next 15 minutes",
         "parameters": [
           {
@@ -3508,7 +3518,7 @@
           }
         },
         "tags": [
-          "database readonly mode"
+          "database"
         ],
         "security": [
           {
@@ -3519,8 +3529,8 @@
     },
     "/v1/projects/{ref}/read-replicas/setup": {
       "post": {
-        "operationId": "setUpReadReplica",
-        "summary": "Set up a read replica",
+        "operationId": "v1-setup-a-read-replica",
+        "summary": "[Beta] Set up a read replica",
         "parameters": [
           {
             "name": "ref",
@@ -3580,7 +3590,7 @@
           }
         },
         "tags": [
-          "read replicas (beta)"
+          "database"
         ],
         "security": [
           {
@@ -3591,8 +3601,8 @@
     },
     "/v1/projects/{ref}/read-replicas/remove": {
       "post": {
-        "operationId": "removeReadReplica",
-        "summary": "Remove a read replica",
+        "operationId": "v1-remove-a-read-replica",
+        "summary": "[Beta] Remove a read replica",
         "parameters": [
           {
             "name": "ref",
@@ -3633,7 +3643,7 @@
           }
         },
         "tags": [
-          "read replicas (beta)"
+          "database"
         ],
         "security": [
           {
@@ -3644,7 +3654,7 @@
     },
     "/v1/projects/{ref}/health": {
       "get": {
-        "operationId": "checkServiceHealth",
+        "operationId": "v1-get-services-health",
         "summary": "Gets project's service health status",
         "parameters": [
           {
@@ -3781,7 +3791,7 @@
           }
         },
         "tags": [
-          "services"
+          "projects"
         ],
         "security": [
           {
@@ -3792,7 +3802,7 @@
     },
     "/v1/projects/{ref}/config/database/postgres": {
       "get": {
-        "operationId": "getConfig",
+        "operationId": "get-postgres-config",
         "summary": "Gets project's Postgres config",
         "parameters": [
           {
@@ -3884,7 +3894,7 @@
           }
         },
         "tags": [
-          "projects config"
+          "database"
         ],
         "security": [
           {
@@ -3893,7 +3903,7 @@
         ]
       },
       "put": {
-        "operationId": "updateConfig",
+        "operationId": "update-postgres-config",
         "summary": "Updates project's Postgres config",
         "parameters": [
           {
@@ -4056,7 +4066,7 @@
           }
         },
         "tags": [
-          "projects config"
+          "database"
         ],
         "security": [
           {
@@ -4067,7 +4077,7 @@
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
       "get": {
-        "operationId": "v1GetPgbouncerConfig",
+        "operationId": "v1-get-project-pgbouncer-config",
         "summary": "Get project's pgbouncer config",
         "parameters": [
           {
@@ -4120,13 +4130,13 @@
           }
         },
         "tags": [
-          "projects config"
+          "database"
         ]
       }
     },
     "/v1/projects/{ref}/config/auth": {
       "get": {
-        "operationId": "getV1AuthConfig",
+        "operationId": "v1-get-auth-service-config",
         "summary": "Gets project's auth config",
         "parameters": [
           {
@@ -4502,8 +4512,7 @@
                       "nullable": true
                     },
                     "mailer_otp_exp": {
-                      "type": "number",
-                      "nullable": true
+                      "type": "number"
                     },
                     "mailer_otp_length": {
                       "type": "number",
@@ -4670,8 +4679,7 @@
                       "nullable": true
                     },
                     "sms_otp_length": {
-                      "type": "number",
-                      "nullable": true
+                      "type": "number"
                     },
                     "sms_provider": {
                       "type": "string",
@@ -4939,7 +4947,7 @@
           }
         },
         "tags": [
-          "projects config"
+          "auth"
         ],
         "security": [
           {
@@ -4948,7 +4956,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateV1AuthConfig",
+        "operationId": "v1-update-auth-service-config",
         "summary": "Updates a project's auth config",
         "parameters": [
           {
@@ -5842,8 +5850,7 @@
                       "nullable": true
                     },
                     "mailer_otp_exp": {
-                      "type": "number",
-                      "nullable": true
+                      "type": "number"
                     },
                     "mailer_otp_length": {
                       "type": "number",
@@ -6010,8 +6017,7 @@
                       "nullable": true
                     },
                     "sms_otp_length": {
-                      "type": "number",
-                      "nullable": true
+                      "type": "number"
                     },
                     "sms_provider": {
                       "type": "string",
@@ -6279,371 +6285,7 @@
           }
         },
         "tags": [
-          "projects config"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/config/auth/third-party-auth": {
-      "post": {
-        "operationId": "createTPAForProject",
-        "summary": "Creates a new third-party auth integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "oidc_issuer_url": {
-                    "type": "string"
-                  },
-                  "jwks_url": {
-                    "type": "string"
-                  },
-                  "custom_jwks": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "oidc_issuer_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "jwks_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "custom_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "resolved_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "inserted_at": {
-                      "type": "string"
-                    },
-                    "updated_at": {
-                      "type": "string"
-                    },
-                    "resolved_at": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "type",
-                    "inserted_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "third-party-auth (alpha)"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "listTPAForProject",
-        "summary": "Lists all third-party auth integrations",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "oidc_issuer_url": {
-                        "type": "string",
-                        "nullable": true
-                      },
-                      "jwks_url": {
-                        "type": "string",
-                        "nullable": true
-                      },
-                      "custom_jwks": {
-                        "type": "object",
-                        "nullable": true
-                      },
-                      "resolved_jwks": {
-                        "type": "object",
-                        "nullable": true
-                      },
-                      "inserted_at": {
-                        "type": "string"
-                      },
-                      "updated_at": {
-                        "type": "string"
-                      },
-                      "resolved_at": {
-                        "type": "string",
-                        "nullable": true
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "type",
-                      "inserted_at",
-                      "updated_at"
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "third-party-auth (alpha)"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
-      "delete": {
-        "operationId": "deleteTPAForProject",
-        "summary": "Removes a third-party auth integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "tpa_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "oidc_issuer_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "jwks_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "custom_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "resolved_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "inserted_at": {
-                      "type": "string"
-                    },
-                    "updated_at": {
-                      "type": "string"
-                    },
-                    "resolved_at": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "type",
-                    "inserted_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "third-party-auth (alpha)"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "getTPAForProject",
-        "summary": "Get a third-party integration",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "tpa_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "oidc_issuer_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "jwks_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "custom_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "resolved_jwks": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "inserted_at": {
-                      "type": "string"
-                    },
-                    "updated_at": {
-                      "type": "string"
-                    },
-                    "resolved_at": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "type",
-                    "inserted_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "third-party-auth (alpha)"
+          "auth"
         ],
         "security": [
           {
@@ -6654,8 +6296,8 @@
     },
     "/v1/projects/{ref}/database/query": {
       "post": {
-        "operationId": "v1RunQuery",
-        "summary": "Run sql query",
+        "operationId": "v1-run-a-query",
+        "summary": "[Beta] Run sql query",
         "parameters": [
           {
             "name": "ref",
@@ -6706,7 +6348,7 @@
           }
         },
         "tags": [
-          "projects (beta)"
+          "database"
         ],
         "security": [
           {
@@ -6717,8 +6359,8 @@
     },
     "/v1/projects/{ref}/database/webhooks/enable": {
       "post": {
-        "operationId": "v1EnableDatabaseWebhooks",
-        "summary": "Enables Database Webhooks on the project",
+        "operationId": "v1-enable-database-webhook",
+        "summary": "[Beta] Enables Database Webhooks on the project",
         "parameters": [
           {
             "name": "ref",
@@ -6744,7 +6386,7 @@
           }
         },
         "tags": [
-          "projects (beta)"
+          "database"
         ],
         "security": [
           {
@@ -6943,7 +6585,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -6952,7 +6594,7 @@
         ]
       },
       "get": {
-        "operationId": "getFunctions",
+        "operationId": "v1-list-all-functions",
         "summary": "List all functions",
         "description": "Returns all functions you've previously added to the specified project.",
         "parameters": [
@@ -7039,7 +6681,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -7050,7 +6692,7 @@
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
       "get": {
-        "operationId": "getFunction",
+        "operationId": "v1-get-a-function",
         "summary": "Retrieve a function",
         "description": "Retrieves a function with the specified slug and project.",
         "parameters": [
@@ -7144,7 +6786,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -7153,7 +6795,7 @@
         ]
       },
       "patch": {
-        "operationId": "updateFunction",
+        "operationId": "v1-update-a-function",
         "summary": "Update a function",
         "description": "Updates a function with the specified slug and project.",
         "parameters": [
@@ -7333,7 +6975,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -7342,7 +6984,7 @@
         ]
       },
       "delete": {
-        "operationId": "deleteFunction",
+        "operationId": "v1-delete-a-function",
         "summary": "Delete a function",
         "description": "Deletes a function with the specified slug from the specified project.",
         "parameters": [
@@ -7380,7 +7022,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -7391,7 +7033,7 @@
     },
     "/v1/projects/{ref}/functions/{function_slug}/body": {
       "get": {
-        "operationId": "getFunctionBody",
+        "operationId": "v1-get-a-function-body",
         "summary": "Retrieve a function body",
         "description": "Retrieves a function body for the specified slug and project.",
         "parameters": [
@@ -7429,7 +7071,7 @@
           }
         },
         "tags": [
-          "functions"
+          "edge functions"
         ],
         "security": [
           {
@@ -7440,7 +7082,7 @@
     },
     "/v1/projects/{ref}/storage/buckets": {
       "get": {
-        "operationId": "getBuckets",
+        "operationId": "v1-list-all-buckets",
         "summary": "Lists all buckets",
         "parameters": [
           {
@@ -7516,7 +7158,7 @@
     },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
-        "operationId": "createProviderForProject",
+        "operationId": "v1-create-a-sso-provider",
         "summary": "Creates a new SSO provider",
         "parameters": [
           {
@@ -7724,7 +7366,7 @@
           }
         },
         "tags": [
-          "sso"
+          "auth"
         ],
         "security": [
           {
@@ -7733,7 +7375,7 @@
         ]
       },
       "get": {
-        "operationId": "listAllProviders",
+        "operationId": "v1-list-all-sso-provider",
         "summary": "Lists all SSO providers",
         "parameters": [
           {
@@ -7877,7 +7519,7 @@
           }
         },
         "tags": [
-          "sso"
+          "auth"
         ],
         "security": [
           {
@@ -7888,7 +7530,7 @@
     },
     "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
       "get": {
-        "operationId": "getProviderById",
+        "operationId": "v1-get-a-sso-provider",
         "summary": "Gets a SSO provider by its UUID",
         "parameters": [
           {
@@ -8029,7 +7671,7 @@
           }
         },
         "tags": [
-          "sso"
+          "auth"
         ],
         "security": [
           {
@@ -8038,7 +7680,7 @@
         ]
       },
       "put": {
-        "operationId": "updateProviderById",
+        "operationId": "v1-update-a-sso-provider",
         "summary": "Updates a SSO provider by its UUID",
         "parameters": [
           {
@@ -8244,7 +7886,7 @@
           }
         },
         "tags": [
-          "sso"
+          "auth"
         ],
         "security": [
           {
@@ -8253,7 +7895,7 @@
         ]
       },
       "delete": {
-        "operationId": "removeProviderById",
+        "operationId": "v1-delete-a-sso-provider",
         "summary": "Removes a SSO provider by its UUID",
         "parameters": [
           {
@@ -8394,7 +8036,7 @@
           }
         },
         "tags": [
-          "sso"
+          "auth"
         ],
         "security": [
           {
@@ -8405,7 +8047,7 @@
     },
     "/v1/projects/{ref}/database/backups": {
       "get": {
-        "operationId": "getBackups",
+        "operationId": "v1-list-all-backups",
         "summary": "Lists all backups",
         "parameters": [
           {
@@ -8494,7 +8136,7 @@
           }
         },
         "tags": [
-          "backups"
+          "database"
         ],
         "security": [
           {
@@ -8505,7 +8147,7 @@
     },
     "/v1/projects/{ref}/database/backups/restore-pitr": {
       "post": {
-        "operationId": "v1RestorePitr",
+        "operationId": "v1-restore-pitr-backup",
         "summary": "Restores a PITR backup for a database",
         "parameters": [
           {
@@ -8544,7 +8186,7 @@
           }
         },
         "tags": [
-          "backups"
+          "database"
         ],
         "security": [
           {
@@ -8555,7 +8197,7 @@
     },
     "/v1/organizations/{slug}/members": {
       "get": {
-        "operationId": "v1ListOrganizationMembers",
+        "operationId": "v1-list-organization-members",
         "summary": "List members of an organization",
         "parameters": [
           {
@@ -8617,7 +8259,7 @@
     },
     "/v1/organizations/{slug}": {
       "get": {
-        "operationId": "getOrganization",
+        "operationId": "v1-get-an-organization",
         "summary": "Gets information about the organization",
         "parameters": [
           {
@@ -8780,6 +8422,9 @@
             "type": "string"
           },
           "pr_number": {
+            "type": "number"
+          },
+          "latest_check_run_id": {
             "type": "number"
           },
           "reset_on_push": {
@@ -8990,7 +8635,8 @@
           },
           "kps_enabled": {
             "type": "boolean",
-            "deprecated": true
+            "deprecated": true,
+            "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
             "type": "string",
@@ -9156,13 +8802,13 @@
             ]
           },
           "visibility": {
-            "type": "string",
             "enum": [
               "user",
               "project",
               "org",
               "public"
-            ]
+            ],
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -9252,13 +8898,13 @@
                   ]
                 },
                 "visibility": {
-                  "type": "string",
                   "enum": [
                     "user",
                     "project",
                     "org",
                     "public"
-                  ]
+                  ],
+                  "type": "string"
                 },
                 "name": {
                   "type": "string"
@@ -10008,7 +9654,6 @@
             "type": "number"
           },
           "error": {
-            "type": "string",
             "enum": [
               "1_upgraded_instance_launch_failed",
               "2_volume_detachchment_from_upgraded_instance_failed",
@@ -10018,10 +9663,10 @@
               "6_volume_detachchment_from_original_instance_failed",
               "7_volume_attachment_to_upgraded_instance_failed",
               "8_upgrade_completion_failed"
-            ]
+            ],
+            "type": "string"
           },
           "progress": {
-            "type": "string",
             "enum": [
               "0_requested",
               "1_started",
@@ -10033,15 +9678,16 @@
               "7_detached_volume_from_original_instance",
               "8_attached_volume_to_upgraded_instance",
               "9_completed_upgrade"
-            ]
+            ],
+            "type": "string"
           },
           "status": {
-            "type": "number",
             "enum": [
               0,
               1,
               2
-            ]
+            ],
+            "type": "number"
           }
         },
         "required": [
@@ -10066,7 +9712,6 @@
                     "type": "number"
                   },
                   "error": {
-                    "type": "string",
                     "enum": [
                       "1_upgraded_instance_launch_failed",
                       "2_volume_detachchment_from_upgraded_instance_failed",
@@ -10076,10 +9721,10 @@
                       "6_volume_detachchment_from_original_instance_failed",
                       "7_volume_attachment_to_upgraded_instance_failed",
                       "8_upgrade_completion_failed"
-                    ]
+                    ],
+                    "type": "string"
                   },
                   "progress": {
-                    "type": "string",
                     "enum": [
                       "0_requested",
                       "1_started",
@@ -10091,15 +9736,16 @@
                       "7_detached_volume_from_original_instance",
                       "8_attached_volume_to_upgraded_instance",
                       "9_completed_upgrade"
-                    ]
+                    ],
+                    "type": "string"
                   },
                   "status": {
-                    "type": "number",
                     "enum": [
                       0,
                       1,
                       2
-                    ]
+                    ],
+                    "type": "number"
                   }
                 },
                 "required": [
@@ -10799,8 +10445,7 @@
             "nullable": true
           },
           "mailer_otp_exp": {
-            "type": "number",
-            "nullable": true
+            "type": "number"
           },
           "mailer_otp_length": {
             "type": "number",
@@ -10967,8 +10612,7 @@
             "nullable": true
           },
           "sms_otp_length": {
-            "type": "number",
-            "nullable": true
+            "type": "number"
           },
           "sms_provider": {
             "type": "string",
@@ -11735,63 +11379,6 @@
             "type": "number"
           }
         }
-      },
-      "CreateThirdPartyAuthBody": {
-        "type": "object",
-        "properties": {
-          "oidc_issuer_url": {
-            "type": "string"
-          },
-          "jwks_url": {
-            "type": "string"
-          },
-          "custom_jwks": {
-            "type": "object"
-          }
-        }
-      },
-      "ThirdPartyAuth": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "oidc_issuer_url": {
-            "type": "string",
-            "nullable": true
-          },
-          "jwks_url": {
-            "type": "string",
-            "nullable": true
-          },
-          "custom_jwks": {
-            "type": "object",
-            "nullable": true
-          },
-          "resolved_jwks": {
-            "type": "object",
-            "nullable": true
-          },
-          "inserted_at": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "resolved_at": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "inserted_at",
-          "updated_at"
-        ]
       },
       "V1RunQueryBody": {
         "type": "object",
