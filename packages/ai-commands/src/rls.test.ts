@@ -10,7 +10,9 @@ import {
   assertNodeType,
   getPolicies,
   getPolicyInfo,
+  parseConstant,
   renderFields,
+  renderJsonExpression,
   renderTargets,
   unwrapNode,
 } from '../test/sql-util'
@@ -347,8 +349,8 @@ describe('rls chat', () => {
       )
 
       assertDefined(selectStatement.targetList, 'Expected SELECT statement to have a target list')
-      const columns = renderTargets(selectStatement.targetList, (target) =>
-        assertAndRenderColumn(target, 'Expected target list to contain columns')
+      const columns = renderTargets(selectStatement.targetList, (node) =>
+        assertAndRenderColumn(node, 'Expected target list to contain columns')
       )
       expect(columns).toContain('library_id')
 
@@ -396,9 +398,9 @@ describe('rls chat', () => {
             selectStatement.targetList,
             'Expected SELECT statement to contain a target list'
           )
-          const [functionCall] = renderTargets(selectStatement.targetList, (target) => {
+          const [functionCall] = renderTargets(selectStatement.targetList, (node) => {
             const funcCall = assertAndUnwrapNode(
-              target,
+              node,
               'FuncCall',
               'Expected SELECT statement to contain a function call'
             )
@@ -406,6 +408,77 @@ describe('rls chat', () => {
             return renderFields(funcCall.funcname)
           })
           expect(functionCall).toBe('auth.uid')
+        }
+      )
+    })
+  })
+
+  test.concurrent('mfa', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'Users need a second form of auth to join a library',
+        },
+      ],
+      tableDefs
+    )
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+    const [policy] = await getPolicies(sql)
+
+    withMetadata({ sql }, () => {
+      expect(policy.cmd_name).toBe('insert')
+
+      assertDefined(policy.with_check, 'Expected INSERT policy to have a WITH CHECK')
+      const expression = assertAndUnwrapNode(
+        policy.with_check,
+        'A_Expr',
+        'Expected WITH CHECK to be an expression'
+      )
+
+      assertEachSideOfExpression(
+        expression,
+        (node) => {
+          const constValue = assertAndUnwrapNode(
+            node,
+            'A_Const',
+            'Expected one side of expression to be a constant'
+          )
+          const stringValue = parseConstant(constValue)
+          expect(stringValue).toBe('aal2')
+        },
+        (node) => {
+          const sublink = assertAndUnwrapNode(
+            node,
+            'SubLink',
+            'Expected one side of expression to be a sub-query'
+          )
+
+          assertDefined(sublink.subselect, 'Expected sublink to have a subselect')
+          const selectStatement = assertAndUnwrapNode(
+            sublink.subselect,
+            'SelectStmt',
+            'Expected sub-query to be a SELECT statement'
+          )
+
+          assertDefined(
+            selectStatement.targetList,
+            'Expected SELECT statement to have a target list'
+          )
+          const [jsonTarget] = renderTargets(selectStatement.targetList, (node) => {
+            const expression = assertAndUnwrapNode(
+              node,
+              'A_Expr',
+              'Expected SELECT target list to contain a JSON expression'
+            )
+            const jsonExpression = renderJsonExpression(expression)
+            return jsonExpression
+          })
+
+          expect(jsonTarget).toBe("auth.jwt()->>'aal'")
         }
       )
     })

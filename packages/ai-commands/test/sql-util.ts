@@ -1,4 +1,4 @@
-import { A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
+import { A_Const, A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query'
 
 export type PolicyInfo = {
   name: string
@@ -245,7 +245,7 @@ export async function getPolicyInfo(createPolicyStatement: CreatePolicyStmt) {
   return policyInfo
 }
 
-export function renderTargets<T>(targets: Node[], renderTarget: (target: Node) => T): T[] {
+export function renderTargets<T>(targets: Node[], renderTarget: (node: Node) => T): T[] {
   return targets.map((node) => {
     const target = assertAndUnwrapNode(
       node,
@@ -268,6 +268,70 @@ export function assertAndRenderColumn(node: Node, errorMessage: string) {
   return renderColumn(column)
 }
 
+export function renderJsonExpression(expression: A_Expr): string {
+  assertDefined(expression.name, 'Expected expression to have an operator')
+
+  if (expression.name.length > 1) {
+    throw new AssertionError('Only one JSON operator supported per expression')
+  }
+
+  const [name] = expression.name
+  const operatorString = assertAndUnwrapNode(
+    name,
+    'String',
+    'Expected JSON operator to be a string'
+  )
+  assertDefined(operatorString.sval, 'PG string expected to have an sval')
+  const operator = operatorString.sval
+
+  if (!['->', '->>'].includes(operator)) {
+    throw new AssertionError(`Invalid JSON operator ${operator}`)
+  }
+
+  assertDefined(expression.lexpr, 'Expected JSON expression to have a left-side component')
+  assertDefined(expression.rexpr, 'Expected JSON expression to have a right-side component')
+
+  let left: string | number
+  let right: string | number
+
+  const leftConstant = unwrapNode(expression.lexpr, 'A_Const')
+  const leftColumn = unwrapNode(expression.lexpr, 'ColumnRef')
+  const leftFuncCall = unwrapNode(expression.lexpr, 'FuncCall')
+  const leftExpression = unwrapNode(expression.lexpr, 'A_Expr')
+
+  if (leftConstant) {
+    // JSON path cannot contain a float
+    if ('fval' in leftConstant) {
+      throw new AssertionError('Invalid JSON path: Expression cannot contain a float')
+    }
+    left = `'${parseConstant(leftConstant)}'`
+  } else if (leftColumn) {
+    left = renderColumn(leftColumn)
+  } else if (leftFuncCall) {
+    assertDefined(leftFuncCall.funcname, 'Expected function call to have a name')
+    const functionName = renderFields(leftFuncCall.funcname)
+    left = `${functionName}()`
+  } else if (leftExpression) {
+    left = renderJsonExpression(leftExpression)
+  } else {
+    throw new AssertionError('Invalid JSON path')
+  }
+
+  const rightConstant = unwrapNode(expression.rexpr, 'A_Const')
+
+  if (rightConstant) {
+    // JSON path cannot contain a float
+    if ('fval' in rightConstant) {
+      throw new AssertionError('Invalid JSON path: Expression cannot contain a float')
+    }
+    right = `'${parseConstant(rightConstant)}'`
+  } else {
+    throw new AssertionError('Invalid JSON path')
+  }
+
+  return `${left}${operator}${right}`
+}
+
 export function renderFields(fields: Node[]) {
   const nameSegments = fields
     .map((field) => {
@@ -286,4 +350,17 @@ export function renderFields(fields: Node[]) {
     .filter((name): name is string => name !== undefined)
 
   return nameSegments.join('.')
+}
+
+export function parseConstant(constant: A_Const) {
+  if ('sval' in constant) {
+    return constant.sval?.sval ?? ''
+  } else if ('ival' in constant) {
+    // The PG parser turns 0 into undefined, so convert it back here
+    return constant.ival?.ival ?? 0
+  } else if ('fval' in constant) {
+    return constant.fval?.fval ? parseFloat(constant.fval.fval) : 0
+  } else {
+    throw new AssertionError(`Constant values must be a string, integer, or float`)
+  }
 }
