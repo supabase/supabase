@@ -4449,7 +4449,7 @@ export interface components {
       default_pool_size: number | null
       max_client_conn: number | null
       /** @enum {string|null} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: 'transaction' | 'session' | 'statement' | null
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number
