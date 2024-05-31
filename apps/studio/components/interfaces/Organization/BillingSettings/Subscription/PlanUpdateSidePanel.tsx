@@ -81,7 +81,7 @@ const PlanUpdateSidePanel = () => {
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success(`Successfully updated subscription to ${subscriptionPlanMeta?.name}!`)
         setSelectedTier(undefined)
         onClose()
