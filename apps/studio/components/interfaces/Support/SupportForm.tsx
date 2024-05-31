@@ -51,17 +51,14 @@ import {
   Input,
   Listbox,
   Separator,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
+  cn,
 } from 'ui'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-import { CommandLabel, TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
+import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -75,42 +72,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
   const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
   const [subject, setSubject] = useState('')
   const [docsResults, setDocsResults] = useState<Page[]>([])
-
-  const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
-  const router = useRouter()
-
-  async function openLink(pageType: PageType, link: string) {
-    switch (pageType) {
-      case PageType.Markdown:
-      case PageType.Reference:
-        if (site === 'docs') {
-          await router.push(link)
-          return setIsOpen(false)
-        } else if (site === 'website') {
-          await router.push(`/docs${link}`)
-          setIsOpen(false)
-        } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank')
-          setIsOpen(false)
-        }
-        break
-      case PageType.Integration:
-        if (site === 'website') {
-          router.push(link)
-          setIsOpen(false)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank')
-          setIsOpen(false)
-        }
-        break
-      case PageType.GithubDiscussion:
-        window.open(link, '_blank')
-        setIsOpen(false)
-        break
-      default:
-        throw new Error(`Unknown page type '${pageType}'`)
-    }
-  }
 
   useEffect(() => {
     if (subject.trim().length > 0) {
@@ -130,20 +91,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
 
   const { isReady } = useRouter()
   const { ref, slug, category, message } = useParams()
-
-  const ChevronArrow = () => (
-    <ChevronRight
-      strokeWidth={1.5}
-      className="
-        text-foreground-muted
-        opacity-0
-        -left-4
-        group-aria-selected:scale-[101%]
-        group-aria-selected:opacity-100
-        group-aria-selected:left-0
-      "
-    />
-  )
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -700,82 +647,12 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                     </div>
 
                     {docsResults.length > 0 && hasResults && (
-                      <div className="py-4 px-6 border rounded-md mx-6 ">
-                        <h2 className="text-sm text-foreground-light">Suggested resources</h2>
+                      <div className="py-4 px-6 border rounded-md mx-6">
+                        <h2 className="text-sm text-foreground-light px-2 mb-2">
+                          Suggested resources
+                        </h2>
                         {docsResults.slice(0, 5).map((page, i) => (
-                          <Command_Shadcn_ key={page.id}>
-                            <CommandGroup_Shadcn_
-                              key={`${page.path}-group`}
-                              heading=""
-                              value={`${encodeURIComponent(page.title)}-group-index-${i}`}
-                              forceMount={true}
-                              className="p-2"
-                            >
-                              <CommandItem_Shadcn_
-                                key={`${page.path}-item`}
-                                value={`${encodeURIComponent(page.title)}-item-index-${i}`}
-                                onSelect={() => openLink(page.type, formatPageUrl(page))}
-                                forceMount={true}
-                                className="hover:cursor-pointer hover:!bg-muted p-2 text-sm"
-                              >
-                                <div className="grow flex gap-3 items-center">
-                                  <IconContainer>{getPageIcon(page)}</IconContainer>
-                                  <div className="flex flex-col gap-0">
-                                    <CommandLabel>
-                                      <TextHighlighter text={page.title} query="test" />
-                                    </CommandLabel>
-                                    {(page.description || page.subtitle) && (
-                                      <div className="text-xs text-foreground-muted">
-                                        <TextHighlighter
-                                          text={page.description || page.subtitle || ''}
-                                          query="test"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                                <ChevronArrow />
-                              </CommandItem_Shadcn_>
-
-                              {page.sections.length > 0 && (
-                                <div className="border-l border-default ml-3 pt-3">
-                                  {page.sections.map((section: PageSection, index: number) => (
-                                    <CommandItem_Shadcn_
-                                      className="ml-3 mb-3 hover:cursor-pointer p-2 text-sm"
-                                      onSelect={() =>
-                                        openLink(page.type, formatSectionUrl(page, section))
-                                      }
-                                      key={`${page.path}__${section.heading}-item-${index}`}
-                                      value={`${encodeURIComponent(page.title)}__${encodeURIComponent(section.heading)}-item-index-${page.id}`}
-                                      forceMount={true}
-                                    >
-                                      <div className="grow flex gap-3 items-center">
-                                        <IconContainer>{getPageSectionIcon(page)}</IconContainer>
-                                        <div className="flex flex-col gap-2">
-                                          <cite>
-                                            <TextHighlighter
-                                              className="not-italic text-xs rounded-full px-3 py-1 bg-overlay-hover text-foreground"
-                                              text={page.title}
-                                              query="test"
-                                            />
-                                          </cite>
-                                          {section.heading && (
-                                            <CommandLabel>
-                                              <TextHighlighter
-                                                text={section.heading}
-                                                query="query"
-                                              />
-                                            </CommandLabel>
-                                          )}
-                                        </div>
-                                      </div>
-                                      <ChevronArrow />
-                                    </CommandItem_Shadcn_>
-                                  ))}
-                                </div>
-                              )}
-                            </CommandGroup_Shadcn_>
-                          </Command_Shadcn_>
+                          <DocsLinkGroup key={`${page.id}-group`} page={page} />
                         ))}
                       </div>
                     )}
@@ -1089,4 +966,85 @@ export function getPageSectionIcon(page: Page) {
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
+}
+
+const cardBaseClasses =
+  'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-sm flex items-center justify-between'
+
+interface DocsLinkGroup {
+  page: Page
+}
+
+const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
+  return (
+    <ul key={page.id} className="grid gap-2">
+      <li key={`${page.path}-group`} className="p-2 mb-2">
+        <Link
+          target="blank"
+          href={formatPageUrl(page)}
+          className={cn(cardBaseClasses, 'flex items-center justify-between pr-5')}
+        >
+          <div className="grow flex gap-3 items-center">
+            <div>{getPageIcon(page)}</div>
+            <div className="flex flex-col gap-0">
+              <span className="text-sm">
+                <TextHighlighter text={page.title} query="test" />
+              </span>
+              {(page.description || page.subtitle) && (
+                <div className="text-xs text">
+                  <TextHighlighter text={page.description || page.subtitle || ''} query="test" />
+                </div>
+              )}
+            </div>
+          </div>
+          <ChevronRight />
+        </Link>
+        {page.sections.length > 0 && (
+          <ul className="border-l border-default ml-3 pt-3 grid gap-2">
+            {page.sections.map((section: PageSection, i) => (
+              <DocsLinkSection
+                key={`${page.path}__${section.heading}-item-${i}`}
+                page={page}
+                section={section}
+              />
+            ))}
+          </ul>
+        )}
+      </li>
+    </ul>
+  )
+}
+
+interface DocsLinkSection {
+  page: Page
+  section: PageSection
+}
+
+const DocsLinkSection = ({ page, section }: DocsLinkSection) => {
+  return (
+    <ul key={`${section.heading}-group`} className="grid gap-2">
+      <li key={`${section.heading}-item`} className="p-2 mb-2">
+        <Link target="blank" href={formatSectionUrl(page, section)} className={cn(cardBaseClasses)}>
+          <div className="grow flex gap-3 items-center">
+            <div>{getPageIcon(page)}</div>
+            <div className="grid gap-1.5">
+              <span>
+                <TextHighlighter
+                  className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
+                  text={section.heading}
+                  query="test"
+                />
+              </span>
+              {section.heading && (
+                <div className="text text-xs ">
+                  <TextHighlighter text={section.heading} query="test" />
+                </div>
+              )}
+            </div>
+          </div>
+          <ChevronRight />
+        </Link>
+      </li>
+    </ul>
+  )
 }
