@@ -30,7 +30,7 @@ import {
 interface UsePoolerCheckboxInterface {
   id: string
   checked: boolean
-  poolingMode: 'transaction' | 'session' | 'statement'
+  poolingMode: 'transaction' | 'session'
   onCheckedChange: (value: boolean) => void
   onSelectPoolingMode: (mode: 'transaction' | 'session') => void
 }

@@ -67,7 +67,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')

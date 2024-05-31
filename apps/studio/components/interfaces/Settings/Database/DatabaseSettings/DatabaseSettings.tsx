@@ -32,7 +32,7 @@ const DatabaseSettings = () => {
   const state = useDatabaseSelectorStateSnapshot()
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
 
   const {
     data: poolingInfo,

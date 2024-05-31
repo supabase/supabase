@@ -4449,17 +4449,17 @@ export interface components {
       default_pool_size: number | null
       max_client_conn: number | null
       /** @enum {string|null} */
-      pool_mode: 'transaction' | 'session' | 'statement' | null
+      pool_mode: 'transaction' | 'session'
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size?: number
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode: 'transaction' | 'session'
     }
     ServiceApiKey: {
       api_key_encrypted?: string
