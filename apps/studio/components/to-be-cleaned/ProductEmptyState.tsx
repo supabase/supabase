@@ -34,8 +34,8 @@ const ProductEmptyState = ({
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>
-            <h5>{title}</h5>
-            <div className="flex flex-col space-y-2">{children}</div>
+            <h5 className="text-foreground">{title}</h5>
+            <div className="flex flex-col space-y-2 text-foreground-light">{children}</div>
             {hasAction && (
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
