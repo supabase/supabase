@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -63,12 +62,10 @@ const ChartHandler = ({
   const router = useRouter()
   const { ref } = router.query
 
-  const { project } = useProjectContext()
-  const isReadReplicasEnabled = project?.is_read_replicas_enabled
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
 
-  const databaseIdentifier = isReadReplicasEnabled ? state.selectedDatabaseId : undefined
+  const databaseIdentifier = state.selectedDatabaseId
 
   const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {

@@ -39,7 +39,6 @@ const DatabaseUsage = () => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const state = useDatabaseSelectorStateSnapshot()
 
-  const isReadReplicasEnabled = project?.is_read_replicas_enabled
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
@@ -69,7 +68,7 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Database" showDatabaseSelector={isReadReplicasEnabled} />
+      <ReportHeader showDatabaseSelector title="Database" />
       <section>
         <Panel title={<h2>Database health</h2>}>
           <Panel.Content>
