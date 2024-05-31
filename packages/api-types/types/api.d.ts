@@ -4454,12 +4454,12 @@ export interface components {
     UpdateSupavisorConfigBody: {
       default_pool_size?: number
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: 'transaction' | 'session' | 'statement'
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size?: number
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: 'transaction' | 'session' | 'statement'
     }
     ServiceApiKey: {
       api_key_encrypted?: string
