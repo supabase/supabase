@@ -358,12 +358,9 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section
-      className={'flex w-full flex-col h-full' + (!queryType ? '' : '')}
-      style={{ maxHeight }}
-    >
+    <section className={'flex flex-grow w-full max-h-screen flex-col h-full'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
-      <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
+      <div className={`flex h-full flex-row ${!queryType ? 'border-x' : ''}`}>
         <DataGrid
           role="table"
           style={{ height: '100%' }}
