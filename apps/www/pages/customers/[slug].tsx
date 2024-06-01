@@ -64,10 +64,15 @@ export async function getStaticProps({ params }: any) {
 function CaseStudyPage(props: any) {
   const content = props.blog.content
 
+  const ogImageUrl = encodeURI(
+    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=customers&title=${props.blog?.meta_title ?? props.blog?.title}&customer=${props.blog.slug}`
+  )
+
   const meta = {
     title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
     image:
+      ogImageUrl ??
       `${SITE_ORIGIN}${props.blog.og_image}` ??
       `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
     url: `${SITE_ORIGIN}/customers/${props.blog.slug}`,
