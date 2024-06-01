@@ -108,6 +108,7 @@ functions:
             'public-anon-key',
           );
           ```
+
   - id: sign-up
     title: 'signUp()'
     description: |
@@ -3217,41 +3218,40 @@ functions:
       queries that return rows (e.g., `select()` or `rpc()` on a function that
       returns a table response).
 
-  - id: limit
-    title: limit()
-    description: |
-      Limits the result with the specified count.
-    params:
-      - name: count
-        isOptional: false
-        type: int
-        description: The maximum number of rows to return.
-      - name: referencedTable
-        isOptional: true
-        type: int
-        description: Set this to limit rows of referenced tables instead of the parent table.
+  - id: db-modifiers-select
+    title: select()
     examples:
-      - id: with-select
-        name: With `select()`
-        isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .limit(1);
-          ```
-      - id: with-embedded-resources
-        name: With embedded resources
+      - id: with-upsert
+        name: With `upsert()`
         code: |
           ```dart
           final data = await supabase
             .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .limit(1,  referencedTable: 'cities' );
+            .upsert({ 'id': 1, 'name': 'Algeria' })
+            .select();
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "name": "Algeria"
+            }
+          ]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
   - id: order
     title: order()
     description: |
@@ -3280,21 +3280,191 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .order('id', ascending: true);
+            .from('countries')
+            .select('id, name')
+            .order('id', ascending: false);
           ```
-      - id: with-embedded-resources
-        name: With embedded resources
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'id': 3,
+              'name': 'Algeria'
+            },
+            {
+              'id': 2,
+              'name': 'Albania'
+            },
+            {
+              'id': 1,
+              'name': 'Afghanistan'
+            }
+          ]
+          ```
+      - id: on-a-referenced-table
+        name: On a referenced table
+        code: |
+          ```dart
+          final data = await supabase
+              .from('countries')
+              .select('''
+                name,
+                cities (
+                  name
+                )
+              ''')
+              .order('name', referencedTable: 'cities', ascending: false);
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States'),
+              (2, 'Vanuatu');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'name': 'United States',
+              'cities': [
+                {
+                  'name': 'New York City'
+                },
+                {
+                  'name': 'Atlanta'
+                }
+              ]
+            },
+            {
+              'name': 'Vanuatu',
+              'cities': []
+            }
+          ]
+          ```
+  - id: limit
+    title: limit()
+    description: |
+      Limits the result with the specified count.
+    params:
+      - name: count
+        isOptional: false
+        type: int
+        description: The maximum number of rows to return.
+      - name: referencedTable
+        isOptional: true
+        type: int
+        description: Set this to limit rows of referenced tables instead of the parent table.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name')
+            .limit(1);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'name': 'Afghanistan'
+            }
+          ]
+          ```
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```dart
           final data = await supabase
             .from('countries')
-            .select('name, cities(name)')
-            .eq('name', 'United States')
-            .order('name', referencedTable: 'cities');
+            .select('''
+              name,
+              cities (
+                name
+              )
+            ''')
+            .limit(1, referencedTable: 'cities');
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
 
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'name': 'United States',
+              'cities': [
+                {
+                  'name': 'Atlanta'
+                }
+              ]
+            }
+          ]
+          ```
   - id: range
     title: range()
     description: |
@@ -3319,11 +3489,34 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .range(0,3);
+            .from('countries')
+            .select('name')
+            .range(0, 1);
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'name': 'Afghanistan'
+            },
+            {
+              'name': 'Albania'
+            }
+          ]
+          ```
   - id: single
     title: single()
     description: |
@@ -3335,9 +3528,29 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
+            .from('countries')
+            .select('name')
+            .limit(1)
             .single();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            'name': 'Afghanistan'
+          }
           ```
   - id: maybe-single
     title: maybeSingle()
@@ -3369,6 +3582,39 @@ functions:
           ```json
           null
           ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: csv
+    title: csv()
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .csv();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          'id,name\n1,Afghanistan\n1,Albania\n1,Algeria'
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
   - id: explain
@@ -3651,18 +3897,63 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.eq.20,id.eq.30');
+            .from('countries')
+            .select('name')
+            .or('id.eq.2,name.eq.Algeria');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'name': 'Albania'
+            },
+            {
+              'name': 'Algeria'
+            }
+          ]
           ```
       - id: use-or-with-and
         name: Use `or` with `and`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
+            .from('countries')
+            .select('name')
+            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        reponse: |
+          ```json
+          [
+            {
+              'name': 'Afghanistan'
+            }
+          ]
           ```
       - id: use-or-on-referenced-tables
         name: Use `or` on referenced tables
@@ -3670,8 +3961,13 @@ functions:
           ```dart
           final data = await supabase
             .from('countries')
-            .select('name, cities!inner(name)')
-            .or('country_id.eq.1,name.eq.Beijing', referencedTable: 'cities');
+            .select('''
+              name,
+              cities!inner (
+                name
+              )
+            ''')
+            .or('country_id.eq.1,name.eq.Beijing', referencedTable: 'cities' );
           ```
         data:
           sql: |
@@ -3745,9 +4041,30 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .not('name', 'eq', 'Paris');
+            .from('countries')
+            .select()
+            .not('name', 'is', null)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+        response: |
+          ```json
+          [
+            {
+              'id': 1,
+              'name': 'null'
+            }
+          ]
           ```
       - id: with-update
         name: With `update()`
@@ -4981,9 +5298,33 @@ functions:
           final data = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', "'fat' & 'cat'",
+            .textSearch('content', "'eggs' & 'ham'",
               config: 'english'
             );
+          ```
+        data:
+          sql: |
+            ```sql
+            create table texts (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              content text
+            );
+
+            insert into texts (content) values
+                ('Four score and seven years ago'),
+                ('The road goes ever on and on'),
+                ('Green eggs and ham')
+            ;
+            ```
+        response: |
+          ```json
+          [
+            {
+              'content': 'Green eggs and ham'
+            }
+          ]
           ```
       - id: basic-normalization
         name: Basic normalization
@@ -5066,9 +5407,31 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .from('countries')
+            .select()
+            .filter('name', 'in', '("Algeria","Japan")')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              'id': 3,
+              'name': 'Algeria'
+            }
+          ]
           ```
       - id: with-update
         name: With `update()`
@@ -5103,8 +5466,13 @@ functions:
           ```dart
           final data = await supabase
             .from('countries')
-            .select('name, countries!inner( name )')
-            .filter('cities.name', 'eq', 'Bali');
+            .select('''
+              name,
+              cities!inner (
+                name
+              )
+            ''')
+            .filter('cities.name', 'eq', 'Bali')
           ```
         data:
           sql: |
@@ -5139,7 +5507,7 @@ functions:
                   'name': 'Bali'
                 }
               ]
-            },
+            }
           ]
           ```
         hideCodeBlock: true
