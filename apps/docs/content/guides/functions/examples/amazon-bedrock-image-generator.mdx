@@ -15,7 +15,7 @@ This guide will walk you through an example using the Amazon Bedrock JavaScript 
 - In your Supabase project, create a `.env` file in the `supabase` directory with the following contents:
 
 ```txt
-AWS_DEFAULT_REGION="<youre_region>"
+AWS_DEFAULT_REGION="<your_region>"
 AWS_ACCESS_KEY_ID="<replace_your_own_credentials>"
 AWS_SECRET_ACCESS_KEY="<replace_your_own_credentials>"
 AWS_SESSION_TOKEN="<replace_your_own_credentials>"
@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
   prepareVirtualFile('./aws/credentials')
 
   const client = new BedrockRuntimeClient({
-    region: 'us-west-2',
+    region: Deno.env.get('AWS_DEFAULT_REGION') ?? 'us-west-2',
     credentials: {
       accessKeyId: Deno.env.get('AWS_ACCESS_KEY_ID') ?? '',
       secretAccessKey: Deno.env.get('AWS_SECRET_ACCESS_KEY') ?? '',
