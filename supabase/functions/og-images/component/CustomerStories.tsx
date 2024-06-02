@@ -44,7 +44,7 @@ const CustomerStories = (props: Props) => {
       </div>
       <div tw="w-full top-0 flex flex-col justify-between mt-4">
         <div tw="flex flex-col w-full">
-          <hr tw="border-b border-[#292929] w-full relative flex mb-10" />
+          <hr tw="border-b border-[#4D4D4D] w-full relative flex mb-10" />
           <h1 tw="w-3/4 my-0 mb-2 text-[53px]">{!title ? 'Supabase' : title}</h1>
         </div>
       </div>
