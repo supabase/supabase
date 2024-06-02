@@ -49,34 +49,37 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     setSubmitting(true)
     let encryptionKeyId = selectedKeyId
 
-    if (selectedKeyId === 'create-new') {
-      const addKeyRes = await addKeyMutation({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        name: values.keyName || undefined,
-      })
-      if (addKeyRes.error) {
-        return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
-      } else {
-        encryptionKeyId = addKeyRes[0].id
+    try {
+      setSubmitting(true)
+      if (selectedKeyId === 'create-new') {
+        const addKeyRes = await addKeyMutation({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: values.keyName || undefined,
+        })
+        if (addKeyRes.error) {
+          return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
+        } else {
+          encryptionKeyId = addKeyRes[0].id
+        }
       }
-    }
 
-    const res = await addSecret({
-      projectRef: project.ref,
-      connectionString: project?.connectionString,
-      name: values.name,
-      description: values.description,
-      secret: values.secret,
-      key_id: encryptionKeyId,
-    })
+      const res = await addSecret({
+        projectRef: project.ref,
+        connectionString: project?.connectionString,
+        name: values.name,
+        description: values.description,
+        secret: values.secret,
+        key_id: encryptionKeyId,
+      })
 
-    if (!res.error) {
-      toast.success(`Successfully added new secret ${values.name}`)
-      onClose()
-      setSubmitting(false)
-    } else {
-      toast.error(`Failed to add secret ${values.name}: ${res.error.message}`)
+      if (!res.error) {
+        toast.success(`Successfully added new secret ${values.name}`)
+        onClose()
+      } else {
+        toast.error(`Failed to add secret ${values.name}: ${res.error.message}`)
+      }
+    } finally {
       setSubmitting(false)
     }
   }

@@ -1,16 +1,16 @@
 import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,21 +28,32 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const ReportsMenu = () => {
   const router = useRouter()
-  const { id } = router.query
-  const project = useSelectedProject()
-  const deleteReport = useContentDeleteMutation()
-  const updateReport = useContentUpsertMutation()
+  const { ref, id } = useParams()
+  const pageKey = (id || router.pathname.split('/')[4]) as string
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
-  const pageKey = (id || router.pathname.split('/')[4]) as string
-  const ref = project?.ref ?? 'default'
-
-  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
-  const [showNewReportModal, setShowNewReportModal] = React.useState(false)
-  const [showUpdateReportModal, setShowUpdateReportModal] = React.useState(false)
-  const [selectedReport, setSelectedReport] = React.useState<Content>()
-
   const { data: content, isLoading } = useContentQuery(ref)
+  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+    onSuccess: () => {
+      setDeleteModalOpen(false)
+      toast.success('Successfully deleted report')
+      router.push(`/project/${ref}/reports`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete report: ${error.message}`)
+    },
+  })
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
+  const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
+
+  const onConfirmDeleteReport = () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (selectedReportToDelete?.id === undefined) return console.error('Report ID is required')
+    deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
+  }
 
   function getReportMenuItems() {
     if (!content) return []
@@ -155,8 +166,7 @@ const ReportsMenu = () => {
                       <DropdownMenuItem
                         onClick={() => {
                           if (!item.id) return
-                          setSelectedReport(item.report)
-                          setShowUpdateReportModal(true)
+                          setSelectedReportToUpdate(item.report)
                         }}
                       >
                         <Edit2 size={12} />
@@ -166,7 +176,7 @@ const ReportsMenu = () => {
                       <DropdownMenuItem
                         onClick={async () => {
                           if (!item.id) return
-                          setSelectedReport(item.report)
+                          setSelectedReportToDelete(item.report)
                           setDeleteModalOpen(true)
                         }}
                       >
@@ -224,34 +234,11 @@ const ReportsMenu = () => {
           </Alert_Shadcn_>
 
           <UpdateCustomReportModal
-            onSubmit={async (newVals) => {
-              try {
-                if (!selectedReport) return
-                if (!selectedReport.id) return
-                if (!selectedReport.project_id) return
-
-                await updateReport.mutateAsync({
-                  projectRef: ref,
-                  payload: {
-                    ...selectedReport,
-                    project_id: selectedReport.project_id,
-                    id: selectedReport.id,
-                    name: newVals.name,
-                    description: newVals.description || '',
-                  },
-                })
-                toast.success('Report updated')
-                setShowUpdateReportModal(false)
-              } catch (error) {
-                toast.error(`Failed to update report. Check console for more details.`)
-                console.error(error)
-              }
-            }}
-            onCancel={() => setShowUpdateReportModal(false)}
-            visible={showUpdateReportModal}
+            onCancel={() => setSelectedReportToUpdate(undefined)}
+            selectedReport={selectedReportToUpdate}
             initialValues={{
-              name: selectedReport?.name || '',
-              description: selectedReport?.description || '',
+              name: selectedReportToUpdate?.name || '',
+              description: selectedReportToUpdate?.description || '',
             }}
           />
 
@@ -260,37 +247,22 @@ const ReportsMenu = () => {
             confirmLabel="Delete report"
             confirmLabelLoading="Deleting report"
             size="medium"
-            loading={deleteReport.isLoading}
+            loading={isDeleting}
             visible={deleteModalOpen}
             onCancel={() => setDeleteModalOpen(false)}
-            onConfirm={async () => {
-              if (selectedReport) {
-                if (!selectedReport.id) return
-                await deleteReport.mutateAsync({
-                  projectRef: ref,
-                  ids: [selectedReport.id],
-                })
-                toast.success('Report deleted')
-                router.push(`/project/${ref}/reports`)
-              }
-              setDeleteModalOpen(false)
-            }}
+            onConfirm={onConfirmDeleteReport}
           >
             <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
-                <p>Are you sure you want to delete '{selectedReport?.name}'?</p>
+                <p>Are you sure you want to delete '{selectedReportToDelete?.name}'?</p>
               </div>
             </div>
           </ConfirmationModal>
 
           <CreateReportModal
             visible={showNewReportModal}
-            onCancel={() => {
-              setShowNewReportModal(false)
-            }}
-            afterSubmit={() => {
-              setShowNewReportModal(false)
-            }}
+            onCancel={() => setShowNewReportModal(false)}
+            afterSubmit={() => setShowNewReportModal(false)}
           />
         </div>
       )}

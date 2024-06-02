@@ -2,7 +2,6 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { Loading, cn } from 'ui'
 
 interface PanelProps {
-  bodyClassName?: string
   className?: string
   footer?: JSX.Element | false
   loading?: boolean

@@ -2,7 +2,6 @@
 
 import { MouseEventHandler, forwardRef, useEffect, useState } from 'react'
 import {
-  Admonition,
   Alert_Shadcn_,
   Button,
   Dialog,
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   cn,
 } from 'ui'
+import { Admonition } from './../admonition'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
 export interface ConfirmationModalProps {
@@ -48,7 +48,7 @@ const ConfirmationModal = forwardRef<
       cancelLabel = 'Cancel',
       confirmLabel = 'Submit',
       confirmLabelLoading,
-      alert,
+      alert = undefined,
       children,
       variant = 'default',
       disabled,
