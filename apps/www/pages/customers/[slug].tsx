@@ -73,7 +73,6 @@ function CaseStudyPage(props: any) {
     meta_title,
     misc,
     name,
-    og_image,
     slug,
     title,
   } = props.blog
@@ -85,10 +84,7 @@ function CaseStudyPage(props: any) {
   const meta = {
     title: meta_title ?? `${name} | Supabase Customer Stories`,
     description: meta_description ?? description,
-    image:
-      ogImageUrl ??
-      `${SITE_ORIGIN}${og_image}` ??
-      `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
+    image: ogImageUrl ?? `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
     url: `${SITE_ORIGIN}/customers/${slug}`,
   }
 

@@ -11,7 +11,7 @@ const STORAGE_URL =
 const CustomerStories = (props: Props) => {
   const { title, customer } = props
 
-  const imageUrl = `${STORAGE_URL}/customers/light/${customer}.png`
+  const imageUrl = `https://supabase.com/images/customers/logos/light/${customer}.png`
   const supabaseLogoUrl = `${STORAGE_URL}/customers/supabase-gradient-icon.svg?t=2024-06-01T16%3A09%3A05.507Z`
 
   return (
@@ -22,9 +22,8 @@ const CustomerStories = (props: Props) => {
         padding: '64px',
         display: 'flex',
         flexDirection: 'column',
-        // color: '#FAFAFA', // foreground-default
         color: '#B4B4B4', // foreground-light
-        backgroundColor: '#1C1C1C',
+        backgroundColor: '#1C1C1C', // bg-default
         fontFamily: 'Circular',
       }}
     >
