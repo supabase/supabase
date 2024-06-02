@@ -5,11 +5,14 @@ type Props = {
   customer: string
 }
 
+const STORAGE_URL =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images'
+
 const CustomerStories = (props: Props) => {
   const { title, customer } = props
 
-  const imageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/customers/light/${customer}.png`
-  const supabaseLogoUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/customers/supabase-gradient-icon.svg?t=2024-06-01T16%3A09%3A05.507Z`
+  const imageUrl = `${STORAGE_URL}/customers/light/${customer}.png`
+  const supabaseLogoUrl = `${STORAGE_URL}/customers/supabase-gradient-icon.svg?t=2024-06-01T16%3A09%3A05.507Z`
 
   return (
     <div
@@ -26,14 +29,13 @@ const CustomerStories = (props: Props) => {
       }}
     >
       <div tw="flex flex-row items-center justify-center top-0 mb-6">
-        <img src={supabaseLogoUrl} width="100px" height="100px" tw="mr-6" />
+        <img src={supabaseLogoUrl} width="90px" height="90px" tw="mr-6" />
         <p tw="text-[#FAFAFA] text-[30px] font-light">+</p>
         {customer && (
           <img
             src={imageUrl}
             tw="h-[100px] w-[200px] ml-10 opacity-90"
             style={{
-              backgroundImage: `url(${imageUrl})`,
               backgroundRepeat: 'no-repeat',
               objectFit: 'contain',
             }}

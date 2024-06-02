@@ -17,6 +17,7 @@ const fontData = await font
 
 export async function handler(req: Request) {
   const url = new URL(req.url)
+
   const site =
     url.searchParams.get('site')?.toLowerCase() ?? url.searchParams.get('amp;site')?.toLowerCase()
   const icon =
