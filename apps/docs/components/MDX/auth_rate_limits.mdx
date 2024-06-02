@@ -11,4 +11,5 @@
 | Anonymous sign-ins                               | `/auth/v1/signup`[^2]                                          | IP Address               | <SharedData data="config">auth.rate_limits.anonymous_signin.requests_per_hour</SharedData> requests per hour (with bursts up to <SharedData data="config">auth.rate_limits.anonymous_signin.requests_burst</SharedData> requests)                              |
 
 [^1]: The rate limit is only applied on `/auth/v1/user` if this endpoint is called to update the user's email address.
+
 [^2]: The rate limit is only applied on `/auth/v1/signup` if this endpoint is called without passing in an email or phone number in the request body.
