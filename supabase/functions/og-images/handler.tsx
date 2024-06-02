@@ -65,7 +65,7 @@ export async function handler(req: Request) {
       )
       break
     case 'customers':
-      return new ImageResponse(<CustomerStories title={title} type={type} customer={customer} />, {
+      return new ImageResponse(<CustomerStories title={title} customer={customer} />, {
         width: 1200,
         height: 630,
         fonts: [

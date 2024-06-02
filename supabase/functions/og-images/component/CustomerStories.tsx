@@ -1,13 +1,12 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 
 type Props = {
-  type?: string | null
   title: string
   customer: string
 }
 
 const CustomerStories = (props: Props) => {
-  const { type, title, customer } = props
+  const { title, customer } = props
 
   const imageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/customers/light/${customer}.png`
   const supabaseLogoUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/customers/supabase-gradient-icon.svg?t=2024-06-01T16%3A09%3A05.507Z`
