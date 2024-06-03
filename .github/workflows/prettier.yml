@@ -25,7 +25,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst@0.11.1
       - name: Run prettier
         run: |-
           npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
