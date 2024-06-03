@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: apps
       - name: Setup node
         uses: actions/setup-node@v4
         with:

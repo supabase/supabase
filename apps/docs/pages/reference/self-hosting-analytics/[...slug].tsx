@@ -5,10 +5,8 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
-import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' assert { type:
-  'json' }
-import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type:
-  'json' }
+import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' assert { type: 'json' }
+import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
 
 const sections = flattenSections(selfHostingAnalyticsCommonSections)
 const libraryPath = '/self-hosting-analytics'

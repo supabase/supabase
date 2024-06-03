@@ -6,8 +6,7 @@ import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 import storageSpec from '~/spec/storage_v0_openapi.json' assert { type: 'json' }
-import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' assert { type:
-  'json' }
+import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' assert { type: 'json' }
 
 const sections = flattenSections(selfHostingStorageCommonSections)
 const libraryPath = '/self-hosting-storage'
