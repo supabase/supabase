@@ -223,7 +223,8 @@ const SQLEditor = () => {
       try {
         const { title } = await generateSqlTitle({ sql })
         snap.renameSnippet(id, title)
-      } finally {
+      } catch (error) {
+        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
     [generateSqlTitle, snap]
