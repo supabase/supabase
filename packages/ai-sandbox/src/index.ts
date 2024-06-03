@@ -1,7 +1,13 @@
 import 'core-js/actual/symbol/async-dispose'
 import 'core-js/actual/symbol/dispose'
 
-import { JSPromiseState, newAsyncRuntime } from 'quickjs-emscripten'
+import {
+  JSPromiseState,
+  QuickJSAsyncContext,
+  QuickJSHandle,
+  RELEASE_ASYNC,
+  newQuickJSAsyncWASMModuleFromVariant,
+} from 'quickjs-emscripten'
 
 export type SuccessResult = {
   exports: Record<string, any>
@@ -18,6 +24,7 @@ export type ExecutionResult = SuccessResult | FailureResult
 export type ExecuteOptions = {
   modules?: Record<string, string>
   urlModuleWhitelist?: string[]
+  expose?: Record<string, (...args: any) => any>
 }
 
 /**
@@ -38,9 +45,10 @@ export async function executeJS(
   source: string,
   options: ExecuteOptions = {}
 ): Promise<ExecutionResult> {
-  const { modules = {}, urlModuleWhitelist = [] } = options
+  const { modules = {}, urlModuleWhitelist = [], expose = {} } = options
 
-  using runtime = await newAsyncRuntime()
+  const quickjs = await newQuickJSAsyncWASMModuleFromVariant(RELEASE_ASYNC)
+  using runtime = quickjs.newRuntime()
 
   runtime.setMemoryLimit(1024 * 640)
   runtime.setMaxStackSize(1024 * 320)
@@ -79,6 +87,10 @@ export async function executeJS(
   )
 
   using context = runtime.newContext()
+
+  for (const functionName in expose) {
+    bindFunction(context, functionName, expose[functionName])
+  }
 
   using setTimeoutHandle = context.newFunction('setTimeout', (fnHandle, timeoutHandle) => {
     // Make a copy because otherwise fnHandle does not live long enough to call after the timeout
@@ -157,6 +169,130 @@ export async function executeJS(
   }
 }
 
+export type SerializableValue =
+  | Promise<SerializableValue>
+  | { [key: string]: SerializableValue }
+  | SerializableValue[]
+  | string
+  | number
+  | boolean
+  | undefined
+  | null
+
+function bindFunction<Args extends any[], ReturnValue extends any>(
+  context: QuickJSAsyncContext,
+  name: string,
+  fn: (...args: Args) => ReturnValue
+) {
+  using functionHandle = context.newFunction(name, (...argHandles) => {
+    const args = argHandles.map((handle) => retrieveVariable(context, handle)) as Args
+
+    const result: any = fn(...args)
+
+    if (result instanceof Promise) {
+      const promise = context.newPromise()
+
+      result
+        .then((result) => {
+          using varHandle = createVariable(context, result)
+          promise.resolve(varHandle)
+        })
+        .catch((err) => {
+          using errorHandle = context.newError(err)
+          promise.reject(errorHandle)
+        })
+
+      return promise.handle
+    }
+
+    return createVariable(context, result)
+  })
+
+  context.setProp(context.global, name, functionHandle)
+}
+
+function createVariable(context: QuickJSAsyncContext, value: SerializableValue): QuickJSHandle {
+  if (typeof value === 'function') {
+    throw new Error(`Value '${value}' cannot be serialized for the VM`)
+  }
+
+  if (typeof value === 'string') {
+    return context.newString(value)
+  }
+
+  if (typeof value === 'number') {
+    return context.newNumber(value)
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? context.true : context.false
+  }
+
+  if (value === undefined) {
+    return context.undefined
+  }
+
+  if (value === null) {
+    return context.null
+  }
+
+  if (Array.isArray(value)) {
+    const arrayHandle = context.newArray()
+    value.forEach((v, i) => {
+      createVariable(context, v).consume((handle) => context.setProp(arrayHandle, i, handle))
+    })
+    return arrayHandle
+  }
+
+  if (typeof value === 'object') {
+    const obj = context.newObject()
+    Object.entries(value).forEach(([key, v]) => {
+      createVariable(context, v).consume((handle) => context.setProp(obj, key, handle))
+    })
+    return obj
+  }
+
+  throw new Error(`Value '${value}' cannot be serialized for the VM`)
+}
+
+function retrieveVariable(context: QuickJSAsyncContext, value: QuickJSHandle): SerializableValue {
+  context.runtime.assertOwned(value)
+
+  const type = context.typeof(value)
+
+  if (type === 'function') {
+    const dumpedValue = context.dump(value)
+    throw new Error(`Function '${dumpedValue}' cannot be serialized from the VM`)
+  }
+
+  // `value` can be a regular value or a promise
+  // Despite its name, `getPromiseState` covers both sync and async values
+  // Sync values will always be fulfilled
+  const promiseState = context.getPromiseState(value)
+
+  if (promiseState.type === 'pending') {
+    const promise = context.resolvePromise(value)
+
+    return promise.then((result) => {
+      if (result.error) {
+        using errorHandle = result.error
+        throw retrieveVariable(context, errorHandle)
+      }
+
+      using valueHandle = result.value
+      return retrieveVariable(context, valueHandle)
+    })
+  } else if (promiseState.type === 'fulfilled') {
+    using promiseValue = promiseState.value
+    const dumpedValue = context.dump(promiseValue)
+    return promiseState.notAPromise ? dumpedValue : Promise.resolve(dumpedValue)
+  } else if (promiseState.type === 'rejected') {
+    using promiseError = promiseState.error
+    const dumpedError = context.dump(promiseError)
+    return Promise.reject(dumpedError)
+  }
+}
+
 function shouldInterruptAfter(timeout: number) {
   let initialTime: number | undefined
 
@@ -194,7 +330,7 @@ function deserializeError(error: unknown): Error {
     Object.assign(newError, error)
 
     if ('stack' in error && typeof error.stack === 'string') {
-      newError.stack = `${error.message}\n${error.stack}`
+      newError.stack = `${error.name}: ${error.message}\n${error.stack}`
     }
 
     return newError
