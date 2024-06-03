@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export const replicationLagQuery = () => {
   const sql = /* SQL */ `
@@ -21,7 +21,7 @@ export type ReplicationLagVariables = {
 }
 
 export type ReplicationLagData = number
-export type ReplicationLagError = unknown
+export type ReplicationLagError = ExecuteSqlError
 
 export const useReplicationLagQuery = <TData extends ReplicationLagData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,
