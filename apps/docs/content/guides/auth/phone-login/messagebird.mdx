@@ -1,4 +1,14 @@
-import { CostWarning } from './AuthSmsProviderConfig.Warnings'
+---
+id: 'auth-messagebird'
+title: 'Phone Auth with MessageBird'
+description: 'How to set up and use Mobile OTP with MessageBird and Supabase.'
+---
+
+<Admonition type="tip">
+
+Authenticating users via SMS can become expensive. Adjust your project's rate limits and [configure CAPTCHA](/docs/guides/auth/auth-captcha) to control the bill. Read more about this in the [Production Checklist](/docs/guides/platform/going-into-prod).
+
+</Admonition>
 
 ## Prerequisites
 
@@ -7,8 +17,6 @@ You'll need:
 - A MessageBird account (sign up [here](https://dashboard.messagebird.com/en/sign-up))
 - A Supabase project (create one [here](https://supabase.com/dashboard))
 - A mobile phone capable of receiving SMS
-
-<CostWarning />
 
 ## Set up MessageBird as your SMS provider
 
@@ -39,6 +47,10 @@ If you use the Test API Key, the OTP will not be delivered to the mobile number 
 
 </Admonition>
 
+Plugin MessageBird credentials
+
+Now the backend should be setup, we can proceed to add our client-side code!
+
 #### SMS custom template
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
@@ -46,3 +58,12 @@ The SMS message sent to a phone containing an OTP code can be customized. This i
 Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
 
 Use the variable `.Code` in the template to display the code.
+
+## Next steps
+
+To implement Phone Login, see the docs on [using Phone Login](/docs/guides/auth/phone-login#using-phone-login).
+
+## Resources
+
+- [MessageBird Signup](https://dashboard.messagebird.com/en/sign-up)
+- [Supabase Dashboard](https://supabase.com/dashboard)
