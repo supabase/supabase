@@ -1,4 +1,12 @@
-import { Button, cn } from 'ui'
+import {
+  Button,
+  CodeBlock,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
+} from 'ui'
 import CopyButton from 'components/ui/CopyButton'
 import { Loading } from 'components/ui/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
@@ -17,7 +25,7 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import { X } from 'lucide-react'
+import { MousePointerClick, X } from 'lucide-react'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import toast from 'react-hot-toast'
 
@@ -49,7 +57,7 @@ const LogSelection = ({
   const {
     refetch: refetchWarehouseData,
     data: warehouseQueryData,
-    isLoading: warehouseQueryLoading,
+    isFetching: warehouseQueryFetching,
   } = useWarehouseQueryQuery(
     {
       ref: projectRef,
@@ -74,13 +82,20 @@ const LogSelection = ({
     if (queryType === 'warehouse') {
       refetchWarehouseData()
     }
-  }, [warehouseQueryData, collectionName, projectRef, partialLog?.id, refetchWarehouseData])
+  }, [
+    warehouseQueryData,
+    collectionName,
+    projectRef,
+    partialLog?.id,
+    refetchWarehouseData,
+    queryType,
+  ])
 
   const Formatter = () => {
     switch (queryType) {
       case 'warehouse':
         if (!warehouseQueryData) return null
-        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.data.result[0]} />
+        return <DefaultPreviewSelectionRenderer log={warehouseQueryData.result[0]} />
       case 'api':
         if (!fullLog) return null
         if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
@@ -169,20 +184,7 @@ const LogSelection = ({
           <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
             <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
             <div className="absolute right-1 -bottom-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="1"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
-                />
-              </svg>
+              <MousePointerClick size="24" strokeWidth={1} />
             </div>
           </div>
           <div className="flex flex-col gap-1">
@@ -195,26 +197,42 @@ const LogSelection = ({
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow bg-surface-100">
-        <div className="pt-4 px-4 flex flex-col gap-4">
-          <div className="flex flex-row justify-between items-center">
-            <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
-            </div>
+      <div className="relative flex-grow flex flex-col bg-surface-100">
+        <Tabs_Shadcn_ defaultValue="details" className="flex flex-col">
+          <TabsList_Shadcn_ className="px-2 pt-2">
+            <TabsTrigger_Shadcn_ className="px-3" value="details">
+              Details
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ className="px-3" value="raw">
+              Raw
+            </TabsTrigger_Shadcn_>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
               <X size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
+          </TabsList_Shadcn_>
+          <div className="flex-grow">
+            {isLoading || warehouseQueryFetching ? (
+              <div className="py-44">
+                <Loading />
+              </div>
+            ) : (
+              <>
+                <TabsContent_Shadcn_ className="bg-surface-100 space-y-6" value="details">
+                  <Formatter />
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="raw" className="px-4">
+                  <CodeBlock language="json" className="prose w-full max-w-full">
+                    {JSON.stringify(fullLog || partialLog, null, 2)}
+                  </CodeBlock>
+                </TabsContent_Shadcn_>
+              </>
+            )}
           </div>
-          <div className="h-px w-full bg-selection rounded " />
-        </div>
-        {isLoading && <Loading />}
-        <div className="flex flex-col space-y-6 bg-surface-100 py-4">
-          {!isLoading && <Formatter />}
-        </div>
+        </Tabs_Shadcn_>
       </div>
     </div>
   )

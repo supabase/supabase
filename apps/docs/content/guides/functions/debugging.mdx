@@ -141,10 +141,7 @@ To find the bundle size of a function, run the following command locally:
 
 Look for the "size" field in the output which represents the approximate bundle size of the function. You can find the accurate bundle size when you deploy your function via Supabase CLI. If the function is part of a larger application, consider examining the bundle size of the specific function independently.
 
-The source code of a function is subject to size limits:
-
-- **Free Plan**: Maximum size of 2MB.
-- **Pro Plan**: Maximum size of 10MB.
+The source code of a function is subject to 10MB site limit.
 
 ### Analyze dependencies
 
@@ -171,12 +168,3 @@ For example, if you only need the `Sheets` submodule from the `googleapis` packa
 ```typescript
 import { Sheets } from 'npm:@googleapis/sheets'
 ```
-
-## Limitations
-
-- Outgoing connections to ports `25` and `587` are not allowed.
-- Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
-- Deno and Node file system APIs are not available.
-- Memory limit for the function: 256MB
-- Wall clock limit: 400 s
-- CPU Time: 2 s

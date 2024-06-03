@@ -12,7 +12,7 @@ import {
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
 import {
   Button,
   DropdownMenu,
@@ -33,6 +33,7 @@ const RestartServerButton = () => {
   const projectRef = project?.ref ?? ''
   const projectRegion = project?.region ?? ''
 
+  const projectRestartDisabled = useFlag('disableProjectRestarts')
   const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
@@ -89,12 +90,17 @@ const RestartServerButton = () => {
             <Button
               type="default"
               className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
-              disabled={project === undefined || !canRestartProject || !isProjectActive}
+              disabled={
+                project === undefined ||
+                !canRestartProject ||
+                !isProjectActive ||
+                projectRestartDisabled
+              }
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
             </Button>
-            {canRestartProject && isProjectActive && (
+            {canRestartProject && isProjectActive && !projectRestartDisabled && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -141,6 +147,23 @@ const RestartServerButton = () => {
                     : !isProjectActive
                       ? 'Unable to restart project as project is not active'
                       : ''}
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        )}
+        {projectRestartDisabled && (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                  'border border-background', //border
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">
+                  Project restart is currently disabled
                 </span>
               </div>
             </Tooltip.Content>

@@ -14,7 +14,7 @@ import { TabPanel, Tabs } from '~/components/Tabs'
 import { CH } from '@code-hike/mdx/components'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
-import { Heading } from './CustomHTMLElements'
+import { Heading } from 'ui'
 
 // Reference guide specific
 // [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything

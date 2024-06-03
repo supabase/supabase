@@ -79,7 +79,7 @@ export const WarehouseCollectionDetail = () => {
     return r
   }
 
-  const results = formatResults(queryData?.data?.result)
+  const results = formatResults(queryData?.result)
 
   function loadMore() {
     setPagination({ ...pagination, offset: pagination.offset + pagination.limit })
