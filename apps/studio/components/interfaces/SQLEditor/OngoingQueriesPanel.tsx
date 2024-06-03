@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { StopCircle } from 'lucide-react'
+import { RefreshCcw, RefreshCw, StopCircle } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -23,6 +23,8 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import AlertError from 'components/ui/AlertError'
+import { ResponseError } from 'types'
 
 interface OngoingQueriesPanel {
   visible: boolean
@@ -37,15 +39,25 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const database = (databases ?? []).find((db) => db.identifier === state.selectedDatabaseId)
 
-  const { data } = useOngoingQueriesQuery({
-    projectRef: project?.ref,
-    connectionString: database?.connectionString,
-  })
+  const {
+    data,
+    error,
+    isError,
+    isLoading: isLoadingOngoingQueries,
+    isFetching: isFetchingOngoingQueries,
+    refetch,
+  } = useOngoingQueriesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: database?.connectionString,
+    },
+    { staleTime: 5000 }
+  )
   const queries = data ?? []
 
   const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
     onSuccess: () => {
-      toast.success(`Successfully aborted query (ID: ${selectedId}`)
+      toast.success(`Successfully aborted query (ID: ${selectedId})`)
       setSelectedId(undefined)
     },
   })
@@ -55,9 +67,16 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
       <Sheet open={visible} onOpenChange={() => onClose()}>
         <SheetContent size="lg">
           <SheetHeader>
-            <SheetTitle>
+            <SheetTitle className="flex items-center gap-x-2">
               Running queries on{' '}
               {database?.identifier === project?.ref ? 'primary database' : 'read replica'}
+              <Button
+                type="default"
+                className="px-1.5"
+                loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
+                icon={<RefreshCw />}
+                onClick={() => refetch()}
+              />
             </SheetTitle>
             <SheetDescription>
               There {queries.length === 1 ? 'is' : 'are'}{' '}
@@ -67,9 +86,25 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
             </SheetDescription>
           </SheetHeader>
           <div className="max-h-full h-full divide-y overflow-y-auto">
+            {isError && (
+              <div className="flex items-center justify-center h-full px-16">
+                <AlertError
+                  subject="Failed to retrieve ongoing queries"
+                  error={error as ResponseError}
+                />
+              </div>
+            )}
             {queries.length === 0 && (
-              <div className="flex items-center justify-center h-full text-foreground-light text-sm">
-                No ongoing queries running on database
+              <div className="flex flex-col gap-y-2 items-center justify-center h-full text-foreground-light text-sm">
+                <span>No ongoing queries running on database</span>
+                <Button
+                  type="default"
+                  loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
+                  icon={<RefreshCw />}
+                  onClick={() => refetch()}
+                >
+                  Refresh
+                </Button>
               </div>
             )}
             {queries.map((query) => (

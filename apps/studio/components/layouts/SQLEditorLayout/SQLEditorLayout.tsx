@@ -21,8 +21,6 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
     []
   )
 
-  console.log({ showOngoingQueries })
-
   return (
     <ProjectLayout
       title={title || 'SQL'}

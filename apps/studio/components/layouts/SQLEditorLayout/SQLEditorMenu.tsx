@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { MoreVertical, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -16,16 +16,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { ResponseError } from 'types'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
@@ -205,9 +196,9 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
 
   return (
     <>
-      <div className="mt-6">
-        <div className="flex flex-col gap-4">
-          <div className="mx-4 flex items-center gap-x-2">
+      <div className="h-full flex flex-col justify-between">
+        <div className="mt-4 flex flex-col gap-4">
+          <div className="mx-4">
             <Button
               block
               type="default"
@@ -217,16 +208,6 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
             >
               New query
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="px-1" type="default" icon={<MoreVertical />} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-52" align="end">
-                <DropdownMenuItem onClick={onViewOngoingQueries}>
-                  View running queries
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           <div className="px-2">
@@ -365,6 +346,12 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
               )}
             </>
           )}
+        </div>
+
+        <div className="p-4 border-t">
+          <Button block type="default" onClick={onViewOngoingQueries}>
+            View running queries
+          </Button>
         </div>
       </div>
 
