@@ -1,7 +1,7 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { Query } from 'components/grid/query/Query'
 import type { VaultSecret } from 'types'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
 export const getVaultSecretsQuery = () => {
@@ -19,7 +19,7 @@ export type VaultSecretsVariables = {
 }
 
 export type VaultSecretsData = VaultSecret[]
-export type VaultSecretsError = unknown
+export type VaultSecretsError = ExecuteSqlError
 
 export const useVaultSecretsQuery = <TData extends VaultSecretsData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,
