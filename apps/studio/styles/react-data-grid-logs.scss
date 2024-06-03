@@ -15,7 +15,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand;
+      @apply border-r border-brand bg-background-surface-300;
       border-right-width: 4px;
     }
 
@@ -27,7 +27,7 @@
 }
 
 .data-grid--logs-explorer {
-  @apply transition-all overflow-x-scroll pb-12;
+  @apply overflow-x-scroll pb-12;
 
   .rdg-cell,
   .rdg-cell span {

@@ -55,9 +55,7 @@ const HTTPRequestFields = ({
 
   const edgeFunctions = functions ?? []
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
-    ? apiService.serviceApiKey
-    : '[YOUR API KEY]'
+  const apiKey = apiService?.serviceApiKey ?? '[YOUR API KEY]'
 
   return (
     <>
@@ -180,7 +178,7 @@ const HTTPRequestFields = ({
                         onAddHeader({
                           id: uuidv4(),
                           name: 'Authorization',
-                          value: `Bearer ${anonKey}`,
+                          value: `Bearer ${apiKey}`,
                         })
                       }
                     >

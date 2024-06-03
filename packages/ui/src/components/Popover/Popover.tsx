@@ -1,3 +1,5 @@
+'use client'
+
 import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
 import * as React from 'react'
@@ -26,6 +28,9 @@ interface RootProps {
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Popover({
   align = 'center',
   ariaLabel,
@@ -91,6 +96,9 @@ function Popover({
   )
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Close() {
   const __styles = styleHandler('popover')
 
@@ -101,6 +109,9 @@ function Close() {
   )
 }
 
+/**
+ * @deprecated Use ./PopoverSeparator_Shadcn_ instead
+ */
 function Separator() {
   const __styles = styleHandler('popover')
 

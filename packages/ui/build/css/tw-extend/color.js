@@ -437,7 +437,7 @@ module.exports = {
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(0, 0%, 25.9%)"
+  value: "hsl(0, 0%, 19.2%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",

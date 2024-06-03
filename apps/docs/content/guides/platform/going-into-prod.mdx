@@ -14,7 +14,7 @@ After developing your project and deciding it's Production Ready, you should run
 
 - Ensure RLS is enabled
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is unlikely to be what you want in the majority of cases.
-  - [Learn more about RLS](/docs/guides/auth/row-level-security).
+  - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
 - Enable replication on tables containing sensitive data by enabling Row Level Security (RLS) and setting row security policies:
   - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
   - Go to the Database > Publications page in the Supabase Dashboard to manage replication tables.
@@ -94,6 +94,3 @@ After developing your project and deciding it's Production Ready, you should run
 ## Next steps
 
 This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [GitHub](https://github.com/supabase/supabase).
-
-[^1]: The rate limit is only applied on `/auth/v1/user` if this endpoint is called to update the user's email address.
-[^2]: The rate limit is only applied on `/auth/v1/signup` if this endpoint is called without passing in an email or phone number in the request body.
