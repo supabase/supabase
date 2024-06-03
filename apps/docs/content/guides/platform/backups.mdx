@@ -74,7 +74,9 @@ This class of physical backups only allows for recovery to a fixed time each day
 Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
 
 [^1]: The threshold for transitioning might be lowered in the future.
+
 [^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
+
 [^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
 
 ### Restoration process [#daily-backups-restoration-process]
