@@ -3,7 +3,7 @@ import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { formatFilterValue } from './utils'
 
 type GetTableRowsCountArgs = {
@@ -43,7 +43,7 @@ export type TableRowsCountVariables = GetTableRowsCountArgs & {
 }
 
 export type TableRowsCountData = TableRowsCount
-export type TableRowsCountError = unknown
+export type TableRowsCountError = ExecuteSqlError
 
 export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableRowsCountData>(
   {

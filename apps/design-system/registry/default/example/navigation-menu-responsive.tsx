@@ -3,7 +3,8 @@
 import * as React from 'react'
 import Link from 'next/link'
 
-import { buttonVariants, cn } from 'ui'
+import { NavigationMenuViewport, ScrollArea, ScrollBar, buttonVariants, cn } from 'ui'
+// import { Icons } from '@/components/icons'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -53,24 +54,21 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function NavigationMenuDemo() {
   return (
-    <div>
-      <NavigationMenu className="w-fit">
-        <NavigationMenuList>
+    <NavigationMenu renderViewport={false} className="max-w-[500px] border rounded-md">
+      <ScrollArea>
+        <NavigationMenuList className="w-full p-3">
           <NavigationMenuItem>
-            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
-              Getting started
-            </NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
                     <a
-                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b border from-background-surface-100/20 to-background-surface-100 p-6 no-underline outline-none focus:shadow-md"
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                       href="/"
                     >
                       {/* <Icons.logo className="h-6 w-6" /> */}
-                      <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
-                      <p className="text-sm leading-tight text-muted-foreground">
+                      shadcn/ui
+                      <p className="text-sm leading-tight text-foreground-muted">
                         Beautifully designed components that you can copy and paste into your apps.
                         Accessible. Customizable. Open Source.
                       </p>
@@ -104,6 +102,48 @@ export default function NavigationMenuDemo() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
+            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+              Components
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                {components.map((component) => (
+                  <ListItem key={component.title} title={component.title} href={component.href}>
+                    {component.description}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+              Components
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                {components.map((component) => (
+                  <ListItem key={component.title} title={component.title} href={component.href}>
+                    {component.description}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className={cn(buttonVariants({ type: 'text', size: 'small' }))}>
+              Components
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                {components.map((component) => (
+                  <ListItem key={component.title} title={component.title} href={component.href}>
+                    {component.description}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <Link href="/docs" legacyBehavior passHref>
               <NavigationMenuLink className={buttonVariants({ type: 'text', size: 'small' })}>
                 Documentation
@@ -111,8 +151,10 @@ export default function NavigationMenuDemo() {
             </Link>
           </NavigationMenuItem>
         </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      <NavigationMenuViewport containerProps={{ className: 'w-full' }} />
+    </NavigationMenu>
   )
 }
 
@@ -124,13 +166,13 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
           <a
             ref={ref}
             className={cn(
-              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-surface-100/50 hover:text-foreground focus:bg-surface-100/50 focus:text-foreground',
+              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-surface-100 hover:text-accent-foreground focus:bg-surface-100 focus:text-accent-foreground',
               className
             )}
             {...props}
           >
-            <div className="text-sm text-foreground leading-none">{title}</div>
-            <p className="line-clamp-2 text-sm leading-snug text-foreground-lighter">{children}</p>
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-foreground-muted">{children}</p>
           </a>
         </NavigationMenuLink>
       </li>
