@@ -499,6 +499,34 @@ export const PhoneLoginsItems = [
   },
 ]
 
+export const ReplicationItems = [
+  {
+    name: 'Airbyte',
+    icon: '/docs/img/icons/airbyte-icon',
+    linkDescription: '',
+    url: '/guides/database/replication/airbyte',
+  },
+  {
+    name: 'Estuary',
+    icon: '/docs/img/icons/estuary-icon',
+    url: '/guides/database/replication/estuary',
+    linkDescription: '',
+  },
+  {
+    name: 'Fivetran',
+    icon: '/docs/img/icons/fivetran-icon',
+    url: '/guides/database/replication/fivetran',
+    linkDescription:
+      '',
+  },
+  {
+    name: 'Stitch',
+    icon: '/docs/img/icons/stitch-icon',
+    url: '/guides/database/replication/stitch',
+    linkDescription: '',
+  },
+]
+
 export const auth = {
   icon: 'auth',
   title: 'Auth',

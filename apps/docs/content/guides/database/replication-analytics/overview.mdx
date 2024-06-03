@@ -1,0 +1,53 @@
+---
+id: 'etl'
+title: 'ETL with Supabase'
+description: 'Performing Extract Transform Load (ETL) with Supabase'
+sidebar_label: 'Overview'
+---
+
+# Replication, Analytics and ETL
+
+You have launched your app. You want to understand what works and what doesn't so you start some queries and soon notice that your queries are taking minutes or that you need to combine these data with another system you are using. Not to worry, you are in the right place.
+
+
+## Why not use my database?
+
+If you want to run analytics on your app, you may wonder why you could not just plug in your database connection string to an analytics tool and go. In some cases, you could, but we do not recommend it. Here's why:
+
+### Security
+
+Adding a new system to your database can expose data and settings that you may want to keep private (or may be required to keep private due to compliance or legislation). Using a read-only user is possible but you must ensure that access is controlled and regularly audited.
+
+### Performance
+
+Your users want to create or view new content and your analytics queries want to perform complex calculations on the past 3 months. Both of these wants will be sharing the same resources and one might win over the other; causing your users to have a bad experience or your analytics report to time out.
+
+### Recovery
+
+If you accidentally drop a table, you might not want to restore your whole project from a backup so you can check these values in your external system before your boss finds out.
+
+
+
+## How?
+
+OK, so now we know why you should not use your primary database for this, what should you use? This is not an easy question and it comes with the "it depends" answer so let's go through some options:
+
+### Read Replicas
+
+Read-Replicas are available on Supabase and allow you to create a second database that is a direct, read-only copy of your primary database that stays in sync. This can be great for many things, like load-balancing, and, in this case, they can be great for analytics workloads.
+
+
+### External Systems
+
+Your use case might go beyond what a Read-Replica can offer and you may need to move your data out of Supabase and into a Data Warehouse, like Clickhouse or Google BigQuery. This could be because of long running jobs, the amount of data or because you need to combine your Supabase data with data from other systems.
+
+When you want to do this, this is where Extract Transform Load (ETL) comes in.
+
+1. Extract - Getting the data out of your source, typically using a method called [Logical Replication](https://www.postgresql.org/docs/current/logical-replication.html)
+2. Transform - Modifying the data for ingestion
+3. Load - Loading the transformed data into the destination
+
+To perform each of these steps, some destinations will pull data directly from Postgresql but, in most cases, you will want to use a tool, such as Estuary or Airbyte or Fivetran. These perform the `Extract` and `Transform` in much the same way, as well as support a large number of destinations to `Load` your data into, ranging from S3 to Salesforce.
+
+To get started, choose the tool you want to use below:
+
