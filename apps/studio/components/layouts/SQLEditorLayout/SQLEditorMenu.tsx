@@ -197,7 +197,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   return (
     <>
       <div className="h-full flex flex-col justify-between">
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="mt-4 mb-2 flex flex-col gap-4">
           <div className="mx-4">
             <Button
               block
@@ -348,7 +348,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
           )}
         </div>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
           <Button block type="default" onClick={onViewOngoingQueries}>
             View running queries
           </Button>
