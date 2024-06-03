@@ -17,6 +17,9 @@ import {
   IconDownload,
   IconEye,
   IconEyeOff,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   cn,
 } from 'ui'
 
@@ -36,7 +39,6 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { motion } from 'framer-motion'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -54,9 +56,10 @@ interface Props {
   hasEditorValue?: boolean
   maxHeight?: string
   className?: string
-  hideHeader?: boolean
   collectionName?: string // Used for warehouse queries
   emptyState?: ReactNode
+  showHeader?: boolean
+  showHistogramToggle?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -79,9 +82,10 @@ const LogTable = ({
   hasEditorValue,
   maxHeight,
   className,
-  hideHeader = false,
   collectionName,
   emptyState,
+  showHeader = true,
+  showHistogramToggle = true,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -193,10 +197,6 @@ const LogTable = ({
     }
   }, [data, focusedLog, stringData])
 
-  // [Joshen] Hmm quite hacky now, but will do
-  const _maxHeight =
-    maxHeight || (!queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)')
-
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
@@ -228,7 +228,7 @@ const LogTable = ({
       className={cn(
         'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
         className,
-        { hidden: hideHeader }
+        { hidden: !showHeader }
       )}
     >
       <div className="flex items-center gap-2">
@@ -258,15 +258,17 @@ const LogTable = ({
         </CSVButton>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button
-          type="default"
-          icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-          onClick={onHistogramToggle}
-        >
-          Histogram
-        </Button>
-      </div>
+      {showHistogramToggle && (
+        <div className="flex items-center gap-2">
+          <Button
+            type="default"
+            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            onClick={onHistogramToggle}
+          >
+            Histogram
+          </Button>
+        </div>
+      )}
 
       <div className="space-x-2">
         {IS_PLATFORM && (
@@ -358,66 +360,65 @@ const LogTable = ({
   if (!data) return null
 
   return (
-    <section className={'flex flex-grow w-full max-h-screen flex-col h-full'} style={{ maxHeight }}>
+    <section className={'flex w-full flex-col h-full'} style={{ maxHeight }}>
       {!queryType && <LogsExplorerTableHeader />}
-      <div className={`flex h-full flex-row ${!queryType ? 'border-x' : ''}`}>
-        <DataGrid
-          role="table"
-          style={{ height: '100%' }}
-          className={`
-            flex-1 flex-grow h-full
-            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
-          `}
-          rowHeight={40}
-          headerRowHeight={queryType ? 0 : 28}
-          onSelectedCellChange={({ rowIdx }) => {
-            if (!hasId) return
-            setFocusedLog(data[rowIdx] as LogData)
-          }}
-          selectedRows={new Set([])}
-          columns={columns}
-          rowClass={(row: LogData) =>
-            [
-              'font-mono tracking-tight',
-              isEqual(row, focusedLog)
-                ? '!bg-border-stronger rdg-row--focused'
-                : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-            ].join(' ')
-          }
-          rows={logDataRows}
-          rowKeyGetter={(r) => {
-            if (!hasId) return JSON.stringify(r)
-            const row = r as LogData
-            return row.id
-          }}
-          // [Next 18 refactor] need to fix
-          // onRowClick={setFocusedLog}
-          renderers={{
-            renderRow: RowRenderer,
-            noRowsFallback: !isLoading ? (
-              <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                {!error && renderNoResultAlert()}
-                {error && renderErrorAlert()}
-              </div>
-            ) : null,
-          }}
-        />
-        {logDataRows.length > 0 ? (
-          <div
-            className={
-              queryType ? 'flex w-1/2 flex-col' : focusedLog ? 'flex w-1/2 flex-col' : 'hidden w-0'
-            }
-          >
-            <LogSelection
-              projectRef={projectRef}
-              onClose={() => setFocusedLog(null)}
-              log={focusedLog}
-              queryType={queryType}
-              params={params}
-              collectionName={collectionName}
+      <div className={`flex h-full flex-row overflow-x-auto`}>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+            <DataGrid
+              role="table"
+              style={{ height: '100%' }}
+              className={cn('flex-1 flex-grow h-full', {
+                'data-grid--simple-logs': queryType,
+                'data-grid--logs-explorer': !queryType,
+              })}
+              rowHeight={40}
+              headerRowHeight={queryType ? 0 : 28}
+              onSelectedCellChange={(row) => {
+                console.log('row', row)
+                setFocusedLog(row.row as LogData)
+              }}
+              selectedRows={new Set([])}
+              columns={columns}
+              rowClass={(row: LogData) =>
+                [
+                  'font-mono tracking-tight',
+                  isEqual(row, focusedLog)
+                    ? '!bg-surface-300 rdg-row--focused'
+                    : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
+                ].join(' ')
+              }
+              rows={logDataRows}
+              rowKeyGetter={(r) => {
+                if (!hasId) return JSON.stringify(r)
+                const row = r as LogData
+                return row.id
+              }}
+              renderers={{
+                renderRow: RowRenderer,
+                noRowsFallback: !isLoading ? (
+                  <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
+                    {!error && renderNoResultAlert()}
+                    {error && renderErrorAlert()}
+                  </div>
+                ) : null,
+              }}
             />
-          </div>
-        ) : null}
+          </ResizablePanel>
+          <ResizableHandle />
+          {focusedLog && (
+            <ResizablePanel defaultSize={40}>
+              <LogSelection
+                projectRef={projectRef}
+                onClose={() => setFocusedLog(null)}
+                log={focusedLog}
+                queryType={queryType}
+                params={params}
+                collectionName={collectionName}
+              />
+            </ResizablePanel>
+          )}
+        </ResizablePanelGroup>
       </div>
     </section>
   )

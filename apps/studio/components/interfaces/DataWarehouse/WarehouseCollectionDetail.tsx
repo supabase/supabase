@@ -128,7 +128,7 @@ export const WarehouseCollectionDetail = () => {
               data={results}
               params={params}
               maxHeight="calc(100vh - 139px)"
-              hideHeader={true}
+              showHeader={false}
               emptyState={
                 <ProductEmptyState
                   title="Send your first event"
