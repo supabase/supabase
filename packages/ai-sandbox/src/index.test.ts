@@ -22,9 +22,11 @@ describe('execute js', () => {
         export const output = value;
       `,
       {
-        'my-lib': codeBlock`
-          export const value = 'test';
-        `,
+        modules: {
+          'my-lib': codeBlock`
+            export const value = 'test';
+          `,
+        },
       }
     )
 
@@ -61,7 +63,11 @@ describe('execute js', () => {
       `
     )
 
-    expect(error?.message).toBe('test')
+    if (!error) {
+      throw new Error('Expected error')
+    }
+
+    expect(error.message).toBe('test')
   })
 
   test('top-level async throw', async () => {
@@ -72,6 +78,49 @@ describe('execute js', () => {
       `
     )
 
-    expect(error?.message).toBe('test')
+    if (!error) {
+      throw new Error('Expected error')
+    }
+
+    expect(error.message).toBe('test')
+  })
+
+  test('interrupt during sync code', async () => {
+    const { exports, error } = await executeJS(
+      codeBlock`
+        while (true) {
+          true;
+        }
+      `
+    )
+
+    if (!error) {
+      throw new Error('Expected error')
+    }
+
+    expect(error.name).toBe('InternalError')
+    expect(error.message).toBe('interrupted')
+  })
+
+  test('url module loading', async () => {
+    const { exports, error } = await executeJS(
+      codeBlock`
+        import { chunk } from 'https://esm.sh/lodash-es';
+
+        export const output = chunk(['a', 'b', 'c', 'd'], 2);
+      `,
+      {
+        urlModuleWhitelist: ['https://esm.sh/lodash-es', 'https://esm.sh/v135/lodash-es'],
+      }
+    )
+
+    if (error) {
+      throw error
+    }
+
+    expect(exports.output).toStrictEqual([
+      ['a', 'b'],
+      ['c', 'd'],
+    ])
   })
 })

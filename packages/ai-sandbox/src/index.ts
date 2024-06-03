@@ -1,7 +1,7 @@
 import 'core-js/actual/symbol/async-dispose'
 import 'core-js/actual/symbol/dispose'
 
-import { JSPromiseState, getQuickJS, shouldInterruptAfterDeadline } from 'quickjs-emscripten'
+import { JSPromiseState, newAsyncRuntime } from 'quickjs-emscripten'
 
 export type SuccessResult = {
   exports: Record<string, any>
@@ -14,6 +14,11 @@ export type FailureResult = {
 }
 
 export type ExecutionResult = SuccessResult | FailureResult
+
+export type ExecuteOptions = {
+  modules?: Record<string, string>
+  urlModuleWhitelist?: string[]
+}
 
 /**
  * Executes JavaScript source code in a secure sandbox via an
@@ -31,16 +36,47 @@ export type ExecutionResult = SuccessResult | FailureResult
  */
 export async function executeJS(
   source: string,
-  modules: Record<string, string> = {}
+  options: ExecuteOptions = {}
 ): Promise<ExecutionResult> {
-  const QuickJS = await getQuickJS()
+  const { modules = {}, urlModuleWhitelist = [] } = options
 
-  using runtime = QuickJS.newRuntime()
+  using runtime = await newAsyncRuntime()
 
   runtime.setMemoryLimit(1024 * 640)
   runtime.setMaxStackSize(1024 * 320)
-  runtime.setInterruptHandler(shouldInterruptAfterDeadline(Date.now() + 1000))
-  runtime.setModuleLoader((moduleName) => modules[moduleName])
+  runtime.setInterruptHandler(shouldInterruptAfter(1000))
+  runtime.setModuleLoader(
+    async (moduleName) => {
+      const url = getUrl(moduleName)
+
+      if (url) {
+        const isInWhitelist = urlModuleWhitelist.some((url) => moduleName.startsWith(url))
+        if (!isInWhitelist) {
+          throw new Error(`URL module '${moduleName}' not in whitelist`)
+        }
+
+        const response = await fetch(url, {
+          headers: {
+            'user-agent': 'es2020',
+          },
+        })
+
+        const source = await response.text()
+
+        return source
+      }
+
+      return modules[moduleName]
+    },
+    async (baseName: string, name: string) => {
+      try {
+        const url = new URL(name, baseName)
+        return url.toString()
+      } catch (err) {
+        return name
+      }
+    }
+  )
 
   using context = runtime.newContext()
 
@@ -65,9 +101,9 @@ export async function executeJS(
 
   context.setProp(context.global, 'setTimeout', setTimeoutHandle)
 
-  const result = context.evalCode(source, 'index.js', { type: 'module' })
+  const result = await context.evalCodeAsync(source, 'index.js', { type: 'module' })
 
-  // This is normally a syntax error, but can also be any top-level error thrown in the module
+  // This could be a syntax error, interrupt, or synchronous error thrown
   if (result.error) {
     using errorHandle = result.error
     const error = context.dump(errorHandle)
@@ -121,6 +157,26 @@ export async function executeJS(
   }
 }
 
+function shouldInterruptAfter(timeout: number) {
+  let initialTime: number | undefined
+
+  return () => {
+    // Execution starts the first time this callback is called
+    if (!initialTime) {
+      initialTime = Date.now()
+    }
+    return Date.now() > initialTime + timeout
+  }
+}
+
+function getUrl(url: string) {
+  try {
+    return new URL(url)
+  } catch (err) {
+    return undefined
+  }
+}
+
 /**
  * Deserializes an error from the VM.
  */
@@ -131,14 +187,16 @@ function deserializeError(error: unknown): Error {
     typeof error === 'object' &&
     'name' in error &&
     'message' in error &&
-    'stack' in error &&
     typeof error.name === 'string' &&
-    typeof error.message === 'string' &&
-    typeof error.stack === 'string'
+    typeof error.message === 'string'
   ) {
     const newError = new Error(error.message)
     Object.assign(newError, error)
-    newError.stack = `${error.message}\n${error.stack}`
+
+    if ('stack' in error && typeof error.stack === 'string') {
+      newError.stack = `${error.message}\n${error.stack}`
+    }
+
     return newError
   } else if (typeof error === 'string') {
     return new Error(error)
