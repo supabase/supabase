@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev --parallel ",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:docs": "turbo run dev --filter=docs --parallel",
