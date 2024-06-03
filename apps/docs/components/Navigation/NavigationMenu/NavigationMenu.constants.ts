@@ -1190,6 +1190,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/push-notifications',
         },
         {
+          name: 'Generating AI images',
+          url: '/guides/functions/examples/amazon-bedrock-image-generator',
+        },
+        {
           name: 'Generating OG images ',
           url: '/guides/functions/examples/og-image',
         },
