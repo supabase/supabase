@@ -1,9 +1,10 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { capitalize } from 'lodash'
+import { BarChart2, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
-import { IconBarChart2, IconExternalLink } from 'ui'
 
+import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   CPUWarnings,
@@ -19,6 +20,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
@@ -27,16 +29,17 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { capitalize } from 'lodash'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
-  const [dateRange, setDateRange] = useState<any>()
   const project = useSelectedProject()
+  const organization = useSelectedOrganization()
+  const state = useDatabaseSelectorStateSnapshot()
+  const [dateRange, setDateRange] = useState<any>()
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -130,6 +133,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
@@ -139,6 +143,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
@@ -148,6 +153,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
@@ -190,8 +196,7 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          {/* [Joshen] Metrics for replicas not available yet */}
-          {/* {readReplicasEnabled && <DatabaseSelector />} */}
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
@@ -238,7 +243,7 @@ const InfrastructureActivity = () => {
                           <Link href={link.url} target="_blank" rel="noreferrer">
                             <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                               <p className="text-sm m-0">{link.name}</p>
-                              <IconExternalLink size={16} strokeWidth={1.5} />
+                              <ExternalLink size={16} strokeWidth={1.5} />
                             </div>
                           </Link>
                         </div>
@@ -388,7 +393,7 @@ const InfrastructureActivity = () => {
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center space-y-2">
-                          <IconBarChart2 className="text-foreground-light mb-2" />
+                          <BarChart2 size={18} className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
                           <p className="text-sm text-foreground-light">
                             May take a few minutes to show

@@ -1300,11 +1300,11 @@ export const functions: NavMenuConstant = {
       url: '/guides/functions',
     },
     {
-      name: 'Quickstart',
+      name: 'Getting started',
       url: undefined,
       items: [
         {
-          name: 'Getting started',
+          name: 'Create an Edge Function',
           url: '/guides/functions/quickstart',
         },
         {
@@ -1372,6 +1372,24 @@ export const functions: NavMenuConstant = {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
+      ],
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
+        },
       ],
     },
     {
@@ -1389,6 +1407,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Sending Push Notifications',
           url: '/guides/functions/examples/push-notifications',
+        },
+        {
+          name: 'Generating AI images',
+          url: '/guides/functions/examples/amazon-bedrock-image-generator',
         },
         {
           name: 'Generating OG images ',
