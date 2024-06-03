@@ -4,8 +4,7 @@ import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
-import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' assert { type:
-  'json' }
+import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' assert { type: 'json' }
 
 const sections = flattenSections(selfHostingRealtimeCommonSections)
 const libraryPath = '/self-hosting-realtime'

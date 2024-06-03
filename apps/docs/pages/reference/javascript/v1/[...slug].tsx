@@ -4,8 +4,7 @@ import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
-import clientLibsCommonSections from '~/spec/common-client-libs-sections.json' assert { type:
-  'json' }
+import clientLibsCommonSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 import typeSpec from '~/spec/enrichments/tsdoc_v1/combined.json' assert { type: 'json' }
 import spec from '~/spec/supabase_js_v1.yml' assert { type: 'yml' }
 

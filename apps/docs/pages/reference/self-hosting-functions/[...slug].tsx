@@ -4,8 +4,7 @@ import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
-import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json' assert { type:
-  'json' }
+import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json' assert { type: 'json' }
 
 const sections = flattenSections(selfHostingFunctionsCommonSections)
 const libraryPath = '/self-hosting-functions'
