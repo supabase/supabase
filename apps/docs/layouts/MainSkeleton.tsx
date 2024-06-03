@@ -231,7 +231,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 
   return (
     <div
-      className={[
+      className={cn(
         'h-full',
         'left-0',
         'right-0',
@@ -239,8 +239,8 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
-        'lg:hidden',
-      ].join(' ')}
+        'lg:hidden'
+      )}
       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
     ></div>
   )
@@ -277,49 +277,44 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
   return (
     <nav
       aria-labelledby="main-nav-title"
-      className={[
+      className={cn(
         // 'hidden',
-        'absolute lg:relative',
+        'absolute !top-[91px] lg:!top-0 lg:relative',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',
         'transition-all',
         'top-0',
-        'flex flex-col ml-0',
-      ].join(' ')}
+        'flex flex-col ml-0'
+      )}
     >
       <div
-        className={[
+        className={cn(
           'top-0',
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-background',
-          'flex flex-col',
-        ].join(' ')}
+          'flex flex-col'
+        )}
       >
-        <h1 id="main-nav-title" className="sr-only">
+        <span id="main-nav-title" className="sr-only">
           Main menu
-        </h1>
-        <div className="top-0 sticky z-10">
-          <div>
-            <div>
-              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
-            </div>
-          </div>
+        </span>
+        <div className="top-0 sticky h-0 z-10">
+          <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
         </div>
         <div
-          className={[
+          className={cn(
             'transition-all ease-out duration-200',
             'absolute left-0 right-0 h-screen',
-            'px-5 pl-5 py-16',
-            'top-[0px]',
+            'px-5 pl-5 pt-6 pb-16',
             'bg-background',
             // desktop styles
-            'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
-            'lg:opacity-100 lg:visible',
-          ].join(' ')}
+            'lg:relative top-0 lg:left-0 lg:pb-10 lg:px-10 lg:flex',
+            'lg:opacity-100 lg:visible'
+          )}
         >
           <NavigationMenu menuId={menuId} />
         </div>
@@ -334,7 +329,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
       <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10')}>
         <TopNavBar />
       </div>
-      <div className="flex flex-row h-full !pt-[90px]">
+      <div className="flex flex-row h-full !pt-[91px]">
         {/* <div className="flex flex-row h-full mt-[var(--header-height,90px)]"> */}
         <NavContainer menuId={menuId} />
         <Container className="[--header-height:40px] lg:[--header-height:90px]">
