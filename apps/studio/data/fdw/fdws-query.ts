@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
@@ -72,7 +72,7 @@ export type FDWsVariables = {
 }
 
 export type FDWsData = FDWsResponse
-export type FDWsError = unknown
+export type FDWsError = ExecuteSqlError
 
 export const useFDWsQuery = <TData extends FDWsData = FDWsData>(
   { projectRef, connectionString }: FDWsVariables,

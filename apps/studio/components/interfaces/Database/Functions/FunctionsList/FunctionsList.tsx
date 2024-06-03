@@ -86,7 +86,7 @@ const FunctionsList = ({
   })
 
   if (isLoading) return <GenericSkeletonLoader />
-  if (isError) <AlertError error={error} subject="Failed to retrieve database functions" />
+  if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
   return (
     <>
