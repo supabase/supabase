@@ -27,12 +27,11 @@ const PaymentMethodSelection = ({
   const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
 
   const {
-    data,
+    data: paymentMethods,
     isLoading,
     isSuccess: loadedPaymentMethods,
     refetch: refetchPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
-  const paymentMethods = useMemo(() => data ?? [], [data])
 
   const { data: customerProfile, isSuccess: loadedCustomerProfile } =
     useOrganizationCustomerProfileQuery({ slug })
@@ -43,19 +42,17 @@ const PaymentMethodSelection = ({
   )
 
   useEffect(() => {
-    if (loadedPaymentMethods && loadedCustomerProfile && paymentMethods.length > 0) {
-      const selectedPaymentMethodExists = paymentMethods.some(
+    if (loadedPaymentMethods && loadedCustomerProfile && paymentMethods.data?.length > 0) {
+      const selectedPaymentMethodExists = paymentMethods.data.some(
         (it) => it.id === selectedPaymentMethod
       )
 
       if (!selectedPaymentMethod || !selectedPaymentMethodExists) {
-        const defaultPaymentMethod = paymentMethods.find(
-          (method) => method.id === customerProfile.invoice_settings.default_payment_method
-        )
+        const defaultPaymentMethod = paymentMethods.data.find((method) => method.is_default)
         if (defaultPaymentMethod !== undefined) {
           onSelectPaymentMethod(defaultPaymentMethod.id)
         } else {
-          onSelectPaymentMethod(paymentMethods[0].id)
+          onSelectPaymentMethod(paymentMethods.data[0].id)
         }
       }
     }
@@ -76,7 +73,7 @@ const PaymentMethodSelection = ({
             <IconLoader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods.length === 0 ? (
+        ) : paymentMethods?.data.length === 0 ? (
           <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
             <div className="flex items-center space-x-4 text-foreground-light">
               <IconAlertCircle size={16} strokeWidth={1.5} />
@@ -123,7 +120,7 @@ const PaymentMethodSelection = ({
             onChange={onSelectPaymentMethod}
             className="flex items-center"
           >
-            {paymentMethods.map((method: any) => {
+            {paymentMethods?.data.map((method: any) => {
               const label = `•••• •••• •••• ${method.card.last4}`
               return (
                 <Listbox.Option
@@ -166,12 +163,12 @@ const PaymentMethodSelection = ({
         onConfirm={async () => {
           setShowAddNewPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
-          const { data } = await refetchPaymentMethods()
-          if (data?.length) {
+          const { data: refetchedPaymentMethods } = await refetchPaymentMethods()
+          if (refetchedPaymentMethods?.data?.length) {
             // Preselect the card that was just added
-            const mostRecentPaymentMethod = data.reduce(
+            const mostRecentPaymentMethod = refetchedPaymentMethods?.data.reduce(
               (prev, current) => (prev.created > current.created ? prev : current),
-              data[0]
+              refetchedPaymentMethods.data[0]
             )
             onSelectPaymentMethod(mostRecentPaymentMethod.id)
           }
