@@ -21,6 +21,7 @@ export async function getDatabaseFunctions(
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/functions', {
+    // @ts-ignore [Joshen] Temp, seems like API codegen is wrong
     params: { path: { ref: projectRef } },
     headers,
     signal,

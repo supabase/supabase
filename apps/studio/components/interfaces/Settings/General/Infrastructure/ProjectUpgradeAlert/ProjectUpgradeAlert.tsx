@@ -8,6 +8,7 @@ import { useParams } from 'common'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useFlag } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -19,6 +20,9 @@ import {
   IconAlertTriangle,
   Listbox,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 const ProjectUpgradeAlert = () => {
@@ -26,6 +30,8 @@ const ProjectUpgradeAlert = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
 
   const formId = 'project-upgrade-form'
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
@@ -59,11 +65,26 @@ const ProjectUpgradeAlert = () => {
           <p className="mb-3">
             The latest version of Postgres ({latestPgVersion}) is available for your project.
           </p>
-          <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
-            Upgrade project
-          </Button>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button
+                size="tiny"
+                type="primary"
+                onClick={() => setShowUpgradeModal(true)}
+                disabled={projectUpgradeDisabled}
+              >
+                Upgrade project
+              </Button>
+            </TooltipTrigger_Shadcn_>
+            {projectUpgradeDisabled && (
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                Project upgrade is currently disabled
+              </TooltipContent_Shadcn_>
+            )}
+          </Tooltip_Shadcn_>
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
+
       <Modal
         hideFooter
         visible={showUpgradeModal}

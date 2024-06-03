@@ -57,10 +57,13 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
           )
         )
 
-        toast.success(`Successfully deleted bucket ${bucket!.name}`)
+        toast.success(`Successfully deleted bucket ${bucket?.name}`)
         router.push(`/project/${projectRef}/storage/buckets`)
         onClose()
-      } finally {
+      } catch (error) {
+        toast.success(
+          `Successfully deleted bucket ${bucket?.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+        )
       }
     },
   })
