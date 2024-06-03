@@ -30,7 +30,7 @@ jobs:
           npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
-          npm run prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          npx prettier -c --debug-check 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
