@@ -57,7 +57,7 @@ const StringToPositiveNumber = z.union([
 
 const FormSchema = z.object({
   default_pool_size: StringToPositiveNumber,
-  pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
+  pool_mode: z.union([z.literal('transaction'), z.literal('session')]),
   max_client_conn: StringToPositiveNumber,
 })
 
@@ -107,7 +107,7 @@ export const ConnectionPooling = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+      pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
       default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
       max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
     },
@@ -141,7 +141,7 @@ export const ConnectionPooling = () => {
   useEffect(() => {
     if (isSuccess) {
       form.reset({
-        pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+        pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
         default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
         max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
       })

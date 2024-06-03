@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -12,6 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
@@ -50,7 +50,7 @@ import { FunctionEditor } from './FunctionEditor'
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
-  func?: PostgresFunction
+  func?: DatabaseFunction
   visible: boolean
   setVisible: (value: boolean) => void
 }
@@ -103,7 +103,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     if (isEditing) {
       updateDatabaseFunction(
         {
-          id: func.id,
+          func,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
