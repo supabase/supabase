@@ -54,7 +54,7 @@ import {
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
-  prefixWithLimit,
+  suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
@@ -314,7 +314,7 @@ const SQLEditor = () => {
         }
 
         const { appendAutoLimit } = checkIfAppendLimitRequired(sql, snap.limit)
-        const formattedSql = prefixWithLimit(sql, snap.limit)
+        const formattedSql = suffixWithLimit(sql, snap.limit)
 
         execute({
           projectRef: project.ref,

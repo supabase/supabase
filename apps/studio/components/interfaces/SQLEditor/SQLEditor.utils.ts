@@ -140,7 +140,7 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
   return { cleanedSql, appendAutoLimit }
 }
 
-export const prefixWithLimit = (sql: string, limit: number = 0) => {
+export const suffixWithLimit = (sql: string, limit: number = 0) => {
   const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
   const formattedSql = appendAutoLimit
     ? cleanedSql.endsWith(';')

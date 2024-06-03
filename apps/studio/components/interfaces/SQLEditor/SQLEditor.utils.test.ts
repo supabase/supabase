@@ -1,4 +1,4 @@
-import { checkIfAppendLimitRequired, prefixWithLimit } from './SQLEditor.utils'
+import { checkIfAppendLimitRequired, suffixWithLimit } from './SQLEditor.utils'
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
   test('Should return false if limit passed is <= 0', () => {
@@ -71,23 +71,23 @@ select * from cities
 })
 
 // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
-describe('SQLEditor.utils.ts:prefixWithLimit', () => {
+describe('SQLEditor.utils.ts:suffixWithLimit', () => {
   test('Should add the limit param properly if query ends without a semi colon', () => {
     const sql = 'select * from countries'
     const limit = 100
-    const formattedSql = prefixWithLimit(sql, limit)
+    const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with a semi colon', () => {
     const sql = 'select * from countries;'
     const limit = 100
-    const formattedSql = prefixWithLimit(sql, limit)
+    const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with multiple semi colon', () => {
     const sql = 'select * from countries;;;;;;;'
     const limit = 100
-    const formattedSql = prefixWithLimit(sql, limit)
+    const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
 })
