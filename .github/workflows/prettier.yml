@@ -25,10 +25,12 @@ jobs:
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |
-          npm ci
+          rm package.json
+          rm package-lock.json
+          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
-          npm run test:prettier
+          npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
