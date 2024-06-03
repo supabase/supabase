@@ -4,23 +4,25 @@ import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { buttonVariants } from './../../Button/Button'
 
 interface NavigationMenuProps
   extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
   viewportClassName?: string | undefined
+  renderViewport?: boolean | undefined
 }
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   NavigationMenuProps
->(({ className, viewportClassName, children, ...props }, ref) => (
+>(({ className, viewportClassName, renderViewport = true, children, ...props }, ref) => (
   <NavigationMenuPrimitive.Root
     ref={ref}
     className={cn('relative z-10 flex flex-1 items-center justify-center', className)}
     {...props}
   >
     {children}
-    <NavigationMenuViewport className={viewportClassName} />
+    {renderViewport && <NavigationMenuViewport className={viewportClassName} />}
   </NavigationMenuPrimitive.Root>
 ))
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
@@ -47,11 +49,7 @@ const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
-  <NavigationMenuPrimitive.Trigger
-    ref={ref}
-    className={cn(navigationMenuTriggerStyle(), 'group', className)}
-    {...props}
-  >
+  <NavigationMenuPrimitive.Trigger ref={ref} className={cn('group', className)} {...props}>
     {children}{' '}
     <ChevronDown
       className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
@@ -80,12 +78,17 @@ const NavigationMenuLink = NavigationMenuPrimitive.Link
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
->(({ className, ...props }, ref) => (
-  <div className={cn('absolute left-0 top-full flex justify-center')}>
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport> & {
+    containerProps?: React.HTMLAttributes<HTMLDivElement>
+  }
+>(({ className, containerProps, ...props }, ref) => (
+  <div
+    {...containerProps}
+    className={cn('absolute left-0 top-full flex justify-center', containerProps?.className)}
+  >
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        'origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-overlay text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-right-10 data-[state=open]:duration-100 data-[state=open]:ease-out data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:duration-75 md:w-[var(--radix-navigation-menu-viewport-width)]',
+        'origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-right-10 data-[state=open]:duration-100 data-[state=open]:ease-out data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:duration-75 md:w-[var(--radix-navigation-menu-viewport-width)]',
         className
       )}
       ref={ref}
