@@ -222,6 +222,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
             <LogTable
+              showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}

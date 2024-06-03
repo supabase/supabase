@@ -1,52 +1,40 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
+import pgMeta from '@supabase/pg-meta'
+import { UseQueryOptions } from '@tanstack/react-query'
+import type { ExecuteSqlData, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
+import { z } from 'zod'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type DatabaseFunction = components['schemas']['PostgresFunction']
+export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
 
-export async function getDatabaseFunctions(
-  { projectRef, connectionString }: DatabaseFunctionsVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) throw new Error('projectRef is required')
+const pgMetaFunctionsList = pgMeta.functions.list()
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/functions', {
-    // @ts-ignore [Joshen] Temp, seems like API codegen is wrong
-    params: { path: { ref: projectRef } },
-    headers,
-    signal,
-  })
-
-  if (error) handleError(error)
-  // [Joshen] API codegen is wrong, its matching Edge functions type to database functions
-  return data as unknown as DatabaseFunction[]
-}
-
-export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctions>>
+export type DatabaseFunctionsData = z.infer<typeof pgMetaFunctionsList.zod>
 export type DatabaseFunctionsError = ResponseError
 
-export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
+export const useDatabaseFunctionsQuery = <
+  TData extends DatabaseFunctionsData = DatabaseFunctionsData,
+>(
   { projectRef, connectionString }: DatabaseFunctionsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
-) =>
-  useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>(
-    databaseFunctionsKeys.list(projectRef),
-    ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
+  options: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
+) => {
+  return useExecuteSqlQuery(
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      projectRef,
+      connectionString,
+      sql: pgMetaFunctionsList.sql,
+      queryKey: ['functions-list'],
+    },
+    {
+      select(data) {
+        return (data as any)?.result ?? []
+      },
       ...options,
     }
   )
+}

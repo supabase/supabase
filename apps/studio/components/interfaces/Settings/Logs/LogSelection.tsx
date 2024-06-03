@@ -224,8 +224,12 @@ const LogSelection = ({
                 <TabsContent_Shadcn_ className="bg-surface-100 space-y-6" value="details">
                   <Formatter />
                 </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ value="raw" className="px-4">
-                  <CodeBlock language="json" className="prose w-full max-w-full">
+                <TabsContent_Shadcn_ value="raw">
+                  <CodeBlock
+                    hideLineNumbers
+                    language="json"
+                    className="prose w-full pt-0 max-w-full border-none"
+                  >
                     {JSON.stringify(fullLog || partialLog, null, 2)}
                   </CodeBlock>
                 </TabsContent_Shadcn_>
