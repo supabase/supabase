@@ -9,6 +9,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from 'ui'
 
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
@@ -20,7 +21,7 @@ const GlobalNavigationMenuDesktop = () => (
     delayDuration={0}
     skipDelayDuration={0}
     className="hidden space-x-4 z-50 lg:flex justify-start px-5 lg:px-10"
-    hasViewport={false}
+    renderViewport={false}
     orientation="vertical"
   >
     <NavigationMenuList>
@@ -30,7 +31,12 @@ const GlobalNavigationMenuDesktop = () => (
             key={`desktop-docs-menu-section-${section[0].label}`}
             className="text-sm relative"
           >
-            <NavigationMenuTrigger className="bg-transparent font-normal text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
+            <NavigationMenuTrigger
+              className={cn(
+                navigationMenuTriggerStyle(),
+                'bg-transparent font-normal text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto'
+              )}
+            >
               {section[0].label === 'Home' ? (
                 <HomeMenuIconPicker icon={section[0].icon} />
               ) : (
