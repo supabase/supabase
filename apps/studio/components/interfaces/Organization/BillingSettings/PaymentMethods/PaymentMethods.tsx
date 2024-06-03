@@ -177,20 +177,17 @@ const PaymentMethods = () => {
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
-                                        {subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card' && (
-                                            <>
-                                              <DropdownMenuItem
-                                                key="make-default"
-                                                onClick={() =>
-                                                  setSelectedMethodForUse(paymentMethod)
-                                                }
-                                              >
-                                                <p>Use this card</p>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuSeparator />
-                                            </>
-                                          )}
+                                        {
+                                          <>
+                                            <DropdownMenuItem
+                                              key="make-default"
+                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
+                                            >
+                                              <p>Use this card</p>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                          </>
+                                        }
                                         <DropdownMenuItem
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}

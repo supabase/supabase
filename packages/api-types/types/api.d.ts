@@ -267,6 +267,10 @@ export interface paths {
     /** Detach Stripe payment method with the given card ID */
     delete: operations['PaymentsController_detachPaymentMethod']
   }
+  '/platform/organizations/{slug}/payments/default': {
+    /** Mark given paymnet method as default for organization */
+    put: operations['PaymentsController_markPaymentMethodAsDefault']
+  }
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
     post: operations['SetupIntentOrgController_setUpPaymentMethod']
@@ -2924,6 +2928,9 @@ export interface components {
         idempotencyKey?: string
         stripeAccount?: string
       }
+    }
+    MarkDefaultPaymentMethodBody: {
+      payment_method_id: string
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -7583,6 +7590,32 @@ export interface operations {
         content: never
       }
       /** @description Failed to detach Stripe payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Mark given paymnet method as default for organization */
+  PaymentsController_markPaymentMethodAsDefault: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MarkDefaultPaymentMethodBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to mark payment method as default */
       500: {
         content: never
       }
