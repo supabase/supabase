@@ -30,7 +30,7 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
   schema: string

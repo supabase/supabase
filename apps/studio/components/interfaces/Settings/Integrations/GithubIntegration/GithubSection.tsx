@@ -76,10 +76,16 @@ const GitHubSection = () => {
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
       if (isBranchingEnabled) {
-        if (!projectRef) throw new Error('Project ref not found')
+        if (!projectRef) {
+          toast.error('Project ref not found')
+          return
+        }
         disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
       }
-      if (!org?.id) throw new Error('Organization not found')
+      if (!org?.id) {
+        toast.error('Organization not found')
+        return
+      }
       deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
     },
     [
@@ -149,7 +155,8 @@ const GitHubSection = () => {
                           name: connection.repository.name,
                           supabaseConfig: {
                             supabaseDirectory: connection.workdir,
-                            supabaseChangesOnly: (connection as any).supabase_changes_only, //[Joshen] potentially API codegen issue
+                            supabaseChangesOnly: connection.supabase_changes_only,
+                            branchLimit: connection.branch_limit,
                           },
                         } as any,
                       }}

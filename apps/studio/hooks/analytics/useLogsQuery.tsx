@@ -11,10 +11,8 @@ import type {
   Logs,
   LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -31,10 +29,6 @@ const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
 ): LogsQueryHook => {
-  // [Joshen] TODO once API is unblocked
-  const state = useDatabaseSelectorStateSnapshot()
-  const { data: databases } = useReadReplicasQuery({ projectRef })
-
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
@@ -50,6 +44,7 @@ const useLogsQuery = (
   const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const queryParams = genQueryParams(params as any)
+
   const {
     data,
     error: rqError,

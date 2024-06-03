@@ -1,8 +1,8 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
-import type { components } from 'data/api'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
@@ -21,12 +21,13 @@ export async function getDatabaseFunctions(
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/functions', {
+    // @ts-ignore [Joshen] Temp, seems like API codegen is wrong
     params: { path: { ref: projectRef } },
     headers,
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   // [Joshen] API codegen is wrong, its matching Edge functions type to database functions
   return data as unknown as DatabaseFunction[]
 }

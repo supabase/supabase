@@ -1,6 +1,6 @@
-import { ident, literal, format } from '@scaleleap/pg-format'
-import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
+import { format, ident, literal } from '@scaleleap/pg-format'
 import type { Dictionary } from 'types'
+import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
 
 export function countQuery(
   table: QueryTable,
@@ -223,7 +223,7 @@ function applySorts(query: string, sorts: Sort[]) {
     .map((x) => {
       const order = x.ascending ? 'asc' : 'desc'
       const nullOrder = x.nullsFirst ? 'nulls first' : 'nulls last'
-      return `${ident(x.column)} ${order} ${nullOrder}`
+      return `${ident(x.table)}.${ident(x.column)} ${order} ${nullOrder}`
     })
     .join(', ')}`
   return query

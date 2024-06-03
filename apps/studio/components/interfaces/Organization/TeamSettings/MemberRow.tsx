@@ -54,6 +54,7 @@ const MemberRow = ({
   const canRemoveRole = rolesRemovable.includes(memberRoleId)
   const disableRoleEdit = !canRemoveRole || memberIsUser || isInvitedUser
   const isEmailUser = member.username === member.primary_email
+  const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
   const validateSelectedRoleToChange = (roleId: any) => {
     if (!role || role.id === roleId) return
@@ -78,7 +79,7 @@ const MemberRow = ({
       <Table.td>
         <div className="flex items-center space-x-4">
           <div>
-            {isInvitedUser || isEmailUser || hasInvalidImg ? (
+            {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
               <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
                 <IconUser strokeWidth={1.5} />
               </div>

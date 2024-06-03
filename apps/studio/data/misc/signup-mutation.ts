@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type SignUpVariables = {
@@ -17,7 +17,7 @@ export async function signup({ email, password, hcaptchaToken, redirectTo }: Sig
     body: { email, password, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

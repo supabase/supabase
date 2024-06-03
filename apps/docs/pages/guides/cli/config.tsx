@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 
 import { CodeBlock, cn } from 'ui'
 
-import { Heading } from '~/components/CustomHTMLElements'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { MainSkeleton } from '~/layouts/MainSkeleton'

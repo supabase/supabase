@@ -4,9 +4,10 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
@@ -57,12 +58,13 @@ const PreviewFilterPanel = ({
   onSelectedDatabaseChange,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
+  const { ref } = useParams()
   const [search, setSearch] = useState('')
-  const { project } = useProjectContext()
+
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
-  const showDatabaseSelector =
-    project?.is_read_replicas_enabled && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+  const showDatabaseSelector = LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -77,6 +79,7 @@ const PreviewFilterPanel = ({
     <Tooltip_Shadcn_ delayDuration={100}>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
+          title="refresh"
           type="default"
           className="px-1.5"
           icon={
@@ -214,7 +217,16 @@ const PreviewFilterPanel = ({
               Open query in Logs Explorer
             </TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
-          <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
+          <DatabaseSelector
+            onSelectId={onSelectedDatabaseChange}
+            additionalOptions={
+              table === LogsTableName.EDGE
+                ? (loadBalancers ?? []).length > 0
+                  ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+                  : []
+                : []
+            }
+          />
         </div>
       ) : (
         <Button asChild type="default" onClick={onExploreClick}>

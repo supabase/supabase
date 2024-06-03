@@ -90,6 +90,14 @@ Compute Credits do not apply to other usage fees like egress, database size, ...
 
 Additionally, Compute Credits are given to you not only for the first month but for every month while you are on a paid plan. Notice though, that they reset every month and do not accumulate, in case you're not running any projects.
 
+### Replicas
+
+In case of deploying additional [Read Replicas](/docs/guides/platform/read-replicas), each replica is a dedicated database that adds additional compute runtime hours.
+
+Each replica incurs one compute hour on the given instance size. An example:
+
+A primary database on XL compute and two read replicas on XL compute would incur ~2.190 XL compute hours (3x 730h) and cost ~$630/month.
+
 ## Unified egress
 
 Each organization receives a total egress quota (eg. 250GB on the Pro plan) which can be used for anything - Storage, Realtime, Auth, Functions, Supavisor or Database.

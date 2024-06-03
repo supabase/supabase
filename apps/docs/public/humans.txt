@@ -15,6 +15,7 @@ Bruno Andrade
 Chandana Anumula
 Charis Lam
 Chase Granberry
+Chris Caruso
 Chris Copplestone
 Chris Gwilliams
 Dave Wilson
@@ -54,6 +55,7 @@ Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Peter Lyn
 Qiao Han
 Raminder Singh
 Rodrigo Mansueli

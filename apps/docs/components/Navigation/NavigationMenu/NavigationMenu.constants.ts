@@ -992,6 +992,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'Tools',
+      url: '/guides/api',
+      items: [{ name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' }],
+    },
+    {
       name: 'Guides',
       url: '/guides/api',
       items: [
@@ -1006,27 +1011,27 @@ export const api: NavMenuConstant = {
       items: [
         {
           name: 'Managing tables, views, and data',
-          url: '/guides/api/data-apis#managing-tables-views-and-data',
+          url: '/guides/database/tables',
         },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/data-apis#querying-joins-and-nested-tables',
+          url: '/guides/database/joins-and-nesting',
         },
         {
           name: 'JSON and unstructured data',
-          url: '/guides/api/data-apis#json-and-unstructured-data',
+          url: '/guides/database/json',
         },
         {
           name: 'Managing database functions',
-          url: '/guides/api/data-apis#managing-database-functions',
+          url: '/guides/database/functions',
         },
         {
           name: 'Using full-text search',
-          url: '/guides/api/data-apis#using-full-text-search',
+          url: '/guides/database/full-text-search',
         },
         {
           name: 'Debugging performance issues',
-          url: '/guides/api/data-apis#debugging-performance-issues',
+          url: '/guides/database/debugging-performance',
         },
         {
           name: 'Using custom schemas',
@@ -1076,11 +1081,11 @@ export const functions: NavMenuConstant = {
       url: '/guides/functions',
     },
     {
-      name: 'Quickstart',
+      name: 'Getting started',
       url: undefined,
       items: [
         {
-          name: 'Getting started',
+          name: 'Create an Edge Function',
           url: '/guides/functions/quickstart',
         },
         {
@@ -1148,6 +1153,24 @@ export const functions: NavMenuConstant = {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
+      ],
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
+        },
       ],
     },
     {
@@ -1165,6 +1188,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Sending Push Notifications',
           url: '/guides/functions/examples/push-notifications',
+        },
+        {
+          name: 'Generating AI images',
+          url: '/guides/functions/examples/amazon-bedrock-image-generator',
         },
         {
           name: 'Generating OG images ',
@@ -1284,12 +1311,7 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
-        {
-          name: 'Bring Your Own Database',
-          url: '/guides/realtime/bring-your-own-database',
-          items: [],
-        },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
     },
   ],
@@ -1578,7 +1600,7 @@ export const ai = {
 }
 
 export const supabase_cli: NavMenuConstant = {
-  icon: 'reference-cli',
+  icon: 'dev-cli',
   title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
@@ -2116,21 +2138,21 @@ export const reference_api = {
 }
 
 export const reference_self_hosting_auth = {
-  icon: 'reference-auth',
+  icon: 'self-hosting',
   title: 'Self-Hosting Auth',
   url: '/guides/reference/self-hosting/auth',
   parent: '/reference',
 }
 
 export const reference_self_hosting_storage = {
-  icon: 'reference-storage',
+  icon: 'self-hosting',
   title: 'Self-Hosting Storage',
   url: '/guides/reference/self-hosting/storage',
   parent: '/reference',
 }
 
 export const reference_self_hosting_realtime = {
-  icon: 'reference-realtime',
+  icon: 'self-hosting',
   title: 'Self-Hosting Realtime',
   url: '/guides/reference/self-hosting/realtime',
   parent: '/reference',

@@ -9,7 +9,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -35,15 +35,19 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      SnackBar(
-        content: Text(error.message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } catch (error) {
-      SnackBar(
-        content: const Text('Unexpected error occurred'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
+      if (mounted) {
+        SnackBar(
+          content: const Text('Unexpected error occurred'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -68,8 +72,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _authStateSubscription.cancel();
     _emailController.dispose();
+    _authStateSubscription.cancel();
     super.dispose();
   }
 

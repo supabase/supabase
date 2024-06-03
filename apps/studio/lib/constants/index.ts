@@ -34,7 +34,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
-  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
@@ -52,6 +51,12 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
 
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+
+  // Key to track account deletion requests
+  ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
+
+  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
+  SENTRY_USER_ID: 'supabase-sentry-user-id',
 }
 
 export const OPT_IN_TAGS = {
@@ -59,3 +64,5 @@ export const OPT_IN_TAGS = {
 }
 
 export const GB = 1024 * 1024 * 1024
+export const MB = 1024 * 1024
+export const KB = 1024

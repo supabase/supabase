@@ -27,6 +27,8 @@ import {
   cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 export interface EntityListItemProps {
   id: number
@@ -44,6 +46,34 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
 
   const isActive = Number(id) === entity.id
+
+  const { data: lints = [] } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const tableHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_disabled_in_public',
+    ['ERROR'],
+    lints,
+    snap.selectedSchemaName
+  ).hasLint
+
+  const viewHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'security_definer_view',
+    ['ERROR', 'WARN'],
+    lints,
+    snap.selectedSchemaName
+  ).hasLint
+
+  const materializedViewHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'materialized_view_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    snap.selectedSchemaName
+  ).hasLint
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -103,6 +133,64 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     } catch (error: any) {
       toast.error(`Failed to export table: ${error.message}`, { id: toastId })
     }
+  }
+
+  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
+    let tooltipContent = null
+
+    switch (entity.type) {
+      case ENTITY_TYPE.TABLE:
+        if (tableHasLints) {
+          tooltipContent = 'RLS Disabled'
+        }
+        break
+      case ENTITY_TYPE.VIEW:
+        if (viewHasLints) {
+          tooltipContent = 'Security Definer view'
+        }
+        break
+      case ENTITY_TYPE.MATERIALIZED_VIEW:
+        if (materializedViewHasLints) {
+          tooltipContent = 'Security Definer view'
+        }
+
+        break
+      case ENTITY_TYPE.FOREIGN_TABLE:
+        tooltipContent = 'RLS is not enforced on foreign tables'
+
+        break
+      default:
+        break
+    }
+
+    if (tooltipContent) {
+      return (
+        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+          <Tooltip.Trigger className="min-w-4" asChild>
+            <Unlock
+              size={14}
+              strokeWidth={2}
+              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
+            />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              side="bottom"
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
+                'text-xs text-foreground',
+              ].join(' ')}
+            >
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              {tooltipContent}
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      )
+    }
+
+    return null
   }
 
   return (
@@ -175,13 +263,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         >
           {entity.name}
         </span>
-        {entity.type === ENTITY_TYPE.TABLE && !entity.rls_enabled && (
-          <Unlock
-            size={14}
-            strokeWidth={2}
-            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-          />
-        )}
+        <EntityTooltipTrigger entity={entity} />
       </div>
 
       {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (

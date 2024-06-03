@@ -6,6 +6,12 @@ description: 'pgvector: a PostgreSQL extension for storing embeddings and perfor
 
 [pgvector](https://github.com/pgvector/pgvector/) is a PostgreSQL extension for vector similarity search. It can also be used for storing [embeddings](https://supabase.com/blog/openai-embeddings-postgres-vector).
 
+<Admonition type="note">
+
+The name of pgvector's Postgres extension is [vector](https://github.com/pgvector/pgvector/blob/258eaf58fdaff1843617ff59ea855e0768243fe9/README.md?plain=1#L64).
+
+</Admonition>
+
 Learn more about Supabase's [AI & Vector](/docs/guides/ai) offering.
 
 ## Concepts
@@ -33,18 +39,18 @@ This is particularly useful if you're building on top of OpenAI's [GPT-3](https:
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgvector" and enable the extension.
+3. Search for "vector" and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
 ```sql
- -- Example: enable the pgvector extension.
+ -- Example: enable the "vector" extension.
 create extension vector
 with
   schema extensions;
 
--- Example: disable the pgvector extension
+-- Example: disable the "vector" extension
 drop
   extension if exists vector;
 ```

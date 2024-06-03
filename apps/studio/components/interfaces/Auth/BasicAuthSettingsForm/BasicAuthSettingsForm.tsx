@@ -1,22 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Form,
-  IconAlertCircle,
-  IconEye,
-  IconEyeOff,
-  Input,
-  InputNumber,
-  Toggle,
-} from 'ui'
 import { boolean, number, object, string } from 'yup'
 
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   FormActions,
@@ -31,10 +20,21 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import Link from 'next/link'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconEye,
+  IconEyeOff,
+  Input,
+  InputNumber,
+  Toggle,
+} from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import FormField from '../AuthProvidersForm/FormField'
-import { ExternalLink } from 'lucide-react'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -332,8 +332,6 @@ const BasicAuthSettingsForm = () => {
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Leaked password protection available on Pro plans and up."
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
                     />
                   )}
                   <Toggle
@@ -355,8 +353,6 @@ const BasicAuthSettingsForm = () => {
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Configuring user sessions requires the Pro plan."
-                      projectRef={projectRef!}
-                      organizationSlug={organization!.slug}
                     />
                   )}
                   <Toggle
