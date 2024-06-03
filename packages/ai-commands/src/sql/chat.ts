@@ -1,9 +1,7 @@
-import { SchemaBuilder } from '@serafin/schema-builder'
 import { OpenAIStream } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
-import { jsonrepair } from 'jsonrepair'
 import OpenAI from 'openai'
-import { ContextLengthError, EmptyResponseError, EmptySqlError } from '../errors'
+import { ContextLengthError } from '../errors'
 import { Message } from '../types'
 
 /**
