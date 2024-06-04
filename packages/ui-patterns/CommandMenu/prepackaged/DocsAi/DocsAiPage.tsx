@@ -114,7 +114,12 @@ const DocsAiPage = () => {
                         ) : (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
+                            components={{
+                              ...markdownComponents,
+                              a: (props) => (
+                                <a {...props} target="_blank" rel="noopener noreferrer" />
+                              ),
+                            }}
                             className="prose dark:prose-dark"
                           >
                             {message.content}

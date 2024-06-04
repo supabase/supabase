@@ -13,7 +13,12 @@ import {
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import {
+  ExecuteSqlData,
+  ExecuteSqlError,
+  executeSql,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 
@@ -60,7 +65,7 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
   sorts.forEach((sort) => {
-    queryChains = queryChains.order(sort.column, sort.ascending, sort.nullsFirst)
+    queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
   })
 
   // Starting from page 0, fetch 500 records per call
@@ -134,7 +139,7 @@ export const getTableRowsSqlQuery = ({
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
   sorts.forEach((x) => {
-    queryChains = queryChains.order(x.column, x.ascending, x.nullsFirst)
+    queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
   })
 
   // getPagination is expecting to start from 0
@@ -155,7 +160,7 @@ export type TableRowsVariables = GetTableRowsArgs & {
 }
 
 export type TableRowsData = TableRows
-export type TableRowsError = unknown
+export type TableRowsError = ExecuteSqlError
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,

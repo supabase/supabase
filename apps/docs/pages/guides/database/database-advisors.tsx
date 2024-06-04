@@ -10,7 +10,7 @@ import rehypeSlug from 'rehype-slug'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 import components from '~/components'
-import { Heading } from '~/components/CustomHTMLElements'
+import { Heading } from 'ui'
 import { TabPanel, Tabs } from '~/components/Tabs'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Layout from '~/layouts/DefaultGuideLayout'

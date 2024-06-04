@@ -19,6 +19,7 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
+    "test:prettier": "prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\" \"packages/pg-meta/**/*.ts\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",

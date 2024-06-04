@@ -325,9 +325,8 @@ const DeployNewReplicaPanel = ({
           <div className="flex flex-col gap-y-2">
             <p className="text-foreground-light text-sm">
               Read replicas will be on the same compute size as your primary database. Deploying a
-              read replica incurs additional{' '}
-              <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
-              Pricing is still in early access and is subject to change.
+              read replica on the {selectedComputeMeta?.name} size incurs additional{' '}
+              <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
             </p>
 
             <p className="text-foreground-light text-sm">

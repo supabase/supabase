@@ -1,26 +1,21 @@
-import { formatSortURLParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
   test('should return an array of sort options based on URL params', () => {
     const mockInput = ['id:asc', 'name:desc']
-    const output = formatSortURLParams(mockInput)
+    const output = formatSortURLParams('fakeTable', mockInput)
     expect(output).toStrictEqual([
-      {
-        column: 'id',
-        ascending: true,
-      },
-      {
-        column: 'name',
-        ascending: false,
-      },
+      { table: 'fakeTable', column: 'id', ascending: true },
+      { table: 'fakeTable', column: 'name', ascending: false },
     ])
   })
   test('should reject any malformed sort options based on URL params', () => {
     const mockInput = ['id', 'name:asc', ':asc']
-    const output = formatSortURLParams(mockInput)
+    const output = formatSortURLParams('fakeTable', mockInput)
     expect(output).toStrictEqual([
       {
+        table: 'fakeTable',
         column: 'name',
         ascending: true,
       },

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { DatabaseLayout } from 'components/layouts'
@@ -54,7 +55,6 @@ const PITR = () => {
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
-  const ref = project?.ref ?? 'default'
   const plan = subscription?.plan?.id
   const isEnabled = backups?.pitr_enabled
 
@@ -78,15 +78,13 @@ const PITR = () => {
             </>
           ) : (
             <UpgradeToPro
-              organizationSlug={organization!.slug}
-              projectRef={ref}
+              addon="pitr"
               primaryText="Point in Time Recovery is a Pro plan add-on."
               secondaryText={
                 plan === 'free'
                   ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro plan customers. Note that the Pro plan already includes daily backups for no extra charge—PITR is an optional upgrade.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
-              addon="pitr"
             />
           )}
         </>
