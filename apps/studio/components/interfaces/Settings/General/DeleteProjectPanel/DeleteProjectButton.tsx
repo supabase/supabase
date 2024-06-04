@@ -3,7 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Input } from 'ui'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -11,6 +10,7 @@ import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { Button, Input } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export interface DeleteProjectButtonProps {
@@ -41,7 +41,8 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
             reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
             exitAction: 'delete',
           })
-        } finally {
+        } catch (error) {
+          // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
         }
       }
 

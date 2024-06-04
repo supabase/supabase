@@ -57,14 +57,10 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
           connectionString: project?.connectionString,
           name: values.keyName || undefined,
         })
-        if (addKeyRes.error) {
-          return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
-        } else {
-          encryptionKeyId = addKeyRes[0].id
-        }
+        encryptionKeyId = addKeyRes[0].id
       }
 
-      const res = await addSecret({
+      await addSecret({
         projectRef: project.ref,
         connectionString: project?.connectionString,
         name: values.name,
@@ -72,13 +68,10 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
         secret: values.secret,
         key_id: encryptionKeyId,
       })
-
-      if (!res.error) {
-        toast.success(`Successfully added new secret ${values.name}`)
-        onClose()
-      } else {
-        toast.error(`Failed to add secret ${values.name}: ${res.error.message}`)
-      }
+      toast.success(`Successfully added new secret ${values.name}`)
+      onClose()
+    } catch (error: any) {
+      // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {
       setSubmitting(false)
     }

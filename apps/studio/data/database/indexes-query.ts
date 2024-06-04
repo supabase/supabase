@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 // [Joshen] Future refactor to move to pg-meta once available
 
@@ -35,7 +34,7 @@ export type IndexesVariables = getIndexesDefinition & {
 }
 
 export type IndexesData = { result: DatabaseIndex[] }
-export type IndexesError = unknown
+export type IndexesError = ExecuteSqlError
 
 export const useIndexesQuery = <TData extends IndexesData = IndexesData>(
   { schema, projectRef, connectionString }: IndexesVariables,
