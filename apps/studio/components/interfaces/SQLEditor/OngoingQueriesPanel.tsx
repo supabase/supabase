@@ -25,6 +25,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AlertError from 'components/ui/AlertError'
 import { ResponseError } from 'types'
+import { IS_PLATFORM } from 'lib/constants'
 
 interface OngoingQueriesPanel {
   visible: boolean
@@ -51,7 +52,10 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
       projectRef: project?.ref,
       connectionString: database?.connectionString,
     },
-    { staleTime: 5000 }
+    {
+      enabled: !IS_PLATFORM || (IS_PLATFORM && database?.connectionString !== undefined),
+      staleTime: 5000,
+    }
   )
   const queries = data ?? []
 
