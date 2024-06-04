@@ -40,6 +40,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
   SQL_EDITOR_AI_SCHEMA: 'supabase_sql-editor-ai-schema-enabled',
+  SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
@@ -64,3 +65,5 @@ export const OPT_IN_TAGS = {
 }
 
 export const GB = 1024 * 1024 * 1024
+export const MB = 1024 * 1024
+export const KB = 1024

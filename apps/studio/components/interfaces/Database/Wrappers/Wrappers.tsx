@@ -33,7 +33,7 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
                 'flex flex-col items-center justify-center space-y-4',
               ].join(' ')}
             >
-              <p className="text-sm">No wrappers created yet</p>
+              <p className="text-foreground-light text-sm">No wrappers created yet</p>
               <WrappersDropdown align="center" buttonText="Create a new wrapper" />
             </div>
           ) : (

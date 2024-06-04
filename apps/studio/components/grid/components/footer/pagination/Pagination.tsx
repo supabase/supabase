@@ -1,15 +1,16 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber, Modal } from 'ui'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Button, InputNumber } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDispatch, useTrackedState } from '../../../store'
 import { DropdownControl } from '../../common'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -17,11 +18,7 @@ const rowsPerPageOptions = [
   { value: 1000, label: '1000 rows' },
 ]
 
-export interface PaginationProps {
-  isLoading?: boolean
-}
-
-const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
+const Pagination = () => {
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -144,11 +141,11 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
       {isSuccess && (
         <>
           <Button
-            icon={<IconArrowLeft />}
+            icon={<ArrowLeft />}
             type="outline"
+            className="px-1.5"
             disabled={page <= 1 || isLoading}
             onClick={onPreviousPage}
-            style={{ padding: '3px 10px' }}
           />
           <p className="text-sm text-foreground-light">Page</p>
           <div className="sb-grid-pagination-input-container">
@@ -165,13 +162,13 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
               min={1}
             />
           </div>
-          <p className="text-sm text-foreground-light">{`of ${totalPages}`}</p>
+          <p className="text-sm text-foreground-light">of {totalPages}</p>
           <Button
-            icon={<IconArrowRight />}
+            icon={<ArrowRight />}
             type="outline"
+            className="px-1.5"
             disabled={page >= maxPages || isLoading}
             onClick={onNextPage}
-            style={{ padding: '3px 10px' }}
           />
 
           <DropdownControl
