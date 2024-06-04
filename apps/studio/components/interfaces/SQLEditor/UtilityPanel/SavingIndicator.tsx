@@ -1,9 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useUser } from 'common'
 import { usePrevious } from 'hooks'
+import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
+import { Button, IconCheck, IconRefreshCcw } from 'ui'
 import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type SavingIndicatorProps = { id: string }
@@ -44,7 +45,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           <Button
             type="text"
             size="tiny"
-            icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+            icon={<RefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
             onClick={retry}
           >
             Retry
@@ -53,7 +54,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         {showSavedText ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconCheck className="text-brand" size={14} strokeWidth={3} />
+              <Check className="text-brand" size={14} strokeWidth={3} />
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -70,7 +71,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         ) : isSnippetOwner && savingState === 'UPDATING' ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+              <Loader2 className="animate-spin" size={14} strokeWidth={2} />
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -88,7 +89,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           isSnippetOwner ? (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
-                <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
+                <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
               </Tooltip.Trigger>
               <Tooltip.Content side="bottom">
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
