@@ -182,30 +182,6 @@ const PostgrestConfig = () => {
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
-  function resetForm(enableApi?: boolean) {
-    const dbSchema =
-      config?.db_schema && config?.db_schema ? config.db_schema.replace(/ /g, '').split(',') : []
-
-    if (config) {
-      form.reset({
-        dbSchema: dbSchema,
-        maxRows: config.max_rows,
-        dbExtraSearchPath: config.db_extra_search_path,
-        dbPool: config.db_pool,
-        enableDataApi: enableApi,
-      })
-    }
-  }
-
-  useEffect(() => {
-    if (schema && config) {
-      const enableDataApi = config.db_schema ? true : false
-      resetForm(enableDataApi)
-    }
-  }, [schema && config])
-
-  const isDataApiEnabledInForm = form.getValues('enableDataApi')
-
   return (
     <Form_Shadcn_ {...form}>
       <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
