@@ -238,7 +238,9 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region,
+      dbRegion: ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+        ? PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region
+        : '',
       instanceSize: sizes[0],
     },
   })
