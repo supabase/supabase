@@ -13,6 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        ref: master
         sparse-checkout: |
           apps/docs
 
