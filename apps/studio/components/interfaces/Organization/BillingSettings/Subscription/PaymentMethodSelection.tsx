@@ -1,11 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
@@ -29,12 +28,8 @@ const PaymentMethodSelection = ({
   const {
     data: paymentMethods,
     isLoading,
-    isSuccess: loadedPaymentMethods,
     refetch: refetchPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
-
-  const { data: customerProfile, isSuccess: loadedCustomerProfile } =
-    useOrganizationCustomerProfileQuery({ slug })
 
   const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -42,7 +37,7 @@ const PaymentMethodSelection = ({
   )
 
   useEffect(() => {
-    if (loadedPaymentMethods && loadedCustomerProfile && paymentMethods.data?.length > 0) {
+    if (paymentMethods?.data && paymentMethods.data.length > 0) {
       const selectedPaymentMethodExists = paymentMethods.data.some(
         (it) => it.id === selectedPaymentMethod
       )
@@ -56,14 +51,7 @@ const PaymentMethodSelection = ({
         }
       }
     }
-  }, [
-    loadedPaymentMethods,
-    loadedCustomerProfile,
-    selectedPaymentMethod,
-    customerProfile,
-    paymentMethods,
-    onSelectPaymentMethod,
-  ])
+  }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
   return (
     <>
