@@ -13,7 +13,7 @@ import { filter } from 'unist-util-filter'
 
 type Json = Record<string, string | number | boolean | null | Json[] | { [key: string]: Json }>
 
-type Section = {
+interface Section {
   content: string
   heading?: string
   slug?: string
