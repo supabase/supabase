@@ -1,0 +1,23 @@
+---
+id: 'replication-considerations'
+title: 'Replication and Analytics with Supabase'
+description: 'Considerations and FAQs when setting up replication'
+sidebar_label: 'Considerations'
+---
+
+## Why not use my Primary database?
+
+If you want to run analytics on your app, you may wonder why you could not just plug in your database connection string to an analytics tool and go. In some cases, you could, but we do not recommend it. Here's why:
+
+### Security
+
+Adding a new system to your database can expose data and settings that you may want to keep private (or may be required to keep private due to compliance or legislation). Using a read-only user is possible but you must ensure that access is controlled and regularly audited.
+
+### Performance
+
+Your users want to create or view new content and your analytics queries want to perform complex calculations on the past 3 months. Both of these wants will be sharing the same resources and one might win over the other; causing your users to have a bad experience or your analytics report to time out.
+
+### Recovery
+
+If you accidentally drop a table, you might not want to restore your whole project from a backup so you can check these values in your external system before your boss finds out.
+

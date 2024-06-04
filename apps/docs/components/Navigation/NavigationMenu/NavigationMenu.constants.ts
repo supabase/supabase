@@ -812,6 +812,20 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'Replication',
+      url: '/guides/database/replication-analytics/overview',
+      items: [
+        { name: 'Overview', url: '/guides/database/replication/overview' },
+        { name: 'Considerations', url: '/guides/database/replication/considerations' },
+        { name: 'Logical Replication', url: '/guides/database/replication/logical-replication-intro' },
+        { name: 'Replication with Airbyte', url: '/guides/database/replication/services/etl-airbyte' },
+        { name: 'Replication with Estuary', url: '/guides/database/replication/services/etl-estuary' },
+        { name: 'Replication with Fivetran', url: '/guides/database/replication/services/etl-fivetran' },
+        { name: 'Replication with Materialize', url: '/guides/database/replication/services/etl-materialize' },
+        { name: 'Replication with Stitch', url: '/guides/database/replication/services/etl-stitch' },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
