@@ -332,7 +332,6 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
         <TopNavBar />
       </div>
       <div className="flex flex-row h-full !pt-[91px]">
-        {/* <div className="flex flex-row h-full mt-[var(--header-height,90px)]"> */}
         {!isHomePage && <NavContainer menuId={menuId} />}
         <Container className="[--header-height:40px] lg:[--header-height:90px]">
           <div
