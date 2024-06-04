@@ -1,13 +1,13 @@
 import { useParams } from 'common/hooks'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+import { Button } from 'ui'
 
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import type { Commands } from './Functions.types'
 
 interface TerminalInstructionsProps {
@@ -28,11 +28,8 @@ const TerminalInstructions = ({
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : '[YOUR ANON KEY]'
+  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
-
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`
@@ -95,25 +92,23 @@ const TerminalInstructions = ({
     >
       <div className="px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-x-3">
             <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
-              <IconTerminal strokeWidth={2} />
+              <Terminal strokeWidth={2} />
             </div>
             <h4>Create your first Edge Function via the CLI</h4>
           </div>
           {closable && (
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
               {showInstructions ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
+                <Minimize2 size={16} strokeWidth={1.5} />
               ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
+                <Maximize2 size={16} strokeWidth={1.5} />
               )}
             </div>
           )}
         </div>
-        <div>
-          <CommandRender commands={commands} />
-        </div>
+        <CommandRender commands={commands} />
       </div>
       {tokens && tokens.length === 0 ? (
         <div className="px-8 py-6 space-y-3 border-t">
@@ -136,23 +131,19 @@ const TerminalInstructions = ({
             </p>
           </div>
           <div className="flex gap-2">
-            <Button asChild type="default" iconRight={<IconBookOpen />}>
-              <Link
-                href="https://supabase.com/docs/guides/functions"
-                target="_blank"
-                rel="noreferrer"
-              >
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href="https://supabase.com/docs/guides/functions" target="_blank" rel="noreferrer">
                 Documentation
-              </Link>
+              </a>
             </Button>
-            <Button asChild type="default" iconRight={<IconCode />}>
-              <Link
+            <Button asChild type="default" icon={<Code />}>
+              <a
                 href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
                 target="_blank"
                 rel="noreferrer"
               >
                 Examples
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

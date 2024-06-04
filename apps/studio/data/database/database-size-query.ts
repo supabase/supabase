@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export const getDatabaseSizeQuery = () => {
   const sql = /* SQL */ `
@@ -15,7 +15,7 @@ export type DatabaseSizeVariables = {
 }
 
 export type DatabaseSizeData = { result: { db_size: number }[] }
-export type DatabaseSizeError = unknown
+export type DatabaseSizeError = ExecuteSqlError
 
 export const useDatabaseSizeQuery = <TData extends DatabaseSizeData = DatabaseSizeData>(
   { projectRef, connectionString }: DatabaseSizeVariables,

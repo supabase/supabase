@@ -722,9 +722,9 @@ export interface paths {
   }
   '/platform/projects/{ref}/config/postgres': {
     /** Gets project's Postgres config */
-    get: operations['PostgresConfigController_getConfig']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['PostgresConfigController_updateConfig']
+    put: operations['v1-update-postgres-config']
   }
   '/platform/projects/{ref}/config/secrets': {
     /** Updates project's secrets config */
@@ -738,9 +738,9 @@ export interface paths {
   }
   '/platform/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
-    get: operations['SupavisorConfigController_getSupavisorConfig']
+    get: operations['v1-get-supavisor-config']
     /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch: operations['v1-update-supavisor-config']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -820,28 +820,9 @@ export interface paths {
     /** Deletes project storage credential */
     delete: operations['StorageS3CredentialsController_deleteCredential']
   }
-  '/platform/stripe/invoices': {
-    /**
-     * Gets invoices for the given customer
-     * @deprecated
-     */
-    get: operations['InvoicesController_getInvoices']
-    /**
-     * Gets the total count of invoices for the given customer
-     * @deprecated
-     */
-    head: operations['InvoicesController_countInvoices']
-  }
   '/platform/stripe/invoices/overdue': {
     /** Gets information about overdue invoices that relate to the authenticated user */
     get: operations['InvoicesController_getOverdueInvoices']
-  }
-  '/platform/stripe/invoices/{id}': {
-    /**
-     * Gets invoice with the given invoice ID
-     * @deprecated
-     */
-    get: operations['InvoicesController_getInvoice']
   }
   '/platform/stripe/setup-intent': {
     /** Sets up a payment method */
@@ -981,19 +962,19 @@ export interface paths {
      * Delete a function
      * @description Deletes a function with the specified slug from the specified project.
      */
-    delete: operations['SystemFunctionSlugController_deleteFunction']
+    delete: operations['v1-delete-a-function']
     /**
      * Update a function
      * @description Updates a function with the specified slug and project.
      */
-    patch: operations['SystemFunctionSlugController_updateFunction']
+    patch: operations['v1-update-a-function']
   }
   '/system/projects/{ref}/functions': {
     /**
      * List all functions
      * @description Returns all functions you've previously added to the specified project.
      */
-    get: operations['SystemFunctionsController_getFunctions']
+    get: operations['v1-list-all-functions']
     /**
      * Create a function
      * @description Creates a function and adds it to the specified project.
@@ -1007,17 +988,17 @@ export interface paths {
      * List all secrets
      * @description Returns all secrets you've previously added to the specified project.
      */
-    get: operations['SystemSecretsController_getSecrets']
+    get: operations['v1-list-all-secrets']
     /**
      * Bulk create secrets
      * @description Creates multiple secrets and adds them to the specified project.
      */
-    post: operations['SystemSecretsController_createSecrets']
+    post: operations['v1-bulk-create-secrets']
     /**
      * Bulk delete secrets
      * @description Deletes all secrets with the given names from the specified project
      */
-    delete: operations['SystemSecretsController_deleteSecrets']
+    delete: operations['v1-bulk-delete-secrets']
   }
   '/system/projects/{ref}/secrets/refresh': {
     /** Refreshes secrets */
@@ -1581,9 +1562,9 @@ export interface paths {
   }
   '/v0/projects/{ref}/config/postgres': {
     /** Gets project's Postgres config */
-    get: operations['PostgresConfigController_getConfig']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['PostgresConfigController_updateConfig']
+    put: operations['v1-update-postgres-config']
   }
   '/v0/projects/{ref}/config/secrets': {
     /** Updates project's secrets config */
@@ -1597,9 +1578,9 @@ export interface paths {
   }
   '/v0/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
-    get: operations['SupavisorConfigController_getSupavisorConfig']
+    get: operations['v1-get-supavisor-config']
     /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch: operations['v1-update-supavisor-config']
   }
   '/v0/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -1676,245 +1657,239 @@ export interface paths {
      * Get database branch config
      * @description Fetches configurations of the specified database branch
      */
-    get: operations['BranchController_getBranchDetails']
+    get: operations['v1-get-a-branch-config']
     /**
      * Delete a database branch
      * @description Deletes the specified database branch
      */
-    delete: operations['BranchController_deleteBranch']
+    delete: operations['v1-delete-a-branch']
     /**
      * Update database branch config
      * @description Updates the configuration of the specified database branch
      */
-    patch: operations['BranchController_updateBranch']
+    patch: operations['v1-update-a-branch-config']
   }
   '/v1/branches/{branch_id}/reset': {
     /**
      * Resets a database branch
      * @description Resets the specified database branch
      */
-    post: operations['BranchController_resetBranch']
+    post: operations['v1-reset-a-branch']
   }
   '/v1/projects': {
     /**
      * List all projects
      * @description Returns a list of all projects you've previously created.
      */
-    get: operations['V1ProjectsController_getProjects']
+    get: operations['v1-list-all-projects']
     /** Create a project */
-    post: operations['V1ProjectsController_createProject']
+    post: operations['v1-create-a-project']
   }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
-    get: operations['ApiKeysController_getProjectApiKeys']
+    get: operations['v1-get-project-api-keys']
   }
   '/v1/projects/{ref}/branches': {
     /**
      * List all database branches
      * @description Returns all database branches of the specified project.
      */
-    get: operations['BranchesController_getBranches']
+    get: operations['v1-list-all-branches']
     /**
      * Create a database branch
      * @description Creates a database branch from the specified project.
      */
-    post: operations['BranchesController_createBranch']
+    post: operations['v1-create-a-branch']
     /**
      * Disables preview branching
      * @description Disables preview branching for the specified project
      */
-    delete: operations['BranchesController_disableBranch']
+    delete: operations['v1-disable-preview-branching']
   }
   '/v1/projects/{ref}/custom-hostname': {
-    /** Gets project's custom hostname config */
-    get: operations['CustomHostnamesController_getCustomHostnameConfig']
-    /** Deletes a project's custom hostname configuration */
-    delete: operations['CustomHostnamesController_removeCustomHostnameConfig']
+    /** [Beta] Gets project's custom hostname config */
+    get: operations['v1-get-hostname-config']
+    /** [Beta] Deletes a project's custom hostname configuration */
+    delete: operations['v1-Delete hostname config']
   }
   '/v1/projects/{ref}/custom-hostname/initialize': {
-    /** Updates project's custom hostname configuration */
-    post: operations['CustomHostnamesController_createCustomHostnameConfig']
+    /** [Beta] Updates project's custom hostname configuration */
+    post: operations['v1-update-hostname-config']
   }
   '/v1/projects/{ref}/custom-hostname/reverify': {
-    /** Attempts to verify the DNS configuration for project's custom hostname configuration */
-    post: operations['CustomHostnamesController_reverify']
+    /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+    post: operations['v1-verify-dns-config']
   }
   '/v1/projects/{ref}/custom-hostname/activate': {
-    /** Activates a custom hostname for a project. */
-    post: operations['CustomHostnamesController_activate']
+    /** [Beta] Activates a custom hostname for a project. */
+    post: operations['v1-activate-custom-hostname']
   }
   '/v1/projects/{ref}/network-bans/retrieve': {
-    /** Gets project's network bans */
-    post: operations['NetworkBansController_getNetworkBans']
+    /** [Beta] Gets project's network bans */
+    post: operations['v1-list-all-network-bans']
   }
   '/v1/projects/{ref}/network-bans': {
-    /** Remove network bans. */
-    delete: operations['NetworkBansController_removeNetworkBan']
+    /** [Beta] Remove network bans. */
+    delete: operations['v1-delete-network-bans']
   }
   '/v1/projects/{ref}/network-restrictions': {
-    /** Gets project's network restrictions */
-    get: operations['NetworkRestrictionsController_getNetworkRestrictions']
+    /** [Beta] Gets project's network restrictions */
+    get: operations['v1-get-network-restrictions']
   }
   '/v1/projects/{ref}/network-restrictions/apply': {
-    /** Updates project's network restrictions */
-    post: operations['NetworkRestrictionsController_applyNetworkRestrictions']
+    /** [Beta] Updates project's network restrictions */
+    post: operations['v1-update-network-restrictions']
   }
   '/v1/projects/{ref}/pgsodium': {
-    /** Gets project's pgsodium config */
-    get: operations['PgsodiumConfigController_getPgsodiumConfig']
-    /** Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
-    put: operations['PgsodiumConfigController_updatePgsodiumConfig']
+    /** [Beta] Gets project's pgsodium config */
+    get: operations['v1-get-pgsodium-config']
+    /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+    put: operations['v1-update-pgsodium-config']
   }
   '/v1/projects/{ref}/postgrest': {
     /** Gets project's postgrest config */
-    get: operations['V1PostgrestConfigController_getPostgRESTConfig']
+    get: operations['v1-get-postgrest-service-config']
     /** Updates project's postgrest config */
-    patch: operations['V1PostgrestConfigController_updatePostgRESTConfig']
+    patch: operations['v1-update-postgrest-service-config']
   }
   '/v1/projects/{ref}': {
     /** Deletes the given project */
-    delete: operations['V1ProjectsRefController_deleteProject']
+    delete: operations['v1-Delete a project']
   }
   '/v1/projects/{ref}/secrets': {
     /**
      * List all secrets
      * @description Returns all secrets you've previously added to the specified project.
      */
-    get: operations['SecretsController_getSecrets']
+    get: operations['v1-list-all-secrets']
     /**
      * Bulk create secrets
      * @description Creates multiple secrets and adds them to the specified project.
      */
-    post: operations['SecretsController_createSecrets']
+    post: operations['v1-bulk-create-secrets']
     /**
      * Bulk delete secrets
      * @description Deletes all secrets with the given names from the specified project
      */
-    delete: operations['SecretsController_deleteSecrets']
+    delete: operations['v1-bulk-delete-secrets']
   }
   '/v1/projects/{ref}/ssl-enforcement': {
-    /** Get project's SSL enforcement configuration. */
-    get: operations['SslEnforcementController_getSslEnforcementConfig']
-    /** Update project's SSL enforcement configuration. */
-    put: operations['SslEnforcementController_updateSslEnforcementConfig']
+    /** [Beta] Get project's SSL enforcement configuration. */
+    get: operations['v1-get-ssl-enforcement-config']
+    /** [Beta] Update project's SSL enforcement configuration. */
+    put: operations['v1-update-ssl-enforcement-config']
   }
   '/v1/projects/{ref}/types/typescript': {
     /**
      * Generate TypeScript types
      * @description Returns the TypeScript types of your schema for use with supabase-js.
      */
-    get: operations['V1TypesController_getTypescriptTypes']
+    get: operations['v1-generate-typescript-types']
   }
   '/v1/projects/{ref}/vanity-subdomain': {
-    /** Gets current vanity subdomain config */
-    get: operations['VanitySubdomainsController_getVanitySubdomainConfig']
-    /** Deletes a project's vanity subdomain configuration */
-    delete: operations['VanitySubdomainsController_removeVanitySubdomainConfig']
+    /** [Beta] Gets current vanity subdomain config */
+    get: operations['v1-get-vanity-subdomain-config']
+    /** [Beta] Deletes a project's vanity subdomain configuration */
+    delete: operations['v1-deactivate-vanity-subdomain-config']
   }
   '/v1/projects/{ref}/vanity-subdomain/check-availability': {
-    /** Checks vanity subdomain availability */
-    post: operations['VanitySubdomainsController_checkVanitySubdomainAvailability']
+    /** [Beta] Checks vanity subdomain availability */
+    post: operations['v1-check-vanity-subdomain-availability']
   }
   '/v1/projects/{ref}/vanity-subdomain/activate': {
-    /** Activates a vanity subdomain for a project. */
-    post: operations['VanitySubdomainsController_activateVanitySubdomainPlease']
+    /** [Beta] Activates a vanity subdomain for a project. */
+    post: operations['v1-activate-vanity-subdomain-config']
   }
   '/v1/projects/{ref}/upgrade': {
-    /** Upgrades the project's Postgres version */
-    post: operations['UpgradeController_upgradeProject']
+    /** [Beta] Upgrades the project's Postgres version */
+    post: operations['v1-upgrade-postgres-version']
   }
   '/v1/projects/{ref}/upgrade/eligibility': {
-    /** Returns the project's eligibility for upgrades */
-    get: operations['UpgradeController_upgradeEligibilityInformation']
+    /** [Beta] Returns the project's eligibility for upgrades */
+    get: operations['v1-get-postgrest-upgrade-eligibility']
   }
   '/v1/projects/{ref}/upgrade/status': {
-    /** Gets the latest status of the project's upgrade */
-    get: operations['UpgradeController_getUpgradeStatus']
+    /** [Beta] Gets the latest status of the project's upgrade */
+    get: operations['v1-get-postgrest-upgrade-status']
   }
   '/v1/projects/{ref}/readonly': {
     /** Returns project's readonly mode status */
-    get: operations['ReadOnlyController_getReadOnlyModeStatus']
+    get: operations['v1-get-readonly-mode-status']
   }
   '/v1/projects/{ref}/readonly/temporary-disable': {
     /** Disables project's readonly mode for the next 15 minutes */
-    post: operations['ReadOnlyController_temporarilyDisableReadonlyMode']
+    post: operations['v1-disable-readonly-mode-temporarily']
   }
   '/v1/projects/{ref}/read-replicas/setup': {
-    /** Set up a read replica */
-    post: operations['ReadReplicaController_setUpReadReplica']
+    /** [Beta] Set up a read replica */
+    post: operations['v1-setup-a-read-replica']
   }
   '/v1/projects/{ref}/read-replicas/remove': {
-    /** Remove a read replica */
-    post: operations['ReadReplicaController_removeReadReplica']
+    /** [Beta] Remove a read replica */
+    post: operations['v1-remove-a-read-replica']
   }
   '/v1/projects/{ref}/health': {
     /** Gets project's service health status */
-    get: operations['ServiceHealthController_checkServiceHealth']
+    get: operations['v1-get-services-health']
   }
   '/v1/projects/{ref}/config/database/postgres': {
     /** Gets project's Postgres config */
-    get: operations['AuthPostgresConfigController_getConfig']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['AuthPostgresConfigController_updateConfig']
+    put: operations['v1-update-postgres-config']
   }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
-    get: operations['V1PgbouncerConfigController_v1GetPgbouncerConfig']
+    get: operations['v1-get-project-pgbouncer-config']
+  }
+  '/v1/projects/{ref}/config/database/pooler': {
+    /** Gets project's supavisor config */
+    get: operations['v1-get-supavisor-config']
+    /** Updates project's supavisor config */
+    patch: operations['v1-update-supavisor-config']
   }
   '/v1/projects/{ref}/config/auth': {
     /** Gets project's auth config */
-    get: operations['V1AuthConfigController_getV1AuthConfig']
+    get: operations['v1-get-auth-service-config']
     /** Updates a project's auth config */
-    patch: operations['V1AuthConfigController_updateV1AuthConfig']
-  }
-  '/v1/projects/{ref}/config/auth/third-party-auth': {
-    /** Lists all third-party auth integrations */
-    get: operations['ThirdPartyAuthController_listTPAForProject']
-    /** Creates a new third-party auth integration */
-    post: operations['ThirdPartyAuthController_createTPAForProject']
-  }
-  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
-    /** Get a third-party integration */
-    get: operations['ThirdPartyAuthController_getTPAForProject']
-    /** Removes a third-party auth integration */
-    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
+    patch: operations['v1-update-auth-service-config']
   }
   '/v1/projects/{ref}/config/auth/sso/providers': {
     /** Lists all SSO providers */
-    get: operations['ProvidersController_listAllProviders']
+    get: operations['v1-list-all-sso-provider']
     /** Creates a new SSO provider */
-    post: operations['ProvidersController_createProviderForProject']
+    post: operations['v1-create-a-sso-provider']
   }
   '/v1/projects/{ref}/config/auth/sso/providers/{provider_id}': {
     /** Gets a SSO provider by its UUID */
-    get: operations['ProvidersController_getProviderById']
+    get: operations['v1-get-a-sso-provider']
     /** Updates a SSO provider by its UUID */
-    put: operations['ProvidersController_updateProviderById']
+    put: operations['v1-update-a-sso-provider']
     /** Removes a SSO provider by its UUID */
-    delete: operations['ProvidersController_removeProviderById']
+    delete: operations['v1-delete-a-sso-provider']
   }
   '/v1/projects/{ref}/database/query': {
-    /** Run sql query */
-    post: operations['V1QueryController_v1RunQuery']
+    /** [Beta] Run sql query */
+    post: operations['v1-run-a-query']
   }
   '/v1/projects/{ref}/database/webhooks/enable': {
-    /** Enables Database Webhooks on the project */
-    post: operations['V1DatabaseWebhooksController_v1EnableDatabaseWebhooks']
+    /** [Beta] Enables Database Webhooks on the project */
+    post: operations['v1-enable-database-webhook']
   }
   '/v1/projects/{ref}/database/backups': {
     /** Lists all backups */
-    get: operations['V1BackupsController_getBackups']
+    get: operations['v1-list-all-backups']
   }
   '/v1/projects/{ref}/database/backups/restore-pitr': {
     /** Restores a PITR backup for a database */
-    post: operations['V1RestorePitrController_v1RestorePitr']
+    post: operations['v1-restore-pitr-backup']
   }
   '/v1/projects/{ref}/functions': {
     /**
      * List all functions
      * @description Returns all functions you've previously added to the specified project.
      */
-    get: operations['FunctionsController_getFunctions']
+    get: operations['v1-list-all-functions']
     /**
      * Create a function
      * @description Creates a function and adds it to the specified project.
@@ -1926,61 +1901,61 @@ export interface paths {
      * Retrieve a function
      * @description Retrieves a function with the specified slug and project.
      */
-    get: operations['FunctionSlugController_getFunction']
+    get: operations['v1-get-a-function']
     /**
      * Delete a function
      * @description Deletes a function with the specified slug from the specified project.
      */
-    delete: operations['FunctionSlugController_deleteFunction']
+    delete: operations['v1-delete-a-function']
     /**
      * Update a function
      * @description Updates a function with the specified slug and project.
      */
-    patch: operations['FunctionSlugController_updateFunction']
+    patch: operations['v1-update-a-function']
   }
   '/v1/projects/{ref}/functions/{function_slug}/body': {
     /**
      * Retrieve a function body
      * @description Retrieves a function body for the specified slug and project.
      */
-    get: operations['FunctionSlugController_getFunctionBody']
+    get: operations['v1-get-a-function-body']
   }
   '/v1/projects/{ref}/storage/buckets': {
     /** Lists all buckets */
-    get: operations['V1StorageBucketsController_getBuckets']
+    get: operations['v1-list-all-buckets']
   }
   '/v1/organizations': {
     /**
      * List all organizations
      * @description Returns a list of organizations that you currently belong to.
      */
-    get: operations['V1OrganizationsController_getOrganizations']
+    get: operations['v1-list-all-organizations']
     /** Create an organization */
-    post: operations['V1OrganizationsController_createOrganization']
+    post: operations['v1-create-an-organization']
   }
   '/v1/organizations/{slug}/members': {
     /** List members of an organization */
-    get: operations['V1OrganizationMembersController_v1ListOrganizationMembers']
+    get: operations['v1-list-organization-members']
   }
   '/v1/organizations/{slug}': {
     /** Gets information about the organization */
-    get: operations['V1OrganizationSlugController_getOrganization']
+    get: operations['v1-get-an-organization']
   }
   '/v1/oauth/authorize': {
-    /** Authorize user through oauth */
-    get: operations['OAuthController_authorize']
+    /** [Beta] Authorize user through oauth */
+    get: operations['v1-authorize-user']
   }
   '/v1/oauth/token': {
-    /** Exchange auth code for user's access and refresh token */
-    post: operations['OAuthController_token']
+    /** [Beta] Exchange auth code for user's access and refresh token */
+    post: operations['v1-exchange-oauth-token']
   }
   '/v1/snippets': {
     /** Lists SQL snippets for the logged in user */
-    get: operations['SnippetsController_listSnippets']
+    get: operations['v1-list-all-snippets']
   }
   '/v1/snippets/{id}': {
     /** Gets a specific SQL snippet */
-    get: operations['SnippetsController_getSnippet']
+    get: operations['v1-get-a-snippet']
   }
   '/partners/flyio/callback': {
     /** Redirects to Supabase dashboard after completing Fly sso */
@@ -2575,10 +2550,18 @@ export interface components {
       stripe_customer_id?: string
       opt_in_tags: string[]
     }
+    CustomerBillingAddress: {
+      city: string | null
+      country: string | null
+      line1: string | null
+      line2: string | null
+      postal_code: string | null
+      state: string | null
+    }
     CustomerResponse: {
       id: string
       email: string
-      address: string
+      address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
@@ -2983,7 +2966,6 @@ export interface components {
     BillingSubscriptionPlan: {
       id: components['schemas']['BillingPlanId']
       name: string
-      price: number
     }
     BillingSubscriptionAddon: {
       name: string
@@ -3031,51 +3013,6 @@ export interface components {
       name: string
       ref: string
     }
-    BillingPricingOptionsUnit: {
-      perUnitPrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsPackage: {
-      packageSize: number
-      packagePrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsNone: {
-      freeUnits?: number
-    }
-    BillingUsageBasedPrice: {
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-      /** @enum {string} */
-      pricingStrategy: 'UNIT' | 'PACKAGE' | 'NONE'
-      pricingOptions:
-        | components['schemas']['BillingPricingOptionsUnit']
-        | components['schemas']['BillingPricingOptionsPackage']
-        | components['schemas']['BillingPricingOptionsNone']
-      name: string
-      unit: string
-    }
     PaymentMethodCardDetails: {
       last_4_digits: string
       brand: string
@@ -3097,7 +3034,6 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       addons: components['schemas']['BillingSubscriptionAddon'][]
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
-      usage_fees: components['schemas']['BillingUsageBasedPrice'][]
       payment_method_type: string
       payment_method_id?: string
       payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
@@ -3749,7 +3685,6 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -3779,8 +3714,6 @@ export interface components {
       ami: components['schemas']['AmiSearchOptions']
     }
     CreateProjectBody: {
-      /** @deprecated */
-      kps_enabled?: boolean
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       cloud_provider: string
       org_id: number
@@ -3792,6 +3725,7 @@ export interface components {
       auth_site_url?: string
       vercel_configuration_id?: string
       custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
+      data_api_exposed_schemas?: string[]
     }
     CreateProjectResponse: {
       infra_compute_size?: components['schemas']['DbInstanceSize']
@@ -3805,7 +3739,6 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -4133,7 +4066,6 @@ export interface components {
       lastDatabaseResizeAt?: string
       is_branch_enabled: boolean
       parent_project_ref?: string
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       v2MaintenanceWindow: {
         start?: string
@@ -4448,18 +4380,22 @@ export interface components {
       connectionString: string
       default_pool_size: number | null
       max_client_conn: number | null
-      /** @enum {string|null} */
-      pool_mode: 'transaction' | 'session' | 'statement' | null
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session'
     }
     UpdateSupavisorConfigBody: {
-      default_pool_size?: number
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      default_pool_size?: number | null
+      /**
+       * @deprecated
+       * @description This field is deprecated and is ignored in this request
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
-      default_pool_size?: number
+      default_pool_size: number | null
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode: 'transaction' | 'session'
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -5241,7 +5177,10 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
-      /** @deprecated */
+      /**
+       * @deprecated
+       * @description This field is deprecated and is ignored in this request
+       */
       kps_enabled?: boolean
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       /**
@@ -5767,22 +5706,6 @@ export interface components {
       db_max_pool_size?: number
       api_max_request_duration?: number
     }
-    CreateThirdPartyAuthBody: {
-      oidc_issuer_url?: string
-      jwks_url?: string
-      custom_jwks?: Record<string, never>
-    }
-    ThirdPartyAuth: {
-      id: string
-      type: string
-      oidc_issuer_url?: string | null
-      jwks_url?: string | null
-      custom_jwks?: unknown
-      resolved_jwks?: unknown
-      inserted_at: string
-      updated_at: string
-      resolved_at?: string | null
-    }
     AttributeValue: {
       default?: Record<string, never> | number | string | boolean
       name?: string
@@ -6114,6 +6037,7 @@ export interface components {
       id: string
       supabase_org_id: string
       name: string
+      free_db_eligible: boolean
     }
     OrganizationExtensionStatus: {
       /** @description Supabase project instance compute size */
@@ -6143,7 +6067,13 @@ export interface components {
        */
       supabase_org_id: string
     }
-    UpdateFlyOrganizationSubscriptionBody: {
+    FlyUpdateOrganizationSubscriptionBody: {
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description The full request target URL */
+      url: string
       /** @example pro */
       plan: components['schemas']['SelfServePlanId']
     }
@@ -8238,12 +8168,16 @@ export interface operations {
       }
     }
   }
-  /**
-   * List all functions
-   * @description Returns all functions you've previously added to the specified project.
-   */
+  /** Gets project pg.functions */
   FunctionsController_getFunctions: {
     parameters: {
+      query: {
+        included_schemas: string
+        excluded_schemas: string
+      }
+      header: {
+        'x-connection-encrypted': string
+      }
       path: {
         /** @description Project ref */
         ref: string
@@ -8252,13 +8186,13 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['FunctionResponse'][]
+          'application/json': components['schemas']['PostgresFunction'][]
         }
       }
       403: {
         content: never
       }
-      /** @description Failed to retrieve project's functions */
+      /** @description Failed to get pg.functions */
       500: {
         content: never
       }
@@ -11097,7 +11031,7 @@ export interface operations {
     }
   }
   /** Gets project's Postgres config */
-  PostgresConfigController_getConfig: {
+  'v1-get-postgres-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11117,7 +11051,7 @@ export interface operations {
     }
   }
   /** Updates project's Postgres config */
-  PostgresConfigController_updateConfig: {
+  'v1-update-postgres-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11218,7 +11152,7 @@ export interface operations {
     }
   }
   /** Gets project's supavisor config */
-  SupavisorConfigController_getSupavisorConfig: {
+  'v1-get-supavisor-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11238,7 +11172,7 @@ export interface operations {
     }
   }
   /** Updates project's supavisor config */
-  SupavisorConfigController_updateSupavisorConfig: {
+  'v1-update-supavisor-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11777,63 +11711,13 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       403: {
         content: never
       }
       /** @description Failed to delete project storage credential */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Gets invoices for the given customer
-   * @deprecated
-   */
-  InvoicesController_getInvoices: {
-    parameters: {
-      query: {
-        customer?: string
-        slug: string
-        limit: string
-        offset: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Invoice'][]
-        }
-      }
-      /** @description Failed to retrieve invoices */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Gets the total count of invoices for the given customer
-   * @deprecated
-   */
-  InvoicesController_countInvoices: {
-    parameters: {
-      query: {
-        customer?: string
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          /** @description total count value */
-          'X-Total-Count'?: unknown
-        }
-        content: never
-      }
-      /** @description Failed to retrieve the total count of invoices */
       500: {
         content: never
       }
@@ -11846,28 +11730,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OverdueInvoiceCount'][]
         }
-      }
-    }
-  }
-  /**
-   * Gets invoice with the given invoice ID
-   * @deprecated
-   */
-  InvoicesController_getInvoice: {
-    parameters: {
-      path: {
-        id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Invoice']
-        }
-      }
-      /** @description Failed to retrieve invoice */
-      500: {
-        content: never
       }
     }
   }
@@ -12563,7 +12425,7 @@ export interface operations {
    * Delete a function
    * @description Deletes a function with the specified slug from the specified project.
    */
-  SystemFunctionSlugController_deleteFunction: {
+  'v1-delete-a-function': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12589,7 +12451,7 @@ export interface operations {
    * Update a function
    * @description Updates a function with the specified slug and project.
    */
-  SystemFunctionSlugController_updateFunction: {
+  'v1-update-a-function': {
     parameters: {
       query?: {
         slug?: string
@@ -12631,7 +12493,7 @@ export interface operations {
    * List all functions
    * @description Returns all functions you've previously added to the specified project.
    */
-  SystemFunctionsController_getFunctions: {
+  'v1-list-all-functions': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12711,7 +12573,7 @@ export interface operations {
    * List all secrets
    * @description Returns all secrets you've previously added to the specified project.
    */
-  SystemSecretsController_getSecrets: {
+  'v1-list-all-secrets': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12737,7 +12599,7 @@ export interface operations {
    * Bulk create secrets
    * @description Creates multiple secrets and adds them to the specified project.
    */
-  SystemSecretsController_createSecrets: {
+  'v1-bulk-create-secrets': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12766,7 +12628,7 @@ export interface operations {
    * Bulk delete secrets
    * @description Deletes all secrets with the given names from the specified project
    */
-  SystemSecretsController_deleteSecrets: {
+  'v1-bulk-delete-secrets': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13176,7 +13038,7 @@ export interface operations {
    * Get database branch config
    * @description Fetches configurations of the specified database branch
    */
-  BranchController_getBranchDetails: {
+  'v1-get-a-branch-config': {
     parameters: {
       path: {
         /** @description Branch ID */
@@ -13199,7 +13061,7 @@ export interface operations {
    * Delete a database branch
    * @description Deletes the specified database branch
    */
-  BranchController_deleteBranch: {
+  'v1-delete-a-branch': {
     parameters: {
       path: {
         /** @description Branch ID */
@@ -13222,7 +13084,7 @@ export interface operations {
    * Update database branch config
    * @description Updates the configuration of the specified database branch
    */
-  BranchController_updateBranch: {
+  'v1-update-a-branch-config': {
     parameters: {
       path: {
         /** @description Branch ID */
@@ -13250,7 +13112,7 @@ export interface operations {
    * Resets a database branch
    * @description Resets the specified database branch
    */
-  BranchController_resetBranch: {
+  'v1-reset-a-branch': {
     parameters: {
       path: {
         /** @description Branch ID */
@@ -13273,7 +13135,7 @@ export interface operations {
    * List all projects
    * @description Returns a list of all projects you've previously created.
    */
-  V1ProjectsController_getProjects: {
+  'v1-list-all-projects': {
     responses: {
       200: {
         content: {
@@ -13283,7 +13145,7 @@ export interface operations {
     }
   }
   /** Create a project */
-  V1ProjectsController_createProject: {
+  'v1-create-a-project': {
     requestBody: {
       content: {
         'application/json': components['schemas']['V1CreateProjectBody']
@@ -13298,7 +13160,7 @@ export interface operations {
     }
   }
   /** Get project api keys */
-  ApiKeysController_getProjectApiKeys: {
+  'v1-get-project-api-keys': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13320,7 +13182,7 @@ export interface operations {
    * List all database branches
    * @description Returns all database branches of the specified project.
    */
-  BranchesController_getBranches: {
+  'v1-list-all-branches': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13343,7 +13205,7 @@ export interface operations {
    * Create a database branch
    * @description Creates a database branch from the specified project.
    */
-  BranchesController_createBranch: {
+  'v1-create-a-branch': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13371,7 +13233,7 @@ export interface operations {
    * Disables preview branching
    * @description Disables preview branching for the specified project
    */
-  BranchesController_disableBranch: {
+  'v1-disable-preview-branching': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13388,8 +13250,8 @@ export interface operations {
       }
     }
   }
-  /** Gets project's custom hostname config */
-  CustomHostnamesController_getCustomHostnameConfig: {
+  /** [Beta] Gets project's custom hostname config */
+  'v1-get-hostname-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13411,8 +13273,8 @@ export interface operations {
       }
     }
   }
-  /** Deletes a project's custom hostname configuration */
-  CustomHostnamesController_removeCustomHostnameConfig: {
+  /** [Beta] Deletes a project's custom hostname configuration */
+  'v1-Delete hostname config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13432,8 +13294,8 @@ export interface operations {
       }
     }
   }
-  /** Updates project's custom hostname configuration */
-  CustomHostnamesController_createCustomHostnameConfig: {
+  /** [Beta] Updates project's custom hostname configuration */
+  'v1-update-hostname-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13460,8 +13322,8 @@ export interface operations {
       }
     }
   }
-  /** Attempts to verify the DNS configuration for project's custom hostname configuration */
-  CustomHostnamesController_reverify: {
+  /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+  'v1-verify-dns-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13483,8 +13345,8 @@ export interface operations {
       }
     }
   }
-  /** Activates a custom hostname for a project. */
-  CustomHostnamesController_activate: {
+  /** [Beta] Activates a custom hostname for a project. */
+  'v1-activate-custom-hostname': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13506,8 +13368,8 @@ export interface operations {
       }
     }
   }
-  /** Gets project's network bans */
-  NetworkBansController_getNetworkBans: {
+  /** [Beta] Gets project's network bans */
+  'v1-list-all-network-bans': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13529,8 +13391,8 @@ export interface operations {
       }
     }
   }
-  /** Remove network bans. */
-  NetworkBansController_removeNetworkBan: {
+  /** [Beta] Remove network bans. */
+  'v1-delete-network-bans': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13555,8 +13417,8 @@ export interface operations {
       }
     }
   }
-  /** Gets project's network restrictions */
-  NetworkRestrictionsController_getNetworkRestrictions: {
+  /** [Beta] Gets project's network restrictions */
+  'v1-get-network-restrictions': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13578,8 +13440,8 @@ export interface operations {
       }
     }
   }
-  /** Updates project's network restrictions */
-  NetworkRestrictionsController_applyNetworkRestrictions: {
+  /** [Beta] Updates project's network restrictions */
+  'v1-update-network-restrictions': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13606,8 +13468,8 @@ export interface operations {
       }
     }
   }
-  /** Gets project's pgsodium config */
-  PgsodiumConfigController_getPgsodiumConfig: {
+  /** [Beta] Gets project's pgsodium config */
+  'v1-get-pgsodium-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13629,8 +13491,8 @@ export interface operations {
       }
     }
   }
-  /** Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
-  PgsodiumConfigController_updatePgsodiumConfig: {
+  /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+  'v1-update-pgsodium-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13658,7 +13520,7 @@ export interface operations {
     }
   }
   /** Gets project's postgrest config */
-  V1PostgrestConfigController_getPostgRESTConfig: {
+  'v1-get-postgrest-service-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13681,7 +13543,7 @@ export interface operations {
     }
   }
   /** Updates project's postgrest config */
-  V1PostgrestConfigController_updatePostgRESTConfig: {
+  'v1-update-postgrest-service-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13709,7 +13571,7 @@ export interface operations {
     }
   }
   /** Deletes the given project */
-  V1ProjectsRefController_deleteProject: {
+  'v1-Delete a project': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13727,94 +13589,8 @@ export interface operations {
       }
     }
   }
-  /**
-   * List all secrets
-   * @description Returns all secrets you've previously added to the specified project.
-   */
-  SecretsController_getSecrets: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SecretResponse'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve project's secrets */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Bulk create secrets
-   * @description Creates multiple secrets and adds them to the specified project.
-   */
-  SecretsController_createSecrets: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateSecretBody'][]
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create project's secrets */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Bulk delete secrets
-   * @description Deletes all secrets with the given names from the specified project
-   */
-  SecretsController_deleteSecrets: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': string[]
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete secrets with given names */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Get project's SSL enforcement configuration. */
-  SslEnforcementController_getSslEnforcementConfig: {
+  /** [Beta] Get project's SSL enforcement configuration. */
+  'v1-get-ssl-enforcement-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13836,8 +13612,8 @@ export interface operations {
       }
     }
   }
-  /** Update project's SSL enforcement configuration. */
-  SslEnforcementController_updateSslEnforcementConfig: {
+  /** [Beta] Update project's SSL enforcement configuration. */
+  'v1-update-ssl-enforcement-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13868,7 +13644,7 @@ export interface operations {
    * Generate TypeScript types
    * @description Returns the TypeScript types of your schema for use with supabase-js.
    */
-  V1TypesController_getTypescriptTypes: {
+  'v1-generate-typescript-types': {
     parameters: {
       query?: {
         included_schemas?: string
@@ -13893,8 +13669,8 @@ export interface operations {
       }
     }
   }
-  /** Gets current vanity subdomain config */
-  VanitySubdomainsController_getVanitySubdomainConfig: {
+  /** [Beta] Gets current vanity subdomain config */
+  'v1-get-vanity-subdomain-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13916,8 +13692,8 @@ export interface operations {
       }
     }
   }
-  /** Deletes a project's vanity subdomain configuration */
-  VanitySubdomainsController_removeVanitySubdomainConfig: {
+  /** [Beta] Deletes a project's vanity subdomain configuration */
+  'v1-deactivate-vanity-subdomain-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13937,8 +13713,8 @@ export interface operations {
       }
     }
   }
-  /** Checks vanity subdomain availability */
-  VanitySubdomainsController_checkVanitySubdomainAvailability: {
+  /** [Beta] Checks vanity subdomain availability */
+  'v1-check-vanity-subdomain-availability': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13965,8 +13741,8 @@ export interface operations {
       }
     }
   }
-  /** Activates a vanity subdomain for a project. */
-  VanitySubdomainsController_activateVanitySubdomainPlease: {
+  /** [Beta] Activates a vanity subdomain for a project. */
+  'v1-activate-vanity-subdomain-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13993,8 +13769,8 @@ export interface operations {
       }
     }
   }
-  /** Upgrades the project's Postgres version */
-  UpgradeController_upgradeProject: {
+  /** [Beta] Upgrades the project's Postgres version */
+  'v1-upgrade-postgres-version': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14021,8 +13797,8 @@ export interface operations {
       }
     }
   }
-  /** Returns the project's eligibility for upgrades */
-  UpgradeController_upgradeEligibilityInformation: {
+  /** [Beta] Returns the project's eligibility for upgrades */
+  'v1-get-postgrest-upgrade-eligibility': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14044,8 +13820,8 @@ export interface operations {
       }
     }
   }
-  /** Gets the latest status of the project's upgrade */
-  UpgradeController_getUpgradeStatus: {
+  /** [Beta] Gets the latest status of the project's upgrade */
+  'v1-get-postgrest-upgrade-status': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14068,7 +13844,7 @@ export interface operations {
     }
   }
   /** Returns project's readonly mode status */
-  ReadOnlyController_getReadOnlyModeStatus: {
+  'v1-get-readonly-mode-status': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14088,7 +13864,7 @@ export interface operations {
     }
   }
   /** Disables project's readonly mode for the next 15 minutes */
-  ReadOnlyController_temporarilyDisableReadonlyMode: {
+  'v1-disable-readonly-mode-temporarily': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14105,8 +13881,8 @@ export interface operations {
       }
     }
   }
-  /** Set up a read replica */
-  ReadReplicaController_setUpReadReplica: {
+  /** [Beta] Set up a read replica */
+  'v1-setup-a-read-replica': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14128,8 +13904,8 @@ export interface operations {
       }
     }
   }
-  /** Remove a read replica */
-  ReadReplicaController_removeReadReplica: {
+  /** [Beta] Remove a read replica */
+  'v1-remove-a-read-replica': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14152,7 +13928,7 @@ export interface operations {
     }
   }
   /** Gets project's service health status */
-  ServiceHealthController_checkServiceHealth: {
+  'v1-get-services-health': {
     parameters: {
       query: {
         timeout_ms?: number
@@ -14175,53 +13951,8 @@ export interface operations {
       }
     }
   }
-  /** Gets project's Postgres config */
-  AuthPostgresConfigController_getConfig: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Failed to retrieve project's Postgres config */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates project's Postgres config */
-  AuthPostgresConfigController_updateConfig: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePostgresConfigBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
-      /** @description Failed to update project's Postgres config */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Get project's pgbouncer config */
-  V1PgbouncerConfigController_v1GetPgbouncerConfig: {
+  'v1-get-project-pgbouncer-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14241,7 +13972,7 @@ export interface operations {
     }
   }
   /** Gets project's auth config */
-  V1AuthConfigController_getV1AuthConfig: {
+  'v1-get-auth-service-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14264,7 +13995,7 @@ export interface operations {
     }
   }
   /** Updates a project's auth config */
-  V1AuthConfigController_updateV1AuthConfig: {
+  'v1-update-auth-service-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14291,91 +14022,8 @@ export interface operations {
       }
     }
   }
-  /** Lists all third-party auth integrations */
-  ThirdPartyAuthController_listTPAForProject: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ThirdPartyAuth'][]
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
-  /** Creates a new third-party auth integration */
-  ThirdPartyAuthController_createTPAForProject: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateThirdPartyAuthBody']
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
-  /** Get a third-party integration */
-  ThirdPartyAuthController_getTPAForProject: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        tpa_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
-  /** Removes a third-party auth integration */
-  ThirdPartyAuthController_deleteTPAForProject: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        tpa_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ThirdPartyAuth']
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
   /** Lists all SSO providers */
-  ProvidersController_listAllProviders: {
+  'v1-list-all-sso-provider': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14398,7 +14046,7 @@ export interface operations {
     }
   }
   /** Creates a new SSO provider */
-  ProvidersController_createProviderForProject: {
+  'v1-create-a-sso-provider': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14426,7 +14074,7 @@ export interface operations {
     }
   }
   /** Gets a SSO provider by its UUID */
-  ProvidersController_getProviderById: {
+  'v1-get-a-sso-provider': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14450,7 +14098,7 @@ export interface operations {
     }
   }
   /** Updates a SSO provider by its UUID */
-  ProvidersController_updateProviderById: {
+  'v1-update-a-sso-provider': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14479,7 +14127,7 @@ export interface operations {
     }
   }
   /** Removes a SSO provider by its UUID */
-  ProvidersController_removeProviderById: {
+  'v1-delete-a-sso-provider': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14502,8 +14150,8 @@ export interface operations {
       }
     }
   }
-  /** Run sql query */
-  V1QueryController_v1RunQuery: {
+  /** [Beta] Run sql query */
+  'v1-run-a-query': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14530,8 +14178,8 @@ export interface operations {
       }
     }
   }
-  /** Enables Database Webhooks on the project */
-  V1DatabaseWebhooksController_v1EnableDatabaseWebhooks: {
+  /** [Beta] Enables Database Webhooks on the project */
+  'v1-enable-database-webhook': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14552,7 +14200,7 @@ export interface operations {
     }
   }
   /** Lists all backups */
-  V1BackupsController_getBackups: {
+  'v1-list-all-backups': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14572,7 +14220,7 @@ export interface operations {
     }
   }
   /** Restores a PITR backup for a database */
-  V1RestorePitrController_v1RestorePitr: {
+  'v1-restore-pitr-backup': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14594,7 +14242,7 @@ export interface operations {
    * Retrieve a function
    * @description Retrieves a function with the specified slug and project.
    */
-  FunctionSlugController_getFunction: {
+  'v1-get-a-function': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14619,78 +14267,10 @@ export interface operations {
     }
   }
   /**
-   * Delete a function
-   * @description Deletes a function with the specified slug from the specified project.
-   */
-  FunctionSlugController_deleteFunction: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Function slug */
-        function_slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete function with given slug */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Update a function
-   * @description Updates a function with the specified slug and project.
-   */
-  FunctionSlugController_updateFunction: {
-    parameters: {
-      query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
-        import_map_path?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Function slug */
-        function_slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update function with given slug */
-      500: {
-        content: never
-      }
-    }
-  }
-  /**
    * Retrieve a function body
    * @description Retrieves a function body for the specified slug and project.
    */
-  FunctionSlugController_getFunctionBody: {
+  'v1-get-a-function-body': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14713,7 +14293,7 @@ export interface operations {
     }
   }
   /** Lists all buckets */
-  V1StorageBucketsController_getBuckets: {
+  'v1-list-all-buckets': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14739,7 +14319,7 @@ export interface operations {
    * List all organizations
    * @description Returns a list of organizations that you currently belong to.
    */
-  V1OrganizationsController_getOrganizations: {
+  'v1-list-all-organizations': {
     responses: {
       200: {
         content: {
@@ -14753,7 +14333,7 @@ export interface operations {
     }
   }
   /** Create an organization */
-  V1OrganizationsController_createOrganization: {
+  'v1-create-an-organization': {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateOrganizationBodyV1']
@@ -14772,7 +14352,7 @@ export interface operations {
     }
   }
   /** List members of an organization */
-  V1OrganizationMembersController_v1ListOrganizationMembers: {
+  'v1-list-organization-members': {
     parameters: {
       path: {
         slug: string
@@ -14787,7 +14367,7 @@ export interface operations {
     }
   }
   /** Gets information about the organization */
-  V1OrganizationSlugController_getOrganization: {
+  'v1-get-an-organization': {
     parameters: {
       path: {
         slug: string
@@ -14801,8 +14381,8 @@ export interface operations {
       }
     }
   }
-  /** Authorize user through oauth */
-  OAuthController_authorize: {
+  /** [Beta] Authorize user through oauth */
+  'v1-authorize-user': {
     parameters: {
       query: {
         client_id: string
@@ -14821,8 +14401,8 @@ export interface operations {
       }
     }
   }
-  /** Exchange auth code for user's access and refresh token */
-  OAuthController_token: {
+  /** [Beta] Exchange auth code for user's access and refresh token */
+  'v1-exchange-oauth-token': {
     requestBody: {
       content: {
         'application/x-www-form-urlencoded': components['schemas']['OAuthTokenBody']
@@ -14837,7 +14417,7 @@ export interface operations {
     }
   }
   /** Lists SQL snippets for the logged in user */
-  SnippetsController_listSnippets: {
+  'v1-list-all-snippets': {
     parameters: {
       query?: {
         project_ref?: string
@@ -14856,7 +14436,7 @@ export interface operations {
     }
   }
   /** Gets a specific SQL snippet */
-  SnippetsController_getSnippet: {
+  'v1-get-a-snippet': {
     parameters: {
       path: {
         id: string
@@ -14990,7 +14570,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateFlyOrganizationSubscriptionBody']
+        'application/json': components['schemas']['FlyUpdateOrganizationSubscriptionBody']
       }
     }
     responses: {
