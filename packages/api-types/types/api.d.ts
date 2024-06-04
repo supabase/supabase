@@ -264,8 +264,12 @@ export interface paths {
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
     get: operations['PaymentsController_getPaymentMethods']
-    /** Detach Stripe payment method with the given card ID */
+    /** Detach payment method with the given card ID */
     delete: operations['PaymentsController_detachPaymentMethod']
+  }
+  '/platform/organizations/{slug}/payments/default': {
+    /** Mark given payment method as default for organization */
+    put: operations['PaymentsController_markPaymentMethodAsDefault']
   }
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
@@ -2559,7 +2563,6 @@ export interface components {
       state: string | null
     }
     CustomerResponse: {
-      id: string
       email: string
       address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
@@ -2623,29 +2626,12 @@ export interface components {
     }
     TaxId: {
       id: string
-      object: string
       country: string
-      created: number
-      customer: Record<string, never>
-      deleted?: Record<string, never>
-      livemode: boolean
       type: string
       value: string
-      verification: Record<string, never>
     }
     TaxIdResponse: {
-      object: string
       data: components['schemas']['TaxId'][]
-      has_more: boolean
-      url: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     CreateTaxIdBody: {
       type: Record<string, never>
@@ -2653,38 +2639,13 @@ export interface components {
     }
     CreateTaxIdResponse: {
       id: string
-      object: string
       country: string
       created: number
-      customer: Record<string, never>
-      livemode: boolean
       type: string
       value: string
-      verification: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     DeleteTaxIdBody: {
       id: string
-    }
-    DeleteTaxIdResponse: {
-      id: string
-      object: string
-      deleted: boolean
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     TransferOrganizationBody: {
       member_gotrue_id: string
@@ -2820,6 +2781,23 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
+    PaymentMethodCard: {
+      brand: string
+      exp_month: number
+      exp_year: number
+      last4: string
+    }
+    PaymentV2: {
+      id: string
+      card?: components['schemas']['PaymentMethodCard']
+      created: number
+      type: string
+      is_default: boolean
+    }
+    PaymentsResponseV2: {
+      defaultPaymentMethodId: string | null
+      data: components['schemas']['PaymentV2'][]
+    }
     Payment: {
       id: string
       object: string
@@ -2877,53 +2855,8 @@ export interface components {
     DetachPaymentMethodBody: {
       card_id: string
     }
-    DetachPaymentResponse: {
-      id: string
-      object: string
-      acss_debit?: Record<string, never>
-      affirm?: Record<string, never>
-      afterpay_clearpay?: Record<string, never>
-      alipay?: Record<string, never>
-      au_becs_debit?: Record<string, never>
-      bacs_debit?: Record<string, never>
-      bancontact?: Record<string, never>
-      billing_details: Record<string, never>
-      blik?: Record<string, never>
-      boleto?: Record<string, never>
-      card?: Record<string, never>
-      card_present?: Record<string, never>
-      created: number
-      customer: Record<string, never>
-      customer_balance?: Record<string, never>
-      eps?: Record<string, never>
-      fpx?: Record<string, never>
-      giropay?: Record<string, never>
-      grabpay?: Record<string, never>
-      ideal?: Record<string, never>
-      interac_present?: Record<string, never>
-      klarna?: Record<string, never>
-      konbini?: Record<string, never>
-      link?: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      oxxo?: Record<string, never>
-      p24?: Record<string, never>
-      paynow?: Record<string, never>
-      promptpay?: Record<string, never>
-      radar_options?: Record<string, never>
-      sepa_debit?: Record<string, never>
-      sofort?: Record<string, never>
-      type: string
-      us_bank_account?: Record<string, never>
-      wechat_pay?: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
+    MarkDefaultPaymentMethodBody: {
+      payment_method_id: string
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -7027,9 +6960,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['DeleteTaxIdResponse']
-        }
+        content: never
       }
       403: {
         content: never
@@ -7566,8 +7497,14 @@ export interface operations {
       }
     }
   }
-  /** Detach Stripe payment method with the given card ID */
+  /** Detach payment method with the given card ID */
   PaymentsController_detachPaymentMethod: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['DetachPaymentMethodBody']
@@ -7575,14 +7512,38 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['DetachPaymentResponse']
-        }
+        content: never
       }
       403: {
         content: never
       }
       /** @description Failed to detach Stripe payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Mark given payment method as default for organization */
+  PaymentsController_markPaymentMethodAsDefault: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MarkDefaultPaymentMethodBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to mark payment method as default */
       500: {
         content: never
       }
