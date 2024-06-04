@@ -96,7 +96,14 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
             )}
             {queries.length === 0 && (
               <div className="flex flex-col gap-y-2 items-center justify-center h-full text-foreground-light text-sm">
-                <span>No ongoing queries running on database</span>
+                <span>
+                  No queries are currently running on the{' '}
+                  {database?.identifier !== project?.ref
+                    ? `read replica ${database?.identifier}`
+                    : (databases ?? []).length > 1
+                      ? 'primary database'
+                      : 'database'}
+                </span>
                 <Button
                   type="default"
                   loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
