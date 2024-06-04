@@ -21,10 +21,17 @@ export type FailureResult = {
 
 export type ExecutionResult = SuccessResult | FailureResult
 
+type ErrorConstructor = new (...args: any[]) => Error
+
 export type ExecuteOptions = {
   modules?: Record<string, string>
   urlModuleWhitelist?: string[]
   expose?: Record<string, (...args: any) => any>
+  customErrors?: ErrorConstructor[]
+}
+
+export class FunctionUnavailableError extends Error {
+  name = 'FunctionUnavailableError'
 }
 
 /**
@@ -45,7 +52,12 @@ export async function executeJS(
   source: string,
   options: ExecuteOptions = {}
 ): Promise<ExecutionResult> {
-  const { modules = {}, urlModuleWhitelist = [], expose = {} } = options
+  const {
+    modules = {},
+    urlModuleWhitelist = [],
+    expose = {},
+    customErrors = [FunctionUnavailableError],
+  } = options
 
   const quickjs = await newQuickJSAsyncWASMModuleFromVariant(RELEASE_ASYNC)
   using runtime = quickjs.newRuntime()
@@ -92,6 +104,13 @@ export async function executeJS(
     bindFunction(context, functionName, expose[functionName])
   }
 
+  // Define custom errors in VM
+  if (customErrors.length > 0) {
+    context.evalCode(customErrors.map((error) => error.toString()).join('\n'), 'custom-errors.js', {
+      type: 'global',
+    })
+  }
+
   using setTimeoutHandle = context.newFunction('setTimeout', (fnHandle, timeoutHandle) => {
     // Make a copy because otherwise fnHandle does not live long enough to call after the timeout
     const fnHandleCopy = fnHandle.dup()
@@ -122,7 +141,7 @@ export async function executeJS(
 
     return {
       exports: undefined,
-      error: deserializeError(error),
+      error: deserializeError(error, customErrors),
     }
   }
 
@@ -160,9 +179,12 @@ export async function executeJS(
     using promiseErrorHandle = promiseState.error
     const error = context.dump(promiseErrorHandle)
 
+    const [myerror] = customErrors
+    const test = new myerror('test')
+
     return {
       exports: undefined,
-      error: deserializeError(error),
+      error: deserializeError(error, customErrors),
     }
   } else {
     throw new Error('Something went wrong, please report this error')
@@ -316,7 +338,10 @@ function getUrl(url: string) {
 /**
  * Deserializes an error from the VM.
  */
-function deserializeError(error: unknown): Error {
+function deserializeError<E extends Error>(
+  error: unknown,
+  customErrors: ErrorConstructor[]
+): Error {
   if (
     error !== undefined &&
     error !== null &&
@@ -326,7 +351,10 @@ function deserializeError(error: unknown): Error {
     typeof error.name === 'string' &&
     typeof error.message === 'string'
   ) {
-    const newError = new Error(error.message)
+    // Use a custom error class if available
+    const ErrorClass = customErrors.find((e) => e.name === error.name) ?? Error
+
+    const newError = new ErrorClass(error.message)
     Object.assign(newError, error)
 
     if ('stack' in error && typeof error.stack === 'string') {

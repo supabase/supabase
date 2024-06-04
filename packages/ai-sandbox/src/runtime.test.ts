@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals'
-import { executeJS } from '.'
 import { codeBlock } from 'common-tags'
+import { executeJS } from './runtime'
 
 describe('execute js', () => {
   test('exports', async () => {

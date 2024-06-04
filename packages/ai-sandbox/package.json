@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "core-js": "^3.37.1",
+    "mdast-util-from-markdown": "^2.0.1",
     "openai": "^4.26.1",
     "quickjs-emscripten": "^0.29.1"
   },

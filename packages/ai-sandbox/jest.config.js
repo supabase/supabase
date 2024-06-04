@@ -7,5 +7,7 @@ module.exports = {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
   setupFiles: ['./test/setup.ts'],
-  transformIgnorePatterns: ['node_modules/(?!(@jitl/quickjs-wasmfile-.*)/)'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(@jitl/quickjs-wasmfile-.*|mdast-.*|micromark|micromark-.*|unist-.*|decode-named-character-reference|character-entities)/)',
+  ],
 }
