@@ -1,17 +1,9 @@
-import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Listbox,
-  SidePanel,
-} from 'ui'
 
+import { useParams } from 'common'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
@@ -20,6 +12,14 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Listbox,
+  SidePanel,
+} from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 
@@ -44,6 +44,9 @@ const DeployNewReplicaPanel = ({
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
+  const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
   useProjectDetailQuery(
     { ref: projectRef },
     {
@@ -54,9 +57,6 @@ const DeployNewReplicaPanel = ({
       },
     }
   )
-
-  const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
   const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
     {
@@ -144,12 +144,32 @@ const DeployNewReplicaPanel = ({
   return (
     <SidePanel
       visible={visible}
-      loading={isSettingUp}
       onCancel={onClose}
-      onConfirm={() => onSubmit()}
-      confirmText="Deploy replica"
+      loading={isSettingUp}
       disabled={!canDeployReplica}
       header="Deploy a new read replica"
+      onConfirm={() => onSubmit()}
+      confirmText="Deploy replica"
+      // [Joshen] Refer to EnablePhysicalBackupsModal as to why this is commented out for now
+      // customFooter={
+      //   <div className="border-t p-2 flex items-center justify-end space-x-2">
+      //     <Button type="default" disabled={false} onClick={onClose}>
+      //       Cancel
+      //     </Button>
+      //     {isMinimallyOnSmallCompute && !isWalgEnabled ? (
+      //       <EnablePhysicalBackupsModal selectedRegion={selectedRegion} />
+      //     ) : (
+      //       <Button
+      //         type="primary"
+      //         disabled={!canDeployReplica}
+      //         loading={isSettingUp}
+      //         onClick={onSubmit}
+      //       >
+      //         Deploy replica
+      //       </Button>
+      //     )}
+      //   </div>
+      // }
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
         {!isAWSProvider ? (
@@ -199,7 +219,44 @@ const DeployNewReplicaPanel = ({
           </Alert_Shadcn_>
         ) : (
           <>
-            {!isWalgEnabled && (
+            {!isMinimallyOnSmallCompute && (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Project required to at least be on a Small compute
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <span>
+                    This is to ensure that read replicas can keep up with the primary databases'
+                    activities.
+                  </span>
+                  <div className="flex items-center gap-x-2 mt-3">
+                    <Button asChild type="default">
+                      <Link
+                        href={
+                          isFreePlan
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                            : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        }
+                      >
+                        {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                      </Link>
+                    </Button>
+                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                      <a
+                        href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Documentation
+                      </a>
+                    </Button>
+                  </div>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+
+            {isMinimallyOnSmallCompute && !isWalgEnabled && (
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
@@ -245,37 +302,6 @@ const DeployNewReplicaPanel = ({
                     </Button>
                   </AlertDescription_Shadcn_>
                 )}
-              </Alert_Shadcn_>
-            )}
-
-            {!isMinimallyOnSmallCompute && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  Project required to at least be on a Small compute
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <span>
-                    This is to ensure that read replicas can keep up with the primary databases'
-                    activities.
-                  </span>
-                  <div className="flex items-center gap-x-2 mt-3">
-                    <Button asChild type="default">
-                      <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
-                        Change compute size
-                      </Link>
-                    </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                      <a
-                        href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </a>
-                    </Button>
-                  </div>
-                </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
 

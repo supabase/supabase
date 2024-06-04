@@ -25,7 +25,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
-    include: [resolve(dirname, './tests/**/*.test.{ts,tsx}')],
+    include: [
+      resolve(dirname, './tests/**/*.test.{ts,tsx}'),
+      resolve(dirname, './components/**/*.test.{ts,tsx}'),
+    ],
     restoreMocks: true,
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
