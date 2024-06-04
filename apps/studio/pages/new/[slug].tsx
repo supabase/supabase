@@ -1,5 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import generator from 'generate-password-browser'
+import { debounce } from 'lodash'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
+
 import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
@@ -18,7 +28,6 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import generator from 'generate-password-browser'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
   CloudProvider,
@@ -27,13 +36,6 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
-import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -51,7 +53,6 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -66,9 +67,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-  // const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-
-  // const [instanceSize, setInstanceSize] = useState<DbInstanceSize>('micro')
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
@@ -99,11 +97,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
-  // const canSubmit =
-  //   projectName !== '' &&
-  //   passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-  //   dbRegion !== undefined
-
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
@@ -118,33 +111,6 @@ const Wizard: NextPageWithLayout = () => {
     setPasswordStrengthWarning(warning)
     setPasswordStrengthMessage(message)
   }
-
-  useEffect(() => {
-    /*
-     * Handle no org
-     * redirect to new org route
-     */
-    if (isEmptyOrganizations) {
-      router.push(`/new`)
-    }
-  }, [isEmptyOrganizations, router])
-
-  useEffect(() => {
-    /*
-     * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /new/new-project url, which is redirected from database.new
-     */
-    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
-    }
-  }, [isInvalidSlug, organizations])
-
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      toast.success('Successfully added new payment method')
-    }
-  }, [router.query.redirect_status, router.query.setup_intent])
 
   const sizes: DesiredInstanceSize[] = [
     'micro',
@@ -266,7 +232,7 @@ const Wizard: NextPageWithLayout = () => {
     resolver: zodResolver(FormSchema),
     mode: 'onChange',
     defaultValues: {
-      organization: currentOrg?.slug,
+      organization: slug,
       projectName: '',
       postgresVersion: '',
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
@@ -275,6 +241,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
         ? PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region
         : '',
+      instanceSize: sizes[0],
     },
   })
 
@@ -323,6 +290,27 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  useEffect(() => {
+    // Handle no org: redirect to new org route
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [isEmptyOrganizations, router])
+
+  useEffect(() => {
+    // [Joshen] Cause slug depends on router which doesnt load immediately on render
+    // While the form data does load immediately
+    if (slug) form.setValue('organization', slug)
+  }, [slug])
+
+  useEffect(() => {
+    // Redirect to first org if the slug doesn't match an org slug
+    // this is mainly to capture the /new/new-project url, which is redirected from database.new
+    if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
+      router.push(`/new/${organizations?.[0].slug}`)
+    }
+  }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -389,7 +377,7 @@ const Wizard: NextPageWithLayout = () => {
                           >
                             <FormControl_Shadcn_>
                               <SelectTrigger_Shadcn_>
-                                <SelectValue_Shadcn_ placeholder="Select a fruit" />
+                                <SelectValue_Shadcn_ placeholder="Select an organization" />
                               </SelectTrigger_Shadcn_>
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
