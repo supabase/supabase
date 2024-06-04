@@ -71,9 +71,11 @@ const FunctionSelector = ({
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load functions
           </AlertTitle_Shadcn_>
+
           <AlertDescription_Shadcn_ className="text-xs mb-2">
             Error: {error.message}
           </AlertDescription_Shadcn_>
+
           <Button type="default" size="tiny" onClick={() => refetch()}>
             Reload functions
           </Button>

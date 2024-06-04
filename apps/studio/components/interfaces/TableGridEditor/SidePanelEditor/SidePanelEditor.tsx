@@ -175,6 +175,8 @@ const SidePanelEditor = ({
     if (payload !== undefined && configuration !== undefined) {
       try {
         await saveRow(payload, isNewRecord, configuration, () => {})
+      } catch (error) {
+        // [Joshen] No error handler required as error is handled within saveRow
       } finally {
         resolve()
       }

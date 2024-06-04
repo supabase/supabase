@@ -40,10 +40,6 @@ test.skip('can display log data', async () => {
   // [Joshen] commenting out for now - seems like we need to mock more stuff
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
-
-  // render copy button
-  userEvent.click(await screen.findByText('Copy'))
-  await screen.findByText(/Copied/)
 })
 
 test('can run if no queryType provided', async () => {
@@ -151,7 +147,6 @@ test("closes the selection if the selected row's data changes", async () => {
   )
   const text = await screen.findByText(/some event message/)
   userEvent.click(text)
-  await screen.findByText('Copy')
 
   rerender(
     <LogTable

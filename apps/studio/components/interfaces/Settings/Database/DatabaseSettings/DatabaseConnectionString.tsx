@@ -2,6 +2,7 @@ import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -9,6 +10,7 @@ import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
@@ -28,7 +30,11 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
+import {
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
   constructConnStringSyntax,
@@ -61,7 +67,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -70,6 +76,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     projectRef,
   })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = poolingConfiguration?.pool_mode
 
   const {
     data: databases,
@@ -82,6 +89,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
+
+  const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
+  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
@@ -218,7 +228,14 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
-              {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
+              {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                <DefaultSessionModeNotice />
+              )}
+              {isSuccessAddons &&
+                poolingMode === 'session' &&
+                ipv4Addon !== undefined &&
+                snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
+              {ipv4Addon === undefined && !snap.usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
                 copy
                 readOnly
