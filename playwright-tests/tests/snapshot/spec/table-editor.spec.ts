@@ -81,7 +81,7 @@ test.describe('Table Editor page', () => {
 
     // sort by the a column
     await page.getByRole('button', { name: 'Sort' }).click()
-    await page.getByRole('button', { name: 'Pick a column to sort by' }).nth(1).click()
+    await page.getByTestId('table-editor-pick-column-to-sort-button').click()
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
     // click away to close the sorting dialog
