@@ -1,8 +1,15 @@
-import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -11,16 +18,8 @@ import {
   Listbox,
   SidePanel,
 } from 'ui'
-
-import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { EnablePhysicalBackupsModal } from './EnablePhysicalBackupsModal'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
@@ -41,33 +40,10 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
-  useProjectDetailQuery(
-    { ref: projectRef },
-    {
-      refetchInterval,
-      refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (data.is_physical_backups_enabled) setRefetchInterval(false)
-      },
-    }
-  )
-
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-
-  const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
-    {
-      onSuccess: () => {
-        toast.success(
-          'Physical backups are currently being enabled, please check back in a few minutes!'
-        )
-        setRefetchInterval(5000)
-      },
-    }
-  )
 
   const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -97,7 +73,6 @@ const DeployNewReplicaPanel = ({
     currentPgVersion >= 15 &&
     isAWSProvider &&
     !isFreePlan &&
-    isWalgEnabled &&
     currentComputeAddon !== undefined
 
   const computeAddons =
@@ -144,12 +119,28 @@ const DeployNewReplicaPanel = ({
   return (
     <SidePanel
       visible={visible}
-      loading={isSettingUp}
       onCancel={onClose}
-      onConfirm={() => onSubmit()}
-      confirmText="Deploy replica"
       disabled={!canDeployReplica}
       header="Deploy a new read replica"
+      customFooter={
+        <div className="border-t p-2 flex items-center justify-end space-x-2">
+          <Button type="default" disabled={false} onClick={onClose}>
+            Cancel
+          </Button>
+          {isMinimallyOnSmallCompute && !isWalgEnabled ? (
+            <EnablePhysicalBackupsModal selectedRegion={selectedRegion} />
+          ) : (
+            <Button
+              type="primary"
+              disabled={!canDeployReplica}
+              loading={isSettingUp}
+              onClick={onSubmit}
+            >
+              Deploy replica
+            </Button>
+          )}
+        </div>
+      }
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
         {!isAWSProvider ? (
@@ -212,8 +203,14 @@ const DeployNewReplicaPanel = ({
                   </span>
                   <div className="flex items-center gap-x-2 mt-3">
                     <Button asChild type="default">
-                      <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
-                        Change compute size
+                      <Link
+                        href={
+                          isFreePlan
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                            : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        }
+                      >
+                        {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
                       </Link>
                     </Button>
                     <Button asChild type="default" icon={<ExternalLink size={14} />}>
@@ -227,55 +224,6 @@ const DeployNewReplicaPanel = ({
                     </Button>
                   </div>
                 </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-
-            {isMinimallyOnSmallCompute && !isWalgEnabled && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  {refetchInterval !== false
-                    ? 'Physical backups are currently being enabled'
-                    : 'Physical backups are required to deploy replicas'}
-                </AlertTitle_Shadcn_>
-                {refetchInterval === false && (
-                  <AlertDescription_Shadcn_ className="mb-2">
-                    Physical backups are used under the hood to spin up read replicas for your
-                    project.
-                  </AlertDescription_Shadcn_>
-                )}
-                <AlertDescription_Shadcn_>
-                  {refetchInterval !== false
-                    ? 'This warning will go away once physical backups have been enabled - check back in a few minutes!'
-                    : 'Enabling physical backups will take a few minutes, after which you will be able to deploy read replicas.'}
-                </AlertDescription_Shadcn_>
-                {refetchInterval !== false ? (
-                  <AlertDescription_Shadcn_ className="mt-2">
-                    You may start deploying read replicas thereafter once this is completed.
-                  </AlertDescription_Shadcn_>
-                ) : (
-                  <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
-                    <Button
-                      type="default"
-                      loading={isEnabling}
-                      disabled={isEnabling}
-                      onClick={() => {
-                        if (projectRef) enablePhysicalBackups({ ref: projectRef })
-                      }}
-                    >
-                      Enable physical backups
-                    </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                      <a
-                        href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </a>
-                    </Button>
-                  </AlertDescription_Shadcn_>
-                )}
               </Alert_Shadcn_>
             )}
 
