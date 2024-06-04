@@ -32,7 +32,7 @@ import {
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
-const SideBarContent = () => {
+export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: () => void }) => {
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -196,16 +196,19 @@ const SideBarContent = () => {
 
   return (
     <>
-      <div className="mt-6">
-        <div className="flex flex-col gap-4">
-          <Button
-            type="default"
-            className="justify-start mx-4"
-            onClick={() => handleNewQuery()}
-            icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
-          >
-            New query
-          </Button>
+      <div className="h-full flex flex-col justify-between">
+        <div className="mt-4 mb-2 flex flex-col gap-4">
+          <div className="mx-4">
+            <Button
+              block
+              type="default"
+              className="justify-start"
+              onClick={() => handleNewQuery()}
+              icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+            >
+              New query
+            </Button>
+          </div>
 
           <div className="px-2">
             <InnerSideMenuItem
@@ -344,6 +347,12 @@ const SideBarContent = () => {
             </>
           )}
         </div>
+
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
+          <Button block type="default" onClick={onViewOngoingQueries}>
+            View running queries
+          </Button>
+        </div>
       </div>
 
       <ConfirmationModal
@@ -369,5 +378,3 @@ const SideBarContent = () => {
     </>
   )
 }
-
-export default SideBarContent
