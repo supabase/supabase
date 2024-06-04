@@ -150,11 +150,6 @@ const PaymentMethods = () => {
 
                               if (!paymentMethod.card) return null
 
-                              console.log({
-                                paymentMethod,
-                                subscription,
-                              })
-
                               return (
                                 <div
                                   key={paymentMethod.id}
