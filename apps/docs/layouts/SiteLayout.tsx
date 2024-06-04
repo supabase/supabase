@@ -7,7 +7,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
       <Head>
         <title>Supabase Docs</title>
       </Head>
-      <main className="grow overflow-hidden">{children}</main>
+      <main className="grow">{children}</main>
     </>
   )
 }

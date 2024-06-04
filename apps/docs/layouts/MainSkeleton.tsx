@@ -328,7 +328,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className={cn('fixed w-full flex top-0 left-0 right-0 z-10')}>
+      <div className={cn('fixed w-full flex top-0 left-0 right-0 z-50')}>
         <TopNavBar />
       </div>
       <div className="flex flex-row h-full !pt-[91px]">
