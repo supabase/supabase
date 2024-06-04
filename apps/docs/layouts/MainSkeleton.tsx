@@ -279,7 +279,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
       aria-labelledby="main-nav-title"
       className={cn(
         // 'hidden',
-        'absolute !top-[91px] lg:!top-0 lg:relative',
+        'absolute lg:relative',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
@@ -294,7 +294,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           'top-0',
           'relative',
           'w-auto',
-          'border-r overflow-auto h-screen',
+          'border-r overflow-auto h-screen lg:h-[calc(100vh-91px)]',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col'
         )}
@@ -308,11 +308,11 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         <div
           className={cn(
             'transition-all ease-out duration-200',
-            'absolute left-0 right-0 h-screen',
+            'absolute left-0 right-0',
             'px-5 pl-5 pt-6 pb-16',
             'bg-background',
             // desktop styles
-            'lg:relative top-0 lg:left-0 lg:pb-10 lg:px-10 lg:flex',
+            'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
             'lg:opacity-100 lg:visible'
           )}
         >
@@ -328,12 +328,15 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className={cn('lg:sticky w-full flex top-0 left-0 right-0 z-50')}>
+      <div className={cn('hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50')}>
         <TopNavBar />
       </div>
-      <div className="flex flex-row h-full lg:!pt-[91px]">
+      <div className="flex flex-row h-full">
         {!isHomePage && <NavContainer menuId={menuId} />}
         <Container className="[--header-height:40px] lg:[--header-height:90px]">
+          <div className={cn('flex lg:hidden w-full top-0 left-0 right-0 z-50')}>
+            <TopNavBar />
+          </div>
           <div
             className={cn(
               'sticky transition-all top-0',
