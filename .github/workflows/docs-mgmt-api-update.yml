@@ -23,9 +23,7 @@ jobs:
 
     - name: Install dependencies in apps/docs/spec/parser directory
       working-directory: apps/docs/spec/parser
-      run: |
-        npm config set loglevel verbose
-        npm ci
+      run: npm ci
 
     - name: Change to apps/docs/spec directory and run make command
       working-directory: apps/docs/spec
