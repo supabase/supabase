@@ -26,6 +26,10 @@ interface EnablePhysicalBackupsModalProps {
   selectedRegion: string
 }
 
+// [Joshen] Just FYI while this is not being used, i'm opting to leave this in as this is IMO an ideal UX
+// Problem right now is that we can't immediately initiate a new replica request once the physical backups
+// flag is flipped to true as RRs still need a physical backup to be completed before setting an RR up
+// i.e This UX will immediately show an error when the create replica request is triggered.
 export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBackupsModalProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
