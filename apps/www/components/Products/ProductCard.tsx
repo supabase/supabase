@@ -40,7 +40,7 @@ const ProductCard = ({
       outerClassName="relative w-full h-full shadow-lg"
       innerClassName={cn(
         `relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-          bg-surface-100 w-full rounded-xl h-full`
+          bg-surface-75 w-full rounded-xl h-full`
       )}
     >
       <div
@@ -49,7 +49,7 @@ const ProductCard = ({
           alignLeft && 'lg:mx-0 lg:pl-8 lg:items-start lg:text-left lg:max-w-[260px]'
         )}
       >
-        <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
+        <div className="flex items-center justify-center h-10 w-10 bg-surface-200 border rounded-lg mb-3">
           {icon && (
             <svg
               width="25"
@@ -60,7 +60,7 @@ const ProductCard = ({
             >
               <path
                 d={icon}
-                stroke="var(--colors-brand9)"
+                stroke="hsl(var(--foreground-lighter))"
                 strokeMiterlimit="10"
                 strokeLinejoin="round"
                 strokeLinecap="round"

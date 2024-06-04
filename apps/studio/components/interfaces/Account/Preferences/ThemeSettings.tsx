@@ -41,7 +41,7 @@ const ThemeSettings = () => {
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_ key={theme.value} value={theme.value} label={theme.name}>
-              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg`} />
+              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
             </RadioGroupLargeItem_Shadcn_>
           ))}
         </RadioGroup_Shadcn_>
