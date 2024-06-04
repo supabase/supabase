@@ -11,7 +11,8 @@ import {
 import { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
 import { flattenSections } from '../../../lib/helpers'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers'
-import { BaseLoader, BaseSource, Json } from './base'
+import type { Json } from '../../helpers.mdx'
+import { BaseLoader, BaseSource } from './base'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   type = 'reference' as const
