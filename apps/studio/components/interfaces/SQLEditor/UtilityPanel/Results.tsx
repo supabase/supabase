@@ -1,17 +1,22 @@
-import { useKeyboardShortcuts } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
+import { Clipboard } from 'lucide-react'
 import { useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import { createPortal } from 'react-dom'
-import { IconClipboard } from 'ui'
+
+import { useKeyboardShortcuts } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { GridFooter } from 'components/ui/GridFooter'
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
-
   const [cellPosition, setCellPosition] = useState<any>(undefined)
 
-  function onCopyCell() {
+  const snap = useSqlEditorStateSnapshot()
+  const results = snap.results[id]?.[0]
+
+  const onCopyCell = () => {
     if (cellPosition) {
       const { rowIdx, column } = cellPosition
       const colKey = column.key
@@ -109,16 +114,24 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={onSelectedCellChange}
       />
+
       {typeof window !== 'undefined' &&
         createPortal(
           <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
             <Item onClick={onCopyCell}>
-              <IconClipboard size="tiny" />
+              <Clipboard size={14} />
               <span className="ml-2 text-xs">Copy cell content</span>
             </Item>
           </Menu>,
           document.body
         )}
+
+      <GridFooter className="flex items-center justify-center">
+        <p className="text-xs text-foreground-light">
+          {rows.length} row{rows.length > 1 ? 's' : ''}
+          {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
+        </p>
+      </GridFooter>
     </>
   )
 }
