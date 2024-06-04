@@ -2546,7 +2546,7 @@ commands:
 
       Serve all Functions locally.
 
-      `supabase functions serve` command includes additional flags to assist developers in debugging using tools like `DevTools`.
+      `supabase functions serve` command includes additional flags to assist developers in debugging Edge Functions via the v8 inspector protocol, allowing for debugging via Chrome DevTools, VS Code, and IntelliJ IDEA for example.
 
       1. `--inspect`
          * Alias of `--inspect-mode run`.
@@ -2562,7 +2562,7 @@ commands:
          * By default, creating an inspector session for the main worker is not allowed, but this flag allows it.
          * Other behaviors follow the `inspect-mode` flag mentioned above.
 
-      Additionally, the following properties can be customised via `supabase/config.toml` under `edge_runtime` section.
+      Additionally, the following properties can be customized via `supabase/config.toml` under `edge_runtime` section.
 
       1. `inspector_port`
          * The port used to listen to the Inspector session, defaults to 8083.
