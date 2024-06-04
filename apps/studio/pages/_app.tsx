@@ -205,7 +205,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
-                <Toaster />
+                {!isTestEnv && <Toaster />}
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
