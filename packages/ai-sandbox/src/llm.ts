@@ -142,6 +142,7 @@ export async function interpretPrompt(
   return {
     ...result,
     source,
+    systemPrompt: systemMessage.content,
   }
 }
 
