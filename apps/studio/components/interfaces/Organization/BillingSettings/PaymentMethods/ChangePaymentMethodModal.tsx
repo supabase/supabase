@@ -2,10 +2,8 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import type { SubscriptionTier } from 'data/subscriptions/types'
 import { Button, Modal } from 'ui'
+import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 
 export interface ChangePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -17,13 +15,12 @@ const ChangePaymentMethodModal = ({
   onClose,
 }: ChangePaymentMethodModalProps) => {
   const { slug } = useParams()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
-    {
+  const { mutate: markAsDefault, isLoading: isUpdating } =
+    useOrganizationPaymentMethodMarkAsDefaultMutation({
       onSuccess: () => {
         toast.success(
           `Successfully changed payment method to the card ending with ${
-            selectedPaymentMethod!.card.last4
+            selectedPaymentMethod!.card!.last4
           }`
         )
         onClose()
@@ -31,23 +28,15 @@ const ChangePaymentMethodModal = ({
       onError: (error) => {
         toast.error(`Failed to change payment method: ${error.message}`)
       },
-    }
-  )
+    })
 
   const onConfirmUpdate = async () => {
     if (!slug) return console.error('Slug is required')
-    if (!subscription) return console.error('Subscription is required')
     if (!selectedPaymentMethod) return console.error('Card ID is required')
 
-    const selectedTier =
-      subscription.plan.id === 'pro' && subscription.usage_billing_enabled
-        ? 'tier_payg'
-        : `tier_${subscription.plan.id}`
-
-    updateOrgSubscription({
+    markAsDefault({
       slug,
-      tier: selectedTier as SubscriptionTier,
-      paymentMethod: selectedPaymentMethod.id,
+      paymentMethodId: selectedPaymentMethod.id,
     })
   }
 
@@ -55,7 +44,7 @@ const ChangePaymentMethodModal = ({
     <Modal
       visible={selectedPaymentMethod !== undefined}
       size="medium"
-      header={`Confirm to use payment method ending with ${selectedPaymentMethod?.card.last4}`}
+      header={`Confirm to use payment method ending with ${selectedPaymentMethod?.card?.last4}`}
       onCancel={() => onClose()}
       customFooter={
         <div className="flex items-center gap-2">
@@ -77,7 +66,7 @@ const ChangePaymentMethodModal = ({
         <Modal.Content>
           <p className="text-sm">
             Upon clicking confirm, all future charges will be deducted from the card ending with{' '}
-            {selectedPaymentMethod?.card.last4}. There are no immediate charges.
+            {selectedPaymentMethod?.card?.last4}. There are no immediate charges.
           </p>
         </Modal.Content>
       </div>

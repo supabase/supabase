@@ -92,7 +92,6 @@ const SchemaSelector = ({
               size={size}
               disabled={disabled}
               type="default"
-              // className="w-full justify-start"
               className={`w-full [&>span]:w-full`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />

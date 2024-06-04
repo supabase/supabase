@@ -20,7 +20,7 @@ const DeletePaymentMethodModal = ({
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
         toast.success(
-          `Successfully removed payment method ending with ${selectedPaymentMethod!.card.last4}`
+          `Successfully removed payment method ending with ${selectedPaymentMethod?.card?.last4}`
         )
         onClose()
       },
@@ -36,7 +36,7 @@ const DeletePaymentMethodModal = ({
     <Modal
       visible={selectedPaymentMethod !== undefined}
       size="medium"
-      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card.last4}`}
+      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card?.last4}`}
       onCancel={() => onClose()}
       customFooter={
         <div className="flex items-center gap-2">
