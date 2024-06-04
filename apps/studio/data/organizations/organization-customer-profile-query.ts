@@ -7,20 +7,6 @@ export type OrganizationCustomerProfileVariables = {
   slug?: string
 }
 
-export type OrganizationCustomerProfileResponse = {
-  address: {
-    city: string | null
-    country: string | null
-    line1: string | null
-    line2: string | null
-    postal_code: string | null
-    state: string | null
-  } | null
-  balance: number
-  email: string
-  id: string
-}
-
 export async function getOrganizationCustomerProfile(
   { slug }: OrganizationCustomerProfileVariables,
   signal?: AbortSignal
@@ -37,7 +23,7 @@ export async function getOrganizationCustomerProfile(
   })
   if (error) handleError(error)
 
-  return data as OrganizationCustomerProfileResponse
+  return data
 }
 
 export type OrganizationCustomerProfileData = Awaited<
