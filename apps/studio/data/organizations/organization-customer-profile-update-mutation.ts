@@ -1,20 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { handleError, patch } from 'data/fetchers'
+import { patch, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { components } from 'api-types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug: string
-  address?: {
-    city: string | null
-    country: string | null
-    line1: string | null
-    line2: string | null
-    postal_code: string | null
-    state: string | null
-  } | null
+  address: components['schemas']['CustomerBillingAddress'] | null
 }
 
 export async function updateOrganizationCustomerProfile({
@@ -27,12 +21,15 @@ export async function updateOrganizationCustomerProfile({
   if (address) payload.address = address
 
   const { data, error } = await patch(`/platform/organizations/{slug}/customer`, {
-    body: payload,
     params: {
       path: {
         slug,
       },
     },
+    headers: {
+      Version: '2',
+    },
+    body: { address: address },
   })
   if (error) throw handleError(error)
   return data

@@ -156,7 +156,7 @@ export interface paths {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
     /** Updates the Stripe customer */
-    patch: operations['CustomerController_updateCustomer']
+    patch: operations['CustomerController_updateCustomerV2']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
@@ -2555,12 +2555,12 @@ export interface components {
       opt_in_tags: string[]
     }
     CustomerBillingAddress: {
-      city: string | null
-      country: string | null
-      line1: string | null
-      line2: string | null
-      postal_code: string | null
-      state: string | null
+      city?: string
+      country?: string
+      line1: string
+      line2?: string
+      postal_code?: string
+      state?: string
     }
     CustomerResponse: {
       email: string
@@ -2607,6 +2607,9 @@ export interface components {
         idempotencyKey?: string
         stripeAccount?: string
       }
+    }
+    BillingCustomerUpdateBody: {
+      address: components['schemas']['CustomerBillingAddress'] | null
     }
     OrganizationRole: {
       id: number
@@ -6852,18 +6855,21 @@ export interface operations {
     }
   }
   /** Updates the Stripe customer */
-  CustomerController_updateCustomer: {
+  CustomerController_updateCustomerV2: {
     parameters: {
       path: {
         /** @description Organization slug */
         slug: string
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BillingCustomerUpdateBody']
+      }
+    }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['CustomerUpdateResponse']
-        }
+        content: never
       }
       403: {
         content: never
