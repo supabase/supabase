@@ -1,4 +1,4 @@
-import { Datum } from 'components/ui/Charts/Charts.types'
+import type { Datum } from 'components/ui/Charts/Charts.types'
 import React from 'react'
 
 interface Metadata {
@@ -86,8 +86,8 @@ export type QueryType =
   | 'realtime'
   | 'storage'
   | 'supavisor'
-  | 'pgbouncer'
   | 'postgrest'
+  | 'warehouse'
 
 export type Mode = 'simple' | 'custom'
 

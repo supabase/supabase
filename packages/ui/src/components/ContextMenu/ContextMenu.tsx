@@ -17,6 +17,9 @@ interface RootProps {
   style?: React.CSSProperties
 }
 
+/**
+ * @deprecated Use ./ContextMenu_shadcn_ instead
+ */
 function ContextMenu({
   onOpenChange,
 
@@ -56,6 +59,9 @@ interface ItemProps {
   onClick?: (event: Event) => void
 }
 
+/**
+ * @deprecated Use ./ContextMenuItem_shadcn_ instead
+ */
 export function Item({ children, icon, disabled, onClick }: ItemProps) {
   return (
     <RadixContextMenu.Item
@@ -69,6 +75,9 @@ export function Item({ children, icon, disabled, onClick }: ItemProps) {
   )
 }
 
+/**
+ * @deprecated Use ./ContextMenu_shadcn_ instead
+ */
 export function Misc({ children, icon }: ItemProps) {
   return (
     <div
@@ -88,6 +97,9 @@ interface CheckboxProps {
   ItemIndicator?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./ContextMenuCheckboxItem_shadcn_ instead
+ */
 export function Checkbox({
   children,
   checked: propsChecked,
@@ -126,6 +138,9 @@ interface RadioProps {
   ItemIndicator?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./ContextMenuRadioItem_shadcn_ instead
+ */
 export function Radio({ children, value, ItemIndicator }: RadioProps) {
   return (
     <RadixContextMenu.RadioItem
@@ -148,6 +163,9 @@ interface RadioGroupProps {
   onChange?(x: string): void
 }
 
+/**
+ * @deprecated Use ./ContextMenuRadioGroup_shadcn_ instead
+ */
 export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
@@ -167,6 +185,9 @@ interface LabelProps {
   children: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./ContextMenuLabel_shadcn_ instead
+ */
 export function Label({ children }: LabelProps) {
   return (
     <RadixContextMenu.Label

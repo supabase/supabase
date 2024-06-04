@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type ApiAuthorizationDeclineVariables = {
   id: string

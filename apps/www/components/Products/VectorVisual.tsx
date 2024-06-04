@@ -1,11 +1,12 @@
+import { detectBrowser, isBrowser } from 'common'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
 const VectorVisual = () => {
   const containerRef = useRef(null)
   const ref = useRef(null)
-  const [isActive, setIsActive] = useState(false)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
+  const isSafari = isBrowser && detectBrowser() === 'Safari'
 
   const handleGlow = (event: any) => {
     if (!ref.current || !containerRef.current) return null
@@ -23,7 +24,6 @@ const VectorVisual = () => {
 
     const isContainerHovered =
       xCont > -3 && xCont < containerWidth + 3 && yCont > -3 && yCont < containerHeight + 3
-    setIsActive(isContainerHovered)
 
     if (!isContainerHovered) return
 
@@ -35,13 +35,17 @@ const VectorVisual = () => {
   }
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!isBrowser || isSafari) return
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
       window.removeEventListener('mousemove', handleGlow)
     }
   }, [])
+
+  const gradientTransform = isSafari
+    ? `translate(90 250) rotate(56.4303) scale(132.019)`
+    : `translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`
 
   return (
     <figure
@@ -51,45 +55,41 @@ const VectorVisual = () => {
       aria-label="Supabase Vector uses pgvector to store, index, and access embeddings"
     >
       <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
+        <Image
+          src={`/images/index/products/vector.svg`}
+          alt="Supabase Vector graph"
+          fill
+          sizes="100%"
+          quality={100}
+          className="absolute inset-0 z-0 object-contain object-center"
+        />
         <svg
           ref={ref}
           viewBox="0 0 390 430"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute w-full h-full z-20 m-auto"
+          className="absolute w-full h-full z-20 m-auto opacity-0 group-hover:opacity-100 transition-opacity"
         >
           {/* Animated ouline */}
           <path
-            d="M195.918 125.344L276.779 172.029V265.399L195.918 312.084L115.057 265.399V172.029L195.918 125.344Z"
+            d="m195.918 125.344 80.861 46.685v93.37l-80.861 46.685-80.861-46.685v-93.37l80.861-46.685Z"
             stroke="url(#paint0_radial_484_53266)"
             strokeWidth={2}
           />
           <defs>
-            {isActive && (
-              <radialGradient
-                id="paint0_radial_484_53266"
-                cx="0"
-                cy="0"
-                r="2"
-                gradientUnits="userSpaceOnUse"
-                gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
-              >
-                <stop stopColor="hsl(var(--brand-default))" />
-                <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="0" />
-              </radialGradient>
-            )}
+            <radialGradient
+              id="paint0_radial_484_53266"
+              cx="0"
+              cy="0"
+              r={isSafari ? '10' : '2'}
+              gradientUnits="userSpaceOnUse"
+              gradientTransform={gradientTransform}
+            >
+              <stop stopColor="hsl(var(--brand-default))" />
+              <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="0" />
+            </radialGradient>
           </defs>
         </svg>
-
-        <Image
-          src={`/images/index/products/vector.svg`}
-          alt="Supabase Vector graph"
-          layout="fill"
-          objectFit="contain"
-          objectPosition="center"
-          className="absolute inset-0"
-          quality={100}
-        />
       </span>
     </figure>
   )

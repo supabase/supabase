@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -52,6 +52,7 @@ export const useForeignTableQuery = <TData = ForeignTableData>(
     ({ signal }) => getForeignTable({ projectRef, connectionString, id }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )

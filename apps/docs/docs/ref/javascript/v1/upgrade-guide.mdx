@@ -304,6 +304,8 @@ const { data, error } = await supabase
 
 #### Get the user's current session
 
+<GetSessionWarning />
+
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
@@ -361,9 +363,8 @@ const user = supabase.auth.user()
 
 ```ts
 const {
-  data: { session },
-} = await supabase.auth.getSession()
-const { user } = session
+  data: { user },
+} = await supabase.auth.getUser()
 ```
 
 </TabPanel>

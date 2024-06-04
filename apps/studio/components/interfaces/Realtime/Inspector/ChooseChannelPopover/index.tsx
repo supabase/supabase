@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTelemetryProps } from 'common'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -16,6 +18,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import Telemetry from 'lib/telemetry'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
@@ -25,6 +28,8 @@ interface ChooseChannelPopoverProps {
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   const FormSchema = z.object({ channel: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -44,6 +49,15 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = () => {
     setOpen(false)
+    Telemetry.sendEvent(
+      {
+        category: 'realtime_inspector',
+        action: 'started_listening_to_channel_in_input_channel_popover',
+        label: 'realtime_inspector_config',
+      },
+      telemetryProps,
+      router
+    )
     onChangeConfig({ ...config, channelName: form.getValues('channel'), enabled: true })
   }
 

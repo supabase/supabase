@@ -1,4 +1,2 @@
-import PITRNotice from './PITRNotice'
-import PITRSelection from './PITRSelection'
-
-export { PITRNotice, PITRSelection }
+export { default as PITRNotice } from './PITRNotice'
+export { default as PITRSelection } from './PITRSelection'

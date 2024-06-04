@@ -1,5 +1,5 @@
+import { Check, Clipboard } from 'lucide-react'
 import { useState } from 'react'
-import { IconCheck, IconClipboard } from 'ui'
 
 const CommandRender = ({ commands }: any) => {
   return (
@@ -15,6 +15,7 @@ export default CommandRender
 
 const Command = ({ item }: any) => {
   const [isCopied, setIsCopied] = useState(false)
+
   return (
     <div className="space-y-1">
       <span className="font-mono text-sm text-foreground-lighter">{`> ${item.comment}`}</span>
@@ -22,7 +23,7 @@ const Command = ({ item }: any) => {
         <div className="flex gap-2 font-mono text-sm font-normal text-foreground">
           <span className="text-foreground-lighter">$</span>
           <span>
-            <span className="">{item.jsx ? item.jsx() : null} </span>
+            <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
               className="text-foreground-lighter hover:text-foreground"
@@ -38,15 +39,9 @@ const Command = ({ item }: any) => {
               }}
             >
               {isCopied ? (
-                <div className="text-brand">
-                  <IconCheck size={14} strokeWidth={3} />
-                </div>
+                <Check size={14} strokeWidth={3} className="text-brand" />
               ) : (
-                <div className="relative">
-                  <div className="block">
-                    <IconClipboard size={14} />
-                  </div>
-                </div>
+                <Clipboard size={14} />
               )}
             </button>
           </span>

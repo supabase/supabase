@@ -15,7 +15,6 @@ import {
   IconAlertTriangle,
   IconChevronLeft,
   IconChevronRight,
-  IconExternalLink,
   IconHelpCircle,
   Modal,
 } from 'ui'
@@ -25,9 +24,11 @@ import InformationBox from 'components/ui/InformationBox'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import Link from 'next/link'
 import BackupsEmpty from '../BackupsEmpty'
-import { Timezone } from './PITR.types'
+import type { Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
@@ -36,9 +37,8 @@ import {
 } from './PITR.utils'
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
-import TimezoneSelection from './TimezoneSelection'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import Link from 'next/link'
+import { TimezoneSelection } from './TimezoneSelection'
+import BackupsStorageAlert from '../BackupsStorageAlert'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -139,6 +139,7 @@ const PITRSelection = () => {
         title="Restore your database from a backup"
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
+      <BackupsStorageAlert />
       {hasNoBackupsAvailable ? (
         <BackupsEmpty />
       ) : (
@@ -295,8 +296,6 @@ const PITRSelection = () => {
                           <p className="text-sm text-foreground-light">Time zone</p>
                           <div className="w-[350px]">
                             <TimezoneSelection
-                              hideLabel
-                              dropdownWidth="w-[400px]"
                               selectedTimezone={selectedTimezone}
                               onSelectTimezone={setSelectedTimezone}
                             />

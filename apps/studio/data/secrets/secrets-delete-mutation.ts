@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
 
 export type SecretsDeleteVariables = {
@@ -18,7 +18,7 @@ export async function deleteSecrets({ projectRef, secrets }: SecretsDeleteVariab
     body: secrets,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -1,9 +1,8 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
-import { useParams } from 'common'
 import {
-  ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
@@ -11,8 +10,10 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
+import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
+import { ExternalLink } from 'lucide-react'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Alert,
@@ -21,12 +22,10 @@ import {
   Alert_Shadcn_,
   Button,
   IconCalendar,
-  IconExternalLink,
 } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -41,8 +40,6 @@ const Subscription = () => {
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
-
   const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
     useOrganizationBillingSubscriptionCancelSchedule()
 
@@ -55,60 +52,22 @@ const Subscription = () => {
 
   const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
-  const hasExceededAnyLimits = Boolean(
-    usage?.usages.find(
-      (metric) =>
-        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
-    )
-  )
-
   return (
     <>
-      {subscription && hasExceededAnyLimits && (
-        <div className="mt-5">
-          <Alert
-            withIcon
-            variant="danger"
-            title="Your organization's usage has exceeded its included quota"
-            actions={[
-              <div key="upgrade-buttons" className="space-x-3">
-                <Button asChild type="outline">
-                  <Link href={`/org/${slug}/usage`}>View usage</Link>
-                </Button>
-
-                <Button asChild type="default">
-                  <Link
-                    href={`/org/${slug}/billing?panel=${
-                      subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                    }`}
-                  >
-                    {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
-                  </Link>
-                </Button>
-              </div>,
-            ]}
-          >
-            <p>
-              Your projects can become unresponsive or enter read-only mode.{' '}
-              {subscription.plan.id === 'free'
-                ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
-                : 'Please disable Spend Cap to ensure that your projects remain available.'}
-            </p>
-          </Alert>
-        </div>
-      )}
-
       <ScaffoldSection>
+        <div className="col-span-12 pb-2">
+          <Restriction />
+        </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
-            <p className="text-base m-0">Subscription Plan</p>
+            <p className="text-foreground text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                   <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                     <p className="text-sm m-0">Pricing</p>
-                    <IconExternalLink size={16} strokeWidth={1.5} />
+                    <ExternalLink size={16} strokeWidth={1.5} />
                   </div>
                 </Link>
               </div>

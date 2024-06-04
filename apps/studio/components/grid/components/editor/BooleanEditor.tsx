@@ -1,5 +1,5 @@
 import { Select } from 'ui'
-import { RenderEditCellProps } from 'react-data-grid'
+import type { RenderEditCellProps } from 'react-data-grid'
 import { useTrackedState } from 'components/grid/store'
 
 interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {

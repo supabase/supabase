@@ -1,4 +1,4 @@
-import { CalculatedColumn } from 'react-data-grid'
+import type { CalculatedColumn } from 'react-data-grid'
 import { Button, IconPlus } from 'ui'
 
 import { ADD_COLUMN_KEY } from '../../constants'

@@ -9,5 +9,12 @@
     return <IconBase icon={Check} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { check } from 'lucide-react'
+  */
   export default IconCheck
   

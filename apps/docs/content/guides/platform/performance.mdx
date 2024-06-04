@@ -1,0 +1,201 @@
+---
+id: 'performance'
+title: 'Performance Tuning'
+description: 'Getting the best results out of your Supabase project'
+---
+
+The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the plan your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
+
+## Examining query performance
+
+Unoptimized queries are a major cause of poor database performance. The techniques on this page can help you identify and understand queries that take the most time and resources from your database.
+
+Database performance is a large topic and many factors can contribute. Some of the most common causes of poor performance include:
+
+- An inefficiently designed schema
+- Inefficiently designed queries
+- A lack of indexes causing slower than required queries over large tables
+- Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
+- Not enough compute resources, such as memory, causing your database to go to disk for results too often
+- Lock contention from multiple queries operating on highly utilized tables
+- Large amount of bloat on your tables causing poor query planning
+
+Thankfully there are solutions to all these issues, which we will cover in the following sections.
+
+<Admonition type="note">
+
+If you're seeing an `insufficient privilege` error when viewing the Query Performance page from the dashboard, run this command:
+
+```shell
+$ grant pg_read_all_stats to postgres;
+```
+
+</Admonition>
+
+### Postgres cumulative statistics system
+
+Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
+
+Here are some example queries to get you started.
+
+#### Most frequently called queries:
+
+```sql
+select
+  auth.rolname,
+  statements.query,
+  statements.calls,
+  -- -- Postgres 13, 14, 15
+  statements.total_exec_time + statements.total_plan_time as total_time,
+  statements.min_exec_time + statements.min_plan_time as min_time,
+  statements.max_exec_time + statements.max_plan_time as max_time,
+  statements.mean_exec_time + statements.mean_plan_time as mean_time,
+  -- -- Postgres <= 12
+  -- total_time,
+  -- min_time,
+  -- max_time,
+  -- mean_time,
+  statements.rows / statements.calls as avg_rows
+from
+  pg_stat_statements as statements
+  inner join pg_authid as auth on statements.userid = auth.oid
+order by statements.calls desc
+limit 100;
+```
+
+This query shows:
+
+- query statistics, ordered by the number of times each query has been executed
+- the role that ran the query
+- the number of times it has been called
+- the average number of rows returned
+- the cumulative total time the query has spent running
+- the min, max and mean query times.
+
+This provides useful information about the queries you run most frequently. Queries that have high `max_time` or `mean_time` times and are being called often can be good candidates for optimization.
+
+#### Slowest queries by execution time:
+
+```sql
+select
+  auth.rolname,
+  statements.query,
+  statements.calls,
+  -- -- Postgres 13, 14, 15
+  statements.total_exec_time + statements.total_plan_time as total_time,
+  statements.min_exec_time + statements.min_plan_time as min_time,
+  statements.max_exec_time + statements.max_plan_time as max_time,
+  statements.mean_exec_time + statements.mean_plan_time as mean_time,
+  -- -- Postgres <= 12
+  -- total_time,
+  -- min_time,
+  -- max_time,
+  -- mean_time,
+  statements.rows / statements.calls as avg_rows
+from
+  pg_stat_statements as statements
+  inner join pg_authid as auth on statements.userid = auth.oid
+order by max_time desc
+limit 100;
+```
+
+This query will show you statistics about queries ordered by the maximum execution time. It is similar to the query above ordered by calls, but this one highlights outliers that may have high executions times. Queries which have high or mean execution times are good candidates for optimization.
+
+#### Most time consuming queries:
+
+```sql
+select
+  auth.rolname,
+  statements.query,
+  statements.calls,
+  statements.total_exec_time + statements.total_plan_time as total_time,
+  to_char(
+    (
+      (statements.total_exec_time + statements.total_plan_time) / sum(
+        statements.total_exec_time + statements.total_plan_time
+      ) over ()
+    ) * 100,
+    'FM90D0'
+  ) || '%' as prop_total_time
+from
+  pg_stat_statements as statements
+  inner join pg_authid as auth on statements.userid = auth.oid
+order by total_time desc
+limit 100;
+```
+
+This query will show you statistics about queries ordered by the cumulative total execution time. It shows the total time the query has spent running as well as the proportion of total execution time the query has taken up.
+
+Queries which are the most time consuming are not necessarily bad, you may have a very efficient and frequently ran queries that end up taking a large total % time, but it can be useful to help spot queries that are taking up more time than they should.
+
+### Hit rate
+
+Generally for most applications a small percentage of data is accessed more regularly than the rest. To make sure that your regularly accessed data is available, Postgres tracks your data access patterns and keeps this in its [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache.
+
+Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk IO limits](./compute-add-ons#disk-io) causing significant performance issues.
+
+You can view your cache and index hit rate by executing the following query:
+
+```sql
+select
+  'index hit rate' as name,
+  (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read), 0) * 100 as ratio
+from pg_statio_user_indexes
+union all
+select
+  'table hit rate' as name,
+  sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0) * 100 as ratio
+from pg_statio_user_tables;
+```
+
+This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
+
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance).
+
+### Optimizing poor performing queries
+
+Postgres has built in tooling to help you optimize poorly performing queries. You can use the [query plan analyzer](https://www.postgresql.org/docs/current/sql-explain.html) on any expensive queries that you have identified:
+
+```sql
+explain analyze <query-statement-here>;
+```
+
+When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+
+If you run just `explain` without the `analyze` keyword, the database will only perform query planning without actually executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries.
+
+Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
+
+- [Official docs.](https://www.postgresql.org/docs/current/using-explain.html)
+- [The Art of PostgreSQL.](https://theartofpostgresql.com/explain-plan-visualizer/)
+- [Postgres Wiki.](https://wiki.postgresql.org/wiki/Using_EXPLAIN)
+- [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
+
+You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](../platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.
+
+## Optimizing the number of connections
+
+The default connection limits for Postgres and Supavisor is based on your compute size. See the default connection numbers in the [Compute Add-ons](/docs/guides/platform/compute-add-ons) section.
+
+If the number of connections is insufficient, you will receive the following error upon connecting to the DB:
+
+```shell
+$ psql -U postgres -h ...
+FATAL: remaining connection slots are reserved for non-replication superuser connections
+```
+
+In such a scenario, you can consider:
+
+- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance)
+- configuring your clients to use fewer connections
+- manually configuring the database for a higher number of connections
+
+### Configuring clients to use fewer connections
+
+You can use the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view to debug which clients are holding open connections on your DB. `pg_stat_activity` only exposes information on direct connections to the database. Information on the number of connections to Supavisor is available [via the metrics endpoint](../platform/metrics).
+
+Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [Supavisor](/docs/guides/database/connecting-to-postgres#connection-pooler) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
+
+### Allowing higher number of connections
+
+You can configure Postgres connection limit among other parameters by using [Custom Postgres Config](/docs/guides/platform/custom-postgres-config#custom-postgres-config).

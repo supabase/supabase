@@ -1,10 +1,10 @@
 import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
+import Footer from '@/components/Footer'
 import Header from '@/components/Header/Header'
 import { ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
-import Footer from '@/components/Footer'
 import { LoadingLine } from './LoadingLine'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Generate schemas from your ideas',
 }
 
-// supressHydrationWarning:
+// suppressHydrationWarning:
 // https://github.com/pacocoursey/next-themes#with-app
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

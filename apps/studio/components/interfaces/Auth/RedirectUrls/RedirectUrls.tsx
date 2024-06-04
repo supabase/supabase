@@ -1,7 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,19 +17,16 @@ import {
 } from 'ui'
 import { object, string } from 'yup'
 
-import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'
-import Link from 'next/link'
 
 const RedirectUrls = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -65,26 +64,18 @@ const RedirectUrls = () => {
     const payloadString = payload.toString()
 
     if (payloadString.length > 2 * 1024) {
-      ui.setNotification({
-        message: 'Too many redirect URLs, please remove some or try to use wildcards',
-        category: 'error',
-      })
-      return
+      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
     }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to update URL: ${error?.message}`,
-          })
+          toast.error(`Failed to update URL: ${error?.message}`)
         },
         onSuccess: () => {
           setOpen(false)
-          ui.setNotification({ category: 'success', message: 'Successfully added URL' })
+          toast.success('Successfully added URL')
         },
       }
     )
@@ -100,15 +91,11 @@ const RedirectUrls = () => {
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
       {
         onError: (error) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to remove URL: ${error?.message}`,
-          })
+          toast.error(`Failed to remove URL: ${error?.message}`)
         },
         onSuccess: () => {
           setSelectedUrlToDelete(undefined)
-          ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
+          toast.success('Successfully removed URL')
         },
       }
     )
@@ -269,4 +256,4 @@ const RedirectUrls = () => {
   )
 }
 
-export default observer(RedirectUrls)
+export default RedirectUrls

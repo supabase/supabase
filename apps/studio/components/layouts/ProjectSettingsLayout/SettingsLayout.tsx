@@ -1,19 +1,12 @@
-import {
-  useFlag,
-  useIsFeatureEnabled,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-  withAuth,
-} from 'hooks'
-import { observer } from 'mobx-react-lite'
+import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
-import ProductMenu from 'components/ui/ProductMenu'
-import ProjectLayout from '..'
 import { useParams } from 'common'
+import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProjectLayout } from '..'
+import { IS_PLATFORM } from 'lib/constants'
 
 interface SettingsLayoutProps {
   title?: string
@@ -22,9 +15,14 @@ interface SettingsLayoutProps {
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push('/project/default')
+    }
+  }, [router])
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -51,14 +49,9 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     invoices: invoicesEnabled,
   })
 
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.extensions.load()
-    }
-  }, [ui.selectedProjectRef])
-
   return (
     <ProjectLayout
+      isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
       productMenu={<ProductMenu page={page} menu={menuRoutes} />}
@@ -70,4 +63,4 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   )
 }
 
-export default withAuth(observer(SettingsLayout))
+export default withAuth(SettingsLayout)

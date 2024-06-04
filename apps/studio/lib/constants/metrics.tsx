@@ -1,41 +1,42 @@
-import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'ui'
+import { Auth, Realtime, Storage } from 'icons'
+import { ActivityIcon, DatabaseIcon, ServerIcon, HeartIcon } from 'lucide-react'
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <IconActivity />,
+    icon: <ActivityIcon size={16} />,
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: <IconDatabase size={16} />,
+    icon: <DatabaseIcon size={16} />,
     key: 'api_database',
   },
   API_AUTH: {
     label: 'Auth API',
-    icon: <IconKey size={16} />,
+    icon: <Auth size={16} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage API',
-    icon: <IconArchive size={16} />,
+    icon: <Storage size={16} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: '',
+    icon: <Realtime size={16} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: <IconHeart size={16} />,
+    icon: <HeartIcon size={16} />,
     key: 'instance',
   },
-  // POSTGRES: {
-  //   label: 'Postgres usage',
-  //   icon: '',
-  //   key: 'postgres',
-  // },
+  SUPAVISOR: {
+    label: 'Supavisor',
+    icon: <ServerIcon size={16} />,
+    key: 'supavisor',
+  },
 }
 
 export const METRICS = [
@@ -93,12 +94,6 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_REALTIME,
   },
-  // {
-  //   key: 'total_realtime_post_requests',
-  //   label: 'total_realtime_post_requests',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API_REALTIME,
-  // },
 
   /**
    * API
@@ -155,13 +150,6 @@ export const METRICS = [
   /**
    * Auth
    */
-
-  // {
-  //   key: 'total_auth_users',
-  //   label: 'Total Auth Users',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API_AUTH,
-  // },
 
   {
     key: 'total_auth_billing_period_mau',
@@ -282,18 +270,6 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
-  // {
-  //   key: 'total_auth_emails',
-  //   name: 'total_auth_emails',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API,
-  // },
-  // {
-  //   key: 'total_auth_texts',
-  //   name: 'total_auth_texts',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API,
-  // },
 
   {
     key: 'total_get_requests',
@@ -301,24 +277,6 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
-  // {
-  //   key: 'total_db_size_bytes',
-  //   name: 'total_db_size_bytes',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API,
-  // },
-  // {
-  //   key: 'total_storage_size_bytes',
-  //   name: 'total_storage_size_bytes',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API,
-  // },
-  // {
-  //   key: 'total_realtime_delete_requests',
-  //   label: 'total_realtime_delete_requests',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API_REALTIME,
-  // },
   {
     key: 'total_storage_patch_requests',
     label: 'Storage PATCH Requests',
@@ -331,13 +289,6 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
-  // {
-  //   key: 'total_realtime_options_requests',
-  //   label: 'total_realtime_options_requests',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API_REALTIME,
-  // },
-
   {
     key: 'total_patch_requests',
     label: 'All PATCH Requests',
@@ -357,12 +308,6 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
-  // {
-  //   key: 'total_realtime_patch_requests',
-  //   label: 'total_realtime_patch_requests',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API_REALTIME,
-  // },
   {
     key: 'total_delete_requests',
     label: 'All DELETE Requests',
@@ -375,12 +320,14 @@ export const METRICS = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
-  // {
-  //   key: 'total_db_egress_bytes',
-  //   name: 'total_db_egress_bytes',
-  //   provider: 'daily-stats',
-  //   category: METRIC_CATEGORIES.API,
-  // },
+
+  /** Supavisor */
+  {
+    key: 'total_supavisor_egress_bytes',
+    label: 'Supavisor Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.SUPAVISOR,
+  },
 ]
 
 export const TIME_PERIODS_BILLING = [
@@ -407,16 +354,6 @@ export const TIME_PERIODS_REPORTS = [
     label: 'Last 30 days',
     interval: '1d',
   },
-  // {
-  //   key: '60d',
-  //   label: 'Last 60 days',
-  //   interval: '1d',
-  // },
-  // {
-  //   key: '120d',
-  //   label: 'Last 120 days',
-  //   interval: '1d',
-  // },
   {
     key: 'startMonth',
     label: 'This month',

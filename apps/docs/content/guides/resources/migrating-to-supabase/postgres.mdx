@@ -1,0 +1,82 @@
+---
+title: 'Migrate from Postgres to Supabase'
+description: 'Migrate your Postgres database to Supabase.'
+---
+
+This is a guide for migrating your Postgres database to [Supabase](https://supabase.com).
+Supabase is a robust and open-source platform. Supabase provide all the backend features developers need to build a product: a Postgres database, authentication, instant APIs, edge functions, realtime subscriptions, and storage. Postgres is the core of Supabase—for example, you can use row-level security and there are more than 40 Postgres extensions available.
+
+This guide demonstrates how to migrate your Postgres database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+
+## Retrieve your Postgres database credentials [#retrieve-credentials]
+
+1. Log in to your provider to get the connection details for your Postgres database.
+1. Click on **PSQL Command** and edit it adding the content after `PSQL_COMMAND=`.
+
+Example:
+
+```bash
+%env PSQL_COMMAND=PGPASSWORD=RgaMDfTS_password_FTPa7 psql -h dpg-a_server_in.oregon-postgres.provider.com -U my_db_pxl0_user my_db_pxl0
+```
+
+## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+
+1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
+   Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
+
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
+
+![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/postgres/database-settings-host.png)
+
+## Migrate the database
+
+The fastest way to migrate your database is with the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="colab"
+  queryGroup="migrate-method"
+>
+<TabPanel id="colab" label="Migrate using Colab">
+
+1. Set the environment variables (`PSQL_COMMAND`, `SUPABASE_HOST`, `SUPABASE_PASSWORD`) in the Colab notebook.
+1. Run the first two steps in [the notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb) in order. The first sets the variables and the second installs PSQL and the migration script.
+1. Run the third step to start the migration. This will take a few minutes.
+
+</TabPanel>
+<TabPanel id="cli" label="Migrate using CLI tools">
+
+### Export your database to a file in console [#export-database]
+
+Use `pg_dump` with your Postgres credentials to export your database to a file (e.g., `dump.sql`).
+
+```bash
+pg_dump --clean --if-exists --quote-all-identifiers \
+ -h $HOST -U $USER -d $DATABASE \
+ --no-owner --no-privileges > dump.sql
+```
+
+### Import the database to your Supabase project [#import-database-to-supabase]
+
+Use `psql` to import the Postgres database file to your Supabase project.
+
+```bash
+psql -d "$YOUR_CONNECTION_STRING" -f dump.sql
+```
+
+### Additional options
+
+- To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
+- To exclude a schema: `--exclude-schema=PATTERN`.
+- To only migrate a single table: `--table=PATTERN`.
+- To exclude a table: `--exclude-table=PATTERN`.
+
+Run `pg_dump --help` for a full list of options.
+
+</TabPanel>
+</Tabs>
+
+<MigrationWarnings />

@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 
 export type SetupIntentVariables = {
   hcaptchaToken: string
@@ -10,10 +10,9 @@ export type SetupIntentVariables = {
 
 export async function setupIntent({ hcaptchaToken }: SetupIntentVariables) {
   const { data, error } = await post('/platform/stripe/setup-intent', {
-    // @ts-ignore [Joshen] API seems to be having the wrong spec
     body: { hcaptchaToken },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

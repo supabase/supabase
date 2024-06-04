@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,14 +21,13 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
 })
 
-const SiteUrl = observer(() => {
-  const { ui } = useStore()
+const SiteUrl = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -50,16 +49,10 @@ const SiteUrl = observer(() => {
       { projectRef: projectRef!, config: payload },
       {
         onError: () => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
+          toast.error('Failed to update settings')
         },
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success('Successfully updated settings')
           resetForm({ values: values, initialValues: values })
         },
       }
@@ -82,6 +75,7 @@ const SiteUrl = observer(() => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (isSuccess) {
             resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
@@ -124,6 +118,6 @@ const SiteUrl = observer(() => {
       }}
     </Form>
   )
-})
+}
 
 export default SiteUrl

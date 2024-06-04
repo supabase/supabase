@@ -24,9 +24,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                 <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
                   <LabelBadge text="10 keyboards" />
                   <p className="text-lg text-[#8B9092] max-w-lg">
-                    Increase your chances of winning a limited-edition{' '}
-                    <span className="text-[#EDEDED]">62-Key ISO Mechanical Keyboard</span> by
-                    sharing your ticket on X and LinkedIn.
+                    Limited-edition{' '}
+                    <span className="text-[#EDEDED]">62-Key ISO Mechanical Keyboard</span>
                   </p>
                 </div>
                 <div className="px-4 mt-10 w-full">
@@ -34,6 +33,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <Image
                       src="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       fill
+                      sizes="100%"
                       quality={100}
                       alt="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       className="h-full w-full block"

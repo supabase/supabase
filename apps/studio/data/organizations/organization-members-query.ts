@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMembersVariables = {
@@ -29,8 +29,8 @@ export async function getOrganizationMembers(
   const { data: orgMembers, error: orgMembersError } = members
   const { data: orgInvites, error: orgInvitesError } = invites
 
-  if (orgMembersError) throw orgMembersError
-  if (orgInvitesError) throw orgInvitesError
+  if (orgMembersError) handleError(orgMembersError)
+  if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
   const invitedMembers = orgInvites.map((invite) => {

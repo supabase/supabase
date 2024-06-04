@@ -18,7 +18,7 @@ export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   },
   {
     text: 'Last 14 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
   {
@@ -33,23 +33,25 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
-const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
+export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
   if (filters.length === 0) return ''
   const conditions = filters
     .map((filter) => {
       const splitKey = filter.key.split('.')
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
+
       if (filter.compare === 'matches') {
-        return `REGEXP_CONTAINS(${normalizedKey}, '${filter.value}')`
+        return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
       } else if (filter.compare === 'is') {
-        return `${normalizedKey} = ${filter.value}`
+        return `${filterKey} = ${filter.value}`
       }
     })
     .join(' AND ')
   if (prepend) {
     return 'WHERE ' + conditions
   } else {
-    return conditions
+    return 'AND ' + conditions
   }
 }
 
@@ -276,9 +278,8 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params) => `
+        sql: (_params, where, orderBy) => `
 -- Most frequently called queries
--- A limit of 100 has been added below
 select
     auth.rolname,
     statements.query,
@@ -296,13 +297,14 @@ select
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    statements.calls desc
-  limit 10;`,
+  ${where || ''}
+  ${orderBy || 'order by statements.calls desc'}
+  limit 20;`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_params) => `-- A limit of 100 has been added below
+        sql: (_, where, orderBy) => `
+-- Most time consuming queries
 select
     auth.rolname,
     statements.query,
@@ -311,14 +313,14 @@ select
     to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    total_time desc
-  limit 10;`,
+  ${where || ''}
+  ${orderBy || 'order by total_time desc'}
+  limit 20;`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params) => `-- Slowest queries by max execution time
--- A limit of 100 has been added below
+        sql: (_params, where, orderBy) => `
+-- Slowest queries by max execution time
 select
     auth.rolname,
     statements.query,
@@ -336,9 +338,9 @@ select
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    max_time desc
-  limit 10`,
+  ${where || ''}
+  ${orderBy || 'order by max_time desc'}
+  limit 20`,
       },
       queryHitRate: {
         queryType: 'db',
@@ -379,6 +381,3 @@ select
     },
   },
 }
-
-export const DATETIME_FORMAT = 'MMM D, ha'
-export const DATETIME_SECOND_FORMAT = 'MMM D, ha'

@@ -1,7 +1,7 @@
 import ColumnType from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnType'
 import useLatest from 'hooks/misc/useLatest'
 import { useEffect, useReducer } from 'react'
-import { Button, IconX, IconXCircle, Input } from 'ui'
+import { Button, IconX, Input } from 'ui'
 
 export type SimpleColumn = {
   id: number

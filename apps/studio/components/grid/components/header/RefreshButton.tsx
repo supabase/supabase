@@ -1,14 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
-import { SupaTable } from 'components/grid/types'
+import type { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
-import { SupabaseGridQueue } from '../../constants'
+import { SupabaseGridQueue } from '../../queue'
+import type { TableLike } from 'hooks/misc/useTable'
+import { Check, RefreshCw } from 'lucide-react'
 
 export type RefreshButtonProps = {
-  table: SupaTable
-  isRefetching: boolean
+  table: TableLike | SupaTable
+  isRefetching?: boolean
 }
 
 const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
@@ -49,9 +51,9 @@ const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
       type="text"
       icon={
         !status ? (
-          <IconRefreshCw className="text-foreground-light" strokeWidth={1.5} />
+          <RefreshCw className="text-foreground-muted" strokeWidth={1.5} />
         ) : status === 'saved' ? (
-          <IconCheck className="text-brand" strokeWidth={3} />
+          <Check className="text-brand" strokeWidth={3} />
         ) : (
           <></>
         )

@@ -9,5 +9,12 @@
     return <IconBase icon={MinusCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { minusCircle } from 'lucide-react'
+  */
   export default IconMinusCircle
   

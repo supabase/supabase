@@ -13,6 +13,7 @@ This example shows how to use [Supabase Storage](https://supabase.io/docs/refere
 const SUPABASE_ANON_KEY = '' // your project's anon key
 const SUPABASE_PROJECT_ID = '' // your project ref
 const STORAGE_BUCKET = '' // your storage bucket name
+const BEARER_TOKEN = '' // your bearer token
 ```
 
 Serve the index.html file locally (e.g. with Python Simple HTTP Server) and start uploading:

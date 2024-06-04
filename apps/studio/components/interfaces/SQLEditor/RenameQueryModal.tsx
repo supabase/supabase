@@ -1,14 +1,15 @@
-import { useParams } from 'common'
-
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { isError } from 'data/utils/error-check'
-import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import { useSelectedOrganization } from 'hooks'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
@@ -18,11 +19,9 @@ export interface RenameQueryModalProps {
 }
 
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -53,16 +52,20 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to rename query: ${error.message}`,
-      })
+      toast.error(`Failed to rename query: ${error.message}`)
     }
   }
 
-  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
-    useSqlTitleGenerateMutation()
+  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+    onSuccess: (data) => {
+      const { title, description } = data
+      setNameInput(title)
+      if (!descriptionInput) setDescriptionInput(description)
+    },
+    onError: (error) => {
+      toast.error(`Failed to rename query: ${error.message}`)
+    },
+  })
 
   const isAiButtonVisible = !!snippet.content.sql
 
@@ -89,30 +92,10 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 onChange={(e) => setNameInput(e.target.value)}
               />
               <div className="flex w-full justify-end mt-2">
-                {supabaseAIEnabled && !hasHipaaAddon && isAiButtonVisible && (
+                {!hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
-                    onClick={async () => {
-                      try {
-                        const { title, description } = await titleSql({
-                          sql: snippet.content.sql,
-                        })
-
-                        setNameInput(title)
-
-                        // Only update description if it was empty
-                        if (!descriptionInput) {
-                          setDescriptionInput(description)
-                        }
-                      } catch (error: unknown) {
-                        if (isError(error)) {
-                          ui.setNotification({
-                            category: 'error',
-                            message: `Failed to rename query: ${error.message}`,
-                          })
-                        }
-                      }
-                    }}
+                    onClick={() => titleSql({ sql: snippet.content.sql })}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
                   >

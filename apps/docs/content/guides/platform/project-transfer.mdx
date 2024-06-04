@@ -1,0 +1,62 @@
+---
+id: 'project-transfer'
+title: 'Project Transfers'
+description: 'Transfer a project to another organization.'
+---
+
+With the introduction of [Organization-based Billing](/docs/guides/platform/org-based-billing), we’re adding the ability to freely transfer projects between different organizations. Head to your [projects' general settings](https://supabase.com/dashboard/project/_/settings/general) to initiate a project transfer.
+
+<div>
+  <Image
+    alt="Project Transfer: General Settings"
+    src={{
+      light: '/docs/img/guides/platform/project-transfer-overview--light.png',
+      dark: '/docs/img/guides/platform/project-transfer-overview.png',
+    }}
+  />
+</div>
+
+<div>
+  <Image
+    alt="Project Transfer: Confirmation Modal"
+    src={{
+      light: '/docs/img/guides/platform/project-transfer-modal--light.png',
+      dark: '/docs/img/guides/platform/project-transfer-modal.png',
+    }}
+  />
+</div>
+
+Source organization - the organization the project currently belongs to
+Target organization - the organization you want to move the project to
+
+## Pre-Requirements
+
+- The target organization you want to move the project to needs to use [Organization-based Billing](/docs/guides/platform/org-based-billing).
+- You need to be the owner of the source organization.
+- You need to be at least a member of the target organization you want to move the project to.
+- Projects with support tier addons cannot be transferred at this point. Please [open a support ticket](https://supabase.com/dashboard/support/new?category=billing&subject=Transfer%20project).
+
+## Usage-billing and project addons
+
+If you’re using a [Point-In-Time-Recovery](/docs/guides/platform/backups#point-in-time-recovery) or a [Custom Domain](/docs/guides/platform/custom-domains), the source organization will get credits for the remaining unused time in your current billing cycle.
+For example, if you are in the middle of your current billing cycle and you already pre-paid $10 for a Custom domain, you’ll get $5 back in credits.
+
+The target organization will be charged immediately for the remaining time in the billing cycle.
+As the billing cycle from the source and target organization likely differ, the prorated charge on the target organization will also differ from the credits on the source organization.
+
+If you’re using a [Compute Add-On](/docs/guides/platform/compute-add-ons), the source organization will get credits for the remaining unused time, whereas the target organization won’t have any immediate charges.
+As we’re charging compute usage-based with [Organization-based Billing](/docs/guides/platform/org-based-billing), you’ll be charged for the usage when the next billing cycle hits based on how long the project has been in the target organization.
+
+Similarly, for other usage metrics such as database size, egress, image transformations and so on, the usage until the project transfer will be billed on the source organization and future usage will be added to the target organization once moved.
+
+## Things to watch out for
+
+Transferring a project comes with no downtime at all, we’re just moving things internally and not your infrastructure.
+
+- You could lose access to certain project features depending on the plan of the target organization, i.e. moving a project from a Pro plan to a Free plan.
+- When moving your project to a Free plan, we also ensure you’re not exceeding your two free project limit. In these cases, it is best to upgrade your target organization to Pro plan first.
+- You could have less rights on the project depending on your role in the target organization, i.e. you were an Owner in the previous organization and only have a Read-Only role in the target organization.
+
+## Transfer to a different region
+
+Note that project transfers are only transferring your projects across an organization and cannot be used to transfer between different regions. To move your project to a different region, see [migrating your project](/docs/guides/platform/migrating-and-upgrading-projects#migrate-your-project).

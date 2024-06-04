@@ -1,11 +1,9 @@
 import { CalculatedColumn } from 'react-data-grid'
 import { TOTAL_ROWS_RESET } from '../../constants'
-import { IRowService, SqlRowService } from '../../services/row'
-import { GridProps, SavedState, SupaTable } from '../../types'
+import type { GridProps, SavedState, SupaTable } from '../../types'
 
 export interface BaseInitialState {
   table: SupaTable | null
-  rowService: IRowService | null
   isInitialComplete: boolean
   editable: boolean
   allRowsSelected: boolean
@@ -13,7 +11,6 @@ export interface BaseInitialState {
 
 export const baseInitialState: BaseInitialState = {
   table: null,
-  rowService: null,
   isInitialComplete: false,
   editable: false,
   allRowsSelected: false,
@@ -28,7 +25,6 @@ export type INIT_ACTIONTYPE =
         gridProps?: GridProps
         savedState?: SavedState
         editable?: boolean
-        onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
         onError: (error: any) => void
       }
     }
@@ -49,11 +45,6 @@ const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
       return {
         ...state,
         table: action.payload.table,
-        rowService: new SqlRowService(
-          action.payload.table,
-          action.payload.onSqlQuery,
-          action.payload.onError
-        ),
         isInitialComplete: true,
         editable: action.payload.editable || false,
       }

@@ -1,0 +1,47 @@
+extends: substitution
+message: "Consider using '%s' instead of '%s'."
+link: 'https://developers.google.com/style/inclusive-documentation'
+ignorecase: true
+level: error
+action:
+  name: replace
+swap:
+  (?:alumna|alumnus):          graduate
+  (?:alumnae|alumni):          graduates
+  air(?:m[ae]n|wom[ae]n):      pilot(s)
+  anchor(?:m[ae]n|wom[ae]n):   anchor(s)
+  authoress:                   author
+  camera(?:m[ae]n|wom[ae]n):   camera operator(s)
+  chair(?:m[ae]n|wom[ae]n):    chair(s)
+  congress(?:m[ae]n|wom[ae]n): member(s) of congress
+  door(?:m[ae]|wom[ae]n):      concierge(s)
+  draft(?:m[ae]n|wom[ae]n):    drafter(s)
+  fire(?:m[ae]n|wom[ae]n):     firefighter(s)
+  fisher(?:m[ae]n|wom[ae]n):   fisher(s)
+  fresh(?:m[ae]n|wom[ae]n):    first-year student(s)
+  garbage(?:m[ae]n|wom[ae]n):  waste collector(s)
+  lady lawyer:                 lawyer
+  ladylike:                    courteous
+  landlord:                    building manager
+  mail(?:m[ae]n|wom[ae]n):     mail carriers
+  man and wife:                husband and wife
+  man enough:                  strong enough
+  mankind:                     human kind
+  manmade:                     manufactured
+  manpower:                    personnel
+  men and girls:               men and women
+  middle(?:m[ae]n|wom[ae]n):   intermediary
+  news(?:m[ae]n|wom[ae]n):     journalist(s)
+  ombuds(?:man|woman):         ombuds
+  oneupmanship:                upstaging
+  poetess:                     poet
+  police(?:m[ae]n|wom[ae]n):   police officer(s)
+  repair(?:m[ae]n|wom[ae]n):   technician(s)
+  sales(?:m[ae]n|wom[ae]n):    salesperson or sales people
+  service(?:m[ae]n|wom[ae]n):  soldier(s)
+  steward(?:ess)?:             flight attendant
+  tribes(?:m[ae]n|wom[ae]n):   tribe member(s)
+  waitress:                    waiter
+  woman doctor:                doctor
+  woman scientist[s]?:         scientist(s)
+  work(?:m[ae]n|wom[ae]n):     worker(s)

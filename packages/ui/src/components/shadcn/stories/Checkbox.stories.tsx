@@ -1,17 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { Button } from '../ui/button'
+import { Checkbox } from '../ui/checkbox'
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '../ui/form'
+import { toast } from '../ui/use-toast'
 // import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'

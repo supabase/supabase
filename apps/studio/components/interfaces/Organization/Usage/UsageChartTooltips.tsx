@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+import type { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {

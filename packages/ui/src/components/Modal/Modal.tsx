@@ -1,15 +1,14 @@
 'use client'
 
-import React, { useEffect } from 'react'
-// @ts-ignore
-import ModalStyles from './Modal.module.css'
-import { Button, IconX, Space } from './../../../index'
-import { cn } from '@ui/lib/utils'
-import { AnimationTailwindClasses } from '../../types'
-
 import * as Dialog from '@radix-ui/react-dialog'
+import React, { useEffect } from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
+import { AnimationTailwindClasses } from '../../types'
+import { Button } from '../Button/Button'
+import IconX from '../Icon/icons/IconX/IconX'
+import Space from '../Space/Space'
 
 // import { Transition } from '@tailwindui/react'
 // Merge Radix Props to surface in the modal component
@@ -61,6 +60,9 @@ interface Props {
   header?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 const Modal = ({
   children,
   customFooter = undefined,
@@ -166,11 +168,17 @@ const Modal = ({
   )
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 function Content({ children, className }: { children: React.ReactNode; className?: string }) {
   const __styles = styleHandler('modal')
   return <div className={cn(__styles.content, className)}>{children}</div>
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 export function Separator() {
   const __styles = styleHandler('modal')
 

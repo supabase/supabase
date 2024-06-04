@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -12,8 +11,6 @@ import {
   CommandList_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
-  IconLoader,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -22,15 +19,16 @@ import {
 
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useStore } from 'hooks'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { Code } from 'lucide-react'
 
 interface FunctionSelectorProps {
   className?: string
   size?: 'tiny' | 'small'
   showError?: boolean
   schema?: string
-  selectedFunctionName: string
-  onSelectFunction: (name: string) => void
+  value: string
+  onChange: (value: string) => void
   disabled?: boolean
 }
 
@@ -40,86 +38,69 @@ const FunctionSelector = ({
   showError = true,
   disabled = false,
   schema,
-  selectedFunctionName,
-  onSelectFunction,
+  value,
+  onChange,
 }: FunctionSelectorProps) => {
   const { project } = useProjectContext()
-  const { meta } = useStore()
   const [open, setOpen] = useState(false)
 
-  const refetchFunctions = () => {
-    meta.functions.load()
-  }
+  const { data, error, isLoading, isError, isSuccess, refetch } = useDatabaseFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-  const functions = meta.functions
-    .list()
+  const functions = (data ?? [])
     .filter((func) => schema && func.schema === schema)
     .filter((func) => func.return_type === 'json' || func.return_type === 'jsonb')
     .filter((func) => {
       const { value } = convertArgumentTypes(func.argument_types)
-
-      if (value.length !== 1) {
-        return false
-      }
-
+      if (value.length !== 1) return false
       return value[0].type === 'json' || value[0].type === 'jsonb'
     })
 
-  const isFunctionsLoading = meta.functions.isLoading
-  const isFunctionsError = meta.functions.hasError
-  const functionsError = meta.functions.error
-  const isFunctionsSuccess = !isFunctionsLoading && !isFunctionsError
-
   return (
     <div className={className}>
-      {isFunctionsLoading && (
-        <Button
-          type="outline"
-          className="w-full [&>span]:w-full"
-          icon={<IconLoader className="animate-spin" size={12} />}
-          disabled={!!disabled}
-        >
-          <div className="w-full flex space-x-3 py-0.5">
-            <p className="text-xs text-foreground-light">Loading functions...</p>
-          </div>
+      {isLoading && (
+        <Button type="default" className="justify-start" block size={size} loading>
+          Loading functions...
         </Button>
       )}
 
-      {showError && isFunctionsError && (
+      {showError && isError && (
         <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load functions
           </AlertTitle_Shadcn_>
+
           <AlertDescription_Shadcn_ className="text-xs mb-2">
-            Error: {functionsError?.message}
+            Error: {error.message}
           </AlertDescription_Shadcn_>
-          <Button type="default" size="tiny" onClick={() => refetchFunctions()}>
+
+          <Button type="default" size="tiny" onClick={() => refetch()}>
             Reload functions
           </Button>
         </Alert_Shadcn_>
       )}
 
-      {isFunctionsSuccess && (
+      {isSuccess && (
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
               size={size}
-              type="outline"
+              type="default"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+                <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
               disabled={!!disabled}
             >
-              <div className="w-full flex space-x-3 py-0.5">
-                <p className="text-xs text-foreground-light">function</p>
-                <p className="text-xs">
-                  {selectedFunctionName === '*' ? 'All functions' : selectedFunctionName}
-                </p>
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter">function:</p>
+                <p className="text-foreground">{value}</p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search functions..." />
               <CommandList_Shadcn_>
@@ -142,18 +123,19 @@ const FunctionSelector = ({
                     {functions?.map((func) => (
                       <CommandItem_Shadcn_
                         key={func.id}
+                        value={func.name.replaceAll('"', '')}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => {
-                          onSelectFunction(func.name)
+                          onChange(func.name)
                           setOpen(false)
                         }}
                         onClick={() => {
-                          onSelectFunction(func.name)
+                          onChange(func.name)
                           setOpen(false)
                         }}
                       >
                         <span>{func.name}</span>
-                        {selectedFunctionName === func.name && (
+                        {value === func.name && (
                           <IconCheck className="text-brand" strokeWidth={2} />
                         )}
                       </CommandItem_Shadcn_>
@@ -169,4 +151,4 @@ const FunctionSelector = ({
   )
 }
 
-export default observer(FunctionSelector)
+export default FunctionSelector

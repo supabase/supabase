@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react'
-import { ScrollArea } from '@ui/components/shadcn/ui/scroll-area'
-import { Separator } from '@ui/components/shadcn/ui/separator'
 import * as React from 'react'
+import { ScrollArea } from '../ui/scroll-area'
+import { Separator } from '../ui/separator'
 
 const meta: Meta = {
   title: 'shadcn/ScrollArea',

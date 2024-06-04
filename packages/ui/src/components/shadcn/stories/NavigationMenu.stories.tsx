@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/react'
-import { Card } from '@ui/components/shadcn/ui/card'
 import * as React from 'react'
 // import Link from 'next/link'
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../../lib/utils/cn'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,8 +9,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@ui/components/shadcn/ui/navigation-menu'
+} from '../ui/navigation-menu'
 
 const meta: Meta = {
   title: 'shadcn/NavigationMenu',

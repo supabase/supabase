@@ -1,35 +1,36 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
-  FormsContainer,
   FormSection,
   FormSectionContent,
   FormSectionLabel,
+  FormsContainer,
 } from 'components/ui/Forms'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
+import { useCheckPermissions } from 'hooks'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { Button, Form, IconArrowLeft, IconEdit, IconTrash, Input } from 'ui'
 import InputField from './InputField'
+import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
 import { makeValidateRequired } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
 
 const CreateWrapper = () => {
   const formId = 'create-wrapper-form'
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ui } = useStore()
   const { ref, type } = useParams()
   const { project } = useProjectContext()
   const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
@@ -41,10 +42,7 @@ const CreateWrapper = () => {
 
   const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created ${wrapperMeta?.label} foreign data wrapper`,
-      })
+      toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       setNewTables([])
 
       const hasNewSchema = newTables.some((table) => table.is_new_schema)
@@ -66,6 +64,16 @@ const CreateWrapper = () => {
         }
       : {}
 
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
+
+  const hasRequiredVersion =
+    (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
+
   if (wrapperMeta === undefined) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
@@ -78,6 +86,37 @@ const CreateWrapper = () => {
         </div>
         <Button asChild type="default">
           <Link href={`/project/${ref}/database/wrappers`}>Head back</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  if (!hasRequiredVersion) {
+    const databaseNeedsUpgrading =
+      wrappersExtension?.installed_version !== wrappersExtension?.default_version
+
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
+        <div className="space-y-2 flex flex-col items-center w-[400px]">
+          <p>Your extension version is outdated for this wrapper.</p>
+          <p className="text-sm text-center text-foreground-light">
+            The wrapper type {type} requires a minimum extension version of{' '}
+            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+            {wrappersExtension?.installed_version} installed. Please{' '}
+            {databaseNeedsUpgrading && 'upgrade your database then '}reinstall the extension to
+            create this wrapper.
+          </p>
+        </div>
+        <Button asChild type="default">
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${ref}/settings/infrastructure`
+                : `/project/${ref}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade Database' : 'Reinstall Extension'}
+          </Link>
         </Button>
       </div>
     )
@@ -129,14 +168,14 @@ const CreateWrapper = () => {
           >
             <Link href={`/project/${ref}/database/wrappers`}>
               <div className="flex items-center space-x-2">
-                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>
               </div>
             </Link>
           </div>
           <h3 className="mb-2 text-xl text-foreground">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link href={wrapperMeta.docsUrl} target="_blank" rel="noreferrer">
                 Documentation
               </Link>
@@ -230,7 +269,7 @@ const CreateWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-foreground-light">
-                                {wrapperMeta.tables[table.index].label}:{' '}
+                                Columns:{' '}
                                 {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>
@@ -289,4 +328,4 @@ const CreateWrapper = () => {
   )
 }
 
-export default observer(CreateWrapper)
+export default CreateWrapper

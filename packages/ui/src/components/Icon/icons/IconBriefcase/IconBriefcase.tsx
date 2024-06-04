@@ -9,5 +9,12 @@
     return <IconBase icon={Briefcase} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { briefcase } from 'lucide-react'
+  */
   export default IconBriefcase
   

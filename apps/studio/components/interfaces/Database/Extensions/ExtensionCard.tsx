@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
-
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useCheckPermissions, useStore } from 'hooks'
-import { isResponseOk } from 'lib/common/fetch'
 import Link from 'next/link'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { extensions } from 'shared-data'
 import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
+import { useCheckPermissions } from 'hooks'
 import EnableExtensionModal from './EnableExtensionModal'
 
 interface ExtensionCardProps {
@@ -15,12 +16,17 @@ interface ExtensionCardProps {
 }
 
 const ExtensionCard = ({ extension }: ExtensionCardProps) => {
-  const { ui, meta } = useStore()
-
+  const { project } = useProjectContext()
   const isOn = extension.installed_version !== null
-  const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
+
+  const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
+    onSuccess: () => {
+      toast.success(`${extension.name} is off.`)
+      setIsDisableModalOpen(false)
+    },
+  })
 
   const canUpdateExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -36,30 +42,14 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     setIsDisableModalOpen(true)
   }
 
-  async function disableExtension() {
-    try {
-      setLoading(true)
-      const response = await meta.extensions.del(extension.name)
-      if (!isResponseOk(response)) {
-        throw response.error
-      }
+  const onConfirmDisable = () => {
+    if (project === undefined) return console.error('Project is required')
 
-      ui.setNotification({
-        category: 'success',
-        message: `${extension.name.toUpperCase()} is off.`,
-      })
-      setIsDisableModalOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Toggle ${extension.name.toUpperCase()} failed: ${error.message}`,
-      })
-    } finally {
-      // Need to reload them because the delete function
-      // removes the extension from the store
-      meta.extensions.load()
-      setLoading(false)
-    }
+    disableExtension({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: extension.name,
+    })
   }
 
   return (
@@ -111,7 +101,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
               </Link>
             ) : null}
           </div>
-          {loading ? (
+          {isDisabling ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
             <Toggle
@@ -135,7 +125,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
-                <Badge color="scale">{`${extension.schema}`}</Badge>
+                <Badge>{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}
@@ -149,21 +139,18 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
       />
       <ConfirmationModal
         visible={isDisableModalOpen}
-        header="Confirm to disable extension"
-        buttonLabel="Disable"
-        onSelectCancel={() => setIsDisableModalOpen(false)}
-        onSelectConfirm={() => {
-          disableExtension()
-        }}
+        title="Confirm to disable extension"
+        confirmLabel="Disable"
+        confirmLabelLoading="Disabling"
+        onCancel={() => setIsDisableModalOpen(false)}
+        onConfirm={() => onConfirmDisable()}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to turn OFF "{extension.name}" extension?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to turn OFF the "{extension.name}" extension?
+        </p>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(ExtensionCard)
+export default ExtensionCard

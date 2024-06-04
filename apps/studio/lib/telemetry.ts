@@ -1,13 +1,18 @@
+import { Sha256 } from '@aws-crypto/sha256-browser'
+import type { NextRouter } from 'next/router'
+
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { User } from 'types'
-import { NextRouter } from 'next/router'
+import type { User } from 'types'
 
 export interface TelemetryProps {
   screenResolution?: string
   language: string
 }
 
+/**
+ * Sends a telemetry event to Logflare for tracking by the product team.
+ */
 const sendEvent = (
   event: {
     category: string
@@ -28,6 +33,11 @@ const sendEvent = (
 
   const { category, action, label, value } = event
 
+  // remove # section from router.asPath as it
+  // often includes sensitive information
+  // such as access/refresh tokens
+  const page_location = router.asPath.split('#')[0]
+
   return post(`${API_URL}/telemetry/event`, {
     action: action,
     category: category,
@@ -35,7 +45,7 @@ const sendEvent = (
     value: value,
     page_referrer: document?.referrer,
     page_title: document?.title,
-    page_location: router.asPath,
+    page_location,
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
@@ -65,6 +75,9 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   })
 }
 
+/**
+ * @deprecated use sendEvent instead.
+ */
 const sendActivity = (
   event: {
     activity: string
@@ -101,8 +114,22 @@ const sendActivity = (
   return post(`${API_URL}/telemetry/activity`, properties)
 }
 
-export default {
+/**
+ * Generates a unique identifier for an anonymous user based on their gotrue id.
+ */
+export const getAnonId = async (id: string) => {
+  const hash = new Sha256()
+  hash.update(id)
+  const u8Array = await hash.digest()
+  const binString = Array.from(u8Array, (byte) => String.fromCodePoint(byte)).join('')
+  const b64encoded = btoa(binString)
+  return b64encoded
+}
+
+const Telemetry = {
   sendEvent,
   sendIdentify,
   sendActivity,
 }
+
+export default Telemetry

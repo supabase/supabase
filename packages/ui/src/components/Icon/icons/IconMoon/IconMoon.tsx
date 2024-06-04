@@ -9,5 +9,12 @@
     return <IconBase icon={Moon} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { moon } from 'lucide-react'
+  */
   export default IconMoon
   

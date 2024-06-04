@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
@@ -73,8 +73,8 @@ export const ProjectCardStatus = ({
   const alertType = isCritical
     ? 'destructive'
     : projectStatus === 'isPaused'
-    ? 'default'
-    : 'warning'
+      ? 'default'
+      : 'warning'
 
   if (
     (activeWarnings.length === 0 || warningContent === undefined) &&
@@ -100,7 +100,7 @@ export const ProjectCardStatus = ({
       ) : (
         <AlertTriangle strokeWidth={1.5} size={12} />
       )}
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between items-center w-full gap-x-1">
         <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
@@ -112,7 +112,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border bg-background',
+                  'border bg-studio w-[280px]',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>

@@ -1,0 +1,237 @@
+---
+title: 'Use Supabase with RedwoodJS'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Setup your new Supabase Project">
+      [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+
+      <Admonition type="important">
+
+      Be sure to make note of the Database Password you used as you will need this later to connect to your database.
+
+      </Admonition>
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![New project for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/new-project.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Gather Database Connection Strings">
+
+    Go to the [database settings page](https://supabase.com/dashboard/project/_/settings/database). In this quickstart, we are going to connect via the connection pooler. If your network supports IPv6, you can connect to the database directly without using the connection pooler.
+
+    We will use the pooler both in `Transaction` and `Session` mode. `Transaction` mode is used for application queries and `Session` mode is used for running migrations with Prisma.
+
+    To do this, set the connection mode to `Transaction` in the [database settings page](https://supabase.com/dashboard/project/_/settings/database) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+
+    To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
+
+    You will need the Transaction mode connection string and the Session mode connection string to setup environment variables in Step 5.
+
+    <Admonition type="tip">
+
+    You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
+
+    </Admonition>
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![pooled connection for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/pooled-connection-strings.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Create a RedwoodJS app">
+      Create a RedwoodJS app with TypeScript.
+
+      <Admonition type="note">
+
+        The [`yarn` package manager](https://yarnpkg.com) is required to create a RedwoodJS app. You will use it to run RedwoodJS commands later.
+
+        While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` flag.
+
+      </Admonition>
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash Terminal
+      yarn create redwood-app my-app --ts
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Open your RedwoodJS app in VS Code">
+      You'll develop your app, manage database migrations, and run your app in VS Code.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash Terminal
+      cd my-app
+      code .
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Configure Environment Variables">
+
+      In your `.env` file, add the following environment variables for your database connection:
+
+      * The `DIRECT_URL` should use the Transaction mode connection string you copied in Step 1.
+
+      * The `DATABASE_URL` should use the Session mode connection string you copied in Step 1.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash .env
+      # Transaction mode connection string used for migrations
+      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+
+      # Session mode connection string — used by Prisma Client
+      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Update your Prisma Schema">
+      By default, RedwoodJS ships with a SQLite database, but we want to use PostgreSQL.
+
+      Update your Prisma schema file `api/db/schema.prisma` to use your Supabase PostgreSQL database connection environment variables you setup in Step 5.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```prisma api/prisma/schema.prisma
+      datasource db {
+        provider  = "postgresql"
+        url       = env("DATABASE_URL")
+        directUrl = env("DIRECT_URL")
+      }
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Create the Country model and apply a schema migration">
+      Create the Country model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```prisma api/db/schema.prisma
+      model Country {
+        id   Int    @id @default(autoincrement())
+        name String @unique
+      }
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Update seed script">
+      Let's seed the database with a few countries.
+
+      Update the file `scripts/seeds.ts` to contain the following code:
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```ts scripts/seed.ts
+      import type { Prisma } from '@prisma/client'
+      import { db } from 'api/src/lib/db'
+
+      export default async () => {
+        try {
+          const data: Prisma.CountryCreateArgs['data'][] = [
+            { name: 'United States' },
+            { name: 'Canada' },
+            { name: 'Mexico' },
+          ]
+
+          console.log('Seeding countries ...')
+
+          const countries = await db.country.createMany({ data })
+
+          console.log('Done.', countries)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={9}>
+    <StepHikeCompact.Details title="Seed your database">
+      Run the seed database command to populate the `Country` table with the countries you just created.
+
+      <Admonition type="tip">
+
+        The reset database command `yarn rw prisma db reset` will recreate the tables and will also run the seed script.
+
+      </Admonition>
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash Terminal
+      yarn rw prisma db seed
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={10}>
+    <StepHikeCompact.Details title="Scaffold the Country UI">
+      Now, we'll use RedwoodJS generators to scaffold a CRUD UI for the `Country` model.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash Terminal
+      yarn rw g scaffold country
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={11}>
+    <StepHikeCompact.Details title="Start the app">
+      Start the app via `yarn rw dev`. A browser will open to the RedwoodJS Splash page.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-splash.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={12}>
+    <StepHikeCompact.Details title="View Countries UI">
+      Click on `/countries` to visit http://localhost:8910/countries where should see the list of countries.
+
+      You may now edit, delete, and add new countries using the scaffolded UI.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-countries-ui.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>

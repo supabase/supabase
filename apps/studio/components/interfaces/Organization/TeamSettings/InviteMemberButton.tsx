@@ -1,15 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
+import toast from 'react-hot-toast'
 import { object, string } from 'yup'
 
+import { useParams } from 'common'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { doPermissionsCheck, useGetPermissions, useStore } from 'hooks'
-import { Role } from 'types'
+import type { OrganizationMember } from 'data/organizations/organization-members-query'
+import { doPermissionsCheck, useGetPermissions } from 'hooks'
+import type { Role } from 'types'
+import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 
 export interface InviteMemberButtonProps {
   orgId: number
@@ -26,7 +27,6 @@ const InviteMemberButton = ({
   roles = [],
   rolesAddable = [],
 }: InviteMemberButtonProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const [isOpen, setIsOpen] = useState(false)
   const { permissions: allPermissions } = useGetPermissions()
@@ -47,7 +47,7 @@ const InviteMemberButton = ({
     role: string().required('Role is required'),
   })
 
-  const { mutateAsync: inviteMember, isLoading: isInviting } =
+  const { mutate: inviteMember, isLoading: isInviting } =
     useOrganizationMemberInviteCreateMutation()
 
   const onInviteMember = async (values: any, { resetForm }: any) => {
@@ -60,35 +60,33 @@ const InviteMemberButton = ({
     )
     if (existingMember !== undefined) {
       if (existingMember.invited_id) {
-        return ui.setNotification({
-          category: 'info',
-          message: 'User has already been invited to this organization',
-        })
+        return toast('User has already been invited to this organization')
       } else {
-        return ui.setNotification({
-          category: 'info',
-          message: 'User is already in this organization',
-        })
+        return toast('User is already in this organization')
       }
     }
 
     const roleId = Number(values.role)
 
-    try {
-      const response = await inviteMember({
+    inviteMember(
+      {
         slug,
         invitedEmail: values.email.toLowerCase(),
         ownerId: userId,
         roleId,
-      })
-      if (isNil(response)) {
-        ui.setNotification({ category: 'error', message: 'Failed to add member' })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
-        setIsOpen(!isOpen)
-        resetForm({ initialValues: { ...initialValues, role: roleId } })
+      },
+      {
+        onSuccess: (data) => {
+          if (isNil(data)) {
+            toast.error('Failed to add member')
+          } else {
+            toast.success('Successfully added new member')
+            setIsOpen(!isOpen)
+            resetForm({ initialValues: { ...initialValues, role: roleId } })
+          }
+        },
       }
-    } catch (error) {}
+    )
   }
 
   return (

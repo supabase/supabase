@@ -1,10 +1,11 @@
-import { Organization, ProjectBase } from 'types'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Organization } from 'types'
 
 export const generateSettingsMenu = (
   ref?: string,
-  project?: ProjectBase,
+  project?: Project,
   organization?: Organization,
   features?: {
     auth?: boolean
@@ -64,7 +65,7 @@ export const generateSettingsMenu = (
       ],
     },
     {
-      title: '',
+      title: 'Configuration',
       items: [
         {
           name: 'Database',

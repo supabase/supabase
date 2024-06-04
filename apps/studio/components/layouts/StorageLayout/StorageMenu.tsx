@@ -1,27 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconEdit,
-  Menu,
-} from 'ui'
 
+import { useParams } from 'common'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
+import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { ArrowUpRight, Edit } from 'lucide-react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu } from 'ui'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -32,6 +25,7 @@ const StorageMenu = () => {
 
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
+  const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -56,8 +50,8 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-foreground-lighter">
-                    <IconEdit size={14} />
+                  <div className="text-foreground-light">
+                    <Edit size={14} />
                   </div>
                 }
                 disabled={!canCreateBuckets}
@@ -88,7 +82,7 @@ const StorageMenu = () => {
         </div>
         <div className="space-y-6">
           <div>
-            <Menu.Group title="All buckets" />
+            <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
               <div className="space-y-2 mx-2">
@@ -119,9 +113,12 @@ const StorageMenu = () => {
               <>
                 {buckets.length === 0 && (
                   <div className="px-2">
-                    <Alert title="No buckets available">
-                      Buckets that you create will appear here
-                    </Alert>
+                    <Alert_Shadcn_>
+                      <AlertTitle_Shadcn_>No buckets available</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Buckets that you create will appear here
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                   </div>
                 )}
                 {buckets.map((bucket, idx: number) => {
@@ -132,6 +129,7 @@ const StorageMenu = () => {
                       bucket={bucket}
                       projectRef={ref}
                       isSelected={isSelected}
+                      onSelectEmptyBucket={() => setSelectedBucketToEmpty(bucket)}
                       onSelectDeleteBucket={() => setSelectedBucketToDelete(bucket)}
                       onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
                     />
@@ -141,11 +139,19 @@ const StorageMenu = () => {
             )}
           </div>
           <div className="h-px w-full bg-border"></div>
-          <div className="">
-            <Menu.Group title="Configuration" />
+          <div>
+            <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
+              </Menu.Item>
+            </Link>
+            <Link href={`/project/${ref}/settings/storage`}>
+              <Menu.Item rounded>
+                <div className="flex items-center justify-between">
+                  <p className="truncate">Settings</p>
+                  <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+                </div>
               </Menu.Item>
             </Link>
           </div>
@@ -163,6 +169,12 @@ const StorageMenu = () => {
         onClose={() => setSelectedBucketToEdit(undefined)}
       />
 
+      <EmptyBucketModal
+        visible={selectedBucketToEmpty !== undefined}
+        bucket={selectedBucketToEmpty}
+        onClose={() => setSelectedBucketToEmpty(undefined)}
+      />
+
       <DeleteBucketModal
         visible={selectedBucketToDelete !== undefined}
         bucket={selectedBucketToDelete}
@@ -172,4 +184,4 @@ const StorageMenu = () => {
   )
 }
 
-export default observer(StorageMenu)
+export default StorageMenu

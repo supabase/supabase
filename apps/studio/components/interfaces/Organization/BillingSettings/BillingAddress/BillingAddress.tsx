@@ -1,7 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
+import { useEffect } from 'react'
+import toast from 'react-hot-toast'
+import { Form, Input, Listbox } from 'ui'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -13,17 +15,15 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { Form, Input, Listbox } from 'ui'
+import { useCheckPermissions } from 'hooks'
 import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
     slug,
   })
-  const { mutateAsync: updateCustomerProfile, isLoading: isUpdating } =
+  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
     useOrganizationCustomerProfileUpdateMutation()
 
   const formId = 'billing-address-form'
@@ -54,21 +54,22 @@ const BillingAddress = () => {
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
-    try {
-      await updateCustomerProfile({ slug, address: values })
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated billing address',
-      })
-      resetForm({ values, initialValues: values })
-    } catch (error) {}
+    updateCustomerProfile(
+      { slug, address: values },
+      {
+        onSuccess: () => {
+          toast.success('Successfully updated billing address')
+          resetForm({ values, initialValues: values })
+        },
+      }
+    )
   }
 
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Billing Address</p>
+          <p className="text-foreground text-base m-0">Billing Address</p>
           <p className="text-sm text-foreground-light m-0">
             This will be reflected in every upcoming invoice, past invoices are not affected
           </p>

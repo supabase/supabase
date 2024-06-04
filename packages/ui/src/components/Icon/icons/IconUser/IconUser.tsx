@@ -9,5 +9,12 @@
     return <IconBase icon={User} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { user } from 'lucide-react'
+  */
   export default IconUser
   

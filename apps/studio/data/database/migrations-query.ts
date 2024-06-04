@@ -1,6 +1,5 @@
-import { useCallback } from 'react'
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type DatabaseMigration = {
   version: string
@@ -25,7 +24,7 @@ export type MigrationsVariables = {
 }
 
 export type MigrationsData = { result: DatabaseMigration[] }
-export type MigrationsError = unknown
+export type MigrationsError = ExecuteSqlError
 
 export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData>(
   { projectRef, connectionString }: MigrationsVariables,
@@ -37,7 +36,7 @@ export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData
       connectionString,
       sql: getMigrationsQuery(),
       queryKey: ['migrations'],
-      handleError: (error: { code: number; message: string; requestId: string }) => {
+      handleError: (error) => {
         if (
           error.message.includes('relation "supabase_migrations.schema_migrations" does not exist')
         ) {
@@ -48,20 +47,5 @@ export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData
       },
     },
     options
-  )
-}
-
-export const useMigrationsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: MigrationsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getMigrationsQuery(),
-        queryKey: ['migrations'],
-      }),
-    [prefetch]
   )
 }

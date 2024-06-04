@@ -366,8 +366,8 @@ let { data: ${resourceId}, error } = await supabase
   .in('column', ['Array', 'Values'])
   .neq('column', 'Not equal to')
   // Arrays
-  .cs('array_column', ['array', 'contains'])
-  .cd('array_column', ['contained', 'by'])
+  .contains('array_column', ['array', 'contains'])
+  .containedBy('array_column', ['contained', 'by'])
 `,
     },
   }),
@@ -637,7 +637,7 @@ let { data, error } = await supabase.auth.verifyOtp({
       code: `
 curl -X POST '${endpoint}/auth/v1/invite' \\
 -H "apikey: ${apiKey}" \\
--H "Authorization: Bearer ${apiKey}" \\
+-H "Authorization: Bearer USER_TOKEN" \\
 -H "Content-Type: application/json" \\
 -d '{
   "email": "someone@email.com"
@@ -647,15 +647,20 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
+let { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@email.com')
 `,
     },
   }),
-  authThirdPartyLogin: () => ({
+  authThirdPartyLogin: (endpoint: string, apiKey: string) => ({
     title: 'Third Party Login',
     bash: {
       language: 'bash',
-      code: ``,
+      code: `
+curl -X GET '${endpoint}/auth/v1/authorize?provider=github' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer USER_TOKEN" \\
+-H "Content-Type: application/json"
+`,
     },
     js: {
       language: 'js',
@@ -710,7 +715,7 @@ let { data, error } = await supabase.auth.resetPasswordForEmail(email)
       code: `
       curl -X PUT '${endpoint}/auth/v1/user' \\
 -H "apikey: ${apiKey}" \\
--H "Authorization: Bearer <USERS-ACCESS-TOKEN>" \\
+-H "Authorization: Bearer USER_TOKEN" \\
 -H "Content-Type: application/json" \\
 -d '{
   "email": "someone@email.com",

@@ -4,6 +4,7 @@ node_modules
 package-lock.json
 docker*
 apps/**/out
+apps/docs/spec/**
 # prettier-plugin-sql-cst only supports sqlite syntax
 **/supabase/migrations/*.sql
 apps/www/schema.sql
@@ -15,3 +16,4 @@ apps/docs/pages/guides/integrations/*.mdx
 apps/studio/public
 apps/**/.turbo
 apps/docs/CONTRIBUTING.md
+apps/design-system/__registry__

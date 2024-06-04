@@ -4,29 +4,29 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Button } from 'ui'
 
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef: string
-  organizationSlug: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
+  disabled?: boolean
 }
 
 const UpgradeToPro = ({
   icon,
   primaryText,
-  projectRef,
-  organizationSlug,
   secondaryText,
   addon,
   buttonText,
+  disabled = false,
 }: UpgradeToProProps) => {
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
+  const project = useSelectedProject()
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
@@ -55,14 +55,14 @@ const UpgradeToPro = ({
             <Tooltip.Trigger asChild>
               <Button
                 type="primary"
-                disabled={!canUpdateSubscription || projectUpdateDisabled}
+                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
                 asChild
               >
                 <Link
                   href={
                     plan === 'free'
-                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                      ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan`
+                      : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
                   }
                 >
                   {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}

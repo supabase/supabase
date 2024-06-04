@@ -1,12 +1,12 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-import { RadioContext } from './RadioContext'
 
-import { useFormContext } from '../Form/FormContext'
-
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import styleHandler from '../../lib/theme/styleHandler'
-
+import { useFormContext } from '../Form/FormContext'
 import { generateUID } from './../../lib/utils/randomIdGenerator'
+import { RadioContext } from './RadioContext'
 
 interface GroupProps {
   allowedValues?: any
@@ -33,6 +33,9 @@ interface GroupProps {
   labelsLayout?: 'horizontal' | 'vertical'
 }
 
+/**
+ * @deprecated Use ./RadioGroup_Shadcn_ instead
+ */
 function RadioGroup({
   id,
   layout,
@@ -146,6 +149,9 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   children?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./RadioGroupItem_Shadcn_ instead
+ */
 function Radio({
   id = generateUID(),
   disabled,

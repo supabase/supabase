@@ -1,8 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, IconSearch, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -10,19 +11,19 @@ import {
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
+import { Button, Input } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
 
   const {
@@ -52,25 +53,25 @@ const TeamSettings = () => {
   const canAddMembers = rolesAddable.length > 0
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
-  const { mutateAsync: deleteMember } = useOrganizationMemberDeleteMutation()
+  const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
+    onSuccess: () => {
+      setIsLeaving(false)
+      setIsLeaveTeamModalOpen(false)
+      window?.location.replace('/') // Force reload to clear Store
+    },
+    onError: (error) => {
+      setIsLeaving(false)
+      toast.error(`Failed to leave organization: ${error?.message}`)
+    },
+  })
 
   const [isLeaveTeamModalOpen, setIsLeaveTeamModalOpen] = useState(false)
 
   const leaveTeam = async () => {
+    if (!slug) return console.error('Org slug is required')
+
     setIsLeaving(true)
-    try {
-      if (!slug) return console.error('Org slug is required')
-      await deleteMember({ slug, gotrueId: profile!.gotrue_id })
-      setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to leave organization: ${error?.message}`,
-      })
-    } finally {
-      setIsLeaving(false)
-    }
+    deleteMember({ slug, gotrueId: profile!.gotrue_id })
   }
 
   return (
@@ -79,7 +80,7 @@ const TeamSettings = () => {
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="justify-between">
             <Input
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size={12} />}
               size="small"
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
@@ -146,18 +147,16 @@ const TeamSettings = () => {
 
       <ConfirmationModal
         visible={isLeaveTeamModalOpen}
-        header="Are you sure?"
-        buttonLabel="Leave"
-        onSelectCancel={() => setIsLeaveTeamModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Are you sure?"
+        confirmLabel="Leave"
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => {
           leaveTeam()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to leave this organization? This is permanent.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to leave this organization? This is permanent.
+        </p>
       </ConfirmationModal>
     </>
   )

@@ -1,14 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
   identifier: string
+  invalidateReplicaQueries: boolean
 }
 
 export async function removeReadReplica({ projectRef, identifier }: ReadReplicaRemoveVariables) {
@@ -20,8 +20,7 @@ export async function removeReadReplica({ projectRef, identifier }: ReadReplicaR
       database_identifier: identifier,
     },
   })
-
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -40,16 +39,14 @@ export const useReadReplicaRemoveMutation = ({
     (vars) => removeReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, identifier } = variables
+        const { projectRef, invalidateReplicaQueries } = variables
 
-        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
-        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
-          return old.filter((db: Database) => db.identifier !== identifier)
-        })
-
-        setTimeout(async () => {
-          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        }, 5000)
+        if (invalidateReplicaQueries) {
+          await Promise.all([
+            queryClient.invalidateQueries(replicaKeys.list(projectRef)),
+            queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+          ])
+        }
 
         await onSuccess?.(data, variables, context)
       },
