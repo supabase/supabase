@@ -1,7 +1,6 @@
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import {
   SelectContent_Shadcn_,
@@ -24,22 +23,24 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
   const router = useRouter()
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
 
-  const {
-    data: region,
-    isSuccess,
-    isError,
-  } = useDefaultRegionQuery(
+  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
-    { refetchOnMount: false, refetchOnWindowFocus: false, refetchInterval: false }
-  )
-
-  useEffect(() => {
-    // only pick a region if one hasn't already been selected
-    if (isError && !field.value) {
-      // if an error happened, and the user haven't selected a region, just select the default one for him
-      form.setValue('dbRegion', PROVIDERS[cloudProvider].default_region)
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      onSuccess(data) {
+        console.log('/trace return', data)
+        if (data) {
+          form.setValue('dbRegion', data)
+        }
+      },
+      onError(error) {
+        console.log('Could not find nearest region', error)
+        form.setValue('dbRegion', PROVIDERS[cloudProvider].default_region)
+      },
     }
-  }, [cloudProvider, isError, isSuccess, field.value, form])
+  )
 
   return (
     <FormItemLayout
@@ -49,11 +50,8 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
     >
       <Select_Shadcn_
         value={field.value}
-        onValueChange={(value) => {
-          if (isSuccess && region && !field.value) {
-            field.onChange(value)
-          }
-        }}
+        onValueChange={field.onChange}
+        disabled={isLoadingDefaultRegion}
       >
         <SelectTrigger_Shadcn_>
           <SelectValue_Shadcn_ placeholder="Select a region for your project.." />

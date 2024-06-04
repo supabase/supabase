@@ -238,9 +238,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-        ? PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region
-        : '',
+      dbRegion: undefined,
       instanceSize: sizes[0],
     },
   })
@@ -452,19 +450,7 @@ const Wizard: NextPageWithLayout = () => {
                           render={({ field }) => (
                             <FormItemLayout label="Cloud provider" layout="horizontal">
                               <Select_Shadcn_
-                                onValueChange={(value: CloudProvider) => {
-                                  field.onChange(value)
-
-                                  // on local/staging quick-select the default region, don't wait for the cloudflare location
-                                  form.setValue(
-                                    'dbRegion',
-                                    ['staging', 'local'].includes(
-                                      process.env.NEXT_PUBLIC_ENVIRONMENT ?? ''
-                                    )
-                                      ? PROVIDERS[value].default_region
-                                      : ''
-                                  )
-                                }}
+                                onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <FormControl_Shadcn_>
@@ -492,7 +478,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {orgSubscription?.plan.id !== 'free' && (
+                    {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -628,7 +614,6 @@ const Wizard: NextPageWithLayout = () => {
                     </Panel.Content>
 
                     <Panel.Content>
-                      <></>
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbRegion"
