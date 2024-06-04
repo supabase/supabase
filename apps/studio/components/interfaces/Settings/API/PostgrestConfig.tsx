@@ -2,9 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormActions, FormPanel } from 'components/ui/Forms'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import {
   FormActions,
   FormPanelContainer,
@@ -14,7 +11,6 @@ import {
 } from 'components/ui/Forms'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
@@ -25,7 +21,6 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
   Admonition,
-  Button,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -41,7 +36,6 @@ import {
   Skeleton,
   Switch,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
