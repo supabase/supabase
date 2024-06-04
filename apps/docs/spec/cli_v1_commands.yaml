@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.169.8
+  version: 1.172.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2542,6 +2542,34 @@ commands:
   - id: supabase-functions-serve
     title: supabase functions serve
     summary: Serve all Functions locally
+    description: |2
+
+      Serve all Functions locally.
+
+      `supabase functions serve` command includes additional flags to assist developers in debugging Edge Functions via the v8 inspector protocol, allowing for debugging via Chrome DevTools, VS Code, and IntelliJ IDEA for example.
+
+      1. `--inspect`
+         * Alias of `--inspect-mode run`.
+
+      2. `--inspect-mode [ run | brk | wait ]`
+         * Activates the inspector capability.
+         * `run` mode simply allows a connection without additional behavior. It is not ideal for short scripts, but it can be useful for long-running scripts where you might occasionally want to set breakpoints.
+         * `brk` mode same as `run` mode, but additionally sets a breakpoint at the first line to pause script execution before any code runs.
+         * `wait` mode similar to `brk` mode, but instead of setting a breakpoint at the first line, it pauses script execution until an inspector session is connected.
+
+      3. `--inspect-main`
+         * Can only be used when one of the above two flags is enabled.
+         * By default, creating an inspector session for the main worker is not allowed, but this flag allows it.
+         * Other behaviors follow the `inspect-mode` flag mentioned above.
+
+      Additionally, the following properties can be customized via `supabase/config.toml` under `edge_runtime` section.
+
+      1. `inspector_port`
+         * The port used to listen to the Inspector session, defaults to 8083.
+      2. `policy`
+         * A value that indicates how the edge-runtime should forward incoming HTTP requests to the worker.
+         * `per_worker` allows multiple HTTP requests to be forwarded to a worker that has already been created.
+         * `oneshot` will force the worker to process a single HTTP request and then exit. (Debugging purpose, This is especially useful if you want to reflect changes you've made immediately.)
     tags: []
     links: []
     usage: supabase functions serve [flags]
@@ -2556,6 +2584,28 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
+      - id: inspect
+        name: --inspect
+        description: Alias of --inspect-mode run.
+        default_value: 'false'
+      - id: inspect-main
+        name: --inspect-main
+        description: Allow inspecting the main worker.
+        default_value: 'false'
+      - id: inspect-mode
+        name: --inspect-mode <[ run | brk | wait ]>
+        description: Activate inspector capability for debugging.
+        default_value: ''
+        accepted_values:
+          - id: run
+            name: run
+            type: '[ run | brk | wait ]'
+          - id: brk
+            name: brk
+            type: '[ run | brk | wait ]'
+          - id: wait
+            name: wait
+            type: '[ run | brk | wait ]'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
