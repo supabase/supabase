@@ -26,7 +26,7 @@ export async function getWarehouseQuery(
   }
 
   // TODO!: Remove type assertion when we have a proper type for the response
-  return data as any
+  return data as { result: any[] }
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>

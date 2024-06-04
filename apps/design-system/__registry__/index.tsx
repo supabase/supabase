@@ -764,6 +764,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "navigation-menu-responsive": {
+      name: "navigation-menu-responsive",
+      type: "components:example",
+      registryDependencies: ["navigation-menu"],
+      component: React.lazy(() => import("@/registry/default/example/navigation-menu-responsive")),
+      source: "",
+      files: ["registry/default/example/navigation-menu-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "popover-demo": {
       name: "popover-demo",
       type: "components:example",

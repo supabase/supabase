@@ -91,7 +91,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   })
 
   const selectedQuery =
-    selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]['query'] : undefined
+    selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]?.['query'] : undefined
   const showIndexSuggestions = (selectedQuery ?? '').trim().toLowerCase().startsWith('select')
 
   const onSortChange = (column: string) => {

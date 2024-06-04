@@ -79,7 +79,7 @@ export const WarehouseCollectionDetail = () => {
     return r
   }
 
-  const results = formatResults(queryData?.data?.result)
+  const results = formatResults(queryData?.result)
 
   function loadMore() {
     setPagination({ ...pagination, offset: pagination.offset + pagination.limit })
@@ -128,7 +128,7 @@ export const WarehouseCollectionDetail = () => {
               data={results}
               params={params}
               maxHeight="calc(100vh - 139px)"
-              hideHeader={true}
+              showHeader={false}
               emptyState={
                 <ProductEmptyState
                   title="Send your first event"
