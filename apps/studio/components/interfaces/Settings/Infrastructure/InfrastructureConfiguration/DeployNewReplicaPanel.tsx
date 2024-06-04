@@ -199,7 +199,38 @@ const DeployNewReplicaPanel = ({
           </Alert_Shadcn_>
         ) : (
           <>
-            {!isWalgEnabled && (
+            {!isMinimallyOnSmallCompute && (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Project required to at least be on a Small compute
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <span>
+                    This is to ensure that read replicas can keep up with the primary databases'
+                    activities.
+                  </span>
+                  <div className="flex items-center gap-x-2 mt-3">
+                    <Button asChild type="default">
+                      <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
+                        Change compute size
+                      </Link>
+                    </Button>
+                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                      <a
+                        href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Documentation
+                      </a>
+                    </Button>
+                  </div>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+
+            {isMinimallyOnSmallCompute && !isWalgEnabled && (
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
@@ -245,37 +276,6 @@ const DeployNewReplicaPanel = ({
                     </Button>
                   </AlertDescription_Shadcn_>
                 )}
-              </Alert_Shadcn_>
-            )}
-
-            {!isMinimallyOnSmallCompute && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  Project required to at least be on a Small compute
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <span>
-                    This is to ensure that read replicas can keep up with the primary databases'
-                    activities.
-                  </span>
-                  <div className="flex items-center gap-x-2 mt-3">
-                    <Button asChild type="default">
-                      <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
-                        Change compute size
-                      </Link>
-                    </Button>
-                    <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                      <a
-                        href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </a>
-                    </Button>
-                  </div>
-                </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
 
