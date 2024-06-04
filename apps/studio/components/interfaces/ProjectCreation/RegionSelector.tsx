@@ -35,11 +35,10 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
 
   useEffect(() => {
     // only pick a region if one hasn't already been selected
-    if (isError && !field.value) {
-      // if an error happened, and the user haven't selected a region, just select the default one for him
-      form.setValue('dbRegion', PROVIDERS[cloudProvider].default_region)
+    if (!field.value) {
+      form.setValue('dbRegion', region)
     }
-  }, [cloudProvider, isError, isSuccess, field.value, form])
+  }, [cloudProvider, isError, isSuccess, field.value, form, region])
 
   return (
     <FormItemLayout
@@ -47,14 +46,7 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
       label="Region"
       description="Select the region closest to your users for the best performance."
     >
-      <Select_Shadcn_
-        value={field.value}
-        onValueChange={(value) => {
-          if (isSuccess && region && !field.value) {
-            field.onChange(value)
-          }
-        }}
-      >
+      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
         <SelectTrigger_Shadcn_>
           <SelectValue_Shadcn_ placeholder="Select a region for your project.." />
         </SelectTrigger_Shadcn_>

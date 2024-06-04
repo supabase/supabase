@@ -454,14 +454,13 @@ const Wizard: NextPageWithLayout = () => {
                                   field.onChange(value)
 
                                   // on local/staging quick-select the default region, don't wait for the cloudflare location
-                                  form.setValue(
-                                    'dbRegion',
+                                  if (
                                     ['staging', 'local'].includes(
                                       process.env.NEXT_PUBLIC_ENVIRONMENT ?? ''
                                     )
-                                      ? PROVIDERS[value].default_region
-                                      : ''
-                                  )
+                                  ) {
+                                    form.setValue('dbRegion', PROVIDERS[value].default_region)
+                                  }
                                 }}
                                 defaultValue={field.value}
                               >
@@ -626,7 +625,6 @@ const Wizard: NextPageWithLayout = () => {
                     </Panel.Content>
 
                     <Panel.Content>
-                      <></>
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbRegion"
