@@ -11,7 +11,7 @@ This is because each Edge Function needs to be booted before serving a request (
 One way to reduce the cold starts and increase performance of your app is to combine multiple actions into a single Edge Function. This way only one instance of the Edge Function needs to be booted and it can handle multiple requests to different actions.
 For example, we can use a single Edge Function to create a typical CRUD API (create, read, update, delete records).
 
-To combine multiple endpoints into a single Edge Function, you can use web application frameworks such as [Express](https://expressjs.com/) or [Oak](https://oakserver.github.io/oak/).
+To combine multiple endpoints into a single Edge Function, you can use web application frameworks such as [Express](https://expressjs.com/), [Oak](https://oakserver.github.io/oak/), or [Hono](https://hono.dev).
 
 Let's dive into some examples.
 
@@ -87,17 +87,16 @@ app.listen({ port: 3000 });
 
 <TabPanel id="hono" label="Hono">
 ```ts
-import { Hono } from 'https://deno.land/x/hono/mod.ts';
-import type { Context } from 'https://deno.land/x/hono/mod.ts';
+import { Hono } from 'jsr:@hono/hono';
 
 const app = new Hono();
 
-app.post('/hello-world', async (c: Context) => {
+app.post('/hello-world', async (c) => {
   const { name } = await c.req.json();
   return new Response(`Hello ${name}!`)
 });
 
-app.get('/hello-world', (c: Context) => {
+app.get('/hello-world', (c) => {
   return new Response('Hello World!')
 });
 
@@ -274,15 +273,14 @@ app.listen({ port: 3000 });
 <TabPanel id="hono" label="Hono">
 
 ```ts
-import { Hono } from 'https://deno.land/x/hono/mod.ts'
-import type { Context } from 'https://deno.land/x/hono/mod.ts'
+import { Hono } from 'jsr:@hono/hono'
 
 // You can set the basePath with Hono
 const functionName = 'tasks'
 const app = new Hono().basePath(`/${functionName}`)
 
 // /tasks/id
-app.get('/:id', async (c: Context) => {
+app.get('/:id', async (c) => {
   const id = c.req.param('id')
   const task = {} // Fetch task by id here
   if (task) {
@@ -292,7 +290,7 @@ app.get('/:id', async (c: Context) => {
   }
 })
 
-app.patch('/:id', async (c: Context) => {
+app.patch('/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.body()
   const updates = body.value
@@ -305,7 +303,7 @@ app.patch('/:id', async (c: Context) => {
   }
 })
 
-app.delete('/:id', async (c: Context) => {
+app.delete('/:id', async (c) => {
   const id = c.req.param('id')
   const task = {} // Fetch task by id here
   if (task) {

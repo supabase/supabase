@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Button, cn } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -136,11 +136,16 @@ const Nav = (props: Props) => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
+                          <NavigationMenuTrigger
+                            className={cn(
+                              buttonVariants({ type: 'text', size: 'small' }),
+                              '!bg-transparent hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground px-2 h-auto'
+                            )}
+                          >
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
-                            className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                          // className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
