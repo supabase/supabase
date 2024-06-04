@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 type GetViewDefinition = {
   schema?: string
@@ -20,7 +20,7 @@ export type ViewDefinitionVariables = GetViewDefinition & {
 }
 
 export type ViewDefinitionData = string
-export type ViewDefinitionError = unknown
+export type ViewDefinitionError = ExecuteSqlError
 
 export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDefinitionData>(
   { projectRef, connectionString, schema, name }: ViewDefinitionVariables,
