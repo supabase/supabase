@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useUrlState } from 'hooks'
 import RefreshButton from '../header/RefreshButton'
+import { GridFooter } from 'components/ui/GridFooter'
 
 export interface FooterProps {
   isLoading?: boolean
@@ -26,7 +27,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="flex min-h-9 overflow-hidden items-center px-5 w-full border-t">
+    <GridFooter>
       {selectedView === 'data' && <Pagination />}
 
       <div className="ml-auto flex items-center gap-2">
@@ -42,7 +43,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
           onClickOption={setSelectedView}
         />
       </div>
-    </div>
+    </GridFooter>
   )
 }
 

@@ -15,6 +15,7 @@ export type ExecuteSqlVariables = {
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  autoLimit?: number
 }
 
 export async function executeSql(

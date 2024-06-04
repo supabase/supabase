@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { GridFooter } from 'components/ui/GridFooter'
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
@@ -125,12 +126,12 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
           document.body
         )}
 
-      <div className="border-t py-1 flex items-center justify-center">
+      <GridFooter className="flex items-center justify-center">
         <p className="text-xs text-foreground-light">
           {rows.length} row{rows.length > 1 ? 's' : ''}
           {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
         </p>
-      </div>
+      </GridFooter>
     </>
   )
 }
