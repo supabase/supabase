@@ -228,7 +228,8 @@ themeFiles.map(function (filePath, i) {
   let fileName = fileNameCleaner(filePath)
 
   // rename concept-one to dark-new
-  fileName = fileName === 'concept-one' ? 'deep-dark' : fileName
+  fileName = fileName === 'dark' ? 'classic-dark' : fileName
+  fileName = fileName === 'concept-one' ? 'dark' : fileName
 
   let configTailwindFilesByType = []
 
