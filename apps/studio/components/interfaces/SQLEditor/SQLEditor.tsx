@@ -49,10 +49,12 @@ import {
 } from './SQLEditor.types'
 import {
   checkDestructiveQuery,
+  checkIfAppendLimitRequired,
   compareAsAddition,
   compareAsModification,
   compareAsNewSnippet,
   createSqlSnippetSkeleton,
+  suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
@@ -91,8 +93,6 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
 
-  const showReadReplicasUI = project?.is_read_replicas_enabled
-
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
     projectRef: ref,
@@ -101,7 +101,7 @@ const SQLEditor = () => {
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
+  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
@@ -171,13 +171,13 @@ const SQLEditor = () => {
   }, [chatMessages])
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess(data) {
-      if (id) snap.addResult(id, data.result)
+    onSuccess(data, vars) {
+      if (id) snap.addResult(id, data.result, vars.autoLimit)
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
     },
-    onError(error: any) {
+    onError(error: any, vars) {
       if (id) {
         if (error.position && monacoRef.current) {
           const editor = editorRef.current
@@ -210,7 +210,7 @@ const SQLEditor = () => {
           }
         }
 
-        snap.addResultError(id, error)
+        snap.addResultError(id, error, vars.autoLimit)
       }
     },
   })
@@ -225,7 +225,8 @@ const SQLEditor = () => {
       try {
         const { title } = await generateSqlTitle({ sql })
         snap.renameSnippet(id, title)
-      } finally {
+      } catch (error) {
+        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
     [generateSqlTitle, snap]
@@ -306,21 +307,24 @@ const SQLEditor = () => {
         }
 
         const impersonatedRole = getImpersonatedRole()
-        const connectionString = !showReadReplicasUI
-          ? project.connectionString
-          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
-              ?.connectionString
+        const connectionString = databases?.find(
+          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+        )?.connectionString
         if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
+        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, snap.limit)
+        const formattedSql = suffixWithLimit(sql, snap.limit)
+
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(sql, {
+          sql: wrapWithRoleImpersonation(formattedSql, {
             projectRef: project.ref,
             role: impersonatedRole,
           }),
+          autoLimit: appendAutoLimit ? snap.limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
           handleError: (error) => {
             throw error
@@ -614,6 +618,7 @@ const SQLEditor = () => {
           executeQuery(true)
         }}
       />
+
       <div className="flex h-full">
         <ResizablePanelGroup
           className="h-full relative"
@@ -744,6 +749,7 @@ const SQLEditor = () => {
             )}
           </ResizablePanel>
         </ResizablePanelGroup>
+
         {isAiOpen && (
           <AiAssistantPanel
             messages={messages}

@@ -11,6 +11,7 @@ import { groupBy } from 'lodash'
 import type { Database } from 'data/read-replicas/replicas-query'
 import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
 import { DatabaseStatus } from 'data/read-replicas/replicas-status-query'
+import { AWS_REGIONS } from 'lib/constants'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise
@@ -58,7 +59,10 @@ export const generateNodes = ({
     type: 'PRIMARY',
     data: {
       id: primary.identifier,
-      region: primaryRegion ?? { name: primary.region },
+      region:
+        primary.cloud_provider === 'FLY'
+          ? { name: 'Singapore (sin)', key: 'SOUTHEAST_ASIA' }
+          : primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,

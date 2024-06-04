@@ -491,6 +491,12 @@ export const examples: Registry = [
     registryDependencies: ['navigation-menu'],
     files: ['example/navigation-menu-demo.tsx'],
   },
+  {
+    name: 'navigation-menu-responsive',
+    type: 'components:example',
+    registryDependencies: ['navigation-menu'],
+    files: ['example/navigation-menu-responsive.tsx'],
+  },
   // {
   //   name: 'pagination-demo',
   //   type: 'components:example',
@@ -985,6 +991,26 @@ export const examples: Registry = [
     name: 'multi-select-form',
     type: 'components:example',
     files: ['example/multi-select-form.tsx'],
+  },
+  {
+    name: 'tree-view-demo',
+    type: 'components:example',
+    files: ['example/tree-view-demo.tsx'],
+  },
+  {
+    name: 'tree-view-edit',
+    type: 'components:example',
+    files: ['example/tree-view-edit.tsx'],
+  },
+  {
+    name: 'tree-view-directories',
+    type: 'components:example',
+    files: ['example/tree-view-directories.tsx'],
+  },
+  {
+    name: 'tree-view-multi-select',
+    type: 'components:example',
+    files: ['example/tree-view-multi-select.tsx'],
   },
   {
     name: 'color-usage-surface-www-and-docs',

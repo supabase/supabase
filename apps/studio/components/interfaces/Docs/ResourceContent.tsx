@@ -1,6 +1,6 @@
-import { useParams } from 'common'
-import { IconTable } from 'ui'
+import { Table2 } from 'lucide-react'
 
+import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
@@ -34,7 +34,8 @@ const ResourceContent = ({
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
   const description = resourceDefinition?.description || null
-  const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
+
+  const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
   const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
     ...val,
     id,
@@ -45,7 +46,7 @@ const ResourceContent = ({
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 p-2 rounded-lg">
-          <IconTable size="small" />
+          <Table2 size={18} />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>
       </h2>

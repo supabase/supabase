@@ -60,6 +60,9 @@ interface Props {
   header?: React.ReactNode
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 const Modal = ({
   children,
   customFooter = undefined,
@@ -165,11 +168,17 @@ const Modal = ({
   )
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 function Content({ children, className }: { children: React.ReactNode; className?: string }) {
   const __styles = styleHandler('modal')
   return <div className={cn(__styles.content, className)}>{children}</div>
 }
 
+/**
+ * @deprecated Use ./Dialog instead
+ */
 export function Separator() {
   const __styles = styleHandler('modal')
 
