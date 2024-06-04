@@ -72,8 +72,14 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'NODE_ENV=test npm --prefix ../apps/studio run dev',
+    command: 'turbo run dev --filter=studio --parallel',
     url: 'http://localhost:8082',
     reuseExistingServer: !process.env.CI,
+    env: {
+      NODE_ENV: 'test',
+    },
+    // Show the nextjs logs in the terminal. Useful for debugging.
+    // stdout: 'pipe',
+    // stderr: 'pipe',
   },
 })
