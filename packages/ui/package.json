@@ -76,7 +76,7 @@
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^8.0.3",
-    "react-resizable-panels": "^2.0.11",
+    "react-resizable-panels": "^2.0.13",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
     "react-use": "^17.5.0",
