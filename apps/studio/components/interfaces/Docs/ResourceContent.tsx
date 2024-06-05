@@ -5,18 +5,20 @@ import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useIsFeatureEnabled } from 'hooks'
 import { AutoApiService } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import {
+  ProjectJsonSchemaDefinitions,
+  ProjectJsonSchemaPaths,
+} from 'data/docs/project-json-schema-query'
+import { useIsFeatureEnabled } from 'hooks'
 
 interface ResourceContentProps {
   autoApiService: AutoApiService
   resourceId: string
   resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
-  definitions: {
-    [key: string]: { type: string; description: string; required: string[]; properties: any }
-  }
-  paths: { [key: string]: { get?: any; post?: any; patch?: any; delete?: any } }
+  definitions: ProjectJsonSchemaDefinitions
+  paths: ProjectJsonSchemaPaths
   selectedLang: 'bash' | 'js'
   showApiKey: string
   refreshDocs: () => void
