@@ -28,7 +28,8 @@ const GlobalNavigationMenu = () => {
       <>{children}</>
     ) : (
       <>
-        <ScrollArea>
+        <ScrollArea className="relative">
+          <div className="absolute h-full right-0 w-7 z-50 bg-gradient-to-r from-transparent to-background" />
           {children}
           <ScrollBar orientation="horizontal" className="hidden" />
           <NavigationMenuViewport containerProps={{ className: 'bg-transparent' }} />
@@ -46,7 +47,7 @@ const GlobalNavigationMenu = () => {
         orientation="horizontal"
       >
         <ResponsiveScrollArea>
-          <NavigationMenuList className="px-5 lg:px-10">
+          <NavigationMenuList className="pl-5 pr-3 lg:px-10">
             {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
               section[0].menuItems ? (
                 <NavigationMenuItem

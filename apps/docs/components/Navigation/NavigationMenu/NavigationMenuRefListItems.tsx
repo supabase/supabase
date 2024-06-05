@@ -181,20 +181,6 @@ const NavigationMenuRefListItems = ({
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-      <Link
-        href="/"
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-foreground-light hover:text-brand-600 hover:cursor-pointer',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Main Menu</span>
-      </Link>
       <div className="flex items-center gap-3 my-3">
         <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />

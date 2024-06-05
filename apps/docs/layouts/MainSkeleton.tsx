@@ -158,51 +158,51 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         'top-0',
         mobileMenuOpen && 'absolute',
         'flex items-center h-[var(--header-height,40px)]',
-        mobileMenuOpen ? 'gap-0' : 'gap-3'
+        mobileMenuOpen ? 'gap-0' : 'gap-2'
       )}
     >
       <button
-        className={[
-          'h-8 w-8 flex group items-center justify-center mr-2',
-          mobileMenuOpen && 'mt-0.5',
-        ].join(' ')}
+        className={cn(
+          'h-8 w-8 flex group items-center justify-center mr-1',
+          mobileMenuOpen && 'mt-0.5'
+        )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
       >
         <div
-          className={[
+          className={cn(
             'space-y-1  cursor-pointer relative',
-            mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]',
-          ].join(' ')}
+            mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]'
+          )}
         >
           <span
-            className={[
+            className={cn(
               'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
-            ].join(' ')}
-          ></span>
+              !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]'
+            )}
+          />
           <span
-            className={[
+            className={cn(
               'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
-            ].join(' ')}
-          ></span>
+              !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]'
+            )}
+          />
         </div>
       </button>
-      <div className={[].join(' ')}>
+      <div>
         <HomeMenuIconPicker
           icon={menuLevel ? levelsData[menuLevel]?.icon : 'home'}
-          className={[
+          className={cn(
             'transition-all duration-200',
-            mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4',
-          ].join(' ')}
+            mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4'
+          )}
         />
       </div>
       <span
-        className={[
+        className={cn(
           'transition-all duration-200',
           'text-foreground',
-          mobileMenuOpen ? 'text-xs' : 'text-sm',
-        ].join(' ')}
+          mobileMenuOpen ? 'text-xs' : 'text-sm'
+        )}
       >
         {mobileMenuOpen
           ? 'Close'
@@ -257,9 +257,7 @@ const Container = memo(function Container({
       // #docs-content-container is used by layout to scroll to top
       id="docs-content-container"
       className={cn(
-        // 'overflow-x-auto',
         'w-full transition-all ease-out',
-        // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
@@ -278,9 +276,8 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
     <nav
       aria-labelledby="main-nav-title"
       className={cn(
-        // 'hidden',
         'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
+        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',
@@ -324,6 +321,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
 })
 
 function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+  const mobileMenuOpen = useMenuMobileOpen()
   const isHomePage = menuId === 'home'
 
   return (
@@ -334,7 +332,13 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
       <div className="flex flex-row h-full">
         {!isHomePage && <NavContainer menuId={menuId} />}
         <Container className="[--header-height:40px] lg:[--header-height:90px]">
-          <div className={cn('flex lg:hidden w-full top-0 left-0 right-0 z-50')}>
+          <div
+            className={cn(
+              'flex lg:hidden w-full top-0 left-0 right-0 z-50',
+              isHomePage && 'sticky',
+              mobileMenuOpen && 'z-10'
+            )}
+          >
             <TopNavBar />
           </div>
           <div
