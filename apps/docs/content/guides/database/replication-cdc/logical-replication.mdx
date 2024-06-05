@@ -23,7 +23,7 @@ When using logical replication, you have a few active components:
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
 - `subscription` - A subscription is made from an external system (i.e. another Postgresql database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created for you
 
-#### Logical Replication Output Format
+## Logical Replication Output Format
 
 Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgresql sends changes to any active replication slot.
 
