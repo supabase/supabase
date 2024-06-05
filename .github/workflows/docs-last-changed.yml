@@ -1,4 +1,4 @@
-name: [Docs] Update last-changed dates
+name: "[Docs] Update last-changed dates"
 
 on:
   # Temporarily turned off until the action is validated manually
