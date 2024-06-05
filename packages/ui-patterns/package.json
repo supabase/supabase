@@ -5,6 +5,7 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
+    "test": "jest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -27,11 +28,14 @@
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.1",
     "tsconfig": "*",
-    "ui": "*"
+    "ui": "*",
+    "valtio": "*"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.4",
-    "api-types": "*"
+    "api-types": "*",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2"
   },
   "peerDependencies": {
     "next": "*",
