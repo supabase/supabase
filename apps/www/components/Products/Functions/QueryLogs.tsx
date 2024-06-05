@@ -109,7 +109,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
         className="absolute z-20 pointer-events-none inset-0 top-auto h-32"
         style={{
           background:
-            'linear-gradient(to top, hsl(var(--background-surface-100)) 0%, transparent 100%)',
+            'linear-gradient(to top, hsl(var(--background-surface-75)) 0%, transparent 100%)',
         }}
       />
       <motion.ul
