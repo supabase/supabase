@@ -31,6 +31,7 @@ interface Options {
 interface Stats {
   sectionsUpdated: number
   sectionsRemoved: number
+  sectionsErrored: number
 }
 
 type SectionWithChecksum = Omit<Section, 'heading'> &
@@ -54,6 +55,7 @@ async function main() {
   const stats: Stats = {
     sectionsUpdated: 0,
     sectionsRemoved: 0,
+    sectionsErrored: 0,
   }
 
   await updateContentDates({ reset, supabase, stats })
@@ -61,6 +63,7 @@ async function main() {
   console.log('Content timestamps successfully updated')
   console.log(`  - ${stats.sectionsUpdated} sections updated`)
   console.log(`  - ${stats.sectionsRemoved} old sections removed`)
+  console.log(`  - ${stats.sectionsErrored} sections errored when updating`)
 }
 
 function checkEnv() {
@@ -119,7 +122,10 @@ async function updateContentDates({
     const tasks = await updateTimestamps(file, { supabase, reset, timestamp, stats })
     updateTasks.push(...tasks)
   }
-  await Promise.all(updateTasks)
+  const results = await Promise.allSettled(updateTasks)
+
+  const numberErrors = results.reduce((sum, res) => (sum + res.status === 'rejected' ? 1 : 0), 0)
+  stats.sectionsErrored = numberErrors
 
   await cleanupObsoleteRows(timestamp, supabase, stats)
 }
@@ -249,8 +255,11 @@ async function updateTimestampsWithLastCommitDate(
     }
   } catch (err) {
     console.error(
-      `Failed to update timestamp with last commit date for section ${filePath}:${section.heading}: ${err}`
+      `Failed to update timestamp with last commit date for section ${filePath}:${section.heading}:\n${err}`
     )
+
+    // Rethrow error to error counter
+    throw err
   }
 }
 
