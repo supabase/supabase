@@ -90,7 +90,7 @@ revoke execute
   from authenticated, anon;
 ```
 
-For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+For security, avoid using the `security definer` tag where possible. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
 
 We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
@@ -110,7 +110,7 @@ SEND_SMS_HOOK_SECRET="v1,whsec_<standard-base-64-secret>"
 Let's break down the secret content:
 
 - `v1` denotes the version of the hook
-- `whsec_` signifies that we’re using a symmetric secret
+- `whsec_` signifies that the secret is symmetric
 - `<base-64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
 
 Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
@@ -135,7 +135,7 @@ Permission to execute the hook is granted based on the validity of the signature
 </TabPanel>
 </Tabs>
 
-## Hook Errors
+## Hook errors
 
 You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 
@@ -196,7 +196,7 @@ Here’s a sample HTTP retry schedule:
 | 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
 | 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
 
-Return a retryable error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
+Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
 
 ```jsx
 return new Response(
@@ -307,14 +307,12 @@ You can visit `SQL Editor > Templates` for hook templates.
 
 </TabPanel>
 <TabPanel id="https-connect-hook-locally" label="HTTP">
-Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. We’ll be developing a `send_sms`  hook and will modify the fields accordingly.
-
+Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
 ```
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
 secret = "env(SEND_SMS_HOOK_SECRET)"
-
 ```
 
 `host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
@@ -322,7 +320,7 @@ secret = "env(SEND_SMS_HOOK_SECRET)"
 Fill in the Hook Secret
 
 ```jsx
-SEND_EMAIL_HOOK_SECRET = 'v1,whsec_<base64_standard_secret>'
+SEND_SMS_HOOK_SECRET = 'v1,whsec_<base64_standard_secret>'
 ```
 
 Start the function locally:
@@ -331,20 +329,16 @@ Start the function locally:
 supabase functions serve send-sms --no-verify-jwt --env-file ./supabase/functions/.env.local
 ```
 
-We disable JWT verification via the `--no-verify-jwt` as some hooks are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
+Disable JWT verification via the `--no-verify-jwt` to accomodate hooks which are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
 
 Note that payloads are sent uncompressed (Encoding: `identity`) in order to accurately track Content Length. In addition, there is a 20KB payload limit to guard against payload stuffing attacks.
 
 </TabPanel>
 </Tabs>
 
-### Debugging Your Hook
-
-Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal. For more details on debugging, visit our [Postgres Functions debugging guide](https://supabase.com/docs/guides/database/functions#debugging-functions)
-
 ## Deploying a Hook
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
+In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
 
 ## Available Hooks
 
@@ -1446,7 +1440,10 @@ authentication_method
 
 ## Hook: Send SMS
 
-Allows the use of an alternative region specific SMS provider.
+Runs before a message is sent. Use the hook to:
+- Use a regional SMS Provider
+- Use alternate messaging channels such as WhatsApp or Facebook Messenger
+- Adjust the message body to include platform specific fields such as the [AppHash](https://developers.google.com/identity/sms-retriever/overview)
 
 **Inputs**
 
@@ -1726,7 +1723,7 @@ Allows the use of an alternative region specific SMS provider.
 
 **Outputs**
 
-- No outputs are required other than an indication of success or failure
+- No outputs are required. An empty response with a status code of 200 is taken as a successful response.
 
 
 **SQL Examples**
@@ -1983,7 +1980,7 @@ Deno.serve(async (req) => {
 
 ## Hook: Send Email
 
-The Send Email Hook runs before an email is sent and allows for customization around email sending. Use this Hook to add internationalization or a fallback provider.
+The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
 
 **Inputs**
 
@@ -2305,8 +2302,7 @@ The Send Email Hook runs before an email is sent and allows for customization ar
 </Tabs>
 
 **Outputs**
-
-- No outputs are required other than an indication of success or failure
+- No outputs are required. An empty response with a status code of 200 is taken as a successful response.
 
 **SQL Examples**
 
