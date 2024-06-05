@@ -27,7 +27,9 @@ begin
     then
       update public.last_changed set
         last_checked = check_time
-        where last_changed.id = existing_id
+        where
+		  last_changed.id = existing_id
+		  and last_changed.last_checked < check_time
 		returning last_checked into updated_check_time
       ;
 
@@ -53,6 +55,7 @@ begin
           last_checked = check_time
         where
           last_changed.id = existing_id
+		  and last_changed.last_checked < check_time
 	  returning last_checked into updated_check_time
       ;
 

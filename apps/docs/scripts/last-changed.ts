@@ -207,18 +207,21 @@ async function updateTimestampsWithLastCommitDate(
   try {
     const updatedAt = await getGitUpdatedAt(filePath, ctx)
 
-    const { error } = await ctx.supabase.from('last_changed').upsert(
-      {
-        parent_page: parentPage,
-        heading: section.heading,
-        checksum: section.checksum,
-        last_updated: updatedAt,
-        last_checked: timestamp,
-      },
-      {
-        onConflict: 'parent_page,heading',
-      }
-    )
+    const { error } = await ctx.supabase
+      .from('last_changed')
+      .upsert(
+        {
+          parent_page: parentPage,
+          heading: section.heading,
+          checksum: section.checksum,
+          last_updated: updatedAt,
+          last_checked: timestamp,
+        },
+        {
+          onConflict: 'parent_page,heading',
+        }
+      )
+      .lt('last_checked', timestamp)
     if (error) {
       throw Error(error.message ?? 'Failed to upsert')
     }
