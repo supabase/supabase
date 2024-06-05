@@ -394,8 +394,8 @@ const uiConfig = ui({
         'flash-code-slow': 'flash-code 2s forwards',
         'accordion-down': 'accordion-down 0.15s ease-out',
         'accordion-up': 'accordion-up 0.15s ease-out',
-        'collapsible-down': 'collapsible-down 0.15s ease-out',
-        'collapsible-up': 'collapsible-down 0.15s ease-out',
+        'collapsible-down': 'collapsible-down 0.10s ease-out',
+        'collapsible-up': 'collapsible-up 0.10s ease-out',
       },
       borderRadius: {
         // lg: `var(--radius)`,

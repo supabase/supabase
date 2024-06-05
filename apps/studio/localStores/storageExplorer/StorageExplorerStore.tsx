@@ -1318,7 +1318,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loader(
+        toast.loading(
           <ToastLoader
             progress={progress * 100}
             message={`Renaming folder to ${newName}`}
@@ -1342,7 +1342,7 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e) {
-      toast.error(`Failed to rename folder to ${newName}`, { id: toastId })
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
     }
   }
 

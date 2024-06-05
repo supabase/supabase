@@ -52,7 +52,55 @@ functions:
   - id: auth-api
     title: "Overview"
     notes: |
-      - The auth methods can be accessed via the `supabase.auth` namespace.
+      The auth methods can be accessed via the `supabase.auth` namespace.
+      
+      ### Handling deep links
+
+      #### UIKit app lifecycle
+
+      ```swift
+      public func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+      ) -> Bool {
+        if let url = launchOptions?[.url] as? URL {
+          supabase.auth.handle(url)
+        }
+
+        return true
+      }
+
+      func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any]
+      ) -> Bool {
+        supabase.auth.handle(url)
+        return true
+      }
+
+      #### UIKit app lifecycle with scenes
+
+      In your `SceneDelegate.swift`:
+
+      ```swift
+      func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        supabase.auth.handle(url)
+      }
+      ```
+
+      #### SwiftUI app lifecycle
+
+      In your `AppDelegate.swift`:
+
+      ```swift
+      SomeView()
+        .onOpenURL { url in
+          supabase.auth.handle(url)
+        }
+      ```
+    
     examples:
       - id: create-auth-client
         name: Create auth client
