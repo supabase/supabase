@@ -155,8 +155,10 @@ export interface paths {
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
+    /** Updates the billing customer */
+    put: operations['updateCustomerV2']
     /** Updates the Stripe customer */
-    patch: operations['CustomerController_updateCustomerV2']
+    patch: operations['CustomerController_updateCustomer']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
@@ -2556,7 +2558,7 @@ export interface components {
     }
     CustomerBillingAddress: {
       city?: string
-      country?: string
+      country: string
       line1: string
       line2?: string
       postal_code?: string
@@ -2568,6 +2570,9 @@ export interface components {
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
+    }
+    BillingCustomerUpdateBody: {
+      address: components['schemas']['CustomerBillingAddress'] | null
     }
     CustomerUpdateResponse: {
       id: string
@@ -2607,9 +2612,6 @@ export interface components {
         idempotencyKey?: string
         stripeAccount?: string
       }
-    }
-    BillingCustomerUpdateBody: {
-      address: components['schemas']['CustomerBillingAddress'] | null
     }
     OrganizationRole: {
       id: number
@@ -6854,8 +6856,8 @@ export interface operations {
       }
     }
   }
-  /** Updates the Stripe customer */
-  CustomerController_updateCustomerV2: {
+  /** Updates the billing customer */
+  updateCustomerV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6870,6 +6872,29 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update the billing customer */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the Stripe customer */
+  CustomerController_updateCustomer: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['CustomerUpdateResponse']
+        }
       }
       403: {
         content: never
