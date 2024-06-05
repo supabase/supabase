@@ -61,7 +61,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
           onSubmit={onInviteUser}
         >
           {() => (
-            <div className="space-y-6 py-4">
+            <>
               <Modal.Content>
                 <Input
                   id="email"
@@ -85,7 +85,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
                   Invite user
                 </Button>
               </Modal.Content>
-            </div>
+            </>
           )}
         </Form>
       </Modal>
