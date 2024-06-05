@@ -55,16 +55,13 @@ const SQLQuickstarts = () => {
       <div className="mb-8">
         <div className="mb-4">
           <h1 className="text-foreground mb-3 text-xl">Quickstarts</h1>
-          <p className="text-foreground-light text-sm">
-            While we're in beta, we want to offer a quick way to explore Supabase. While we build
-            importers, check out these simple starters.
-          </p>
+
           <p className="text-foreground-light text-sm">
             Click on any script to fill the query box, modify the script, then click
             <span className="text-code">Run</span>.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {quickStart.map((x) => (
             <SQLCard
               key={x.title}

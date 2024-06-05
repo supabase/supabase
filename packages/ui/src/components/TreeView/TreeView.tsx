@@ -1,3 +1,5 @@
+'use client'
+
 import { ChevronRight, FolderClosed, FolderOpen } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive from 'react-accessible-treeview'

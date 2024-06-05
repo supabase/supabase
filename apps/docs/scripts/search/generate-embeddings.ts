@@ -3,8 +3,8 @@ import dotenv from 'dotenv'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
+import type { Json, Section } from '../helpers.mdx'
 import { fetchSources } from './sources'
-import { Json, Section } from './sources/base'
 
 dotenv.config()
 

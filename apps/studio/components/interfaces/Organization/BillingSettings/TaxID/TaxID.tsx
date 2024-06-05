@@ -21,7 +21,7 @@ import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utilts'
+import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utils'
 
 const TaxID = () => {
   const { slug } = useParams()

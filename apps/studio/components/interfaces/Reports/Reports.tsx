@@ -37,7 +37,6 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
-  const hasReadReplicasEnabled = project?.is_read_replicas_enabled
 
   const [config, setConfig] = useState<any>(undefined)
   const [startDate, setStartDate] = useState<any>(null)
@@ -45,9 +44,13 @@ const Reports = () => {
   const [hasEdits, setHasEdits] = useState<any>(false)
 
   const { data: userContents, isLoading } = useContentQuery(ref)
-  const { mutateAsync: saveReport, isLoading: isSaving } = useContentUpdateMutation({
+  const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
+      setHasEdits(false)
       toast.success('Successfully saved report!')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update report: ${error.message}`)
     },
   })
   const currentReport = userContents?.content.find((report) => report.id === id)
@@ -117,10 +120,7 @@ const Reports = () => {
   const onSaveReport = async () => {
     if (ref === undefined) return console.error('Project ref is required')
     if (id === undefined) return console.error('Report ID is required')
-
-    await saveReport({ projectRef: ref, id, type: 'report', content: config })
-
-    setHasEdits(false)
+    saveReport({ projectRef: ref, id, type: 'report', content: config })
   }
 
   function handleChartSelection({ metric, value }: any) {
@@ -283,8 +283,7 @@ const Reports = () => {
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           )}
-
-          {hasReadReplicasEnabled && <DatabaseSelector />}
+          <DatabaseSelector />
         </div>
       </div>
 

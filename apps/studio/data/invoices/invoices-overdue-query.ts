@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { invoicesKeys } from './keys'
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import { invoicesKeys } from './keys'
 
 export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
 
@@ -9,10 +9,8 @@ export async function getOverdueInvoices(signal?: AbortSignal) {
   const { data, error } = await get('/platform/stripe/invoices/overdue', {
     signal,
   })
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 

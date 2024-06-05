@@ -5,7 +5,7 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Michel Pelletier at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 15 Dec 2022 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 15 Dec 2022 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-michel-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/vault-now-in-beta</guid>
@@ -13,13 +13,6 @@
   <link>https://supabase.com/blog/vault-now-in-beta</link>
   <description>A Postgres extension to store encrypted secrets and encrypt data.</description>
   <pubDate>Thu, 15 Dec 2022 23:00:00 GMT</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/transparent-column-encryption-with-postgres</guid>
-  <title>Transparent Column Encryption with Postgres</title>
-  <link>https://supabase.com/blog/transparent-column-encryption-with-postgres</link>
-  <description>Using pgsodium&apos;s Transparent Column Encryption to encrypt data and provide your users with row-level encryption.</description>
-  <pubDate>Wed, 30 Nov 2022 23:00:00 GMT</pubDate>
 </item>
 
     </channel>

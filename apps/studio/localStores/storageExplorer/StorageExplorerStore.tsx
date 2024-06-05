@@ -561,7 +561,14 @@ class StorageExplorerStore {
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
-      const formattedFileName = has(file, ['path']) && isWithinFolder ? file.path : fileName
+      const unsanitizedFormattedFileName =
+        has(file, ['path']) && isWithinFolder ? file.path : fileName
+      /**
+       * Storage maintains a list of allowed characters, which excludes
+       * characters such as the narrow no-break space used in Mac screenshots.
+       * To preempt errors, replace all non-word characters with underscores.
+       */
+      const formattedFileName = unsanitizedFormattedFileName.replace(/[^\w.-]/g, '_')
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : formattedFileName
 
@@ -1134,7 +1141,7 @@ class StorageExplorerStore {
         return col
       })
     } else if (!res.error.message.includes('aborted')) {
-      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
+      toast.error(`Failed to retrieve more folder contents: ${res.error.message}`)
     }
   }
 
@@ -1311,7 +1318,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loader(
+        toast.loading(
           <ToastLoader
             progress={progress * 100}
             message={`Renaming folder to ${newName}`}
@@ -1335,7 +1342,7 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e) {
-      toast.error(`Failed to rename folder to ${newName}`, { id: toastId })
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
     }
   }
 
