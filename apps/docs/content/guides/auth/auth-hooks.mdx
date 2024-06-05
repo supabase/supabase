@@ -96,8 +96,6 @@ We recommend that you do not use any tag and explicitly grant permissions to `su
 
 Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-
-
 </TabPanel>
 <TabPanel id="https-hook-security-model" label="HTTP">
 
@@ -132,7 +130,7 @@ Deno.serve(async (req) => {
 
 ```
 
-Permission to execute the hook is granted based on the validity of the signature. You can use the access token as an additional layer of security for hooks such as the MFA Verification Hook which run post authentication.
+Permission to execute the hook is granted based on the validity of the signature. You can use the access token as an additional layer of security for hooks which run post authentication such as the MFA Verification Hook.
 
 </TabPanel>
 </Tabs>
@@ -172,7 +170,7 @@ Here's an example:
 }
 ```
 
-Errors returned from a Postgres Hook are not retryable. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
 </TabPanel>
 
@@ -182,10 +180,10 @@ Hooks return status codes based on the nature of the response. These status code
 | HTTP Status Code | Description                                                   | Example Usage                                  |
 | ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
 | 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
-| 429, 503         | Retryable errors with Retry-after header supported            | Temporary server overload or maintenance       |
+| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
 | 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-Errors are responses which contain status codes 400 and above. On a retryable error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a backoff of two seconds.
+Errors are responses which contain status codes 400 and above. On a retryable error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
 
 Here’s a sample HTTP retry schedule:
 
@@ -193,9 +191,9 @@ Here’s a sample HTTP retry schedule:
 | --------------------------- | ----------------------- | ------------------------------------------------- |
 | 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
 | 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
-| 00:00:07                    | Retry Start #1          | After 2 sec delay, 1st retry begins.              |
+| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
 | 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
-| 00:00:14                    | Retry Start #2          | After 2 sec delay, 2nd retry begins.              |
+| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
 | 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
 
 Return a retryable error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
@@ -523,7 +521,6 @@ revoke all
 </Tabs>
 
 **HTTP Examples**
-**SQLExamples**
 
 <Tabs
   scrollable
@@ -534,26 +531,27 @@ revoke all
 >
 <TabPanel id="sql-limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
 
-Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli).
+Your company requires that a user can make an incorrect MFA verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in our company setup.
 
-Select the Global type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file.
-Your company requires that a user can input an incorrect MFA Verification code no more than once every 2 seconds.
+Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli) to track verification attempts.
 
-Use Redis to record the last time a user had an incorrect MFA verification attempt for a factor.
+Select the Global type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file. Also ensure that you have `AUTH_MFA_VERIFICATION_ATTEMPT_SECRET` set.
 
-Create a hook to read and write information from Redis. For example:
+Create a hook to read and write information from Redis, which will record the last time a user had an incorrect MFA verification attempt for a factor. For example:
 
 ```sql
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 
-console.log(`Function "upstash-redis-password-counter" up and running!`)
+console.log(`Function "upstash-redis-mfa-verification-counter" up and running!`)
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const base64_secret = Deno.env.get('AUTH_MFA_VERIFICATION_ATTEMPT_SECRET')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret);
+  const secondsBeforeNextRetry = 3600;
+
 
   try {
     const { user_id, factor_id, valid } = wh.verify(payload, headers);
@@ -564,9 +562,12 @@ Deno.serve(async (req) => {
     })
 
     if (!valid) {
-      await redis.hincrby('mfa-attempts', `${user_id}:fail`, 1)
+      const userKey = `${user_id}:mfa_fail`
+      await redis.hincrby('mfa-attempts', userKey, 1)
 
-      const failedAttemptsCount = await redis.hget('mfa-attempts', `${user_id}:fail`);
+      const failedAttemptsCount = await redis.hget('mfa-attempts', userKey);
+      await redis.expire(userKey, secondsBeforeNextRetry)
+
 
       if (failedAttemptsCount >= 3) {
         return new Response(JSON.stringify({ decision: 'reject' }), { status: 403, headers: { "Content-Type": "application/json" } });
@@ -653,16 +654,16 @@ Example output:
 }
 ```
 
-**Examples**
+**SQL Examples**
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="limit-failed-password-verification-attempts"
+  defaultActiveId="sql-limit-failed-password-verification-attempts"
   queryGroup="language"
 >
-<TabPanel id="limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
+<TabPanel id="sql-limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
 
 As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You want to write a hook to enforce this.
 
@@ -744,7 +745,7 @@ revoke all
 ```
 
 </TabPanel>
-<TabPanel id="send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
+<TabPanel id="sql-send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 
 You can notify a user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use [`pg_net`](/docs/guides/database/extensions/pg_net) to send a HTTP request to our email provider to send the email. Ensure that you have configured a sender signature for the email account which you are sending emails from.
 
@@ -858,6 +859,98 @@ revoke all
   from authenticated, anon;
 ```
 
+</TabPanel>
+</Tabs>
+
+**HTTP Examples**
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-limit-failed-password-verification-attempts"
+  queryGroup="language"
+>
+<TabPanel id="http-limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
+Your company requires that a user can make an incorrect password verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in our company setup.
+
+Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli) to track verification attempts.
+
+Select the Global type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file. Also ensure that you have `AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET` set.
+
+Create a hook to read and write information from Redis, which will record the number of occasions where the user had an invalid verification attempt. For example:
+
+```
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0";
+import {
+    Redis
+} from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts';
+
+console.log(`Function "upstash-redis-password-counter" up and running!`);
+
+Deno.serve(async (req) => {
+    const payload = await req.text();
+    const base64_secret = Deno.env.get('AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET');
+    const headers = Object.fromEntries(req.headers);
+    const wh = new Webhook(base64_secret);
+    const secondsBeforeNextRetry = 3600
+
+    try {
+        const {
+            user_id,
+            valid
+        } = wh.verify(payload, headers);
+
+        const redis = new Redis({
+            url: Deno.env.get('UPSTASH_REDIS_REST_URL') !,
+            token: Deno.env.get('UPSTASH_REDIS_REST_TOKEN') !,
+        });
+
+        if (!valid) {
+            const userKey = `${user_id}:password_fail`
+            await redis.hincrby('password-attempts', userKey, 1);
+            const passwordFailedAttemptsCount = await redis.hget('password-attempts', userKey);
+            await redis.expire(userKey, secondsBeforeNextRetry)
+
+            if (passwordFailedAttemptsCount >= 3) {
+                return new Response(JSON.stringify({
+                    decision: 'reject',
+                    message: 'You have exceeded maximum number of password sign-in attempts.',
+                    should_logout_user: false
+                }), {
+                    status: 403,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+            }
+        }
+
+        return new Response(JSON.stringify({
+            decision: 'continue'
+        }), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    } catch (error) {
+        return new Response(JSON.stringify({
+            error: error.message
+        }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+});
+```
+
+</TabPanel>
+<TabPanel id="http-send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 </TabPanel>
 </Tabs>
 
@@ -1241,71 +1334,109 @@ revoke execute
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="http-add-metdata-claim"
+  defaultActiveId="http-add-metadata-claim"
   queryGroup="language"
 >
 <TabPanel id="http-add-metadata-claim" label="Add claim">
 
-
 ```javascript
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
-import { readAll } from "https://deno.land/std/io/read_all.ts";
-import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
   const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
   const headers = Object.fromEntries(req.headers)
-  const wh = new Webhook(base64_secret);
+  const wh = new Webhook(base64_secret)
   try {
-    const { user_id, claims, authentication_method } = wh.verify(payload, headers);
-    claims["my_custom_claim"] = "my_custom_claim"
-    return new Response(JSON.stringify({
-    claims
-    }), { status: 200, headers: { "Content-Type": "application/json"} });
-
+    const { user_id, claims, authentication_method } = wh.verify(payload, headers)
+    claims['my_custom_claim'] = 'my_custom_claim'
+    return new Response(
+      JSON.stringify({
+        claims,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
   } catch (error) {
-        return new Response(JSON.stringify({
-            error: `Failed to process the request: ${error}`
-        }), { status: 500, headers: { "Content-Type": "application/json" } });
-    }
-
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
 })
-````
+```
+
 </TabPanel>
 <TabPanel id="http-restrict-access-to-sso-users" label="Restrict access to SSO users">
 You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 ```javascript
-
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
-import { readAll } from "https://deno.land/std/io/read_all.ts";
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0"
+import {
+    readAll
+} from "https://deno.land/std/io/read_all.ts";
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
 Deno.serve(async (req) => {
-  const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
-  const headers = Object.fromEntries(req.headers)
-  const wh = new Webhook(base64_secret);
-  try {
-    const { user_id, claims, authentication_method } = wh.verify(payload, headers);
+const payload = await req.text()
+const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+const headers = Object.fromEntries(req.headers)
+const wh = new Webhook(base64_secret);
+try {
+const {
+user_id,
+claims,
+authentication_method
+} = wh.verify(payload, headers);
 
-    // Check the condition
-    const allowedEmails = ['myemail@company.com', 'example@company.com'];
-    if (authentication_method === 'sso/saml' || allowedEmails.includes(claims.email)) {
-      return new Response(JSON.stringify({
-        claims
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    } else {
-      return new Response(JSON.stringify({
-        error: 'Unauthorized'
-      }), { status: 500, headers: { "Content-Type": "application/json" } });
+        // Check the condition
+        const allowedEmails = ['myemail@company.com', 'example@company.com'];
+        if (authentication_method === 'sso/saml' || allowedEmails.includes(claims.email)) {
+            return new Response(JSON.stringify({
+                claims
+            }), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        } else {
+            return new Response(JSON.stringify({
+                error: 'Unauthorized'
+            }), {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        }
+    } catch (error) {
+        return new Response(JSON.stringify({
+            error: `Failed to process the request: ${error}`
+        }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
     }
-  } catch (error) {
-    return new Response(JSON.stringify({
-      error: `Failed to process the request: ${error}`
-    }), { status: 500, headers: { "Content-Type": "application/json" } });
-  }
+
 })
+
 ````
 
 </TabPanel>
@@ -1606,8 +1737,9 @@ Allows the use of an alternative region specific SMS provider.
   queryGroup="language"
 >
 <TabPanel id="sql-alternative-sms-provider" label="Use a regional SMS Provider">
+Your company is building an internal authentication tool and uses a worker to manage all messaging related jobs. Your company has an internal messaging which accepts requests in batches. Instead of sending a message immediately, we queue messages
+and send them to the messaging service in periodic intervals using `pg_cron`.
 </TabPanel>
-
 
 </Tabs>
 
@@ -1616,100 +1748,120 @@ Allows the use of an alternative region specific SMS provider.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="http-alternative-sms-provider"
+  defaultActiveId="http-configure-message-body"
   queryGroup="language"
 >
-<TabPanel id="http-alternative-sms-provider" label="Use an alternative SMS Provider">
-</TabPanel>
+<TabPanel id="http-configure-message-body" label="Configure message body">
+Your company would like to add an AppHash to the message body. In this case, we add an AppHash which allows a mobile application to fetch the OTP code from an SMS without the user having to exit the application.
+
 ```javascript
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
-import { readAll } from "https://deno.land/std/io/read_all.ts";
-import { Twilio } from "https://cdn.skypack.dev/twilio";
+import {
+	Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0"
+import {
+	readAll
+} from "https://deno.land/std/io/read_all.ts";
+import {
+	Twilio
+} from "https://cdn.skypack.dev/twilio";
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
-
-
 
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
 const fromNumber: string = Deno.env.get("TWILIO_PHONE_NUMBER")
 const APP_HASH = Deno.env.get("APP_HASH")
 
-
-
 const sendTextMessage = async (
-  messageBody: string,
-  accountSid: string | undefined,
-  authToken: string | undefined,
-  fromNumber: string,
-  toNumber: string,
-): Promise<any> => {
-  if (!accountSid || !authToken) {
-    console.log(
-      "Your Twilio account credentials are missing. Please add them.",
-    );
-    return;
-  }
-  const url: string =
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+	messageBody: string,
+	accountSid: string | undefined,
+	authToken: string | undefined,
+	fromNumber: string,
+	toNumber: string,
+): Promise < any > => {
+	if (!accountSid || !authToken) {
+		console.log(
+			"Your Twilio account credentials are missing. Please add them.",
+		);
+		return;
+	}
+	const url: string =
+		`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-  const encodedCredentials: string = base64.fromUint8Array(
-    new TextEncoder().encode(`${accountSid}:${authToken}`),
-  );
+	const encodedCredentials: string = base64.fromUint8Array(
+		new TextEncoder().encode(`${accountSid}:${authToken}`),
+	);
 
-  const body: URLSearchParams = new URLSearchParams({
-    To: `+${toNumber}`,
-    From: fromNumber,
-    // Uncomment when testing with a fixed number
-    Body: messageBody,
-  });
+	const body: URLSearchParams = new URLSearchParams({
+		To: `+${toNumber}`,
+		From: fromNumber,
+		// Uncomment when testing with a fixed number
+		Body: messageBody,
+	});
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": `Basic ${encodedCredentials}`,
-    },
-    body,
-  });
+	const response = await fetch(url, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
+			"Authorization": `Basic ${encodedCredentials}`,
+		},
+		body,
+	});
 
-  return response.json();
+	return response.json();
 };
 
-
 Deno.serve(async (req) => {
-  const payload = await req.text()
-  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
-  const headers = Object.fromEntries(req.headers)
-  const wh = new Webhook(base64_secret);
-  try {
-    const { user, sms } = wh.verify(payload, headers);
-    const messageBody = `Your OTP is: ${sms.otp} <#> Your code: ${APP_HASH}`;
-    const response = await sendTextMessage(
-      messageBody,
-      accountSid,
-      authToken,
-      fromNumber,
-      user.phone,
-    );
-    if (response.status !== "queued") {
-            return new Response(JSON.stringify({
-                error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`
-            }), { status: response.status, headers: { "Content-Type": "application/json" } });
-        }
-    return new Response(JSON.stringify({
-       message: "SMS sent successfully."
-     }), { headers: { "Content-Type": "application/json" } });
-  } catch (error) {
-        return new Response(JSON.stringify({
-            error: `Failed to process the request: ${error}`
-        }), { status: 500, headers: { "Content-Type": "application/json" } });
-  }
+	const payload = await req.text()
+	const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+	const headers = Object.fromEntries(req.headers)
+	const wh = new Webhook(base64_secret);
+	try {
+		const {
+			user,
+			sms
+		} = wh.verify(payload, headers);
+		const messageBody = `Your OTP is: ${sms.otp} <#> Your code: ${APP_HASH}`;
+		const response = await sendTextMessage(
+			messageBody,
+			accountSid,
+			authToken,
+			fromNumber,
+			user.phone,
+		);
+		if (response.status !== "queued") {
+			return new Response(JSON.stringify({
+				error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`
+			}), {
+				status: response.status,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			});
+		}
+		return new Response(JSON.stringify({
+			message: "SMS sent successfully."
+		}), {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+	} catch (error) {
+		return new Response(JSON.stringify({
+			error: `Failed to process the request: ${error}`
+		}), {
+			status: 500,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+	}
 
-  return Response.json(
-      data,
-  )
+	return Response.json(
+		data,
+	)
 })
 ```
+</TabPanel>
 
 
 </Tabs>
@@ -1717,7 +1869,7 @@ Deno.serve(async (req) => {
 
 ## Hook: Send Email
 
-Allows for use of internationalized templates.
+The Send Email Hook runs before an email is sent and allows for customization around email Sending. Use this Hook to add internationalization or a fallback provider.
 
 **Inputs**
 
@@ -2048,10 +2200,12 @@ Allows for use of internationalized templates.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="sql-internationalization-for-emails"
+  defaultActiveId="sql-queue-email-messages"
   queryGroup="language"
 >
-<TabPanel id="sql-internationalization-for-emails" label="Add Internationalization for Email Templates">
+<TabPanel id="sql-queue-email-messages" label="Add Internationalization for Email Templates">
+Your company is building an internal authentication tool and uses a worker to manage all email related jobs. Emails are sent in periodic intervals using `pg_cron`
+
 </TabPanel>
 
 
@@ -2068,125 +2222,144 @@ Allows for use of internationalized templates.
   queryGroup="language"
 >
 <TabPanel id="http-internationalization-for-emails" label="Add Internationalization for Email Templates">
-</TabPanel>
+Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language.
+
 ```javascript
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
-import { readAll } from "https://deno.land/std/io/read_all.ts";
+import {
+	Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0"
+import {
+	readAll
+} from "https://deno.land/std/io/read_all.ts";
 
 const postmarkEndpoint = 'https://api.postmarkapp.com/email';
 
 // Email Subjects
 const subjects = {
-  en: {
-    signup: 'Confirm Your Email',
-    recovery: 'Reset Your Password',
-    invite: 'You have been invited',
-    magic_link: 'Your Magic Link',
-    email_change: 'Confirm Email Change',
-    email_change_new: 'Confirm New Email Address',
-    reauthentication: 'Confirm Reauthentication'
-  },
-  es: {
-    signup: 'Confirma tu correo electrónico',
-    recovery: 'Restablece tu contraseña',
-    invite: 'Has sido invitado',
-    magic_link: 'Tu enlace mágico',
-    email_change: 'Confirma el cambio de correo electrónico',
-    email_change_new: 'Confirma la Nueva Dirección de Correo',
-    reauthentication: 'Confirma la reautenticación'
-  },
-  fr: {
-     signup: 'Confirmez votre adresse e-mail',
-     recovery: 'Réinitialisez votre mot de passe',
-     invite: 'Vous avez été invité',
-     magic_link: 'Votre Lien Magique',
-     email_change: 'Confirmez le changement d’adresse e-mail',
-     email_change_new: 'Confirmez la nouvelle adresse e-mail',
-     reauthentication: 'Confirmez la réauthentification'
-   }
+	en: {
+		signup: 'Confirm Your Email',
+		recovery: 'Reset Your Password',
+		invite: 'You have been invited',
+		magic_link: 'Your Magic Link',
+		email_change: 'Confirm Email Change',
+		email_change_new: 'Confirm New Email Address',
+		reauthentication: 'Confirm Reauthentication'
+	},
+	es: {
+		signup: 'Confirma tu correo electrónico',
+		recovery: 'Restablece tu contraseña',
+		invite: 'Has sido invitado',
+		magic_link: 'Tu enlace mágico',
+		email_change: 'Confirma el cambio de correo electrónico',
+		email_change_new: 'Confirma la Nueva Dirección de Correo',
+		reauthentication: 'Confirma la reautenticación'
+	},
+	fr: {
+		signup: 'Confirmez votre adresse e-mail',
+		recovery: 'Réinitialisez votre mot de passe',
+		invite: 'Vous avez été invité',
+		magic_link: 'Votre Lien Magique',
+		email_change: 'Confirmez le changement d’adresse e-mail',
+		email_change_new: 'Confirmez la nouvelle adresse e-mail',
+		reauthentication: 'Confirmez la réauthentification'
+	}
 };
 
 // HTML Body
 const templates = {
-  en: {
-    signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
-    email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
-    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
-  },
-  es: {
-    signup: `<h2>Confirma tu correo electrónico</h2><p>Sigue este enlace para confirmar tu correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma tu correo electrónico</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
-    recovery: `<h2>Restablece tu contraseña</h2><p>Sigue este enlace para restablecer la contraseña de tu usuario:</p><p><a href="{{confirmation_url}}">Restablece tu contraseña</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
-    invite: `<h2>Has sido invitado</h2><p>Has sido invitado para crear un usuario en {{site_url}}. Sigue este enlace para aceptar la invitación:</p><p><a href="{{confirmation_url}}">Aceptar la invitación</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
-    magic_link: `<h2>Tu enlace mágico</h2><p>Sigue este enlace para iniciar sesión:</p><p><a href="{{confirmation_url}}">Iniciar sesión</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
-    email_change: `<h2>Confirma el cambio de correo electrónico</h2><p>Sigue este enlace para confirmar la actualización de tu correo electrónico de {{old_email}} a {{new_email}}:</p><p><a href="{{confirmation_url}}">Cambiar correo electrónico</a></p><p>Alternativamente, ingresa los códigos: {{token}} y {{new_token}}</p>`,
-    email_change_new: `<h2>Confirma la Nueva Dirección de Correo</h2><p>Sigue este enlace para confirmar tu nueva dirección de correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma la nueva dirección de correo</a></p><p>Alternativamente, ingresa el código: {{new_token}}</p>`,
-    reauthentication: `<h2>Confirma la reautenticación</h2><p>Ingresa el código: {{token}}</p>`
-  },
-  fr: {
-    signup: `<h2>Confirmez votre adresse e-mail</h2><p>Suivez ce lien pour confirmer votre adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez votre adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
-    recovery: `<h2>Réinitialisez votre mot de passe</h2><p>Suivez ce lien pour réinitialiser votre mot de passe :</p><p><a href="{{confirmation_url}}">Réinitialisez votre mot de passe</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
-    invite: `<h2>Vous avez été invité</h2><p>Vous avez été invité à créer un utilisateur sur {{site_url}}. Suivez ce lien pour accepter l'invitation :</p><p><a href="{{confirmation_url}}">Acceptez l'invitation</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
-    magic_link: `<h2>Votre Lien Magique</h2><p>Suivez ce lien pour vous connecter :</p><p><a href="{{confirmation_url}}">Connectez-vous</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
-    email_change: `<h2>Confirmez le changement d’adresse e-mail</h2><p>Suivez ce lien pour confirmer la mise à jour de votre adresse e-mail de {{old_email}} à {{new_email}} :</p><p><a href="{{confirmation_url}}">Changez d’adresse e-mail</a></p><p>Vous pouvez aussi saisir les codes : {{token}} et {{new_token}}</p>`,
-    email_change_new: `<h2>Confirmez la nouvelle adresse e-mail</h2><p>Suivez ce lien pour confirmer votre nouvelle adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez la nouvelle adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{new_token}}</p>`,
-    reauthentication: `<h2>Confirmez la réauthentification</h2><p>Saisissez le code : {{token}}</p>`
-  }
+	en: {
+		signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+		recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+		invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+		magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+		email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
+		email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
+		reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
+	},
+	es: {
+		signup: `<h2>Confirma tu correo electrónico</h2><p>Sigue este enlace para confirmar tu correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma tu correo electrónico</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+		recovery: `<h2>Restablece tu contraseña</h2><p>Sigue este enlace para restablecer la contraseña de tu usuario:</p><p><a href="{{confirmation_url}}">Restablece tu contraseña</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+		invite: `<h2>Has sido invitado</h2><p>Has sido invitado para crear un usuario en {{site_url}}. Sigue este enlace para aceptar la invitación:</p><p><a href="{{confirmation_url}}">Aceptar la invitación</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+		magic_link: `<h2>Tu enlace mágico</h2><p>Sigue este enlace para iniciar sesión:</p><p><a href="{{confirmation_url}}">Iniciar sesión</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+		email_change: `<h2>Confirma el cambio de correo electrónico</h2><p>Sigue este enlace para confirmar la actualización de tu correo electrónico de {{old_email}} a {{new_email}}:</p><p><a href="{{confirmation_url}}">Cambiar correo electrónico</a></p><p>Alternativamente, ingresa los códigos: {{token}} y {{new_token}}</p>`,
+		email_change_new: `<h2>Confirma la Nueva Dirección de Correo</h2><p>Sigue este enlace para confirmar tu nueva dirección de correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma la nueva dirección de correo</a></p><p>Alternativamente, ingresa el código: {{new_token}}</p>`,
+		reauthentication: `<h2>Confirma la reautenticación</h2><p>Ingresa el código: {{token}}</p>`
+	},
+	fr: {
+		signup: `<h2>Confirmez votre adresse e-mail</h2><p>Suivez ce lien pour confirmer votre adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez votre adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+		recovery: `<h2>Réinitialisez votre mot de passe</h2><p>Suivez ce lien pour réinitialiser votre mot de passe :</p><p><a href="{{confirmation_url}}">Réinitialisez votre mot de passe</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+		invite: `<h2>Vous avez été invité</h2><p>Vous avez été invité à créer un utilisateur sur {{site_url}}. Suivez ce lien pour accepter l'invitation :</p><p><a href="{{confirmation_url}}">Acceptez l'invitation</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+		magic_link: `<h2>Votre Lien Magique</h2><p>Suivez ce lien pour vous connecter :</p><p><a href="{{confirmation_url}}">Connectez-vous</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+		email_change: `<h2>Confirmez le changement d’adresse e-mail</h2><p>Suivez ce lien pour confirmer la mise à jour de votre adresse e-mail de {{old_email}} à {{new_email}} :</p><p><a href="{{confirmation_url}}">Changez d’adresse e-mail</a></p><p>Vous pouvez aussi saisir les codes : {{token}} et {{new_token}}</p>`,
+		email_change_new: `<h2>Confirmez la nouvelle adresse e-mail</h2><p>Suivez ce lien pour confirmer votre nouvelle adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez la nouvelle adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{new_token}}</p>`,
+		reauthentication: `<h2>Confirmez la réauthentification</h2><p>Saisissez le code : {{token}}</p>`
+	}
 };
 
 Deno.serve(async (req) => {
-  const payload = await req.text();
-  const serverToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
-  const headers = Object.fromEntries(req.headers);
-  const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET');
-  const wh = new Webhook(base64_secret);
-  const { user, email_data } = wh.verify(payload, headers);
+	const payload = await req.text();
+	const serverToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
+	const headers = Object.fromEntries(req.headers);
+	const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET');
+	const wh = new Webhook(base64_secret);
+	const {
+		user,
+		email_data
+	} = wh.verify(payload, headers);
 
-  const language = user.user_metadata && user.user_metadata.i18n || 'en';
-  const subject = subjects[language][email_data.email_action_type] || 'Notification';
+	const language = user.user_metadata && user.user_metadata.i18n || 'en';
+	const subject = subjects[language][email_data.email_action_type] || 'Notification';
 
-  let template = templates[language][email_data.email_action_type];
-  let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
-    .replace('{{token}}', email_data.token || '')
-    .replace('{{new_token}}', email_data.new_token || '')
-    .replace('{{site_url}}', email_data.site_url || '')
-    .replace('{{old_email}}', email_data.email || '')
-    .replace('{{new_email}}', email_data.new_email || '');
+	let template = templates[language][email_data.email_action_type];
+	let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+		.replace('{{token}}', email_data.token || '')
+		.replace('{{new_token}}', email_data.new_token || '')
+		.replace('{{site_url}}', email_data.site_url || '')
+		.replace('{{old_email}}', email_data.email || '')
+		.replace('{{new_email}}', email_data.new_email || '');
 
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-Postmark-Server-Token': serverToken
-    },
-    body: JSON.stringify({
-      From: "welcome@supabase.com",
-      To: user.email,
-      Subject: subject,
-      HtmlBody: htmlBody
-    })
-  };
+	const requestOptions = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			'X-Postmark-Server-Token': serverToken
+		},
+		body: JSON.stringify({
+			From: "welcome@supabase.com",
+			To: user.email,
+			Subject: subject,
+			HtmlBody: htmlBody
+		})
+	};
 
-  try {
-    const response = await fetch(postmarkEndpoint, requestOptions);
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to send email: ${errorData.Message}`);
-    }
-    return new Response(JSON.stringify({
-      message: "Email sent successfully."
-    }), { headers: { "Content-Type": "application/json" } });
-  } catch (error) {
-    return new Response(JSON.stringify({
-      error: `Failed to process the request: ${error.message}`
-    }), { status: 500, headers: { "Content-Type": "application/json" } });
-  }
+	try {
+		const response = await fetch(postmarkEndpoint, requestOptions);
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`Failed to send email: ${errorData.Message}`);
+		}
+		return new Response(JSON.stringify({
+			message: "Email sent successfully."
+		}), {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+	} catch (error) {
+		return new Response(JSON.stringify({
+			error: `Failed to process the request: ${error.message}`
+		}), {
+			status: 500,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
+	}
 });
 ```
+</TabPanel>
 
 
 </Tabs>
+````
