@@ -154,7 +154,8 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
   return (
     <div
       className={cn(
-        'transition-all ease-out z-10',
+        'lg:hidden px-3.5 border-b z-10',
+        'transition-all ease-out',
         'top-0',
         mobileMenuOpen && 'absolute',
         'flex items-center h-[var(--header-height,40px)]',
@@ -326,7 +327,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className={cn('hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50')}>
+      <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
         <TopNavBar />
       </div>
       <div className="flex flex-row h-full">
@@ -343,16 +344,11 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
           </div>
           <div
             className={cn(
-              'sticky transition-all top-0',
-              'z-10',
+              'sticky transition-all top-0 z-10',
               'backdrop-blur backdrop-filter bg-background'
             )}
           >
-            {!isHomePage && (
-              <div className={cn('lg:hidden', 'px-3.5', 'border-b z-10')}>
-                <MobileHeader menuId={menuId} />
-              </div>
-            )}
+            {!isHomePage && <MobileHeader menuId={menuId} />}
           </div>
           <div className="grow">
             {children}
