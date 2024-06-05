@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -28,20 +29,19 @@ import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
+import { SmoothstepEdge } from './Edge'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { SmoothstepEdge } from './Edge'
-import { useSelectedProject } from 'hooks'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
-  const project = useSelectedProject()
+  const { project, isLoading: isLoadingProject } = useProjectContext()
   const snap = useSubscriptionPageStateSnapshot()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
@@ -204,12 +204,16 @@ const InstanceConfigurationUI = () => {
     <>
       <div
         className={`h-[500px] w-full relative ${
-          isSuccessReplicas ? '' : 'flex items-center justify-center px-28'
+          isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {isLoading && <Loader2 className="animate-spin text-foreground-light" />}
+        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
+            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
+        {(isLoading || isLoadingProject) && (
+          <Loader2 className="animate-spin text-foreground-light" />
+        )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
-        {isSuccessReplicas && (
+        {isSuccessReplicas && !isLoadingProject && (
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <div className="flex items-center justify-center">
