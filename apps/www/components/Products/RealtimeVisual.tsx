@@ -5,9 +5,6 @@ const RealtimeVisual = () => {
   return (
     <figure
       className="absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 overflow-hidden"
-      style={{
-        background: 'radial-gradient(320px 320px at 30% 100%, #85E0B740, transparent)',
-      }}
       role="img"
       aria-label="Supabase Realtime multiplayer app demo"
     >
