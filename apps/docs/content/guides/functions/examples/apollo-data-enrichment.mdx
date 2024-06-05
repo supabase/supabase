@@ -1,0 +1,140 @@
+---
+id: 'examples-apollo-data-enrichment'
+title: 'Enriching User Information'
+description: 'Using the Apollo.io to enrich User Information.'
+video: ''
+---
+
+[Apollo.io](https://www.apollo.io/product/api)'s REST API lets you query for data to enrich your system. This example shows how to use Apollo.io to enrich user information based on their first name, last name, and email address. The API documentation can be found [here](https://apolloio.github.io/apollo-api-docs/?shell#people-enrichment)
+
+## Create an Apollo API Key Pair 
+
+1. Launch Apollo and click **Settings** > **Integrations**.
+2. Find the **API option** and click **Connect**.
+3. Click **API Keys** to view or create new API keys. Then, click **Create New Key** to generate a new API Key.
+4. Copy the API Key and save it in a secure location.
+
+## Add the API Key to Environment Variables
+
+Follow this [guide](https://supabase.com/docs/guides/functions/secrets) to configure a Superbase environmental vvariable. For example, we can add the API Key to the production databse with the following command:
+
+```bash
+supabase secrets set APOLLO_API_KEY="your-api-key"
+```
+
+## Code
+
+Create a new function in your project:
+
+```bash
+supabase functions new apollo-data-enrichment
+```
+
+And add the code to the `index.ts` file:
+```ts index.ts
+
+Deno.serve(async (req) => {
+  // Get APOLLO_API_KEY environment variable.
+  const apollo_api_key = Deno.env.get("APOLLO_API_KEY");
+
+  const url = "https://api.apollo.io/v1/people/match";
+  const { first_name, last_name, email } = await req.json();
+  const send_data = { first_name, last_name, email };
+
+  // Call Apollo API
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      "X-Api-Key": apollo_api_key,
+    },
+    body: JSON.stringify(send_data),
+  });
+
+  // Get response body
+  const response_body = await response.json();
+
+  return new Response(
+    JSON.stringify(response_body), {
+    headers: {
+      "Content-Type": "application/json",
+    }
+  },
+  )
+})
+
+```
+
+## Run/Deploy the function to Supabase Edge Functions
+We can either deploy the function with:
+```bash
+supabase functions deploy apollo-data-enrichment
+```
+
+Or first serve locally with
+```bash
+supabase functions serve apollo-data-enrichment --env-file ./supabase/.env.local
+```
+
+## Invoke the function
+We can invoke the function locally with a CURL HTTP request
+```bash
+curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/apollo-data-enrichment' \
+    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+    --header 'Content-Type: application/json' \
+    --data '{ "first_name":"Tim", "last_name":"Zheng" , "email":"tim@apollo.io"}'
+```
+
+Or invoke the function with the Supabase client
+
+```js
+const { data, error } = await supabase.functions.invoke('apollo-data-enrichment', {
+  first_name: 'Tim',
+  last_name: 'Zheng',
+  email: 'tim@apollo.io',
+});
+```
+
+## Example Response
+```json
+{
+  person: {
+    id: "652fc57e2802bf00010c52f8",
+    first_name: "Tim",
+    last_name: "Z",
+    name: "Tim Z",
+    linkedin_url: null,
+    title: "Founder & CEO",
+    email_status: null,
+    photo_url: "https://static.licdn.com/aero-v1/sc/h/9c8pery4andzj6ohjkjp54ma2",
+    twitter_url: null,
+    github_url: null,
+    facebook_url: null,
+    extrapolated_email_confidence: null,
+    headline: "Founder & CEO at Apollo",
+    email: "tim@apollo.io",
+    organization_id: "5e66b6381e05b4008c8331b8",
+    employment_history: [
+      {
+        _id: "665fb65081e1860001245111",
+        created_at: null,
+        current: true,
+        degree: null,
+        description: null,
+        emails: null,
+        end_date: null,
+        grade_level: null,
+        kind: null,
+        major: null,
+        organization_id: "5e66b6381e05b4008c8331b8",
+        organization_name: "Apollo",
+        raw_address: null,
+        start_date: "2016-01-01",
+        title: "Founder & CEO",
+        updated_at: null,
+        id: "665fb65081e1860001245111",
+        key: "665fb65081e1860001245111"
+      },
+    ...
+```
