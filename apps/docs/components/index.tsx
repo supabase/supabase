@@ -79,7 +79,6 @@ import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
 import { Mermaid } from './Mermaid'
 import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
-import { DatabaseReplicationConfig } from './DatabaseReplicationConfig'
 
 const components = {
   ...markdownComponents,
@@ -94,7 +93,6 @@ const components = {
   AuthProviders,
   AuthRateLimits,
   AuthSmsProviderConfig,
-  DatabaseReplicationConfig,
   Button,
   ButtonCard,
   CH,

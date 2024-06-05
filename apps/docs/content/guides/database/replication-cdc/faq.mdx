@@ -5,7 +5,7 @@ description: 'Considerations and FAQs when setting up replication'
 sidebar_label: 'Considerations'
 ---
 
-## Why not use my Primary database?
+# Why not use my Primary database?
 
 If you want to run analytics on your app, you may wonder why you could not just plug in your database connection string to an analytics tool and go. In some cases, you could, but we do not recommend it. Here's why:
 
@@ -21,3 +21,21 @@ Your users want to create or view new content and your analytics queries want to
 
 If you accidentally drop a table, you might not want to restore your whole project from a backup so you can check these values in your external system before your boss finds out.
 
+
+# Which connection string should I use?
+
+Always use the direct connection string for logical replication. 
+
+Connections through a pooler, such as Supavisor, will not work.
+
+# The tool I am using does not support IPv6
+
+No worries! Simply enable the [IPv4 addon](/guides/platform/ipv4-address) for your project.
+
+# Should I use XMIN?
+
+Xmin is a different form of replication from logical replication and is only really designed to be used if logical replication is not available for your database (i.e. older versions of Postgresql).
+
+Xmin performs replication by checking the [xmin sytem column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronised.
+
+It does not capture deletion of data and is **not recommended**.

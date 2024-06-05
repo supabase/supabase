@@ -499,34 +499,6 @@ export const PhoneLoginsItems = [
   },
 ]
 
-export const ReplicationItems = [
-  {
-    name: 'Airbyte',
-    icon: '/docs/img/icons/airbyte-icon',
-    linkDescription: '',
-    url: '/guides/database/replication/airbyte',
-  },
-  {
-    name: 'Estuary',
-    icon: '/docs/img/icons/estuary-icon',
-    url: '/guides/database/replication/estuary',
-    linkDescription: '',
-  },
-  {
-    name: 'Fivetran',
-    icon: '/docs/img/icons/fivetran-icon',
-    url: '/guides/database/replication/fivetran',
-    linkDescription:
-      '',
-  },
-  {
-    name: 'Stitch',
-    icon: '/docs/img/icons/stitch-icon',
-    url: '/guides/database/replication/stitch',
-    linkDescription: '',
-  },
-]
-
 export const auth = {
   icon: 'auth',
   title: 'Auth',
@@ -812,17 +784,17 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Replication',
-      url: '/guides/database/replication-analytics/overview',
+      name: 'CDC and Logical Replication',
+      url: '/guides/database/replication-cdc/overview',
       items: [
-        { name: 'Overview', url: '/guides/database/replication/overview' },
-        { name: 'Considerations', url: '/guides/database/replication/considerations' },
-        { name: 'Logical Replication', url: '/guides/database/replication/logical-replication-intro' },
-        { name: 'Replication with Airbyte', url: '/guides/database/replication/services/etl-airbyte' },
-        { name: 'Replication with Estuary', url: '/guides/database/replication/services/etl-estuary' },
-        { name: 'Replication with Fivetran', url: '/guides/database/replication/services/etl-fivetran' },
-        { name: 'Replication with Materialize', url: '/guides/database/replication/services/etl-materialize' },
-        { name: 'Replication with Stitch', url: '/guides/database/replication/services/etl-stitch' },
+        { name: 'Logical Replication', url: '/guides/database/replication-cdc/logical-replication' },
+        { name: 'FAQs', url: '/guides/database/replication/faq' },
+        { name: 'CDC with Airbyte', url: '/guides/database/replication-cdc/services/etl-airbyte' },
+        { name: 'CDC with Artie', url: '/partners/integrations/artie' },
+        { name: 'CDC with Estuary', url: '/partners/integrations/estuary' },
+        { name: 'CDC with Fivetran', url: '/guides/database/replication-cdc/services/etl-fivetran' },
+        { name: 'CDC with Materialize', url: '/guides/database/replication-cdc/services/etl-materialize' },
+        { name: 'CDC with Stitch', url: '/guides/database/replication-cdc/services/etl-stitch' },
       ],
     },
     {
