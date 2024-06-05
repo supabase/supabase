@@ -68,7 +68,7 @@ export const UpdateCustomReportModal = ({
         onSubmit={onConfirmUpdateReport}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
+          <>
             <Modal.Content>
               <Input label="Name" id="name" name="name" />
             </Modal.Content>
@@ -82,17 +82,15 @@ export const UpdateCustomReportModal = ({
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Save custom report
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                Save custom report
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>

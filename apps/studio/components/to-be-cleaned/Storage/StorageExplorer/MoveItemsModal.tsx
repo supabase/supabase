@@ -65,7 +65,7 @@ const MoveItemsModal = ({
       }
     >
       <Modal.Content>
-        <form className="my-4">
+        <form>
           <div className="relative flex items-center">
             <Input
               autoFocus

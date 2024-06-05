@@ -27,6 +27,7 @@
     "docker:remove": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
+	"test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "test:playwright": "npm --prefix playwright-tests run test",

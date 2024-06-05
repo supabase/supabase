@@ -196,7 +196,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
       )}
 
       <Modal
-        header={<h5 className="text-sm text-foreground">Increase Disk Storage Size</h5>}
+        header="Increase Disk Storage Size"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}
@@ -230,47 +230,43 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
               </Alert_Shadcn_>
             ) : (
               <>
-                <Modal.Content>
-                  <div className="w-full space-y-4 py-6">
-                    <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
-                      <Info size={16} />
-                      <AlertTitle_Shadcn_>
-                        This operation is only possible every 6 hours
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        {isAbleToResizeDatabase
-                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}`
-                          : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                    <InputNumber
-                      required
-                      id="new-disk-size"
-                      label="New disk size"
-                      labelOptional="GB"
-                      disabled={!isAbleToResizeDatabase}
-                    />
-                  </div>
+                <Modal.Content className="w-full space-y-4">
+                  <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                    <Info size={16} />
+                    <AlertTitle_Shadcn_>
+                      This operation is only possible every 6 hours
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {isAbleToResizeDatabase
+                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}`
+                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                  <InputNumber
+                    required
+                    id="new-disk-size"
+                    label="New disk size"
+                    labelOptional="GB"
+                    disabled={!isAbleToResizeDatabase}
+                  />
                 </Modal.Content>
                 <Modal.Separator />
-                <Modal.Content>
-                  <div className="flex space-x-2 justify-end pt-1 pb-3">
-                    <Button type="default" onClick={() => setShowResetDbPass(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      htmlType="submit"
-                      type="primary"
-                      disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
-                      loading={isUpdatingDiskSize}
-                    >
-                      Update disk size
-                    </Button>
-                  </div>
+                <Modal.Content className="flex space-x-2 justify-end">
+                  <Button type="default" onClick={() => setShowResetDbPass(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    htmlType="submit"
+                    type="primary"
+                    disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
+                    loading={isUpdatingDiskSize}
+                  >
+                    Update disk size
+                  </Button>
                 </Modal.Content>
               </>
             )
