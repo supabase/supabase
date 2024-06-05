@@ -880,7 +880,7 @@ Select the Global type to minimize the latency from all edge locations. Copy the
 
 Create a hook to read and write information from Redis, which will record the number of occasions where the user had an invalid verification attempt. For example:
 
-```
+```javascript
 import {
     Webhook
 } from "https://esm.sh/standardwebhooks@1.0.0";
@@ -949,8 +949,6 @@ Deno.serve(async (req) => {
 });
 ```
 
-</TabPanel>
-<TabPanel id="http-send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 </TabPanel>
 </Tabs>
 
@@ -1339,6 +1337,8 @@ revoke execute
 >
 <TabPanel id="http-add-metadata-claim" label="Add claim">
 
+Your company wishes to add assign permissions via the role claim on the `app_metadata` field. Add the role claim to the token via a Hook.
+
 ```javascript
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
@@ -1351,7 +1351,9 @@ Deno.serve(async (req) => {
   const wh = new Webhook(base64_secret)
   try {
     const { user_id, claims, authentication_method } = wh.verify(payload, headers)
-    claims['my_custom_claim'] = 'my_custom_claim'
+    if (claims.app_metadata && claims.app_metadata.role) {
+      claims['role'] = claims.app_metadata.role
+    }
     return new Response(
       JSON.stringify({
         claims,
@@ -1733,12 +1735,127 @@ Allows the use of an alternative region specific SMS provider.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="sql-alternative-sms-provider"
+  defaultActiveId="sql-send-message-via-job-queue"
   queryGroup="language"
 >
-<TabPanel id="sql-alternative-sms-provider" label="Use a regional SMS Provider">
-Your company is building an internal authentication tool and uses a worker to manage all messaging related jobs. Your company has an internal messaging which accepts requests in batches. Instead of sending a message immediately, we queue messages
-and send them to the messaging service in periodic intervals using `pg_cron`.
+<TabPanel id="sql-send-message-via-job-queue" label="Send messages via a job queue">
+
+Your company uses a worker to manage all messaging related jobs. For performance reasons, the messaging system sends messages in intervals via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
+
+Create a table to store jobs
+
+```sql
+create table job_queue (
+    job_id uuid primary key default gen_random_uuid(),
+    job_data jsonb not null,
+    created_at timestamp default now(),
+    status text default 'pending',
+    priority int default 0,
+    retry_count int default 0,
+    max_retries int default 2,
+    scheduled_at timestamp default now()
+);
+```
+
+Create the hook:
+
+```sql
+create or replace function send_sms(event jsonb) returns void as $$
+declare
+    job_data jsonb;
+    scheduled_time timestamp;
+    priority int;
+begin
+    -- extract phone and otp from the event json
+    job_data := jsonb_build_object(
+        'phone', event->'user'->>'phone',
+        'otp', event->'sms'->>'otp'
+    );
+
+    -- calculate the nearest 5-minute window for scheduled_time
+    scheduled_time := date_trunc('minute', now()) + interval '5 minute' * floor(extract('epoch' from (now() - date_trunc('minute', now())) / 60) / 5);
+
+    -- assign priority dynamically (example logic: higher priority for earlier scheduled time)
+    priority := extract('epoch' from (scheduled_time - now()))::int;
+
+    -- insert the job into the job_queue table
+    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    values (job_data, priority, scheduled_time, 2);
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.send_sms
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.send_sms
+  from authenticated, anon;
+
+grant all
+  on table public.job_queue
+  to supabase_auth_admin;
+
+revoke all
+  on table public.job_queue
+  from authenticated, anon;
+```
+
+Create a function to periodically run and dequeue all jobs
+
+```sql
+create or replace function dequeue_and_run_jobs() returns void as $$
+declare
+    job record;
+begin
+    for job in
+        select * from job_queue
+        where status = 'pending'
+          and scheduled_at <= now()
+        order by priority desc, created_at
+        for update skip locked
+    loop
+        begin
+            -- add job processing logic here.
+            -- for demonstration, we'll just update the job status to 'completed'.
+            update job_queue
+            set status = 'completed'
+            where job_id = job.job_id;
+
+        exception when others then
+            -- handle job failure and retry logic
+            if job.retry_count < job.max_retries then
+                update job_queue
+                set retry_count = retry_count + 1,
+                    scheduled_at = now() + interval '1 minute'  -- delay retry by 1 minute
+                where job_id = job.job_id;
+            else
+                update job_queue
+                set status = 'failed'
+                where job_id = job.job_id;
+            end if;
+        end;
+    end loop;
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.dequeue_and_run_jobs
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.dequeue_and_run_jobs
+  from authenticated, anon;
+```
+Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
+```sql
+select cron.schedule(
+    '* * * * *',  -- this cron expression means every minute.
+    'select dequeue_and_run_jobs();'
+);
+```
+
+
 </TabPanel>
 
 </Tabs>
@@ -1748,11 +1865,11 @@ and send them to the messaging service in periodic intervals using `pg_cron`.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="http-configure-message-body"
+  defaultActiveId="http-alternate-message-provider"
   queryGroup="language"
 >
-<TabPanel id="http-configure-message-body" label="Configure message body">
-Your company would like to add an AppHash to the message body. In this case, we add an AppHash which allows a mobile application to fetch the OTP code from an SMS without the user having to exit the application.
+<TabPanel id="http-alternate-message-provider" label="Alternate message provider">
+Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). For demonstration, we use Twilio as it is widely available and does not require a regional number.
 
 ```javascript
 import {
@@ -1769,7 +1886,6 @@ import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
 const fromNumber: string = Deno.env.get("TWILIO_PHONE_NUMBER")
-const APP_HASH = Deno.env.get("APP_HASH")
 
 const sendTextMessage = async (
 	messageBody: string,
@@ -1820,7 +1936,7 @@ Deno.serve(async (req) => {
 			user,
 			sms
 		} = wh.verify(payload, headers);
-		const messageBody = `Your OTP is: ${sms.otp} <#> Your code: ${APP_HASH}`;
+		const messageBody = `Your OTP is: ${sms.otp}`;
 		const response = await sendTextMessage(
 			messageBody,
 			accountSid,
@@ -1862,8 +1978,6 @@ Deno.serve(async (req) => {
 })
 ```
 </TabPanel>
-
-
 </Tabs>
 
 
@@ -2204,8 +2318,121 @@ The Send Email Hook runs before an email is sent and allows for customization ar
   queryGroup="language"
 >
 <TabPanel id="sql-queue-email-messages" label="Add Internationalization for Email Templates">
-Your company is building an internal authentication tool and uses a worker to manage all email related jobs. Emails are sent in periodic intervals using `pg_cron`
+Your company uses a worker to manage all emails related jobs. For performance reasons, the messaging system sends emails in batches via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
 
+Create a table to store jobs
+
+```sql
+create table job_queue (
+    job_id uuid primary key default gen_random_uuid(),
+    job_data jsonb not null,
+    created_at timestamp default now(),
+    status text default 'pending',
+    priority int default 0,
+    retry_count int default 0,
+    max_retries int default 2,
+    scheduled_at timestamp default now()
+);
+```
+
+Create the hook
+
+```sql
+create or replace function send_email(event jsonb) returns void as $$
+declare
+    job_data jsonb;
+    scheduled_time timestamp;
+    priority int;
+begin
+    -- Extract email details from the event JSON
+    job_data := jsonb_build_object(
+        'email_action_type', event->'email_data'->>'email_action_type',
+        'token_hash', event->'email_data'->>'token_hash',
+        'token', event->'email_data'->>'token',
+        'email', event->'user'->>'email'
+    );
+
+    -- Calculate the nearest 5-minute window for scheduled_time
+    scheduled_time := date_trunc('minute', now()) + interval '5 minute' * floor(extract('epoch' from (now() - date_trunc('minute', now())) / 60) / 5);
+
+    -- Assign priority dynamically (example logic: higher priority for earlier scheduled time)
+    priority := extract('epoch' from (scheduled_time - now()))::int;
+
+    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    values (job_data, priority, scheduled_time, 2);
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.send_email
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.send_email
+  from authenticated, anon;
+
+grant all
+  on table public.job_queue
+  to supabase_auth_admin;
+
+revoke all
+  on table public.job_queue
+  from authenticated, anon;
+```
+
+Create a function to periodically run and dequeue all jobs
+
+```sql
+create or replace function dequeue_and_run_jobs() returns void as $$
+declare
+    job record;
+begin
+    for job in
+        select * from job_queue
+        where status = 'pending'
+          and scheduled_at <= now()
+        order by priority desc, created_at
+        for update skip locked
+    loop
+        begin
+            -- add job processing logic here.
+            -- for demonstration, we'll just update the job status to 'completed'.
+            update job_queue
+            set status = 'completed'
+            where job_id = job.job_id;
+
+        exception when others then
+            -- handle job failure and retry logic
+            if job.retry_count < job.max_retries then
+                update job_queue
+                set retry_count = retry_count + 1,
+                    scheduled_at = now() + interval '1 minute'  -- delay retry by 1 minute
+                where job_id = job.job_id;
+            else
+                update job_queue
+                set status = 'failed'
+                where job_id = job.job_id;
+            end if;
+        end;
+    end loop;
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.dequeue_and_run_jobs
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.dequeue_and_run_jobs
+  from authenticated, anon;
+```
+Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
+```sql
+select cron.schedule(
+    '* * * * *',  -- this cron expression means every minute.
+    'select dequeue_and_run_jobs();'
+);
+```
 </TabPanel>
 
 
@@ -2359,7 +2586,6 @@ Deno.serve(async (req) => {
 });
 ```
 </TabPanel>
-
 
 </Tabs>
 ````
