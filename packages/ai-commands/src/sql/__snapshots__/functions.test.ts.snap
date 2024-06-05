@@ -20,12 +20,3 @@ exports[`debug fix typos 1`] = `
 from
   employees;"
 `;
-
-exports[`rls chat select policy using table definition 1`] = `
-{
-  "checkExpression": undefined,
-  "command": "select",
-  "table": "todos",
-  "usingExpression": "user_id = auth.uid ()",
-}
-`;

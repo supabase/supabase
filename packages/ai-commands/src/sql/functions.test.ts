@@ -1,15 +1,14 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
-import { collectStream, extractMarkdownSql, formatSql, getPolicyInfo } from '../test/util'
-import { debugSql, titleSql } from './sql'
-import { chatRlsPolicy } from './sql.edge'
+import { formatSql } from '../../test/util'
+import { debugSql, titleSql } from './functions'
 
 const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
 describe('debug', () => {
-  test('fix order of operations', async () => {
+  test.concurrent('fix order of operations', async () => {
     const { sql } = await debugSql(
       openai,
       'relation "departments" does not exist',
@@ -31,7 +30,7 @@ describe('debug', () => {
     expect(formatSql(sql)).toMatchSnapshot()
   })
 
-  test('fix typos', async () => {
+  test.concurrent('fix typos', async () => {
     const { sql, solution } = await debugSql(
       openai,
       'syntax error at or near "fromm"',
@@ -66,38 +65,5 @@ describe('title', () => {
 
     await expect(title).toMatchCriteria('relates to employees and departments')
     await expect(description).toMatchCriteria('describes employees and departments')
-  })
-})
-
-describe('rls chat', () => {
-  test('select policy using table definition', async () => {
-    const responseStream = await chatRlsPolicy(
-      openai,
-      [
-        {
-          role: 'user',
-          content: 'Users can only select their own todos',
-        },
-      ],
-      [
-        codeBlock`
-          create table todos (
-            id bigint primary key generated always as identity,
-            task text,
-            email text,
-            user_id uuid references auth.users (id)
-          );
-        `,
-      ]
-    )
-    const responseText = await collectStream(responseStream)
-    const [sql] = extractMarkdownSql(responseText)
-
-    const { name, ...otherInfo } = await getPolicyInfo(sql)
-
-    expect(otherInfo).toMatchSnapshot()
-    await expect(name).toMatchCriteria(
-      'policy says that users can select their own todos (not insert, update, delete, etc)'
-    )
   })
 })
