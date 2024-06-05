@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { getAvailableRegions } from './ProjectCreation.utils'
+import { useEffect } from 'react'
 
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
@@ -23,24 +24,9 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
   const router = useRouter()
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
 
-  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery(
-    { cloudProvider },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
-      onSuccess(data) {
-        console.log('/trace return', data)
-        if (data) {
-          form.setValue('dbRegion', data)
-        }
-      },
-      onError(error) {
-        console.log('Could not find nearest region', error)
-        form.setValue('dbRegion', PROVIDERS[cloudProvider].default_region)
-      },
-    }
-  )
+  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
+    cloudProvider,
+  })
 
   return (
     <FormItemLayout

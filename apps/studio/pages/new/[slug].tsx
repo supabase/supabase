@@ -53,6 +53,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -70,10 +71,24 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
   const { data: orgSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
+  const { data: defaultRegion } = useDefaultRegionQuery(
+    {
+      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+    },
+    {
+      onSuccess: (data) => {
+        if (data) {
+          form.setValue('dbRegion', data)
+        }
+      },
+      onError: (error) => {
+        form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
+      },
+    }
+  )
 
   const {
     mutate: createProject,
@@ -238,7 +253,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: undefined,
+      dbRegion: defaultRegion || undefined,
       instanceSize: sizes[0],
     },
   })
@@ -593,6 +608,7 @@ const Wizard: NextPageWithLayout = () => {
                                 type="password"
                                 placeholder="Type in a strong password"
                                 {...field}
+                                autoComplete="off"
                                 onChange={async (event) => {
                                   field.onChange(event)
                                   form.trigger('dbPassStrength')
