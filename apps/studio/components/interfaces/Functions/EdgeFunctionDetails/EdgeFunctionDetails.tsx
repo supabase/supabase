@@ -289,13 +289,11 @@ const EdgeFunctionDetails = () => {
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={onConfirmDelete}
       >
-        <div className="py-6">
-          <Modal.Content>
-            <Alert withIcon variant="warning" title="This action cannot be undone">
-              Ensure that you have made a backup if you want to restore your edge function
-            </Alert>
-          </Modal.Content>
-        </div>
+        <Modal.Content>
+          <Alert withIcon variant="warning" title="This action cannot be undone">
+            Ensure that you have made a backup if you want to restore your edge function
+          </Alert>
+        </Modal.Content>
       </Modal>
     </>
   )

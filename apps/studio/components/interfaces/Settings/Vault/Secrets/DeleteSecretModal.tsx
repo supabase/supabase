@@ -42,24 +42,19 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
       onCancel={onClose}
       onConfirm={onConfirmDeleteSecret}
       loading={isDeleting}
-      header={<h5 className="text-sm text-foreground">Confirm to delete secret</h5>}
+      header="Confirm to delete secret"
     >
-      <div className="py-4">
-        <Modal.Content>
-          <div className="space-y-4">
-            <p className="text-sm">
-              The following secret will be permanently removed and cannot be recovered. Are you
-              sure?
-            </p>
-            <div className="space-y-1">
-              <p className="text-sm">{selectedSecret?.description}</p>
-              <p className="text-sm text-foreground-light">
-                ID: <span className="font-mono">{selectedSecret?.key_id}</span>
-              </p>
-            </div>
-          </div>
-        </Modal.Content>
-      </div>
+      <Modal.Content className="space-y-4">
+        <p className="text-sm">
+          The following secret will be permanently removed and cannot be recovered. Are you sure?
+        </p>
+        <div className="space-y-1">
+          <p className="text-sm">{selectedSecret?.description}</p>
+          <p className="text-sm text-foreground-light">
+            ID: <span className="font-mono">{selectedSecret?.key_id}</span>
+          </p>
+        </div>
+      </Modal.Content>
     </Modal>
   )
 }

@@ -156,113 +156,108 @@ const AddRestrictionModal = ({
 
           return (
             <>
-              <Modal.Content>
-                <div className="py-6 space-y-4">
-                  <p className="text-sm text-foreground-light">
-                    This will add an IP address range to a list of allowed ranges that can access
-                    your database.
-                  </p>
-                  <InformationBox
-                    title="Note: Restrictions only apply to direct connections to your database and Supavisor"
-                    description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
-                    urlLabel="Learn more"
-                    url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
-                  />
-                  <div className="flex space-x-4">
-                    <div className="w-[55%]">
-                      <Input
-                        label={`${type} address`}
-                        id="ipAddress"
-                        name="ipAddress"
-                        placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'}
-                      />
-                    </div>
-                    <div className="flex-grow">
-                      <Input
-                        label={
-                          <div className="flex items-center space-x-2">
-                            <p>CIDR Block Size</p>
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger>
-                                <IconHelpCircle size="tiny" strokeWidth={2} />
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background w-[300px]',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">
-                                      Classless inter-domain routing (CIDR) notation is the notation
-                                      used to identify networks and hosts in the networks. The block
-                                      size tells us how many bits we need to take for the network
-                                      prefix, and is a value between 0 to{' '}
-                                      {type === 'IPv4'
-                                        ? IPV4_MAX_CIDR_BLOCK_SIZE
-                                        : IPV6_MAX_CIDR_BLOCK_SIZE}
-                                      .
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
-                          </div>
-                        }
-                        id="cidrBlockSize"
-                        name="cidrBlockSize"
-                        type="number"
-                        placeholder={
-                          type === 'IPv4'
-                            ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
-                            : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
-                        }
-                        min={0}
-                        max={type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE}
-                      />
-                    </div>
+              <Modal.Content className="space-y-4">
+                <p className="text-sm text-foreground-light">
+                  This will add an IP address range to a list of allowed ranges that can access your
+                  database.
+                </p>
+                <InformationBox
+                  title="Note: Restrictions only apply to direct connections to your database and Supavisor"
+                  description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
+                  urlLabel="Learn more"
+                  url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
+                />
+                <div className="flex space-x-4">
+                  <div className="w-[55%]">
+                    <Input
+                      label={`${type} address`}
+                      id="ipAddress"
+                      name="ipAddress"
+                      placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'}
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <Input
+                      label={
+                        <div className="flex items-center space-x-2">
+                          <p>CIDR Block Size</p>
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger>
+                              <IconHelpCircle size="tiny" strokeWidth={2} />
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background w-[300px]',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-foreground">
+                                    Classless inter-domain routing (CIDR) notation is the notation
+                                    used to identify networks and hosts in the networks. The block
+                                    size tells us how many bits we need to take for the network
+                                    prefix, and is a value between 0 to{' '}
+                                    {type === 'IPv4'
+                                      ? IPV4_MAX_CIDR_BLOCK_SIZE
+                                      : IPV6_MAX_CIDR_BLOCK_SIZE}
+                                    .
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        </div>
+                      }
+                      id="cidrBlockSize"
+                      name="cidrBlockSize"
+                      type="number"
+                      placeholder={
+                        type === 'IPv4'
+                          ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
+                          : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
+                      }
+                      min={0}
+                      max={type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE}
+                    />
                   </div>
                 </div>
               </Modal.Content>
               <Modal.Separator />
               {isValidCIDR ? (
-                <Modal.Content>
-                  <div className="space-y-1 pt-2 pb-4">
-                    <p className="text-sm">
-                      The address range <code className="text-xs">{normalizedAddress}</code> will be
-                      restricted
-                    </p>
-                    <p className="text-sm text-foreground-light">
-                      Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
-                      to <code className="text-xs">{addressRange.end}</code>{' '}
-                    </p>
-                    <p className="text-sm text-foreground-light">
-                      Number of addresses: {availableAddresses}
-                    </p>
-                  </div>
+                <Modal.Content className="space-y-1">
+                  <p className="text-sm">
+                    The address range <code className="text-xs">{normalizedAddress}</code> will be
+                    restricted
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    Selected address space: <code className="text-xs">{addressRange.start}</code> to{' '}
+                    <code className="text-xs">{addressRange.end}</code>{' '}
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    Number of addresses: {availableAddresses}
+                  </p>
                 </Modal.Content>
               ) : (
                 <Modal.Content>
-                  <div className="pt-2 pb-4">
-                    <div className="h-[68px] flex items-center">
-                      <p className="text-sm text-foreground-light">
-                        A summary of your restriction will be shown here after entering a valid IP
-                        address and CIDR block size. IP addresses will also be normalized.
-                      </p>
-                    </div>
+                  <div className="h-[68px] flex items-center">
+                    <p className="text-sm text-foreground-light">
+                      A summary of your restriction will be shown here after entering a valid IP
+                      address and CIDR block size. IP addresses will also be normalized.
+                    </p>
                   </div>
                 </Modal.Content>
               )}
-              <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
+              <Modal.Separator />
+              <Modal.Content className="flex items-center justify-end space-x-2">
                 <Button type="default" disabled={isApplying} onClick={() => onClose()}>
                   Cancel
                 </Button>
                 <Button htmlType="submit" loading={isApplying} disabled={isApplying}>
                   Save restriction
                 </Button>
-              </div>
+              </Modal.Content>
             </>
           )
         }}

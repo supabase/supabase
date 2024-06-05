@@ -146,7 +146,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="pt-3 pb-1">
+          <Modal.Content className="">
             {isLoadingConnections && <GenericSkeletonLoader />}
             {isErrorConnections && (
               <AlertError
@@ -175,7 +175,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Separator />
 
-          <Modal.Content className="pt-1 pb-3 space-y-3">
+          <Modal.Content className="space-y-3">
             <p className="text-sm">
               Choose a Git Branch to base your Preview Branch on. Any migration changes added to
               this Git Branch will be run on this new Preview Branch.
@@ -220,21 +220,19 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Separator />
 
-          <Modal.Content>
-            <div className="flex items-center justify-end space-x-2 py-2 pb-4">
-              <Button disabled={isCreating} type="default" onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button
-                form={formId}
-                disabled={isCreating || !canSubmit}
-                loading={isCreating}
-                type="primary"
-                htmlType="submit"
-              >
-                Create Preview branch
-              </Button>
-            </div>
+          <Modal.Content className="flex items-center justify-end space-x-2">
+            <Button disabled={isCreating} type="default" onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              disabled={isCreating || !canSubmit}
+              loading={isCreating}
+              type="primary"
+              htmlType="submit"
+            >
+              Create Preview branch
+            </Button>
           </Modal.Content>
         </Modal>
       </form>
