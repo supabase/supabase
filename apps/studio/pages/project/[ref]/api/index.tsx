@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
 import { DocsLayout } from 'components/layouts'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
@@ -127,7 +127,7 @@ const DocView = observer(() => {
         <div>
           {resource ? (
             <ResourceContent
-              autoApiService={autoApiService}
+              autoApiService={autoApiService as AutoApiService}
               selectedLang={selectedLang}
               resourceId={resource}
               resources={PageState.resources}

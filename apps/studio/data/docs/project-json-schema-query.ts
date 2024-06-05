@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { get, handleError } from 'data/fetchers'
 import { docsKeys } from './keys'
 
 export type ProjectJsonSchemaVariables = {
@@ -13,14 +13,15 @@ export async function getProjectJsonSchema(
   { projectRef }: ProjectJsonSchemaVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const url = `${API_URL}/projects/${projectRef}/api/rest`
-  const response = await get(url, { signal })
-  if (response.error) throw response.error
-  return response as ProjectJsonSchemaResponse
+  const { data, error } = await get('/platform/projects/{ref}/api/rest', {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 export type ProjectJsonSchemaData = Awaited<ReturnType<typeof getProjectJsonSchema>>

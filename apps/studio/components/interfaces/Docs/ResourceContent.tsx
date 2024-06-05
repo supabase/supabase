@@ -7,6 +7,20 @@ import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useIsFeatureEnabled } from 'hooks'
+import { AutoApiService } from 'data/config/project-api-query'
+
+interface ResourceContentProps {
+  autoApiService: AutoApiService
+  resourceId: string
+  resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
+  definitions: {
+    [key: string]: { type: string; description: string; required: string[]; properties: any }
+  }
+  paths: { [key: string]: { get?: any; post?: any; patch?: any; delete?: any } }
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+  refreshDocs: () => void
+}
 
 const ResourceContent = ({
   autoApiService,
@@ -17,7 +31,7 @@ const ResourceContent = ({
   selectedLang,
   showApiKey,
   refreshDocs,
-}: any) => {
+}: ResourceContentProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
@@ -33,10 +47,10 @@ const ResourceContent = ({
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition?.description || null
+  const description = resourceDefinition?.description || ''
 
   const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
-  const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
+  const properties = Object.entries(resourceDefinition?.properties ?? []).map(([id, val]: any) => ({
     ...val,
     id,
     required: resourceDefinition?.required?.includes(id),
