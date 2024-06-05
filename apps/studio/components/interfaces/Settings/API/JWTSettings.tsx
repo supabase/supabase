@@ -265,41 +265,39 @@ const JWTSettings = () => {
           </div>
         }
       >
-        <Modal.Content>
-          <div className="py-4 space-y-2">
-            <p className="text-sm text-foreground-light">
-              Create a custom JWT secret. Make sure it is a strong combination of characters that
-              cannot be guessed easily.
-            </p>
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle />
-              <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
-                of your API keys, including your <code className="text-xs">service_role</code> and{' '}
-                <code className="text-xs">anon</code> keys. Your project will also be restarted
-                during this process, which will terminate any existing connections.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <Input
-              onChange={(e: any) => setCustomToken(e.target.value)}
-              value={customToken}
-              icon={<IconKey />}
-              type={showCustomTokenInput ? 'text' : 'password'}
-              className="w-full text-left"
-              label="Custom JWT secret"
-              descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
-              actions={
-                <div className="flex items-center justify-center mr-1">
-                  <Button
-                    type="default"
-                    icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
-                    onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
-                  />
-                </div>
-              }
-            />
-          </div>
+        <Modal.Content className="space-y-2">
+          <p className="text-sm text-foreground-light">
+            Create a custom JWT secret. Make sure it is a strong combination of characters that
+            cannot be guessed easily.
+          </p>
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle />
+            <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
+              your API keys, including your <code className="text-xs">service_role</code> and{' '}
+              <code className="text-xs">anon</code> keys. Your project will also be restarted during
+              this process, which will terminate any existing connections.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+          <Input
+            onChange={(e: any) => setCustomToken(e.target.value)}
+            value={customToken}
+            icon={<IconKey />}
+            type={showCustomTokenInput ? 'text' : 'password'}
+            className="w-full text-left"
+            label="Custom JWT secret"
+            descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
+            actions={
+              <div className="flex items-center justify-center mr-1">
+                <Button
+                  type="default"
+                  icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
+                  onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
+                />
+              </div>
+            }
+          />
         </Modal.Content>
       </Modal>
     </>

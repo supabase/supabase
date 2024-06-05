@@ -72,56 +72,52 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
       >
         {() => (
           <Loading active={isLoading}>
-            <div className="space-y-6 py-4">
-              <Modal.Content>
-                <div className="space-y-4">
-                  <Input
-                    id="email"
-                    autoComplete="off"
-                    label="User Email"
-                    icon={<IconMail />}
-                    type="email"
-                    name="email"
-                    placeholder="user@example.com"
-                    disabled={isCreatingUser || isLoading}
-                  />
+            <Modal.Content className="space-y-4">
+              <Input
+                id="email"
+                autoComplete="off"
+                label="User Email"
+                icon={<IconMail />}
+                type="email"
+                name="email"
+                placeholder="user@example.com"
+                disabled={isCreatingUser || isLoading}
+              />
 
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    label="User Password"
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    icon={<IconLock />}
-                    disabled={isCreatingUser || isLoading}
-                    autoComplete="new-password"
-                  />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                label="User Password"
+                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                icon={<IconLock />}
+                disabled={isCreatingUser || isLoading}
+                autoComplete="new-password"
+              />
 
-                  <Checkbox
-                    value="true"
-                    id="autoConfirmUser"
-                    name="autoConfirmUser"
-                    label="Auto Confirm User?"
-                    size="medium"
-                    description="Creates the user without sending them a confirmation email"
-                    defaultChecked={true}
-                    disabled={isCreatingUser || isLoading}
-                  />
-                </div>
-              </Modal.Content>
-
-              <Modal.Content>
-                <Button
-                  block
-                  size="small"
-                  htmlType="submit"
-                  loading={isCreatingUser}
-                  disabled={!canCreateUsers || isCreatingUser || isLoading}
-                >
-                  Create user
-                </Button>
-              </Modal.Content>
-            </div>
+              <Checkbox
+                value="true"
+                id="autoConfirmUser"
+                name="autoConfirmUser"
+                label="Auto Confirm User?"
+                size="medium"
+                description="Creates the user without sending them a confirmation email"
+                defaultChecked={true}
+                disabled={isCreatingUser || isLoading}
+              />
+            </Modal.Content>
+            <Modal.Separator />
+            <Modal.Content>
+              <Button
+                block
+                size="small"
+                htmlType="submit"
+                loading={isCreatingUser}
+                disabled={!canCreateUsers || isCreatingUser || isLoading}
+              >
+                Create user
+              </Button>
+            </Modal.Content>
           </Loading>
         )}
       </Form>

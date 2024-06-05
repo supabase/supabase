@@ -1,7 +1,12 @@
 import { useParams } from 'common/hooks'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { Button } from 'ui'
+import { ElementRef, forwardRef, useState } from 'react'
+import {
+  Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+} from 'ui'
 
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
@@ -10,15 +15,16 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import type { Commands } from './Functions.types'
 
-interface TerminalInstructionsProps {
+interface TerminalInstructionsProps
+  extends React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean
   removeBorder?: boolean
 }
 
-const TerminalInstructions = ({
-  closable = false,
-  removeBorder = false,
-}: TerminalInstructionsProps) => {
+const TerminalInstructions = forwardRef<
+  React.ElementRef<typeof Collapsible_Shadcn_>,
+  TerminalInstructionsProps
+>(({ closable = false, removeBorder = false, ...props }, ref) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)
@@ -84,72 +90,79 @@ const TerminalInstructions = ({
   ]
 
   return (
-    <div
-      className={`col-span-7 overflow-hidden transition-all rounded bg-surface-100 ${
-        removeBorder ? '' : 'border shadow'
-      }`}
-      style={{ maxHeight: showInstructions ? 500 : 80 }}
+    <Collapsible_Shadcn_
+      ref={ref}
+      open={showInstructions}
+      className="w-full"
+      onOpenChange={() => setShowInstructions(!showInstructions)}
+      {...props}
     >
-      <div className="px-8 py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-x-3">
-            <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
-              <Terminal strokeWidth={2} />
-            </div>
-            <h4>Create your first Edge Function via the CLI</h4>
+      <CollapsibleTrigger_Shadcn_ className="flex w-full justify-between" disabled={!closable}>
+        <div className="flex items-center gap-x-3">
+          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
+            <Terminal strokeWidth={2} />
           </div>
-          {closable && (
-            <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
-              {showInstructions ? (
-                <Minimize2 size={16} strokeWidth={1.5} />
-              ) : (
-                <Maximize2 size={16} strokeWidth={1.5} />
-              )}
-            </div>
-          )}
+          <h4>Create your first Edge Function via the CLI</h4>
         </div>
-        <CommandRender commands={commands} />
-      </div>
-      {tokens && tokens.length === 0 ? (
-        <div className="px-8 py-6 space-y-3 border-t">
-          <div>
-            <h3 className="text-base text-foreground">You may need to create an access token</h3>
-            <p className="text-sm text-foreground-light">
-              You can create a secure access token in your account section
-            </p>
+        {closable && (
+          <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
+            {showInstructions ? (
+              <Minimize2 size={16} strokeWidth={1.5} />
+            ) : (
+              <Maximize2 size={16} strokeWidth={1.5} />
+            )}
           </div>
-          <Button type="default" onClick={() => router.push('/account/tokens')}>
-            Access tokens
-          </Button>
-        </div>
-      ) : (
-        <div className="px-8 py-6 space-y-3 border-t">
-          <div>
-            <h3 className="text-base text-foreground">Need help?</h3>
-            <p className="text-sm text-foreground-light">
-              Read the documentation, or browse some sample code.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a href="https://supabase.com/docs/guides/functions" target="_blank" rel="noreferrer">
-                Documentation
-              </a>
-            </Button>
-            <Button asChild type="default" icon={<Code />}>
-              <a
-                href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Examples
-              </a>
+        )}
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_ className="w-full transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+        <CommandRender commands={commands} className="my-4" />
+        {tokens && tokens.length === 0 ? (
+          <div className="px-8 py-4 space-y-3 border-t">
+            <div>
+              <p className="text-sm text-foreground">You may need to create an access token</p>
+              <p className="text-sm text-foreground-light">
+                You can create a secure access token in your account section
+              </p>
+            </div>
+            <Button type="default" onClick={() => router.push('/account/tokens')}>
+              Access tokens
             </Button>
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="py-4 space-y-3 border-t">
+            <div>
+              <h3 className="text-base text-foreground">Need help?</h3>
+              <p className="text-sm text-foreground-light">
+                Read the documentation, or browse some sample code.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <a
+                  href="https://supabase.com/docs/guides/functions"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </a>
+              </Button>
+              <Button asChild type="default" icon={<Code />}>
+                <a
+                  href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Examples
+                </a>
+              </Button>
+            </div>
+          </div>
+        )}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
-}
+})
+
+TerminalInstructions.displayName = 'TerminalInstructions'
 
 export default TerminalInstructions
