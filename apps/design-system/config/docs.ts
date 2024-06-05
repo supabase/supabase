@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'cmdk',
+          href: '/docs/fragments/cmdk',
+          items: [],
+        },
+        {
           title: 'Text Confirm Dialog',
           href: '/docs/fragments/text-confirm-dialog',
           items: [],
