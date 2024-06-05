@@ -19,7 +19,7 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 | ----------------------------- | -------------------- |
 | Custom Access Token           | Free, Pro            |
 | Send SMS                      | Free, Pro            |
-| Send Email                    | Free, Pro            |
+| Send email                    | Free, Pro            |
 | MFA Verification Attempt      | Teams and Enterprise |
 | Password Verification Attempt | Teams and Enterprise |
 
@@ -29,7 +29,7 @@ You can connect a hook to Supabase Auth to signal to Supabase Auth that it shoul
 
 ### What is a hook
 
-A Hook is a primitive invoked by Supabase Auth, with an event object, at a point in the flow. The Hook returns an object which provides instructions on how Supabase Auth should continue processing. While the Hook interface is protocol agnostic, we currently limit platform support to Postgres (SQL) and HTTP Hooks. We recommend that you pick the Hook corresponding to the medium (PL/pgSQL or JavaScript) that you are most familiar with.
+A Hook is a primitive invoked by Supabase Auth, with an event object, at a point in the flow. The Hook returns an object which provides instructions on how Supabase Auth should continue processing. While the Hook interface is protocol agnostic, platform support is limited to Postgres (SQL) and HTTP Hooks. Pick the Hook corresponding to the medium (PL/pgSQL or JavaScript) that you are most familiar with.
 
 <Tabs
   scrollable
@@ -39,17 +39,17 @@ A Hook is a primitive invoked by Supabase Auth, with an event object, at a point
 >
 <TabPanel id="postgres-what-is-a-hook" label="SQL">
 
-A Postgres Hook is a Postgres Function which takes a single argument -- the event of type JSONB -- and returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance. You can read more about Postgres Functions in [our Postgres guide](/docs/guides/database/functions)
+A Postgres Hook is a Postgres Function which takes a single argument -- the event of type JSONB -- and returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance. You can read more about Postgres Functions in [the Postgres guide](/docs/guides/database/functions)
 
 </TabPanel>
 <TabPanel id="https-what-is-a-hook" label="HTTP">
 A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. HTTP Hooks in Supabase follow the Standard Webhooks Specification, which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee authenticity of the payload:
 
-- `webhook-id`: the unique webhook identifier described in the sections above.
-- `webhook-timestamp`: integer unix timestamp (seconds since epoch).
-- `webhook-signature`: the signature(s) of this webhook. This is generated from body of the hook.
+- `webhook-id`: the unique webhook identifier described in the preceding sections.
+- `webhook-timestamp`: integer UNIX timestamp (seconds since epoch).
+- `webhook-signature`: the signatures of this webhook. This is generated from body of the hook.
 
-You can use any HTTP endpoint as a Hook, including an endpoint on your application. However, out of convenience, we will use a Supabase Edge Function for our examples.
+You can use any HTTP endpoint as a Hook, including an endpoint on your application. For convenience, a Supabase Edge Function is used for demonstration.
 
 </TabPanel>
 </Tabs>
@@ -113,7 +113,7 @@ Let's break down the secret content:
 - `whsec_` signifies that we’re using a symmetric secret
 - `<base-64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
 
-We will use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
+Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
 
 ```jsx
 
@@ -183,7 +183,7 @@ Hooks return status codes based on the nature of the response. These status code
 | 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
 | 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-Errors are responses which contain status codes 400 and above. On a retryable error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
+Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
 
 Here’s a sample HTTP retry schedule:
 
@@ -218,13 +218,13 @@ Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout err
 
 Let us develop a Hook locally and then deploy it to the cloud. As a recap, here’s a list of available Hooks
 
-| Hook                          | Suggested Function Name       | When it is called                                  | What it Does                                                                                              |
-| ----------------------------- | ----------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Send SMS                      | send_sms                      | Each time an SMS is sent                           | Allows you to customize message content and SMS Provider                                                  |
-| Send Email                    | send_email                    | Each time an Email is sent                         | Allows you to customize message content and Email Provider                                                |
-| Custom Access Token           | custom_access_token           | Each time a new JWT is created                     | Returns the claims you wish to be present in the JWT.                                                     |
-| MFA Verification Attempt      | mfa_verification_attempt      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
-| Password Verification Attempt | password_verification_attempt | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
+| Hook                          | Suggested Function Name         | When it is called                                  | What it Does                                                                                              |
+| ----------------------------- | ------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Send SMS                      | `send_sms`                      | Each time an SMS is sent                           | Allows you to customize message content and SMS Provider                                                  |
+| Send Email                    | `send_email`                    | Each time an Email is sent                         | Allows you to customize message content and Email Provider                                                |
+| Custom Access Token           | `custom_access_token`           | Each time a new JWT is created                     | Returns the claims you wish to be present in the JWT.                                                     |
+| MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
+| Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
 
 Edit config.toml to set up the Auth Hook locally.
 
@@ -317,7 +317,7 @@ secret = "env(SEND_SMS_HOOK_SECRET)"
 
 ```
 
-In this case we use `host.docker.internal` which is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
+`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
 
 Fill in the Hook Secret
 
@@ -531,7 +531,7 @@ revoke all
 >
 <TabPanel id="sql-limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
 
-Your company requires that a user can make an incorrect MFA verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in our company setup.
+Your company requires that a user can make an incorrect MFA verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in the company setup.
 
 Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli) to track verification attempts.
 
@@ -1869,7 +1869,7 @@ select cron.schedule(
   queryGroup="language"
 >
 <TabPanel id="http-alternate-message-provider" label="Alternate message provider">
-Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). For demonstration, we use Twilio as it is widely available and does not require a regional number.
+Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). The example uses Twilio as it is widely available and does not require a regional number.
 
 ```javascript
 import {
@@ -1983,7 +1983,7 @@ Deno.serve(async (req) => {
 
 ## Hook: Send Email
 
-The Send Email Hook runs before an email is sent and allows for customization around email Sending. Use this Hook to add internationalization or a fallback provider.
+The Send Email Hook runs before an email is sent and allows for customization around email sending. Use this Hook to add internationalization or a fallback provider.
 
 **Inputs**
 
