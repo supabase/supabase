@@ -2,7 +2,7 @@ create table last_changed (
 	id bigint primary key generated always as identity,
 	checksum text not null,
 	parent_page text not null,
-	heading text,
+	heading text not null,
 	last_updated timestamp with time zone default now() not null,
 	last_checked timestamp with time zone default now() not null,
 	unique (parent_page, heading)
