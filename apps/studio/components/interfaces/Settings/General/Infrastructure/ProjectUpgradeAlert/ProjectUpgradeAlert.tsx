@@ -99,118 +99,117 @@ const ProjectUpgradeAlert = () => {
 
             return (
               <>
-                <div className="py-6">
-                  <Modal.Content>
-                    <div className="space-y-4">
-                      <p className="text-sm">All services are going offline.</p>
-                      <p className="text-sm">
-                        You will not be able to downgrade back to Postgres {currentPgVersion}.
-                      </p>
-                      <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
+                <Modal.Content>
+                  <div className="space-y-4">
+                    <p className="text-sm">All services are going offline.</p>
+                    <p className="text-sm">
+                      You will not be able to downgrade back to Postgres {currentPgVersion}.
+                    </p>
+                    <Alert_Shadcn_ title="Your project will be offline while the upgrade is in progress">
+                      <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+                      <AlertTitle_Shadcn_>
+                        Your project will be offline for up to {durationEstimateHours} hour
+                        {durationEstimateHours === 1 ? '' : 's'}
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <p>
+                          It is advised to upgrade at a time when there will be minimal impact for
+                          your application.
+                        </p>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                    {(data?.potential_breaking_changes ?? []).length > 0 && (
+                      <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                         <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
-                        <AlertTitle_Shadcn_>
-                          Your project will be offline for up to {durationEstimateHours} hour
-                          {durationEstimateHours === 1 ? '' : 's'}
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
+                        <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                           <p>
-                            It is advised to upgrade at a time when there will be minimal impact for
-                            your application.
+                            Your project will be upgraded across major versions of Postgres. This
+                            may involve breaking changes.
                           </p>
+
+                          <div>
+                            <Button size="tiny" type="default" asChild>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                View docs
+                              </Link>
+                            </Button>
+                          </div>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
-                      {(data?.potential_breaking_changes ?? []).length > 0 && (
-                        <Alert_Shadcn_ variant="destructive" title="Breaking changes">
-                          <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
-                          <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                            <p>
-                              Your project will be upgraded across major versions of Postgres. This
-                              may involve breaking changes.
-                            </p>
-
-                            <div>
-                              <Button size="tiny" type="default" asChild>
-                                <Link
-                                  href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  View docs
-                                </Link>
-                              </Button>
-                            </div>
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-                      {legacyAuthCustomRoles.length > 0 && (
-                        <Alert_Shadcn_
-                          variant="warning"
-                          title="Custom Postgres roles using md5 authentication have been detected"
-                        >
-                          <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
-                          <AlertTitle_Shadcn_>
-                            Custom Postgres roles will not work automatically after upgrade
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                            <p>You must run a series of commands after upgrading.</p>
-                            <p>
-                              This is because new Postgres versions use scram-sha-256 authentication
-                              by default and do not support md5, as it has been deprecated.
-                            </p>
-                            <div>
-                              <p className="mb-1">Run the following commands after the upgrade:</p>
-                              <div className="flex items-baseline gap-2">
-                                <code className="text-xs">
-                                  {legacyAuthCustomRoles.map((role) => (
-                                    <div key={role} className="pb-1">
-                                      ALTER ROLE <span className="text-brand">{role}</span> WITH
-                                      PASSWORD '<span className="text-brand">newpassword</span>';
-                                    </div>
-                                  ))}
-                                </code>
-                              </div>
-                            </div>
-                            <div>
-                              <Button size="tiny" type="default" asChild>
-                                <Link
-                                  href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  View docs
-                                </Link>
-                              </Button>
-                            </div>
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-                      <Listbox
-                        id="version"
-                        name="version"
-                        label="Select the version of Postgres to upgrade to"
-                        descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${
-                          selectedVersion?.app_version?.split('supabase-postgres-')[1] ??
-                          values.version
-                        }`}
+                    )}
+                    {legacyAuthCustomRoles.length > 0 && (
+                      <Alert_Shadcn_
+                        variant="warning"
+                        title="Custom Postgres roles using md5 authentication have been detected"
                       >
-                        {data?.target_upgrade_versions.map((version) => (
-                          <Listbox.Option
-                            key={version.postgres_version}
-                            value={version.postgres_version}
-                            label={`${version.postgres_version} (${
-                              version.app_version.split('supabase-postgres-')[1]
-                            })`}
-                          >
-                            {version.postgres_version} (
-                            {version.app_version.split('supabase-postgres-')[1]})
-                          </Listbox.Option>
-                        ))}
-                      </Listbox>
-                    </div>
-                  </Modal.Content>
-                </div>
-                <div className="flex items-center space-x-2 justify-end px-4 py-4 border-t">
+                        <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                        <AlertTitle_Shadcn_>
+                          Custom Postgres roles will not work automatically after upgrade
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                          <p>You must run a series of commands after upgrading.</p>
+                          <p>
+                            This is because new Postgres versions use scram-sha-256 authentication
+                            by default and do not support md5, as it has been deprecated.
+                          </p>
+                          <div>
+                            <p className="mb-1">Run the following commands after the upgrade:</p>
+                            <div className="flex items-baseline gap-2">
+                              <code className="text-xs">
+                                {legacyAuthCustomRoles.map((role) => (
+                                  <div key={role} className="pb-1">
+                                    ALTER ROLE <span className="text-brand">{role}</span> WITH
+                                    PASSWORD '<span className="text-brand">newpassword</span>';
+                                  </div>
+                                ))}
+                              </code>
+                            </div>
+                          </div>
+                          <div>
+                            <Button size="tiny" type="default" asChild>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                View docs
+                              </Link>
+                            </Button>
+                          </div>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                    <Listbox
+                      id="version"
+                      name="version"
+                      label="Select the version of Postgres to upgrade to"
+                      descriptionText={`Postgres will be upgraded from ${currentPgVersion} to ${
+                        selectedVersion?.app_version?.split('supabase-postgres-')[1] ??
+                        values.version
+                      }`}
+                    >
+                      {data?.target_upgrade_versions.map((version) => (
+                        <Listbox.Option
+                          key={version.postgres_version}
+                          value={version.postgres_version}
+                          label={`${version.postgres_version} (${
+                            version.app_version.split('supabase-postgres-')[1]
+                          })`}
+                        >
+                          {version.postgres_version} (
+                          {version.app_version.split('supabase-postgres-')[1]})
+                        </Listbox.Option>
+                      ))}
+                    </Listbox>
+                  </div>
+                </Modal.Content>
+                <Modal.Separator />
+                <Modal.Content className="flex items-center space-x-2 justify-end">
                   <Button
                     type="default"
                     onClick={() => setShowUpgradeModal(false)}
@@ -221,7 +220,7 @@ const ProjectUpgradeAlert = () => {
                   <Button htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
                     Confirm upgrade
                   </Button>
-                </div>
+                </Modal.Content>
               </>
             )
           }}

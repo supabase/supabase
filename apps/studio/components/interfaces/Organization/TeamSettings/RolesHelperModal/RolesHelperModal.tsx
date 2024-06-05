@@ -48,61 +48,57 @@ const RolesHelperModal = () => {
         header="Permissions for each role"
         onCancel={() => setShowModal(!showModal)}
       >
-        <div className="space-y-4 py-4">
-          <Modal.Content>
-            <p className="text-sm">
-              The following table shows the corresponding permissions for each available role in the
-              dashboard.
-            </p>
-          </Modal.Content>
-          <Modal.Content>
-            <div className="rounded border border-default bg-surface-200">
-              <div className="flex items-center border-b border-control">
-                <div className={permissionColumnClassName}>Permissions</div>
-                <div className={roleColumnClassName}>Owner</div>
-                <div className={roleColumnClassName}>Administrator</div>
-                <div className={roleColumnClassName}>Developer</div>
-                <div className={roleColumnClassName}>Read-only&nbsp;{accessTooltip}</div>
-                <div className={roleColumnClassName}>Billing-only&nbsp;{accessTooltip}</div>
-              </div>
-
-              <div className="max-h-[425px] overflow-y-auto">
-                {PERMISSIONS_MAPPING.map((group) => (
-                  <Fragment key={group.title}>
-                    <div className="flex items-center border-b border-control py-2 px-4 last:border-none">
-                      <div className="w-[100%] text-sm">{group.title}</div>
-                    </div>
-                    {group.actions.map((action, idx) => (
-                      <div
-                        key={`${group.title}-${idx}`}
-                        className="flex items-center border-b border-control bg-overlay-hover last:border-none"
-                      >
-                        <div className={permissionColumnClassName}>{action.description}</div>
-                        <div className={roleColumnClassName}>
-                          {action.permissions.owner && <IconCheck size={14} strokeWidth={2} />}
-                        </div>
-                        <div className={roleColumnClassName}>
-                          {action.permissions.admin && <IconCheck size={14} strokeWidth={2} />}
-                        </div>
-                        <div className={roleColumnClassName}>
-                          {action.permissions.developer && <IconCheck size={14} strokeWidth={2} />}
-                        </div>
-                        <div className={roleColumnClassName}>
-                          {action.permissions.read_only && <IconCheck size={14} strokeWidth={2} />}
-                        </div>
-                        <div className={roleColumnClassName}>
-                          {action.permissions.billing_only && (
-                            <IconCheck size={14} strokeWidth={2} />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </Fragment>
-                ))}
-              </div>
+        <Modal.Content>
+          <p className="text-sm">
+            The following table shows the corresponding permissions for each available role in the
+            dashboard.
+          </p>
+        </Modal.Content>
+        <Modal.Content>
+          <div className="rounded border border-default bg-surface-200">
+            <div className="flex items-center border-b border-control">
+              <div className={permissionColumnClassName}>Permissions</div>
+              <div className={roleColumnClassName}>Owner</div>
+              <div className={roleColumnClassName}>Administrator</div>
+              <div className={roleColumnClassName}>Developer</div>
+              <div className={roleColumnClassName}>Read-only&nbsp;{accessTooltip}</div>
+              <div className={roleColumnClassName}>Billing-only&nbsp;{accessTooltip}</div>
             </div>
-          </Modal.Content>
-        </div>
+
+            <div className="max-h-[425px] overflow-y-auto">
+              {PERMISSIONS_MAPPING.map((group) => (
+                <Fragment key={group.title}>
+                  <div className="flex items-center border-b border-control py-2 px-4 last:border-none">
+                    <div className="w-[100%] text-sm">{group.title}</div>
+                  </div>
+                  {group.actions.map((action, idx) => (
+                    <div
+                      key={`${group.title}-${idx}`}
+                      className="flex items-center border-b border-control bg-overlay-hover last:border-none"
+                    >
+                      <div className={permissionColumnClassName}>{action.description}</div>
+                      <div className={roleColumnClassName}>
+                        {action.permissions.owner && <IconCheck size={14} strokeWidth={2} />}
+                      </div>
+                      <div className={roleColumnClassName}>
+                        {action.permissions.admin && <IconCheck size={14} strokeWidth={2} />}
+                      </div>
+                      <div className={roleColumnClassName}>
+                        {action.permissions.developer && <IconCheck size={14} strokeWidth={2} />}
+                      </div>
+                      <div className={roleColumnClassName}>
+                        {action.permissions.read_only && <IconCheck size={14} strokeWidth={2} />}
+                      </div>
+                      <div className={roleColumnClassName}>
+                        {action.permissions.billing_only && <IconCheck size={14} strokeWidth={2} />}
+                      </div>
+                    </div>
+                  ))}
+                </Fragment>
+              ))}
+            </div>
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )
