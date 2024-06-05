@@ -5,7 +5,13 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "apps/docs/spec/parser",
+    "tests",
+    "playwright-tests",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
@@ -27,7 +33,7 @@
     "docker:remove": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
-	"test:ui-patterns": "turbo run test --filter=ui-patterns",
+    "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "test:playwright": "npm --prefix playwright-tests run test",
@@ -52,7 +58,14 @@
     "npm": ">=9.0.0",
     "node": ">=20.0.0"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "volta": {
     "node": "20.11.1"
   }
