@@ -61,6 +61,7 @@ begin
   return updated_check_time;
 end;
 $$
+;
 
 create or replace function cleanup_last_changed_pages()
 returns integer
@@ -88,3 +89,4 @@ begin
   return number_deleted;
 end;
 $$
+;
