@@ -74,7 +74,7 @@ const Wizard: NextPageWithLayout = () => {
   const { data: orgSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: defaultRegion } = useDefaultRegionQuery(
+  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
     },
@@ -82,14 +82,6 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
-      onSuccess: (data) => {
-        if (data) {
-          form.setValue('dbRegion', data)
-        }
-      },
-      onError: (error) => {
-        form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
-      },
     }
   )
 
@@ -326,6 +318,18 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/new/${organizations?.[0].slug}`)
     }
   }, [isInvalidSlug, isOrganizationsSuccess, organizations])
+
+  useEffect(() => {
+    if (form.getValues('dbRegion') === undefined && defaultRegion) {
+      form.setValue('dbRegion', defaultRegion)
+    }
+  }, [defaultRegion])
+
+  useEffect(() => {
+    if (defaultRegionError) {
+      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
+    }
+  }, [defaultRegionError])
 
   return (
     <Form_Shadcn_ {...form}>
