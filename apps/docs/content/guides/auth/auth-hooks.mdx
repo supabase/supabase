@@ -275,17 +275,18 @@ For security, we recommend against the use the `security definer` tag. The `secu
 
 We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
-Read more about `security definer` tag [in our database guide](https://www.notion.so/docs/guides/database/functions#security-definer-vs-invoker).
+Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](https://www.notion.so/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
 
-Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
+Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](/docs/reference/cli/supabase-migration-new) to create a migration.
 
 <Admonition type="caution">
-  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string
-  exist as a top-level key within the JSON value?*) operator. Use a direct connection to the
-  database if you need to use it when defining a function.
+
+If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string exist as a top-level key within the JSON value?*) operator. Use a direct connection to the database if you need to use it when defining a function.
+  
 </Admonition>
+
 Here is an example hook signature:
 
 ```sql
@@ -533,7 +534,7 @@ Select the Global type to minimize the latency from all edge locations. Copy the
 
 Create a hook to read and write information from Redis, which will record the last time a user had an incorrect MFA verification attempt for a factor. For example:
 
-```sql
+```js
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 
@@ -2852,4 +2853,3 @@ Deno.serve(async (req) => {
 </TabPanel>
 
 </Tabs>
-````
