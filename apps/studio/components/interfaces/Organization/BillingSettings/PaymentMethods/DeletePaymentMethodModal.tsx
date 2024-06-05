@@ -54,13 +54,11 @@ const DeletePaymentMethodModal = ({
         </div>
       }
     >
-      <div className="py-4">
-        <Modal.Content>
-          <Alert withIcon variant="info" title="This will permanently delete your payment method.">
-            <p>You can re-add the payment method any time.</p>
-          </Alert>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <Alert withIcon variant="info" title="This will permanently delete your payment method.">
+          <p>You can re-add the payment method any time.</p>
+        </Alert>
+      </Modal.Content>
     </Modal>
   )
 }

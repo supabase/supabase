@@ -58,11 +58,9 @@ const ConfirmDeleteModal = ({
       }
     >
       <Modal.Content>
-        <div className="my-4">
-          <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
-            {description}
-          </Alert>
-        </div>
+        <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
+          {description}
+        </Alert>
       </Modal.Content>
     </Modal>
   )

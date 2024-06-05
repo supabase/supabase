@@ -159,9 +159,8 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                     )}
                   />
                 </DialogSection>
-
                 <DialogFooter>
-                  <Button className="mt-4" htmlType="submit" loading={isCreating}>
+                  <Button htmlType="submit" loading={isCreating}>
                     Create access key
                   </Button>
                 </DialogFooter>
