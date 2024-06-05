@@ -5,31 +5,23 @@ import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
-import { AutoApiService } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import {
-  ProjectJsonSchemaDefinitions,
-  ProjectJsonSchemaPaths,
-} from 'data/docs/project-json-schema-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from 'hooks'
 
 interface ResourceContentProps {
-  autoApiService: AutoApiService
+  apiEndpoint: string
   resourceId: string
   resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
-  definitions: ProjectJsonSchemaDefinitions
-  paths: ProjectJsonSchemaPaths
   selectedLang: 'bash' | 'js'
   showApiKey: string
   refreshDocs: () => void
 }
 
 const ResourceContent = ({
-  autoApiService,
+  apiEndpoint,
   resourceId,
   resources,
-  definitions,
-  paths,
   selectedLang,
   showApiKey,
   refreshDocs,
@@ -38,16 +30,17 @@ const ResourceContent = ({
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
+  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { paths, definitions } = jsonSchema || {}
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
-      : autoApiService.endpoint
-
-  if (!paths || !definitions) return null
+      : apiEndpoint
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
-  const resourcePaths = paths[`/${resourceId}`]
-  const resourceDefinition = definitions[resourceId]
+  const resourcePaths = paths?.[`/${resourceId}`]
+  const resourceDefinition = definitions?.[resourceId]
   const resourceMeta = resources[resourceId]
   const description = resourceDefinition?.description || ''
 
@@ -57,6 +50,8 @@ const ResourceContent = ({
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
+
+  if (!paths || !definitions) return null
 
   return (
     <>
