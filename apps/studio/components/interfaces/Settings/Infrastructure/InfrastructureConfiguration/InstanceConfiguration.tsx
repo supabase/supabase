@@ -116,7 +116,7 @@ const InstanceConfigurationUI = () => {
 
   const nodes = useMemo(
     () =>
-      isSuccessReplicas && isSuccessLoadBalancers
+      isSuccessReplicas && isSuccessLoadBalancers && primary !== undefined
         ? generateNodes({
             primary,
             replicas,
