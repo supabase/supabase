@@ -38,8 +38,8 @@ const AISettingsModal = () => {
       visible={snap.showAiSettingsModal}
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
-      <div className="flex flex-col items-start justify-between gap-y-4 px-6 py-3">
-        <div className="flex justify-between gap-x-8 mr-8 my-4">
+      <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
+        <div className="flex justify-between gap-x-5 mr-8 my-4">
           <Toggle
             disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
@@ -78,7 +78,7 @@ const AISettingsModal = () => {
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-      </div>
+      </Modal.Content>
     </Modal>
   )
 }

@@ -359,7 +359,7 @@ const PlanUpdateSidePanel = () => {
         overlayClassName="pointer-events-none"
         header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
-        <Modal.Content className="mt-4">
+        <Modal.Content>
           {subscriptionPreviewError && (
             <AlertError
               error={subscriptionPreviewError}

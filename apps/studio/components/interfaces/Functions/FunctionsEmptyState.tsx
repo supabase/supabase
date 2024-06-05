@@ -7,8 +7,8 @@ import TerminalInstructions from './TerminalInstructions'
 const FunctionsEmptyState = () => {
   return (
     <>
-      <div className="grid max-w-7xl gap-y-12 py-12 lg:grid-cols-12 lg:gap-x-16">
-        <div className="col-span-5 space-y-4">
+      <div className="flex flex-col gap-8 w-full">
+        <div className="flex flex-col gap-4">
           <p className="max-w-lg text-base text-foreground">
             Scalable functions to run your code with no server management.
           </p>
@@ -38,7 +38,9 @@ const FunctionsEmptyState = () => {
             </Button>
           </div>
         </div>
-        <TerminalInstructions />
+        <div className="col-span-8 bg-surface-100 px-5 py-4 border rounded-md">
+          <TerminalInstructions />
+        </div>
       </div>
     </>
   )
