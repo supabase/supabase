@@ -253,7 +253,6 @@ const Wizard: NextPageWithLayout = () => {
     })
 
     form.setValue('dbPass', password)
-    form.trigger('dbPass')
     delayedCheckPasswordStrength(password)
   }
 
@@ -597,7 +596,6 @@ const Wizard: NextPageWithLayout = () => {
                                 onChange={async (event) => {
                                   field.onChange(event)
                                   form.trigger('dbPassStrength')
-                                  form.trigger('dbPass')
                                   const value = event.target.value
                                   if (event.target.value === '') {
                                     await form.setValue('dbPassStrength', 0)
