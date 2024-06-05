@@ -79,6 +79,9 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
     },
     {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
       onSuccess: (data) => {
         if (data) {
           form.setValue('dbRegion', data)
