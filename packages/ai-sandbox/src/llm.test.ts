@@ -46,6 +46,24 @@ describe('single stage llm', () => {
     })
   })
 
+  test.concurrent('solve quadratic equation', async () => {
+    const { exports, source, error } = await interpretPrompt(openai, [
+      {
+        role: 'user',
+        content: 'solve for x: (2x + 3)^2 = 25',
+      },
+    ])
+
+    withMetadata({ source, exports }, () => {
+      if (error) {
+        throw error
+      }
+
+      const { default: output } = exports
+      expect(output).toStrictEqual([1, -4])
+    })
+  })
+
   test.concurrent('count words', async () => {
     const { exports, source, error } = await interpretPrompt(openai, [
       {
@@ -132,7 +150,7 @@ describe('single stage llm', () => {
       ],
       {
         getNouns: {
-          description: 'Returns a list of nouns in a paragraph',
+          description: 'Returns a list of nouns in a paragraph.',
           typeDef: '(text: string): Promise<string[]>',
           fn: async (text: string) => {
             const chatCompletion = await openai.chat.completions.create({

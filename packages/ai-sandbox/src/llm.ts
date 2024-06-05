@@ -72,6 +72,7 @@ export async function interpretPrompt(
       - Use as little functions/variables as possible
         (ie. don't create a function or variable that wraps another - just call the function/variable directly)
       - If applicable, break the problem into intermediate steps and export each step along the way
+      - Show your work along the way
 
       Your results should be exported like so:
       \`\`\`javascript
