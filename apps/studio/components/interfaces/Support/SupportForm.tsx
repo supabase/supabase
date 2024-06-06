@@ -385,11 +385,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
   }
 
   const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
-    const handleClick = (e: React.MouseEvent, pageType: PageType, link: string) => {
-      e.preventDefault()
-      handleLinkClick(pageType, link)
-    }
-
+    console.log('page', page)
     const link = generateLink(page.type, page.path)
 
     return (
@@ -403,7 +399,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
           >
             <div className="grow flex gap-3 items-center">
               <div>{getPageIcon(page)}</div>
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-0 pr-6">
                 <span className="text-sm">
                   <TextHighlighter text={page.title} query="test" />
                 </span>
@@ -414,7 +410,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                 )}
               </div>
             </div>
-            <ChevronRight />
+            <ChevronRight size={18} />
           </Link>
           {page.sections.length > 0 && (
             <ul className="border-l border-default ml-3 pt-3 grid gap-2">
@@ -447,13 +443,16 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
             <div className="grow flex gap-3 items-center">
               <div>{getPageIcon(page)}</div>
               <div className="grid gap-1.5">
-                <span>
-                  <TextHighlighter
-                    className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
-                    text={section.heading}
-                    query="test"
-                  />
-                </span>
+                {page.type !== 'github-discussions' && (
+                  <span>
+                    <TextHighlighter
+                      className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
+                      text={section.heading}
+                      query="test"
+                    />
+                  </span>
+                )}
+
                 {section.heading && (
                   <div className="text text-xs ">
                     <TextHighlighter text={section.heading} query="test" />
@@ -461,7 +460,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                 )}
               </div>
             </div>
-            <ChevronRight />
+            <ChevronRight size={18} />
           </Link>
         </li>
       </ul>
