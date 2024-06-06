@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -12,9 +13,21 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Button, IconPauseCircle, Modal } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
+import { useBackupsQuery } from 'data/database/backups-query'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -23,24 +36,30 @@ export interface ProjectPausedStateProps {
 const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const selectedOrganization = useSelectedOrganization()
   const { project } = useProjectContext()
+  const selectedOrganization = useSelectedOrganization()
+
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-
+  const isRestoreDisabled = true //project?.is_restore_disabled
   const isFreePlan = subscription?.plan?.id === 'free'
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
     { enabled: isFreePlan }
   )
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+  const sortedBackups = (backups?.backups ?? []).sort(
+    (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+  )
+  const latestBackup = sortedBackups[0]
 
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
   const { mutate: restoreProject } = useProjectRestoreMutation({
-    onSuccess: (res, variables) => {
+    onSuccess: (_, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
       toast.success('Restoring project')
     },
@@ -70,91 +89,135 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       <div className="space-y-4">
         <div className="w-full mx-auto mb-16 max-w-7xl">
           <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
-            <div className="grid w-[480px] gap-4">
+            <div className="grid w-[550px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
-                <IconPauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
+                <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
               </div>
 
-              <div className="space-y-2">
-                <p className="text-center">
-                  The project "{project?.name ?? ''}" is currently paused.
-                </p>
-                <p className="text-sm text-foreground-light text-center">
-                  All of your project's data is still intact, but your project is inaccessible while
-                  paused.{' '}
-                  {product !== undefined ? (
-                    <>
-                      Restore this project to access the{' '}
-                      <span className="text-brand">{product}</span> page
-                    </>
-                  ) : (
-                    'Restore this project and get back to building the next big thing!'
-                  )}
-                </p>
-                {isFreePlan && (
-                  <p className="text-sm text-foreground-light text-center">
-                    You can also prevent project pausing in the future by upgrading to Pro.
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-center">
+                    The project "{project?.name ?? ''}" is currently paused.
                   </p>
-                )}
-                {!isFreePlan && (
                   <p className="text-sm text-foreground-light text-center">
-                    Unpaused projects count towards compute usage. For every hour your instance is
-                    active, we'll bill you based on the instance size of your project. See{' '}
-                    <Link
-                      href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline"
-                    >
-                      Compute Instance Usage Billing
-                    </Link>{' '}
-                    for more details.
+                    All of your project's data is still intact, but your project is inaccessible
+                    while paused.{' '}
                   </p>
-                )}
-              </div>
+                </div>
 
-              <div className="flex items-center justify-center gap-4">
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger asChild>
-                    <Button
-                      size="tiny"
-                      type="primary"
-                      disabled={!canResumeProject}
-                      onClick={onSelectRestore}
-                    >
-                      Restore project
-                    </Button>
-                  </Tooltip.Trigger>
-                  {!canResumeProject && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                            'border border-background', //border
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to resume this project
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  )}
-                </Tooltip.Root>
-                {isFreePlan ? (
-                  <Button asChild type="default">
-                    <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
-                      Upgrade to Pro
-                    </Link>
-                  </Button>
+                {isFreePlan && isRestoreDisabled ? (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>
+                      Project cannot be restored through the dashboard
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      This project has been paused for a period longer than 30 days and hence cannot
+                      be restored through the dashboard. Your data is still intact and can be
+                      downloaded as a backup nonetheless
+                    </AlertDescription_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+                      <Tooltip_Shadcn_>
+                        <TooltipTrigger_Shadcn_ asChild>
+                          <Button type="default" disabled={latestBackup === undefined}>
+                            Download backup
+                          </Button>
+                        </TooltipTrigger_Shadcn_>
+                        {latestBackup === undefined && (
+                          <TooltipContent_Shadcn_ side="bottom">
+                            No backups available
+                          </TooltipContent_Shadcn_>
+                        )}
+                      </Tooltip_Shadcn_>
+                      <Button type="default" icon={<ExternalLink />}>
+                        Documentation
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 ) : (
-                  <Button asChild type="default">
-                    <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
-                  </Button>
+                  <p className="text-sm text-foreground-light text-center">
+                    {product !== undefined ? (
+                      <>
+                        Restore this project to access the{' '}
+                        <span className="text-brand">{product}</span> page
+                      </>
+                    ) : (
+                      'Restore this project and get back to building!'
+                    )}
+                    {isFreePlan &&
+                      ' You can also prevent project pausing in the future by upgrading to Pro.'}
+                  </p>
+                )}
+
+                {!isFreePlan && (
+                  <Alert_Shadcn_>
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>
+                      Project will count towards compute usage once restored
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      For every hour your instance is active, we will bill you based on the instance
+                      size of your project.
+                    </AlertDescription_Shadcn_>
+                    <AlertDescription_Shadcn_ className="mt-3">
+                      <Button asChild type="default" icon={<ExternalLink />}>
+                        <a
+                          href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          More information
+                        </a>
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 )}
               </div>
+
+              {!isRestoreDisabled && (
+                <div className="flex items-center justify-center gap-4">
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        size="tiny"
+                        type="primary"
+                        disabled={!canResumeProject}
+                        onClick={onSelectRestore}
+                      >
+                        Restore project
+                      </Button>
+                    </Tooltip.Trigger>
+                    {!canResumeProject && (
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={cn(
+                              'border border-background',
+                              'rounded bg-alternative py-1 px-2 leading-none shadow'
+                            )}
+                          >
+                            <span className="text-xs text-foreground">
+                              You need additional permissions to resume this project
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    )}
+                  </Tooltip.Root>
+                  {isFreePlan ? (
+                    <Button asChild type="default">
+                      <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
+                        Upgrade to Pro
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button asChild type="default">
+                      <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
