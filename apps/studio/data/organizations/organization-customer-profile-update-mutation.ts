@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -16,25 +15,27 @@ export type OrganizationCustomerProfileUpdateVariables = {
     postal_code: string | null
     state: string | null
   } | null
-  invoice_settings?: {
-    default_payment_method: string
-  }
 }
 
 export async function updateOrganizationCustomerProfile({
   slug,
   address,
-  invoice_settings,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
 
   const payload: any = {}
   if (address) payload.address = address
-  if (invoice_settings) payload.invoice_settings = invoice_settings
 
-  const response = await patch(`${API_URL}/organizations/${slug}/customer`, payload)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await patch(`/platform/organizations/{slug}/customer`, {
+    body: payload,
+    params: {
+      path: {
+        slug,
+      },
+    },
+  })
+  if (error) throw handleError(error)
+  return data
 }
 
 type OrganizationCustomerProfileUpdateData = Awaited<

@@ -54,8 +54,8 @@ comment on table public.role_permissions is 'Application permissions for each ro
 ```
 
 <Admonition type="note">
-  
-  For the [full schema](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/README.md), see the example application on [GitHub](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone).
+
+For the [full schema](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/README.md), see the example application on [GitHub](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone).
 
 </Admonition>
 
@@ -93,7 +93,7 @@ as $$
     claims jsonb;
     user_role public.app_role;
   begin
-    -- Check if the user is marked as admin in the profiles table
+    -- Fetch the user role in the user_roles table
     select role into user_role from public.user_roles where user_id = (event->>'user_id')::uuid;
 
     claims := event->'claims';
@@ -205,7 +205,7 @@ In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/proje
 When developing locally, follow the [local development](/docs/guides/auth/auth-hooks#local-development) instructions.
 
 <Admonition type="note">
-  
+
 To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth-hooks).
 
 </Admonition>

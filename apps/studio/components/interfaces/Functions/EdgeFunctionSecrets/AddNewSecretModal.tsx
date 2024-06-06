@@ -64,7 +64,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       >
         {() => (
           <>
-            <Modal.Content className="py-4 space-y-3">
+            <Modal.Content className="space-y-3">
               <Input id="name" label="Secret name" />
               <Input
                 id="value"

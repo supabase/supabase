@@ -17,6 +17,10 @@ export interface AdmonitionProps {
   title?: string
   description?: string | React.ReactNode
   showIcon?: boolean
+  childProps?: {
+    title?: React.ComponentProps<typeof AlertTitle>
+    description?: React.ComponentProps<typeof AlertDescription>
+  }
 }
 
 const admonitionToAlertMapping: Record<
@@ -113,17 +117,29 @@ export const Admonition = forwardRef<
         {label || title ? (
           <>
             <AlertTitle
+              {...props.childProps?.title}
               className={cn(
                 'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
-                !label && 'flex-col'
+                !label && 'flex-col',
+                props.childProps?.title?.className
               )}
             >
               {label || title}
             </AlertTitle>
-            {description && <AlertDescription>{description}</AlertDescription>}
+            {description && (
+              <AlertDescription className={props.childProps?.description?.className}>
+                {description}
+              </AlertDescription>
+            )}
             {/* // children is to handle Docs and MDX issues with children and <p> elements */}
             {children && (
-              <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">
+              <AlertDescription
+                {...props.childProps?.description}
+                className={cn(
+                  'mt-3 [&_p]:mb-1.5 [&_p]:mt-0',
+                  props.childProps?.description?.className
+                )}
+              >
                 {children}
               </AlertDescription>
             )}
