@@ -1373,11 +1373,11 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1445,11 +1445,11 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1499,7 +1499,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1523,7 +1523,7 @@ end;
 $$;
 -- Permissions for the hook
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
-revoke execute on function public.custom_access_token_hook from authenticated, anon;
+revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
   },
 ]
