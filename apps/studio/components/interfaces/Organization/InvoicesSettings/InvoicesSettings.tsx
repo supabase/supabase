@@ -23,17 +23,15 @@ const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
 
   const selectedOrganization = useSelectedOrganization()
-  const { stripe_customer_id, slug } = selectedOrganization ?? {}
+  const { slug } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
   const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery({
-    customerId: stripe_customer_id,
     slug,
   })
   const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery({
-    customerId: stripe_customer_id,
     slug,
     offset,
     limit: PAGE_LIMIT,
@@ -46,7 +44,7 @@ const InvoicesSettings = () => {
 
   const fetchInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice({ id })
+      const invoice = await getInvoice({ invoiceId: id, slug })
       if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
     } catch (error: any) {
       toast.error(`Failed to fetch the selected invoice: ${error.message}`)

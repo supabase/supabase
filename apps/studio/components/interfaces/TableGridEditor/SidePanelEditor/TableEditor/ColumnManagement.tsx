@@ -1,5 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { isEmpty, noop, partition } from 'lodash'
+import { HelpCircle, Key } from 'lucide-react'
+import { useState } from 'react'
 import {
   DragDropContext,
   Draggable,
@@ -7,18 +9,29 @@ import {
   Droppable,
   DroppableProvided,
 } from 'react-beautiful-dnd'
-import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconEdit,
+  IconExternalLink,
+  IconTrash,
+} from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
-import type { ImportContent } from './TableEditor.types'
+import type { ImportContent, TableField } from './TableEditor.types'
 
 interface ColumnManagementProps {
+  table: TableField
   columns?: ColumnField[]
   relations: ForeignKey[]
   enumTypes: EnumeratedType[]
@@ -27,9 +40,11 @@ interface ColumnManagementProps {
   onColumnsUpdated: (columns: ColumnField[]) => void
   onSelectImportData: () => void
   onClearImportContent: () => void
+  onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
 const ColumnManagement = ({
+  table,
   columns = [],
   relations,
   enumTypes = [],
@@ -38,7 +53,12 @@ const ColumnManagement = ({
   onColumnsUpdated = noop,
   onSelectImportData = noop,
   onClearImportContent = noop,
+  onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const [open, setOpen] = useState(false)
+  const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
     columns,
@@ -154,20 +174,22 @@ const ColumnManagement = ({
         )}
 
         {primaryKeyColumns.length === 0 && (
-          <Alert title="Warning: No primary keys selected" variant="warning" withIcon>
-            Tables require at least one column as a primary key in order to uniquely identify each
-            row. Without a primary key, you will not be able to update or delete rows from the
-            table.
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Warning: No primary keys selected</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Tables should have at least one column as the primary key to identify each row.
+              Without a primary key, you will not be able to update or delete rows from the table.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         )}
 
         {primaryKeyColumns.length > 1 && (
           <InformationBox
             block
-            icon={<IconKey className="text-white" size="large" />}
+            icon={<Key size={16} />}
             title="Composite primary key selected"
-            description="The columns that you've selected will be grouped as a primary key, and will serve
-          as the unique identifier for the rows in your table"
+            description="The columns that you've selected will be grouped as a primary key, and will serve as the unique identifier for the rows in your table"
           />
         )}
 
@@ -181,7 +203,7 @@ const ColumnManagement = ({
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                    <HelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
@@ -211,7 +233,7 @@ const ColumnManagement = ({
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <h5 className="text-xs text-foreground-lighter">
-                    <IconHelpCircle size={15} strokeWidth={1.5} />
+                    <HelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
@@ -262,6 +284,9 @@ const ColumnManagement = ({
                           >
                             <Column
                               column={column}
+                              relations={relations.filter((relation) => {
+                                return relation.columns.some((x) => x.source === column.name)
+                              })}
                               enumTypes={enumTypes}
                               hasForeignKeys={checkIfHaveForeignKeys(column)}
                               isNewRecord={isNewRecord}
@@ -269,6 +294,11 @@ const ColumnManagement = ({
                               dragHandleProps={draggableProvided.dragHandleProps}
                               onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                               onRemoveColumn={() => onRemoveColumn(column)}
+                              onEditForeignKey={(fk) => {
+                                setOpen(true)
+                                setSelectedColumn(column)
+                                if (fk) setSelectedFk(fk)
+                              }}
                             />
                           </div>
                         )}
@@ -294,6 +324,9 @@ const ColumnManagement = ({
                         <div ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}>
                           <Column
                             column={column}
+                            relations={relations.filter((relation) => {
+                              return relation.columns.some((x) => x.source === column.name)
+                            })}
                             enumTypes={enumTypes}
                             isNewRecord={isNewRecord}
                             hasForeignKeys={checkIfHaveForeignKeys(column)}
@@ -301,6 +334,11 @@ const ColumnManagement = ({
                             dragHandleProps={draggableProvided.dragHandleProps}
                             onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                             onRemoveColumn={() => onRemoveColumn(column)}
+                            onEditForeignKey={(fk) => {
+                              setOpen(true)
+                              setSelectedColumn(column)
+                              if (fk) setSelectedFk(fk)
+                            }}
                           />
                         </div>
                       )}
@@ -321,6 +359,31 @@ const ColumnManagement = ({
           </div>
         )}
       </div>
+
+      <ForeignKeySelector
+        visible={open}
+        column={selectedColumn}
+        table={{ id: table.id, name: table.name, columns: table.columns }}
+        foreignKey={selectedFk}
+        onClose={() => {
+          setOpen(false)
+          setSelectedFk(undefined)
+          setSelectedColumn(undefined)
+        }}
+        onSaveRelation={(fk) => {
+          const existingRelationIds = relations.map((x) => x.id)
+          if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
+            onUpdateFkRelations(
+              relations.map((x) => {
+                if (x.id === fk.id) return fk
+                return x
+              })
+            )
+          } else {
+            onUpdateFkRelations(relations.concat([fk]))
+          }
+        }}
+      />
     </>
   )
 }

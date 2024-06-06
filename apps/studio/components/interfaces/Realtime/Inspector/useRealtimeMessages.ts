@@ -161,7 +161,7 @@ export const useRealtimeMessages = (
     }
 
     // Finally, subscribe to the Channel we just setup
-    newChannel.subscribe(async (status, error) => {
+    newChannel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         // Let LiveView know we connected so we can update the button text
         // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
@@ -174,8 +174,6 @@ export const useRealtimeMessages = (
             payload: { name: name, t: performance.now() },
           })
         }
-      } else if (status === 'CLOSED') {
-        // console.log(`Realtime Channel status: ${status}`)
       } else if (status === 'CHANNEL_ERROR') {
         toast.error(
           'Failed to connect to the channel: This may be due to restrictive RLS policies. Check your role and try again.'
@@ -184,9 +182,6 @@ export const useRealtimeMessages = (
         newChannel.unsubscribe()
         setChannel(undefined)
         setRealtimeConfig({ ...config, enabled: false })
-      } else {
-        // console.error(`Realtime Channel error status: ${status}`)
-        // console.error(`Realtime Channel error: ${error}`)
       }
     })
 

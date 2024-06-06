@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { Bucket } from 'data/storage/buckets-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -18,6 +18,7 @@ import FileExplorerHeader from './FileExplorerHeader'
 import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 
 interface StorageExplorerProps {
   bucket: Bucket
@@ -58,6 +59,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+
+  // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
+  // Will be better once we deprecate the mobx store entirely, which we will get there
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+
   const apiService = (projectSettings?.services ?? []).find(
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
   )

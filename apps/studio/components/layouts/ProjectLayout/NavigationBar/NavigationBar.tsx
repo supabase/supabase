@@ -80,6 +80,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -111,6 +112,7 @@ const NavigationBar = () => {
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[40px]"
+              onClick={onCloseNavigationIconLink}
             >
               <img
                 alt="Supabase"
@@ -161,6 +163,18 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
               )
             } else {
               return (

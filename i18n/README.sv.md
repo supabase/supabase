@@ -3,11 +3,9 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
----
-
 # Supabase
 
-[Supabase](https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp Firebase-funktionerna med hjälp av verktyg för öppen källkod i företagsklass.
+[Supabase](https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp funktionerna från Firebase med hjälp av öppen källkod-verktyg i företagsklass.
 
 - [x] Hosted Postgres-databas. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentisering och auktorisering. [Docs](https://supabase.com/docs/guides/auth)
@@ -19,9 +17,14 @@
   - [x] Databasfunktioner. [Dokument](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
 - [x] Lagring av filer. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vektor/Inbäddningsverktyg. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Kontrollpanel
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+Bevaka "releases" i denna repo för att få information om större uppdateringar.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## Dokumentation
 
@@ -35,19 +38,6 @@ För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bäst för: buggar och fel som du stöter på när du använder Supabase.
 - [E-postsupport](https://supabase.com/docs/support#business-support). Bäst för: problem med din databas eller infrastruktur.
 - [Discord](https://discord.supabase.com). Bäst för: att dela med dig av dina applikationer och umgås med gemenskapen.
-
-## Status
-
-- [Alpha: Vi testar Supabase med en sluten grupp av kunder
-- [x] Public Alpha: Vem som helst kan registrera sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men var försiktig med oss, det finns några problem
-- [x] Public Beta: Stabil nog för de flesta användningsområden som inte är företag
-- [ ] Public: Allmän tillgänglighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
-
-Vi befinner oss för närvarande i Public Beta. Bevaka "releases" i denna repo för att få information om större uppdateringar.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
----
 
 ## Hur det fungerar
 
@@ -208,53 +198,45 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
   
 </table>
 
+## Märken
+
+![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
 ## Översättningar
 
-- [Arabiska | العربية](/i18n/README.ar.md)
-- [albanska / Shqip](/i18n/README.sq.md)
-- [Bangla / বাংলা](/i18n/README.bn.md)
-- [Bulgariska / Български](/i18n/README.bg.md)
-- [Katalanska / Català](/i18n/README.ca.md)
-- [Danska / Dansk](/i18n/README.da.md)
-- [Nederländska / Nederlands](/i18n/README.nl.md)
-- [Engelska](https://github.com/supabase/supabase)
-- [finska / Suomalainen](/i18n/README.fi.md)
-- [Franska / Français](/i18n/README.fr.md)
-- [Tyska / Deutsch](/i18n/README.de.md)
-- [Grekiska / Ελληνικά](/i18n/README.gr.md)
-- [Hebreiska / עברית](/i18n/README.he.md)
-- [Hindi / हिंदी](/i18n/README.hi.md)
-- [Ungerska / Magyar](/i18n/README.hu.md)
-- [Nepali / नेपाली](/i18n/README.ne.md)
-- [Indonesiska / Bahasa Indonesia](/i18n/README.id.md)
-- [Italienska / Italiano](/i18n/README.it.md)
-- [Japanska / 日本語](/i18n/README.jp.md)
-- [Koreanska / 한국어](/i18n/README.ko.md)
-- [Malay / Bahasa Malaysia](/i18n/README.ms.md)
-- [Norsk (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
-- [Persiska / فارسی](/i18n/README.fa.md)
-- [Polska / Polski](/i18n/README.pl.md)
-- [Portugisiska / Português](/i18n/README.pt.md)
-- [Portugisiska (Brasilien) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Rumänska / Română](/i18n/README.ro.md)
-- [Ryska / Pусский](/i18n/README.ru.md)
-- [Serbiska / Srpski](/i18n/README.sr.md)
-- [Sinhala / සිංහල](/i18n/README.si.md)
-- [Spanska / Español](/i18n/README.es.md)
-- [Förenklad kinesiska / 简体中文](/i18n/README.zh-cn.md)
-- [Swedish / Svenska](/i18n/README.sv.md)
-- [Thai / ไทย](/i18n/README.th.md)
-- [Traditionell kinesiska / 繁體中文](/i18n/README.zh-tw.md)
-- [Turkiska / Türkçe](/i18n/README.tr.md)
-- [Ukrainska / Українська](/i18n/README.uk.md)
-- [Vietnamesiska / Tiếng Việt](/i18n/README.vi-vn.md)
 - [Förteckning över översättningar](/i18n/languages.md) <!--- Keep only this -->
-
----
-
-## Sponsorer
-
-[![Ny sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

@@ -1,11 +1,6 @@
-import { CLIENT_LIBRARIES } from 'common/constants'
-import { HelpCircle } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-
+import * as Sentry from '@sentry/nextjs'
 import { useParams } from 'common'
+import { CLIENT_LIBRARIES } from 'common/constants'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -18,6 +13,11 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,17 +25,11 @@ import {
   Button,
   Checkbox,
   Form,
-  IconAlertCircle,
-  IconExternalLink,
-  IconLoader,
-  IconMail,
-  IconPlus,
-  IconX,
   Input,
   Listbox,
   Separator,
 } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
@@ -45,9 +39,10 @@ const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
 export interface SupportFormProps {
   setSentCategory: (value: string) => void
+  setSelectedProject: (value: string) => void
 }
 
-const SupportForm = ({ setSentCategory }: SupportFormProps) => {
+const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) => {
   const { isReady } = useRouter()
   const { ref, slug, subject, category, message } = useParams()
 
@@ -79,9 +74,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     onSuccess: (res, variables) => {
       toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
+      setSelectedProject(variables.projectRef ?? 'no-project')
     },
     onError: (error) => {
       toast.error(`Failed to submit support ticket: ${error.message}`)
+      Sentry.captureMessage('Failed to submit Support Form: ' + error.message)
       setIsSubmitting(false)
     },
   })
@@ -193,7 +190,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-      } finally {
+      } catch (error) {
+        // [Joshen] No error handler required as fetching these info are nice to haves, not necessary
       }
     }
 
@@ -253,6 +251,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
         const selectedProject = projects.find((project) => project.ref === values.projectRef)
         const isFreeProject = (subscription?.plan.id ?? 'free') === 'free'
+
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
@@ -322,112 +321,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             <div className="px-6">
               <h3 className="text-xl">How can we help?</h3>
             </div>
-            <div className="px-6">
-              <Listbox
-                id="category"
-                layout="vertical"
-                label="What area are you having problems with?"
-              >
-                {CATEGORY_OPTIONS.map((option, i) => {
-                  return (
-                    <Listbox.Option
-                      key={`option-${option.value}`}
-                      label={option.label}
-                      value={option.value}
-                      className="min-w-[500px]"
-                    >
-                      <span>{option.label}</span>
-                      <span className="block text-xs opacity-50">{option.description}</span>
-                    </Listbox.Option>
-                  )
-                })}
-              </Listbox>
-            </div>
-
-            {values.category !== 'Login_issues' && (
-              <div className="px-6">
-                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
-                  {isLoadingProjects && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which project is affected?</p>
-                      <ShimmeringLoader className="!py-[19px]" />
-                    </div>
-                  )}
-                  {isErrorProjects && (
-                    <div className="space-y-2">
-                      <p className="text-sm prose">Which project is affected?</p>
-                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
-                        <p className="text-sm prose">Failed to retrieve projects</p>
-                      </div>
-                    </div>
-                  )}
-                  {isSuccessProjects && (
-                    <Listbox
-                      id="projectRef"
-                      layout="vertical"
-                      label="Which project is affected?"
-                      onChange={(val) => {
-                        setSelectedProjectRef(val)
-                      }}
-                    >
-                      {projects.map((option) => {
-                        const organization = organizations?.find(
-                          (x) => x.id === option.organization_id
-                        )
-                        return (
-                          <Listbox.Option
-                            key={`option-${option.ref}`}
-                            label={option.name || ''}
-                            value={option.ref}
-                            className="!w-72"
-                          >
-                            <span>{option.name}</span>
-                            <span className="block text-xs opacity-50">{organization?.name}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  )}
-                  <Listbox id="severity" layout="vertical" label="Severity">
-                    {SEVERITY_OPTIONS.map((option: any) => {
-                      return (
-                        <Listbox.Option
-                          key={`option-${option.value}`}
-                          label={option.label}
-                          value={option.value}
-                          className="!w-72"
-                        >
-                          <span>{option.label}</span>
-                          <span className="block text-xs opacity-50">{option.description}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                </div>
-
-                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
-                  <p className="text-sm text-foreground-light mt-2">
-                    This project is on the{' '}
-                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
-                  </p>
-                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
-                  <div className="flex items-center space-x-2 mt-2">
-                    <IconLoader size={14} className="animate-spin" />
-                    <p className="text-sm text-foreground-light">Checking project's plan</p>
-                  </div>
-                ) : (
-                  <></>
-                )}
-                {(values.severity === 'Urgent' || values.severity === 'High') && (
-                  <p className="text-sm text-foreground-light mt-2">
-                    We do our best to respond to everyone as quickly as possible; however,
-                    prioritization will be based on production status. We ask that you reserve High
-                    and Urgent severity for production-impacting issues only.
-                  </p>
-                )}
-              </div>
-            )}
 
             {isSuccessProjects &&
               values.projectRef === 'no-project' &&
@@ -443,7 +336,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="space-y-2">
                       <p className="text-sm prose">Which organization is affected?</p>
                       <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                        <IconAlertCircle strokeWidth={2} className="text-foreground-light" />
+                        <AlertCircle size={16} strokeWidth={2} className="text-foreground-light" />
                         <p className="text-sm prose">Failed to retrieve organizations</p>
                       </div>
                     </div>
@@ -470,65 +363,176 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 </div>
               )}
 
+            {isLoadingProjects && (
+              <div className="space-y-2">
+                <p className="text-sm prose">Which project is affected?</p>
+                <ShimmeringLoader className="!py-[19px]" />
+              </div>
+            )}
+            {isErrorProjects && (
+              <div className="space-y-2">
+                <p className="text-sm prose">Which project is affected?</p>
+                <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                  <HelpCircle strokeWidth={2} className="text-foreground-light" />
+                  <p className="text-sm prose">Failed to retrieve projects</p>
+                </div>
+              </div>
+            )}
+            {isSuccessProjects && (
+              <div className="px-6">
+                <Listbox
+                  id="projectRef"
+                  layout="vertical"
+                  label="Which project is affected?"
+                  onChange={(val) => {
+                    setSelectedProjectRef(val)
+                  }}
+                  className="w-full"
+                >
+                  {projects.map((option) => {
+                    const organization = organizations?.find((x) => x.id === option.organization_id)
+                    return (
+                      <Listbox.Option
+                        key={`option-${option.ref}`}
+                        label={option.name || ''}
+                        value={option.ref}
+                        className="w-full"
+                      >
+                        <span>{option.name}</span>
+                        <span className="block text-xs opacity-50">{organization?.name}</span>
+                      </Listbox.Option>
+                    )
+                  })}
+                </Listbox>
+                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
+                  <p className="text-sm text-foreground-light mt-2">
+                    This project is on the{' '}
+                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
+                  </p>
+                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Loader2 size={14} className="animate-spin" />
+                    <p className="text-sm text-foreground-light">Checking project's plan</p>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
+            )}
+
             {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
-                  icon={<IconAlertCircle strokeWidth={2} />}
+                  icon={<AlertCircle size={18} strokeWidth={2} />}
                   defaultVisibility={true}
                   hideCollapse={true}
-                  title="Expected response times are based on your project's plan"
-                  description={
-                    <div className="space-y-4 mb-1">
-                      {subscription?.plan.id === 'free' && (
-                        <p>
-                          Free plan support is available within the community and officially by the
-                          team on a best efforts basis. For a guaranteed response we recommend
-                          upgrading to the Pro plan. Enhanced SLAs for support are available on our
-                          Enterprise Plan.
-                        </p>
-                      )}
-
-                      {subscription?.plan.id === 'pro' && (
-                        <p>
-                          Pro Plan includes email-based support. You can expect an answer within 1
-                          business day in most situation for all severities. We recommend upgrading
-                          to the Team plan for prioritized ticketing on all issues and prioritized
-                          escalation to product engineering teams. Enhanced SLAs for support are
-                          available on our Enterprise Plan.
-                        </p>
-                      )}
-
-                      {subscription?.plan.id === 'team' && (
-                        <p>
-                          Team plan includes email-based support. You get prioritized ticketing on
-                          all issues and prioritized escalation to product engineering teams. Low,
-                          Normal, and High severity tickets will generally be handled within 1
-                          business day, while Urgent issues, we respond within 1 day, 365 days a
-                          year. Enhanced SLAs for support are available on our Enterprise Plan.
-                        </p>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
-                        <Button asChild>
-                          <Link
-                            href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
-                          >
-                            Upgrade project
-                          </Link>
-                        </Button>
-                        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
-                          <Link
-                            href="https://supabase.com/contact/enterprise"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Enquire about Enterprise
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
+                  title={
+                    selectedProjectRef === 'no-project'
+                      ? 'Please note that no project has been selected'
+                      : "Expected response times are based on your project's plan"
                   }
+                  {...(selectedProjectRef !== 'no-project' && {
+                    description: (
+                      <div className="space-y-4 mb-1">
+                        {subscription?.plan.id === 'free' && (
+                          <p>
+                            Free plan support is available within the community and officially by
+                            the team on a best efforts basis. For a guaranteed response we recommend
+                            upgrading to the Pro plan. Enhanced SLAs for support are available on
+                            our Enterprise Plan.
+                          </p>
+                        )}
+
+                        {subscription?.plan.id === 'pro' && (
+                          <p>
+                            Pro Plan includes email-based support. You can expect an answer within 1
+                            business day in most situations for all severities. We recommend
+                            upgrading to the Team plan for prioritized ticketing on all issues and
+                            prioritized escalation to product engineering teams. Enhanced SLAs for
+                            support are available on our Enterprise Plan.
+                          </p>
+                        )}
+
+                        {subscription?.plan.id === 'team' && (
+                          <p>
+                            Team plan includes email-based support. You get prioritized ticketing on
+                            all issues and prioritized escalation to product engineering teams. Low,
+                            Normal, and High severity tickets will generally be handled within 1
+                            business day, while Urgent issues, we respond within 1 day, 365 days a
+                            year. Enhanced SLAs for support are available on our Enterprise Plan.
+                          </p>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
+                          <Button asChild>
+                            <Link
+                              href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
+                            >
+                              Upgrade project
+                            </Link>
+                          </Button>
+                          <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                            <Link
+                              href="https://supabase.com/contact/enterprise"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Enquire about Enterprise
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    ),
+                  })}
                 />
+              </div>
+            )}
+
+            {values.category !== 'Login_issues' && (
+              <div className="px-6">
+                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
+                  <Listbox
+                    id="category"
+                    layout="vertical"
+                    label="What area are you having problems with?"
+                  >
+                    {CATEGORY_OPTIONS.map((option, i) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
+                          className="min-w-[50px] !w-72"
+                        >
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                  <Listbox id="severity" layout="vertical" label="Severity">
+                    {SEVERITY_OPTIONS.map((option: any) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
+                          className="!w-72"
+                        >
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                </div>
+                {(values.severity === 'Urgent' || values.severity === 'High') && (
+                  <p className="text-sm text-foreground-light mt-2">
+                    We do our best to respond to everyone as quickly as possible; however,
+                    prioritization will be based on production status. We ask that you reserve High
+                    and Urgent severity for production-impacting issues only.
+                  </p>
+                )}
               </div>
             )}
 
@@ -561,7 +565,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                               >
                                 Github discussions
-                                <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                <ExternalLink size={14} strokeWidth={2} className="ml-1" />
                               </Link>
                               <span> for a quick answer</span>
                             </p>
@@ -629,7 +633,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                    icon={<ExternalLink size={14} strokeWidth={1.5} />}
                                   >
                                     <Link href={library.url} target="_blank" rel="noreferrer">
                                       View Github issues
@@ -655,7 +659,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Button
                                 asChild
                                 type="default"
-                                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                                icon={<ExternalLink size={14} strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/supabase/supabase"
@@ -712,7 +716,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               <Button
                                 asChild
                                 type="default"
-                                icon={<IconExternalLink strokeWidth={1.5} />}
+                                icon={<ExternalLink strokeWidth={1.5} />}
                               >
                                 <Link
                                   href="https://github.com/orgs/supabase/discussions/17817"
@@ -771,7 +775,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               ].join(' ')}
                               onClick={() => removeUploadedFile(idx)}
                             >
-                              <IconX size={12} strokeWidth={2} />
+                              <X size={12} strokeWidth={2} />
                             </div>
                           </div>
                         ))}
@@ -785,7 +789,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
                             }}
                           >
-                            <IconPlus strokeWidth={2} size={20} />
+                            <Plus strokeWidth={2} size={20} />
                           </div>
                         )}
                       </div>
@@ -804,7 +808,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <Button
                           htmlType="submit"
                           size="small"
-                          icon={<IconMail />}
+                          icon={<Mail />}
                           disabled={isSubmitting}
                           loading={isSubmitting}
                         >

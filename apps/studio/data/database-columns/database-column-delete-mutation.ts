@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { sqlKeys } from 'data/sql/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
-import type { TableLike } from 'hooks/misc/useTable'
+import { del, handleError } from 'data/fetchers'
+import { sqlKeys } from 'data/sql/keys'
 import { tableKeys } from 'data/tables/keys'
 import { viewKeys } from 'data/views/keys'
+import type { TableLike } from 'hooks/misc/useTable'
+import type { ResponseError } from 'types'
 
 export type DatabaseColumnDeleteVariables = {
   projectRef: string
@@ -36,7 +36,7 @@ export async function deleteDatabaseColumn({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
