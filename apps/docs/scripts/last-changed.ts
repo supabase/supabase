@@ -175,7 +175,7 @@ function processMdx(rawContent: string): Array<SectionWithChecksum> {
     if (seenHeadings.has(rawHeading)) {
       const idx = seenHeadings.get(rawHeading) + 1
       seenHeadings.set(rawHeading, idx)
-      heading = `${rawHeading} (${idx})`
+      heading = `${rawHeading} (__UNIQUE_MARKER__${idx})`
     } else {
       seenHeadings.set(rawHeading, 1)
     }
@@ -255,7 +255,7 @@ async function updateTimestampsWithChecksumMatch(
     if (error) {
       throw Error(error.message || 'Error running function to update checksum')
     }
-    if (timestamp.toISOString() === new Date(data).toISOString()) {
+    if (timestamp.toISOString() === new Date(data ?? null).toISOString()) {
       ctx.stats.sectionsUpdated++
     }
   } catch (err) {
