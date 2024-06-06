@@ -4,9 +4,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { type PropsWithChildren, memo, useEffect } from 'react'
-
 import { cn } from 'ui'
-
 import Footer from '~/components/Navigation/Footer'
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
@@ -278,6 +276,7 @@ const Container = memo(function Container({
 
   return (
     <div
+      // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
         /**

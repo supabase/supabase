@@ -88,7 +88,7 @@ To use Google's pre-built signin buttons:
 
   <TabPanel id="flutter" label="Flutter">
 
-    ## Google sign-in for iOS and Android
+    ### iOS and Android
 
     1. Configure Web, Android, and iOS OAuth credentials. Follow the Platform integration instructions on the [README of google_sign_in package](https://pub.dev/packages/google_sign_in#platform-integration) for Android and iOS.
         - For both Android and iOS, you will need to create a Web client ID in the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
@@ -117,7 +117,7 @@ To use Google's pre-built signin buttons:
         <!-- End of the Google Sign-in Section -->
         ```
 
-    ## Google sign-in for Web, macOS, Windows, and Linux
+    ### Web, macOS, Windows, and Linux
 
     To use the OAuth 2.0 flow, you will require the following information:
 
@@ -125,20 +125,9 @@ To use Google's pre-built signin buttons:
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your Supabase project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
     3. Finally, add the client ID and secret from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
-    <div className="video-container">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/utMg6fVmX0U"
-        frameBorder="1"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
-    </div>
-
   </TabPanel>
 
   <TabPanel id="swift" label="Swift">
-
-    ## Google sign-in for iOS
 
     Google sign-in with Supabase is done through the [GoogleSignIn-iOS](https://github.com/google/GoogleSignIn-iOS) package.
 
@@ -185,7 +174,7 @@ To use Google's pre-built signin buttons:
 
   <TabPanel id="android" label="Android (Kotlin)">
 
-    ## Using Google sign-in on Android
+    ### Using Google sign-in on Android
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. You need two client IDs, a web client ID and Android client ID. When creating a new Android OAuth client ID, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
@@ -193,7 +182,7 @@ To use Google's pre-built signin buttons:
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
 
-    ## Using Google sign-in with Kotlin Multiplatform
+    ### Using Google sign-in with Kotlin Multiplatform
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
@@ -204,15 +193,6 @@ To use Google's pre-built signin buttons:
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
-
-    <div className="video-container">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/P_jZMDmodG4"
-        frameBorder="1"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
-    </div>
 
   </TabPanel>
 
@@ -427,7 +407,7 @@ export default function () {
 
 <TabPanel id="flutter" label="Flutter">
 
-## Google sign-in for iOS and Android
+### iOS and Android
 
 Google sign-in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android.
 
@@ -476,7 +456,7 @@ Future<void> _nativeGoogleSignIn() async {
 ...
 ```
 
-## Google sign-in for Web, macOS, Windows, and Linux
+### Web, macOS, Windows, and Linux
 
 Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [signInWithOAuth](docs/reference/dart/auth-signinwithoauth) method.
 
@@ -491,11 +471,20 @@ supabase.auth.signInWithOAuth(
 
 This call takes the user to Google's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your Flutter application with an access and refresh token representing the user's session.
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/utMg6fVmX0U"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 </TabPanel>
 
 <TabPanel id="android" label="Android (Kotlin)">
 
-## Using Google sign-in on Android
+### Using Google sign-in on Android
 
 The Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
@@ -592,7 +581,7 @@ fun GoogleSignInButton() {
 }
 ```
 
-## Using Google sign-in with Kotlin Multiplatform
+### Using Google sign-in with Kotlin Multiplatform
 
 When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses the Credential Manager automatically and on other platforms it uses `auth.signInWith(Google)`.
 
@@ -631,11 +620,20 @@ Button(onClick = { authState.startFlow() }) {
 }
 ```
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/P_jZMDmodG4"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 </TabPanel>
 
 <TabPanel id="chrome-extensions" label="Chrome Extensions">
 
-## Using native sign in for Chrome extensions
+### Using native sign in for Chrome extensions
 
 Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/identity/) to launch an authentication flow.
 

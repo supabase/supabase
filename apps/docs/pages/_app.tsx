@@ -4,12 +4,12 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import Head from 'next/head'
 import { ThemeProvider } from 'common'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import Head from 'next/head'
 import { PortalToast } from 'ui'
 import { PromoToast } from 'ui-patterns/PromoToast'
-
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { AuthContainer } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
 import { ShortcutPreviewBuild } from '~/features/envs/staging.client'
@@ -18,7 +18,6 @@ import { ThemeSandbox } from '~/features/ui/theme.client'
 import { ScrollRestoration } from '~/features/ui/helpers.scroll.client'
 import SiteLayout from '~/layouts/SiteLayout'
 import type { AppPropsWithLayout } from '~/types'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
