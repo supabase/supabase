@@ -129,56 +129,50 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
           )
 
           return isLoadingSecretValue ? (
-            <div className="p-4">
+            <Modal.Content>
               <GenericSkeletonLoader />
-            </div>
+            </Modal.Content>
           ) : (
-            <div className="py-4">
-              <Modal.Content>
-                <div className="space-y-4 pb-4">
-                  <Input id="name" label="Name" />
-                  <Input id="description" label="Description" labelOptional="Optional" />
-                  <Input
-                    id="secret"
-                    type={showSecretValue ? 'text' : 'password'}
-                    label="Secret value"
-                    actions={
-                      <div className="mr-1">
-                        <Button
-                          type="default"
-                          icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
-                          onClick={() => setShowSecretValue(!showSecretValue)}
-                        />
-                      </div>
-                    }
-                  />
-                </div>
+            <>
+              <Modal.Content className="space-y-4">
+                <Input id="name" label="Name" />
+                <Input id="description" label="Description" labelOptional="Optional" />
+                <Input
+                  id="secret"
+                  type={showSecretValue ? 'text' : 'password'}
+                  label="Secret value"
+                  actions={
+                    <div className="mr-1">
+                      <Button
+                        type="default"
+                        icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
+                        onClick={() => setShowSecretValue(!showSecretValue)}
+                      />
+                    </div>
+                  }
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="py-4 space-y-4">
-                  <EncryptionKeySelector
-                    id="keyId"
-                    nameId="keyName"
-                    label="Select a key to encrypt your secret with"
-                    labelOptional="Optional"
-                    selectedKeyId={selectedKeyId}
-                    onSelectKey={setSelectedKeyId}
-                  />
-                </div>
+              <Modal.Content className="space-y-4">
+                <EncryptionKeySelector
+                  id="keyId"
+                  nameId="keyName"
+                  label="Select a key to encrypt your secret with"
+                  labelOptional="Optional"
+                  selectedKeyId={selectedKeyId}
+                  onSelectKey={setSelectedKeyId}
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                    Update secret
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  Update secret
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

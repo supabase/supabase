@@ -1,189 +1,176 @@
 'use client'
 
-import * as Dialog from '@radix-ui/react-dialog'
-import React, { useEffect } from 'react'
-
+import React, { forwardRef, useEffect } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
-import { AnimationTailwindClasses } from '../../types'
-import { Button } from '../Button/Button'
-import IconX from '../Icon/icons/IconX/IconX'
-import Space from '../Space/Space'
+import { Button, ButtonVariantProps } from '../Button/Button'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+  DialogClose,
+} from '../shadcn/ui/dialog'
 
-// import { Transition } from '@tailwindui/react'
-// Merge Radix Props to surface in the modal component
-export type ModalProps = RadixProps & Props
-
-interface RadixProps
-  extends Dialog.DialogProps,
-    Pick<
-      Dialog.DialogContentProps,
-      | 'onOpenAutoFocus'
-      | 'onCloseAutoFocus'
-      | 'onEscapeKeyDown'
-      | 'onPointerDownOutside'
-      | 'onInteractOutside'
-    > {}
-
-interface Props {
-  children?: React.ReactNode
+export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
+  Separator?: React.ComponentType
+  Content?: React.ComponentType
+  visible?: boolean
+  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
   customFooter?: React.ReactNode
   description?: string
+  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
   hideFooter?: boolean
+  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
   alignFooter?: 'right' | 'left'
+  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
   layout?: 'horizontal' | 'vertical'
-  icon?: React.ReactNode
   loading?: boolean
   onCancel?: any
   cancelText?: string
   onConfirm?: any
   confirmText?: string
-  /**
-   * @deprecated This prop is no longer being used in the Modal component
-   */
-  closable?: boolean
-  showIcon?: boolean
   showCloseButton?: boolean
   footerBackground?: boolean
-  title?: string | React.ReactNode
-  variant?: 'danger' | 'warning' | 'success'
-  visible: boolean
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
-  style?: React.CSSProperties
+  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  variant?: ButtonVariantProps['type']
   overlayStyle?: React.CSSProperties
   contentStyle?: React.CSSProperties
-  className?: string
   overlayClassName?: string
-  transition?: AnimationTailwindClasses
-  transitionOverlay?: AnimationTailwindClasses
+  // @deprecated please consider using <Dialog/> and <DialogTrigger/> components
   triggerElement?: React.ReactNode
+  // @deprecated please consider using <Dialog/> and <DialogHeader/> components
   header?: React.ReactNode
+  modal?: React.ComponentProps<typeof Dialog>['modal']
+  defaultOpen?: React.ComponentProps<typeof Dialog>['defaultOpen']
+  /**
+   * @deprecated No longer in use
+   */
+  closable?: boolean
 }
 
-/**
- * @deprecated Use ./Dialog instead
- */
-const Modal = ({
-  children,
-  customFooter = undefined,
-  description,
-  hideFooter = false,
-  alignFooter = 'left',
-  layout = 'horizontal',
-  loading = false,
-  cancelText = 'Cancel',
-  onConfirm = () => {},
-  onCancel = () => {},
-  confirmText = 'Confirm',
-  closable = false,
-  showIcon = false,
-  showCloseButton = false,
-  title,
-  footerBackground,
-  icon,
-  variant = 'success',
-  visible = false,
-  size = 'large',
-  style,
-  overlayStyle,
-  contentStyle,
-  className = '',
-  overlayClassName,
-  triggerElement,
-  header,
-  ...props
-}: ModalProps) => {
-  const [open, setOpen] = React.useState(visible ? visible : false)
-  const __styles = styleHandler('modal')
+interface ModalType
+  extends React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
+  > {
+  Content: React.ComponentType<{ children: React.ReactNode; className?: string }>
+  Separator: React.ComponentType
+}
 
-  useEffect(() => {
-    setOpen(visible)
-  }, [visible])
+// @deprecated use <Dialog/> instead
+const Modal = forwardRef<
+  React.ElementRef<typeof DialogContent>,
+  React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
+>(
+  (
+    {
+      children,
+      customFooter = undefined,
+      description,
+      hideFooter = false,
+      alignFooter = 'left',
+      layout = 'horizontal',
+      loading = false,
+      cancelText = 'Cancel',
+      onConfirm = () => {},
+      onCancel = () => {},
+      confirmText = 'Confirm',
+      showCloseButton = true,
+      footerBackground,
+      variant = 'success',
+      visible = false,
+      size = 'large',
+      style,
+      overlayStyle,
+      contentStyle,
+      className = '',
+      overlayClassName,
+      triggerElement,
+      header,
+      modal,
+      defaultOpen,
+      ...props
+    },
+    ref
+  ) => {
+    const [open, setOpen] = React.useState(visible ? visible : false)
+    const __styles = styleHandler('modal')
 
-  const footerContent = customFooter ? (
-    customFooter
-  ) : (
-    <Space
-      className="flex w-full space-x-2"
-      style={{
-        width: '100%',
-        justifyContent:
-          layout === 'vertical' ? 'center' : alignFooter === 'right' ? 'flex-end' : 'flex-start',
-      }}
-    >
-      <Button type="default" onClick={onCancel} disabled={loading}>
-        {cancelText}
-      </Button>
-      <Button
-        onClick={onConfirm}
-        disabled={loading}
-        loading={loading}
-        type={variant === 'danger' ? 'danger' : 'primary'}
+    useEffect(() => {
+      setOpen(visible)
+    }, [visible])
+
+    const footerContent = customFooter ? (
+      customFooter
+    ) : (
+      <div
+        className="flex w-full space-x-2"
+        style={{
+          width: '100%',
+          justifyContent:
+            layout === 'vertical' ? 'center' : alignFooter === 'right' ? 'flex-end' : 'flex-start',
+        }}
       >
-        {confirmText}
-      </Button>
-    </Space>
-  )
+        <Button type="default" onClick={onCancel} disabled={loading}>
+          {cancelText}
+        </Button>
+        <Button
+          onClick={onConfirm}
+          disabled={loading}
+          loading={loading}
+          type={variant === 'danger' ? 'danger' : 'primary'}
+        >
+          {confirmText}
+        </Button>
+      </div>
+    )
 
-  function handleOpenChange(open: boolean) {
-    if (visible !== undefined && !open) {
-      // controlled component behaviour
-      onCancel()
-    } else {
-      // un-controlled component behaviour
-      setOpen(open)
+    function handleOpenChange(open: boolean) {
+      if (visible !== undefined && !open) {
+        // controlled component behavior
+        onCancel()
+      } else {
+        // un-controlled component behavior
+        setOpen(open)
+      }
     }
+
+    return (
+      <Dialog open={open} defaultOpen={defaultOpen} onOpenChange={handleOpenChange} modal={modal}>
+        {triggerElement && <DialogTrigger>{triggerElement}</DialogTrigger>}
+        <DialogContent ref={ref} hideClose={!showCloseButton} {...props} size={size}>
+          {header || description ? (
+            <DialogHeader className={cn('border-b')} padding={'small'}>
+              {header && <DialogTitle>{header}</DialogTitle>}
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
+          ) : null}
+          {children}
+          {!hideFooter && <DialogFooter padding={'small'}>{footerContent}</DialogFooter>}
+        </DialogContent>
+      </Dialog>
+    )
   }
+) as ModalType
 
-  return (
-    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      {triggerElement && <Dialog.Trigger>{triggerElement}</Dialog.Trigger>}
-      <Dialog.Portal>
-        <Dialog.Overlay className={__styles.overlay} />
-        <Dialog.Overlay className={__styles.scroll_overlay}>
-          <Dialog.Content
-            className={[__styles.base, __styles.size[size], className].join(' ')}
-            onInteractOutside={props.onInteractOutside}
-            onEscapeKeyDown={props.onEscapeKeyDown}
-          >
-            {header && (
-              <div className={__styles.header}>
-                {header}
-                {showCloseButton && (
-                  <Button
-                    onClick={onCancel}
-                    type="text"
-                    icon={<IconX size="small" strokeWidth={1.5} />}
-                    className="p-0.5 !mt-0"
-                  />
-                )}
-              </div>
-            )}
-            {children}
-            {!hideFooter && <div className={__styles.footer}>{footerContent}</div>}
-          </Dialog.Content>
-        </Dialog.Overlay>
-      </Dialog.Portal>
-    </Dialog.Root>
-  )
-}
+const Content = forwardRef<
+  React.ElementRef<typeof DialogSection>,
+  React.ComponentPropsWithoutRef<typeof DialogSection>
+>(({ ...props }, ref) => {
+  return <DialogSection ref={ref} {...props} padding="small" className={cn(props.className)} />
+})
 
-/**
- * @deprecated Use ./Dialog instead
- */
-function Content({ children, className }: { children: React.ReactNode; className?: string }) {
-  const __styles = styleHandler('modal')
-  return <div className={cn(__styles.content, className)}>{children}</div>
-}
-
-/**
- * @deprecated Use ./Dialog instead
- */
-export function Separator() {
-  const __styles = styleHandler('modal')
-
-  return <div className={__styles.separator}></div>
-}
+const Separator = forwardRef<
+  React.ElementRef<typeof DialogSectionSeparator>,
+  React.ComponentPropsWithoutRef<typeof DialogSectionSeparator>
+>(({ ...props }, ref) => {
+  return <DialogSectionSeparator ref={ref} {...props} />
+})
 
 Modal.Content = Content
 Modal.Separator = Separator

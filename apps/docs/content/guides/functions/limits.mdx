@@ -18,6 +18,7 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 ## Other limits & restrictions
 
 - Outgoing connections to ports `25` and `587` are not allowed.
-- Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
+- Serving of HTML content is only supported with [custom domains](/docs/reference/cli/supabase-domains) (Otherwise `GET` requests that return `text/html` will be rewritten to `text/plain`).
 - Deno and Node file system APIs are not available.
 - Web Worker API (or Node `vm` API) are not available.
+- Node Libraries that require multithreading are not supported. Examples: [libvips](https://github.com/libvips/libvips), [sharp](https://github.com/lovell/sharp).

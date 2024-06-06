@@ -213,7 +213,7 @@ const TableEditor = ({
         setFkRelations([])
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
-          table!,
+          table,
           foreignKeyMeta || [],
           isDuplicating,
           isRealtimeEnabled
