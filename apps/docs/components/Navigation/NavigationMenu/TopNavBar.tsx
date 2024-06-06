@@ -39,7 +39,7 @@ const TopNavBar: FC = () => {
       className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
     >
       <div className="w-full px-5 flex justify-between h-[var(--header-height,50px)] lg:h-[var(--header-height,60px)]">
-        <div className="hidden px-5 lg:flex h-full items-center bg-background flex-col gap-8">
+        <div className="hidden px-5 lg:flex h-full items-center flex-col gap-8">
           <HeaderLogo />
         </div>
         <div className="w-full lg:w-auto max-w-7xl flex gap-3 justify-between items-center h-full">
