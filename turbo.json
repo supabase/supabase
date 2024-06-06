@@ -6,19 +6,16 @@
       "outputs": ["dist/**", ".next/**"]
     },
     "www#build": {
-      "dependsOn": ["^build","www#build:content"],
+      "dependsOn": ["^build"],
       "env": [
         "SUPABASE_SERVICE_ROLE_SECRET",
         "EMAIL_TO_ID_SECRET",
         "SUPABASE_URL",
         "GITHUB_OAUTH_CLIENT_SECRET"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
-    "www#build:content": {
-      "inputs": ["contentlayer.config.ts", "_blog/*.mdx"],
-      "outputs": [".contentlayer/**"]
-    },
+
     "docs#build": {
       "dependsOn": ["^build"],
       "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_API_KEY"],
