@@ -1,7 +1,11 @@
+import { Github } from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import * as Sentry from '@sentry/nextjs'
+
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
-import { useState } from 'react'
-import { Button, IconGitHub } from 'ui'
+import { Button } from 'ui'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
@@ -26,8 +30,9 @@ const SignInWithGitHub = () => {
         },
       })
       if (error) throw error
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      toast.error(`Failed to sign in via GitHub: ${error.message}`)
+      Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
       setLoading(false)
     }
   }
@@ -37,7 +42,7 @@ const SignInWithGitHub = () => {
       block
       onClick={handleGithubSignIn}
       // set the width to 20 so that it matches the loading spinner and don't push the text when loading
-      icon={<IconGitHub width={20} height={18} />}
+      icon={<Github width={20} height={18} />}
       size="large"
       type="default"
       loading={loading}

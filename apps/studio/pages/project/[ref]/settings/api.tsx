@@ -1,12 +1,6 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
 import { SettingsLayout } from 'components/layouts'
-import {
-  ScaffoldColumn,
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
 const ApiSettings: NextPageWithLayout = () => {

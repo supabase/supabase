@@ -24,7 +24,7 @@ const RPC = ({ language }: ContentProps) => {
   const rpc = functions.find((fn) => fn.name === rpcName)
   const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
 
-  const summary = rpcJsonSchema?.post.summary
+  const summary = rpcJsonSchema?.post?.summary
   const parameters = rpc?.get.parameters ?? []
 
   useEffect(() => {

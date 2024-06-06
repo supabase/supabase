@@ -138,7 +138,8 @@ const EnableBranchingModal = () => {
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg !max-w-[40rem]"
-        size="xlarge"
+        size="medium"
+        hideClose
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -146,7 +147,7 @@ const EnableBranchingModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
-            <Modal.Content className="px-7 py-5 flex items-center justify-between space-x-4">
+            <Modal.Content className="flex items-center justify-between space-x-4">
               <div className="flex items-center gap-x-4">
                 <IconGitBranch strokeWidth={2} size={20} />
                 <div>
@@ -207,14 +208,14 @@ const EnableBranchingModal = () => {
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
                 )}
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+                <Modal.Content className="py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
                     Please keep in mind the following:
                   </p>
                   <div className="flex flex-row gap-4">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <IconDollarSign className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -230,8 +231,8 @@ const EnableBranchingModal = () => {
                   </div>
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
+                        <IconFileText className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -251,29 +252,27 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            <Modal.Content className="px-7">
-              <div className="flex items-center space-x-2 py-2 pb-4">
-                <Button
-                  size="medium"
-                  block
-                  disabled={isCreating}
-                  type="default"
-                  onClick={() => snap.setShowEnableBranchingModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  block
-                  size="medium"
-                  form={formId}
-                  disabled={!isSuccess || isCreating || !canSubmit}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  I understand, enable branching
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center gap-3">
+              <Button
+                size="medium"
+                block
+                disabled={isCreating}
+                type="default"
+                onClick={() => snap.setShowEnableBranchingModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                block
+                size="medium"
+                form={formId}
+                disabled={!isSuccess || isCreating || !canSubmit}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                I understand, enable branching
+              </Button>
             </Modal.Content>
           </form>
         </Form_Shadcn_>

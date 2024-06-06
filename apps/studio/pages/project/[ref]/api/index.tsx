@@ -1,7 +1,5 @@
 import { useParams } from 'common'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
@@ -12,56 +10,18 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 
-const PageContext = createContext(null)
-
 const PageConfig: NextPageWithLayout = () => {
-  const PageState: any = useLocalObservable(() => ({
-    projectRef: '',
-    jsonSchema: {},
-    resources: {},
-    rpcs: {},
-    setJsonSchema(value: any) {
-      const { paths } = value || {}
-      const functionPath = 'rpc/'
-      let resources: any = {}
-      let rpcs: any = {}
-
-      Object.entries(paths || []).forEach(([name, val]) => {
-        let trimmed = name.slice(1)
-        let id = trimmed.replace(functionPath, '')
-        let displayName = id.replace(/_/g, ' ')
-        let camelCase = snakeToCamel(id)
-        let enriched = { id, displayName, camelCase }
-        if (!trimmed.length) return
-        else if (trimmed.includes(functionPath)) rpcs[id] = enriched
-        else resources[id] = enriched
-      })
-
-      PageState.jsonSchema = value
-      PageState.resources = resources
-      PageState.rpcs = rpcs
-    },
-  }))
-
-  const router = useRouter()
-  const { query } = router
-  PageState.projectRef = query.ref
-
-  return (
-    <PageContext.Provider value={PageState}>
-      <DocView />
-    </PageContext.Provider>
-  )
+  return <DocView />
 }
 
 PageConfig.getLayout = (page) => <DocsLayout title="API">{page}</DocsLayout>
 
-export default observer(PageConfig)
+export default PageConfig
 
-const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+const DocView = () => {
+  const functionPath = 'rpc/'
+  const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-const DocView = observer(() => {
-  const PageState: any = useContext(PageContext)
   const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
@@ -73,6 +33,7 @@ const DocView = observer(() => {
   const {
     data: jsonSchema,
     error: jsonSchemaError,
+    isLoading,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
@@ -84,13 +45,44 @@ const DocView = observer(() => {
       ? `https://${customDomainData.customDomain?.hostname}`
       : `${data?.autoApiService.protocol ?? 'https'}://${data?.autoApiService.endpoint ?? '-'}`
 
-  const { paths, definitions } = PageState.jsonSchema || {}
+  const { paths } = jsonSchema || {}
   const PAGE_KEY: any = resource || rpc || page || 'index'
   const autoApiService = { ...(data?.autoApiService ?? {}), endpoint }
 
-  useEffect(() => {
-    PageState.setJsonSchema(jsonSchema)
-  }, [jsonSchema])
+  const { resources, rpcs } = Object.entries(paths || {}).reduce(
+    (a, [name]) => {
+      const trimmedName = name.slice(1)
+      const id = trimmedName.replace(functionPath, '')
+
+      const displayName = id.replace(/_/g, ' ')
+      const camelCase = snakeToCamel(id)
+      const enriched = { id, displayName, camelCase }
+
+      if (!trimmedName.length) {
+        return a
+      }
+
+      return {
+        resources: {
+          ...a.resources,
+          ...(!trimmedName.includes(functionPath)
+            ? {
+                [id]: enriched,
+              }
+            : {}),
+        },
+        rpcs: {
+          ...a.rpcs,
+          ...(trimmedName.includes(functionPath)
+            ? {
+                [id]: enriched,
+              }
+            : {}),
+        },
+      }
+    },
+    { resources: {}, rpcs: {} }
+  )
 
   if (error || jsonSchemaError) {
     return (
@@ -103,7 +95,7 @@ const DocView = observer(() => {
     )
   }
 
-  if (!data || !jsonSchema || !PageState.jsonSchema) {
+  if (isLoading || !data || !jsonSchema) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
@@ -127,12 +119,10 @@ const DocView = observer(() => {
         <div>
           {resource ? (
             <ResourceContent
-              autoApiService={autoApiService}
+              apiEndpoint={endpoint}
               selectedLang={selectedLang}
               resourceId={resource}
-              resources={PageState.resources}
-              definitions={definitions}
-              paths={paths}
+              resources={resources}
               showApiKey={showApiKey.key}
               refreshDocs={refreshDocs}
             />
@@ -142,7 +132,7 @@ const DocView = observer(() => {
               selectedLang={selectedLang}
               rpcId={rpc}
               paths={paths}
-              rpcs={PageState.rpcs}
+              rpcs={rpcs}
               showApiKey={showApiKey.key}
               refreshDocs={refreshDocs}
             />
@@ -158,4 +148,4 @@ const DocView = observer(() => {
       </div>
     </div>
   )
-})
+}

@@ -86,10 +86,9 @@ export const meta = {
       <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
         {migrationGuides.map((product) => {
           return (
-              <li className={product.span ?? 'col-span-6 md:col-span-4'}>
+              <li className={product.span ?? 'col-span-6 md:col-span-4'} key={product.title}>
                 <Link
                   href={product.href}
-                  key={product.title}
                   passHref
                 >
                   <IconPanel {...product} background={true} showIconBg={true} showLink={false}>
@@ -116,10 +115,9 @@ export const meta = {
     <ul className="grid grid-cols-12 gap-6 not-prose">
       {additionalResources.map((product) => {
         return (
-            <li className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}>
+            <li className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'} key={product.title}>
               <Link
                 href={product.href}
-                key={product.title}
                 className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}
                 passHref
               >
@@ -160,10 +158,9 @@ export const meta = {
       <ul className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
         {selfHostingOptions.map((product) => {
           return (
-            <li className={product.span ?? 'col-span-6'}>
+            <li className={product.span ?? 'col-span-6'} key={product.title}>
                 <Link
                   href={product.href}
-                  key={product.title}
                   passHref
                 >
                   <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
