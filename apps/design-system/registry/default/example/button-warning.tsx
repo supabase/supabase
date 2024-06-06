@@ -1,17 +1,17 @@
 import { Mail } from 'lucide-react'
 import { Button } from 'ui'
 
-export default function ButtonGhost() {
+export default function ButtonDemo() {
   return (
     <div className="flex gap-3">
-      <Button type="text">Button rest</Button>
-      <Button type="text" loading>
+      <Button type="warning">Button rest</Button>
+      <Button type="warning" loading>
         Button loading
       </Button>
-      <Button type="text" icon={<Mail />}>
+      <Button type="warning" icon={<Mail />}>
         Button icon
       </Button>
-      <Button type="text" iconRight={<Mail />}>
+      <Button type="warning" iconRight={<Mail />}>
         Button iconRight
       </Button>
     </div>
