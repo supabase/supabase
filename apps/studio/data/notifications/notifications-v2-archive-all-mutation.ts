@@ -24,7 +24,7 @@ export const useNotificationsArchiveAllMutation = ({
   const queryClient = useQueryClient()
   return useMutation<NotificationsArchiveAllData, ResponseError>(() => archiveAllNotifications(), {
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(notificationKeys.list())
+      await queryClient.invalidateQueries(notificationKeys.listV2())
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -24,7 +24,6 @@ interface MemberRowProps {
   member: OrganizationMember
   roles: Role[]
   isLoadingRoles?: boolean
-  showMfaEnabledColumn?: boolean
   setUserRoleChangeModalVisible: Dispatch<SetStateAction<boolean>>
   setSelectedMember: Dispatch<SetStateAction<SelectedMember | undefined>>
 }
@@ -33,7 +32,6 @@ const MemberRow = ({
   member,
   roles,
   isLoadingRoles = false,
-  showMfaEnabledColumn = false,
   setUserRoleChangeModalVisible,
   setSelectedMember,
 }: MemberRowProps) => {
@@ -114,17 +112,15 @@ const MemberRow = ({
         )}
       </Table.td>
 
-      {showMfaEnabledColumn && (
-        <Table.td>
-          <div className="flex items-center justify-center">
-            {member.mfa_enabled ? (
-              <Check className="text-brand" strokeWidth={2} size={18} />
-            ) : (
-              <X className="text-foreground-light" strokeWidth={1.5} size={18} />
-            )}
-          </div>
-        </Table.td>
-      )}
+      <Table.td>
+        <div className="flex items-center justify-center">
+          {member.mfa_enabled ? (
+            <Check className="text-brand" strokeWidth={2} size={18} />
+          ) : (
+            <X className="text-foreground-light" strokeWidth={1.5} size={18} />
+          )}
+        </div>
+      </Table.td>
 
       <Table.td>
         {isLoadingRoles ? (
@@ -217,6 +213,9 @@ const MemberRow = ({
           </div>
         )}
       </Table.td>
+
+      <Table.td>Scope</Table.td>
+
       <Table.td>{!memberIsUser && <MemberActions member={member} roles={roles} />}</Table.td>
     </Table.tr>
   )

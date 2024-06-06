@@ -1,5 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { MoreHorizontal, Trash } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -10,7 +11,6 @@ import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/or
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import { Trash } from 'lucide-react'
 import type { Role } from 'types'
 import {
   Button,
@@ -19,8 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMoreHorizontal,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -119,12 +117,14 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
+  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
+
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
-            <Button type="text" icon={<IconMoreHorizontal />} />
+            <Button type="text" icon={<MoreHorizontal />} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -146,16 +146,18 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
-  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
-
   return (
     <>
       <div className="flex items-center justify-end">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" disabled={isLoading} loading={isLoading}>
-              <IconMoreHorizontal />
-            </Button>
+            <Button
+              type="text"
+              className="px-1.5"
+              disabled={isLoading}
+              loading={isLoading}
+              icon={<MoreHorizontal />}
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
             <>
