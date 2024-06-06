@@ -550,7 +550,7 @@ const NewFeaturesAndIntegrations = () => {
                   </a>{' '}
                   (and{' '}
                   <a
-                    href="/docs/gotrue/server/about#endpoints"
+                    href="/docs/guides/auth/architecture#client-layer"
                     target="_blank"
                     className="text-brand hover:text-brand"
                   >

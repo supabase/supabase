@@ -62,15 +62,30 @@ export async function getStaticProps({ params }: any) {
 }
 
 function CaseStudyPage(props: any) {
-  const content = props.blog.content
+  const {
+    about,
+    company_url,
+    content,
+    date,
+    description,
+    logo,
+    meta_description,
+    meta_title,
+    misc,
+    name,
+    slug,
+    title,
+  } = props.blog
+
+  const ogImageUrl = encodeURI(
+    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=customers&customer=${slug}&title=${meta_title ?? title}`
+  )
 
   const meta = {
-    title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
-    description: props.blog.meta_description ?? props.blog.description,
-    image:
-      `${SITE_ORIGIN}${props.blog.og_image}` ??
-      `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
-    url: `${SITE_ORIGIN}/customers/${props.blog.slug}`,
+    title: meta_title ?? `${name} | Supabase Customer Stories`,
+    description: meta_description ?? description,
+    image: ogImageUrl ?? `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
+    url: `${SITE_ORIGIN}/customers/${slug}`,
   }
 
   return (
@@ -86,7 +101,7 @@ function CaseStudyPage(props: any) {
             //
             // to do: add expiration and modified dates
             // https://github.com/garmeeh/next-seo#article
-            publishedTime: props.blog.date,
+            publishedTime: date,
           },
           images: [
             {
@@ -126,12 +141,8 @@ function CaseStudyPage(props: any) {
                     <Link href="/customers" className="text-brand hover:text-brand-600 mb-2 mt-0">
                       Customer Stories
                     </Link>
-                    <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">
-                      {props.blog.title}
-                    </h1>
-                    <h2 className="text-foreground text-xl xl:text-2xl">
-                      {props.blog.description}
-                    </h2>
+                    <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>
+                    <h2 className="text-foreground text-xl xl:text-2xl">{description}</h2>
                   </div>
 
                   <div className="grid grid-cols-12 prose max-w-none gap-8 lg:gap-20">
@@ -141,37 +152,41 @@ function CaseStudyPage(props: any) {
                         <div className="relative h-16 w-32 lg:mt-5">
                           <Image
                             fill
-                            src={`${props.blog.logo}`}
-                            alt={`${props.blog.title} logo`}
+                            src={logo}
+                            alt={`${title} logo`}
+                            priority
+                            placeholder="blur"
+                            blurDataURL="/images/blur.png"
+                            draggable={false}
                             className="
-                                bg-no-repeat
-                                object-left
-                                object-contain
-                                m-0
+                              bg-no-repeat
+                              object-left
+                              object-contain
+                              m-0
 
-                                [[data-theme*=dark]_&]:brightness-200
-                                [[data-theme*=dark]_&]:contrast-0
-                                [[data-theme*=dark]_&]:filter
-                              "
+                              [[data-theme*=dark]_&]:brightness-200
+                              [[data-theme*=dark]_&]:contrast-0
+                              [[data-theme*=dark]_&]:filter
+                            "
                           />
                         </div>
 
                         <div className="flex flex-col space-y-2">
                           <span className="text-foreground-lighter">About</span>
-                          <p>{props.blog.about}</p>
+                          <p>{about}</p>
                           <span className="not-prose ">
                             <a
-                              href={props.blog.company_url}
+                              href={company_url}
                               className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
                               target="_blank"
                             >
-                              <span>{props.blog.company_url}</span>
+                              <span>{company_url}</span>
                               <IconExternalLink size={14} />
                             </a>
                           </span>
                         </div>
 
-                        {props.blog.misc.map((x: any) => {
+                        {misc?.map((x: any) => {
                           return (
                             <div className="flex flex-col gap-0">
                               <span className="text-foreground-lighter">{x.label}</span>

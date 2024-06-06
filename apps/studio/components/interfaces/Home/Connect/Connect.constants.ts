@@ -175,6 +175,9 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+]
+
+export const MOBILES: ConnectionType[] = [
   {
     key: 'exporeactnative',
     label: 'Expo React Native',
@@ -225,5 +228,6 @@ export const ORMS: ConnectionType[] = [
 
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
+  { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
 ]

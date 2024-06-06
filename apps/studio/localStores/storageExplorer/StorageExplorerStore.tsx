@@ -12,7 +12,11 @@ import {
   STORAGE_SORT_BY,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
+import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { ToastLoader } from 'components/ui/ToastLoader'
+import { configKeys } from 'data/config/keys'
+import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
+import { getQueryClient } from 'data/query-client'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
@@ -459,6 +463,14 @@ class StorageExplorerStore {
   }
 
   uploadFiles = async (files, columnIndex, isDrop = false) => {
+    const queryClient = getQueryClient()
+    const storageConfiguration = queryClient
+      .getQueryCache()
+      .find(configKeys.storage(this.projectRef))?.state.data as
+      | ProjectStorageConfigResponse
+      | undefined
+    const fileSizeLimit = storageConfiguration?.fileSizeLimit
+
     const t1 = new Date()
 
     const autofix = true
@@ -468,12 +480,39 @@ class StorageExplorerStore {
       : Array.from(files)
     const derivedColumnIndex = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
 
+    const filesWithinUploadLimit =
+      fileSizeLimit !== undefined
+        ? filesToUpload.filter((file) => file.size <= fileSizeLimit)
+        : filesToUpload
+
+    if (filesWithinUploadLimit.length < filesToUpload.length) {
+      const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit.length
+      const { value, unit } = convertFromBytes(fileSizeLimit)
+
+      toast.error(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
+            {numberOfFilesRejected > 1 ? 'their' : 'its'} size
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the upload limit of {value}
+            {unit}.
+          </p>
+          <p className="text-foreground-light">
+            You may change the file size upload limit under Storage in Project Settings.
+          </p>
+        </div>,
+        { duration: 8000 }
+      )
+
+      if (numberOfFilesRejected === filesToUpload.length) return
+    }
+
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
     const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
-    const formattedFilesToUpload = filesToUpload.map((file) => {
+    const formattedFilesToUpload = filesWithinUploadLimit.map((file) => {
       // If the files are from clicking "Upload button", just take them as they are since users cannot
       // upload folders from clicking that button, only via drag drop
       if (!file.path) return file
@@ -522,7 +561,14 @@ class StorageExplorerStore {
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
-      const formattedFileName = has(file, ['path']) && isWithinFolder ? file.path : fileName
+      const unsanitizedFormattedFileName =
+        has(file, ['path']) && isWithinFolder ? file.path : fileName
+      /**
+       * Storage maintains a list of allowed characters, which excludes
+       * characters such as the narrow no-break space used in Mac screenshots.
+       * To preempt errors, replace all non-word characters with underscores.
+       */
+      const formattedFileName = unsanitizedFormattedFileName.replace(/[^\w.-]/g, '_')
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : formattedFileName
 
@@ -1095,7 +1141,7 @@ class StorageExplorerStore {
         return col
       })
     } else if (!res.error.message.includes('aborted')) {
-      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
+      toast.error(`Failed to retrieve more folder contents: ${res.error.message}`)
     }
   }
 
@@ -1272,7 +1318,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loader(
+        toast.loading(
           <ToastLoader
             progress={progress * 100}
             message={`Renaming folder to ${newName}`}
@@ -1296,7 +1342,7 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e) {
-      toast.error(`Failed to rename folder to ${newName}`, { id: toastId })
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
     }
   }
 

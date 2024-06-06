@@ -73,7 +73,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       },
     })
 
-  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
+  const { mutate: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
     useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
@@ -89,13 +89,19 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
-    createOrganizationMemberInvite({
-      slug,
-      invitedEmail: member.primary_email!,
-      ownerId: invitedId,
-      roleId: roleId,
-    })
+    asyncDeleteMemberInvite(
+      { slug, invitedId, invalidateDetail: false },
+      {
+        onSuccess: () => {
+          createOrganizationMemberInvite({
+            slug,
+            invitedEmail: member.primary_email!,
+            ownerId: invitedId,
+            roleId: roleId,
+          })
+        },
+      }
+    )
   }
 
   const handleRevokeInvitation = async (member: OrganizationMember) => {
@@ -103,8 +109,14 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    await asyncDeleteMemberInvite({ slug, invitedId })
-    toast.success('Successfully revoked the invitation.')
+    asyncDeleteMemberInvite(
+      { slug, invitedId },
+      {
+        onSuccess: () => {
+          toast.success('Successfully revoked the invitation.')
+        },
+      }
+    )
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {

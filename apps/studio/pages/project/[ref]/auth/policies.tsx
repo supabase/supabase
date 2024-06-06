@@ -1,7 +1,10 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
@@ -15,17 +18,8 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded, useUrlState } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { partition } from 'lodash'
 import type { NextPageWithLayout } from 'types'
-import {
-  Button,
-  IconExternalLink,
-  IconSearch,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -69,6 +63,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -134,11 +129,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 const str = e.target.value
                 setParams({ ...params, search: str === '' ? undefined : str })
               }}
-              icon={<IconSearch size="tiny" />}
+              icon={<Search size={14} />}
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />} asChild>
+            <Button type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />} asChild>
               <a
                 target="_blank"
                 rel="noreferrer"
@@ -148,26 +143,28 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               </a>
             </Button>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="primary"
-                  disabled={!canCreatePolicies || schemaHasNoTables}
-                  onClick={() => setShowPolicyAiEditor(true)}
-                >
-                  Create a new policy
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {(!canCreatePolicies || schemaHasNoTables) && (
-                <TooltipContent_Shadcn_ side="bottom">
-                  {!canCreatePolicies
-                    ? 'You need additional permissions to create RLS policies'
-                    : schemaHasNoTables
-                      ? `No table in schema ${schema} to create policies on`
-                      : null}
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+            {isAiAssistantEnabled && (
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <Button
+                    type="primary"
+                    disabled={!canCreatePolicies || schemaHasNoTables}
+                    onClick={() => setShowPolicyAiEditor(true)}
+                  >
+                    Create a new policy
+                  </Button>
+                </TooltipTrigger_Shadcn_>
+                {(!canCreatePolicies || schemaHasNoTables) && (
+                  <TooltipContent_Shadcn_ side="bottom">
+                    {!canCreatePolicies
+                      ? 'You need additional permissions to create RLS policies'
+                      : schemaHasNoTables
+                        ? `No table in schema ${schema} to create policies on`
+                        : null}
+                  </TooltipContent_Shadcn_>
+                )}
+              </Tooltip_Shadcn_>
+            )}
           </div>
         </div>
       </div>

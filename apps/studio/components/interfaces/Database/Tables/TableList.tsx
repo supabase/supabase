@@ -230,9 +230,11 @@ const TableList = ({
                           <p>{x.name}</p>
                         )}
                       </Table.td>
-                      <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
+                      <Table.td className="hidden lg:table-cell ">
                         {x.comment !== null ? (
-                          <p title={x.comment}>{x.comment}</p>
+                          <span className="lg:max-w-48 truncate inline-block" title={x.comment}>
+                            {x.comment}
+                          </span>
                         ) : (
                           <p className="text-border-stronger">No description</p>
                         )}

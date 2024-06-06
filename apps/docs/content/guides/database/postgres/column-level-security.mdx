@@ -28,7 +28,7 @@ For example, let's assume you have a `posts` table with the following columns:
 You can restrict updates to just the user who created it using [RLS](/docs/guides/auth#row-level-security), with the following policy:
 
 ```sql
-create a policy "Allow update for owners" on posts for
+create policy "Allow update for owners" on posts for
 update
   using ((select auth.uid()) = user_id);
 ```
@@ -127,7 +127,7 @@ supabase migration new create_posts_table
       );
 
       -- Add row-level security
-      create a policy "Allow update for owners" on posts for
+      create policy "Allow update for owners" on posts for
       update
       using ((select auth.uid()) = user_id);
 

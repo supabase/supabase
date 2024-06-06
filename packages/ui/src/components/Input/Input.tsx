@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -34,6 +36,9 @@ export interface Props
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ */
 function Input({
   autoComplete,
   autoFocus,
@@ -194,6 +199,9 @@ function Input({
   )
 }
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string

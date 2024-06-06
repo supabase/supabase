@@ -5,6 +5,7 @@ import { pricing } from './pricing'
 import { products } from './products'
 import questions from './questions'
 import extensions from './extensions.json'
+import config from './config'
 
-export { tweets, logConstants, plans, pricing, products, questions, extensions }
+export { config, tweets, logConstants, plans, pricing, products, questions, extensions }
 export type { PricingInformation }

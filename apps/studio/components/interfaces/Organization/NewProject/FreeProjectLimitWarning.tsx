@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Admonition, Button, IconAlertCircle } from 'ui'
+import { Button, IconAlertCircle } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import InformationBox from 'components/ui/InformationBox'
 import type { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'

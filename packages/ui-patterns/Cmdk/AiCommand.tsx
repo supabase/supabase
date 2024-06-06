@@ -357,7 +357,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
+      <div className={cn('relative mb-[145px] py-4')}>
         {!hasError &&
           messages.map((message, index) => {
             switch (message.role) {
@@ -379,7 +379,7 @@ const AiCommand = () => {
                 )
               case MessageRole.Assistant:
                 return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-[150px]">
+                  <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
                     <div className="flex gap-6 [overflow-anchor:none] mb-6">
                       <AiIconChat
                         loading={
@@ -393,10 +393,14 @@ const AiCommand = () => {
                         ) : (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
-                            linkTarget="_blank"
+                            components={{
+                              ...markdownComponents,
+                              a: (props) => (
+                                <a {...props} target="_blank" rel="noopener noreferrer" />
+                              ),
+                            }}
                             className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
+                            urlTransform={(href: string) => {
                               const supabaseUrl = new URL('https://supabase.com')
                               const linkUrl = new URL(href, 'https://supabase.com')
 

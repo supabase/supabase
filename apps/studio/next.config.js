@@ -374,6 +374,16 @@ const nextConfig = {
         source: '/project/:ref/database/linter',
         destination: '/project/:ref/database/security-advisor',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/database/security-advisor',
+        destination: '/project/:ref/advisors/security',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/performance-advisor',
+        destination: '/project/:ref/advisors/performance',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -429,7 +439,15 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'libpg-query',
+  ],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)

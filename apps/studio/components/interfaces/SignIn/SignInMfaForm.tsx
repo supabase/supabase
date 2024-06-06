@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { object, string } from 'yup'
+import * as Sentry from '@sentry/nextjs'
 
 import { useTelemetryProps } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -22,9 +23,11 @@ const signInSchema = object({
 })
 
 const SignInMfaForm = () => {
-  const queryClient = useQueryClient()
   const router = useRouter()
+  const signOut = useSignOut()
+  const queryClient = useQueryClient()
   const telemetryProps = useTelemetryProps()
+  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
 
   const {
     data: factors,
@@ -33,35 +36,17 @@ const SignInMfaForm = () => {
     isSuccess: isSuccessFactors,
     isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
-  const {
-    mutateAsync: mfaChallengeAndVerify,
-    isLoading,
-    isSuccess,
-  } = useMfaChallengeAndVerifyMutation()
-  const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
-  const signOut = useSignOut()
+  const { mutate: mfaChallengeAndVerify, isLoading, isSuccess } = useMfaChallengeAndVerifyMutation()
 
   const onClickLogout = async () => {
     await signOut()
     await router.replace('/sign-in')
   }
 
-  useEffect(() => {
-    if (isSuccessFactors) {
-      // if the user wanders into this page and he has no MFA setup, send the user to the next screen
-      if (factors.totp.length === 0) {
-        queryClient.resetQueries().then(() => router.push(getReturnToPath()))
-      }
-      if (factors.totp.length > 0) {
-        setSelectedFactor(factors.totp[0])
-      }
-    }
-  }, [factors?.totp, isSuccessFactors, router, queryClient])
-
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = toast.loading('Signing in...')
     if (selectedFactor) {
-      await mfaChallengeAndVerify(
+      mfaChallengeAndVerify(
         { factorId: selectedFactor.id, code, refreshFactors: false },
         {
           onSuccess: async () => {
@@ -75,12 +60,25 @@ const SignInMfaForm = () => {
             router.push(getReturnToPath())
           },
           onError: (error) => {
-            toast.error((error as AuthError).message, { id: toastId })
+            toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
+            Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + error.message)
           },
         }
       )
     }
   }
+
+  useEffect(() => {
+    if (isSuccessFactors) {
+      // if the user wanders into this page and he has no MFA setup, send the user to the next screen
+      if (factors.totp.length === 0) {
+        queryClient.resetQueries().then(() => router.push(getReturnToPath()))
+      }
+      if (factors.totp.length > 0) {
+        setSelectedFactor(factors.totp[0])
+      }
+    }
+  }, [factors?.totp, isSuccessFactors, router, queryClient])
 
   return (
     <>

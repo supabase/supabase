@@ -655,6 +655,7 @@ parameters:
       - `github`
       - `gitlab`
       - `google`
+      - `kakao`
       - `keycloak`
       - `linkedin`
       - `notion`
