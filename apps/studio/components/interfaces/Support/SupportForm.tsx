@@ -36,6 +36,7 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -177,6 +178,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     allowSupportAccess: false,
   }
 
+  const { site } = useCommandMenu()
+  const router = useRouter()
+
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
     const items = event.target.files || (event as any).dataTransfer.items
@@ -307,6 +311,162 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
       {...props}
     />
   )
+
+  function generateLink(pageType: PageType, link: string): string {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        if (site === 'docs') {
+          return link
+        } else if (site === 'website') {
+          return `/docs${link}`
+        } else {
+          return `https://supabase.com/docs${link}`
+        }
+      case PageType.Integration:
+        if (site === 'website') {
+          return link
+        } else {
+          return `https://supabase.com${link}`
+        }
+      case PageType.GithubDiscussion:
+        return link
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
+
+  async function handleLinkClick(pageType: PageType, link: string) {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        if (site === 'docs') {
+          await router.push(link)
+        } else if (site === 'website') {
+          await router.push(`/docs${link}`)
+        } else {
+          window.open(`https://supabase.com/docs${link}`, '_blank')
+        }
+        break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
+        }
+        break
+      case PageType.GithubDiscussion:
+        window.open(link, '_blank')
+        break
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
+
+  function formatSectionUrl(page: Page, section: PageSection): string {
+    switch (page.type) {
+      case PageType.Markdown:
+      case PageType.GithubDiscussion:
+        return `${generateLink(page.type, page.path)}#${section.slug ?? ''}`
+      case PageType.Reference:
+        return `${generateLink(page.type, page.path)}/${section.slug ?? ''}`
+      case PageType.Integration:
+        return generateLink(page.type, page.path) // Assuming no section slug for Integration pages
+      default:
+        throw new Error(`Unknown page type '${page.type}'`)
+    }
+  }
+
+  const cardBaseClasses =
+    'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-sm flex items-center justify-between'
+
+  interface DocsLinkGroup {
+    page: Page
+  }
+
+  const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
+    const handleClick = (e: React.MouseEvent, pageType: PageType, link: string) => {
+      e.preventDefault()
+      handleLinkClick(pageType, link)
+    }
+
+    const link = generateLink(page.type, page.path)
+
+    return (
+      <ul key={page.id} className="grid gap-2">
+        <li key={`${page.path}-group`} className="p-2 mb-2">
+          <Link
+            target="_blank"
+            rel="noreferrer"
+            href={link}
+            className={cn(cardBaseClasses, 'flex items-center justify-between pr-5')}
+          >
+            <div className="grow flex gap-3 items-center">
+              <div>{getPageIcon(page)}</div>
+              <div className="flex flex-col gap-0">
+                <span className="text-sm">
+                  <TextHighlighter text={page.title} query="test" />
+                </span>
+                {(page.description || page.subtitle) && (
+                  <div className="text-xs text">
+                    <TextHighlighter text={page.description || page.subtitle || ''} query="test" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChevronRight />
+          </Link>
+          {page.sections.length > 0 && (
+            <ul className="border-l border-default ml-3 pt-3 grid gap-2">
+              {page.sections.map((section: PageSection, i) => (
+                <DocsLinkSection
+                  key={`${page.path}__${section.heading}-item-${i}`}
+                  page={page}
+                  section={section}
+                />
+              ))}
+            </ul>
+          )}
+        </li>
+      </ul>
+    )
+  }
+
+  interface DocsLinkSection {
+    page: Page
+    section: PageSection
+  }
+
+  const DocsLinkSection = ({ page, section }: DocsLinkSection) => {
+    const sectionLink = formatSectionUrl(page, section)
+
+    return (
+      <ul key={`${section.heading}-group`} className="grid gap-2">
+        <li key={`${section.heading}-item`} className="p-2 mb-2">
+          <Link target="_blank" href={sectionLink} className={cn(cardBaseClasses)}>
+            <div className="grow flex gap-3 items-center">
+              <div>{getPageIcon(page)}</div>
+              <div className="grid gap-1.5">
+                <span>
+                  <TextHighlighter
+                    className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
+                    text={section.heading}
+                    query="test"
+                  />
+                </span>
+                {section.heading && (
+                  <div className="text text-xs ">
+                    <TextHighlighter text={section.heading} query="test" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChevronRight />
+          </Link>
+        </li>
+      </ul>
+    )
+  }
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
@@ -916,33 +1076,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
 
 export default SupportForm
 
-export function formatPageUrl(page: Page) {
-  switch (page.type) {
-    case PageType.Markdown:
-    case PageType.Reference:
-    case PageType.Integration:
-    case PageType.GithubDiscussion:
-      return page.path
-    default:
-      throw new Error(`Unknown page type '${page.type}'`)
-  }
-}
-
-export function formatSectionUrl(page: Page, section: PageSection) {
-  switch (page.type) {
-    case PageType.Markdown:
-    case PageType.GithubDiscussion:
-      return `${formatPageUrl(page)}#${section.slug ?? ''}`
-    case PageType.Reference:
-      return `${formatPageUrl(page)}/${section.slug ?? ''}`
-    case PageType.Integration:
-      // [Charis] Markdown headings on integrations pages don't have slugs yet
-      return formatPageUrl(page)
-    default:
-      throw new Error(`Unknown page type '${page.type}'`)
-  }
-}
-
 export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
@@ -967,85 +1100,4 @@ export function getPageSectionIcon(page: Page) {
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
-}
-
-const cardBaseClasses =
-  'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-sm flex items-center justify-between'
-
-interface DocsLinkGroup {
-  page: Page
-}
-
-const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
-  return (
-    <ul key={page.id} className="grid gap-2">
-      <li key={`${page.path}-group`} className="p-2 mb-2">
-        <Link
-          target="blank"
-          href={formatPageUrl(page)}
-          className={cn(cardBaseClasses, 'flex items-center justify-between pr-5')}
-        >
-          <div className="grow flex gap-3 items-center">
-            <div>{getPageIcon(page)}</div>
-            <div className="flex flex-col gap-0">
-              <span className="text-sm">
-                <TextHighlighter text={page.title} query="test" />
-              </span>
-              {(page.description || page.subtitle) && (
-                <div className="text-xs text">
-                  <TextHighlighter text={page.description || page.subtitle || ''} query="test" />
-                </div>
-              )}
-            </div>
-          </div>
-          <ChevronRight />
-        </Link>
-        {page.sections.length > 0 && (
-          <ul className="border-l border-default ml-3 pt-3 grid gap-2">
-            {page.sections.map((section: PageSection, i) => (
-              <DocsLinkSection
-                key={`${page.path}__${section.heading}-item-${i}`}
-                page={page}
-                section={section}
-              />
-            ))}
-          </ul>
-        )}
-      </li>
-    </ul>
-  )
-}
-
-interface DocsLinkSection {
-  page: Page
-  section: PageSection
-}
-
-const DocsLinkSection = ({ page, section }: DocsLinkSection) => {
-  return (
-    <ul key={`${section.heading}-group`} className="grid gap-2">
-      <li key={`${section.heading}-item`} className="p-2 mb-2">
-        <Link target="blank" href={formatSectionUrl(page, section)} className={cn(cardBaseClasses)}>
-          <div className="grow flex gap-3 items-center">
-            <div>{getPageIcon(page)}</div>
-            <div className="grid gap-1.5">
-              <span>
-                <TextHighlighter
-                  className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
-                  text={section.heading}
-                  query="test"
-                />
-              </span>
-              {section.heading && (
-                <div className="text text-xs ">
-                  <TextHighlighter text={section.heading} query="test" />
-                </div>
-              )}
-            </div>
-          </div>
-          <ChevronRight />
-        </Link>
-      </li>
-    </ul>
-  )
 }
