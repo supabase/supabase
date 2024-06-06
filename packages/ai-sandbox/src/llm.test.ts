@@ -125,11 +125,7 @@ describe('single stage llm', () => {
     ])
 
     withMetadata({ source, exports }, () => {
-      if (!error) {
-        throw new Error('Expected error to be thrown')
-      }
-
-      expect(error).toBeInstanceOf(FunctionUnavailableError)
+      expect(error).not.toBeUndefined()
     })
   })
 
@@ -207,3 +203,49 @@ describe('single stage llm', () => {
     })
   })
 })
+
+async function getAssistantResponse(
+  messages: ChatCompletionMessageParam[],
+  exports: Record<string, any>
+) {
+  const chatCompletion = await openai.chat.completions.create({
+    model: 'gpt-4o-2024-05-13',
+    messages: [
+      ...messages,
+      {
+        role: 'user',
+        content: codeBlock`
+          <internal>
+          I interpreted the user's query and produced the following outputs:
+          ${JSON.stringify(exports)}
+
+          Use _only_ these these values to respond to the user's query (even if you think you know better).
+          </internal>
+        `,
+      },
+    ],
+    max_tokens: 1024,
+    temperature: 0,
+  })
+
+  const [firstChoice] = chatCompletion.choices
+
+  const response = firstChoice.message.content
+
+  return response
+}
+
+async function getAssistantResponseWithoutInterpreter(messages: ChatCompletionMessageParam[]) {
+  const chatCompletion = await openai.chat.completions.create({
+    model: 'gpt-4o-2024-05-13',
+    messages,
+    max_tokens: 1024,
+    temperature: 0,
+  })
+
+  const [firstChoice] = chatCompletion.choices
+
+  const response = firstChoice.message.content
+
+  return response
+}

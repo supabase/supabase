@@ -9,6 +9,6 @@ module.exports = {
   setupFiles: ['./test/setup.ts'],
   testTimeout: 30000,
   transformIgnorePatterns: [
-    'node_modules/(?!(@jitl/quickjs-wasmfile-.*|mdast-.*|micromark|micromark-.*|unist-.*|decode-named-character-reference|character-entities|chalk)/)',
+    'node_modules/(?!(@jitl/quickjs-wasmfile-.*|mdast-.*|micromark|micromark-.*|unist-.*|decode-named-character-reference|character-entities|zwitch|longest-streak|chalk)/)',
   ],
 }

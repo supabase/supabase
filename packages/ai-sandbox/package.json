@@ -10,8 +10,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "ai": "^3.1.30",
     "core-js": "^3.37.1",
     "mdast-util-from-markdown": "^2.0.1",
+    "mdast-util-to-markdown": "^2.1.0",
     "openai": "^4.26.1",
     "quickjs-emscripten": "^0.29.1"
   },
@@ -20,6 +22,7 @@
     "@babel/preset-env": "^7.23.6",
     "@jest/globals": "^29.7.0",
     "@types/common-tags": "^1.8.4",
+    "@types/mdast": "^4.0.4",
     "babel-jest": "^29.7.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
     "chalk": "^5.3.0",
