@@ -15,7 +15,6 @@
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
-
     "docs#build": {
       "dependsOn": ["^build"],
       "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_API_KEY"],
