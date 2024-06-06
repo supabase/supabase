@@ -57,10 +57,12 @@ const InfrastructureInfo = () => {
   return (
     <>
       <ScaffoldDivider />
-
-      <InstanceConfiguration />
-
-      <ScaffoldDivider />
+      {project?.cloud_provider !== 'FLY' && (
+        <>
+          <InstanceConfiguration />
+          <ScaffoldDivider />
+        </>
+      )}
 
       <ScaffoldContainer>
         <ScaffoldSection>

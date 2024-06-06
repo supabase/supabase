@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
@@ -83,6 +84,7 @@ export const useProjectCreateMutation = ({
         } else {
           onError(data, variables, context)
         }
+        Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
       },
       ...options,
     }
