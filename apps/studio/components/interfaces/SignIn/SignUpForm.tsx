@@ -20,6 +20,8 @@ import {
 } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
+const WHITELIST_ERRORS = ['A user with this email already exists']
+
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
 })
@@ -40,7 +42,10 @@ const SignUpForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign up: ${error.message}`)
-      Sentry.captureMessage('[CRITICAL] Failed to sign up: ' + error.message)
+
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign up: ' + error.message)
+      }
     },
   })
 
