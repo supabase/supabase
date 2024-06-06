@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export const getMaxConnectionsQuery = () => {
   const sql = /* SQL */ `show max_connections`
@@ -15,7 +15,7 @@ export type MaxConnectionsVariables = {
 }
 
 export type MaxConnectionsData = { maxConnections: number }
-export type MaxConnectionsError = unknown
+export type MaxConnectionsError = ExecuteSqlError
 
 export const useMaxConnectionsQuery = <TData extends MaxConnectionsData = MaxConnectionsData>(
   { projectRef, connectionString }: MaxConnectionsVariables,

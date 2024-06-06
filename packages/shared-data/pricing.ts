@@ -110,6 +110,16 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Branching',
+        plans: {
+          free: false,
+          pro: '$0.32 per branch, per day',
+          team: '$0.32 per branch, per day',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Bandwidth',
         tooltips: {
           main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',

@@ -33,45 +33,43 @@ const PolicyEditor = ({
 
   return (
     <div>
-      <div className="space-y-8 py-8">
-        <Modal.Content>
-          <PolicyName
-            name={policyFormFields.name}
-            limit={63}
-            onUpdatePolicyName={(name) => onUpdatePolicyFormFields({ name })}
-          />
-        </Modal.Content>
-        <Modal.Separator />
-        {isNewPolicy && (
-          <>
-            <Modal.Content>
-              <PolicyAllowedOperation
-                operation={operation}
-                onSelectOperation={(command) => onUpdatePolicyFormFields({ command })}
-              />
-            </Modal.Content>
-            <Modal.Separator />
-          </>
-        )}
-        <Modal.Content>
-          <PolicyRoles
-            selectedRoles={selectedRoles}
-            onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
-          />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
-          <PolicyDefinition
-            operation={operation}
-            definition={definition}
-            check={check}
-            onUpdatePolicyUsing={(definition: string | undefined) =>
-              onUpdatePolicyFormFields({ definition })
-            }
-            onUpdatePolicyCheck={(check: string | undefined) => onUpdatePolicyFormFields({ check })}
-          />
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <PolicyName
+          name={policyFormFields.name}
+          limit={63}
+          onUpdatePolicyName={(name) => onUpdatePolicyFormFields({ name })}
+        />
+      </Modal.Content>
+      <Modal.Separator />
+      {isNewPolicy && (
+        <>
+          <Modal.Content>
+            <PolicyAllowedOperation
+              operation={operation}
+              onSelectOperation={(command) => onUpdatePolicyFormFields({ command })}
+            />
+          </Modal.Content>
+          <Modal.Separator />
+        </>
+      )}
+      <Modal.Content>
+        <PolicyRoles
+          selectedRoles={selectedRoles}
+          onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
+        />
+      </Modal.Content>
+      <Modal.Separator />
+      <Modal.Content>
+        <PolicyDefinition
+          operation={operation}
+          definition={definition}
+          check={check}
+          onUpdatePolicyUsing={(definition: string | undefined) =>
+            onUpdatePolicyFormFields({ definition })
+          }
+          onUpdatePolicyCheck={(check: string | undefined) => onUpdatePolicyFormFields({ check })}
+        />
+      </Modal.Content>
       <PolicyEditorFooter
         showTemplates={isNewPolicy}
         onViewTemplates={onViewTemplates}

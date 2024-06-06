@@ -1,28 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import type {
+  EnvironmentTargets,
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
+import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconClock,
   Switch,
-  cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { ScaffoldDivider } from 'components/layouts/Scaffold'
-import type {
-  Integration,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 
 const VercelIntegrationConnectionForm = ({
   connection,
@@ -31,89 +26,63 @@ const VercelIntegrationConnectionForm = ({
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
-  const config = connection.metadata.supabaseConfig
+  const envSyncTargets = connection.env_sync_targets ?? []
 
   const FormSchema = z.object({
-    environmentVariablesProduction: z
-      .boolean()
-      .default(config?.environmentVariables?.production ?? true),
-    authRedirectUrisProduction: z.boolean().default(config?.authRedirectUris?.production ?? true),
-    environmentVariablesPreview: z.boolean().default(config?.environmentVariables?.preview ?? true),
-    authRedirectUrisPreview: z.boolean().default(config?.authRedirectUris?.preview ?? true),
+    environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),
+    environmentVariablesPreview: z.boolean().default(envSyncTargets.includes('preview')),
+    environmentVariablesDevelopment: z.boolean().default(envSyncTargets.includes('development')),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      environmentVariablesProduction: config?.environmentVariables?.production ?? true,
-      environmentVariablesPreview: config?.environmentVariables?.preview ?? true,
-      authRedirectUrisProduction: config?.authRedirectUris?.production ?? true,
-      authRedirectUrisPreview: config?.authRedirectUris?.preview ?? true,
+      environmentVariablesProduction: envSyncTargets.includes('production'),
+      environmentVariablesPreview: envSyncTargets.includes('preview'),
+      environmentVariablesDevelopment: envSyncTargets.includes('development'),
     },
   })
 
   const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
-    onSuccess: (data) => {
-      toast.success(`Updated Supabase directory`)
-    },
+    onSuccess: () => toast.success(`Updated Vercel connection`),
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    const metadata = {
-      ...connection.metadata,
-    }
+    const {
+      environmentVariablesProduction,
+      environmentVariablesPreview,
+      environmentVariablesDevelopment,
+    } = data
 
-    metadata.supabaseConfig = {
-      environmentVariables: {
-        production: data.environmentVariablesProduction,
-        preview: data.environmentVariablesPreview,
-      },
-      authRedirectUris: {
-        production: data.authRedirectUrisProduction,
-        preview: data.authRedirectUrisPreview,
-      },
-    }
+    const envSyncTargets: string[] = []
+
+    if (environmentVariablesProduction) envSyncTargets.push('production')
+    if (environmentVariablesPreview) envSyncTargets.push('preview')
+    if (environmentVariablesDevelopment) envSyncTargets.push('development')
 
     updateVercelConnection({
       id: connection.id,
-      metadata,
+      envSyncTargets: envSyncTargets as EnvironmentTargets[],
       organizationIntegrationId: integration.id,
     })
   }
 
   return (
     <Form_Shadcn_ {...form}>
-      <div className="py-4 px-8">
-        <Alert_Shadcn_ variant="default">
-          <IconClock className="h-4 w-4" strokeWidth={2} />
-          <AlertTitle_Shadcn_>Vercel Connection configuration coming soon</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            This configuration will allow you to control the environment variables and auth
-            redirects for production and preview deployments.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
-      <ScaffoldDivider />
-      <form onSubmit={form.handleSubmit(onSubmit)} className={cn('w-full space-y-6')}>
-        <div>
-          {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
-          <div className="flex flex-col gap-6 px-8 py-8">
-            <h5 className="text-foreground text-sm">Vercel Production deployments </h5>
+      <form onSubmit={form.handleSubmit(onSubmit)} className={'w-full space-y-6'}>
+        <div className="px-6 py-4 flex flex-col gap-y-4">
+          <h5 className="text-foreground text-sm">
+            Sync environment variables for selected target environments
+          </h5>
+          <div className="flex flex-col gap-4">
             <FormField_Shadcn_
               control={form.control}
               name="environmentVariablesProduction"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">
-                      Sync environment variables for Vercel Production deployments
-                    </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Deploy Edge Functions when merged into Production Branch
-                    </FormDescription_Shadcn_>
-                  </div>
+                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -121,55 +90,23 @@ const VercelIntegrationConnectionForm = ({
                       }}
                     />
                   </FormControl_Shadcn_>
-                </FormItem_Shadcn_>
-              )}
-            />
-            {/* <Button htmlType="submit">Submit</Button> */}
-            <FormField_Shadcn_
-              control={form.control}
-              name="authRedirectUrisProduction"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
                   <div>
-                    <FormLabel_Shadcn_ className="!text">
-                      Auto update Auth Redirect URIs for Vercel Production Deployments
-                    </FormLabel_Shadcn_>
+                    <FormLabel_Shadcn_ className="!text">Production</FormLabel_Shadcn_>
                     <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Deploy Edge Functions when merged into Production Branch
+                      Sync environment variables for <code>production</code> environment.
                     </FormDescription_Shadcn_>
                   </div>
-                  <FormControl_Shadcn_>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={(e) => {
-                        field.onChange(e)
-                        form.handleSubmit(onSubmit)()
-                      }}
-                    />
-                  </FormControl_Shadcn_>
                 </FormItem_Shadcn_>
               )}
             />
-          </div>
-          <ScaffoldDivider />
-          <div className="flex flex-col gap-6 px-8 py-8">
-            <h5 className="text-foreground text-sm">Vercel Preview deployments </h5>
             <FormField_Shadcn_
               control={form.control}
               name="environmentVariablesPreview"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">
-                      Sync environment variables for Vercel Preview Deployments
-                    </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Preview deployments will be able to connect to Supabase Database Preview
-                      branches
-                    </FormDescription_Shadcn_>
-                  </div>
+                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -177,24 +114,23 @@ const VercelIntegrationConnectionForm = ({
                       }}
                     />
                   </FormControl_Shadcn_>
+                  <div>
+                    <FormLabel_Shadcn_ className="!text">Preview</FormLabel_Shadcn_>
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                      Sync environment variables for <code>preview</code> environment.
+                    </FormDescription_Shadcn_>
+                  </div>
                 </FormItem_Shadcn_>
               )}
             />
             <FormField_Shadcn_
               control={form.control}
-              name="authRedirectUrisPreview"
+              name="environmentVariablesDevelopment"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">
-                      Auto update Auth Redirect URIs for Vercel Preview Deployments
-                    </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Deploy Edge Functions when merged into Production Branch
-                    </FormDescription_Shadcn_>
-                  </div>
+                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -202,12 +138,17 @@ const VercelIntegrationConnectionForm = ({
                       }}
                     />
                   </FormControl_Shadcn_>
+                  <div>
+                    <FormLabel_Shadcn_ className="!text">Development</FormLabel_Shadcn_>
+                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                      Sync environment variables for <code>development</code> environment.
+                    </FormDescription_Shadcn_>
+                  </div>
                 </FormItem_Shadcn_>
               )}
             />
           </div>
         </div>
-        {/* <Button htmlType="submit">Submit</Button> */}
       </form>
     </Form_Shadcn_>
   )

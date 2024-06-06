@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type PitrRestoreVariables = {
@@ -14,7 +14,7 @@ export async function restoreFromPitr({ ref, recovery_time_target_unix }: PitrRe
     params: { path: { ref } },
     body: { recovery_time_target_unix },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

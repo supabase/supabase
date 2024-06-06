@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -15,7 +15,7 @@ export async function resetBranch({ id }: Pick<BranchResetVariables, 'id'>) {
     params: { path: { branch_id: id } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

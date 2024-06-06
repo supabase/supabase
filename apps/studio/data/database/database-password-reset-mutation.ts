@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
 import type { ResponseError } from 'types'
 
@@ -18,7 +18,7 @@ export async function resetDatabasePassword({ ref, password }: DatabasePasswordR
     body: { password },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

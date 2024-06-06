@@ -5,6 +5,6 @@
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "./../../packages/ui/src/**/*.d.ts"],
   "exclude": ["node_modules"]
 }

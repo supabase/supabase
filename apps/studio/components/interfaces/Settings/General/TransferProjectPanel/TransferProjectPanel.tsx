@@ -14,7 +14,7 @@ const TransferProjectPanel = () => {
     <section id="transfer-project">
       <FormHeader
         title="Transfer Project"
-        description="Transfer your project to a different organization with no downtime."
+        description="Transfer your project to a different organization."
       />
       <Panel>
         <Panel.Content>

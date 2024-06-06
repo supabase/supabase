@@ -579,7 +579,14 @@ class StorageExplorerStore {
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
-      const formattedFileName = file.path && isWithinFolder ? file.path : fileName
+      const unsanitizedFormattedFileName =
+        has(file, ['path']) && isWithinFolder ? file.path : fileName
+      /**
+       * Storage maintains a list of allowed characters, which excludes
+       * characters such as the narrow no-break space used in Mac screenshots.
+       * To preempt errors, replace all non-word characters with underscores.
+       */
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(/[^\w.-]/g, '_')
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
@@ -1206,7 +1213,7 @@ class StorageExplorerStore {
       })
     } catch (error: any) {
       if (!error.message.includes('aborted')) {
-        toast.error(`Failed to retrieve folder contents from "${prefix}": ${error.message}`)
+        toast.error(`Failed to retrieve more folder contents: ${error.message}`)
       }
     }
   }
@@ -1425,8 +1432,8 @@ class StorageExplorerStore {
         (fileCache) => !fileIds.includes(fileCache.id)
       )
       this.filePreviewCache = updatedFilePreviewCache
-    } catch (e) {
-      toast.error(`Failed to rename folder to ${newName}`, { id: toastId })
+    } catch (e: any) {
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
     }
   }
 

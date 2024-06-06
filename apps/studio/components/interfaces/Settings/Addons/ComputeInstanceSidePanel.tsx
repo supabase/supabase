@@ -470,15 +470,13 @@ const ComputeInstanceSidePanel = () => {
         header="Confirm to upgrade compute instance now"
       >
         <Modal.Content>
-          <div className="py-6">
-            <Alert
-              withIcon
-              variant="warning"
-              title="Your project will need to be restarted when changing its compute size"
-            >
-              Your project will be unavailable for up to 2 minutes while the changes take place.
-            </Alert>
-          </div>
+          <Alert
+            withIcon
+            variant="warning"
+            title="Your project will need to be restarted when changing its compute size"
+          >
+            Your project will be unavailable for up to 2 minutes while the changes take place.
+          </Alert>
         </Modal.Content>
       </Modal>
     </>

@@ -1,12 +1,16 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
+import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   TabsList_Shadcn_,
@@ -25,9 +29,6 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-import { useLocalStorageQuery } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { X } from 'lucide-react'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -39,8 +40,10 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const router = useRouter()
-  const { preset } = useParams()
+  const { ref, preset } = useParams()
   const { project } = useProjectContext()
+  const state = useDatabaseSelectorStateSnapshot()
+
   const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
   )
@@ -107,6 +110,10 @@ export const QueryPerformance = ({
     mostTimeConsumingQueries,
     slowestExecutionTime,
   ])
+
+  useEffect(() => {
+    state.setSelectedDatabaseId(ref)
+  }, [ref])
 
   return (
     <>
@@ -194,7 +201,7 @@ export const QueryPerformance = ({
         >
           <X size="14" />
         </Button>
-        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>
           <p className="text-xs text-foreground-light">
             Consider resetting the analysis after optimizing any queries
@@ -207,11 +214,21 @@ export const QueryPerformance = ({
             Reset report
           </Button>
         </div>
-        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>How is this report generated?</p>
           <Markdown
             className="text-xs"
             content="This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](https://supabase.com/docs/guides/platform/performance#examining-query-performance)."
+          />
+        </div>
+
+        <div className="w-[33%] flex flex-col gap-y-1 text-sm">
+          <p>Inspect your database for potential issues</p>
+          <Markdown
+            className="text-xs"
+            content="The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
+            potential issues. [Learn more here](https://supabase.com/docs/guides/database/inspect)."
           />
         </div>
       </div>
