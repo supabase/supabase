@@ -9,7 +9,7 @@ export type OrganizationRolesV2Variables = {
   slug?: string
 }
 
-export type OrganizationRolesv2Response = components['schemas']['RoleResponseV2']
+export type OrganizationRolesv2Response = components['schemas']['OrganizationRoleResponseV2']
 
 export async function getOrganizationRolesV2(
   { slug }: OrganizationRolesV2Variables,

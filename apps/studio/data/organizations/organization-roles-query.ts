@@ -9,7 +9,7 @@ export type OrganizationRolesVariables = {
   slug?: string
 }
 
-export type OrganizationRole = components['schemas']['Role']
+export type OrganizationRole = components['schemas']['OrganizationRole']
 
 export type OrganizationRolesResponse = {
   roles: OrganizationRole[]
