@@ -1,9 +1,11 @@
-import { useMutation } from '@tanstack/react-query'
+import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
+import { ResponseError } from 'types'
 
-type signBucketObjectParams = {
+type SignBucketObjectParams = {
   projectRef: string
   bucketId?: string
   path: string
@@ -11,7 +13,7 @@ type signBucketObjectParams = {
   options?: components['schemas']['SignedUrlOptions']
 }
 export const signBucketObject = async (
-  { projectRef, bucketId, path, expiresIn, options }: signBucketObjectParams,
+  { projectRef, bucketId, path, expiresIn, options }: SignBucketObjectParams,
   signal?: AbortSignal
 ) => {
   if (!bucketId) throw new Error('bucketId is required')
@@ -31,8 +33,30 @@ export const signBucketObject = async (
   return data
 }
 
-export function useSignBucketObjectMutation() {
-  return useMutation({
-    mutationFn: signBucketObject,
-  })
+type SignBucketObjectData = Awaited<ReturnType<typeof signBucketObject>>
+
+export const useGetSignBucketObjectMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<SignBucketObjectData, ResponseError, SignBucketObjectParams>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>(
+    (vars) => signBucketObject(vars),
+    {
+      async onSuccess(data, variables, context) {
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to get sign bucket object: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }
