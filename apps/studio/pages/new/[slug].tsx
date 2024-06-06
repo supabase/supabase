@@ -1,23 +1,26 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
+import { ExternalLink, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox, Separator } from 'ui'
 
+import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import {
+  AVAILABLE_SIZES,
+  INSTANCE_SIZE_SPECS,
+} from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import type { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -28,18 +31,14 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
-  AWS_REGIONS,
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
-  FLY_REGIONS,
   PROVIDERS,
-  Region,
 } from 'lib/constants'
-import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { passwordStrength } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-
-type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
+import { Badge, Button, Input, Listbox } from 'ui'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -104,33 +103,6 @@ const Wizard: NextPageWithLayout = () => {
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
-
-  useEffect(() => {
-    /*
-     * Handle no org
-     * redirect to new org route
-     */
-    if (isEmptyOrganizations) {
-      router.push(`/new`)
-    }
-  }, [isEmptyOrganizations, router])
-
-  useEffect(() => {
-    /*
-     * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /new/new-project url, which is redirected from database.new
-     */
-    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
-    }
-  }, [isInvalidSlug, organizations])
-
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      toast.success('Successfully added new payment method')
-    }
-  }, [router.query.redirect_status, router.query.setup_intent])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -205,98 +177,32 @@ const Wizard: NextPageWithLayout = () => {
     delayedCheckPasswordStrength(password)
   }
 
-  // [Fran] Enforce APSE1 region on staging
-  function getAvailableRegions(cloudProvider: CloudProvider): Region {
-    if (cloudProvider === 'AWS') {
-      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
-        : AWS_REGIONS
-      // to do - may need to pluck regions for staging for FLY also
-    } else if (cloudProvider === 'FLY') {
-      return FLY_REGIONS
+  useEffect(() => {
+    /*
+     * Handle no org
+     * redirect to new org route
+     */
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
     }
+  }, [isEmptyOrganizations, router])
 
-    throw new Error('Invalid cloud provider')
-  }
+  useEffect(() => {
+    /*
+     * Redirect to first org if the slug doesn't match an org slug
+     * this is mainly to capture the /new/new-project url, which is redirected from database.new
+     */
+    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
+      router.push(`/new/${organizations?.[0].slug}`)
+    }
+  }, [isInvalidSlug, organizations])
 
-  const sizes: DesiredInstanceSize[] = [
-    'micro',
-    'small',
-    'medium',
-    'large',
-    'xlarge',
-    '2xlarge',
-    '4xlarge',
-    '8xlarge',
-    '12xlarge',
-    '16xlarge',
-  ]
-
-  const instanceSizeSpecs: Record<
-    DesiredInstanceSize,
-    { label: string; ram: string; cpu: string; price: string }
-  > = {
-    micro: {
-      label: 'Micro',
-      ram: '1 GB',
-      cpu: '2-core ARM',
-      price: '$0.01344/hour (~$10/month)',
-    },
-    small: {
-      label: 'Small',
-      ram: '2 GB',
-      cpu: '2-core ARM',
-      price: '$0.0206/hour (~$15/month)',
-    },
-    medium: {
-      label: 'Medium',
-      ram: '4 GB',
-      cpu: '2-core ARM',
-      price: '$0.0822/hour (~$60/month)',
-    },
-    large: {
-      label: 'Large',
-      ram: '8 GB',
-      cpu: '2-core ARM',
-      price: '$0.1517/hour (~$110/month)',
-    },
-    xlarge: {
-      label: 'XL',
-      ram: '16 GB',
-      cpu: '4-core ARM',
-      price: '$0.2877/hour (~$210/month)',
-    },
-    '2xlarge': {
-      label: '2XL',
-      ram: '32 GB',
-      cpu: '8-core ARM',
-      price: '$0.562/hour (~$410/month)',
-    },
-    '4xlarge': {
-      label: '4XL',
-      ram: '64 GB',
-      cpu: '16-core ARM',
-      price: '$1.32/hour (~$960/month)',
-    },
-    '8xlarge': {
-      label: '8XL',
-      ram: '128 GB',
-      cpu: '32-core ARM',
-      price: '$2.562/hour (~$1,870/month)',
-    },
-    '12xlarge': {
-      label: '12XL',
-      ram: '192 GB',
-      cpu: '48-core ARM',
-      price: '$3.836/hour (~$2,800/month)',
-    },
-    '16xlarge': {
-      label: '16XL',
-      ram: '256 GB',
-      cpu: '64-core ARM',
-      price: '$5.12/hour (~$3,730/month)',
-    },
-  }
+  useEffect(() => {
+    // User added a new payment method
+    if (router.query.setup_intent && router.query.redirect_status) {
+      toast.success('Successfully added new payment method')
+    }
+  }, [router.query.redirect_status, router.query.setup_intent])
 
   return (
     <Panel
@@ -358,7 +264,7 @@ const Wizard: NextPageWithLayout = () => {
                       key={x.id}
                       label={x.name}
                       value={x.slug}
-                      addOnBefore={() => <IconUsers />}
+                      addOnBefore={() => <Users size={18} />}
                     >
                       {x.name}
                     </Listbox.Option>
@@ -444,7 +350,7 @@ const Wizard: NextPageWithLayout = () => {
                             >
                               <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                 <p className="text-sm m-0">Compute Add-Ons</p>
-                                <IconExternalLink size={16} strokeWidth={1.5} />
+                                <ExternalLink size={16} strokeWidth={1.5} />
                               </div>
                             </Link>
 
@@ -454,7 +360,7 @@ const Wizard: NextPageWithLayout = () => {
                             >
                               <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                 <p className="text-sm m-0">Compute Billing</p>
-                                <IconExternalLink size={16} strokeWidth={1.5} />
+                                <ExternalLink size={16} strokeWidth={1.5} />
                               </div>
                             </Link>
                           </div>
@@ -476,11 +382,11 @@ const Wizard: NextPageWithLayout = () => {
                         </>
                       }
                     >
-                      {sizes.map((option) => {
+                      {AVAILABLE_SIZES.map((option) => {
                         return (
                           <Listbox.Option
                             key={option}
-                            label={`${instanceSizeSpecs[option].ram} RAM / ${instanceSizeSpecs[option].cpu} CPU (${instanceSizeSpecs[option].label})`}
+                            label={`${INSTANCE_SIZE_SPECS[option].ram} RAM / ${INSTANCE_SIZE_SPECS[option].cpu} CPU (${INSTANCE_SIZE_SPECS[option].label})`}
                             value={option}
                           >
                             <div className="flex space-x-2">
@@ -489,16 +395,16 @@ const Wizard: NextPageWithLayout = () => {
                                   variant={option === 'micro' ? 'default' : 'brand'}
                                   className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
                                 >
-                                  {instanceSizeSpecs[option].label}
+                                  {INSTANCE_SIZE_SPECS[option].label}
                                 </Badge>
                               </div>
                               <div className="text-sm">
                                 <span className="text-foreground">
-                                  {instanceSizeSpecs[option].ram} RAM /{' '}
-                                  {instanceSizeSpecs[option].cpu} CPU
+                                  {INSTANCE_SIZE_SPECS[option].ram} RAM /{' '}
+                                  {INSTANCE_SIZE_SPECS[option].cpu} CPU
                                 </span>
                                 <p className="text-xs text-muted">
-                                  {instanceSizeSpecs[option].price}
+                                  {INSTANCE_SIZE_SPECS[option].price}
                                 </p>
                               </div>
                             </div>
