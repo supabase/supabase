@@ -66,7 +66,7 @@ const GlobalNavigationMenu: FC = () => {
         orientation="horizontal"
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
-          <NavigationMenuList className="pl-5 pr-3 lg:px-10">
+          <NavigationMenuList className="pl-5 pr-3 lg:px-10 space-x-2">
             {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
               section[0].menuItems ? (
                 <NavigationMenuItem
@@ -121,7 +121,7 @@ const GlobalNavigationMenu: FC = () => {
                       href={section[0].href}
                       className={cn(
                         'relative flex-1 whitespace-nowrap border-b border-transparent flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-none p-2 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground h-[37px]',
-                        sectionIndex === 0 && '-ml-2',
+                        sectionIndex === 0 && '-ml-2.5',
                         activeParent === section[0].label && 'text-foreground border-foreground'
                       )}
                     >
