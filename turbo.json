@@ -13,7 +13,7 @@
         "SUPABASE_URL",
         "GITHUB_OAUTH_CLIENT_SECRET"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
