@@ -62,14 +62,12 @@ const ChangePaymentMethodModal = ({
         </div>
       }
     >
-      <div className="py-4">
-        <Modal.Content>
-          <p className="text-sm">
-            Upon clicking confirm, all future charges will be deducted from the card ending with{' '}
-            {selectedPaymentMethod?.card?.last4}. There are no immediate charges.
-          </p>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <p className="text-sm">
+          Upon clicking confirm, all future charges will be deducted from the card ending with{' '}
+          {selectedPaymentMethod?.card?.last4}. There are no immediate charges.
+        </p>
+      </Modal.Content>
     </Modal>
   )
 }

@@ -1,15 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import generator from 'generate-password-browser'
-import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { z } from 'zod'
-
+import { components } from 'api-types'
 import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
@@ -20,7 +11,7 @@ import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import type { components } from 'data/api'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -28,6 +19,7 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import generator from 'generate-password-browser'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
   CloudProvider,
@@ -36,6 +28,13 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { debounce } from 'lodash'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -53,7 +52,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { z } from 'zod'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 

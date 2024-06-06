@@ -20,7 +20,7 @@ export function getCellValueSql({
 }: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .select(column)
+    .select(`"${column}"`)
     .match(pkMatch)
     .toSql()
 }

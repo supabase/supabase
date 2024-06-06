@@ -479,6 +479,10 @@ module.exports = {
   cssVariable: "var(--background-button-default)",
   value: "hsl(0, 0%, 18%)"
 },
+"background-dialog-DEFAULT": {
+  cssVariable: "var(--background-dialog-default)",
+  value: "hsl(0, 0%, 7.1%)"
+},
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
   value: "hsl(0, 0%, 16.1%)"

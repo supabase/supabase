@@ -1,15 +1,20 @@
 import { Check, Clipboard } from 'lucide-react'
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
+import { cn } from 'ui'
 
-const CommandRender = ({ commands }: any) => {
-  return (
-    <div className="space-y-4">
-      {commands.map((item: any, idx: number) => {
-        return <Command key={`command-${idx}`} item={item} />
-      })}
-    </div>
-  )
-}
+const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
+  ({ commands, className }, ref) => {
+    return (
+      <div ref={ref} className={cn('space-y-4', className)}>
+        {commands.map((item: any, idx: number) => (
+          <Command key={`command-${idx}`} item={item} />
+        ))}
+      </div>
+    )
+  }
+)
+
+CommandRender.displayName = 'CommandRender'
 
 export default CommandRender
 
