@@ -290,7 +290,7 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 
   // if the user is already logged in return them to the account page
   if (session) {
-    throw redirect(303, '/account')
+    redirect(303, '/account')
   }
 
   return { url: url.origin }
@@ -327,7 +327,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  throw redirect(303, '/account')
+  redirect(303, '/account')
 }
 ```
 
@@ -345,7 +345,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  throw redirect(303, '/account')
+  redirect(303, '/account')
 }
 ```
 
@@ -449,7 +449,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
   const { session } = await safeGetSession()
 
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
 
   const { data: profile } = await supabase
@@ -500,7 +500,7 @@ export const actions: Actions = {
     const { session } = await safeGetSession()
     if (session) {
       await supabase.auth.signOut()
-      throw redirect(303, '/')
+      redirect(303, '/')
     }
   },
 }

@@ -1,9 +1,12 @@
+import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
 import { Button, Form, Input } from 'ui'
+
+const WHITELIST_ERRORS = ['New password should be different from the old password']
 
 const ResetPasswordForm = () => {
   const router = useRouter()
@@ -19,7 +22,10 @@ const ResetPasswordForm = () => {
       await auth.signOut({ scope: 'others' })
       await router.push('/projects')
     } else {
-      toast.error(error.message, { id: toastId })
+      toast.error(`Failed to save password: ${error.message}`, { id: toastId })
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to reset password: ' + error.message)
+      }
     }
   }
 

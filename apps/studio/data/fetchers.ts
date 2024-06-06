@@ -151,12 +151,14 @@ export const options: typeof _options = async (url, init) => {
 }
 
 export const handleError = (error: any): never => {
-  if (error && error.msg) {
-    throw new Error(error.msg)
+  if (error && typeof error.msg === 'string') {
+    throw new Error(error.msg || 'API error happened while trying to communicate with the server.')
   }
 
-  if (error && error.message) {
-    throw new Error(error.message)
+  if (error && typeof error.message === 'string') {
+    throw new Error(
+      error.message || 'API error happened while trying to communicate with the server.'
+    )
   }
 
   console.error(error.stack)

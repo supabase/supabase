@@ -6,41 +6,52 @@ import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from 'hooks'
 
+interface ResourceContentProps {
+  apiEndpoint: string
+  resourceId: string
+  resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+  refreshDocs: () => void
+}
+
 const ResourceContent = ({
-  autoApiService,
+  apiEndpoint,
   resourceId,
   resources,
-  definitions,
-  paths,
   selectedLang,
   showApiKey,
   refreshDocs,
-}: any) => {
+}: ResourceContentProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
+  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { paths, definitions } = jsonSchema || {}
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
-      : autoApiService.endpoint
-
-  if (!paths || !definitions) return null
+      : apiEndpoint
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
-  const resourcePaths = paths[`/${resourceId}`]
-  const resourceDefinition = definitions[resourceId]
+  const resourcePaths = paths?.[`/${resourceId}`]
+  const resourceDefinition = definitions?.[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition?.description || null
+  const description = resourceDefinition?.description || ''
 
   const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
-  const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
+  const properties = Object.entries(resourceDefinition?.properties ?? []).map(([id, val]: any) => ({
     ...val,
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
+
+  if (!paths || !definitions) return null
 
   return (
     <>

@@ -9,6 +9,7 @@ import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { ChevronDownIcon, Clipboard, Download } from 'lucide-react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   Button,
@@ -16,9 +17,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconClipboard,
-  IconDownload,
 } from 'ui'
 
 export type ResultsDropdownProps = {
@@ -122,7 +120,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="text" iconRight={<IconChevronDown />}>
+        <Button type="text" iconRight={<ChevronDownIcon size={14} />}>
           Export
         </Button>
       </DropdownMenuTrigger>
@@ -137,15 +135,15 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       <DropdownMenuContent side="bottom" align="start">
         <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
-          <IconDownload size="tiny" />
+          <Download size={14} />
           <p>Download CSV</p>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
-          <IconClipboard size="tiny" />
+          <Clipboard size={14} />
           <p>Copy as markdown</p>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={onCopyAsJSON} className="space-x-2">
-          <IconClipboard size="tiny" />
+          <Clipboard size={14} />
           <p>Copy as JSON</p>
         </DropdownMenuItem>
       </DropdownMenuContent>
