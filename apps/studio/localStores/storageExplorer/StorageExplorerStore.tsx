@@ -1,7 +1,6 @@
-// @ts-nocheck
-import { createClient } from '@supabase/supabase-js'
+import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
+import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
 import { toast as UiToast } from 'ui'
@@ -10,8 +9,15 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
+import {
+  StorageColumn,
+  StorageItem,
+  StorageItemMetadata,
+  StorageItemWithColumn,
+} from 'components/to-be-cleaned/Storage/Storage.types'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { ToastLoader } from 'components/ui/ToastLoader'
 import { configKeys } from 'data/config/keys'
@@ -22,17 +28,20 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
 import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
 import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
+import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+
+type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
  * If we can switch to this method, we can remove the implementation below, and we don't need compose() within the react components
  */
-let store = null
+let store: StorageExplorerStore | null = null
 export function useStorageStore() {
-  if (store === null) store = new StorageExplorerStore(null)
+  if (store === null) store = new StorageExplorerStore()
   return store
 }
 
@@ -46,44 +55,44 @@ const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
 
 class StorageExplorerStore {
-  projectRef = ''
-  loaded = false
-  view = STORAGE_VIEWS.COLUMNS
-  sortBy = STORAGE_SORT_BY.NAME
-  sortByOrder = 'asc'
-  buckets = []
-  selectedBucket: { id?: string } = {}
-  columns = []
-  openedFolders = []
-  selectedItems = []
-  selectedItemsToDelete = []
-  selectedItemsToMove = []
-  selectedFilePreview = {}
-  selectedFileCustomExpiry = undefined
+  private projectRef: string = ''
+  view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
+  sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
+  sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
+  // selectedBucket will get initialized with a bucket before using
+  selectedBucket: Bucket = {} as Bucket
+  columns: StorageColumn[] = []
+  openedFolders: StorageItem[] = []
+  selectedItems: StorageItemWithColumn[] = []
+  selectedItemsToDelete: StorageItemWithColumn[] = []
+  selectedItemsToMove: StorageItemWithColumn[] = []
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null = null
+  selectedFileCustomExpiry: StorageItem | undefined = undefined
 
-  DEFAULT_OPTIONS = {
+  private DEFAULT_OPTIONS = {
     limit: LIMIT,
     offset: OFFSET,
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
-  /* Supabase client */
-  supabaseClient = null
-  /* [Joshen] Move towards using API */
-  endpoint = ''
+  /* Supabase client, will get initialized immediately after constructing the instance */
+  supabaseClient: SupabaseClient<any, 'public', any> = null as any as SupabaseClient<
+    any,
+    'public',
+    any
+  >
 
   /* FE Cacheing for file previews */
-  filePreviewCache = []
+  private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  uploadProgress = 0
+  private uploadProgress: number = 0
 
   /* Controllers to abort API calls */
-  abortController: AbortController | null = null
+  private abortController: AbortController | null = null
 
-  constructor(projectRef) {
+  constructor() {
     makeAutoObservable(this, { supabaseClient: false })
-    this.projectRef = projectRef
 
     // ignore when in a non-browser environment
     if (typeof window !== 'undefined') {
@@ -91,15 +100,23 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
+  initStore(
+    projectRef: string,
+    url: string,
+    serviceKey: string,
+    protocol: string = PROJECT_ENDPOINT_PROTOCOL
+  ) {
     this.projectRef = projectRef
-    this.endpoint = `${API_URL}/storage/${projectRef}`
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
+  private initializeSupabaseClient = (
+    serviceKey: string,
+    serviceEndpoint: string,
+    protocol: string
+  ) => {
     this.supabaseClient = createClient(
       `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
@@ -107,11 +124,10 @@ class StorageExplorerStore {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
-          multiTab: false,
           detectSessionInUrl: false,
-          localStorage: {
+          storage: {
             getItem: (key) => {
-              return undefined
+              return null
             },
             setItem: (key, value) => {},
             removeItem: (key) => {},
@@ -121,7 +137,7 @@ class StorageExplorerStore {
     )
   }
 
-  updateFileInPreviewCache = (fileCache) => {
+  private updateFileInPreviewCache = (fileCache: CachedFile) => {
     const updatedFilePreviewCache = this.filePreviewCache.map((file) => {
       if (file.id === fileCache.id) return fileCache
       return file
@@ -129,29 +145,21 @@ class StorageExplorerStore {
     this.filePreviewCache = updatedFilePreviewCache
   }
 
-  addFileToPreviewCache = (fileCache) => {
+  private addFileToPreviewCache = (fileCache: CachedFile) => {
     const updatedFilePreviewCache = this.filePreviewCache.concat([fileCache])
     this.filePreviewCache = updatedFilePreviewCache
   }
 
-  clearFilePreviewCache = () => {
-    this.filePreviewCache = []
-  }
-
-  getLocalStorageKey = () => {
+  private getLocalStorageKey = () => {
     return `supabase-storage-${this.projectRef}`
   }
 
-  getLatestColumnIndex = () => {
+  private getLatestColumnIndex = () => {
     return this.columns.length - 1
   }
 
-  getCurrentlySelectedBucket = () => {
-    return this.columns.length > 1 ? this.columns[1] : null
-  }
-
   // Probably refactor this to ignore bucket by default
-  getPathAlongOpenedFolders = (includeBucket = true) => {
+  private getPathAlongOpenedFolders = (includeBucket = true) => {
     if (includeBucket) {
       return this.openedFolders.length > 0
         ? `${this.selectedBucket.name}/${this.openedFolders.map((folder) => folder.name).join('/')}`
@@ -160,8 +168,8 @@ class StorageExplorerStore {
     return this.openedFolders.map((folder) => folder.name).join('/')
   }
 
-  abortApiCalls = () => {
-    this.abortController.abort()
+  private abortApiCalls = () => {
+    this.abortController?.abort()
     this.abortController = new AbortController()
   }
 
@@ -171,42 +179,34 @@ class StorageExplorerStore {
 
   /* UI specific methods */
 
-  setLoaded = (val) => {
-    this.loaded = val
-  }
-
-  setSelectedBucket = (bucket) => {
+  private setSelectedBucket = (bucket: Bucket) => {
     this.selectedBucket = bucket
     this.clearOpenedFolders()
     this.closeFilePreview()
     this.clearSelectedItems()
   }
 
-  setView = (view) => {
+  setView = (view: STORAGE_VIEWS) => {
     this.view = view
     this.closeFilePreview()
     this.updateExplorerPreferences()
   }
 
-  setSortBy = async (sortBy) => {
+  setSortBy = async (sortBy: STORAGE_SORT_BY) => {
     this.sortBy = sortBy
     this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
   }
 
-  setSortByOrder = async (sortByOrder) => {
+  setSortByOrder = async (sortByOrder: STORAGE_SORT_BY_ORDER) => {
     this.sortByOrder = sortByOrder
     this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
   }
 
-  clearColumns = () => {
-    this.columns = []
-  }
-
-  pushColumnAtIndex = (column, index) => {
+  private pushColumnAtIndex = (column: StorageColumn, index: number) => {
     this.columns = this.columns.slice(0, index + 1).concat([column])
   }
 
@@ -215,17 +215,17 @@ class StorageExplorerStore {
     this.columns = this.columns.slice(0, this.getLatestColumnIndex())
   }
 
-  popColumnAtIndex = (index) => {
+  popColumnAtIndex = (index: number) => {
     this.columns = this.columns.slice(0, index + 1)
   }
 
-  setColumnIsLoadingMore = (index, isLoadingMoreItems = true) => {
+  private setColumnIsLoadingMore = (index: number, isLoadingMoreItems: boolean = true) => {
     this.columns = this.columns.map((col, idx) => {
       return idx === index ? { ...col, isLoadingMoreItems } : col
     })
   }
 
-  pushOpenedFolderAtIndex = (folder, index) => {
+  pushOpenedFolderAtIndex = (folder: StorageItem, index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index).concat(folder)
   }
 
@@ -233,7 +233,7 @@ class StorageExplorerStore {
     this.openedFolders = this.openedFolders.slice(0, this.openedFolders.length - 1)
   }
 
-  popOpenedFoldersAtIndex = (index) => {
+  popOpenedFoldersAtIndex = (index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index + 1)
   }
 
@@ -241,11 +241,11 @@ class StorageExplorerStore {
     this.openedFolders = []
   }
 
-  setSelectedItems = (items) => {
+  setSelectedItems = (items: StorageItemWithColumn[]) => {
     this.selectedItems = items
   }
 
-  clearSelectedItems = (columnIndex) => {
+  clearSelectedItems = (columnIndex?: number) => {
     if (columnIndex !== undefined) {
       this.selectedItems = this.selectedItems.filter((item) => item.columnIndex !== columnIndex)
     } else {
@@ -253,7 +253,7 @@ class StorageExplorerStore {
     }
   }
 
-  setSelectedItemsToDelete = (items) => {
+  setSelectedItemsToDelete = (items: StorageItemWithColumn[]) => {
     this.selectedItemsToDelete = items
   }
 
@@ -261,7 +261,7 @@ class StorageExplorerStore {
     this.selectedItemsToDelete = []
   }
 
-  setSelectedItemsToMove = (items) => {
+  setSelectedItemsToMove = (items: StorageItemWithColumn[]) => {
     this.selectedItemsToMove = items
   }
 
@@ -269,19 +269,19 @@ class StorageExplorerStore {
     this.selectedItemsToMove = []
   }
 
-  setSelectedFileCustomExpiry = (item) => {
+  setSelectedFileCustomExpiry = (item: StorageItem | undefined) => {
     this.selectedFileCustomExpiry = item
   }
 
-  addNewFolderPlaceholder = (columnIndex) => {
+  addNewFolderPlaceholder = (columnIndex: number) => {
     const isPrepend = true
     const folderName = 'Untitled folder'
     const folderType = STORAGE_ROW_TYPES.FOLDER
     const columnIdx = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
-    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, {}, isPrepend)
+    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, null, isPrepend)
   }
 
-  addNewFolder = async (folderName, columnIndex) => {
+  addNewFolder = async (folderName: string, columnIndex: number) => {
     const autofix = false
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
@@ -321,7 +321,7 @@ class StorageExplorerStore {
     }
   }
 
-  setFilePreview = async (file) => {
+  setFilePreview = async (file: StorageItemWithColumn) => {
     const size = file.metadata?.size
     const mimeType = file.metadata?.mimetype
 
@@ -334,7 +334,7 @@ class StorageExplorerStore {
 
       // Either retrieve file preview from FE cache or retrieve signed url
       this.selectedFilePreview = { ...file, previewUrl: 'loading' }
-      const cachedPreview = find(this.filePreviewCache, { id: file.id })
+      const cachedPreview = this.filePreviewCache.find((cache) => cache.id === file.id)
 
       const fetchedAt = cachedPreview?.fetchedAt ?? null
       const expiresIn = cachedPreview?.expiresIn ?? null
@@ -342,7 +342,7 @@ class StorageExplorerStore {
       const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
 
       if (!isExpired) {
-        this.selectedFilePreview = { ...file, previewUrl: cachedPreview.url }
+        this.selectedFilePreview = { ...file, previewUrl: cachedPreview?.url }
       } else {
         const previewUrl = await this.fetchFilePreview(file.name)
         const formattedPreviewUrl = this.selectedBucket.public
@@ -350,8 +350,8 @@ class StorageExplorerStore {
           : previewUrl
         this.selectedFilePreview = { ...file, previewUrl: formattedPreviewUrl }
 
-        const fileCache = {
-          id: file.id,
+        const fileCache: CachedFile = {
+          id: file.id as string,
           url: previewUrl,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
@@ -363,28 +363,28 @@ class StorageExplorerStore {
         }
       }
     } else {
-      this.selectedFilePreview = { ...file, previewUrl: null }
+      this.selectedFilePreview = { ...file, previewUrl: undefined }
     }
   }
 
   closeFilePreview = () => {
-    this.selectedFilePreview = {}
+    this.selectedFilePreview = null
   }
 
-  getFileUrl = async (file, expiresIn = 0) => {
-    const filePreview = find(this.filePreviewCache, { id: file.id })
+  getFileUrl = async (file: StorageItem, expiresIn = 0) => {
+    const filePreview = this.filePreviewCache.find((cache) => cache.id === file.id)
     if (filePreview !== undefined && expiresIn === 0) {
       return filePreview.url
     } else {
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
       try {
-        const formattedUrl = new URL(signedUrl)
+        const formattedUrl = new URL(signedUrl!)
         formattedUrl.searchParams.set('t', new Date().toISOString())
         const fileUrl = formattedUrl.toString()
 
         // Also save it to cache
-        const fileCache = {
-          id: file.id,
+        const fileCache: CachedFile = {
+          id: file.id as string,
           url: fileUrl,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
@@ -400,7 +400,7 @@ class StorageExplorerStore {
 
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
-  openBucket = async (bucket) => {
+  openBucket = async (bucket: Bucket) => {
     const { id, name } = bucket
     const columnIndex = -1
     if (!isEqual(this.selectedBucket, bucket)) {
@@ -411,7 +411,7 @@ class StorageExplorerStore {
 
   /* Files CRUD */
 
-  getFile = async (fileEntry) => {
+  private getFile = async (fileEntry: FileSystemFileEntry): Promise<File | undefined> => {
     try {
       return await new Promise((resolve, reject) => fileEntry.file(resolve, reject))
     } catch (err) {
@@ -421,23 +421,28 @@ class StorageExplorerStore {
   }
 
   // https://stackoverflow.com/a/53058574
-  getFilesDataTransferItems = async (items) => {
+  private getFilesDataTransferItems = async (items: DataTransferItemList) => {
     const { dismiss } = UiToast({ description: 'Retrieving items to upload...' })
-    const files = []
-    const queue = []
+    const files: (File & { path: string })[] = []
+    const queue: FileSystemEntry[] = []
     for (const item of items) {
-      queue.push(item.webkitGetAsEntry())
+      const entry = item.webkitGetAsEntry()
+      if (entry) {
+        queue.push(entry)
+      }
     }
     while (queue.length > 0) {
-      const entry = queue.shift() || {}
-      if (entry.isFile) {
-        const file = await this.getFile(entry)
+      const entry = queue.shift()
+      if (entry && entry.isFile) {
+        const fileEntry = entry as FileSystemFileEntry
+        const file = await this.getFile(fileEntry)
         if (file !== undefined) {
-          file.path = entry.fullPath.slice(1)
-          files.push(file)
+          ;(file as any).path = fileEntry.fullPath.slice(1)
+          files.push(file as File & { path: string })
         }
-      } else if (entry.isDirectory) {
-        queue.push(...(await this.readAllDirectoryEntries(entry.createReader())))
+      } else if (entry && entry.isDirectory) {
+        const dirEntry = entry as FileSystemDirectoryEntry
+        queue.push(...(await this.readAllDirectoryEntries(dirEntry.createReader())))
       }
     }
     dismiss()
@@ -446,10 +451,10 @@ class StorageExplorerStore {
 
   // Get all the entries (files or sub-directories) in a directory
   // by calling readEntries until it returns empty array
-  readAllDirectoryEntries = async (directoryReader) => {
+  private readAllDirectoryEntries = async (directoryReader: FileSystemDirectoryReader) => {
     const entries = []
     let readEntries = await this.readEntriesPromise(directoryReader)
-    while (readEntries.length > 0) {
+    while (readEntries && readEntries.length > 0) {
       entries.push(...readEntries)
       readEntries = await this.readEntriesPromise(directoryReader)
     }
@@ -459,9 +464,9 @@ class StorageExplorerStore {
   // Wrap readEntries in a promise to make working with readEntries easier
   // readEntries will return only some of the entries in a directory
   // e.g. Chrome returns at most 100 entries at a time
-  readEntriesPromise = async (directoryReader) => {
+  private readEntriesPromise = async (directoryReader: FileSystemDirectoryReader) => {
     try {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<FileSystemEntry[]>((resolve, reject) => {
         directoryReader.readEntries(resolve, reject)
       })
     } catch (err) {
@@ -469,7 +474,11 @@ class StorageExplorerStore {
     }
   }
 
-  uploadFiles = async (files, columnIndex, isDrop = false) => {
+  uploadFiles = async (
+    files: FileList | DataTransferItemList,
+    columnIndex: number,
+    isDrop: boolean = false
+  ) => {
     const queryClient = getQueryClient()
     const storageConfiguration = queryClient
       .getQueryCache()
@@ -482,9 +491,11 @@ class StorageExplorerStore {
 
     const autofix = true
     // We filter out any folders which are just '#' until we can properly encode such characters in the URL
-    const filesToUpload = isDrop
-      ? (await this.getFilesDataTransferItems(files)).filter((file) => !file.path.includes('#/'))
-      : Array.from(files)
+    const filesToUpload: (File & { path?: string })[] = isDrop
+      ? (await this.getFilesDataTransferItems(files as DataTransferItemList)).filter(
+          (file) => !file.path.includes('#/')
+        )
+      : Array.from(files as FileList)
     const derivedColumnIndex = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
 
     const filesWithinUploadLimit =
@@ -494,7 +505,7 @@ class StorageExplorerStore {
 
     if (filesWithinUploadLimit.length < filesToUpload.length) {
       const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit.length
-      const { value, unit } = convertFromBytes(fileSizeLimit)
+      const { value, unit } = convertFromBytes(fileSizeLimit as number)
 
       toast.error(
         <div className="flex flex-col gap-y-1">
@@ -516,7 +527,7 @@ class StorageExplorerStore {
 
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
-    const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
+    const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
     const formattedFilesToUpload = filesWithinUploadLimit.map((file) => {
@@ -526,20 +537,20 @@ class StorageExplorerStore {
 
       const path = file.path.split('/')
       const topLevelFolder = path.length > 1 ? path[0] : null
-      if (topLevelFolders.includes(topLevelFolder)) {
+      if (topLevelFolders.includes(topLevelFolder as string)) {
         const newTopLevelFolder = this.sanitizeNameForDuplicateInColumn(
-          topLevelFolder,
+          topLevelFolder as string,
           autofix,
           columnIndex
         )
-        path[0] = newTopLevelFolder
+        path[0] = newTopLevelFolder as string
         file.path = path.join('/')
       }
       return file
     })
 
     this.uploadProgress = 0
-    const uploadedTopLevelFolders = []
+    const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
     let numberOfFilesUploadedFail = 0
@@ -562,18 +573,18 @@ class StorageExplorerStore {
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
       const fileOptions = { cacheControl: '3600' }
-      const metadata = { mimetype: file.type, size: file.size }
+      const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
-      const formattedFileName = has(file, ['path']) && isWithinFolder ? file.path : fileName
+      const formattedFileName = file.path && isWithinFolder ? file.path : fileName
       const formattedPathToFile =
-        pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : formattedFileName
+        pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
       if (isWithinFolder) {
-        const topLevelFolder = file.path.split('/')[0]
+        const topLevelFolder = file.path?.split('/')[0] || ''
         if (!uploadedTopLevelFolders.includes(topLevelFolder)) {
           this.addTempRow(
             STORAGE_ROW_TYPES.FOLDER,
@@ -587,7 +598,7 @@ class StorageExplorerStore {
       } else {
         this.addTempRow(
           STORAGE_ROW_TYPES.FILE,
-          fileName,
+          fileName!,
           STORAGE_ROW_STATUS.LOADING,
           derivedColumnIndex,
           metadata
@@ -595,7 +606,7 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
           const { error } = await this.supabaseClient.storage
             .from(this.selectedBucket.name)
             .upload(formattedPathToFile, file, fileOptions)
@@ -673,11 +684,11 @@ class StorageExplorerStore {
 
     const t2 = new Date()
     console.log(
-      `Total time taken for ${formattedFilesToUpload.length} files: ${(t2 - t1) / 1000} seconds`
+      `Total time taken for ${formattedFilesToUpload.length} files: ${((t2 as any) - (t1 as any)) / 1000} seconds`
     )
   }
 
-  moveFiles = async (newPathToFile) => {
+  moveFiles = async (newPathToFile: string) => {
     const newPaths = compact(newPathToFile.split('/'))
     const formattedNewPathToFile = newPaths.join('/')
     let numberOfFilesMovedFail = 0
@@ -736,7 +747,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName, expiresIn = 0): Promise<string | null> => {
+  private fetchFilePreview = async (fileName: string, expiresIn: number = 0) => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
@@ -765,16 +776,20 @@ class StorageExplorerStore {
         toast.error(`Failed to fetch signed url preview: ${error.message}`)
       }
     }
-    return null
+    return ''
   }
 
-  deleteFiles = async (files, isDeleteFolder = false) => {
+  // the method accepts either files with column index or with prefix.
+  deleteFiles = async (
+    files: (StorageItemWithColumn & { prefix?: string })[],
+    isDeleteFolder = false
+  ) => {
     this.closeFilePreview()
     let progress = 0
 
     // If every file has the 'prefix' property, then just construct the prefix
     // directly (from delete folder). Otherwise go by the opened folders.
-    const prefixes = !some(files, 'prefix')
+    const prefixes = !files.some((f) => f.prefix)
       ? files.map((file) => {
           const { name, columnIndex } = file
           const pathToFile = this.openedFolders
@@ -846,7 +861,7 @@ class StorageExplorerStore {
     }
   }
 
-  downloadFolder = async (folder) => {
+  downloadFolder = async (folder: StorageItemWithColumn) => {
     let progress = 0
     const toastId = toast.loading('Retrieving files from folder...')
 
@@ -856,7 +871,7 @@ class StorageExplorerStore {
       <ToastLoader
         progress={0}
         message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        desription={STORAGE_PROGRESS_INFO_TEXT}
+        description={STORAGE_PROGRESS_INFO_TEXT}
       />,
       { id: toastId }
     )
@@ -864,7 +879,14 @@ class StorageExplorerStore {
     const promises = files.map((file) => {
       const fileMimeType = file.metadata?.mimetype ?? null
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<
+          | {
+              name: string
+              prefix: string
+              blob: Blob
+            }
+          | boolean
+        >(async (resolve) => {
           try {
             const data = await downloadBucketObject({
               projectRef: this.projectRef,
@@ -888,19 +910,28 @@ class StorageExplorerStore {
     })
 
     const batchedPromises = chunk(promises, 10)
-    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
-      const previousResults = await previousPromise
-      const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader
-          progress={progress * 100}
-          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-          desription={STORAGE_PROGRESS_INFO_TEXT}
-        />,
-        { id: toastId }
-      )
-      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
-    }, Promise.resolve())
+    const downloadedFiles = await batchedPromises.reduce(
+      async (previousPromise, nextBatch) => {
+        const previousResults = await previousPromise
+        const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+        toast.loading(
+          <ToastLoader
+            progress={progress * 100}
+            message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+            description={STORAGE_PROGRESS_INFO_TEXT}
+          />,
+          { id: toastId }
+        )
+        return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+      },
+      Promise.resolve<
+        {
+          name: string
+          prefix: string
+          blob: Blob
+        }[]
+      >([])
+    )
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
@@ -919,7 +950,7 @@ class StorageExplorerStore {
     link.setAttribute('download', `${folder.name}.zip`)
     document.body.appendChild(link)
     link.click()
-    link.parentNode.removeChild(link)
+    link.parentNode?.removeChild(link)
 
     toast.success(
       downloadedFiles.length === files.length
@@ -931,10 +962,10 @@ class StorageExplorerStore {
     )
   }
 
-  downloadSelectedFiles = async (files) => {
+  downloadSelectedFiles = async (files: StorageItemWithColumn[]) => {
     const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
-    const formattedFilesWithPrefix = files.map((file) => {
+    const formattedFilesWithPrefix: any[] = files.map((file) => {
       const { name, columnIndex } = file
       const pathToFile = this.openedFolders
         .slice(lowestColumnIndex, columnIndex)
@@ -953,10 +984,13 @@ class StorageExplorerStore {
 
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
           const data = await this.downloadFile(file, showIndividualToast, returnBlob)
           progress = progress + 1 / formattedFilesWithPrefix.length
-          resolve({ ...data, name: file.formattedPathToFile })
+          if (isObject(data)) {
+            resolve({ ...data, name: file.formattedPathToFile })
+          }
+          resolve(false)
         })
       }
     })
@@ -973,8 +1007,8 @@ class StorageExplorerStore {
         />,
         { id: toastId }
       )
-      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
-    }, Promise.resolve())
+      return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+    }, Promise.resolve<{ name: string; blob: Blob }[]>([]))
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
@@ -988,14 +1022,14 @@ class StorageExplorerStore {
     link.setAttribute('download', `supabase-files.zip`)
     document.body.appendChild(link)
     link.click()
-    link.parentNode.removeChild(link)
+    link.parentNode?.removeChild(link)
 
     toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
-  downloadFile = async (file, showToast = true, returnBlob = false) => {
-    const fileName = file.name
-    const fileMimeType = file?.metadata?.mimetype ?? null
+  downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
+    const fileName: string = file.name
+    const fileMimeType = file?.metadata?.mimetype ?? undefined
 
     const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
@@ -1022,7 +1056,7 @@ class StorageExplorerStore {
       link.setAttribute('download', `${fileName}`)
       document.body.appendChild(link)
       link.click()
-      link.parentNode.removeChild(link)
+      link.parentNode?.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
         toast.success(`Downloading ${fileName}`, { id: toastId })
@@ -1036,7 +1070,7 @@ class StorageExplorerStore {
     }
   }
 
-  renameFile = async (file, newName, columnIndex) => {
+  renameFile = async (file: StorageItem, newName: string, columnIndex: number) => {
     const originalName = file.name
     if (originalName === newName || newName.length === 0) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1064,8 +1098,8 @@ class StorageExplorerStore {
         )
         this.filePreviewCache = updatedFilePreviewCache
 
-        if (this.selectedFilePreview.name === originalName) {
-          const { previewUrl, ...fileData } = file
+        if (this.selectedFilePreview?.name === originalName) {
+          const { previewUrl, ...fileData } = file as any
           this.setFilePreview({ ...fileData, name: newName })
         }
 
@@ -1078,7 +1112,12 @@ class StorageExplorerStore {
 
   /* Folders CRUD */
 
-  fetchFolderContents = async (folderId, folderName, index, searchString = '') => {
+  fetchFolderContents = async (
+    folderId: string | null,
+    folderName: string,
+    index: number,
+    searchString: string = ''
+  ) => {
     if (this.selectedBucket.id === undefined) return
 
     this.abortApiCalls()
@@ -1117,6 +1156,7 @@ class StorageExplorerStore {
         {
           id: folderId || folderName,
           name: folderName,
+          status: STORAGE_ROW_STATUS.READY,
           items: formattedItems,
           hasMoreItems: formattedItems.length === LIMIT,
           isLoadingMoreItems: false,
@@ -1130,7 +1170,11 @@ class StorageExplorerStore {
     }
   }
 
-  fetchMoreFolderContents = async (index, column, searchString = '') => {
+  fetchMoreFolderContents = async (
+    index: number,
+    column: StorageColumn,
+    searchString: string = ''
+  ) => {
     this.setColumnIsLoadingMore(index)
 
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
@@ -1172,7 +1216,11 @@ class StorageExplorerStore {
     await this.fetchFoldersByPath(paths)
   }
 
-  fetchFoldersByPath = async (paths, searchString = '', showLoading = false) => {
+  fetchFoldersByPath = async (
+    paths: string[],
+    searchString: string = '',
+    showLoading: boolean = false
+  ) => {
     if (this.selectedBucket.id === undefined) return
 
     const pathsWithEmptyPrefix = [''].concat(paths)
@@ -1212,6 +1260,7 @@ class StorageExplorerStore {
       const formattedItems = this.formatFolderItems(folderItems)
       return {
         id: null,
+        status: STORAGE_ROW_STATUS.READY,
         name: idx === 0 ? this.selectedBucket.name : pathsWithEmptyPrefix[idx],
         items: formattedItems,
         hasMoreItems: formattedItems.length === LIMIT,
@@ -1223,7 +1272,7 @@ class StorageExplorerStore {
     this.columns = formattedFolders
 
     // Update openedFolders as well
-    const updatedOpenedFolders = paths.map((path, idx) => {
+    const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
       const folderInfo = find(formattedFolders[idx].items, { name: path })
       // Folder doesnt exist, FE just scaffolds a "fake" folder
       if (!folderInfo) {
@@ -1232,6 +1281,11 @@ class StorageExplorerStore {
           name: path,
           type: STORAGE_ROW_TYPES.FOLDER,
           status: STORAGE_ROW_STATUS.READY,
+          metadata: null,
+          isCorrupted: false,
+          created_at: null,
+          updated_at: null,
+          last_accessed_at: null,
         }
       }
       return folderInfo
@@ -1241,7 +1295,7 @@ class StorageExplorerStore {
 
   // Check parent folder if its empty, if yes, reinstate .emptyFolderPlaceholder
   // Used when deleting folder or deleting files
-  validateParentFolderEmpty = async (parentFolderPrefix) => {
+  private validateParentFolderEmpty = async (parentFolderPrefix: string) => {
     try {
       const data = await listBucketObjects({
         projectRef: this.projectRef,
@@ -1259,10 +1313,10 @@ class StorageExplorerStore {
     } catch (error) {}
   }
 
-  deleteFolder = async (folder) => {
+  deleteFolder = async (folder: StorageItemWithColumn) => {
     const isDeleteFolder = true
     const files = await this.getAllItemsAlongFolder(folder)
-    await this.deleteFiles(files, isDeleteFolder)
+    await this.deleteFiles(files as any[], isDeleteFolder)
 
     this.popColumnAtIndex(folder.columnIndex)
     this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
@@ -1281,7 +1335,7 @@ class StorageExplorerStore {
     toast.success(`Successfully deleted ${folder.name}`)
   }
 
-  renameFolder = async (folder, newName, columnIndex) => {
+  renameFolder = async (folder: StorageItemWithColumn, newName: string, columnIndex: number) => {
     const originalName = folder.name
     if (originalName === newName) {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1323,7 +1377,7 @@ class StorageExplorerStore {
         .concat(pathSegments.slice(columnIndex + 1))
         .join('/')
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
           progress = progress + 1 / files.length
           try {
             await moveStorageObject({
@@ -1348,7 +1402,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loader(
+        toast.loading(
           <ToastLoader
             progress={progress * 100}
             message={`Renaming folder to ${newName}`}
@@ -1382,8 +1436,12 @@ class StorageExplorerStore {
     Used specifically for any operation that deals with every file along the folder
     e.g Delete folder, rename folder
   */
-  getAllItemsAlongFolder = async (folder) => {
-    const items = []
+  private getAllItemsAlongFolder = async (folder: {
+    name: string
+    columnIndex: number
+    prefix?: string
+  }): Promise<(StorageObject & { prefix: string })[]> => {
+    const items: (StorageObject & { prefix: string })[] = []
 
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
@@ -1406,7 +1464,7 @@ class StorageExplorerStore {
       offset: OFFSET,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
-    let folderContents = []
+    let folderContents: StorageObject[] = []
 
     for (;;) {
       try {
@@ -1431,7 +1489,7 @@ class StorageExplorerStore {
 
     const subFolderContents = await Promise.all(
       subfolders.map((folder) =>
-        this.getAllItemsAlongFolder({ ...folder, prefix: formattedPathToFolder })
+        this.getAllItemsAlongFolder({ ...folder, columnIndex: 0, prefix: formattedPathToFolder })
       )
     )
     subFolderContents.map((subfolderContent) => {
@@ -1443,10 +1501,10 @@ class StorageExplorerStore {
 
   /* UI Helper functions */
 
-  sanitizeNameForDuplicateInColumn = (
-    name,
-    autofix = false,
-    columnIndex = this.getLatestColumnIndex()
+  private sanitizeNameForDuplicateInColumn = (
+    name: string,
+    autofix: boolean = false,
+    columnIndex: number = this.getLatestColumnIndex()
   ) => {
     const currentColumn = this.columns[columnIndex]
     const currentColumnItems = currentColumn.items.filter(
@@ -1477,7 +1535,7 @@ class StorageExplorerStore {
     return name
   }
 
-  formatFolderItems = (items: StorageObject[] = []) => {
+  private formatFolderItems = (items: StorageObject[] = []): StorageItem[] => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
@@ -1497,16 +1555,29 @@ class StorageExplorerStore {
               ? STORAGE_ROW_STATUS.LOADING
               : STORAGE_ROW_STATUS.READY
 
-          const itemObj = { ...item, type, status, isCorrupted }
+          const itemObj = {
+            ...item,
+            metadata: item.metadata as any as StorageItemMetadata,
+            type,
+            status,
+            isCorrupted,
+          }
           return itemObj
         }) ?? []
     return formattedItems
   }
 
-  addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
+  private addTempRow = (
+    type: STORAGE_ROW_TYPES,
+    name: string,
+    status: STORAGE_ROW_STATUS,
+    columnIndex: number,
+    metadata: StorageItemMetadata | null,
+    isPrepend: boolean = false
+  ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
-        const tempRow = { type, name, status, metadata }
+        const tempRow = { type, name, status, metadata } as StorageItem
         const updatedItems = isPrepend
           ? [tempRow].concat(column.items)
           : column.items.concat([tempRow])
@@ -1517,7 +1588,7 @@ class StorageExplorerStore {
     this.columns = updatedColumns
   }
 
-  removeTempRows = (columnIndex) => {
+  private removeTempRows = (columnIndex: number) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const updatedItems = column.items.filter((item) => has(item, 'id'))
@@ -1528,15 +1599,15 @@ class StorageExplorerStore {
     this.columns = updatedColumns
   }
 
-  setSelectedItemToRename = (file) => {
+  setSelectedItemToRename = (file: { name: string; columnIndex: number }) => {
     this.updateRowStatus(file.name, STORAGE_ROW_STATUS.EDITING, file.columnIndex)
   }
 
-  updateRowStatus = (
-    name,
-    status,
-    columnIndex = this.getLatestColumnIndex(),
-    updatedName = null
+  private updateRowStatus = (
+    name: string,
+    status: STORAGE_ROW_STATUS,
+    columnIndex: number = this.getLatestColumnIndex(),
+    updatedName?: string
   ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
@@ -1557,10 +1628,10 @@ class StorageExplorerStore {
     this.columns = updatedColumns
   }
 
-  updateFolderAfterEdit = (
-    folderName,
-    columnIndex = this.getLatestColumnIndex(),
-    status = STORAGE_ROW_STATUS.READY
+  private updateFolderAfterEdit = (
+    folderName: string,
+    columnIndex: number = this.getLatestColumnIndex(),
+    status: STORAGE_ROW_STATUS = STORAGE_ROW_STATUS.READY
   ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
@@ -1589,7 +1660,7 @@ class StorageExplorerStore {
 
   /* User Preferences */
 
-  updateExplorerPreferences = () => {
+  private updateExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
     const preferences = {
       view: this.view,
@@ -1616,7 +1687,7 @@ class StorageExplorerStore {
     }
   }
 
-  selectRangeItems = (columnIndex, toItemIndex) => {
+  selectRangeItems = (columnIndex: number, toItemIndex: number) => {
     const columnItems = this.columns[columnIndex].items
     const toItem = columnItems[toItemIndex]
     const selectedItemIds = this.selectedItems.map((item) => item.id)
