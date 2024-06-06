@@ -1,0 +1,19 @@
+name: UI Tests
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs
+
+      - name: Check Git timestamp
+        working-directory: ./apps/docs
+        run: git log -5 --format=%cI content/guides/ai.mdx
