@@ -3,8 +3,6 @@ import { proxy } from 'valtio'
 
 import { type ICommandSection } from '../CommandSection'
 
-type ICommandPageName = string
-
 type PageComponent = () => ReactNode
 
 enum PageType {
@@ -30,10 +28,10 @@ const isComponentPage = (page: PageDefinition): page is ComponentPage =>
   page.type === PageType.Component
 
 type IPagesState = {
-  commandPages: Record<ICommandPageName, PageDefinition>
-  pageStack: Array<ICommandPageName>
-  registerNewPage: (name: ICommandPageName, page: PageDefinition) => () => void
-  appendPageStack: (name: ICommandPageName) => void
+  commandPages: Record<string, PageDefinition>
+  pageStack: Array<string>
+  registerNewPage: (name: string, page: PageDefinition) => () => void
+  appendPageStack: (name: string) => void
   popPageStack: () => void
 }
 
@@ -48,7 +46,8 @@ const initPagesState = () => {
         delete state.commandPages[name]
       }
     },
-    appendPageStack: (name) => state.pageStack.at(-1) !== name && state.pageStack.push(name),
+    appendPageStack: (name) =>
+      name in state.commandPages && state.pageStack.at(-1) !== name && state.pageStack.push(name),
     popPageStack: () => state.pageStack.pop(),
   })
 
@@ -56,4 +55,4 @@ const initPagesState = () => {
 }
 
 export { PageType, initPagesState, isCommandsPage, isComponentPage }
-export type { ICommandPageName, IPagesState, PageDefinition }
+export type { IPagesState, PageDefinition }

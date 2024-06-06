@@ -849,7 +849,7 @@ export default {
 
   sidepanel: {
     base: `
-      z-40
+      z-50
       bg-overlay
       flex flex-col
       fixed
@@ -902,7 +902,7 @@ export default {
       bg-border
     `,
     overlay: `
-      z-40
+      z-50
       fixed
       bg-alternative
       h-full w-full

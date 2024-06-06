@@ -2,11 +2,7 @@ import { useEffect, useMemo, useReducer, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
-import {
-  type ICommandPageName,
-  type PageDefinition,
-  isComponentPage,
-} from '../../internal/state/pagesState'
+import { type PageDefinition, isComponentPage } from '../../internal/state/pagesState'
 import { isEqual } from 'lodash'
 import { useSetQuery } from './queryHooks'
 
@@ -55,7 +51,7 @@ const usePopPage = () => {
 const EMPTY_ARRAY = [] as any[]
 
 const useRegisterPage = (
-  name: ICommandPageName,
+  name: string,
   definition: PageDefinition,
   { deps = EMPTY_ARRAY, enabled = true }: { deps?: any[]; enabled?: boolean } = {}
 ) => {
