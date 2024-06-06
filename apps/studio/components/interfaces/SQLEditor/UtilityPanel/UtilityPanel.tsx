@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -111,28 +111,23 @@ const UtilityPanel = ({
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-2">
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            Results{' '}
-            {!isExecuting &&
-              (result?.rows ?? []).length > 0 &&
-              `(${result.rows.length.toLocaleString()})`}
+            <span className="translate-y-[1px]">Results</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            Chart
+            <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
+          {result?.rows && <ResultsDropdown id={id} />}
         </div>
-        <div className="flex gap-1 h-full items-center">
-          {result && result.rows && <ResultsDropdown id={id} />}
-          <UtilityActions
-            id={id}
-            isExecuting={isExecuting}
-            isDisabled={isDisabled}
-            hasSelection={hasSelection}
-            prettifyQuery={prettifyQuery}
-            executeQuery={executeQuery}
-          />
-        </div>
+        <UtilityActions
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          hasSelection={hasSelection}
+          prettifyQuery={prettifyQuery}
+          executeQuery={executeQuery}
+        />
       </TabsList_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
         <UtilityTabResults

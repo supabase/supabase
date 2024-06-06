@@ -47,29 +47,25 @@ export const SendMessageModal = ({
         }
       }}
     >
-      <Modal.Content>
-        <div className="py-4 flex flex-col gap-y-4">
-          <Input
-            label="Message name"
-            size="small"
-            className="flex-grow"
-            value={values.message}
-            onChange={(v) => setValues({ ...values, message: v.target.value })}
+      <Modal.Content className="flex flex-col gap-y-4">
+        <Input
+          label="Message name"
+          size="small"
+          className="flex-grow"
+          value={values.message}
+          onChange={(v) => setValues({ ...values, message: v.target.value })}
+        />
+        <div className="flex flex-col gap-y-2">
+          <p className="text-sm text-scale-1100">Message payload</p>
+          <CodeEditor
+            id="message-payload"
+            language="json"
+            className="!mb-0 h-32 overflow-hidden rounded border"
+            onInputChange={(e: string | undefined) => setValues({ ...values, payload: e ?? '{}' })}
+            options={{ wordWrap: 'off', contextmenu: false }}
+            value={values.payload}
           />
-          <div className="flex flex-col gap-y-2">
-            <p className="text-sm text-scale-1100">Message payload</p>
-            <CodeEditor
-              id="message-payload"
-              language="json"
-              className="!mb-0 h-32 overflow-hidden rounded border"
-              onInputChange={(e: string | undefined) =>
-                setValues({ ...values, payload: e ?? '{}' })
-              }
-              options={{ wordWrap: 'off', contextmenu: false }}
-              value={values.payload}
-            />
-            {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
-          </div>
+          {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
         </div>
       </Modal.Content>
     </Modal>

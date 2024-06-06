@@ -69,7 +69,7 @@ If you encounter any problems or issues with your Edge Functions, here are some 
 
 ### Unable to deploy Edge Function
 
-- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
+- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
 - If the output from the commands above does not help you to resolve the issue, open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output from the commands mentioned above.
 
 ### Unable to call Edge Function
@@ -88,7 +88,7 @@ If your Edge Function takes too long to respond or times out:
 - Navigate to the [Functions section](https://supabase.com/dashboard/project/_/functions) in your dashboard, select your function from the list, and click `Logs`.
 - In the logs, look for the `booted` event and check if they have consistent boot times.
   - If the boot times are similar, it’s likely an issue with your function’s code, such as a large dependency, a slow API call, or a complex computation. You can try to optimize your code, reduce the size of your dependencies, or use caching techniques to improve the performance of your function.
-  - If only some of the `booted` events are slow, find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
+  - If only some of the `booted` events are slow, find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
 
 ### Receiving 546 Error Response
 
@@ -99,10 +99,10 @@ The 546 error response might occur because:
 
 ### Issues serving Edge Functions locally with the Supabase CLI
 
-- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
-- Run the serve command with the `-debug` flag.
+- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
+- Run the serve command with the `-debug` flag.
 - Support engineers can then try to run the provided sample code locally and see if they can reproduce the issue.
-- Search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repos for the error message, to see if it has been reported before.
+- Search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repos for the error message, to see if it has been reported before.
 - If the output from the commands above does not help you to resolve the issue, please open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output and details about your commands.
 
 ## Advanced techniques
