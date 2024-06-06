@@ -5,13 +5,7 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "apps/docs/spec/parser",
-    "tests",
-    "playwright-tests",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
@@ -58,14 +52,7 @@
     "npm": ">=9.0.0",
     "node": ">=20.0.0"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "volta": {
     "node": "20.11.1"
   }
