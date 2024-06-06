@@ -66,6 +66,9 @@ end;
 $$
 ;
 
+revoke all on function public.update_last_changed_checksum
+from public, anon, authenticated;
+
 create or replace function cleanup_last_changed_pages()
 returns integer
 language plpgsql
@@ -93,3 +96,6 @@ begin
 end;
 $$
 ;
+
+revoke all on function public.cleanup_last_changed_pages
+from public, anon, authenticated;
