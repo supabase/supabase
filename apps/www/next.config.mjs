@@ -1,16 +1,16 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { withContentlayer } from 'next-contentlayer2'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
 import rewrites from './lib/rewrites.js'
 
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
+import { withContentlayer } from 'next-contentlayer2'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
