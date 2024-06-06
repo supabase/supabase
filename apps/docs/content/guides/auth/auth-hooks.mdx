@@ -116,7 +116,6 @@ Let's break down the secret content:
 Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
 
 ```jsx
-
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
 
 Deno.serve(async (req) => {
@@ -207,12 +206,12 @@ return new Response(
 )
 ```
 
-Note that all responses, including errors responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
+Note that all responses, including error responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
 
 </TabPanel>
 </Tabs>
 
-Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have **two** seconds to complete processing while HTTP Hooks should complete in **five** seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
+Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have <SharedData data="config">auth.hook_timeouts.postgres_hooks</SharedData> seconds to complete processing while HTTP Hooks should complete in <SharedData data="config">auth.hook_timeouts.http_hooks</SharedData> seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
 
 ## Developing A Hook
 
@@ -963,7 +962,7 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
-  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`.
 
 <Tabs
   scrollable
@@ -1389,16 +1388,16 @@ import {
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
 Deno.serve(async (req) => {
-const payload = await req.text()
-const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
-const headers = Object.fromEntries(req.headers)
-const wh = new Webhook(base64_secret);
-try {
-const {
-user_id,
-claims,
-authentication_method
-} = wh.verify(payload, headers);
+    const payload = await req.text()
+    const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+    const headers = Object.fromEntries(req.headers)
+    const wh = new Webhook(base64_secret);
+    try {
+        const {
+            user_id,
+            claims,
+            authentication_method
+        } = wh.verify(payload, headers);
 
         // Check the condition
         const allowedEmails = ['myemail@company.com', 'example@company.com'];
@@ -1433,8 +1432,7 @@ authentication_method
     }
 
 })
-
-````
+```
 
 </TabPanel>
 </Tabs>
