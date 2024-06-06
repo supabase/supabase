@@ -8,6 +8,10 @@ import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
+const WHITELIST_ERRORS = [
+  'The following organization members have reached their maximum limits for the number of active free projects',
+]
+
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
 
 export type ProjectCreateVariables = {
@@ -84,7 +88,9 @@ export const useProjectCreateMutation = ({
         } else {
           onError(data, variables, context)
         }
-        Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
+        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
+        }
       },
       ...options,
     }
