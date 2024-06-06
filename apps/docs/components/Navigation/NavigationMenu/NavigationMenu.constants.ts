@@ -189,7 +189,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'Product',
+      label: 'Products',
       menuItems: [
         [
           {
@@ -234,28 +234,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'Data API',
-      menuItems: [
-        [
-          {
-            label: 'REST',
-            icon: 'rest',
-            href: '/guides/api',
-            level: 'api',
-          },
-          {
-            label: 'GraphQL',
-            icon: 'graphql',
-            href: '/guides/graphql',
-            level: 'graphql',
-          },
-        ],
-      ],
-    },
-  ],
-  [
-    {
-      label: 'Development Cycle',
+      label: 'Build',
       menuItems: [
         [
           {
@@ -282,7 +261,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'API Reference',
+      label: 'Reference',
       menuItems: [
         [
           {
@@ -329,9 +308,24 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
         ],
         [
+          // { label: 'Data API' },
           {
-            label: 'Tools',
+            label: 'REST',
+            icon: 'rest',
+            href: '/guides/api',
+            level: 'api',
           },
+          {
+            label: 'GraphQL',
+            icon: 'graphql',
+            href: '/guides/graphql',
+            level: 'graphql',
+          },
+        ],
+        [
+          // {
+          //   label: 'Tools',
+          // },
           {
             label: 'CLI Commands',
             icon: 'reference-cli',
