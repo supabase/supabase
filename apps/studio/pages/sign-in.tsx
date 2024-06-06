@@ -1,12 +1,12 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
 import SignInWithSSO from 'components/interfaces/SignIn/SignInWithSSO'
 import { SignInLayout } from 'components/layouts'
 import { IS_PLATFORM } from 'lib/constants'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
