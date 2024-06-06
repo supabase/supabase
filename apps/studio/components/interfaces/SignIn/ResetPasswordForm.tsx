@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
@@ -19,7 +20,8 @@ const ResetPasswordForm = () => {
       await auth.signOut({ scope: 'others' })
       await router.push('/projects')
     } else {
-      toast.error(error.message, { id: toastId })
+      toast.error(`Failed to save password: ${error.message}`, { id: toastId })
+      Sentry.captureMessage('[CRITICAL] Failed to reset password: ' + error.message)
     }
   }
 

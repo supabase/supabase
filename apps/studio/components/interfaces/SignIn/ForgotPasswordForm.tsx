@@ -1,4 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -28,6 +29,7 @@ const ForgotPasswordForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to send reset email: ${error.message}`)
+      Sentry.captureMessage('[CRITICAL] Failed to send reset password email: ' + error.message)
     },
   })
 
