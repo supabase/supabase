@@ -41,6 +41,7 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   variant?: ButtonVariantProps['type']
   overlayStyle?: React.CSSProperties
   contentStyle?: React.CSSProperties
+  dialogOverlayProps?: React.ComponentProps<typeof DialogContent>['dialogOverlayProps']
   // @deprecated please consider using <Dialog/> and <DialogTrigger/> components
   triggerElement?: React.ReactNode
   // @deprecated please consider using <Dialog/> and <DialogHeader/> components
