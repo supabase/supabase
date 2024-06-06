@@ -6,7 +6,7 @@
       "outputs": ["dist/**", ".next/**"]
     },
     "www#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build","www#build:content"],
       "env": [
         "SUPABASE_SERVICE_ROLE_SECRET",
         "EMAIL_TO_ID_SECRET",
@@ -14,6 +14,10 @@
         "GITHUB_OAUTH_CLIENT_SECRET"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "www#build:content": {
+      "inputs": ["contentlayer.config.ts", "_blog/*.mdx"],
+      "outputs": [".contentlayer/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
