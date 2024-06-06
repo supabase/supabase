@@ -9,6 +9,8 @@ import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 
+const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
+
 const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
@@ -54,7 +56,10 @@ const SignInSSOForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
-      Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
+
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
+      }
     }
   }
 
