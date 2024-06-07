@@ -22,6 +22,8 @@ interface RegionSelectorProps {
 
 export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorProps) => {
   const router = useRouter()
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
@@ -32,7 +34,14 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
     <FormItemLayout
       layout="horizontal"
       label="Region"
-      description="Select the region closest to your users for the best performance."
+      description={
+        <>
+          {showNonProdFields && (
+            <p>Select the region closest to your users for the best performance.</p>
+          )}
+          <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
+        </>
+      }
     >
       <Select_Shadcn_
         value={field.value}
