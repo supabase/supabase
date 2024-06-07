@@ -140,7 +140,6 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
         <Modal
           hideFooter
           size="medium"
-          modal={true}
           visible={visible}
           onCancel={onClose}
           header="Create a new preview branch"
