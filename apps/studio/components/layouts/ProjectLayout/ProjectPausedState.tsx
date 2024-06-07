@@ -45,9 +45,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
 
-  const daysFromLastUpdate = dayjs()
-    .utc()
-    .diff(dayjs(project?.updated_at), 'd')
+  const daysFromLastUpdate = dayjs().utc().diff(dayjs(project?.updated_at), 'd')
   const restoreThresholdReached = daysFromLastUpdate >= RESTORE_THRESHOLD_DAYS
   const isFreePlan = subscription?.plan?.id === 'free'
   const isRestoreDisabled = isFreePlan && restoreThresholdReached
