@@ -25,6 +25,8 @@ import {
 } from './EmptyStates'
 import Overview from './Overview'
 
+type Tab = 'overview' | 'prs' | 'branches'
+
 const BranchManagement = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -38,8 +40,8 @@ const BranchManagement = () => {
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const [urlParams, setParams] = useUrlState()
-  const tab = (urlParams.tab ?? 'overview') as 'overview' | 'prs' | 'branches'
-  const setTab = (tab: 'overview' | 'prs' | 'branches') => setParams({ tab })
+  const tab = (urlParams.tab ?? 'overview') as Tab
+  const setTab = (tab: Tab) => setParams({ tab })
 
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
