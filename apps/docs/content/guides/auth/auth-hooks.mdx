@@ -77,7 +77,7 @@ You also need to grant usage to `supabase_auth_admin`:
 grant usage on schema public to supabase_auth_admin;
 ```
 
-Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. We revoke access on the `public` role as it has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Consequently, we need to revoke permissions from `public` in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
 
 ```sql
 revoke execute
