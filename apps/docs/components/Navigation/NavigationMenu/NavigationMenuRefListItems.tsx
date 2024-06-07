@@ -61,7 +61,7 @@ const FunctionLink = React.memo(function FunctionLink({
         onClick={(e) => {
           e.preventDefault()
           history.pushState({}, '', url)
-          document.getElementById(slug)?.scrollIntoView()
+          document.getElementById(slug)?.scrollIntoView({ behavior: 'smooth' })
           onClick()
         }}
         className={cn(

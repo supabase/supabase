@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <CommandMenuProvider site="docs">
-              <div className="h-screen flex flex-col">
+              <div className="flex flex-col">
                 <SiteLayout>
                   <PortalToast />
                   <PromoToast />

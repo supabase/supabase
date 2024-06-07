@@ -1,4 +1,4 @@
-import { type PropsWithChildren, memo, useEffect } from 'react'
+import { type PropsWithChildren, memo, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import Footer from '~/components/Navigation/Footer'
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
@@ -253,19 +253,19 @@ const Container = memo(function Container({
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
-    <div
+    <main
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
-        'w-full transition-all ease-out',
-        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
+        'w-full transition-all ease-out relative',
+        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%]' : '',
         // desktop override any margin styles
         'lg:ml-0',
         className
       )}
     >
-      <div className="flex flex-col relative">{children}</div>
-    </div>
+      <div className="flex flex-col sticky top-0">{children}</div>
+    </main>
   )
 })
 
@@ -288,10 +288,11 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
     >
       <div
         className={cn(
-          'top-0',
-          'relative',
+          'top-0 lg:top-[98px]',
+          'h-full lg:h-[calc(100vh-98px)]',
+          'sticky',
           'w-auto',
-          'border-r overflow-auto h-screen lg:h-[calc(100vh-91px)]',
+          'border-r overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col'
         )}
@@ -306,7 +307,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           className={cn(
             'transition-all ease-out duration-200',
             'absolute left-0 right-0',
-            'px-5 pl-5 pt-6 pb-16',
+            'px-5 pl-5 pt-6 pb-16 lg:pb-32',
             'bg-background',
             // desktop styles
             'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
@@ -321,15 +322,23 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
 })
 
 function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+  const ref = useRef(null)
   const mobileMenuOpen = useMenuMobileOpen()
   const isHomePage = menuId === 'home'
 
+  // useEffect(() => {
+  //   if (!ref.current) return
+
+  //   const { height } = ref.current.getBoundingClientRect()
+  //   document.documentElement.style.setProperty('--header-height', height)
+  // }, [])
+
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+      <div ref={ref} className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
         <TopNavBar />
       </div>
-      <div className="flex flex-row h-full">
+      <div className="flex flex-row h-full relative">
         {!isHomePage && <NavContainer menuId={menuId} />}
         <Container>
           <div
@@ -343,7 +352,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
           </div>
           <div
             className={cn(
-              'sticky transition-all top-0 z-10',
+              'transition-all top-0 z-10',
               'backdrop-blur backdrop-filter bg-background'
             )}
           >

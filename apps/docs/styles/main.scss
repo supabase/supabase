@@ -266,6 +266,10 @@ article p code {
   height: unset !important;
 }
 
+#docs-content-container #introduction {
+  @apply scroll-mt-60;
+}
+
 /* dat.GUI */
 
 .dg.ac {

@@ -143,7 +143,7 @@ const Layout: FC<Props> = (props) => {
                 className={cn(
                   'col-span-3 self-start',
                   'hidden md:block md:col-span-3',
-                  'sticky top-16',
+                  'sticky top-[calc(98px+4rem)]',
                   'max-h-[calc(100vh-60px-5rem)]'
                 )}
               />

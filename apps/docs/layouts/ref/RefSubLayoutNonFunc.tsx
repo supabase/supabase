@@ -37,10 +37,7 @@ const RefSubLayoutNonFunc: FC<PropsWithChildren<RefSubLayoutNonFuncType>> &
 
 const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
   return (
-    <article
-      key={props.id}
-      className={`${props.singleColumn ? 'prose py-16 lg:py-32 ' : 'py-16 lg:py-32'}`}
-    >
+    <article key={props.id} className={`${props.singleColumn ? 'prose py-16' : 'py-16'}`}>
       <StickyHeader {...props} />
       <div
         className={`ref-container gap-16 ${
