@@ -302,7 +302,8 @@ const LogTable = ({
           </Tooltip.Root>
         )}
         <Button
-          title="run-logs-query"
+          data-testid="run-logs-query-btn"
+          title="Run logs query"
           type={hasEditorValue ? 'primary' : 'alternative'}
           disabled={!hasEditorValue}
           onClick={onRun}
@@ -366,6 +367,7 @@ const LogTable = ({
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
             <DataGrid
+              data-testid={'logs-table'}
               role="table"
               style={{ height: '100%' }}
               className={cn('flex-1 flex-grow h-full', {
@@ -375,7 +377,6 @@ const LogTable = ({
               rowHeight={40}
               headerRowHeight={queryType ? 0 : 28}
               onSelectedCellChange={(row) => {
-                console.log('row', row)
                 setFocusedLog(row.row as LogData)
               }}
               selectedRows={new Set([])}

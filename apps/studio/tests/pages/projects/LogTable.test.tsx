@@ -5,39 +5,33 @@ import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import { render } from '../../helpers'
 
-beforeAll(() => {
-  vi.mock('next/router', () => require('next-router-mock'))
-})
-
-test.skip('can display log data', async () => {
+test('can display log data', async () => {
   render(
-    <>
-      <LogTable
-        projectRef="projectRef"
-        params={{}}
-        data={[
-          {
-            id: 'some-uuid',
-            timestamp: 1621323232312,
-            event_message: 'event message',
-            metadata: {
-              my_key: 'something_value',
-            },
+    <LogTable
+      projectRef="ref"
+      params={{}}
+      data={[
+        {
+          event_message: 'event message',
+          id: 'some-uuid',
+          timestamp: 1621323232312,
+          metadata: {
+            my_key: 'something_value',
           },
-        ]}
-      />
-    </>
+        },
+      ]}
+    />
   )
 
-  await screen.findByText(/event message/)
+  const table = await screen.findByTestId('logs-table')
 
-  prettyDOM(screen.getByText(/event message/))
+  console.log(prettyDOM(table))
 
-  const row = await screen.findByText(/event message/)
+  await screen.findByText('timestamp')
+  const row = await screen.findByText('1621323232312')
 
   userEvent.click(row)
 
-  // [Joshen] commenting out for now - seems like we need to mock more stuff
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
 })
@@ -234,23 +228,6 @@ test.each([
     ...excludes.map((text) => expect(screen.findByText(text)).rejects.toThrow()),
   ])
 })
-
-// [Terry] removing, doesn't look like the histogram is being rendered in the LogTable component anymore
-// test('toggle histogram', async () => {
-//   const mockFn = vi.fn()
-//   render(
-//     <LogTable
-//       projectRef="mockProjectRef" // Provide a mock value for projectRef
-//       params={{}} // Provide a mock value for params
-//       queryType={QueryType.Auth} // Provide a mock value for queryType
-//       onHistogramToggle={mockFn}
-//       isHistogramShowing={true}
-//     />
-//   )
-//   const toggle = await screen.getByText(/Histogram/)
-//   userEvent.click(toggle)
-//   expect(mockFn).toBeCalled()
-// })
 
 test('error message handling', async () => {
   // Render LogTable with error as a string
