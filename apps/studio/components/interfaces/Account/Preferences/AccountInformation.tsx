@@ -65,32 +65,35 @@ const AccountInformation = ({ profile }: { profile?: Profile }) => {
                   </CollapsibleTrigger_Shadcn_>
                   <CollapsibleContent_Shadcn_ className=" mt-2">
                     <div className="bg-surface-200 p-4 rounded-lg grid gap-4">
-                      <div>
-                        <h4 className="text-sm">If you used GitHub to login: </h4>
-                        <ul className="prose text-sm ml-4 mt-2">
-                          <li>Log out of Supabase</li>
-                          <li>
-                            Change your Primary Email in{' '}
-                            <Link href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/changing-your-primary-email-address">
-                              GitHub
-                            </Link>{' '}
-                            (not your public email, but primary email)
-                          </li>
-                          <li>Log out of GitHub</li>
-                          <li>Log back into GitHub (with the new, desired email set as primary)</li>
-                          <li>Log back into Supabase</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="text-sm">If you used an email and password to login: </h4>
-                        <ul className="prose text-sm ml-4 mt-2">
-                          <li>Create a new account with the new email</li>
-                          <li>Invite this email to be an owner of the Org</li>
-                          <li>Join the Org</li>
-                          <li>Remove the old email from the Org</li>
-                          <li>Email Supabase Support to delete the old email (Optional) </li>
-                        </ul>
-                      </div>
+                      {session?.user.app_metadata.provider === 'email' ? (
+                        <div>
+                          <ul className="prose text-sm ml-4 mt-1">
+                            <li>Create a new account with the new email</li>
+                            <li>Invite this email to be an owner of the Org</li>
+                            <li>Join the Org</li>
+                            <li>Remove the old email from the Org</li>
+                            <li>Email Supabase Support to delete the old email (Optional) </li>
+                          </ul>
+                        </div>
+                      ) : (
+                        <div>
+                          <ul className="prose text-sm ml-4 mt-2">
+                            <li>Log out of Supabase</li>
+                            <li>
+                              Change your Primary Email in{' '}
+                              <Link href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/changing-your-primary-email-address">
+                                GitHub
+                              </Link>{' '}
+                              (not your public email, but primary email)
+                            </li>
+                            <li>Log out of GitHub</li>
+                            <li>
+                              Log back into GitHub (with the new, desired email set as primary)
+                            </li>
+                            <li>Log back into Supabase</li>
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </CollapsibleContent_Shadcn_>
                 </Collapsible_Shadcn_>
