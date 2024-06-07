@@ -37,6 +37,7 @@ interface CreateBranchModalProps {
 }
 
 const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+  console.log('visible:', visible)
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -140,7 +141,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
         <Modal
           hideFooter
           size="medium"
-          modal={false}
+          modal={true}
           visible={visible}
           onCancel={onClose}
           header="Create a new preview branch"
