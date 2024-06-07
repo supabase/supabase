@@ -37,11 +37,11 @@ function EnvironmentMetadata() {
   if ((environment === 'staging' || environment === 'local') && isPlatform) {
     return (
       <div className="bg-foreground text-background px-4 py-1 font-mono text-xs flex items-center gap-4 w-full top-0 z-50">
-        <span>
+        <span className="truncate">
           <strong>Environment:</strong> {environment || 'undefined'}
         </span>
         {pullRequestId && (
-          <span>
+          <span className="truncate">
             <strong>Pull Request ID:</strong>{' '}
             <a
               href={`${repoUrl}/pull/${pullRequestId}`}
@@ -54,7 +54,7 @@ function EnvironmentMetadata() {
           </span>
         )}
         {branch && (
-          <span>
+          <span className="truncate">
             <strong>Branch:</strong>{' '}
             <a
               href={`${repoUrl}/tree/${branch}`}
