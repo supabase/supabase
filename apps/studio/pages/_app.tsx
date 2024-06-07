@@ -56,6 +56,7 @@ import { getAnonId } from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { DeploymentBanner } from 'components/ui/DeploymentBanner'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -193,6 +194,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                           <CommandMenuWrapper>
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
+                                <DeploymentBanner />
                                 {getLayout(<Component {...pageProps} />)}
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
