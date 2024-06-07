@@ -1,6 +1,29 @@
-import * as Sentry from '@sentry/nextjs'
-import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import {
+  AlertCircle,
+  Book,
+  ChevronRight,
+  ExternalLink,
+  Github,
+  Hash,
+  HelpCircle,
+  Loader2,
+  Mail,
+  MessageSquare,
+  Plus,
+  X,
+} from 'lucide-react'
+
+import {
+  DocsSearchResultType as PageType,
+  useDocsSearch,
+  useParams,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+} from 'common'
+
+import * as Sentry from '@sentry/nextjs'
+
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -13,7 +36,8 @@ import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { AlertCircle, ExternalLink, HelpCircle, Loader2, Mail, Plus, X } from 'lucide-react'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
+
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -28,11 +52,14 @@ import {
   Input,
   Listbox,
   Separator,
+  cn,
 } from 'ui'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+
+import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -43,8 +70,28 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) => {
+  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
+  const [subject, setSubject] = useState('')
+  const [docsResults, setDocsResults] = useState<Page[]>([])
+
+  useEffect(() => {
+    if (subject.trim().length > 0) {
+      handleDocsSearchDebounced(subject.trim())
+    } else {
+      setDocsResults([])
+    }
+  }, [subject])
+
+  useEffect(() => {
+    if (subject.trim().length > 0 && searchState.status === 'fullResults') {
+      setDocsResults(searchState.results)
+    } else if (searchState.status === 'noResults' || searchState.status === 'error') {
+      setDocsResults([])
+    }
+  }, [searchState])
+
   const { isReady } = useRouter()
-  const { ref, slug, subject, category, message } = useParams()
+  const { ref, slug, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -130,6 +177,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     message: message || '',
     allowSupportAccess: false,
   }
+
+  const { site } = useCommandMenu()
+  const router = useRouter()
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
@@ -218,6 +268,10 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
   ]
 
   const ipv4MigrationStringMatched = ipv4MigrationStrings.some((str) => textAreaValue.includes(str))
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length > 0)
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -235,6 +289,183 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
       if (selectedProjectFromUrl !== undefined) setSelectedProjectRef(selectedProjectFromUrl.ref)
     }
   }, [isSuccessProjects])
+
+  const IconContainer = (
+    props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+  ) => (
+    <div
+      className="
+        transition
+        w-6 h-6
+        bg-alternative
+        group-aria-selected:scale-[105%]
+        group-aria-selected:bg-foreground
+        text-foreground
+        group-aria-selected:text-background
+        rounded flex
+        items-center
+        justify-center
+
+        group-aria-selected:[&_svg]:scale-[103%]
+        "
+      {...props}
+    />
+  )
+
+  function generateLink(pageType: PageType, link: string): string {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        if (site === 'docs') {
+          return link
+        } else if (site === 'website') {
+          return `/docs${link}`
+        } else {
+          return `https://supabase.com/docs${link}`
+        }
+      case PageType.Integration:
+        if (site === 'website') {
+          return link
+        } else {
+          return `https://supabase.com${link}`
+        }
+      case PageType.GithubDiscussion:
+        return link
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
+
+  async function handleLinkClick(pageType: PageType, link: string) {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        if (site === 'docs') {
+          await router.push(link)
+        } else if (site === 'website') {
+          await router.push(`/docs${link}`)
+        } else {
+          window.open(`https://supabase.com/docs${link}`, '_blank')
+        }
+        break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
+        }
+        break
+      case PageType.GithubDiscussion:
+        window.open(link, '_blank')
+        break
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
+
+  function formatSectionUrl(page: Page, section: PageSection): string {
+    switch (page.type) {
+      case PageType.Markdown:
+      case PageType.GithubDiscussion:
+        return `${generateLink(page.type, page.path)}#${section.slug ?? ''}`
+      case PageType.Reference:
+        return `${generateLink(page.type, page.path)}/${section.slug ?? ''}`
+      case PageType.Integration:
+        return generateLink(page.type, page.path) // Assuming no section slug for Integration pages
+      default:
+        throw new Error(`Unknown page type '${page.type}'`)
+    }
+  }
+
+  const cardBaseClasses =
+    'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-sm flex items-center justify-between'
+
+  interface DocsLinkGroup {
+    page: Page
+  }
+
+  const DocsLinkGroup = ({ page }: DocsLinkGroup) => {
+    console.log('page', page)
+    const link = generateLink(page.type, page.path)
+
+    return (
+      <ul key={page.id} className="grid gap-2">
+        <li key={`${page.path}-group`} className="p-2 mb-2">
+          <Link
+            target="_blank"
+            rel="noreferrer"
+            href={link}
+            className={cn(cardBaseClasses, 'flex items-center justify-between pr-5')}
+          >
+            <div className="grow flex gap-3 items-center">
+              <div>{getPageIcon(page)}</div>
+              <div className="flex flex-col gap-0 pr-6">
+                <span className="text-sm">
+                  <TextHighlighter text={page.title} query="test" />
+                </span>
+                {(page.description || page.subtitle) && (
+                  <div className="text-xs text">
+                    <TextHighlighter text={page.description || page.subtitle || ''} query="test" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChevronRight size={18} />
+          </Link>
+          {page.sections.length > 0 && (
+            <ul className="border-l border-default ml-3 pt-3 grid gap-2">
+              {page.sections.map((section: PageSection, i) => (
+                <DocsLinkSection
+                  key={`${page.path}__${section.heading}-item-${i}`}
+                  page={page}
+                  section={section}
+                />
+              ))}
+            </ul>
+          )}
+        </li>
+      </ul>
+    )
+  }
+
+  interface DocsLinkSection {
+    page: Page
+    section: PageSection
+  }
+
+  const DocsLinkSection = ({ page, section }: DocsLinkSection) => {
+    const sectionLink = formatSectionUrl(page, section)
+
+    return (
+      <ul key={`${section.heading}-group`} className="grid gap-2">
+        <li key={`${section.heading}-item`} className="p-2 mb-2">
+          <Link target="_blank" href={sectionLink} className={cn(cardBaseClasses)}>
+            <div className="grow flex gap-3 items-center">
+              <div>{getPageIcon(page)}</div>
+              <div className="grid gap-1.5">
+                {page.type !== 'github-discussions' && (
+                  <span>
+                    <TextHighlighter
+                      className="not-italic text-xs rounded-full px-3 py-1 bg-surface-300 "
+                      text={section.heading}
+                      query="test"
+                    />
+                  </span>
+                )}
+
+                {section.heading && (
+                  <div className="text text-xs ">
+                    <TextHighlighter text={section.heading} query="test" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChevronRight size={18} />
+          </Link>
+        </li>
+      </ul>
+    )
+  }
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
@@ -552,6 +783,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        onChange={(e) => setSubject(e.target.value)}
                         descriptionText={
                           values.subject.length > 0 &&
                           INCLUDE_DISCUSSIONS.includes(values.category) ? (
@@ -573,6 +805,18 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                         }
                       />
                     </div>
+
+                    {docsResults.length > 0 && hasResults && (
+                      <div className="py-4 px-6 border rounded-md mx-6">
+                        <h2 className="text-sm text-foreground-light px-2 mb-2">
+                          Suggested resources
+                        </h2>
+                        {docsResults.slice(0, 5).map((page, i) => (
+                          <DocsLinkGroup key={`${page.id}-group`} page={page} />
+                        ))}
+                      </div>
+                    )}
+
                     {values.category === 'Problem' && (
                       <div className="px-6">
                         <Listbox
@@ -830,3 +1074,29 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
 }
 
 export default SupportForm
+
+export function getPageIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageSectionIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
