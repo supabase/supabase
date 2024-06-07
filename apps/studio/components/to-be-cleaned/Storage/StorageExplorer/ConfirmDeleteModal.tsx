@@ -1,10 +1,11 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Modal } from 'ui'
+import { StorageItem } from '../Storage.types'
 
 interface ConfirmDeleteModalProps {
   visible: boolean
-  selectedItemsToDelete: any[]
+  selectedItemsToDelete: StorageItem[]
   onSelectCancel: () => void
   onSelectDelete: () => void
 }

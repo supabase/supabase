@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
-    "@supabase/sql-to-rest": "^0.1.4",
+    "@supabase/sql-to-rest": "^0.1.6",
     "cmdk": "^0.2.1",
     "common": "*",
     "common-tags": "^1.8.2",
