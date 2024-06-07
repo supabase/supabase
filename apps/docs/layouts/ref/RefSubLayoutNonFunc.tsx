@@ -96,7 +96,7 @@ interface ISectionExamples {}
 const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
   return (
     <div className="w-full">
-      <div className="sticky top-24">{props.children}</div>
+      <div className="sticky top-32">{props.children}</div>
     </div>
   )
 }
