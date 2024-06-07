@@ -8,7 +8,7 @@ import { components } from 'api-types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug: string
-  address: components['schemas']['CustomerBillingAddress'] | null
+  address?: components['schemas']['CustomerBillingAddress']
 }
 
 export async function updateOrganizationCustomerProfile({
@@ -26,7 +26,7 @@ export async function updateOrganizationCustomerProfile({
         slug,
       },
     },
-    body: { address: address },
+    body: { address },
   })
   if (error) throw handleError(error)
   return data
