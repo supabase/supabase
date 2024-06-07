@@ -2572,7 +2572,7 @@ export interface components {
       billing_via_partner: boolean
     }
     BillingCustomerUpdateBody: {
-      address: components['schemas']['CustomerBillingAddress'] | null
+      address?: components['schemas']['CustomerBillingAddress']
     }
     CustomerUpdateResponse: {
       id: string
