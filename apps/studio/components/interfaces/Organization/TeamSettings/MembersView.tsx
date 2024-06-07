@@ -49,9 +49,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const allMembers = members ?? []
   const roles = rolesData?.roles ?? []
 
-  const showMfaEnabledColumn = allMembers.some(
-    (member) => member.gotrue_id !== undefined && member.mfa_enabled !== undefined
-  )
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
@@ -105,13 +102,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
               head={[
                 <Table.th key="header-user">User</Table.th>,
                 <Table.th key="header-status" className="w-24" />,
-                ...(showMfaEnabledColumn
-                  ? [
-                      <Table.th key="header-mfa" className="text-center w-32">
-                        Enabled MFA
-                      </Table.th>,
-                    ]
-                  : []),
+                <Table.th key="header-mfa" className="text-center w-32">
+                  Enabled MFA
+                </Table.th>,
                 <Table.th key="header-role" className="flex items-center space-x-2">
                   <span>Role</span>
                   <RolesHelperModal />
@@ -125,7 +118,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     member={member}
                     roles={roles}
                     isLoadingRoles={isLoadingRoles}
-                    showMfaEnabledColumn={showMfaEnabledColumn}
                     setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
                     setSelectedMember={setSelectedMember}
                   />

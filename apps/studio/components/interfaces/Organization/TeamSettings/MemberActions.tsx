@@ -165,9 +165,13 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-1" disabled={isLoading} loading={isLoading}>
-              <MoreVertical size={18} />
-            </Button>
+            <Button
+              type="text"
+              className="px-1.5"
+              disabled={isLoading}
+              loading={isLoading}
+              icon={<MoreVertical />}
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
             <>
