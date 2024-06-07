@@ -8,7 +8,7 @@ function DeploymentBanner() {
     const commitMessage = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE
     const pullRequestId = process.env.NEXT_PUBLIC_VERCEL_GIT_PULL_REQUEST_ID
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF
-    const repoUrl = `https://github.com/${process.env.NEXT_PUBLIC_GIT_REPO_OWNER}/${process.env.NEXT_PUBLIC_GIT_REPO_SLUG}`
+    const repoUrl = `https://github.com/supabase/supabase`
 
     return (
       <div className="bg-foreground text-background px-4 py-1 font-mono text-xs flex items-center gap-4">
