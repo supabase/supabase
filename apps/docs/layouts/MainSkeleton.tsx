@@ -282,7 +282,8 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         'lg:left-0',
         'transition-all',
         'top-0',
-        'flex flex-col ml-0'
+        'flex flex-col ml-0',
+        'border-r'
       )}
     >
       <div
@@ -291,7 +292,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           'h-full lg:h-[calc(100vh-98px)]',
           'lg:sticky',
           'w-auto',
-          'border-r overflow-auto h-screen',
+          'overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col'
         )}
