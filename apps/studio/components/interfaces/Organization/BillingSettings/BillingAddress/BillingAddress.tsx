@@ -62,8 +62,6 @@ const BillingAddress = () => {
 
     const address = !values.line1 ? null : values
 
-    console.log(address)
-
     updateCustomerProfile(
       { slug, address },
       {
