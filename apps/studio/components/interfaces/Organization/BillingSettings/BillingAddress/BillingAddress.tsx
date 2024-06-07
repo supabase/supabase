@@ -48,14 +48,22 @@ const BillingAddress = () => {
     ) {
       errors['country'] = 'Please select a country'
     }
+    if (
+      (values.country || values.line2 || values.postal_code || values.state || values.city) &&
+      !values.line1
+    ) {
+      errors['line1'] = 'Please provide an address line'
+    }
     return errors
   }
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
+    const address = !values.line1 ? null : values
+
     updateCustomerProfile(
-      { slug, address: values },
+      { slug, address },
       {
         onSuccess: () => {
           toast.success('Successfully updated billing address')

@@ -155,6 +155,8 @@ export interface paths {
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
+    /** Updates the billing customer */
+    put: operations['updateCustomerV2']
     /** Updates the Stripe customer */
     patch: operations['CustomerController_updateCustomer']
   }
@@ -2555,12 +2557,12 @@ export interface components {
       opt_in_tags: string[]
     }
     CustomerBillingAddress: {
-      city: string | null
-      country: string | null
-      line1: string | null
-      line2: string | null
-      postal_code: string | null
-      state: string | null
+      city?: string
+      country: string
+      line1: string
+      line2?: string
+      postal_code?: string
+      state?: string
     }
     CustomerResponse: {
       email: string
@@ -2568,6 +2570,9 @@ export interface components {
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
+    }
+    BillingCustomerUpdateBody: {
+      address?: components['schemas']['CustomerBillingAddress']
     }
     CustomerUpdateResponse: {
       id: string
@@ -6846,6 +6851,32 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve the Stripe customer */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the billing customer */
+  updateCustomerV2: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BillingCustomerUpdateBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update the billing customer */
       500: {
         content: never
       }
