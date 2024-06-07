@@ -10,34 +10,33 @@ function DeploymentBanner() {
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF
 
     return (
-      <div className="bg-foreground text-background px-5 py-1 font-mono text-xs">
-        <div className="mx-auto flex justify-between items-center">
-          <div>
-            <span className="mr-4">
-              <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
-            </span>
-            {commitSha && (
-              <span className="mr-4">
-                <strong>Commit SHA:</strong> {commitSha}
-              </span>
-            )}
-            {commitMessage && (
-              <span className="mr-4">
-                <strong>Commit Message:</strong> {commitMessage}
-              </span>
-            )}
-            {pullRequestId && (
-              <span className="mr-4">
-                <strong>Pull Request ID:</strong> {pullRequestId}
-              </span>
-            )}
-            {branch && (
-              <span className="mr-4">
-                <strong>Branch:</strong> {branch}
-              </span>
-            )}
-          </div>
-        </div>
+      <div className="bg-foreground text-background px-4 py-1 font-mono text-xs flex items-center gap-4">
+        <span>
+          <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
+        </span>
+        <span>
+          <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
+        </span>
+        {commitSha && (
+          <span>
+            <strong>Commit SHA:</strong> {commitSha}
+          </span>
+        )}
+        {commitMessage && (
+          <span>
+            <strong>Commit Message:</strong> {commitMessage}
+          </span>
+        )}
+        {pullRequestId && (
+          <span>
+            <strong>Pull Request ID:</strong> {pullRequestId}
+          </span>
+        )}
+        {branch && (
+          <span>
+            <strong>Branch:</strong> {branch}
+          </span>
+        )}
       </div>
     )
   } else {
