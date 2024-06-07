@@ -10,10 +10,12 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",
+    "last-changed": "tsx scripts/last-changed.ts",
+    "last-changed:reset": "npm run last-changed -- --reset",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
@@ -97,6 +99,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.1.3",
+    "simple-git": "^3.24.0",
     "tsconfig": "*",
     "tsx": "^4.6.2",
     "typescript": "^5.4.3"

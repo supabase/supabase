@@ -1,7 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import type { Dictionary } from 'types'
-import { isEmpty, isUndefined, noop, partition } from 'lodash'
+import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
+import type { Dictionary } from 'types'
 import { SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -11,13 +11,14 @@ import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
 import { JsonEditor } from './JsonEditor'
-import type { JsonEditValue, RowField } from './RowEditor.types'
+import type { EditValue, RowField } from './RowEditor.types'
 import {
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
   validateFields,
 } from './RowEditor.utils'
+import { TextEditor } from './TextEditor'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -38,13 +39,16 @@ const RowEditor = ({
 }: RowEditorProps) => {
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [rowFields, setRowFields] = useState<any[]>([])
-  const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<JsonEditValue>()
+
+  const [selectedValueForTextEdit, setSelectedValueForTextEdit] = useState<EditValue>()
+  const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<EditValue>()
 
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
   const [referenceRow, setReferenceRow] = useState<RowField>()
 
-  const isNewRecord = isUndefined(row)
-  const isEditingJson = !isUndefined(selectedValueForJsonEdit)
+  const isNewRecord = row === undefined
+  const isEditingText = selectedValueForTextEdit !== undefined
+  const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
 
@@ -140,7 +144,7 @@ const RowEditor = ({
       visible={visible}
       header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
       className={`transition-all duration-100 ease-in ${
-        isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
+        isEditingText || isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
     >
@@ -181,6 +185,7 @@ const RowEditor = ({
                           field={field}
                           errors={errors}
                           onUpdateField={onUpdateField}
+                          onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         />
@@ -190,10 +195,22 @@ const RowEditor = ({
                 </SidePanel.Content>
               </>
             )}
+
+            <TextEditor
+              visible={isEditingText}
+              row={row}
+              column={selectedValueForTextEdit?.column ?? ''}
+              closePanel={() => setSelectedValueForTextEdit(undefined)}
+              onSaveField={(value) => {
+                onUpdateField({ [selectedValueForTextEdit?.column ?? '']: value })
+                setSelectedValueForTextEdit(undefined)
+              }}
+            />
             <JsonEditor
               visible={isEditingJson}
+              row={row}
               column={selectedValueForJsonEdit?.column ?? ''}
-              jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+              jsonString={selectedValueForJsonEdit?.value ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}
               onSaveJSON={(value) => {
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })

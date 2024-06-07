@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
@@ -6,6 +7,11 @@ import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+
+const WHITELIST_ERRORS = [
+  'The following organization members have reached their maximum limits for the number of active free projects',
+  'db_pass must be longer than or equal to 4 characters',
+]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -82,6 +88,9 @@ export const useProjectCreateMutation = ({
           toast.error(`Failed to create new project: ${data.message}`)
         } else {
           onError(data, variables, context)
+        }
+        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
         }
       },
       ...options,

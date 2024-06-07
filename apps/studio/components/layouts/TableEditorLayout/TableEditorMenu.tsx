@@ -1,5 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
@@ -9,10 +14,6 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { partition } from 'lodash'
-import { Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import {
@@ -92,9 +93,9 @@ const TableEditorMenu = () => {
         className="pt-5 flex flex-col flex-grow gap-5 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
-            className="mx-4 h-7"
+            className="mx-4"
             selectedSchemaName={snap.selectedSchemaName}
             onSelectSchema={(name: string) => {
               setSearchText('')

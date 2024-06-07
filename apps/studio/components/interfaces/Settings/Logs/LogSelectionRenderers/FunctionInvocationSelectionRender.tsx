@@ -29,6 +29,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         <SelectionDetailedRow label="Method" value={method} />
         <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
+        <SelectionDetailedRow label="Execution ID" value={metadata.execution_id} />
         <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
         <SelectionDetailedRow label="Log ID" value={log.id} />
         {requestUrl !== undefined && (

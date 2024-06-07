@@ -66,8 +66,8 @@ export interface SortOverlayProps {
 
 const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayProps) => {
   const initialSorts = useMemo(
-    () => formatSortURLParams((sortsFromUrl as string[]) ?? []),
-    [sortsFromUrl]
+    () => formatSortURLParams(table.name, sortsFromUrl ?? []),
+    [table.name, sortsFromUrl]
   )
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
@@ -82,7 +82,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
     }) || []
 
   function onAddSort(columnName: string | number) {
-    setSorts([...sorts, { column: columnName as string, ascending: true }])
+    setSorts([...sorts, { table: table.name, column: columnName as string, ascending: true }])
   }
 
   const onDeleteSort = useCallback((column: string) => {
