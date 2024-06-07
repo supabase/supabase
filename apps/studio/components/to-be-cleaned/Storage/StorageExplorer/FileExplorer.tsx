@@ -1,20 +1,20 @@
-import { useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useEffect, useRef } from 'react'
 
-import { STORAGE_VIEWS, CONTEXT_MENU_KEYS } from '../Storage.constants'
-import ItemContextMenu from './ItemContextMenu'
-import FolderContextMenu from './FolderContextMenu'
+import { noop } from 'lodash'
+import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
+import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
-import { noop } from 'lodash'
-import type { StorageColumn } from '../Storage.types'
+import FolderContextMenu from './FolderContextMenu'
+import ItemContextMenu from './ItemContextMenu'
 
 export interface FileExplorerProps {
   view: string
-  columns: any[]
-  openedFolders: any[]
-  selectedItems: any[]
-  selectedFilePreview: any
+  columns: StorageColumn[]
+  openedFolders: StorageItem[]
+  selectedItems: StorageItemWithColumn[]
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -28,7 +28,7 @@ const FileExplorer = ({
   columns = [],
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview = {},
+  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,

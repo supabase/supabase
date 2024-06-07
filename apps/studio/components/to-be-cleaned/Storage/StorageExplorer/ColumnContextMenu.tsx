@@ -40,19 +40,19 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
 
   const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item: any) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item: any) => {
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
-    const selectedItemsFromColumn = selectedItems.filter((item: any) =>
-      columnFilesId.includes(item.id)
+    const columnFilesId = compact(columnFiles.map((item) => item.id))
+    const selectedItemsFromColumn = selectedItems.filter(
+      (item) => item.id && columnFilesId.includes(item.id)
     )
 
     if (selectedItemsFromColumn.length === columnFiles.length) {
       // Deselect all items from column
       const updatedSelectedItems = selectedItems.filter(
-        (item: any) => !columnFilesId.includes(item.id)
+        (item) => item.id && !columnFilesId.includes(item.id)
       )
       setSelectedItems(updatedSelectedItems)
     } else {
