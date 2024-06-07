@@ -1,9 +1,12 @@
+import { isEqual } from 'lodash'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import {
@@ -17,7 +20,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  Modal,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -38,12 +40,13 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { RolesAccessMatrix } from './RolesAccessMatrix'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import toast from 'react-hot-toast'
-import { isEqual } from 'lodash'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
+import { RolesAccessMatrix } from './RolesAccessMatrix'
 import { ProjectRoleConfiguration, deriveChanges } from './UpdateRolesPanel.utils'
+import { useOrganizationMemberUpdateMutation } from 'data/organization-members/organization-member-update-mutation'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -56,8 +59,22 @@ interface UpdateRolesPanelProps {
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
+
   const { data: projects } = useProjectsQuery()
-  const { data } = useOrganizationRolesQuery({ slug })
+  const { data: permissions } = usePermissionsQuery()
+  const { data } = useOrganizationRolesV2Query({ slug })
+  const availableRoles = data?.org_scoped_roles ?? []
+
+  // console.log(member)
+
+  // const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
+  //   organization?.id,
+  //   availableRoles,
+  //   permissions ?? []
+  // )
+  // console.log({ availableRoles, rolesAddable, rolesRemovable })
+
+  const { mutateAsync: updateRole } = useOrganizationMemberUpdateMutation()
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
@@ -66,10 +83,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     ProjectRoleConfiguration[]
   >([])
 
-  const availableRoles = data?.roles ?? []
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
-    projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.projectId === undefined
+    projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
   const lowerPermissionsRole = availableRoles.find((r) => r.name === 'Developer')?.id
@@ -77,42 +93,42 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     return { ...obj, [item]: index }
   }, {})
   const noAccessProjects = orgProjects.filter((project) => {
-    return !projectsRoleConfiguration.some((p) => p.projectId === project.id)
+    return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
 
   const changesToRoles = deriveChanges(
-    [{ projectId: undefined, roleId: member.role_ids[0] }],
+    [{ ref: undefined, roleId: member.role_ids[0] }],
     projectsRoleConfiguration
   )
 
-  const onSelectProject = (id: number) => {
+  const onSelectProject = (ref: string) => {
     setProjectsRoleConfiguration(
       projectsRoleConfiguration.concat({
-        projectId: id,
+        ref,
         roleId: lowerPermissionsRole ?? availableRoles[0].id,
       })
     )
     setShowProjectDropdown(false)
   }
 
-  const onRemoveProject = (id?: number) => {
-    if (id === undefined) return
-    setProjectsRoleConfiguration(projectsRoleConfiguration.filter((p) => p.projectId !== id))
+  const onRemoveProject = (ref?: string) => {
+    if (ref === undefined) return
+    setProjectsRoleConfiguration(projectsRoleConfiguration.filter((p) => p.ref !== ref))
   }
 
   const onSelectRole = (value: string, project: ProjectRoleConfiguration) => {
-    if (project.projectId !== undefined) {
+    if (project.ref !== undefined) {
       setProjectsRoleConfiguration(
         projectsRoleConfiguration.map((p) => {
-          if (p.projectId === project.projectId) {
-            return { projectId: p.projectId, roleId: Number(value) }
+          if (p.ref === project.ref) {
+            return { ref: p.ref, roleId: Number(value) }
           } else {
             return p
           }
         })
       )
     } else {
-      setProjectsRoleConfiguration([{ projectId: undefined, roleId: Number(value) }])
+      setProjectsRoleConfiguration([{ ref: undefined, roleId: Number(value) }])
     }
   }
 
@@ -122,11 +138,55 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     if (isApplyingRoleToAllProjects) {
       setProjectsRoleConfiguration(
         orgProjects.map((p) => {
-          return { projectId: p.id, roleId: roleIdToApply }
+          return { ref: p.ref, roleId: roleIdToApply }
         })
       )
     } else {
-      setProjectsRoleConfiguration([{ projectId: undefined, roleId: roleIdToApply }])
+      setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+    }
+  }
+
+  const onConfirmUpdateMemberRoles = async () => {
+    if (slug === undefined) return console.error('Slug is required')
+
+    console.log(projectsRoleConfiguration)
+    const gotrueId = member.gotrue_id
+    const isOrgScope =
+      projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
+
+    // [Joshen TODO] Can we also debug why full page crash if payload is wrong e.g projects is [null]
+    if (isOrgScope) {
+      try {
+        await updateRole({ slug, gotrueId, roleId: projectsRoleConfiguration[0].roleId })
+        toast.success(`Successfully updated role for ${member.username}`)
+        setShowConfirmation(false)
+        onClose()
+        return
+      } catch (error: any) {
+        return toast.error(`Failed to update role: ${error.message}`)
+      }
+    }
+
+    const uniqueRoleIds = projectsRoleConfiguration.reduce((a, b) => {
+      if (!a.includes(b.roleId)) return [...a, b.roleId]
+      return a
+    }, [] as number[])
+
+    try {
+      await Promise.all(
+        uniqueRoleIds.map((roleId) => {
+          updateRole({
+            slug,
+            gotrueId,
+            roleId,
+            projects: projectsRoleConfiguration
+              .filter((p) => p.roleId === roleId)
+              .map((p) => p.ref) as string[],
+          })
+        })
+      )
+    } catch (error: any) {
+      return toast.error(`Failed to update role: ${error.message}`)
     }
   }
 
@@ -134,7 +194,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     // [Joshen] This is an assumption for the structure, and assumption for the UI that it starts with org level
     if (visible) {
       const roleId = member.role_ids[0]
-      setProjectsRoleConfiguration([{ projectId: undefined, roleId }])
+      setProjectsRoleConfiguration([{ ref: undefined, roleId }])
     } else {
       setShowRolesAccessMatrix(false)
     }
@@ -226,14 +286,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <div className="flex flex-col gap-y-2">
                 {projectsRoleConfiguration.map((project) => {
                   const name =
-                    project.projectId === undefined
+                    project.ref === undefined
                       ? 'All projects'
-                      : projects?.find((p) => p.id === project.projectId)?.name
+                      : projects?.find((p) => p.ref === project.ref)?.name
                   const role = availableRoles.find((r) => r.id === project.roleId)
 
                   return (
                     <div
-                      key={`${project.projectId}-${project.roleId}`}
+                      key={`${project.ref}-${project.roleId}`}
                       className="flex items-center justify-between"
                     >
                       <p className="text-sm">{name}</p>
@@ -269,7 +329,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             type="text"
                             className="px-1"
                             icon={<X size={14} />}
-                            onClick={() => onRemoveProject(project?.projectId)}
+                            onClick={() => onRemoveProject(project?.ref)}
                           />
                         )}
                       </div>
@@ -298,15 +358,15 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
                             {orgProjects.map((project) => {
                               const hasRoleAssigned = projectsRoleConfiguration.some(
-                                (p) => p.projectId === project.id
+                                (p) => p.ref === project.ref
                               )
                               return (
                                 <CommandItem_Shadcn_
                                   key={project.ref}
                                   disabled={hasRoleAssigned}
                                   className="cursor-pointer w-full justify-between"
-                                  onSelect={() => onSelectProject(project.id)}
-                                  onClick={() => onSelectProject(project.id)}
+                                  onSelect={() => onSelectProject(project.ref)}
+                                  onClick={() => onSelectProject(project.ref)}
                                 >
                                   <p className="truncate">{project.name}</p>
                                   {hasRoleAssigned && (
@@ -334,7 +394,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 onClick={() => {
                   if (
                     isEqual(projectsRoleConfiguration, [
-                      { projectId: undefined, roleId: member.role_ids[0] },
+                      { ref: undefined, roleId: member.role_ids[0] },
                     ])
                   ) {
                     onClose()
@@ -355,18 +415,13 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       <ConfirmationModal
         size="medium"
         visible={showConfirmation}
-        header="Confirm to change roles of member"
-        buttonLabel="Update roles"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={() => setShowConfirmation(false)}
-        onSelectConfirm={() => {
-          toast.success('Done')
-          setShowConfirmation(false)
-          onClose()
-        }}
+        title="Confirm to change roles of member"
+        confirmLabel="Update roles"
+        confirmLabelLoading="Updating"
+        onCancel={() => setShowConfirmation(false)}
+        onConfirm={onConfirmUpdateMemberRoles}
       >
-        {/* [Joshen] Need to update this once Jonny's PR goes through */}
-        <Modal.Content className="py-content flex flex-col gap-y-3">
+        <div className="flex flex-col gap-y-3">
           <p className="text-sm text-foreground-light">
             You are making the following changes to the role of{' '}
             <span className="text-foreground">{member.username}</span> in the organization{' '}
@@ -382,7 +437,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 <ul className="list-disc pl-6">
                   {changesToRoles.removed.map((x, i) => {
                     const role = availableRoles.find((y) => y.id === x.roleId)
-                    const project = orgProjects.find((y) => y.id === x.projectId)
+                    const project = orgProjects.find((y) => y.ref === x.ref)
                     return (
                       <li key={`update-${i}`} className="text-sm text-foreground-light">
                         <span className="text-foreground">{role?.name}</span> on{' '}
@@ -404,7 +459,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 <ul className="list-disc pl-6">
                   {changesToRoles.added.map((x, i) => {
                     const role = availableRoles.find((y) => y.id === x.roleId)
-                    const project = orgProjects.find((y) => y.id === x.projectId)
+                    const project = orgProjects.find((y) => y.ref === x.ref)
                     return (
                       <li key={`update-${i}`} className="text-sm text-foreground-light">
                         <span className="text-foreground">{role?.name}</span> on{' '}
@@ -427,7 +482,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   {changesToRoles.updated.map((x, i) => {
                     const originalRole = availableRoles.find((y) => y.id === x.originalRole)
                     const updatedRole = availableRoles.find((y) => y.id === x.updatedRole)
-                    const project = orgProjects.find((y) => y.id === x.projectId)
+                    const project = orgProjects.find((y) => y.ref === x.ref)
                     return (
                       <li key={`update-${i}`} className="text-sm text-foreground-light">
                         From <span className="text-foreground">{originalRole?.name}</span> to{' '}
@@ -445,7 +500,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
           <p className="text-sm text-foreground">
             By changing the role of this member their permissions will change.
           </p>
-        </Modal.Content>
+        </div>
       </ConfirmationModal>
     </>
   )

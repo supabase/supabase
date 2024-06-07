@@ -1,5 +1,5 @@
 export interface ProjectRoleConfiguration {
-  projectId?: number
+  ref?: string
   roleId: number
 }
 
@@ -9,15 +9,15 @@ export const deriveChanges = (
 ) => {
   const removed: ProjectRoleConfiguration[] = []
   const added: ProjectRoleConfiguration[] = []
-  const updated: { projectId?: number; originalRole: number; updatedRole: number }[] = []
+  const updated: { ref?: string; originalRole: number; updatedRole: number }[] = []
 
   original.forEach((x) => {
-    const updatedRoleForProject = final.find((y) => x.projectId === y.projectId)
+    const updatedRoleForProject = final.find((y) => x.ref === y.ref)
     if (updatedRoleForProject === undefined) {
       removed.push(x)
     } else if (updatedRoleForProject.roleId !== x.roleId) {
       updated.push({
-        projectId: updatedRoleForProject.projectId,
+        ref: updatedRoleForProject.ref,
         originalRole: x.roleId,
         updatedRole: updatedRoleForProject.roleId,
       })
@@ -25,7 +25,7 @@ export const deriveChanges = (
   })
 
   final.forEach((x) => {
-    const newRoleForProject = original.find((y) => x.projectId === y.projectId)
+    const newRoleForProject = original.find((y) => x.ref === y.ref)
     if (newRoleForProject === undefined) {
       added.push(x)
     }

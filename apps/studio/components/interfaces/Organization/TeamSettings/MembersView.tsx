@@ -8,7 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { Button, Loading, Modal } from 'ui'
 import { getUserDisplayName } from '../Organization.utils'
 import MemberRow, { SelectedMember } from './MemberRow'
@@ -33,7 +33,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     error: rolesError,
     isLoading: isLoadingRoles,
     isError: isErrorRoles,
-  } = useOrganizationRolesQuery({ slug })
+  } = useOrganizationRolesV2Query({ slug })
   const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
     onSuccess() {
       setUserRoleChangeModalVisible(false)
@@ -47,7 +47,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   })
 
   const allMembers = members ?? []
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
 
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
@@ -116,8 +116,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   <MemberRow
                     key={member.gotrue_id}
                     member={member}
-                    roles={roles}
-                    isLoadingRoles={isLoadingRoles}
                     setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
                     setSelectedMember={setSelectedMember}
                   />
@@ -150,7 +148,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         </div>
       )}
 
-      <Modal
+      {/* <Modal
         hideFooter
         size="medium"
         visible={userRoleChangeModalVisible}
@@ -189,7 +187,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
             Confirm
           </Button>
         </Modal.Content>
-      </Modal>
+      </Modal> */}
     </>
   )
 }

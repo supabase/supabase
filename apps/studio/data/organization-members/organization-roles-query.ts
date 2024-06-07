@@ -1,16 +1,12 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError, Role } from 'types'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
-export type OrganizationRolesVariables = {
-  slug?: string
-}
-
-export type OrganizationRolesResponse = {
-  roles: Role[]
-}
+export type OrganizationRolesVariables = { slug?: string }
+export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponseV2']
 
 export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,
@@ -20,18 +16,18 @@ export async function getOrganizationRoles(
 
   const { data, error } = await get('/platform/organizations/{slug}/roles', {
     params: { path: { slug } },
+    headers: { Version: '2' },
     signal,
   })
 
   if (error) handleError(error)
-
-  return { roles: data } as unknown as OrganizationRolesResponse
+  return data
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>
 export type OrganizationRolesError = ResponseError
 
-export const useOrganizationRolesQuery = <TData = OrganizationRolesData>(
+export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
   { slug }: OrganizationRolesVariables,
   {
     enabled = true,
@@ -39,7 +35,7 @@ export const useOrganizationRolesQuery = <TData = OrganizationRolesData>(
   }: UseQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
 ) =>
   useQuery<OrganizationRolesData, OrganizationRolesError, TData>(
-    organizationKeys.roles(slug),
+    organizationKeys.rolesV2(slug),
     ({ signal }) => getOrganizationRoles({ slug }, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',

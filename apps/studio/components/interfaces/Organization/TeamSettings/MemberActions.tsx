@@ -18,7 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Modal,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -121,7 +120,8 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
-  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
+  // [Joshen TODO] Replace false with !canRemoveMember
+  if (false || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
         <Tooltip_Shadcn_>
@@ -145,13 +145,15 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="default"
-              disabled={isPendingInviteAcceptance || !canRemoveMember}
+              // [Joshen TODO] Replace false with !canRemoveMember
+              disabled={isPendingInviteAcceptance || false}
               onClick={() => setShowAccessModal(true)}
             >
               Manage access
             </Button>
           </TooltipTrigger_Shadcn_>
-          {!canRemoveMember && (
+          {/* [Joshen TODO] Replace false with !canRemoveMember */}
+          {false && (
             <TooltipContent_Shadcn_ side="bottom">
               You need additional permissions to manage this team member
             </TooltipContent_Shadcn_>

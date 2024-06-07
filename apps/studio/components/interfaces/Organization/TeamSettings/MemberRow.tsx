@@ -14,6 +14,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 
 export interface SelectedMember extends OrganizationMember {
   oldRoleId: number
@@ -22,37 +23,37 @@ export interface SelectedMember extends OrganizationMember {
 
 interface MemberRowProps {
   member: OrganizationMember
-  roles: Role[]
-  isLoadingRoles?: boolean
   setUserRoleChangeModalVisible: Dispatch<SetStateAction<boolean>>
   setSelectedMember: Dispatch<SetStateAction<SelectedMember | undefined>>
 }
 
 const MemberRow = ({
   member,
-  roles,
-  isLoadingRoles = false,
   setUserRoleChangeModalVisible,
   setSelectedMember,
 }: MemberRowProps) => {
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
+  const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
+  const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
+    slug: selectedOrganization?.slug,
+  })
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
-    roles,
+    roles?.org_scoped_roles ?? [],
     permissions ?? []
   )
 
-  const [memberRoleId] = member.role_ids ?? []
-  const role = (roles || []).find((role) => role.id === memberRoleId)
+  // const [memberRoleId] = member.role_ids ?? []
+  // const role = (roles || []).find((role) => role.id === memberRoleId)
   const memberIsUser = member.primary_email == profile?.primary_email
   const isInvitedUser = Boolean(member.invited_id)
-  const canRemoveRole = rolesRemovable.includes(memberRoleId)
-  const disableRoleEdit = !canRemoveRole || memberIsUser || isInvitedUser
+  // const canRemoveRole = rolesRemovable.includes(memberRoleId)
+  // const disableRoleEdit = !canRemoveRole || memberIsUser || isInvitedUser
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
@@ -71,8 +72,6 @@ const MemberRow = ({
   //   setUserRoleChangeModalVisible(true)
   //   setSelectedMember({ ...member, oldRoleId: role.id, newRoleId: roleId })
   // }
-
-  const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
   return (
     <Table.tr>
@@ -128,15 +127,29 @@ const MemberRow = ({
           <ShimmeringLoader className="w-32" />
         ) : (
           member.role_ids.map((id) => {
-            const role = (roles ?? []).find((role) => role.id === id)
-            const projectsApplied = projects?.map((p) => p.name) ?? []
+            const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
+            const projectScopedRole = (roles?.project_scoped_roles ?? []).find(
+              (role) => role.id === id
+            )
+            const role = orgScopedRole || projectScopedRole
+            const roleName = (role?.name ?? '').split('_')[0]
+            const projectsApplied =
+              role?.project_ids === null
+                ? projects?.map((p) => p.name) ?? []
+                : (role?.project_ids ?? []).map((id) => {
+                    return projects?.find((p) => p.id === id)?.name ?? ''
+                  })
+
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
-                <span>{role?.name}</span>
+                <span>{roleName}</span>
                 <span>•</span>
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
-                    <span className="text-foreground">All projects</span>
+                    <span className="text-foreground">
+                      {role?.project_ids === null ? 'All' : projectsApplied.length} project
+                      {projectsApplied.length > 1 ? 's' : ''}
+                    </span>
                   </TooltipTrigger_Shadcn_>
                   <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
                     {projectsApplied?.slice(0, 2).map((name) => <span key={name}>{name}</span>)}
@@ -154,7 +167,9 @@ const MemberRow = ({
         )}
       </Table.td>
 
-      <Table.td>{!memberIsUser && <MemberActions member={member} roles={roles} />}</Table.td>
+      <Table.td>
+        {!memberIsUser && <MemberActions member={member} roles={roles?.org_scoped_roles} />}
+      </Table.td>
     </Table.tr>
   )
 }
