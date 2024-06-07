@@ -118,7 +118,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   if (!file) {
-    return <></>
+    return null
   }
 
   const width = 450
