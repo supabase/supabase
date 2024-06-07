@@ -580,6 +580,10 @@ export interface paths {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
   }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
+  }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
     post: operations['ResizeController_resizeDatabase']
@@ -1449,6 +1453,10 @@ export interface paths {
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
@@ -3919,6 +3927,9 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      last_paused_at: string | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -3977,7 +3988,6 @@ export interface components {
       db_host: string
       id: number
       inserted_at: string
-      updated_at: string
       name: string
       organization_id: number
       ref: string
@@ -10122,6 +10132,22 @@ export interface operations {
       /** @description Failed to pause the project */
       500: {
         content: never
+      }
+    }
+  }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
       }
     }
   }

@@ -29,6 +29,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
 import { useBackupsQuery } from 'data/database/backups-query'
+import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 
 const RESTORE_THRESHOLD_DAYS = 90
 
@@ -44,9 +45,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
+  const { data: pauseStatus } = useProjectPauseStatusQuery(
+    { ref },
+    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
+  )
 
-  const daysFromLastUpdate = dayjs().utc().diff(dayjs(project?.updated_at), 'd')
-  const restoreThresholdReached = daysFromLastUpdate >= RESTORE_THRESHOLD_DAYS
+  const daysFromLastPaused =
+    (pauseStatus?.last_paused_at ?? null) !== null
+      ? dayjs()
+          .utc()
+          .diff(dayjs(pauseStatus?.last_paused_at), 'd')
+      : 0
+  const restoreThresholdReached = daysFromLastPaused >= RESTORE_THRESHOLD_DAYS
   const isFreePlan = subscription?.plan?.id === 'free'
   const isRestoreDisabled = isFreePlan && restoreThresholdReached
 
@@ -160,7 +170,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <Alert_Shadcn_>
                       <AlertTitle_Shadcn_>
                         Project can be restored through the dashboard within{' '}
-                        {RESTORE_THRESHOLD_DAYS - daysFromLastUpdate} more days
+                        {RESTORE_THRESHOLD_DAYS - daysFromLastPaused} more days
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Free projects cannot be restored through the dashboard if they are paused
