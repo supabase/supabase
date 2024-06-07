@@ -14,9 +14,7 @@ function DeploymentBanner() {
         <span>
           <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
         </span>
-        <span>
-          <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
-        </span>
+
         {commitSha && (
           <span>
             <strong>Commit SHA:</strong> {commitSha}
