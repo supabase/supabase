@@ -36,7 +36,7 @@ export const MAX_CHARACTERS = 10 * KB
 
 // return the primary key column if exists, otherwise return the first column
 // to use as a default sort
-const getPrimaryKeyColumn = (table: SupaTable) => {
+const getDefaultOrderByColumn = (table: SupaTable) => {
   return table.columns.find((column) => column.isPrimaryKey)?.name || table.columns[0]?.name
 }
 
@@ -74,7 +74,7 @@ export const fetchAllTableRows = async ({
 
   // If sorts is empty, use the primary key as the default sort
   if (sorts.length === 0) {
-    const primaryKey = getPrimaryKeyColumn(table)
+    const primaryKey = getDefaultOrderByColumn(table)
     if (primaryKey) {
       queryChains = queryChains.order(table.name, primaryKey, true, true)
     }
@@ -157,8 +157,8 @@ export const getTableRowsSqlQuery = ({
 
   // If sorts is empty, use the primary key as the default sort
   if (sorts.length === 0) {
-    const primaryKey = getPrimaryKeyColumn(table)
-    console.log({ primaryKey })
+    const primaryKey = getDefaultOrderByColumn(table)
+
     if (primaryKey) {
       queryChains = queryChains.order(table.name, primaryKey, true, true)
     }
