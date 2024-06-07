@@ -121,7 +121,6 @@ const GlobalNavigationMenu: FC = () => {
                       href={section[0].href}
                       className={cn(
                         'relative flex-1 whitespace-nowrap border-b border-transparent flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-none py-2 px-0 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground h-full',
-                        // sectionIndex === 0 && '-ml-2.5',
                         activeLabel === section[0].label && 'text-foreground border-foreground'
                       )}
                     >

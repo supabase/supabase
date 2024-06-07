@@ -258,7 +258,6 @@ const Container = memo(function Container({
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
         'w-full transition-all ease-out relative',
-        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%]' : '',
         // desktop override any margin styles
         'lg:ml-0',
         className
@@ -276,7 +275,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
     <nav
       aria-labelledby="main-nav-title"
       className={cn(
-        'absolute lg:relative',
+        'fixed lg:relative z-40',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
@@ -290,7 +289,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         className={cn(
           'top-0 lg:top-[98px]',
           'h-full lg:h-[calc(100vh-98px)]',
-          'sticky',
+          'lg:sticky',
           'w-auto',
           'border-r overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-background',
@@ -352,6 +351,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
           </div>
           <div
             className={cn(
+              'sticky',
               'transition-all top-0 z-10',
               'backdrop-blur backdrop-filter bg-background'
             )}
