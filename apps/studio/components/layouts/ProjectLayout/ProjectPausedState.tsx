@@ -52,9 +52,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const daysFromLastPaused =
     (pauseStatus?.last_paused_at ?? null) !== null
-      ? dayjs()
-          .utc()
-          .diff(dayjs(pauseStatus?.last_paused_at), 'd')
+      ? dayjs().utc().diff(dayjs(pauseStatus?.last_paused_at), 'd')
       : 0
   const restoreThresholdReached = daysFromLastPaused >= RESTORE_THRESHOLD_DAYS
   const isFreePlan = subscription?.plan?.id === 'free'
