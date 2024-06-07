@@ -1345,6 +1345,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging',
         },
         {
+          name: 'Debugging Tools',
+          url: '/guides/functions/debugging-tools',
+        },
+        {
           name: 'Logging and Using Headers',
           url: '/guides/functions/functions-headers',
         },

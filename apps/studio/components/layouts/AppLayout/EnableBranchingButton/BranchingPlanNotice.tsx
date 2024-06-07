@@ -12,7 +12,7 @@ const BranchingPlanNotice = () => {
   return (
     <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border-0 border-y">
       <AlertCircleIcon />
-      <AlertTitle_Shadcn_ className="text-base">
+      <AlertTitle_Shadcn_>
         Database branching is only available on the Pro plan and above
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
