@@ -20,7 +20,7 @@ import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
-import { simpleGit } from 'simple-git'
+import { SimpleGit, simpleGit } from 'simple-git'
 
 import { Section } from './helpers.mdx'
 
@@ -31,6 +31,13 @@ interface Options {
 interface Stats {
   sectionsUpdated: number
   sectionsRemoved: number
+  sectionsErrored: number
+}
+
+interface Ctx {
+  supabase: SupabaseClient
+  git: SimpleGit
+  stats: Stats
 }
 
 type SectionWithChecksum = Omit<Section, 'heading'> &
@@ -50,17 +57,22 @@ async function main() {
 
   const { reset } = parseOptions()
   const supabase = createSupabaseClient()
+  const git = simpleGit()
 
   const stats: Stats = {
     sectionsUpdated: 0,
     sectionsRemoved: 0,
+    sectionsErrored: 0,
   }
 
-  await updateContentDates({ reset, supabase, stats })
+  const ctx: Ctx = { supabase, git, stats }
+
+  await updateContentDates({ reset, ctx })
 
   console.log('Content timestamps successfully updated')
   console.log(`  - ${stats.sectionsUpdated} sections updated`)
   console.log(`  - ${stats.sectionsRemoved} old sections removed`)
+  console.log(`  - ${stats.sectionsErrored} sections errored when updating`)
 }
 
 function checkEnv() {
@@ -100,15 +112,7 @@ function createSupabaseClient() {
   )
 }
 
-async function updateContentDates({
-  supabase,
-  reset,
-  stats,
-}: {
-  supabase: SupabaseClient
-  reset: boolean
-  stats: Stats
-}) {
+async function updateContentDates({ reset, ctx }: { reset: boolean; ctx: Ctx }) {
   const CONTENT_DIR = getContentDir()
   const mdxFiles = await walkDir(CONTENT_DIR)
 
@@ -116,12 +120,12 @@ async function updateContentDates({
 
   const updateTasks: Array<Promise<void>> = []
   for (const file of mdxFiles) {
-    const tasks = await updateTimestamps(file, { supabase, reset, timestamp, stats })
+    const tasks = await updateTimestamps(file, { reset, timestamp, ctx })
     updateTasks.push(...tasks)
   }
   await Promise.all(updateTasks)
 
-  await cleanupObsoleteRows(timestamp, supabase, stats)
+  await cleanupObsoleteRows(ctx)
 }
 
 function getContentDir() {
@@ -138,21 +142,16 @@ async function walkDir(fullPath: string) {
 
 async function updateTimestamps(
   filePath: string,
-  {
-    supabase,
-    reset,
-    timestamp,
-    stats,
-  }: { supabase: SupabaseClient; reset: boolean; timestamp: Date; stats: Stats }
+  { reset, timestamp, ctx }: { reset: boolean; timestamp: Date; ctx: Ctx }
 ) {
   try {
     const content = await readFile(filePath, 'utf-8')
     const sections = processMdx(content)
     return sections.map((section) => {
       if (reset) {
-        return updateTimestampsWithLastCommitDate(filePath, section, timestamp, supabase, stats)
+        return updateTimestampsWithLastCommitDate(filePath, section, timestamp, ctx)
       } else {
-        throw Error('not implemented')
+        return updateTimestampsWithChecksumMatch(filePath, section, timestamp, ctx)
       }
     })
   } catch (err) {
@@ -176,7 +175,7 @@ function processMdx(rawContent: string): Array<SectionWithChecksum> {
     if (seenHeadings.has(rawHeading)) {
       const idx = seenHeadings.get(rawHeading) + 1
       seenHeadings.set(rawHeading, idx)
-      heading = `${rawHeading} (${idx})`
+      heading = `${rawHeading} (__UNIQUE_MARKER__${idx})`
     } else {
       seenHeadings.set(rawHeading, 1)
     }
@@ -201,69 +200,88 @@ async function updateTimestampsWithLastCommitDate(
   filePath: string,
   section: SectionWithChecksum,
   timestamp: Date,
-  supabase: SupabaseClient,
-  stats: Stats
+  ctx: Ctx
 ) {
+  const parentPage = getContentDirParentPage(filePath)
+
   try {
-    const git = simpleGit()
-    const updatedAt = (await git.raw('log', '-1', '--format=%cI', filePath)).trim()
+    const updatedAt = await getGitUpdatedAt(filePath, ctx)
 
-    const contentDir = getContentDir()
-    const parentPage = `/content${filePath.replace(contentDir, '')}`
-
-    const { data, error } = await supabase
+    const { error } = await ctx.supabase
       .from('last_changed')
-      .select('id')
-      .eq('parent_page', parentPage)
-      .eq('heading', section.heading)
-      .maybeSingle()
-    if (error) {
-      throw Error(error.message ?? 'Failed to fetch section from database')
-    }
-
-    if (data && 'id' in data) {
-      const { error } = await supabase
-        .from('last_changed')
-        .update({
+      .upsert(
+        {
+          parent_page: parentPage,
+          heading: section.heading,
           checksum: section.checksum,
           last_updated: updatedAt,
           last_checked: timestamp,
-        })
-        .eq('id', data.id)
-      if (error) {
-        throw Error(error.message ?? 'Failed to update row')
-      }
-      stats.sectionsUpdated++
-    } else {
-      const { error } = await supabase.from('last_changed').insert({
-        parent_page: parentPage,
-        heading: section.heading,
-        checksum: section.checksum,
-        last_updated: updatedAt,
-        last_checked: timestamp,
-      })
-      if (error) {
-        throw Error(error.message ?? 'Failed to insert row')
-      }
-      stats.sectionsUpdated++
+        },
+        {
+          onConflict: 'parent_page,heading',
+        }
+      )
+      .lt('last_checked', timestamp)
+    if (error) {
+      throw Error(error.message ?? 'Failed to upsert')
     }
+    ctx.stats.sectionsUpdated++
   } catch (err) {
     console.error(
-      `Failed to update timestamp with last commit date for section ${filePath}:${section.heading}: ${err}`
+      `Failed to update timestamp with last commit date for section ${parentPage}:${section.heading}:\n${err}`
     )
+    ctx.stats.sectionsErrored++
   }
 }
 
-async function cleanupObsoleteRows(timestamp: Date, supabase: SupabaseClient, stats: Stats) {
+async function updateTimestampsWithChecksumMatch(
+  filePath: string,
+  section: SectionWithChecksum,
+  timestamp: Date,
+  ctx: Ctx
+) {
+  const parentPage = getContentDirParentPage(filePath)
+
   try {
-    const { count, error } = await supabase
-      .from('last_changed')
-      .delete({ count: 'exact' })
-      .neq('last_checked', timestamp.toISOString())
-    stats.sectionsRemoved = count
+    const gitUpdatedAt = await getGitUpdatedAt(filePath, ctx)
+
+    const { data, error } = await ctx.supabase.rpc('update_last_changed_checksum', {
+      new_parent_page: parentPage,
+      new_heading: section.heading,
+      new_checksum: section.checksum,
+      git_update_time: gitUpdatedAt,
+      check_time: timestamp,
+    })
+    if (error) {
+      throw Error(error.message || 'Error running function to update checksum')
+    }
+    if (timestamp.toISOString() === new Date(data ?? null).toISOString()) {
+      ctx.stats.sectionsUpdated++
+    }
+  } catch (err) {
+    console.error(
+      `Failed to update timestamp with checksum for section ${parentPage}:${section.heading}:\n${err}`
+    )
+    ctx.stats.sectionsErrored++
+  }
+}
+
+async function getGitUpdatedAt(filePath: string, { git }: { git: SimpleGit }) {
+  return (await git.raw('log', '-1', '--format=%cI', filePath)).trim()
+}
+
+function getContentDirParentPage(filePath: string) {
+  const contentDir = getContentDir()
+  return `/content${filePath.replace(contentDir, '')}`
+}
+
+async function cleanupObsoleteRows(ctx: Ctx) {
+  try {
+    const { data: count, error } = await ctx.supabase.rpc('cleanup_last_changed_pages')
     if (error) {
       throw Error(error.message ?? 'Failed to delete rows')
     }
+    ctx.stats.sectionsRemoved = count
   } catch (err) {
     console.error(`Error cleanup obsolete rows: ${err}`)
   }
