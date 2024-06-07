@@ -82,6 +82,17 @@ async function signInWithFacebook() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `facebook` as the `provider`:
+
+```dart
+Future<void> signInWithFacebook() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.facebook);
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Facebook` as the `Provider`:

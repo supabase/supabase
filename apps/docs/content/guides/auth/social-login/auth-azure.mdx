@@ -138,6 +138,20 @@ async function signInWithAzure() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
+
+```dart
+Future<void> signInWithAzure() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.azure,
+    scopes: 'email',
+  );
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Azure` as the `Provider`:

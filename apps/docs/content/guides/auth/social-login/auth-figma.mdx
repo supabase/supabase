@@ -66,6 +66,17 @@ async function signInWithFigma() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/flutter/auth-signinwithoauth) with `figma` as the `provider`:
+
+```js
+Future<void> signInWithFigma() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.figma);
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Figma` as the `Provider`:

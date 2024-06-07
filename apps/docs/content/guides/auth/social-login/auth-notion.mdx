@@ -66,6 +66,17 @@ async function signInWithNotion() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `notion` as the `provider`:
+
+```dart
+Future<void> signInWithNotion() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.notion);
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Notion` as the `Provider`:

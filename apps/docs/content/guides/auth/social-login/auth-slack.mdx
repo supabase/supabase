@@ -84,6 +84,17 @@ async function signInWithSlack() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `slack` as the `provider`:
+
+```dart
+Future<void> signInWithSlack() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.slack);
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Slack` as the `Provider`:
