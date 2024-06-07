@@ -6,7 +6,10 @@ import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
 import { Button, Form, Input } from 'ui'
 
-const WHITELIST_ERRORS = ['New password should be different from the old password']
+const WHITELIST_ERRORS = [
+  'New password should be different from the old password',
+  'Password is known to be weak and easy to guess, please choose a different one',
+]
 
 const ResetPasswordForm = () => {
   const router = useRouter()
@@ -23,7 +26,7 @@ const ResetPasswordForm = () => {
       await router.push('/projects')
     } else {
       toast.error(`Failed to save password: ${error.message}`, { id: toastId })
-      if (!WHITELIST_ERRORS.includes(error.message)) {
+      if (!WHITELIST_ERRORS.some((e) => error.message.includes(e))) {
         Sentry.captureMessage('[CRITICAL] Failed to reset password: ' + error.message)
       }
     }
