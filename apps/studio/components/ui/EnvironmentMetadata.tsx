@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-function DeploymentBanner() {
+function EnvironmentMetadata() {
   const environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 
   if (environment === 'staging' || environment === 'local') {
@@ -13,7 +13,7 @@ function DeploymentBanner() {
 
     useEffect(() => {
       console.log(
-        `\n\n%cVercel Deployment Information\n\n%cEnvironment: %c${environment || 'undefined'}\n%cCommit SHA: %c${commitSha ? `${repoUrl}/commit/${commitSha}` : 'undefined'}\n%cCommit Message: %c${commitMessage || 'undefined'}\n%cPull Request ID: %c${pullRequestId ? `${repoUrl}/pull/${pullRequestId}` : 'undefined'}\n%cBranch: %c${branch ? `${repoUrl}/tree/${branch}` : 'undefined'}\n%cRepository: %c${repoOwner || 'undefined'}/${repoSlug || 'undefined'}\n\n`,
+        `\n⚡️ ⚡️ ⚡️\n\n%cSupabase Dashboard\n\n%cEnvironment: %c${environment || 'undefined'}\n%cCommit SHA: %c${commitSha ? `${repoUrl}/commit/${commitSha}` : 'undefined'}\n%cCommit Message: %c${commitMessage || 'undefined'}\n%cPull Request ID: %c${pullRequestId ? `${repoUrl}/pull/${pullRequestId}` : 'undefined'}\n%cBranch: %c${branch ? `${repoUrl}/tree/${branch}` : 'undefined'}\n%cRepository: %c${repoOwner || 'undefined'}/${repoSlug || 'undefined'}\n\n`,
         'color: green; font-size: 16px; font-weight: bold;',
         'color: inherit;',
         'color: green;',
@@ -88,4 +88,4 @@ function DeploymentBanner() {
   }
 }
 
-export { DeploymentBanner }
+export { EnvironmentMetadata }
