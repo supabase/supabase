@@ -1,19 +1,41 @@
+import { useEffect } from 'react'
+
 function DeploymentBanner() {
-  console.log('env', process.env.VERCEL_ENV)
-  if (
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-  ) {
+  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+
+  if (environment === 'staging' || environment === 'local') {
     const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
     const commitMessage = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_MESSAGE
     const pullRequestId = process.env.NEXT_PUBLIC_VERCEL_GIT_PULL_REQUEST_ID
     const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF
-    const repoUrl = `https://github.com/supabase/supabase`
+    const repoOwner = process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_OWNER
+    const repoSlug = process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG
+
+    useEffect(() => {
+      console.log(
+        `\n\n%cVercel Deployment Information\n\n%cEnvironment: %c${environment || 'undefined'}\n%cCommit SHA: %c${commitSha ? `${repoUrl}/commit/${commitSha}` : 'undefined'}\n%cCommit Message: %c${commitMessage || 'undefined'}\n%cPull Request ID: %c${pullRequestId ? `${repoUrl}/pull/${pullRequestId}` : 'undefined'}\n%cBranch: %c${branch ? `${repoUrl}/tree/${branch}` : 'undefined'}\n%cRepository: %c${repoOwner || 'undefined'}/${repoSlug || 'undefined'}\n\n`,
+        'color: green; font-size: 16px; font-weight: bold;',
+        'color: inherit;',
+        'color: green;',
+        'color: inherit;',
+        'color: green;',
+        'color: inherit;',
+        'color: green;',
+        'color: inherit;',
+        'color: green;',
+        'color: inherit;',
+        'color: green;',
+        'color: inherit;',
+        'color: green;'
+      )
+    }, [environment, commitSha, commitMessage, pullRequestId, branch, repoOwner, repoSlug])
+
+    const repoUrl = `https://github.com/${repoOwner}/${repoSlug}`
 
     return (
-      <div className="bg-foreground text-background px-4 py-1 font-mono text-xs flex items-center gap-4">
+      <div className="bg-foreground text-background px-4 py-1 font-mono text-xs flex items-center gap-4 w-full top-0 z-50">
         <span>
-          <strong>Environment:</strong> {process.env.NEXT_PUBLIC_ENVIRONMENT || 'undefined'}
+          <strong>Environment:</strong> {environment || 'undefined'}
         </span>
         {commitSha && (
           <span>
