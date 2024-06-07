@@ -128,7 +128,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       Project cannot be restored through the dashboard
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      This project has been paused for a period longer than{' '}
+                      This project has been paused more than{' '}
                       <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span> and
                       hence cannot be restored through the dashboard. Your data is still intact and
                       can be downloaded as a backup nonetheless.
@@ -166,7 +166,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Free projects cannot be restored through the dashboard if they are paused
-                        for a period longer than{' '}
+                        for more than{' '}
                         <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span>. Your
                         database backup will still be available for download thereafter nonetheless.
                       </AlertDescription_Shadcn_>
