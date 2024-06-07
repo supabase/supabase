@@ -3977,6 +3977,7 @@ export interface components {
       db_host: string
       id: number
       inserted_at: string
+      updated_at: string
       name: string
       organization_id: number
       ref: string
@@ -4005,7 +4006,6 @@ export interface components {
       is_branch_enabled: boolean
       parent_project_ref?: string
       is_physical_backups_enabled: boolean
-      is_restore_disabled: boolean
       v2MaintenanceWindow: {
         start?: string
         end?: string

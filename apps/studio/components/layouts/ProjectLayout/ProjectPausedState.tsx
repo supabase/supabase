@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
@@ -29,6 +30,8 @@ import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
 import { useBackupsQuery } from 'data/database/backups-query'
 
+const RESTORE_THRESHOLD_DAYS = 90
+
 export interface ProjectPausedStateProps {
   product?: string
 }
@@ -41,8 +44,13 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const isRestoreDisabled = true //project?.is_restore_disabled
+
+  const daysFromLastUpdate = dayjs()
+    .utc()
+    .diff(dayjs(project?.updated_at), 'd')
+  const restoreThresholdReached = daysFromLastUpdate >= RESTORE_THRESHOLD_DAYS
   const isFreePlan = subscription?.plan?.id === 'free'
+  const isRestoreDisabled = isFreePlan && restoreThresholdReached
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -102,19 +110,28 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   <p className="text-sm text-foreground-light text-center">
                     All of your project's data is still intact, but your project is inaccessible
                     while paused.{' '}
+                    {product !== undefined ? (
+                      <>
+                        Restore this project to access the{' '}
+                        <span className="text-brand">{product}</span> page
+                      </>
+                    ) : (
+                      'Restore this project and get back to building!'
+                    )}
                   </p>
                 </div>
 
-                {isFreePlan && isRestoreDisabled ? (
+                {isRestoreDisabled ? (
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
                       Project cannot be restored through the dashboard
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      This project has been paused for a period longer than 30 days and hence cannot
-                      be restored through the dashboard. Your data is still intact and can be
-                      downloaded as a backup nonetheless
+                      This project has been paused for a period longer than{' '}
+                      <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span> and
+                      hence cannot be restored through the dashboard. Your data is still intact and
+                      can be downloaded as a backup nonetheless.
                     </AlertDescription_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
                       <Tooltip_Shadcn_>
@@ -129,25 +146,33 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                           </TooltipContent_Shadcn_>
                         )}
                       </Tooltip_Shadcn_>
-                      <Button type="default" icon={<ExternalLink />}>
-                        Documentation
-                      </Button>
+                      {/* [Joshen] To update this once we have docs ready */}
+                      {/* <Button asChild type="default" icon={<ExternalLink />}>
+                        <a href="/" target="_blank" rel="noreferrer">
+                          Documentation
+                        </a>
+                      </Button> */}
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
-                ) : (
-                  <p className="text-sm text-foreground-light text-center">
-                    {product !== undefined ? (
-                      <>
-                        Restore this project to access the{' '}
-                        <span className="text-brand">{product}</span> page
-                      </>
-                    ) : (
-                      'Restore this project and get back to building!'
-                    )}
-                    {isFreePlan &&
-                      ' You can also prevent project pausing in the future by upgrading to Pro.'}
-                  </p>
-                )}
+                ) : isFreePlan ? (
+                  <>
+                    <p className="text-sm text-foreground-light text-center">
+                      You can also prevent project pausing in the future by upgrading to Pro.
+                    </p>
+                    <Alert_Shadcn_>
+                      <AlertTitle_Shadcn_>
+                        Project can be restored through the dashboard within{' '}
+                        {RESTORE_THRESHOLD_DAYS - daysFromLastUpdate} more days
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Free projects cannot be restored through the dashboard if they are paused
+                        for a period longer than{' '}
+                        <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span>. Your
+                        database backup will still be available for download thereafter nonetheless.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  </>
+                ) : null}
 
                 {!isFreePlan && (
                   <Alert_Shadcn_>
