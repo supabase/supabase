@@ -56,8 +56,17 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     OrganizationCustomerProfileUpdateVariables
   >((vars) => updateOrganizationCustomerProfile(vars), {
     async onSuccess(data, variables, context) {
-      const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
+      const { address, slug } = variables
+
+      // We do not invalidate here as GET endpoint data is stale for 1-2 seconds, so we handle state manually
+      queryClient.setQueriesData(organizationKeys.customerProfile(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          address,
+        }
+      })
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
