@@ -255,6 +255,7 @@ const TableEditor = ({
     >
       <SidePanel.Content className="space-y-10 py-6">
         <Input
+          data-testid="table-name-input"
           label="Name"
           layout="horizontal"
           type="text"

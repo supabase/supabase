@@ -38,6 +38,7 @@ interface InputWithSuggestionsProps {
   suggestionsHeader?: string
   onChange: (event: any) => void
   onSelectSuggestion: (suggestion: Suggestion) => void
+  'data-testid'?: string
 }
 
 const InputWithSuggestions = ({
@@ -54,6 +55,7 @@ const InputWithSuggestions = ({
   suggestionsHeader,
   onChange = noop,
   onSelectSuggestion = noop,
+  'data-testid': dataTestId,
 }: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
@@ -92,6 +94,7 @@ const InputWithSuggestions = ({
         type="text"
         value={value}
         onChange={onInputChange}
+        data-testid={dataTestId}
         actions={
           showSuggestions && (
             <DropdownMenu>

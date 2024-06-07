@@ -7,8 +7,6 @@ const dismissToast = async (page: Page) => {
 }
 
 test.describe('Table Editor page', () => {
-  test.setTimeout(60000)
-
   test.beforeEach(async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
       'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
@@ -25,19 +23,15 @@ test.describe('Table Editor page', () => {
 
     // The page has been loaded with the table data, we can now interact with the page
     await page.getByRole('button', { name: 'New table', exact: true }).click()
-    await page
-      .locator('.col-span-8 > div > .relative > .peer\\/input')
-      .first()
-      .waitFor({ state: 'visible' })
-    await page.locator('.col-span-8 > div > .relative > .peer\\/input').first().click()
-    await page.locator('.col-span-8 > div > .relative > .peer\\/input').first().fill(tableName)
+    await page.getByTestId('table-name-input').waitFor({ state: 'visible' })
+    await page.getByTestId('table-name-input').click()
+    await page.getByTestId('table-name-input').fill(tableName)
 
     // make the built-in created_at column nullable
-    await page.locator('div:nth-child(3) > div > div > div:nth-child(7) > button').click()
+    await page.getByTestId('created_at-extra-options').click()
     await page.getByText('Is Nullable').click()
-    await page
-      .locator('div:nth-child(3) > div > div > div:nth-child(7) > button')
-      .click({ force: true })
+    // the force option is needed because the button is obscured by the popover but we just want to close the popover.
+    await page.getByTestId('created_at-extra-options').click({ force: true })
 
     // add a new column and add default value
     await page.getByRole('button', { name: 'Add column' }).click()
@@ -45,8 +39,8 @@ test.describe('Table Editor page', () => {
     await page.getByRole('textbox', { name: 'column_name' }).fill('defaultValueColumn')
     await page.getByRole('button', { name: '---' }).click()
     await page.getByText('Signed two-byte integer').click()
-    await page.getByPlaceholder('NULL').nth(2).click()
-    await page.getByPlaceholder('NULL').nth(2).fill('2')
+    await page.getByTestId('defaultValueColumn-default-value').click()
+    await page.getByTestId('defaultValueColumn-default-value').fill('2')
 
     await page.getByRole('button', { name: 'Save' }).waitFor({ state: 'visible' })
     await page.getByRole('button', { name: 'Save' }).click()
@@ -62,8 +56,8 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: tableName }).click()
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByPlaceholder("Default: '2'::smallint").click()
-    await page.getByPlaceholder("Default: '2'::smallint").fill('100')
+    await page.getByTestId('defaultValueColumn-input').click()
+    await page.getByTestId('defaultValueColumn-input').fill('100')
     await page.getByTestId('action-bar-save-row').click()
     await dismissToast(page)
 
@@ -71,8 +65,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: tableName }).click()
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByPlaceholder("Default: '2'::smallint").click()
-    // await page.getByPlaceholder("Default: '2'::smallint").fill('100')
+    // the default value should be '100' for defaultValueColumn
     await page.getByTestId('action-bar-save-row').click()
     await dismissToast(page)
 
