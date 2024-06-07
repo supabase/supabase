@@ -56,9 +56,9 @@ You can supply either the Supabase Client constructor or an already-initiated in
 <TabPanel id="constructor" label="With constructor">
 
 ```ts
-import * as Sentry from "@sentry/browser"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { supabaseIntegration } from "@supabase/sentry-js-integration"
+import * as Sentry from '@sentry/browser'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { supabaseIntegration } from '@supabase/sentry-js-integration'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -77,9 +77,9 @@ Sentry.init({
 <TabPanel id="instance" label="With instance">
 
 ```ts
-import * as Sentry from "@sentry/browser"
-import { createClient } from "@supabase/supabase-js"
-import { supabaseIntegration } from "@supabase/sentry-js-integration"
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+import { supabaseIntegration } from '@supabase/sentry-js-integration'
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
 
@@ -106,9 +106,9 @@ All available configuration options are available in our [`supabase-community/se
 If you're already monitoring HTTP errors in Sentry, for example with the Http, Fetch, or Undici integrations, you will get duplicate spans for Supabase calls. You can deduplicate the spans by skipping them in your other integration:
 
 ```ts
-import * as Sentry from "@sentry/browser"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { supabaseIntegration } from "@supabase/sentry-js-integration"
+import * as Sentry from '@sentry/browser'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { supabaseIntegration } from '@supabase/sentry-js-integration'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -162,9 +162,9 @@ See this example for a setup with Next.js to cover browser, server, and edge env
 <TabPanel id="browser" label="Browser">
 
 ```ts sentry.client.config.ts
-import * as Sentry from "@sentry/nextjs"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { supabaseIntegration } from "@supabase/sentry-js-integration"
+import * as Sentry from '@sentry/nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { supabaseIntegration } from '@supabase/sentry-js-integration'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -176,11 +176,7 @@ Sentry.init({
     }),
     Sentry.nativeNodeFetchIntegration({
       shouldCreateSpanForRequest: (url) => {
-        console.log(
-          "server",
-          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`,
-          url
-        )
+        console.log('server', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`, url)
         return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`)
       },
     }),
@@ -199,9 +195,9 @@ Sentry.init({
 <TabPanel id="server" label="Server">
 
 ```ts sentry.server.config.ts
-import * as Sentry from "@sentry/nextjs"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { supabaseIntegration } from "@supabase/sentry-js-integration"
+import * as Sentry from '@sentry/nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { supabaseIntegration } from '@supabase/sentry-js-integration'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -265,12 +261,12 @@ Sentry.init({
 ```js instrumentation.ts
 // https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
 export async function register() {
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./sentry.server.config");
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config')
   }
 
-  if (process.env.NEXT_RUNTIME === "edge") {
-    await import("./sentry.edge.config");
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config')
   }
 }
 ```
