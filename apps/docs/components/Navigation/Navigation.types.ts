@@ -9,7 +9,7 @@ export interface NavMenuGroup {
 
 export interface NavMenuSection {
   name: string
-  url?: `/${string}`
+  url?: `/${string}` | `https://supabase.com/${string}`
   items: Partial<NavMenuSection>[]
 }
 

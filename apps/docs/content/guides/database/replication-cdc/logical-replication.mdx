@@ -1,0 +1,41 @@
+---
+id: 'logical-replication'
+title: 'Logical Replication: An Introduction'
+description: 'Covering the concepts, terms and config of Logical Replication'
+sidebar_label: 'Logical Replication'
+---
+
+# Concepts and Terms
+
+## Write Ahead Log (WAL)
+
+You may have heard this term, seen it in error messages or configuration files. Postgresql uses a system called the Write Ahead Log to managae changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgresql will start appending to a new segment. After a period of time, a checkpoint occurs and Postgresql synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+
+## Logical Replication and WAL
+
+Logical replication is a method of replication where Postgresql can reuse the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files.
+
+## Logical Replication Architecture
+
+When using logical replication, you have a few active components:
+
+- `publication` - A set of tables that you want to replicate
+- `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
+- `subscription` - A subscription is made from an external system (i.e. another Postgresql database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created for you
+
+## Logical Replication Output Format
+
+Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgresql sends changes to any active replication slot.
+
+# Logical Replication Configuration
+
+When you use logical replication, you are usually telling Postgresql to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
+
+In order to mitigate this, Postgresql has many options and settings that can be tweaked to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+
+| Setting                                                                                | Description                                       | User-facing | Default |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------- | ------- |
+| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/) | Max count of replication slots allowed            |    No         |         |
+| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                 | Minimum size of WAL files to keep for replication |    No        |         |
+| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/)                                                               | Max WAL size that can be reserved by replication slots                                                  | No            |         |
+| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)       | Max time between WAL checkpoints                  |  No           |         |
