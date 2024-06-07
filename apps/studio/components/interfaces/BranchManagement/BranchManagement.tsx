@@ -39,8 +39,8 @@ const BranchManagement = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const [urlParams, setParams] = useUrlState()
-  const tab = (urlParams.tab ?? 'overview') as Tab
+  const [urlParams, setParams] = useUrlState<{ tab: Tab }>()
+  const tab = urlParams.tab ?? 'overview'
   const setTab = (tab: Tab) => setParams({ tab })
 
   const [showCreateBranch, setShowCreateBranch] = useState(false)
