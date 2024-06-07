@@ -37,7 +37,6 @@ interface CreateBranchModalProps {
 }
 
 const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
-  console.log('visible:', visible)
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
