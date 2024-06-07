@@ -40,24 +40,6 @@ function EnvironmentMetadata() {
         <span>
           <strong>Environment:</strong> {environment || 'undefined'}
         </span>
-        {commitSha && (
-          <span>
-            <strong>Commit SHA:</strong>{' '}
-            <a
-              href={`${repoUrl}/commit/${commitSha}`}
-              className="underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {commitSha}
-            </a>
-          </span>
-        )}
-        {commitMessage && (
-          <span>
-            <strong>Commit Message:</strong> {commitMessage}
-          </span>
-        )}
         {pullRequestId && (
           <span>
             <strong>Pull Request ID:</strong>{' '}
