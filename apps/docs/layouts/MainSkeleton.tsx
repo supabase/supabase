@@ -157,7 +157,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         'transition-all ease-out',
         'top-0',
         mobileMenuOpen && 'absolute',
-        'flex items-center h-[var(--header-height,40px)]',
+        'flex items-center',
         mobileMenuOpen ? 'gap-0' : 'gap-2'
       )}
     >
@@ -331,7 +331,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
       </div>
       <div className="flex flex-row h-full">
         {!isHomePage && <NavContainer menuId={menuId} />}
-        <Container className="[--header-height:40px] lg:[--header-height:90px]">
+        <Container>
           <div
             className={cn(
               'flex lg:hidden w-full top-0 left-0 right-0 z-50',

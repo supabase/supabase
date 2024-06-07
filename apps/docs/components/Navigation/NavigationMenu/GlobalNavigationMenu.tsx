@@ -57,17 +57,17 @@ const GlobalNavigationMenu: FC = () => {
   const activeLabel = useActiveMenuLabel()
 
   return (
-    <div className="h-[30px] flex relative gap-2 justify-start items-end w-full">
+    <div className="flex relative gap-2 justify-start items-end w-full">
       <NavigationMenu
         delayDuration={0}
         skipDelayDuration={0}
         className="w-full flex justify-start"
         renderViewport={isLowerThanMd}
-        viewportClassName="mt-0 border-x-none border-y rounded-none lg:mt-1.5 lg:rounded-md lg:!border-x"
+        viewportClassName="mt-0 max-w-screen overflow-hidden border-x-0 border-y rounded-none lg:mt-1.5 lg:rounded-md lg:!border-x"
         orientation="horizontal"
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
-          <NavigationMenuList className="px-5 lg:px-10 space-x-5 lg:space-x-6">
+          <NavigationMenuList className="px-5 lg:px-10 space-x-5 lg:space-x-6 h-[37px]">
             {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
               section[0].menuItems ? (
                 <NavigationMenuItem
@@ -77,9 +77,8 @@ const GlobalNavigationMenu: FC = () => {
                   <NavigationMenuTrigger
                     className={cn(
                       navigationMenuTriggerStyle(),
-                      'bg-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-[37px]',
-                      activeLabel === section[0].label &&
-                        'text-foreground border-b border-foreground'
+                      'bg-transparent border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full',
+                      activeLabel === section[0].label && 'text-foreground border-foreground'
                     )}
                   >
                     {section[0].label === 'Home' ? (
@@ -115,13 +114,13 @@ const GlobalNavigationMenu: FC = () => {
               ) : (
                 <NavigationMenuItem
                   key={`desktop-docs-menu-section-${section[0].label}`}
-                  className="text-sm relative"
+                  className="text-sm relative h-full"
                 >
                   <NavigationMenuLink asChild>
                     <Link
                       href={section[0].href}
                       className={cn(
-                        'relative flex-1 whitespace-nowrap border-b border-transparent flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-none py-2 px-0 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground h-[37px]',
+                        'relative flex-1 whitespace-nowrap border-b border-transparent flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-none py-2 px-0 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground h-full',
                         // sectionIndex === 0 && '-ml-2.5',
                         activeLabel === section[0].label && 'text-foreground border-foreground'
                       )}
@@ -155,7 +154,7 @@ const ResponsiveScrollArea: FC<PropsWithChildren<{ isLowerThanMd: boolean }>> = 
         <div className="absolute h-full right-0 w-7 z-50 bg-gradient-to-r from-transparent to-background" />
         {children}
         <ScrollBar orientation="horizontal" className="hidden" />
-        <NavigationMenuViewport />
+        <NavigationMenuViewport containerProps={{ className: 'overflow-hidden' }} />
       </ScrollArea>
     </>
   )
