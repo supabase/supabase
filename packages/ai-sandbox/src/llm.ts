@@ -100,7 +100,11 @@ export async function streamTextWithInterpreter(options: StreamTextWithInterpret
   let system: string
 
   if (isToolMode) {
-    system = 'Relay the tool result to the user.'
+    system = codeBlock`
+      ${options.system ?? 'You are a helpful assistant.'}
+      
+      Relay the tool result to the user.
+    `
   } else {
     system = buildSystemPrompt({
       basePrompt: options.system,
@@ -232,6 +236,7 @@ export function buildSystemPrompt({
     - The JavaScript code will run behind the scenes, so when outside of the code, don't refer to it (or the functions) directly (instead say something like "computing..." / "working on it" / etc)
     - You are expected to use modern ES2020 syntax
     - You are writing code for ES modules, so use imports and exports
+    - Imports and exports can not be nested in an if-statement
     - Top level await is supported, so use it if needed
     - Use Math.* functions when performing math operations or using math constants
     - Create your own functions as necessary to keep the code modular
