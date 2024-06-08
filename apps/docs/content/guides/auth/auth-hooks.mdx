@@ -77,12 +77,12 @@ You also need to grant usage to `supabase_auth_admin`:
 grant usage on schema public to supabase_auth_admin;
 ```
 
-Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the`public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
 
 ```sql
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
@@ -258,11 +258,11 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -389,11 +389,11 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -500,7 +500,7 @@ grant execute
 
 revoke execute
   on function public.hook_notify_user_on_failed_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant all
   on table public.password_sign_in_attempts
@@ -508,7 +508,7 @@ grant all
 
 revoke all
   on table public.password_sign_in_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -602,7 +602,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant all
   on table public.profiles
@@ -610,7 +610,7 @@ grant all
 
 revoke all
   on table public.profiles
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -662,7 +662,7 @@ grant all
 
 revoke all
   on table public.profiles
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -706,7 +706,7 @@ grant execute
 
 revoke execute
   on function public.restrict_application_access
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>

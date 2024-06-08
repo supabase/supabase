@@ -255,6 +255,7 @@ const TableEditor = ({
     >
       <SidePanel.Content className="space-y-10 py-6">
         <Input
+          data-testid="table-name-input"
           label="Name"
           layout="horizontal"
           type="text"
@@ -282,12 +283,7 @@ const TableEditor = ({
               <Badge>Recommended</Badge>
             </div>
           }
-          // @ts-ignore
-          description={
-            <>
-              <p>Restrict access to your table by enabling RLS and writing Postgres policies.</p>
-            </>
-          }
+          description="Restrict access to your table by enabling RLS and writing Postgres policies."
           checked={tableFields.isRLSEnabled}
           onChange={() => {
             // if isEnabled, show confirm modal to turn off
