@@ -17,7 +17,8 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
    */
   await Promise.all(
     sections.map(async (section) => {
-      const pathName = `docs/ref${slug}/${section.id}.mdx`
+      const isSharedSection = section.meta?.shared
+      const pathName = `docs/ref${isSharedSection ? '/shared' : slug}/${section.id}.mdx`
 
       function checkFileExists(x) {
         if (fs.existsSync(x)) {
