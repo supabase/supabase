@@ -1,18 +1,19 @@
 'use client'
 
+import 'chart.js/auto'
+
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
-import { FunctionBinding, executeJS } from 'ai-sandbox'
 import { useChat } from 'ai/react'
-import { codeBlock } from 'common-tags'
 import { ArrowUp } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { Chart } from 'react-chartjs-2'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { format } from 'sql-formatter'
-import { CodeBlock, markdownComponents } from 'ui'
+import { markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 
@@ -22,29 +23,37 @@ let db: PGlite = new PGlite('idb://local')
 
 export default function Page() {
   const [sql, setSql] = useState('')
+  const [isEditorVisible, setIsEditorVisible] = useState(false)
 
-  const functionBindings: Record<string, FunctionBinding> = useMemo(() => {
-    return {
-      runSql: {
-        description: codeBlock`
-        Runs Postgres SQL.
-
-        type Row<T = {
-          [key: string]: any;
-        }> = T;
-        type Results<T = {
-          [key: string]: any;
-        }> = {
-          rows: Row<T>[];
-          affectedRows?: number;
-          fields: {
-              name: string;
-              dataTypeID: number;
-          }[];
-        };
-        `,
-        typeDef: '(sql: string): Promise<Result>',
-        fn: async (sql: string) => {
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: 'api/chat',
+    maxToolRoundtrips: 5,
+    async onToolCall({ toolCall }) {
+      console.log('tool call', toolCall)
+      switch (toolCall.toolName) {
+        case 'getDatabaseSchema': {
+          const { sql } = toolCall.args as any
+          console.log(sql)
+          const results = await db.exec(sql)
+          console.log(results)
+          return results
+        }
+        case 'brainstormReports': {
+          return 'Reports have been brainstormed. Relay this info to the user.'
+        }
+        case 'executeSql': {
+          const { sql } = toolCall.args as any
+          console.log(sql)
+          const results = await db.exec(sql)
+          console.log(results)
+          return results
+        }
+        case 'generateChart': {
+          const { config } = toolCall.args as any
+          return 'Chart has been generated and shown to the user. Say something like, "Above is a chart ...".'
+        }
+        case 'appendSqlToMigration': {
+          const { sql } = toolCall.args as any
           setSql((s) => {
             const newSql = (s + '\n' + sql).trim()
             return format(newSql, {
@@ -55,96 +64,57 @@ export default function Page() {
               functionCase: 'lower',
             })
           })
-
-          console.log('about to exec')
-          const results = await db.exec(sql)
-          console.log('after exec')
-          return results
-        },
-      },
-    }
-  }, [])
-
-  const expose = useMemo(() => {
-    return Object.entries(functionBindings).reduce(
-      (merged, [name, { fn }]) => ({
-        ...merged,
-        [name]: fn,
-      }),
-      {}
-    )
-  }, [functionBindings])
-
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: 'api/plan',
-    body: {
-      functionBindings,
-    },
-    maxToolRoundtrips: 5,
-    async onToolCall({ toolCall }) {
-      console.log('tool', toolCall)
-      if (toolCall.toolName === 'interpret') {
-        const args: any = toolCall.args
-        const { exports, error } = await executeJS(args.source, {
-          expose,
-        })
-
-        if (error) {
-          // Make `message` enumerable so that it gets serialized
-          Object.defineProperty(error, 'message', {
-            enumerable: true,
-          })
+          setIsEditorVisible(true)
+          return 'SQL has successfully been appended to the migration file.'
         }
-
-        const result = error ?? exports
-
-        return result
       }
     },
   })
 
   return (
     <div className="w-full h-full flex p-6">
-      <div className="h-full w-[50rem] py-4 rounded-md bg-[#1e1e1e]">
-        <Editor
-          language="pgsql"
-          value={sql}
-          theme="vs-dark"
-          options={{
-            tabSize: 2,
-            minimap: {
-              enabled: false,
-            },
-            fontSize: 13,
-          }}
-          onMount={async (editor, monaco) => {
-            // Register pgsql formatter
-            monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-              async provideDocumentFormattingEdits(model) {
-                const currentCode = editor.getValue()
-                const formattedCode = format(currentCode, {
-                  language: 'postgresql',
-                  keywordCase: 'lower',
-                })
-                return [
-                  {
-                    range: model.getFullModelRange(),
-                    text: formattedCode,
-                  },
-                ]
+      {isEditorVisible && (
+        <div className="h-full w-[50rem] py-4 rounded-md bg-[#1e1e1e]">
+          <Editor
+            language="pgsql"
+            value={sql}
+            theme="vs-dark"
+            options={{
+              tabSize: 2,
+              minimap: {
+                enabled: false,
               },
-            })
+              fontSize: 13,
+            }}
+            onMount={async (editor, monaco) => {
+              // Register pgsql formatter
+              monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+                async provideDocumentFormattingEdits(model) {
+                  const currentCode = editor.getValue()
+                  const formattedCode = format(currentCode, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                  })
+                  return [
+                    {
+                      range: model.getFullModelRange(),
+                      text: formattedCode,
+                    },
+                  ]
+                },
+              })
 
-            // Format on cmd+s
-            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+              // Format on cmd+s
+              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+                await editor.getAction('editor.action.formatDocument').run()
+              })
+
+              // Run format on the initial value
               await editor.getAction('editor.action.formatDocument').run()
-            })
-
-            // Run format on the initial value
-            await editor.getAction('editor.action.formatDocument').run()
-          }}
-        />
-      </div>
+            }}
+          />
+        </div>
+      )}
       <div className="flex-1 max-h-full flex flex-col items-stretch">
         <div className="flex-1 flex flex-col items-center overflow-y-auto">
           <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
@@ -173,31 +143,21 @@ export default function Page() {
                       >
                         {message.content}
                       </ReactMarkdown>
-                      {message.toolInvocations &&
-                        message.toolInvocations.map((invocation) => (
-                          <div key={invocation.toolCallId}>
-                            <div className="flex items-center px-3 py-2 bg-neutral-600 text-white text-xs rounded-t-md">
-                              <h3>JavaScript (Interpreter)</h3>
-                            </div>
-                            <div className="">
-                              <div className="py-4 bg-neutral-100">
-                                <CodeBlock className="language-js border-none p-0">
-                                  {invocation.args.source}
-                                </CodeBlock>
-                              </div>
-                              {'result' in invocation && (
-                                <div className="bg-white p-4 border border-neutral-100 rounded-b-md">
-                                  <CodeBlock
-                                    className="language-js border-none p-0"
-                                    hideLineNumbers
-                                  >
-                                    {JSON.stringify(invocation.result, undefined, 2)}
-                                  </CodeBlock>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                      {message.toolInvocations?.map((toolInvocation) => {
+                        switch (toolInvocation.toolName) {
+                          case 'executeSql': {
+                            return <div>Executing SQL...</div>
+                          }
+                          case 'generateChart': {
+                            return (
+                              <Chart
+                                key={toolInvocation.toolCallId}
+                                {...toolInvocation.args.config}
+                              />
+                            )
+                          }
+                        }
+                      })}
                     </div>
                   )
               }
@@ -215,6 +175,7 @@ export default function Page() {
               value={input}
               onChange={handleInputChange}
               placeholder="Message Supabase AI"
+              autoFocus
               id="input"
             />
             <Button className="rounded-full w-8 h-8 p-1.5 text-white bg-neutral-800" type="submit">
