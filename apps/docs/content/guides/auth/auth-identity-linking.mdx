@@ -38,7 +38,7 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/dart/auth-linkidentity):
 
@@ -96,7 +96,7 @@ const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 You can use [`getUserIdentities()`](/docs/reference/dart/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/dart/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
 

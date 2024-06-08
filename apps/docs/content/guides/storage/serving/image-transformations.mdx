@@ -39,7 +39,7 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final url = supabase.storage.from('bucket').getPublicUrl(
@@ -101,7 +101,7 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final url = await supabase.storage.from('bucket').createSignedUrl(
@@ -166,7 +166,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final data = await supabase.storage.from('bucket').download(
@@ -246,7 +246,7 @@ await supabase.storage.from('bucket').download('image.jpeg', {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final data = await supabase.storage.from('bucket').download(
@@ -357,7 +357,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final data = await supabase.storage.from('bucket').download(
@@ -437,7 +437,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
+<TabPanel id="dart" label="Dart">
 
 ```dart
 final data = supabase.storage.from('bucket').download(
