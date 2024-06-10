@@ -3,7 +3,9 @@ import { noop } from 'lodash'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 import {
-  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -30,6 +32,7 @@ import {
   ToggleRight,
   Type,
 } from 'lucide-react'
+import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -40,8 +43,6 @@ import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
 interface ColumnTypeProps {
   value: string
   enumTypes: EnumeratedType[]
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
-  layout?: 'vertical' | 'horizontal'
   className?: string
   error?: any
   disabled?: boolean
@@ -54,9 +55,6 @@ interface ColumnTypeProps {
 const ColumnType = ({
   value,
   enumTypes = [],
-  className,
-  size = 'medium',
-  layout,
   error,
   disabled = false,
   showLabel = true,
@@ -69,10 +67,8 @@ const ColumnType = ({
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
   const [open, setOpen] = useState(false)
-  const [columnValue, setColumnValue] = useState('')
 
   const inferIcon = (type: string) => {
-    console.log({ type })
     switch (type) {
       case 'number':
         return <Hash size={14} className="text-foreground" strokeWidth={1.5} />
@@ -81,6 +77,12 @@ const ColumnType = ({
       case 'text':
         return <Type size={14} className="text-foreground" strokeWidth={1.5} />
       case 'json':
+        return (
+          <div className="text-foreground" style={{ padding: '0px 1px' }}>
+            {'{ }'}
+          </div>
+        )
+      case 'jsonb':
         return (
           <div className="text-foreground" style={{ padding: '0px 1px' }}>
             {'{ }'}
@@ -146,7 +148,6 @@ const ColumnType = ({
             layout={showLabel ? 'horizontal' : undefined}
             className="md:gap-x-0"
             size="small"
-            icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
           />
         </Tooltip.Trigger>
@@ -178,7 +179,7 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
-            className="w-[250px] w-full justify-between"
+            className="w-full justify-between"
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
             {value ? (
@@ -191,7 +192,7 @@ const ColumnType = ({
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[460px] p-0" side="top" align="center">
+        <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
           <ScrollArea className="h-[335px]">
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search types..." />
@@ -208,7 +209,6 @@ const ColumnType = ({
                         onOptionSelect(value)
                         setOpen(false)
                       }}
-                      //addOnBefore={() => inferIcon(option.type)}
                     >
                       <div className="flex items-center gap-2 pr-6">
                         <span>{inferIcon(option.type)}</span>
@@ -265,31 +265,32 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert
-          withIcon
-          variant="warning"
-          title={
-            <>
-              It is recommended to use <code className="text-xs">{recommendation.alternative}</code>{' '}
-              instead
-            </>
-          }
-        >
-          <p>
-            Postgres recommends against using the data type <code className="text-xs">{value}</code>{' '}
-            unless you have a very specific use case.
-          </p>
-          <div className="flex items-center space-x-2 mt-3">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <Link href={recommendation.reference} target="_blank" rel="noreferrer">
-                Read more
-              </Link>
-            </Button>
-            <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
-              Use {recommendation.alternative}
-            </Button>
-          </div>
-        </Alert>
+        <Alert_Shadcn_ variant="warning">
+          <CriticalIcon />
+          <AlertTitle_Shadcn_>
+            {' '}
+            It is recommended to use <code className="text-xs">
+              {recommendation.alternative}
+            </code>{' '}
+            insteadn
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            <p>
+              Postgres recommends against using the data type{' '}
+              <code className="text-xs">{value}</code> unless you have a very specific use case.
+            </p>
+            <div className="flex items-center space-x-2 mt-3">
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <Link href={recommendation.reference} target="_blank" rel="noreferrer">
+                  Read more
+                </Link>
+              </Button>
+              <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
+                Use {recommendation.alternative}
+              </Button>
+            </div>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       )}
     </div>
   )

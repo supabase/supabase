@@ -269,7 +269,6 @@ const ColumnEditor = ({
           <ColumnType
             showRecommendation
             value={columnFields?.format ?? ''}
-            layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
             description={
