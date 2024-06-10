@@ -6,7 +6,7 @@ import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationM
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { useLockBodyScroll, useToggle } from 'react-use'
+// import { useLockBodyScroll } from 'react-use'
 
 const levelsData = {
   home: {
@@ -272,7 +272,7 @@ const Container = memo(function Container({
 const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
   const mobileMenuOpen = useMenuMobileOpen()
 
-  useLockBodyScroll(mobileMenuOpen)
+  // useLockBodyScroll(mobileMenuOpen)
 
   return (
     <nav
@@ -289,7 +289,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         'top-0 bottom-0',
         'flex flex-col ml-0',
         'border-r',
-        'overflow-y-scroll lg:overflow-y-auto'
+        'lg:overflow-y-auto'
       )}
     >
       <div
@@ -298,7 +298,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           'h-full',
           'relative lg:sticky',
           'w-full lg:w-auto',
-          'h-auto lg:h-screen lg:overflow-auto',
+          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col'
         )}
