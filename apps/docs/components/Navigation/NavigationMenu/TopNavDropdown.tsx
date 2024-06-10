@@ -19,8 +19,6 @@ import {
 import Link from 'next/link'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
-import { useIsLoggedIn, useSignOut } from 'common'
 
 const menu = [
   [
@@ -55,16 +53,7 @@ const menu = [
 ]
 
 const TopNavDropdown = () => {
-  const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const isLoggedIn = useIsLoggedIn()
-
-  const signOut = useSignOut()
-  const onClickLogout = async () => {
-    await signOut()
-    await router.push('/sign-in')
-    router.reload()
-  }
 
   return (
     <DropdownMenu modal={false}>
@@ -73,7 +62,7 @@ const TopNavDropdown = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            'text-foreground-light w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 bg-transparent'
+            'text-foreground-light w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-default data-[state=open]:border-strong hover:!bg-overlay-hover/50 bg-transparent'
           )}
         >
           <IconMenu />
@@ -116,14 +105,6 @@ const TopNavDropdown = () => {
               ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
-        {isLoggedIn && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={onClickLogout}>Log out</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

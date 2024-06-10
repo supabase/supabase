@@ -3,7 +3,6 @@ import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import {
   Badge,
-  buttonVariants,
   cn,
   MenubarSeparator,
   NavigationMenu,
@@ -57,7 +56,7 @@ const GlobalNavigationMenu: FC = () => {
   const isLowerThanMd = useBreakpoint('md')
   const activeLabel = useActiveMenuLabel()
   const triggerClassName =
-    'bg-transparent border-0 border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none'
+    'bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
 
   return (
     <div className="flex relative gap-2 justify-start items-end w-full">
@@ -79,7 +78,6 @@ const GlobalNavigationMenu: FC = () => {
                 >
                   <NavigationMenuTrigger
                     className={cn(
-                      buttonVariants({ type: 'default' }),
                       navigationMenuTriggerStyle(),
                       triggerClassName,
                       activeLabel === section[0].label && 'text-foreground border-foreground'
@@ -124,7 +122,6 @@ const GlobalNavigationMenu: FC = () => {
                     <Link
                       href={section[0].href}
                       className={cn(
-                        buttonVariants({ type: 'default' }),
                         navigationMenuTriggerStyle(),
                         triggerClassName,
                         activeLabel === section[0].label && 'text-foreground border-foreground'

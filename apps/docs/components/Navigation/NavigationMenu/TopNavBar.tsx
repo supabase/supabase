@@ -28,7 +28,7 @@ const TopNavBar: FC = () => {
 
           <div className="md:w-full md:max-w-xs flex items-center gap-6">
             <SearchButton
-              className="md:w-full lg:w-96
+              className="md:w-full lg:w-96 h-[30px]
                         focus-visible:!outline-4 
                         focus-visible:outline-offset-1
                         focus-visible:outline-brand-600"
@@ -39,13 +39,12 @@ const TopNavBar: FC = () => {
                   group
                   items-center
                   justify-between
-                  bg-surface-100
-                  bg-opacity-75
-                  hover:bg-surface-200
+                  bg-surface-100/75
                   hover:bg-opacity-100
+                  hover:border-stronger
                   border
                   transition
-                  pl-1.5 md:pl-3 pr-1.5 w-full h-[30px] rounded
+                  pl-1.5 md:pl-3 pr-1 w-full h-full rounded-lg
                   text-foreground-lighter
                 "
               >
