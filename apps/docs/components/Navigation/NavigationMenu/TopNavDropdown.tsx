@@ -9,7 +9,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconHelpCircle,
   IconMenu,
   Theme,
   buttonVariants,
@@ -18,7 +17,6 @@ import {
 } from 'ui'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
