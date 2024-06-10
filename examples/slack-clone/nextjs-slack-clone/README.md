@@ -109,7 +109,7 @@ Users with the `moderator` role can delete all messages. Users with the `admin` 
 
 ### Postgres Row level security
 
-This project uses very high-level Authorization using Postgres' Role Level Security.
+This project uses very high-level Authorization using Postgres' Row Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.

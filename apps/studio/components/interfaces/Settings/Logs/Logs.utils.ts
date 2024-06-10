@@ -445,6 +445,7 @@ export const fillTimeseries = (
       'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
     )
   }
+
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 

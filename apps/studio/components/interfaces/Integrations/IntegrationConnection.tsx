@@ -3,9 +3,6 @@ import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +13,6 @@ import {
   IconLoader,
   IconRefreshCw,
   IconTrash,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -27,7 +23,6 @@ import {
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -49,6 +44,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const onConfirm = useCallback(async () => {
       try {
         await onDeleteConnection(connection)
+      } catch (error) {
+        // [Joshen] No need for error handler
       } finally {
         setIsOpen(false)
       }

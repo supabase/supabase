@@ -19,7 +19,11 @@ const model = new Supabase.ai.Session('model-name')
 
 <Admonition type="tip">
 
-To get type hints and checks for the API we recommend adding this triple-slash directive to the start of the Edge Function code: `/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />`
+To get type hints and checks for the API you can import types from `functions-js` at the top of your file:
+
+```ts
+import 'https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts'
+```
 
 </Admonition>
 
@@ -95,7 +99,7 @@ Inference via larger models is supported via [Ollama](https://ollama.com/). In t
    ```
 
    ```ts
-   /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+   import 'https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts'
    const session = new Supabase.ai.Session('mistral')
 
    Deno.serve(async (req: Request) => {

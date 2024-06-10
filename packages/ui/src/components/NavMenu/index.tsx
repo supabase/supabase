@@ -20,17 +20,16 @@ export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
   }
 )
 
-export const NavMenuItem = forwardRef(
-  ({
-    children,
-    className,
-    active,
-    ...props
-  }: PropsWithChildren<{
+interface NavMenuItemProps
+  extends PropsWithChildren<{
     className?: string
     active: boolean
-  }>) => (
+  }> {}
+
+export const NavMenuItem = forwardRef<HTMLLIElement, NavMenuItemProps>(
+  ({ children, className, active, ...props }, ref) => (
     <li
+      ref={ref}
       aria-selected={active ? 'true' : 'false'}
       data-state={active ? 'active' : 'inactive'}
       className={cn(

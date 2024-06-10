@@ -1146,6 +1146,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging',
         },
         {
+          name: 'Debugging Tools',
+          url: '/guides/functions/debugging-tools',
+        },
+        {
           name: 'Logging and Using Headers',
           url: '/guides/functions/functions-headers',
         },
@@ -1188,6 +1192,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Sending Push Notifications',
           url: '/guides/functions/examples/push-notifications',
+        },
+        {
+          name: 'Generating AI images',
+          url: '/guides/functions/examples/amazon-bedrock-image-generator',
         },
         {
           name: 'Generating OG images ',
@@ -1307,7 +1315,8 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
+        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
       ],
     },
   ],

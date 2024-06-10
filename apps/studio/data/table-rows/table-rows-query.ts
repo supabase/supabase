@@ -13,7 +13,12 @@ import {
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import {
+  ExecuteSqlData,
+  ExecuteSqlError,
+  executeSql,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 
@@ -155,7 +160,7 @@ export type TableRowsVariables = GetTableRowsArgs & {
 }
 
 export type TableRowsData = TableRows
-export type TableRowsError = unknown
+export type TableRowsError = ExecuteSqlError
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,

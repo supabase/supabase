@@ -150,53 +150,44 @@ const InviteMemberButton = ({
 
             return (
               <>
-                <Modal.Content>
-                  <div className="w-full py-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        {roles && (
-                          <Listbox
-                            id="role"
-                            name="role"
-                            label="Member role"
-                            error={
-                              invalidRoleSelected
-                                ? `You need additional permissions to assign users the role of ${selectedRole?.name}`
-                                : ''
-                            }
-                          >
-                            {roles.map((role: any) => (
-                              <Listbox.Option key={role.id} value={role.id} label={role.name}>
-                                {role.name}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox>
-                        )}
-                      </div>
-
-                      <Input
-                        autoFocus
-                        id="email"
-                        icon={<IconMail />}
-                        placeholder="Enter email address"
-                        label="Email address"
-                      />
-                    </div>
-                  </div>
+                <Modal.Content className="space-y-4">
+                  {roles && (
+                    <Listbox
+                      id="role"
+                      name="role"
+                      label="Member role"
+                      error={
+                        invalidRoleSelected
+                          ? `You need additional permissions to assign users the role of ${selectedRole?.name}`
+                          : ''
+                      }
+                    >
+                      {roles.map((role: any) => (
+                        <Listbox.Option key={role.id} value={role.id} label={role.name}>
+                          {role.name}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox>
+                  )}
+                  <Input
+                    autoFocus
+                    id="email"
+                    icon={<IconMail />}
+                    placeholder="Enter email address"
+                    label="Email address"
+                  />
                 </Modal.Content>
                 <Modal.Separator />
                 <Modal.Content>
-                  <div className="pt-2 pb-3">
-                    <Button
-                      block
-                      size="medium"
-                      htmlType="submit"
-                      disabled={isInviting || invalidRoleSelected}
-                      loading={isInviting}
-                    >
-                      Invite new member
-                    </Button>
-                  </div>
+                  <Button
+                    block
+                    size="medium"
+                    htmlType="submit"
+                    disabled={isInviting || invalidRoleSelected}
+                    loading={isInviting}
+                  >
+                    Invite new member
+                  </Button>
                 </Modal.Content>
               </>
             )

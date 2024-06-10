@@ -82,11 +82,9 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
         onSubmit={(newVals) => createCustomReport(newVals)}
       >
         {() => (
-          <div className="space-y-4 py-4">
-            <Modal.Content>
+          <>
+            <Modal.Content className="space-y-4">
               <Input label="Name" id="name" name="name" />
-            </Modal.Content>
-            <Modal.Content>
               <Input.TextArea
                 label="Description"
                 id="description"
@@ -96,17 +94,15 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isCreating}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isCreating} disabled={isCreating}>
-                  Create report
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isCreating}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isCreating} disabled={isCreating}>
+                Create report
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>
