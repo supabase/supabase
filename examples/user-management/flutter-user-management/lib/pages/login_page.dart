@@ -29,25 +29,13 @@ class _LoginPageState extends State<LoginPage> {
             kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Check your email for a login link!')),
-        );
+        _showSnackBar('Check your email for a login link!');
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      if (mounted) {
-        SnackBar(
-          content: Text(error.message),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        );
-      }
+      _showSnackBar(error.message, isError: true);
     } catch (error) {
-      if (mounted) {
-        SnackBar(
-          content: const Text('Unexpected error occurred'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        );
-      }
+      _showSnackBar('Unexpected error occurred');
     } finally {
       if (mounted) {
         setState(() {
@@ -98,5 +86,16 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(isError ? "Error: $message" : message),
+        backgroundColor: isError
+            ? Theme.of(context).colorScheme.error
+            : Theme.of(context).snackBarTheme.backgroundColor,
+      ));
+    }
   }
 }
