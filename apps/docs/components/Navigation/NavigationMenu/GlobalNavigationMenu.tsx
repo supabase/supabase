@@ -57,7 +57,7 @@ const GlobalNavigationMenu: FC = () => {
   const isLowerThanMd = useBreakpoint('md')
   const activeLabel = useActiveMenuLabel()
   const triggerClassName =
-    'bg-transparent border-0 border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded'
+    'bg-transparent border-0 border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none'
 
   return (
     <div className="flex relative gap-2 justify-start items-end w-full">
