@@ -5,11 +5,11 @@
 import '@testing-library/jest-dom'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Fragment, useState } from 'react'
 
 import { CommandProvider } from '../CommandProvider'
 import type { ICommand } from '../types'
 import { useCommands, useRegisterCommands } from './commandsHooks'
-import { Fragment, useState } from 'react'
 
 const oneCommand = [
   {
@@ -226,6 +226,7 @@ describe('useRegisterCommand', () => {
     await waitFor(() => {
       expect(screen.queryByText('Command one')).toBeNull()
     })
+    expect(screen.getByRole('listitem')).toHaveTextContent('Command two')
   })
 
   it("doesn't trigger command menu rerender when dependencies are unchanged", async () => {
