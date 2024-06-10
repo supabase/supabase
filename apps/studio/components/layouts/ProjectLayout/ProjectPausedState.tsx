@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
@@ -8,7 +7,9 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useBackupsQuery } from 'data/database/backups-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -28,10 +29,6 @@ import {
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
-
-const RESTORE_THRESHOLD_DAYS = 90
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -50,13 +47,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     { enabled: project?.status === PROJECT_STATUS.INACTIVE }
   )
 
-  const daysFromLastPaused =
-    (pauseStatus?.last_paused_at ?? null) !== null
-      ? dayjs().utc().diff(dayjs(pauseStatus?.last_paused_at), 'd')
-      : 0
-  const restoreThresholdReached = daysFromLastPaused >= RESTORE_THRESHOLD_DAYS
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = isFreePlan && restoreThresholdReached
+  const isRestoreDisabled = !pauseStatus?.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -135,9 +127,11 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       This project has been paused more than{' '}
-                      <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span> and
-                      hence cannot be restored through the dashboard. Your data is still intact and
-                      can be downloaded as a backup nonetheless.
+                      <span className="text-foreground">
+                        {pauseStatus?.max_days_till_restore_disabled ?? 90} days
+                      </span>{' '}
+                      and hence cannot be restored through the dashboard. Your data is still intact
+                      and can be downloaded as a backup nonetheless.
                     </AlertDescription_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
                       <Tooltip_Shadcn_>
@@ -168,13 +162,16 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <Alert_Shadcn_>
                       <AlertTitle_Shadcn_>
                         Project can be restored through the dashboard within{' '}
-                        {RESTORE_THRESHOLD_DAYS - daysFromLastPaused} more days
+                        {pauseStatus.remaining_days_till_restore_disabled} more days
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Free projects cannot be restored through the dashboard if they are paused
                         for more than{' '}
-                        <span className="text-foreground">{RESTORE_THRESHOLD_DAYS} days</span>. Your
-                        database backup will still be available for download thereafter nonetheless.
+                        <span className="text-foreground">
+                          {pauseStatus.max_days_till_restore_disabled} days
+                        </span>
+                        . Your database backup will still be available for download thereafter
+                        nonetheless.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   </>

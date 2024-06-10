@@ -3928,7 +3928,9 @@ export interface components {
     }
     Buffer: Record<string, never>
     PauseStatusResponse: {
-      last_paused_at: string | null
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
     }
     ResizeBody: {
       volume_size_gb: number
