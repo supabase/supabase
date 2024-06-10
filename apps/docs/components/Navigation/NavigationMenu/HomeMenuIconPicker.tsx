@@ -24,6 +24,8 @@ import {
   IconMenuKotlin,
   IconMenuAI,
   IconMenuDevCli,
+  IconGitHub,
+  IconSupport,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className: string) {
@@ -76,6 +78,10 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuCli width={width} height={height} className={className} />
     case 'status':
       return <IconMenuStatus width={width} height={height} className={className} />
+    case 'github':
+      return <IconGitHub width={width} height={height} className={className} />
+    case 'support':
+      return <IconSupport width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

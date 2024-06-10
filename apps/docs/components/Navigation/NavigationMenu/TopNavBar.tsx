@@ -2,38 +2,19 @@ import { FC, memo, useState } from 'react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { Button, IconCommand, IconGitHub, IconMenu, IconSearch } from 'ui'
 import { SearchButton } from 'ui-patterns/Cmdk'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
-import GlobalNavigationMenu from './GlobalNavigationMenu'
 import GlobalMobileMenu from './GlobalMobileMenu'
 import { ThemeToggle } from 'ui-patterns'
+import { Button, IconCommand, IconGitHub, IconMenu, IconSearch, buttonVariants, cn } from 'ui'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import GlobalNavigationMenu from './GlobalNavigationMenu'
+import TopNavDropdown from './TopNavDropdown'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const { resolvedTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const HeaderLogo = memo(() => {
-    const { resolvedTheme } = useTheme()
-    return (
-      <Link href="/" className="flex h-full items-center gap-2">
-        <Image
-          className="cursor-pointer"
-          src={
-            resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-          }
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-      </Link>
-    )
-  })
-
-  HeaderLogo.displayName = 'HeaderLogo'
+  const { resolvedTheme } = useTheme()
 
   return (
     <>
@@ -41,49 +22,40 @@ const TopNavBar: FC = () => {
         aria-label="top bar"
         className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
       >
-        <div className="w-full px-5 flex justify-between h-[var(--header-height,50px)] lg:h-[var(--header-height,60px)]">
-          <div className="hidden px-5 lg:flex h-full items-center flex-col gap-8">
+        <div className="w-full px-5 flex justify-between h-[var(--header-height,50px)] gap-3 lg:h-[var(--header-height,60px)]">
+          <div className="hidden px-5 lg:flex h-full items-center justify-center flex-col gap-8">
             <HeaderLogo />
           </div>
-          <div className="w-full lg:w-auto max-w-7xl flex gap-3 justify-between items-center h-full">
+          <div className="w-full grow lg:w-auto max-w-7xl flex gap-3 justify-between lg:justify-end items-center h-full">
             <div className="lg:hidden">
-              <Link href="/" className="flex items-center gap-2">
-                <Image
-                  className="cursor-pointer"
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? '/docs/supabase-dark.svg'
-                      : '/docs/supabase-light.svg'
-                  }
-                  width={96}
-                  height={24}
-                  alt="Supabase Logo"
-                />
-                <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-              </Link>
+              <HeaderLogo />
             </div>
 
-            <div className="md:w-full md:max-w-xs flex items-center gap-2 lg:gap-6">
-              <SearchButton className="md:w-full lg:w-96">
+            <div className="flex gap-2 items-center">
+              <SearchButton
+                className="flex-grow md:w-full lg:w-96 h-[30px]
+                          focus-visible:!outline-4 
+                          focus-visible:outline-offset-1
+                          focus-visible:outline-brand-600"
+              >
                 <div
                   className="
-                  flex
-                  group
-                  items-center
-                  justify-between
-                  bg-surface-100
-                  bg-opacity-75
-                  hover:bg-surface-200
-                  hover:bg-opacity-100
-                  border
-                  transition
-                  pl-1.5 md:pl-3 pr-1.5 w-full h-[30px] rounded
-                  text-foreground-lighter
-                "
+                    flex
+                    group
+                    items-center
+                    justify-between
+                    bg-surface-100/75
+                    hover:bg-opacity-100
+                    hover:border-stronger
+                    border
+                    transition
+                    pl-1.5 md:pl-3 pr-1 w-full h-full rounded-md
+                    text-foreground-lighter
+                  "
                 >
                   <div className="flex items-center space-x-2">
                     <IconSearch size={18} strokeWidth={2} />
-                    <p className="hidden md:flex text-sm">Search docs...</p>
+                    <p className="flex text-sm pr-2">Search docs...</p>
                   </div>
                   <div className="hidden md:flex items-center space-x-1">
                     <div
@@ -104,42 +76,26 @@ const TopNavBar: FC = () => {
                 <IconMenu />
               </button>
             </div>
-            <div className="hidden lg:flex grow items-center justify-end gap-3">
-              <Button type="text" asChild>
-                <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
-                  Supabase.com
+          </div>
+          <div className="hidden lg:flex items-center justify-end gap-3">
+            {!isUserLoading && (
+              <Button asChild>
+                <a
+                  href="https://supabase.com/dashboard"
+                  className="h-[30px]"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
                 </a>
               </Button>
-              {!isUserLoading && (
-                <Button asChild>
-                  <a
-                    href="https://supabase.com/dashboard"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    {isLoggedIn ? 'Dashboard' : 'Sign up'}
-                  </a>
-                </Button>
-              )}
-              {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
-                <Button asChild>
-                  <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
-                </Button>
-              )}
-              <Link
-                href="https://github.com/supabase/supabase"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="px-2.5 py-1"
-              >
-                <span className="sr-only">GitHub</span>
-                <IconGitHub
-                  size={16}
-                  className="text-foreground-light hover:text-foreground transition"
-                />
-              </Link>
-              <ThemeToggle />
-            </div>
+            )}
+            {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
+              <Button asChild>
+                <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
+              </Button>
+            )}
+            <TopNavDropdown />
           </div>
         </div>
         <GlobalNavigationMenu />
@@ -148,6 +104,32 @@ const TopNavBar: FC = () => {
     </>
   )
 }
+
+const HeaderLogo = memo(() => {
+  const { resolvedTheme } = useTheme()
+  return (
+    <Link
+      href="/"
+      className={cn(
+        buttonVariants({ type: 'default' }),
+        'flex h-auto items-center !bg-transparent !border-none !shadow-none'
+      )}
+    >
+      <Image
+        className="cursor-pointer"
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+    </Link>
+  )
+})
+
+HeaderLogo.displayName = 'HeaderLogo'
 
 TopNavBar.displayName = 'TopNavBar'
 

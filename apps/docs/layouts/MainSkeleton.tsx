@@ -1,7 +1,6 @@
 import { type PropsWithChildren, memo, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import Footer from '~/components/Navigation/Footer'
-import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
@@ -158,7 +157,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         'top-0',
         mobileMenuOpen && 'absolute',
         'flex items-center',
-        mobileMenuOpen ? 'gap-0' : 'gap-2'
+        mobileMenuOpen ? 'gap-0' : 'gap-1'
       )}
     >
       <button
@@ -188,7 +187,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
           />
         </div>
       </button>
-      <div>
+      {/* <div>
         <HomeMenuIconPicker
           icon={menuLevel ? levelsData[menuLevel]?.icon : 'home'}
           className={cn(
@@ -196,7 +195,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
             mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4'
           )}
         />
-      </div>
+      </div> */}
       <span
         className={cn(
           'transition-all duration-200',
