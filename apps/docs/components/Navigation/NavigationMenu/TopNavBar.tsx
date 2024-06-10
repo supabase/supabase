@@ -46,7 +46,7 @@ const TopNavBar: FC = () => {
                     justify-between
                     bg-surface-100/75
                     hover:bg-opacity-100
-                    hover:border-stronger
+                    hover:border-strong
                     border
                     transition
                     pl-1.5 md:pl-3 pr-1 w-full h-full rounded-md
@@ -70,7 +70,10 @@ const TopNavBar: FC = () => {
               </SearchButton>
               <button
                 title="Menu dropdown button"
-                className="flex lg:hidden border border-default bg-surface-100/75 text-foreground-light rounded min-w-[30px] w-[30px] h-[30px] items-center justify-center data-[state=open]:bg-overlay-hover/30"
+                className={cn(
+                  buttonVariants({ type: 'default' }),
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+                )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <IconMenu />
