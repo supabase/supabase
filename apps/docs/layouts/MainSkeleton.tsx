@@ -300,7 +300,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
           'backdrop-blur backdrop-filter bg-background',
-          'flex flex-col'
+          'flex flex-col flex-grow'
         )}
       >
         <span id="main-nav-title" className="sr-only">
