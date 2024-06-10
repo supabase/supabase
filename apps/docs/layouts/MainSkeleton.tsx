@@ -278,24 +278,27 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
     <nav
       aria-labelledby="main-nav-title"
       className={cn(
-        'fixed lg:relative z-40',
+        'fixed lg:relative z-50 lg:z-40',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
+        'lg:top-[98px] lg:sticky',
+        'h-screen lg:h-[calc(100vh-98px)]',
         // desktop override any left styles
         'lg:left-0',
         'transition-all',
-        'top-0',
+        'top-0 bottom-0',
         'flex flex-col ml-0',
-        'border-r'
+        'border-r',
+        'overflow-y-scroll lg:overflow-y-auto'
       )}
     >
       <div
         className={cn(
           'top-0 lg:top-[98px]',
-          'h-full lg:h-[calc(100vh-98px)]',
-          'lg:sticky',
-          'w-auto',
-          'overflow-auto h-screen',
+          'h-full',
+          'relative lg:sticky',
+          'w-full lg:w-auto',
+          'h-auto lg:h-screen lg:overflow-auto',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col'
         )}
@@ -328,13 +331,6 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
   const ref = useRef(null)
   const mobileMenuOpen = useMenuMobileOpen()
   const isHomePage = menuId === 'home'
-
-  // useEffect(() => {
-  //   if (!ref.current) return
-
-  //   const { height } = ref.current.getBoundingClientRect()
-  //   document.documentElement.style.setProperty('--header-height', height)
-  // }, [])
 
   return (
     <div className="flex flex-col h-full w-full">
