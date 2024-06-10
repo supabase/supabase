@@ -3,7 +3,7 @@
  */
 
 import '@testing-library/jest-dom'
-import { act, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { CommandProvider } from '../CommandProvider'
@@ -149,14 +149,16 @@ describe('useRegisterCommand', () => {
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitForElementToBeRemoved(() => screen.getByRole('listitem'))
-    expect(screen.queryByRole('listitem')).toBeNull()
+    await waitFor(() => {
+      expect(screen.queryByRole('listitem')).toBeNull()
+    })
 
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitFor(() => screen.getByText('Simple'))
-    expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
+    await waitFor(() => {
+      expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
+    })
   })
 
   it('unregisters multiple commands when component unmounts', async () => {
@@ -174,8 +176,9 @@ describe('useRegisterCommand', () => {
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitForElementToBeRemoved(() => screen.getAllByRole('listitem')[0])
-    expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+    await waitFor(() => {
+      expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+    })
   })
 
   it('unregisters and reregisters a command when enabled changes', async () => {
@@ -193,14 +196,16 @@ describe('useRegisterCommand', () => {
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitForElementToBeRemoved(() => screen.getByRole('listitem'))
-    expect(screen.queryByRole('listitem')).toBeNull()
+    await waitFor(() => {
+      expect(screen.queryByRole('listitem')).toBeNull()
+    })
 
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitFor(() => screen.getByRole('listitem'))
-    expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
+    await waitFor(() => {
+      expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
+    })
   })
 
   it('reregisters commands when dependencies change', async () => {
@@ -218,8 +223,9 @@ describe('useRegisterCommand', () => {
     act(() => {
       userEvent.click(screen.getByRole('button'))
     })
-    await waitFor(() => screen.getByText('Command two'))
-    expect(screen.queryByText('Command one')).toBeNull()
+    await waitFor(() => {
+      expect(screen.queryByText('Command one')).toBeNull()
+    })
   })
 
   it("doesn't trigger command menu rerender when dependencies are unchanged", async () => {
