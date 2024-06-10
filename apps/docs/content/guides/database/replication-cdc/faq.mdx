@@ -32,10 +32,27 @@ Connections through a pooler, such as Supavisor, will not work.
 
 No worries! Simply enable the [IPv4 addon](/guides/platform/ipv4-address) for your project.
 
-# Should I use XMIN?
+# What is XMIN and should it be used?
 
-Xmin is a different form of replication from logical replication and is only really designed to be used if logical replication is not available for your database (i.e. older versions of Postgresql).
+Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database (i.e. older versions of Postgres).
 
 Xmin performs replication by checking the [xmin system column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronized.
 
-It does not capture deletion of data and is **not recommended**.
+It does not capture deletion of data and is **not recommended**, particularly for larger databases.
+
+# Can I configure replication in the Dashboard?
+
+You can view [publications](https://supabase.com/dashboard/project/default/database/publications) in the Dashboard but all steps to configure replication must be done using the [SQL Editor](https://supabase.com/dashboard/project/default/sql/new) or a tool of your choice.
+
+# How can I see the status of replication?
+
+Postgres has some system tables that allow you to monitor the status of replication:
+
+## Primary
+
+- `select * from pg_stat_replication;` - Shows the `lag` of active replicas to indicate how far behind they are from the primary database
+- `select * from pg_replication_slots;` - Shows the last confirmed data that was sent and consumed on the slot
+
+## Replica
+
+- `select * from pg_subscription_rel;` - Shows the status of any subscriptions on a replica

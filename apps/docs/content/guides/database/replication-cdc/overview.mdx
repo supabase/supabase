@@ -5,27 +5,35 @@ description: 'Performing Extract Transform Load (ETL) with Supabase'
 sidebar_label: 'Overview'
 ---
 
-# Logical Replication and Change Data Capture (CDC)
-
-You have launched your app. You want to understand what works and what doesn't so you start some queries and soon notice that your queries are taking minutes or that you need to combine these data with another system you are using. Not to worry, you are in the right place.
+Performing analytics, connecting external tools or expanding access are all tasks that you do not want to use your primary database for. In these scenarios, the most common options are:
+1. Setting up a Read-Replica
+2. Configuring Logical replication to send your data to a Data Warehouse
 
 ## Read Replicas
 
-[Read-Replicas](/guides/platform/read-replicas) are available on Supabase and allow you to create a second database that is a direct, read-only copy of your primary database that stays in sync. This can be great for many things, like load-balancing, and, in this case, they can be great for analytics workloads.
+[Read-Replicas](/guides/platform/read-replicas) are available on Supabase and allow you to create a second database that is a direct, read-only copy of your primary database that stays in sync. This can be useful for many things, like load-balancing, and, in this case, for analytics workloads.
 
 ## Logical Replication
 
+<Admonition type="warning">
+
+Logical replication does work on the Supabase platform but it is not currently fully supported due to restricted access to certain Postgres settings.
+Full support is in development and our Support team can help you in the meantime.
+
+</Admonition>
+
 Your use case might go beyond what a Read-Replica can offer and you may need to replicate your data from Supabase into a Data Warehouse, like Clickhouse or Google BigQuery. This could be because of long running queries, the amount of data or because you need to combine your Supabase data with data from other systems.
 
-This is done using a method called [Logical Replication](/guides/database/replication-cdc/logical-replication).
+This is done using a method called [Logical Replication](/guides/database/logical-replication).
 
-In most cases you will want to use a tool, such as Estuary or Airbyte or Fivetran, to susbscribe to your database, capture the changes and write them to a destination of your choice, ranging from S3 to  Google BigQuery to Google Sheets to Salesforce.
+In most cases a tool, such as Estuary or Airbyte or Fivetran, will be used to susbscribe to your database, capture the changes and write them to a destination of your choice, ranging from S3 to  Google BigQuery to Google Sheets to Salesforce.
 
-Regardless of the tool you choose, it is very likely you will be using logical replication, so make sure you read the [introduction]((/guides/database/replication-cdc/logical-replication) to that, as well as the [FAQ](/guides/databae/replication-cdc/faq)
+Regardless of the tool chosen, it is very likely that logical replication will be used at its core. To understand the process, we have an [introduction](/guides/database/replication-cdc/logical-replication), as well as an [FAQ](/guides/databae/replication-cdc/faq)
 
-To learn how to configure Supabase with a specific tool, select a services from the navigation menu.
+To learn how to configure Supabase with a specific tool, do the following:
+1. Follow the steps in our [guide to setting up replication](/guides/database/postgres/setup-replicstion-external) to create a `publication` and a `replication slot`
+2. Select a guide from the navigation menu 
 
 ## Resources 
 
 - [Managing logical replication](/guides/database/managing-replication)
-- [Replicating to an external Postgres database](/guides/database/postgres/setup-replicstion-external)
