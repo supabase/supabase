@@ -57,7 +57,7 @@ const GlobalNavigationMenu: FC = () => {
   const activeLabel = useActiveMenuLabel()
 
   return (
-    <div className="flex relative gap-2 justify-start items-end w-full">
+    <div className="hidden lg:flex relative gap-2 justify-start items-end w-full">
       <NavigationMenu
         delayDuration={0}
         skipDelayDuration={0}
