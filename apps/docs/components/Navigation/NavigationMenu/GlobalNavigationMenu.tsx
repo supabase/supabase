@@ -63,7 +63,7 @@ const GlobalNavigationMenu: FC = () => {
         skipDelayDuration={0}
         className="w-full flex justify-start"
         renderViewport={isLowerThanMd}
-        viewportClassName="mt-0 max-w-screen overflow-hidden border-x-0 border-y rounded-none lg:mt-1.5 lg:rounded-md lg:!border-x"
+        viewportClassName="mt-0 max-w-screen overflow-hidden border-0 rounded-none lg:mt-1.5 lg:rounded-md lg:!border-x"
         orientation="horizontal"
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
@@ -87,7 +87,7 @@ const GlobalNavigationMenu: FC = () => {
                       section[0].label
                     )}
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] w-screen md:w-64 overflow-hidden rounded-none md:rounded-md md:border border-overlay bg-overlay p-3 md:p-1 text-foreground-light shadow-md !duration-0">
+                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] border-y w-screen md:w-64 overflow-hidden rounded-none md:rounded-md md:border border-overlay bg-overlay p-3 md:p-1 text-foreground-light shadow-md !duration-0">
                     {section[0].menuItems?.map((menuItem, menuItemIndex) => (
                       <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
                         {menuItemIndex !== 0 && <MenubarSeparator />}
