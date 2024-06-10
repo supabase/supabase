@@ -229,7 +229,7 @@ const ColumnType = ({
                   <>
                     <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {enumTypes.map((option: PostgresType) => (
+                      {enumTypes.map((option: any) => (
                         <CommandItem_Shadcn_
                           key={option.name}
                           value={option.name}
