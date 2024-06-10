@@ -1,13 +1,13 @@
 'use client'
 
-import 'chart.js/auto'
-
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
 import { useChat } from 'ai/react'
+import Chart from 'chart.js/auto'
 import { ArrowUp } from 'lucide-react'
-import { useState } from 'react'
-import { Chart } from 'react-chartjs-2'
+import { useCallback, useRef, useState } from 'react'
+import { Chart as ChartWrapper } from 'react-chartjs-2'
+import { ErrorBoundary } from 'react-error-boundary'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -15,7 +15,6 @@ import remarkMath from 'remark-math'
 import { format } from 'sql-formatter'
 import { markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
-import { Input } from 'ui/src/components/shadcn/ui/input'
 
 // React's double-rendering in dev mode causes pglite errors
 // Temp: storing single instance in module scope
@@ -50,7 +49,22 @@ export default function Page() {
         }
         case 'generateChart': {
           const { config } = toolCall.args as any
-          return 'Chart has been generated and shown to the user. Say something like, "Above is a chart ...".'
+
+          // Validate that the chart can be rendered without error
+          const canvas = document.createElement('canvas')
+
+          try {
+            const chart = new Chart(canvas, config)
+            chart.destroy()
+            return 'Chart has been generated and shown to the user. Say something like, "Above is a chart ...".'
+          } catch (err) {
+            if (err instanceof Error) {
+              return { error: err.message }
+            }
+            throw err
+          } finally {
+            canvas.remove()
+          }
         }
         case 'appendSqlToMigration': {
           const { sql } = toolCall.args as any
@@ -70,6 +84,16 @@ export default function Page() {
       }
     },
   })
+
+  const scrollRef = useRef<HTMLDivElement>()
+  const prevScrollHeightRef = useRef<number>()
+
+  const scrollToBottom = useCallback(() => {
+    const scrollElement = scrollRef.current
+    if (scrollElement) {
+      scrollElement.scrollTo({ top: scrollElement.scrollHeight })
+    }
+  }, [])
 
   return (
     <div className="w-full h-full flex p-6">
@@ -115,8 +139,30 @@ export default function Page() {
           />
         </div>
       )}
-      <div className="flex-1 max-h-full flex flex-col items-stretch">
-        <div className="flex-1 flex flex-col items-center overflow-y-auto">
+      <div className="flex-1 h-full flex flex-col items-stretch">
+        <div
+          className="flex-1 flex flex-col items-center overflow-y-auto"
+          ref={(element) => {
+            if (element) {
+              scrollRef.current = element
+
+              const resizeObserver = new ResizeObserver(() => {
+                if (element.scrollHeight !== prevScrollHeightRef.current) {
+                  prevScrollHeightRef.current = element.scrollHeight
+                  console.log('resize scroll')
+                  element.scrollTo({
+                    top: element.scrollHeight - element.clientHeight,
+                    behavior: 'smooth',
+                  })
+                }
+              })
+
+              for (const child of Array.from(element.children)) {
+                resizeObserver.observe(child)
+              }
+            }
+          }}
+        >
           <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
             {messages.map((message) => {
               switch (message.role) {
@@ -133,7 +179,7 @@ export default function Page() {
                   return (
                     <div
                       key={message.id}
-                      className="self-stretch flex flex-col items-stretch gap-4"
+                      className="self-stretch flex flex-col items-stretch gap-6"
                     >
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
@@ -145,15 +191,17 @@ export default function Page() {
                       </ReactMarkdown>
                       {message.toolInvocations?.map((toolInvocation) => {
                         switch (toolInvocation.toolName) {
-                          case 'executeSql': {
-                            return <div>Executing SQL...</div>
-                          }
                           case 'generateChart': {
+                            const { type, data, options } = toolInvocation.args.config
                             return (
-                              <Chart
+                              <ErrorBoundary
                                 key={toolInvocation.toolCallId}
-                                {...toolInvocation.args.config}
-                              />
+                                fallbackRender={() => (
+                                  <div className="bg-warning-300">Error loading chart</div>
+                                )}
+                              >
+                                <ChartWrapper type={type} data={data} options={options} />
+                              </ErrorBoundary>
                             )
                           }
                         }
@@ -167,10 +215,13 @@ export default function Page() {
         <div className="flex flex-col items-center gap-2 pb-2">
           <form
             className="flex items-center py-2 px-3 rounded-full bg-neutral-100 w-full max-w-4xl"
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              handleSubmit(e)
+              scrollToBottom()
+            }}
           >
-            <Input
-              className="flex-grow border-none text-base placeholder:text-neutral-400"
+            <input
+              className="flex-grow border-none focus-visible:ring-0 text-base bg-inherit placeholder:text-neutral-400"
               name="prompt"
               value={input}
               onChange={handleInputChange}
@@ -183,7 +234,7 @@ export default function Page() {
             </Button>
           </form>
           <div className="text-xs text-neutral-500">
-            AI can make mistakes. Check import information.
+            AI can make mistakes. Check important information.
           </div>
         </div>
       </div>
