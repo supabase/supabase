@@ -12,32 +12,6 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
 
-  const HeaderLogo = memo(() => {
-    const { resolvedTheme } = useTheme()
-    return (
-      <Link
-        href="/"
-        className={cn(
-          buttonVariants({ type: 'default' }),
-          'flex h-auto items-center gap-2 !bg-transparent ! border-none'
-        )}
-      >
-        <Image
-          className="cursor-pointer"
-          src={
-            resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-          }
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
-      </Link>
-    )
-  })
-
-  HeaderLogo.displayName = 'HeaderLogo'
-
   return (
     <nav
       aria-label="top bar"
@@ -53,7 +27,12 @@ const TopNavBar: FC = () => {
           </div>
 
           <div className="md:w-full md:max-w-xs flex items-center gap-6">
-            <SearchButton className="md:w-full lg:w-96">
+            <SearchButton
+              className="md:w-full lg:w-96
+                        focus-visible:!outline-4 
+                        focus-visible:outline-offset-1
+                        focus-visible:outline-brand-600"
+            >
               <div
                 className="
                   flex
@@ -112,6 +91,32 @@ const TopNavBar: FC = () => {
     </nav>
   )
 }
+
+const HeaderLogo = memo(() => {
+  const { resolvedTheme } = useTheme()
+  return (
+    <Link
+      href="/"
+      className={cn(
+        buttonVariants({ type: 'default' }),
+        'flex h-auto items-center !bg-transparent !border-none !shadow-none'
+      )}
+    >
+      <Image
+        className="cursor-pointer"
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+    </Link>
+  )
+})
+
+HeaderLogo.displayName = 'HeaderLogo'
 
 TopNavBar.displayName = 'TopNavBar'
 
