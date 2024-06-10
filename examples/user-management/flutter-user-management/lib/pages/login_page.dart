@@ -54,6 +54,13 @@ class _LoginPageState extends State<LoginPage> {
         _redirecting = true;
         Navigator.of(context).pushReplacementNamed('/account');
       }
+    },
+    onError: (error) {
+        if (error is AuthException) {
+          _showSnackBar(error.message, isError: true);
+        } else {
+          _showSnackBar('Unexpected error occurred', isError: true);
+        }
     });
     super.initState();
   }
