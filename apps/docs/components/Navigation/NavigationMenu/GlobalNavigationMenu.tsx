@@ -68,7 +68,7 @@ const GlobalNavigationMenu: FC = () => {
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
           <NavigationMenuList className="px-5 lg:px-10 space-x-5 lg:space-x-6 h-[37px]">
-            {GLOBAL_MENU_ITEMS.map((section, sectionIndex) =>
+            {GLOBAL_MENU_ITEMS.map((section) =>
               section[0].menuItems ? (
                 <NavigationMenuItem
                   key={`desktop-docs-menu-section-${section[0].label}`}
