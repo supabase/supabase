@@ -6,7 +6,7 @@ import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationM
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
-// import { useLockBodyScroll } from 'react-use'
+import { useLockBodyScroll } from 'react-use'
 
 const levelsData = {
   home: {
@@ -272,7 +272,7 @@ const Container = memo(function Container({
 const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
   const mobileMenuOpen = useMenuMobileOpen()
 
-  // useLockBodyScroll(mobileMenuOpen)
+  useLockBodyScroll(mobileMenuOpen)
 
   return (
     <nav
