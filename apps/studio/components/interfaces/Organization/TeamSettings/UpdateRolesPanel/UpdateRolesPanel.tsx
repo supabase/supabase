@@ -1,11 +1,10 @@
 import { isEqual } from 'lodash'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
@@ -40,13 +39,13 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { RolesAccessMatrix } from './RolesAccessMatrix'
-import { ProjectRoleConfiguration, deriveChanges } from './UpdateRolesPanel.utils'
-import { useOrganizationMemberUpdateMutation } from 'data/organization-members/organization-member-update-mutation'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
+import {
+  ProjectRoleConfiguration,
+  formatMemberRoleToProjectRoleConfiguration,
+} from './UpdateRolesPanel.utils'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -54,18 +53,16 @@ interface UpdateRolesPanelProps {
   onClose: () => void
 }
 
-// [Joshen] This is just scaffolding the UI logic, will need to change quite a bit to fit the API structure
-
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
-  const { data } = useOrganizationRolesV2Query({ slug })
-  const availableRoles = data?.org_scoped_roles ?? []
+  const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  // console.log(member)
+  // [Joshen] We use the org scoped roles as the source for available roles
+  const availableRoles = allRoles?.org_scoped_roles ?? []
 
   // const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
   //   organization?.id,
@@ -74,8 +71,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   // )
   // console.log({ availableRoles, rolesAddable, rolesRemovable })
 
-  const { mutateAsync: updateRole } = useOrganizationMemberUpdateMutation()
-
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
   const [showRolesAccessMatrix, setShowRolesAccessMatrix] = useState(false)
@@ -83,6 +78,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     ProjectRoleConfiguration[]
   >([])
 
+  const originalConfiguration =
+    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
@@ -95,11 +92,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const noAccessProjects = orgProjects.filter((project) => {
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
-
-  const changesToRoles = deriveChanges(
-    [{ ref: undefined, roleId: member.role_ids[0] }],
-    projectsRoleConfiguration
-  )
+  const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
+  const numberOfAccessHasChanges = originalConfiguration.length !== noAccessProjects.length
 
   const onSelectProject = (ref: string) => {
     setProjectsRoleConfiguration(
@@ -146,59 +140,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     }
   }
 
-  const onConfirmUpdateMemberRoles = async () => {
-    if (slug === undefined) return console.error('Slug is required')
-
-    console.log(projectsRoleConfiguration)
-    const gotrueId = member.gotrue_id
-    const isOrgScope =
-      projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
-
-    // [Joshen TODO] Can we also debug why full page crash if payload is wrong e.g projects is [null]
-    if (isOrgScope) {
-      try {
-        await updateRole({ slug, gotrueId, roleId: projectsRoleConfiguration[0].roleId })
-        toast.success(`Successfully updated role for ${member.username}`)
-        setShowConfirmation(false)
-        onClose()
-        return
-      } catch (error: any) {
-        return toast.error(`Failed to update role: ${error.message}`)
-      }
-    }
-
-    const uniqueRoleIds = projectsRoleConfiguration.reduce((a, b) => {
-      if (!a.includes(b.roleId)) return [...a, b.roleId]
-      return a
-    }, [] as number[])
-
-    try {
-      await Promise.all(
-        uniqueRoleIds.map((roleId) => {
-          updateRole({
-            slug,
-            gotrueId,
-            roleId,
-            projects: projectsRoleConfiguration
-              .filter((p) => p.roleId === roleId)
-              .map((p) => p.ref) as string[],
-          })
-        })
-      )
-    } catch (error: any) {
-      return toast.error(`Failed to update role: ${error.message}`)
-    }
-  }
-
   useEffect(() => {
-    // [Joshen] This is an assumption for the structure, and assumption for the UI that it starts with org level
-    if (visible) {
-      const roleId = member.role_ids[0]
-      setProjectsRoleConfiguration([{ ref: undefined, roleId }])
+    if (visible && isSuccessRoles) {
+      const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(member, allRoles)
+      setProjectsRoleConfiguration(roleConfiguration)
     } else {
       setShowRolesAccessMatrix(false)
     }
-  }, [visible])
+  }, [visible, isSuccessRoles])
 
   return (
     <>
@@ -269,11 +218,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 projectsRoleConfiguration.length !== orgProjects.length && (
                   <Alert_Shadcn_>
                     <AlertTitle_Shadcn_>
-                      This member will only have access to 3 projects in organization
+                      {numberOfAccessHasChanges
+                        ? `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
+                        : `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      {member.username} will not have access to the following{' '}
-                      {noAccessProjects.length} project{noAccessProjects.length > 1 ? 's' : ''}:
+                      {member.username} {numberOfAccessHasChanges ? 'will' : 'does'} not have access
+                      to the following {noAccessProjects.length} project
+                      {noAccessProjects.length > 1 ? 's' : ''}:
                       <ul className="list-disc pl-6">
                         {noAccessProjects.map((project) => {
                           return <li key={project.id}>{project.name}</li>
@@ -289,7 +241,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                     project.ref === undefined
                       ? 'All projects'
                       : projects?.find((p) => p.ref === project.ref)?.name
-                  const role = availableRoles.find((r) => r.id === project.roleId)
+                  const role = availableRoles.find((r) => {
+                    if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
+                    else return r.id === project.roleId
+                  })
 
                   return (
                     <div
@@ -301,11 +256,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       <div className="flex items-center gap-x-2">
                         <Select_Shadcn_
                           disabled={false}
-                          value={project.roleId.toString()}
+                          value={(project?.baseRoleId ?? project.roleId).toString()}
                           onValueChange={(value) => onSelectRole(value, project)}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 w-56">
-                            {role?.name}
+                          <SelectTrigger_Shadcn_
+                            className={cn(
+                              'text-sm h-10 w-56',
+                              role?.name === undefined && 'text-foreground-light'
+                            )}
+                          >
+                            {role?.name ?? 'Please select a role'}
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
                             <SelectGroup_Shadcn_>
@@ -392,11 +352,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 loading={false}
                 disabled={!canSaveRoles}
                 onClick={() => {
-                  if (
-                    isEqual(projectsRoleConfiguration, [
-                      { ref: undefined, roleId: member.role_ids[0] },
-                    ])
-                  ) {
+                  if (isEqual(projectsRoleConfiguration, originalConfiguration)) {
                     onClose()
                   } else {
                     setShowConfirmation(true)
@@ -412,96 +368,15 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         </SheetContent>
       </Sheet>
 
-      <ConfirmationModal
-        size="medium"
+      <UpdateRolesConfirmationModal
         visible={showConfirmation}
-        title="Confirm to change roles of member"
-        confirmLabel="Update roles"
-        confirmLabelLoading="Updating"
-        onCancel={() => setShowConfirmation(false)}
-        onConfirm={onConfirmUpdateMemberRoles}
-      >
-        <div className="flex flex-col gap-y-3">
-          <p className="text-sm text-foreground-light">
-            You are making the following changes to the role of{' '}
-            <span className="text-foreground">{member.username}</span> in the organization{' '}
-            <span className="text-foreground">{organization?.name}</span>:
-          </p>
-          <div className="flex flex-col gap-y-2">
-            {changesToRoles.removed.length !== 0 && (
-              <div>
-                <p className="text-sm">
-                  Removing {changesToRoles.removed.length} role
-                  {changesToRoles.removed.length > 1 ? 's' : ''} from user:
-                </p>
-                <ul className="list-disc pl-6">
-                  {changesToRoles.removed.map((x, i) => {
-                    const role = availableRoles.find((y) => y.id === x.roleId)
-                    const project = orgProjects.find((y) => y.ref === x.ref)
-                    return (
-                      <li key={`update-${i}`} className="text-sm text-foreground-light">
-                        <span className="text-foreground">{role?.name}</span> on{' '}
-                        <span className={project !== undefined ? 'text-foreground' : ''}>
-                          {project?.name ?? 'organization'}
-                        </span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-            {changesToRoles.added.length !== 0 && (
-              <div>
-                <p className="text-sm">
-                  Added {changesToRoles.added.length} role
-                  {changesToRoles.added.length > 1 ? 's' : ''} from user:
-                </p>
-                <ul className="list-disc pl-6">
-                  {changesToRoles.added.map((x, i) => {
-                    const role = availableRoles.find((y) => y.id === x.roleId)
-                    const project = orgProjects.find((y) => y.ref === x.ref)
-                    return (
-                      <li key={`update-${i}`} className="text-sm text-foreground-light">
-                        <span className="text-foreground">{role?.name}</span> on{' '}
-                        <span className={project !== undefined ? 'text-foreground' : ''}>
-                          {project?.name ?? 'organization'}
-                        </span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-            {changesToRoles.updated.length !== 0 && (
-              <div>
-                <p className="text-sm">
-                  Updating {changesToRoles.updated.length} role
-                  {changesToRoles.updated.length > 1 ? 's' : ''} from user:
-                </p>
-                <ul className="list-disc pl-6">
-                  {changesToRoles.updated.map((x, i) => {
-                    const originalRole = availableRoles.find((y) => y.id === x.originalRole)
-                    const updatedRole = availableRoles.find((y) => y.id === x.updatedRole)
-                    const project = orgProjects.find((y) => y.ref === x.ref)
-                    return (
-                      <li key={`update-${i}`} className="text-sm text-foreground-light">
-                        From <span className="text-foreground">{originalRole?.name}</span> to{' '}
-                        <span className="text-foreground">{updatedRole?.name}</span> on{' '}
-                        <span className={project !== undefined ? 'text-foreground' : ''}>
-                          {project?.name ?? 'organization'}
-                        </span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
-          <p className="text-sm text-foreground">
-            By changing the role of this member their permissions will change.
-          </p>
-        </div>
-      </ConfirmationModal>
+        member={member}
+        projectsRoleConfiguration={projectsRoleConfiguration}
+        onClose={(success) => {
+          setShowConfirmation(false)
+          if (success) onClose()
+        }}
+      />
     </>
   )
 }

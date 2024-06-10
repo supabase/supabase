@@ -4,13 +4,13 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import type { Role } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -28,10 +28,9 @@ import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {
   member: OrganizationMember
-  roles: Role[]
 }
 
-const MemberActions = ({ member, roles }: MemberActionsProps) => {
+export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
   const [showAccessModal, setShowAccessModal] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -39,13 +38,18 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
+  const { data: allRoles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
+    slug: selectedOrganization?.slug,
+  })
+  // [Joshen TODO] Needs to change
+  const roles = allRoles?.org_scoped_roles ?? []
+  const isPendingInviteAcceptance = !!member.invited_id
+
   const { rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
     roles,
     permissions ?? []
   )
-
-  const isPendingInviteAcceptance = !!member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
@@ -239,5 +243,3 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     </>
   )
 }
-
-export default MemberActions

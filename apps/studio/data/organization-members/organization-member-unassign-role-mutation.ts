@@ -1,60 +1,61 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
-import { handleError, patch } from 'data/fetchers'
-import { components } from 'api-types'
 
-export type OrganizationMemberUpdateRoleVariables = {
+export type OrganizationMemberUnassignRoleVariables = {
   slug: string
   gotrueId: string
   roleId: number
-  projects?: string[]
   skipInvalidation?: boolean
 }
 
-export async function updateOrganizationMemberRole({
+export async function unassignOrganizationMemberRole({
   slug,
   gotrueId,
   roleId,
-  projects,
-}: OrganizationMemberUpdateRoleVariables) {
-  const payload: components['schemas']['UpdateMemberRoleBodyV2'] = { role_id: roleId }
-  if (projects !== undefined) payload.role_scoped_projects = projects
-
-  const { data, error } = await patch('/platform/organizations/{slug}/members/{gotrue_id}', {
-    params: { path: { slug, gotrue_id: gotrueId } },
-    body: payload,
-    headers: { Version: '2' },
-  })
+}: OrganizationMemberUnassignRoleVariables) {
+  const { data, error } = await del(
+    '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}',
+    {
+      params: {
+        path: {
+          slug,
+          gotrue_id: gotrueId,
+          role_id: roleId.toString(),
+        },
+      },
+    }
+  )
 
   if (error) handleError(error)
   return data
 }
 
-type OrganizationMemberUpdateData = Awaited<ReturnType<typeof updateOrganizationMemberRole>>
+type OrganizationMemberUnassignRoleData = Awaited<ReturnType<typeof unassignOrganizationMemberRole>>
 
-export const useOrganizationMemberUpdateRoleMutation = ({
+export const useOrganizationMemberUnassignRoleMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
   UseMutationOptions<
-    OrganizationMemberUpdateData,
+    OrganizationMemberUnassignRoleData,
     ResponseError,
-    OrganizationMemberUpdateRoleVariables
+    OrganizationMemberUnassignRoleVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<
-    OrganizationMemberUpdateData,
+    OrganizationMemberUnassignRoleData,
     ResponseError,
-    OrganizationMemberUpdateRoleVariables
-  >((vars) => updateOrganizationMemberRole(vars), {
+    OrganizationMemberUnassignRoleVariables
+  >((vars) => unassignOrganizationMemberRole(vars), {
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 
@@ -69,7 +70,7 @@ export const useOrganizationMemberUpdateRoleMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update member role: ${data.message}`)
+        toast.error(`Failed to unassign member role: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

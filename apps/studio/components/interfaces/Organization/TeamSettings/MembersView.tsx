@@ -1,17 +1,13 @@
 import { AlertCircle } from 'lucide-react'
-import { useState } from 'react'
-import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { Button, Loading, Modal } from 'ui'
-import { getUserDisplayName } from '../Organization.utils'
-import MemberRow, { SelectedMember } from './MemberRow'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { Loading } from 'ui'
+import { MemberRow } from './MemberRow'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 
 export interface MembersViewProps {
@@ -28,30 +24,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     isError: isErrorMembers,
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
-  const {
-    data: rolesData,
-    error: rolesError,
-    isLoading: isLoadingRoles,
-    isError: isErrorRoles,
-  } = useOrganizationRolesV2Query({ slug })
-  const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
-    onSuccess() {
-      setUserRoleChangeModalVisible(false)
-      toast.success(`Successfully updated role for ${getUserDisplayName(selectedMember)}`)
-    },
-    onError(error) {
-      toast.error(
-        `Failed to update role for ${getUserDisplayName(selectedMember)}: ${error.message}`
-      )
-    },
+  const { error: rolesError, isError: isErrorRoles } = useOrganizationRolesV2Query({
+    slug,
   })
 
   const allMembers = members ?? []
-  const roles = rolesData?.org_scoped_roles ?? []
-
-  const [selectedMember, setSelectedMember] = useState<SelectedMember>()
-  const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
-
   const filteredMembers = (
     !searchString
       ? allMembers
@@ -68,20 +45,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   )
     .slice()
     .sort((a, b) => a.username.localeCompare(b.username))
-
-  const getRoleNameById = (id: number | undefined) => {
-    if (!roles) return id
-    return roles.find((member) => member.id === id)?.name
-  }
-
-  const handleRoleChange = async () => {
-    if (!selectedMember) return
-
-    const { gotrue_id, newRoleId } = selectedMember
-    if (!slug) return console.error('slug is required')
-    if (!gotrue_id) return console.error('gotrue_id is required')
-    updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
-  }
 
   return (
     <>
@@ -116,8 +79,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   <MemberRow
                     key={member.gotrue_id}
                     member={member}
-                    setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
-                    setSelectedMember={setSelectedMember}
+                    // setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
+                    // setSelectedMember={setSelectedMember}
                   />
                 )),
                 ...(searchString.length > 0 && filteredMembers.length === 0
@@ -147,47 +110,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
           </Loading>
         </div>
       )}
-
-      {/* <Modal
-        hideFooter
-        size="medium"
-        visible={userRoleChangeModalVisible}
-        onCancel={() => setUserRoleChangeModalVisible(false)}
-        header="Change role of member"
-      >
-        <Modal.Content>
-          <p className="text-sm text-foreground-light">
-            You are changing the role of{' '}
-            <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
-            <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span> to{' '}
-            <span className="text-foreground">{getRoleNameById(selectedMember?.newRoleId)}</span>
-          </p>
-          <p className="mt-3 text-sm text-foreground">
-            By changing the role of this member their permissions will change.
-          </p>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex gap-3">
-          <Button
-            type="default"
-            block
-            size="medium"
-            onClick={() => setUserRoleChangeModalVisible(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            block
-            type="warning"
-            size="medium"
-            disabled={isLoading}
-            loading={isLoading}
-            onClick={() => handleRoleChange()}
-          >
-            Confirm
-          </Button>
-        </Modal.Content>
-      </Modal> */}
     </>
   )
 }

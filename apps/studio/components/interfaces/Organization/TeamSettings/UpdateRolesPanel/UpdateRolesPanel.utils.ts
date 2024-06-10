@@ -1,11 +1,43 @@
+import { OrganizationRolesResponse } from 'data/organization-members/organization-roles-query'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
+
 export interface ProjectRoleConfiguration {
   ref?: string
   roleId: number
+  baseRoleId?: number
+}
+
+export const formatMemberRoleToProjectRoleConfiguration = (
+  member: OrganizationMember,
+  allRoles: OrganizationRolesResponse
+) => {
+  const { org_scoped_roles, project_scoped_roles } = allRoles
+
+  const roleConfiguration = member.role_ids
+    .map((id) => {
+      const orgRole = org_scoped_roles.find((role) => role.id === id)
+      if (orgRole !== undefined) {
+        return { ref: undefined, roleId: orgRole.id }
+      }
+      const projectRole = project_scoped_roles.find((role) => role.id === id)
+      if (projectRole !== undefined) {
+        const projectRefs = projectRole.description.split(',').map((x) => x.trim())
+        return projectRefs.map((ref) => ({
+          ref,
+          roleId: projectRole.id,
+          baseRoleId: projectRole.base_role_id,
+        }))
+      }
+    })
+    .filter(Boolean)
+    .flat() as ProjectRoleConfiguration[]
+
+  return roleConfiguration
 }
 
 export const deriveChanges = (
-  original: ProjectRoleConfiguration[],
-  final: ProjectRoleConfiguration[]
+  original: ProjectRoleConfiguration[] = [],
+  final: ProjectRoleConfiguration[] = []
 ) => {
   const removed: ProjectRoleConfiguration[] = []
   const added: ProjectRoleConfiguration[] = []

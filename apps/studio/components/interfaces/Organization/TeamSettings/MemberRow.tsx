@@ -1,37 +1,25 @@
 import { Check, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Role } from 'types'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
-import MemberActions from './MemberActions'
+import { MemberActions } from './MemberActions'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-
-export interface SelectedMember extends OrganizationMember {
-  oldRoleId: number
-  newRoleId: number
-}
 
 interface MemberRowProps {
   member: OrganizationMember
-  setUserRoleChangeModalVisible: Dispatch<SetStateAction<boolean>>
-  setSelectedMember: Dispatch<SetStateAction<SelectedMember | undefined>>
 }
 
-const MemberRow = ({
-  member,
-  setUserRoleChangeModalVisible,
-  setSelectedMember,
-}: MemberRowProps) => {
+export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
@@ -144,34 +132,34 @@ const MemberRow = ({
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <span>{roleName}</span>
                 <span>•</span>
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <span className="text-foreground">
-                      {role?.project_ids === null ? 'All' : projectsApplied.length} project
-                      {projectsApplied.length > 1 ? 's' : ''}
-                    </span>
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                    {projectsApplied?.slice(0, 2).map((name) => <span key={name}>{name}</span>)}
-                    {projectsApplied.length > 2 && (
-                      <span>
-                        And {projectsApplied.length - 2} other project
-                        {projectsApplied.length > 4 ? 's' : ''}
+                {projectsApplied.length === 1 ? (
+                  <span className="text-foreground">{projectsApplied[0]}</span>
+                ) : (
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
+                      <span className="text-foreground">
+                        {role?.project_ids === null ? 'All' : projectsApplied.length} project
+                        {projectsApplied.length > 1 ? 's' : ''}
                       </span>
-                    )}
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                      {projectsApplied?.slice(0, 2).map((name) => <span key={name}>{name}</span>)}
+                      {projectsApplied.length > 2 && (
+                        <span>
+                          And {projectsApplied.length - 2} other project
+                          {projectsApplied.length > 4 ? 's' : ''}
+                        </span>
+                      )}
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                )}
               </div>
             )
           })
         )}
       </Table.td>
 
-      <Table.td>
-        {!memberIsUser && <MemberActions member={member} roles={roles?.org_scoped_roles} />}
-      </Table.td>
+      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
     </Table.tr>
   )
 }
-
-export default MemberRow
