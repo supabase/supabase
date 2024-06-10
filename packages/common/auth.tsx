@@ -105,6 +105,34 @@ export const useUser = () => useSession()?.user ?? null
 
 export const useIsUserLoading = () => useAuth().isLoading
 
+const LOCAL_STORAGE_KEYS_ALLOWLIST = [
+  'graphiql:theme',
+  'theme',
+  'supabaseDarkMode',
+  'supabase.dashboard.auth.debug',
+  'supabase.dashboard.auth.navigatorLock.disabled',
+]
+
+export function clearLocalStorage() {
+  for (const key in localStorage) {
+    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
+      localStorage.removeItem(key)
+    }
+  }
+}
+
+export function useSignOut() {
+  // const queryClient = useQueryClient()
+
+  return useCallback(async () => {
+    const result = await gotrueClient.signOut()
+    clearLocalStorage()
+    // await gotrueClient.clear()
+
+    return result
+  }, [gotrueClient])
+}
+
 export const useIsLoggedIn = () => {
   const user = useUser()
 

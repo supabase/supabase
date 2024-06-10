@@ -3,6 +3,7 @@ import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import {
   Badge,
+  buttonVariants,
   cn,
   MenubarSeparator,
   NavigationMenu,
@@ -55,6 +56,8 @@ const useActiveMenuLabel = () => {
 const GlobalNavigationMenu: FC = () => {
   const isLowerThanMd = useBreakpoint('md')
   const activeLabel = useActiveMenuLabel()
+  const triggerClassName =
+    'bg-transparent border-0 border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded'
 
   return (
     <div className="flex relative gap-2 justify-start items-end w-full">
@@ -76,8 +79,9 @@ const GlobalNavigationMenu: FC = () => {
                 >
                   <NavigationMenuTrigger
                     className={cn(
+                      buttonVariants({ type: 'default' }),
                       navigationMenuTriggerStyle(),
-                      'bg-transparent border-b border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full',
+                      triggerClassName,
                       activeLabel === section[0].label && 'text-foreground border-foreground'
                     )}
                   >
@@ -120,7 +124,9 @@ const GlobalNavigationMenu: FC = () => {
                     <Link
                       href={section[0].href}
                       className={cn(
-                        'relative flex-1 whitespace-nowrap border-b border-transparent flex items-center text-foreground-lighter text-sm hover:text-foreground select-none rounded-none py-2 px-0 leading-none no-underline outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground h-full',
+                        buttonVariants({ type: 'default' }),
+                        navigationMenuTriggerStyle(),
+                        triggerClassName,
                         activeLabel === section[0].label && 'text-foreground border-foreground'
                       )}
                     >

@@ -159,7 +159,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         'top-0',
         mobileMenuOpen && 'absolute',
         'flex items-center',
-        mobileMenuOpen ? 'gap-0' : 'gap-2'
+        mobileMenuOpen ? 'gap-0' : 'gap-1'
       )}
     >
       <button
@@ -189,7 +189,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
           />
         </div>
       </button>
-      <div>
+      {/* <div>
         <HomeMenuIconPicker
           icon={menuLevel ? levelsData[menuLevel]?.icon : 'home'}
           className={cn(
@@ -197,7 +197,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
             mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4'
           )}
         />
-      </div>
+      </div> */}
       <span
         className={cn(
           'transition-all duration-200',
