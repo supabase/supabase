@@ -5,7 +5,6 @@ import { useState } from 'react'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
@@ -13,7 +12,6 @@ import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ 
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -25,41 +23,14 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
   const { data: projects } = useProjectsQuery()
-  const { data: permissions } = usePermissionsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
 
-  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
-    roles?.org_scoped_roles ?? [],
-    permissions ?? []
-  )
-
-  // const [memberRoleId] = member.role_ids ?? []
-  // const role = (roles || []).find((role) => role.id === memberRoleId)
   const memberIsUser = member.primary_email == profile?.primary_email
   const isInvitedUser = Boolean(member.invited_id)
-  // const canRemoveRole = rolesRemovable.includes(memberRoleId)
-  // const disableRoleEdit = !canRemoveRole || memberIsUser || isInvitedUser
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
-
-  // const validateSelectedRoleToChange = (roleId: any) => {
-  //   if (!role || role.id === roleId) return
-
-  //   const selectedRole = (roles || []).find((role) => role.id === roleId)
-  //   const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
-
-  //   if (!canAddRole) {
-  //     return toast.error(
-  //       `You do not have permission to update this team member to ${selectedRole!.name}`
-  //     )
-  //   }
-
-  //   setUserRoleChangeModalVisible(true)
-  //   setSelectedMember({ ...member, oldRoleId: role.id, newRoleId: roleId })
-  // }
 
   return (
     <Table.tr>

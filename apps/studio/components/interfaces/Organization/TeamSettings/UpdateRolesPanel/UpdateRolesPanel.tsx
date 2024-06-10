@@ -40,6 +40,7 @@ import {
   cn,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { RolesAccessMatrix } from './RolesAccessMatrix'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -62,14 +63,15 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   // [Joshen] We use the org scoped roles as the source for available roles
-  const availableRoles = allRoles?.org_scoped_roles ?? []
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+  const projectScopedRoles = allRoles?.project_scoped_roles ?? []
 
-  // const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-  //   organization?.id,
-  //   availableRoles,
-  //   permissions ?? []
-  // )
-  // console.log({ availableRoles, rolesAddable, rolesRemovable })
+  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
+    organization?.id,
+    orgScopedRoles.concat(projectScopedRoles),
+    permissions ?? []
+  )
+  const cannotAddAnyRoles = orgScopedRoles.every((r) => !rolesAddable.includes(r.id))
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
@@ -85,7 +87,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
-  const lowerPermissionsRole = availableRoles.find((r) => r.name === 'Developer')?.id
+  const lowerPermissionsRole = orgScopedRoles.find((r) => r.name === 'Developer')?.id
   const sortByObject: any = ['Owner', 'Administrator', 'Developer'].reduce((obj, item, index) => {
     return { ...obj, [item]: index }
   }, {})
@@ -99,7 +101,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     setProjectsRoleConfiguration(
       projectsRoleConfiguration.concat({
         ref,
-        roleId: lowerPermissionsRole ?? availableRoles[0].id,
+        roleId: lowerPermissionsRole ?? orgScopedRoles[0].id,
       })
     )
     setShowProjectDropdown(false)
@@ -128,7 +130,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   const onToggleApplyToAllProjects = () => {
     const roleIdToApply =
-      projectsRoleConfiguration[0]?.roleId ?? lowerPermissionsRole ?? availableRoles[0].id
+      projectsRoleConfiguration[0]?.roleId ?? lowerPermissionsRole ?? orgScopedRoles[0].id
     if (isApplyingRoleToAllProjects) {
       setProjectsRoleConfiguration(
         orgProjects.map((p) => {
@@ -195,9 +197,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <div className="flex items-center justify-between">
                 <p className="text-sm">Apply roles to all projects in the organization</p>
                 <Toggle
+                  size="small"
+                  disabled={cannotAddAnyRoles}
                   checked={isApplyingRoleToAllProjects}
                   onChange={onToggleApplyToAllProjects}
-                  size="small"
                 />
               </div>
 
@@ -241,10 +244,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                     project.ref === undefined
                       ? 'All projects'
                       : projects?.find((p) => p.ref === project.ref)?.name
-                  const role = availableRoles.find((r) => {
+                  const role = orgScopedRoles.find((r) => {
                     if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
                     else return r.id === project.roleId
                   })
+                  const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
 
                   return (
                     <div
@@ -254,43 +258,71 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       <p className="text-sm">{name}</p>
 
                       <div className="flex items-center gap-x-2">
-                        <Select_Shadcn_
-                          disabled={false}
-                          value={(project?.baseRoleId ?? project.roleId).toString()}
-                          onValueChange={(value) => onSelectRole(value, project)}
-                        >
-                          <SelectTrigger_Shadcn_
-                            className={cn(
-                              'text-sm h-10 w-56',
-                              role?.name === undefined && 'text-foreground-light'
-                            )}
+                        {cannotAddAnyRoles ? (
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_ asChild>
+                              <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
+                                {role?.name ?? 'Unknown'}
+                              </div>
+                            </TooltipTrigger_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom">
+                              Additional permissions required to update role
+                            </TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
+                        ) : (
+                          <Select_Shadcn_
+                            disabled={false}
+                            value={(project?.baseRoleId ?? project.roleId).toString()}
+                            onValueChange={(value) => onSelectRole(value, project)}
                           >
-                            {role?.name ?? 'Please select a role'}
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              {(availableRoles ?? [])
-                                .sort((a, b) => sortByObject[a.name] - sortByObject[b.name])
-                                .map((role) => (
-                                  <SelectItem_Shadcn_
-                                    key={role.id}
-                                    value={role.id.toString()}
-                                    className="text-sm"
-                                  >
-                                    {role.name}
-                                  </SelectItem_Shadcn_>
-                                ))}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            <SelectTrigger_Shadcn_
+                              className={cn(
+                                'text-sm h-10 w-56',
+                                role?.name === undefined && 'text-foreground-light'
+                              )}
+                            >
+                              {role?.name ?? 'Please select a role'}
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectGroup_Shadcn_>
+                                {(orgScopedRoles ?? [])
+                                  .sort((a, b) => sortByObject[a.name] - sortByObject[b.name])
+                                  .map((role) => {
+                                    const canAssignRole = rolesAddable.includes(role.id)
+
+                                    return (
+                                      <SelectItem_Shadcn_
+                                        key={role.id}
+                                        value={role.id.toString()}
+                                        className="text-sm"
+                                        disabled={!canAssignRole}
+                                      >
+                                        {role.name}
+                                      </SelectItem_Shadcn_>
+                                    )
+                                  })}
+                              </SelectGroup_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        )}
 
                         {!isApplyingRoleToAllProjects && (
-                          <Button
-                            type="text"
-                            className="px-1"
-                            icon={<X size={14} />}
-                            onClick={() => onRemoveProject(project?.ref)}
-                          />
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_ asChild>
+                              <Button
+                                type="text"
+                                disabled={!canRemoveRole}
+                                className="px-1"
+                                icon={<X size={14} />}
+                                onClick={() => onRemoveProject(project?.ref)}
+                              />
+                            </TooltipTrigger_Shadcn_>
+                            {!canRemoveRole && (
+                              <TooltipContent_Shadcn_ side="bottom">
+                                Additional permission required to remove role from member
+                              </TooltipContent_Shadcn_>
+                            )}
+                          </Tooltip_Shadcn_>
                         )}
                       </div>
                     </div>

@@ -38,21 +38,20 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
-  const { data: allRoles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
-    slug: selectedOrganization?.slug,
-  })
-  // [Joshen TODO] Needs to change
-  const roles = allRoles?.org_scoped_roles ?? []
+  const { data: allRoles } = useOrganizationRolesV2Query({ slug })
+
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+  const projectScopedRoles = allRoles?.project_scoped_roles ?? []
   const isPendingInviteAcceptance = !!member.invited_id
 
   const { rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
-    roles,
+    orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
 
   const roleId = member.role_ids?.[0] ?? -1
-  const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
+  const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
   const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
@@ -80,6 +79,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { mutate: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
     useOrganizationMemberInviteDeleteMutation()
+
+  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
   const handleMemberDelete = async () => {
     if (!slug) return console.error('slug is required')
@@ -124,8 +125,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     )
   }
 
-  // [Joshen TODO] Replace false with !canRemoveMember
-  if (false || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
+  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
         <Tooltip_Shadcn_>
@@ -140,8 +140,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     )
   }
 
-  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
-
   return (
     <>
       <div className="flex items-center justify-end gap-x-2">
@@ -149,15 +147,13 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="default"
-              // [Joshen TODO] Replace false with !canRemoveMember
-              disabled={isPendingInviteAcceptance || false}
+              disabled={isPendingInviteAcceptance || !canRemoveMember}
               onClick={() => setShowAccessModal(true)}
             >
               Manage access
             </Button>
           </TooltipTrigger_Shadcn_>
-          {/* [Joshen TODO] Replace false with !canRemoveMember */}
-          {false && (
+          {!canRemoveMember && (
             <TooltipContent_Shadcn_ side="bottom">
               You need additional permissions to manage this team member
             </TooltipContent_Shadcn_>
@@ -187,7 +183,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                     <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                       <div className="flex flex-col">
                         <p>Cancel invitation</p>
-                        <p className="block opacity-50">Revoke this invitation.</p>
+                        <p className="text-foreground-lighter">Revoke this invitation.</p>
                       </div>
                     </DropdownMenuItem>
                   )}
@@ -197,7 +193,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       <DropdownMenuItem onClick={() => handleResendInvite(member)}>
                         <div className="flex flex-col">
                           <p>Resend invitation</p>
-                          <p className="block opacity-50">Invites expire after 24hrs.</p>
+                          <p className="text-foreground-lighter">Invites expire after 24hrs.</p>
                         </div>
                       </DropdownMenuItem>
                     </>
@@ -206,13 +202,19 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               ) : (
                 organizationMembersDeletionEnabled && (
                   <DropdownMenuItem
-                    className="space-x-2"
+                    className="space-x-2 items-start"
+                    disabled={!canRemoveMember}
                     onClick={() => {
                       setIsDeleteModalOpen(true)
                     }}
                   >
                     <Trash size={16} />
-                    <p>Remove member</p>
+                    <div className="flex flex-col">
+                      <p>Remove member</p>
+                      {!canRemoveMember && (
+                        <p className="text-foreground-lighter">Additional permissions required</p>
+                      )}
+                    </div>
                   </DropdownMenuItem>
                 )
               )}

@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -36,6 +37,8 @@ export const UpdateRolesConfirmationModal = ({
   const { data: projects } = useProjectsQuery()
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
 
+  // [Joshen] Separate saving state instead of using RQ due to several successive steps
+  const [saving, setSaving] = useState(false)
   const { mutateAsync: updateRole } = useOrganizationMemberUpdateRoleMutation()
   const { mutateAsync: removeRole } = useOrganizationMemberUnassignRoleMutation({
     onError: () => {},
@@ -54,13 +57,13 @@ export const UpdateRolesConfirmationModal = ({
   const onConfirmUpdateMemberRoles = async () => {
     if (slug === undefined) return console.error('Slug is required')
 
+    setSaving(true)
     const gotrueId = member.gotrue_id
     const isOrgScope =
       projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
 
     // Early return if we're just updating org level roles
     // Everything else below is just project level role changes then
-    // [Joshen TODO] Can we also debug why full page crash if payload is wrong e.g projects is [null]
     if (isOrgScope) {
       try {
         await updateRole({
@@ -72,6 +75,7 @@ export const UpdateRolesConfirmationModal = ({
         onClose(true)
         return
       } catch (error: any) {
+        setSaving(false)
         return toast.error(`Failed to update role: ${error.message}`)
       }
     }
@@ -85,6 +89,7 @@ export const UpdateRolesConfirmationModal = ({
     try {
       await Promise.all(roleIdsToRemove.map((roleId) => removeRole({ slug, gotrueId, roleId })))
     } catch (error: any) {
+      setSaving(false)
       return toast.error(`Failed to update role: ${error.message}`)
     }
 
@@ -105,6 +110,7 @@ export const UpdateRolesConfirmationModal = ({
         )
       )
     } catch (error: any) {
+      setSaving(false)
       return toast.error(`Failed to update role: ${error.message}`)
     }
 
@@ -151,6 +157,7 @@ export const UpdateRolesConfirmationModal = ({
           queryClient.invalidateQueries(organizationKeysV1.members(slug)),
         ])
       } catch (error: any) {
+        setSaving(false)
         toast.error(`Failed to update role: ${error.message}`)
       }
     })
@@ -163,6 +170,7 @@ export const UpdateRolesConfirmationModal = ({
     <ConfirmationModal
       size="medium"
       visible={visible}
+      loading={saving}
       title="Confirm to change roles of member"
       confirmLabel="Update roles"
       confirmLabelLoading="Updating"
