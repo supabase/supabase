@@ -102,7 +102,10 @@ export default function Page() {
             return results
           }
           case 'brainstormReports': {
-            return 'Reports have been brainstormed. Relay this info to the user.'
+            return {
+              success: true,
+              message: 'Reports have been brainstormed. Relay this info to the user.',
+            }
           }
           case 'executeSql': {
             try {
@@ -114,7 +117,7 @@ export default function Page() {
             } catch (err) {
               if (err instanceof Error) {
                 console.log(err.message)
-                return { error: err.message }
+                return { success: false, error: err.message }
               }
               throw err
             }
@@ -123,17 +126,21 @@ export default function Page() {
             const { config } = toolCall.args as any
 
             // Validate that the chart can be rendered without error
-            const canvas = document.createElement('canvas')
+            const canvas = document.createElement('canvas', {})
+            canvas.className = 'invisible'
+            document.body.appendChild(canvas)
 
             try {
               const chart = new Chart(canvas, config)
               chart.destroy()
-              return codeBlock`
-              The chart has been generated and displayed to the user above. Acknowledge the user's request.
-            `
+              return {
+                success: true,
+                message:
+                  "The chart has been generated and displayed to the user above. Acknowledge the user's request.",
+              }
             } catch (err) {
               if (err instanceof Error) {
-                return { error: err.message }
+                return { success: false, error: err.message }
               }
               throw err
             } finally {
@@ -153,7 +160,10 @@ export default function Page() {
               })
             })
             setIsEditorVisible(true)
-            return 'SQL has successfully been appended to the migration file.'
+            return {
+              success: true,
+              message: 'SQL has successfully been appended to the migration file.',
+            }
           }
         }
       },
@@ -298,6 +308,21 @@ export default function Page() {
                             {message.toolInvocations?.map((toolInvocation) => {
                               switch (toolInvocation.toolName) {
                                 case 'generateChart': {
+                                  if (!('result' in toolInvocation)) {
+                                    return undefined
+                                  }
+
+                                  if ('error' in toolInvocation.result) {
+                                    return (
+                                      <div
+                                        key={toolInvocation.toolCallId}
+                                        className="bg-destructive-300 px-6 py-4 rounded-md"
+                                      >
+                                        Error loading chart
+                                      </div>
+                                    )
+                                  }
+
                                   const { type, data, options } = toolInvocation.args.config
                                   return (
                                     <ErrorBoundary
