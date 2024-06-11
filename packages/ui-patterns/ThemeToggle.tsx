@@ -17,9 +17,14 @@ import {
 interface ThemeToggleProps {
   forceDark?: boolean
   triggerClassName?: string
+  contentClassName?: string
 }
 
-export const ThemeToggle = ({ forceDark = false, triggerClassName }: ThemeToggleProps) => {
+export const ThemeToggle = ({
+  forceDark = false,
+  triggerClassName,
+  contentClassName,
+}: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
 
@@ -41,7 +46,7 @@ export const ThemeToggle = ({ forceDark = false, triggerClassName }: ThemeToggle
           <span className="sr-only">Toggle theme</span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
+      <DropdownMenuContent align="end" className={cn('w-60', contentClassName)}>
         <DropdownMenuGroup>
           <DropdownMenuRadioGroup
             value={currentTheme} // Use the currentTheme variable here

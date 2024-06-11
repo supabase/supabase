@@ -134,7 +134,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
               </Link>
               <div className="flex gap-4 items-center">
-                <ThemeToggle />
+                <ThemeToggle contentClassName="bg-surface-200" />
                 <button
                   onClick={() => setOpen(false)}
                   type="button"
