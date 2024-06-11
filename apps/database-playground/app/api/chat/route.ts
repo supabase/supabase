@@ -52,8 +52,14 @@ export async function POST(req: Request) {
         }),
       },
       generateChart: {
-        description:
-          'Generates a chart using Chart.js for a given SQL query. Plugins are not available. Call `executeSql` first.',
+        description: codeBlock`
+          Generates a chart using Chart.js for a given SQL query.
+          - Label both axises
+          - Line charts should default to \`cubicInterpolationMode: 'monotone'\`
+          - Plugins are not available
+          
+          Call \`executeSql\` first.
+        `,
         parameters: z.object({
           config: z
             .any()
