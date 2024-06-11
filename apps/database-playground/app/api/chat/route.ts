@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       },
       executeSql: {
         description:
-          "Executes Postgres SQL against the user's database. Don't assume schema. If uncertain, call `getDatabaseSchema` first.",
+          "Executes Postgres SQL against the user's database. Don't assume schema. If uncertain, call `getDatabaseSchema` first. Perform joins automatically.",
         parameters: z.object({ sql: z.string() }),
       },
       brainstormReports: {
