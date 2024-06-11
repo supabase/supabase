@@ -126,12 +126,12 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       Project cannot be restored through the dashboard
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      This project has been paused more than{' '}
+                      This project has been paused for over{' '}
                       <span className="text-foreground">
                         {pauseStatus?.max_days_till_restore_disabled ?? 90} days
                       </span>{' '}
-                      and hence cannot be restored through the dashboard. Your data is still intact
-                      and can be downloaded as a backup nonetheless.
+                      and cannot be restored through the dashboard. However, your data remains
+                      intact and can be downloaded as a backup.
                     </AlertDescription_Shadcn_>
                     <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
                       <Tooltip_Shadcn_>
@@ -157,12 +157,12 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 ) : isFreePlan ? (
                   <>
                     <p className="text-sm text-foreground-light text-center">
-                      You can also prevent project pausing in the future by upgrading to Pro.
+                      To prevent future pauses, consider upgrading to Pro.
                     </p>
                     <Alert_Shadcn_>
                       <AlertTitle_Shadcn_>
-                        Project can be restored through the dashboard within{' '}
-                        {pauseStatus.remaining_days_till_restore_disabled} more day
+                        Project can be restored through the dashboard within the next{' '}
+                        {pauseStatus.remaining_days_till_restore_disabled} day
                         {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1 ? 's' : ''}
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
@@ -171,8 +171,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         <span className="text-foreground">
                           {pauseStatus.max_days_till_restore_disabled} days
                         </span>
-                        . Your database backup will still be available for download thereafter
-                        nonetheless.
+                        . However, your database backup will still be available for download.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   </>
