@@ -396,7 +396,7 @@ export default function Page() {
                         <m.div
                           key={report.name}
                           layoutId={`report-suggestion-${report.name}`}
-                          className="w-64 h-32 flex flex-col overflow-ellipsis shadow-lg shadow-neutral-50 rounded-md cursor-pointer"
+                          className="w-64 h-32 flex flex-col overflow-ellipsis rounded-md cursor-pointer"
                           onMouseDown={() => append({ role: 'user', content: report.description })}
                           variants={{
                             hidden: { scale: 0 },
