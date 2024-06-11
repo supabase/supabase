@@ -81,6 +81,20 @@ const { data, error } = await supabase.auth.signUp({
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final res = await supabase.auth.signUp(
+  email: 'example@email.com',
+  password: 'example-password',
+  data: {
+    'first_name': 'John',
+    'age': 27,
+  },
+);
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -127,6 +141,14 @@ const {
   data: { user },
 } = await supabase.auth.getUser()
 let metadata = user.user_metadata
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final User? user = supabase.auth.currentUser;
+final Map<String, dynamic>? metadata = user?.userMetadata;
 ```
 
 </TabPanel>
