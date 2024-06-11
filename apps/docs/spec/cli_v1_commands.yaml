@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.172.2
+  version: 1.176.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -46,6 +46,10 @@ flags:
     name: -h, --help
     description: help for supabase
     default_value: 'false'
+  - id: network-id
+    name: --network-id <string>
+    description: use the specified docker network instead of a generated one
+    default_value: ''
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
@@ -509,7 +513,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -976,7 +980,7 @@ commands:
     description: Unset a secret(s) from the linked Supabase project.
     tags: []
     links: []
-    usage: supabase secrets unset <NAME> ...
+    usage: supabase secrets unset [NAME] ...
     subcommands: []
     flags:
       - id: project-ref
@@ -989,7 +993,7 @@ commands:
     description: Set a secret(s) to the linked Supabase project.
     tags: []
     links: []
-    usage: supabase secrets set [flags] <NAME=VALUE> ...
+    usage: supabase secrets set <NAME=VALUE> ... [flags]
     subcommands: []
     flags:
       - id: env-file
@@ -2546,7 +2550,7 @@ commands:
 
       Serve all Functions locally.
 
-      `supabase functions serve` command includes additional flags to assist developers in debugging Edge Functions via the v8 inspector protocol, allowing for debugging via Chrome DevTools, VS Code, and IntelliJ IDEA for example. Refer to the [docs guide](/docs/guides/functions/debugging-tools) for setup instructions.
+      `supabase functions serve` command includes additional flags to assist developers in debugging using tools like `DevTools`.
 
       1. `--inspect`
          * Alias of `--inspect-mode brk`.
@@ -2562,7 +2566,7 @@ commands:
          * By default, creating an inspector session for the main worker is not allowed, but this flag allows it.
          * Other behaviors follow the `inspect-mode` flag mentioned above.
 
-      Additionally, the following properties can be customized via `supabase/config.toml` under `edge_runtime` section.
+      Additionally, the following properties can be customised via `supabase/config.toml` under `edge_runtime` section.
 
       1. `inspector_port`
          * The port used to listen to the Inspector session, defaults to 8083.
@@ -2586,7 +2590,7 @@ commands:
         default_value: ''
       - id: inspect
         name: --inspect
-        description: Alias of --inspect-mode run.
+        description: Alias of --inspect-mode brk.
         default_value: 'false'
       - id: inspect-main
         name: --inspect-main
