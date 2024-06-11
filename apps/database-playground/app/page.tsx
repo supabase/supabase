@@ -6,7 +6,7 @@ import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
 import { codeBlock } from 'common-tags'
 import { LazyMotion, m } from 'framer-motion'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Chart as ChartWrapper } from 'react-chartjs-2'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -84,7 +84,7 @@ export default function Page() {
   const [isEditorVisible, setIsEditorVisible] = useState(false)
   const { reports } = useReportSuggestions(db)
 
-  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, append, stop, isLoading } = useChat({
     api: 'api/chat',
     maxToolRoundtrips: 5,
     async onToolCall({ toolCall }) {
@@ -392,8 +392,18 @@ export default function Page() {
               <Button
                 className="rounded-full w-8 h-8 p-1.5 text-white bg-neutral-800"
                 type="submit"
+                onClick={(e) => {
+                  if (isLoading) {
+                    e.preventDefault()
+                    stop()
+                  }
+                }}
               >
-                <ArrowUp />
+                {isLoading ? (
+                  <Square fill="white" strokeWidth={0} className="w-3.5 h-3.5" />
+                ) : (
+                  <ArrowUp />
+                )}
               </Button>
             </form>
             <div className="text-xs text-neutral-500">
