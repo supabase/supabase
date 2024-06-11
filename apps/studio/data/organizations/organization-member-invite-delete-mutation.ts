@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -16,12 +15,11 @@ export async function deleteOrganizationMemberInvite({
   slug,
   invitedId,
 }: OrganizationMemberInviteDeleteVariables) {
-  const response = await delete_(
-    `${API_URL}/organizations/${slug}/members/invite?invited_id=${invitedId}`,
-    {}
-  )
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await del('/platform/organizations/{slug}/members/invite', {
+    params: { path: { slug }, query: { invited_id: invitedId } },
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type OrganizationMemberInviteDeleteData = Awaited<ReturnType<typeof deleteOrganizationMemberInvite>>

@@ -19,7 +19,7 @@ import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { Button, Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import InviteMemberButton from './InviteMemberButton'
+import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -92,17 +92,7 @@ const TeamSettings = () => {
               {organizationMembersCreationEnabled &&
                 canAddMembers &&
                 profile !== undefined &&
-                selectedOrganization !== undefined && (
-                  <div>
-                    <InviteMemberButton
-                      orgId={selectedOrganization.id}
-                      userId={profile.id}
-                      members={members ?? []}
-                      roles={roles}
-                      rolesAddable={rolesAddable}
-                    />
-                  </div>
-                )}
+                selectedOrganization !== undefined && <InviteMemberButton />}
               {/* if organizationMembersDeletionEnabled is false, you also can't delete yourself */}
               {organizationMembersDeletionEnabled && (
                 <div>

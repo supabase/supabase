@@ -21,16 +21,25 @@ export async function getOrganizationMembers(
 ) {
   if (!slug) throw new Error('slug is required')
 
+  // [Joshen TODO] Left off here
   const [members, invites] = await Promise.all([
     get('/platform/organizations/{slug}/members', { params: { path: { slug } }, signal }),
     get('/platform/organizations/{slug}/members/invite', { params: { path: { slug } }, signal }),
+    // get('/platform/organizations/{slug}/members/invitations', {
+    //   params: { path: { slug } },
+    //   signal,
+    // }),
   ])
 
   const { data: orgMembers, error: orgMembersError } = members
   const { data: orgInvites, error: orgInvitesError } = invites
+  // const { data: orgInvitesV2, error: orgInvitesV2Error } = invitesV2
 
   if (orgMembersError) handleError(orgMembersError)
   if (orgInvitesError) handleError(orgInvitesError)
+  // if (orgInvitesV2) handleError(orgInvitesV2Error)
+
+  // console.log({ orgInvitesV2 })
 
   // Remap invite data to look like existing members data
   const invitedMembers = orgInvites.map((invite) => {

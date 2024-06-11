@@ -155,6 +155,8 @@ export interface paths {
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
+    /** Updates the billing customer */
+    put: operations['updateCustomerV2']
     /** Updates the Stripe customer */
     patch: operations['CustomerController_updateCustomer']
   }
@@ -578,6 +580,10 @@ export interface paths {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
   }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
+  }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
     post: operations['ResizeController_resizeDatabase']
@@ -986,6 +992,10 @@ export interface paths {
     post: operations['SystemFunctionsController_createFunction']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
+  }
+  '/system/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['SystemProjectRunLintsController_runProjectLints']
   }
   '/system/projects/{ref}/secrets': {
     /**
@@ -1447,6 +1457,10 @@ export interface paths {
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
@@ -2555,12 +2569,12 @@ export interface components {
       opt_in_tags: string[]
     }
     CustomerBillingAddress: {
-      city: string | null
-      country: string | null
-      line1: string | null
-      line2: string | null
-      postal_code: string | null
-      state: string | null
+      city?: string
+      country: string
+      line1: string
+      line2?: string
+      postal_code?: string
+      state?: string
     }
     CustomerResponse: {
       email: string
@@ -2568,6 +2582,9 @@ export interface components {
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
+    }
+    BillingCustomerUpdateBody: {
+      address?: components['schemas']['CustomerBillingAddress']
     }
     CustomerUpdateResponse: {
       id: string
@@ -3914,6 +3931,11 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -4088,11 +4110,6 @@ export interface components {
       name: string
       limit: number
     }
-    PreviewTransferInvoiceItem: {
-      description: string
-      quantity: number
-      amount: number
-    }
     PreviewProjectTransferResponse: {
       source_subscription_plan: components['schemas']['BillingPlanId']
       target_subscription_plan: components['schemas']['BillingPlanId']
@@ -4105,11 +4122,6 @@ export interface components {
       source_project_eligible: boolean
       target_organization_eligible: boolean | null
       target_organization_has_free_project_slots: boolean | null
-      credits_on_source_organization: number
-      costs_on_target_organization: number
-      charge_on_target_organization: number
-      source_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
-      target_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
     }
     AnalyticsResponse: {
       error?: OneOf<
@@ -4994,10 +5006,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       db_host: string
       db_user?: string
       db_pass?: string
@@ -5070,10 +5085,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -5872,17 +5890,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -5983,17 +6004,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -6846,6 +6870,32 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve the Stripe customer */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the billing customer */
+  updateCustomerV2: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BillingCustomerUpdateBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update the billing customer */
       500: {
         content: never
       }
@@ -10093,6 +10143,22 @@ export interface operations {
       }
     }
   }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
+      }
+    }
+  }
   /** Resize database disk */
   ResizeController_resizeDatabase: {
     parameters: {
@@ -12526,6 +12592,25 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  SystemProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }
