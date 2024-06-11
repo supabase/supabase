@@ -10,10 +10,19 @@ const corsHeaders = {
 }
 
 // Load custom font
-const FONT_URL =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6/CircularStd-Book.otf'
-const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const fontData = await font
+const FONT_URLS = {
+  CIRCULAR:
+    'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/CircularStd-Book.otf',
+  MONO: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/SourceCodePro-Regular.ttf',
+}
+const FONT_CIRCULAR = fetch(new URL(FONT_URLS['CIRCULAR'], import.meta.url)).then((res) =>
+  res.arrayBuffer()
+)
+const FONT_MONO = fetch(new URL(FONT_URLS['MONO'], import.meta.url)).then((res) =>
+  res.arrayBuffer()
+)
+const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
+const MONO_FONT_DATA = await FONT_MONO
 
 export async function handler(req: Request) {
   const url = new URL(req.url)
@@ -53,8 +62,13 @@ export async function handler(req: Request) {
           fonts: [
             {
               name: 'Circular',
-              data: fontData,
+              data: CIRCULAR_FONT_DATA,
               style: 'normal',
+            },
+            {
+              name: 'SourceCode',
+              data: MONO_FONT_DATA,
+              style: 'mono',
             },
           ],
           headers: {
