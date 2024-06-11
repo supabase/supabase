@@ -99,6 +99,11 @@ const config = {
       },
     },
   },
+  branching: {
+    inactivity_period_in_minutes: {
+      value: 5,
+    },
+  },
 } as const
 
 export default config
