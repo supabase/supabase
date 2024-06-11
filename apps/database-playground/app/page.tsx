@@ -372,16 +372,31 @@ export default function Page() {
                       ))}
                     </m.div>
                   ) : (
-                    <div className="flex flex-col gap-6 justify-center items-center">
+                    <m.div
+                      className="flex flex-row gap-4 justify-center items-center"
+                      variants={{
+                        hidden: {
+                          opacity: 0,
+                          y: -10,
+                        },
+                        show: {
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            delay: 0.5,
+                          },
+                        },
+                      }}
+                      initial="hidden"
+                      animate="show"
+                    >
+                      <m.div layoutId="ai-loading-icon">
+                        <AiIconAnimation loading />
+                      </m.div>
                       <h3 className="text-lg italic font-light text-neutral-500">
                         Brainstorming some ideas
                       </h3>
-                      <div className="scale-75">
-                        <m.div layoutId="ai-loading-icon">
-                          <AiIconAnimation loading />
-                        </m.div>
-                      </div>
-                    </div>
+                    </m.div>
                   )}
                 </div>
               </div>
