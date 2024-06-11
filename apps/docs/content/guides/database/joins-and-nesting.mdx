@@ -370,6 +370,20 @@ const { data, error } = await supabase.from('shifts').select(
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.from('shifts').select('''
+  *,
+  scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  )
+''');
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
