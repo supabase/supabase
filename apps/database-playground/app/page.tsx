@@ -461,6 +461,7 @@ export default function Page() {
                     stop()
                   }
                 }}
+                disabled={!isLoading && !input}
               >
                 {isLoading ? (
                   <Square fill="white" strokeWidth={0} className="w-3.5 h-3.5" />
