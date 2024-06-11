@@ -665,7 +665,7 @@ Upon sign up, an email will be sent to the user with a unique hash code. This ke
 
 In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
 - Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
 - Finally, we redirect the user to the `account` page.
 
@@ -693,23 +693,18 @@ import { createClient } from '@/utils/supabase/server'
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type')
+  const code = searchParams.get('code')
   const next = '/account'
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone()
   redirectTo.pathname = next
-  redirectTo.searchParams.delete('token_hash')
-  redirectTo.searchParams.delete('type')
+  redirectTo.searchParams.delete('code')
 
-  if (token_hash && type) {
+  if (code) {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       redirectTo.searchParams.delete('next')
       return NextResponse.redirect(redirectTo)
@@ -735,23 +730,18 @@ import { createClient } from '@/utils/supabase/server'
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as EmailOtpType | null
+  const code = searchParams.get('code')
   const next = '/account'
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone()
   redirectTo.pathname = next
-  redirectTo.searchParams.delete('token_hash')
-  redirectTo.searchParams.delete('type')
+  redirectTo.searchParams.delete('code')
 
-  if (token_hash && type) {
+  if (code) {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       redirectTo.searchParams.delete('next')
       return NextResponse.redirect(redirectTo)
