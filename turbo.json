@@ -12,7 +12,10 @@
         "SUPABASE_SERVICE_ROLE_SECRET",
         "EMAIL_TO_ID_SECRET",
         "SUPABASE_URL",
-        "GITHUB_OAUTH_CLIENT_SECRET"
+        "GITHUB_OAUTH_CLIENT_SECRET",
+        "NEXT_PUBLIC_MISC_USE_URL",
+        "NEXT_PUBLIC_MISC_USE_ANON_KEY",
+        "MISC_USE_SERVICE_ROLE_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
