@@ -10,14 +10,16 @@ import {
   IconMoon,
   IconSun,
   Theme,
+  cn,
   themes,
 } from 'ui'
 
 interface ThemeToggleProps {
   forceDark?: boolean
+  triggerClassName?: string
 }
 
-export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
+export const ThemeToggle = ({ forceDark = false, triggerClassName }: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
 
@@ -29,7 +31,10 @@ export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
       <DropdownMenuTrigger asChild disabled={forceDark}>
         <button
           id="user-settings-dropdown"
-          className="flex items-center justify-center h-7 w-7 text-foreground"
+          className={cn(
+            'flex items-center justify-center h-7 w-7 text-foreground-light',
+            triggerClassName
+          )}
         >
           <IconSun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <IconMoon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

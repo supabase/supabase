@@ -1,15 +1,15 @@
 import React, { Dispatch, Fragment, SetStateAction } from 'react'
+import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
-
-import { Accordion, Button, IconX, cn } from 'ui'
-
-import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 import { useKey } from 'react-use'
+
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { useTheme } from 'next-themes'
-import { MenuItem } from './GlobalNavigationMenu'
+import { Accordion, Button, IconX, cn } from 'ui'
+import { ThemeToggle } from 'ui-patterns'
+
+import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
+import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -19,9 +19,11 @@ interface Props {
 }
 
 const GlobalMobileMenu = ({ open, setOpen }: Props) => {
-  const { resolvedTheme } = useTheme()
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+
+  console.log('activeLabel', activeLabel)
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -49,7 +51,11 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
         <Accordion.Item
           header={section[0].label}
           id={section[0].label}
-          className={cn('relative', itemClassName)}
+          className={cn(
+            'relative',
+            activeLabel === section[0].label && '!text-foreground',
+            itemClassName
+          )}
         >
           {section[0].menuItems?.map((menuItem, menuItemIndex) => (
             <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
@@ -71,7 +77,10 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
           ))}
         </Accordion.Item>
       ) : (
-        <Link href={section[0].href} className={cn('', itemClassName)}>
+        <Link
+          href={section[0].href}
+          className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
+        >
           {section[0].label}
         </Link>
       )}
@@ -107,26 +116,34 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
             <div className="absolute px-5 h-[50px] flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  className="cursor-pointer"
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? '/docs/supabase-dark.svg'
-                      : '/docs/supabase-light.svg'
-                  }
+                  className="cursor-pointer hidden dark:block"
+                  src="/docs/supabase-dark.svg"
+                  priority
+                  width={96}
+                  height={24}
+                  alt="Supabase Logo"
+                />
+                <Image
+                  className="cursor-pointer block dark:hidden"
+                  src="/docs/supabase-light.svg"
+                  priority
                   width={96}
                   height={24}
                   alt="Supabase Logo"
                 />
                 <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
               </Link>
-              <button
-                onClick={() => setOpen(false)}
-                type="button"
-                className="inline-flex items-center justify-center focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset border border-default bg-surface-100/75 text-foreground-light rounded min-w-[30px] w-[30px] h-[30px]"
-              >
-                <span className="sr-only">Close menu</span>
-                <IconX />
-              </button>
+              <div className="flex gap-4 items-center">
+                <ThemeToggle />
+                <button
+                  onClick={() => setOpen(false)}
+                  type="button"
+                  className="inline-flex items-center justify-center focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset border border-default bg-surface-100/75 text-foreground-light rounded min-w-[30px] w-[30px] h-[30px]"
+                >
+                  <span className="sr-only">Close menu</span>
+                  <IconX />
+                </button>
+              </div>
             </div>
             <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto pt-12 pb-32 px-3">
               <Menu />

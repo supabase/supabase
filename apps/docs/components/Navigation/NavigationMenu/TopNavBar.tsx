@@ -55,7 +55,9 @@ const TopNavBar: FC = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <IconSearch size={18} strokeWidth={2} />
-                    <p className="flex text-sm pr-2">Search docs...</p>
+                    <p className="flex text-sm pr-2">
+                      Search<span className="hidden sm:inline ml-1"> docs...</span>
+                    </p>
                   </div>
                   <div className="hidden md:flex items-center space-x-1">
                     <div
