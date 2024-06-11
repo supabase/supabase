@@ -1,5 +1,7 @@
 'use client'
 
+import 'chartjs-adapter-date-fns'
+
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
 import { nanoid } from 'ai'
