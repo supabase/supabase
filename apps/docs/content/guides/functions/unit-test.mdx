@@ -34,13 +34,8 @@ The following script is a good example to get started with testing your Edge Fun
 
 ```typescript function-one-test.ts
 // Import required libraries and modules
-import {
-  assert,
-  assertExists,
-  assertEquals,
-} from 'https://deno.land/std@0.192.0/testing/asserts.ts'
+import { assert, assertEquals } from 'https://deno.land/std@0.192.0/testing/asserts.ts'
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0'
-import { delay } from 'https://deno.land/x/delay@v0.2.0/mod.ts'
 
 // Set up the configuration for the Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -147,7 +142,7 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
 4. To run the tests, use the following command in your terminal:
 
    ```bash
-   deno test --allow-all supabase/functions/function-one-test.ts --env-file .env.local
+   deno test --allow-all supabase/functions/tests/function-one-test.ts --env=.env.local
    ```
 
 ## Resources
