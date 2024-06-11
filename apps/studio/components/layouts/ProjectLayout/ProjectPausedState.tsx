@@ -162,7 +162,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <Alert_Shadcn_>
                       <AlertTitle_Shadcn_>
                         Project can be restored through the dashboard within{' '}
-                        {pauseStatus.remaining_days_till_restore_disabled} more days
+                        {pauseStatus.remaining_days_till_restore_disabled} more day
+                        {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1 ? 's' : ''}
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Free projects cannot be restored through the dashboard if they are paused
