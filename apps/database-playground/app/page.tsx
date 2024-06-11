@@ -157,6 +157,8 @@ export default function Page() {
       },
     })
 
+  const lastMessage = messages.at(-1)
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const nextMessageId = useMemo(() => nanoid(), [messages])
 
@@ -322,7 +324,7 @@ export default function Page() {
                 <AnimatePresence>
                   {isLoading && (
                     <m.div
-                      className="-translate-x-12"
+                      className="-translate-x-12 flex gap-4 justify-start items-center"
                       variants={{
                         hidden: { opacity: 0 },
                         show: { opacity: 1 },
@@ -334,6 +336,22 @@ export default function Page() {
                       <m.div layoutId="ai-loading-icon">
                         <AiIconAnimation loading />
                       </m.div>
+                      {lastMessage &&
+                        (lastMessage.role === 'user' ||
+                          (lastMessage.role === 'assistant' && !lastMessage.content)) && (
+                          <m.div
+                            layout
+                            className="text-neutral-400 italic"
+                            variants={{
+                              hidden: { opacity: 0 },
+                              show: { opacity: 1, transition: { delay: 1.5 } },
+                            }}
+                            initial="hidden"
+                            animate="show"
+                          >
+                            Working on it...
+                          </m.div>
+                        )}
                     </m.div>
                   )}
                 </AnimatePresence>
