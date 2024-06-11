@@ -5,7 +5,7 @@ import { Editor } from '@monaco-editor/react'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
 import { codeBlock } from 'common-tags'
-import { LazyMotion, m } from 'framer-motion'
+import { AnimatePresence, LazyMotion, m } from 'framer-motion'
 import { ArrowUp, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Chart as ChartWrapper } from 'react-chartjs-2'
@@ -313,11 +313,24 @@ export default function Page() {
                       )
                   }
                 })}
-                {isLoading && (
-                  <m.div layout>
-                    <AiIconAnimation loading />
-                  </m.div>
-                )}
+                <AnimatePresence>
+                  {isLoading && (
+                    <m.div
+                      className="-translate-x-12"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        show: { opacity: 1 },
+                      }}
+                      initial="hidden"
+                      animate="show"
+                      exit="hidden"
+                    >
+                      <m.div layoutId="ai-loading-icon">
+                        <AiIconAnimation loading />
+                      </m.div>
+                    </m.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <div className="flex-1 w-full max-w-4xl flex flex-col gap-10 justify-center items-center">
@@ -363,8 +376,10 @@ export default function Page() {
                       <h3 className="text-lg italic font-light text-neutral-500">
                         Brainstorming some ideas
                       </h3>
-                      <div className="scale-150">
-                        <AiIconAnimation loading />
+                      <div className="scale-75">
+                        <m.div layoutId="ai-loading-icon">
+                          <AiIconAnimation loading />
+                        </m.div>
                       </div>
                     </div>
                   )}
