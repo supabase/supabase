@@ -22,7 +22,7 @@ If you understand Git, you already understand Supabase Branching.
 
 Supabase Branching works with Git. You can test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity.
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
