@@ -6,6 +6,9 @@ import { z } from 'zod'
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
 
+const reportSchema = z.object({ name: z.string(), description: z.string() })
+export type Report = typeof reportSchema._type
+
 export async function POST(req: Request) {
   const { messages } = await req.json()
 
@@ -25,6 +28,8 @@ export async function POST(req: Request) {
       Err on the side of caution. Ask the user to confirm before any mutating operations.
       
       If you're just querying schema, data, or showing charts, go ahead and do it without asking.
+
+      Feel free to suggest corrections for suspected typos.
     `,
     model: openai('gpt-4o-2024-05-13'),
     messages: convertToCoreMessages(messages),
@@ -35,14 +40,15 @@ export async function POST(req: Request) {
         parameters: z.object({ sql: z.string() }),
       },
       executeSql: {
-        description: "Executes Postgres SQL against the user's database",
+        description:
+          "Executes Postgres SQL against the user's database. Don't assume schema. If uncertain, call `getDatabaseSchema` first.",
         parameters: z.object({ sql: z.string() }),
       },
       brainstormReports: {
         description:
           'Brainstorms some interesting reports to show to the user. Call `getDatabaseSchema` first.',
         parameters: z.object({
-          reports: z.array(z.object({ name: z.string() })),
+          reports: z.array(reportSchema),
         }),
       },
       generateChart: {
