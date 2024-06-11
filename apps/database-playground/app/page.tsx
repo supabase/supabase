@@ -244,9 +244,10 @@ export default function Page() {
             {messages.length > 0 ? (
               <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
                 {messages
-                  // Don't include tool calls that don't have an associated UI
                   .filter(
                     (message) =>
+                      message.content ||
+                      // Don't include tool calls that don't have an associated UI
                       !message.toolInvocations?.every((t) => t.toolName !== 'generateChart')
                   )
                   .map((message) => {
