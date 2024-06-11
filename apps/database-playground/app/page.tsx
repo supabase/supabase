@@ -2,12 +2,13 @@
 
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
+import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
 import { codeBlock } from 'common-tags'
 import { AnimatePresence, LazyMotion, m } from 'framer-motion'
 import { ArrowUp, Square } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Chart as ChartWrapper } from 'react-chartjs-2'
 import { ErrorBoundary } from 'react-error-boundary'
 import ReactMarkdown from 'react-markdown'
@@ -84,76 +85,80 @@ export default function Page() {
   const [isEditorVisible, setIsEditorVisible] = useState(false)
   const { reports } = useReportSuggestions(db)
 
-  const { messages, input, handleInputChange, handleSubmit, append, stop, isLoading } = useChat({
-    api: 'api/chat',
-    maxToolRoundtrips: 5,
-    async onToolCall({ toolCall }) {
-      console.log('tool call', toolCall)
-      switch (toolCall.toolName) {
-        case 'getDatabaseSchema': {
-          const { sql } = toolCall.args as any
-          console.log(sql)
-          const results = await db.exec(sql)
-          console.log(results)
-          return results
-        }
-        case 'brainstormReports': {
-          return 'Reports have been brainstormed. Relay this info to the user.'
-        }
-        case 'executeSql': {
-          try {
+  const { messages, input, setInput, handleInputChange, handleSubmit, append, stop, isLoading } =
+    useChat({
+      api: 'api/chat',
+      maxToolRoundtrips: 5,
+      async onToolCall({ toolCall }) {
+        console.log('tool call', toolCall)
+        switch (toolCall.toolName) {
+          case 'getDatabaseSchema': {
             const { sql } = toolCall.args as any
             console.log(sql)
             const results = await db.exec(sql)
             console.log(results)
             return results
-          } catch (err) {
-            if (err instanceof Error) {
-              console.log(err.message)
-              return { error: err.message }
-            }
-            throw err
           }
-        }
-        case 'generateChart': {
-          const { config } = toolCall.args as any
+          case 'brainstormReports': {
+            return 'Reports have been brainstormed. Relay this info to the user.'
+          }
+          case 'executeSql': {
+            try {
+              const { sql } = toolCall.args as any
+              console.log(sql)
+              const results = await db.exec(sql)
+              console.log(results)
+              return results
+            } catch (err) {
+              if (err instanceof Error) {
+                console.log(err.message)
+                return { error: err.message }
+              }
+              throw err
+            }
+          }
+          case 'generateChart': {
+            const { config } = toolCall.args as any
 
-          // Validate that the chart can be rendered without error
-          const canvas = document.createElement('canvas')
+            // Validate that the chart can be rendered without error
+            const canvas = document.createElement('canvas')
 
-          try {
-            const chart = new Chart(canvas, config)
-            chart.destroy()
-            return codeBlock`
+            try {
+              const chart = new Chart(canvas, config)
+              chart.destroy()
+              return codeBlock`
               The chart has been generated and displayed to the user above. Acknowledge the user's request.
             `
-          } catch (err) {
-            if (err instanceof Error) {
-              return { error: err.message }
+            } catch (err) {
+              if (err instanceof Error) {
+                return { error: err.message }
+              }
+              throw err
+            } finally {
+              canvas.remove()
             }
-            throw err
-          } finally {
-            canvas.remove()
+          }
+          case 'appendSqlToMigration': {
+            const { sql } = toolCall.args as any
+            setSql((s) => {
+              const newSql = (s + '\n' + sql).trim()
+              return format(newSql, {
+                language: 'postgresql',
+                keywordCase: 'lower',
+                identifierCase: 'lower',
+                dataTypeCase: 'lower',
+                functionCase: 'lower',
+              })
+            })
+            setIsEditorVisible(true)
+            return 'SQL has successfully been appended to the migration file.'
           }
         }
-        case 'appendSqlToMigration': {
-          const { sql } = toolCall.args as any
-          setSql((s) => {
-            const newSql = (s + '\n' + sql).trim()
-            return format(newSql, {
-              language: 'postgresql',
-              keywordCase: 'lower',
-              identifierCase: 'lower',
-              dataTypeCase: 'lower',
-              functionCase: 'lower',
-            })
-          })
-          setIsEditorVisible(true)
-          return 'SQL has successfully been appended to the migration file.'
-        }
-      }
-    },
-  })
+      },
+    })
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const nextMessageId = useMemo(() => nanoid(), [messages])
 
   const scrollRef = useRef<HTMLDivElement>()
   const prevScrollHeightRef = useRef<number>()
@@ -242,6 +247,7 @@ export default function Page() {
                       return (
                         <m.div
                           key={message.id}
+                          layoutId={message.id}
                           variants={{
                             hidden: {
                               opacity: 0,
@@ -402,14 +408,41 @@ export default function Page() {
               </div>
             )}
           </div>
-          <div className="flex flex-col items-center gap-2 pb-2">
+          <div className="flex flex-col items-center gap-2 pb-2 relative">
             <form
               className="flex items-center py-2 px-3 rounded-full bg-neutral-100 w-full max-w-4xl"
               onSubmit={(e) => {
-                handleSubmit(e)
+                // Manually manage message submission so that we can control its ID
+                // We want to control the ID so that we can perform layout animations via `layoutId`
+                // (see hidden dummy message above)
+                e.preventDefault()
+                append({
+                  id: nextMessageId,
+                  role: 'user',
+                  content: input,
+                })
+                setInput('')
                 scrollToBottom()
               }}
             >
+              {/*
+               * This is a hidden dummy message acting as an animation anchor
+               * before the real message is added to the chat.
+               *
+               * The animation starts in this element's position and moves over to
+               * the location of the real message after submit.
+               *
+               * It works by sharing the same `layoutId` between both message elements
+               * which framer motion requires to animate between them.
+               */}
+              {input && (
+                <m.div
+                  layoutId={nextMessageId}
+                  className="absolute invisible -top-12 px-5 py-2.5 text-base rounded-full bg-neutral-100"
+                >
+                  {input}
+                </m.div>
+              )}
               <input
                 className="flex-grow border-none focus-visible:ring-0 text-base bg-inherit placeholder:text-neutral-400"
                 name="prompt"
