@@ -243,84 +243,90 @@ export default function Page() {
           >
             {messages.length > 0 ? (
               <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
-                {messages.map((message) => {
-                  switch (message.role) {
-                    case 'user':
-                      return (
-                        <m.div
-                          key={message.id}
-                          layoutId={message.id}
-                          variants={{
-                            hidden: {
-                              opacity: 0,
-                              y: 10,
-                            },
-                            show: {
-                              opacity: 1,
-                              y: 0,
-                            },
-                          }}
-                          initial="hidden"
-                          animate="show"
-                          className="self-end px-5 py-2.5 text-base rounded-full bg-neutral-100"
-                        >
-                          {message.content}
-                        </m.div>
-                      )
-                    case 'assistant':
-                      return (
-                        <div
-                          key={message.id}
-                          className="self-stretch flex flex-col items-stretch gap-6"
-                        >
-                          {message.content && (
-                            <ReactMarkdown
-                              remarkPlugins={[
-                                remarkGfm,
-                                [remarkMath, { singleDollarTextMath: false }],
-                              ]}
-                              rehypePlugins={[[rehypeKatex, { output: 'html' }]]}
-                              components={{ ...markdownComponents, img: () => null }}
-                              className="prose [&_.katex-display>.katex]:text-left"
-                            >
-                              {message.content}
-                            </ReactMarkdown>
-                          )}
-                          {message.toolInvocations?.map((toolInvocation) => {
-                            switch (toolInvocation.toolName) {
-                              case 'generateChart': {
-                                const { type, data, options } = toolInvocation.args.config
-                                return (
-                                  <ErrorBoundary
-                                    key={toolInvocation.toolCallId}
-                                    fallbackRender={() => (
-                                      <div className="bg-warning-300">Error loading chart</div>
-                                    )}
-                                  >
-                                    <m.div
-                                      className="relative w-full"
-                                      variants={{
-                                        hidden: {
-                                          opacity: 0,
-                                        },
-                                        show: {
-                                          opacity: 1,
-                                        },
-                                      }}
-                                      initial="hidden"
-                                      animate="show"
+                {messages
+                  // Don't include tool calls that don't have an associated UI
+                  .filter(
+                    (message) =>
+                      !message.toolInvocations?.every((t) => t.toolName !== 'generateChart')
+                  )
+                  .map((message) => {
+                    switch (message.role) {
+                      case 'user':
+                        return (
+                          <m.div
+                            key={message.id}
+                            layoutId={message.id}
+                            variants={{
+                              hidden: {
+                                opacity: 0,
+                                y: 10,
+                              },
+                              show: {
+                                opacity: 1,
+                                y: 0,
+                              },
+                            }}
+                            initial="hidden"
+                            animate="show"
+                            className="self-end px-5 py-2.5 text-base rounded-full bg-neutral-100"
+                          >
+                            {message.content}
+                          </m.div>
+                        )
+                      case 'assistant':
+                        return (
+                          <div
+                            key={message.id}
+                            className="self-stretch flex flex-col items-stretch gap-6"
+                          >
+                            {message.content && (
+                              <ReactMarkdown
+                                remarkPlugins={[
+                                  remarkGfm,
+                                  [remarkMath, { singleDollarTextMath: false }],
+                                ]}
+                                rehypePlugins={[[rehypeKatex, { output: 'html' }]]}
+                                components={{ ...markdownComponents, img: () => null }}
+                                className="prose [&_.katex-display>.katex]:text-left"
+                              >
+                                {message.content}
+                              </ReactMarkdown>
+                            )}
+                            {message.toolInvocations?.map((toolInvocation) => {
+                              switch (toolInvocation.toolName) {
+                                case 'generateChart': {
+                                  const { type, data, options } = toolInvocation.args.config
+                                  return (
+                                    <ErrorBoundary
+                                      key={toolInvocation.toolCallId}
+                                      fallbackRender={() => (
+                                        <div className="bg-warning-300">Error loading chart</div>
+                                      )}
                                     >
-                                      <ChartWrapper type={type} data={data} options={options} />
-                                    </m.div>
-                                  </ErrorBoundary>
-                                )
+                                      <m.div
+                                        className="relative w-full"
+                                        variants={{
+                                          hidden: {
+                                            opacity: 0,
+                                          },
+                                          show: {
+                                            opacity: 1,
+                                          },
+                                        }}
+                                        initial="hidden"
+                                        animate="show"
+                                      >
+                                        <ChartWrapper type={type} data={data} options={options} />
+                                      </m.div>
+                                    </ErrorBoundary>
+                                  )
+                                }
                               }
-                            }
-                          })}
-                        </div>
-                      )
-                  }
-                })}
+                            })}
+                          </div>
+                        )
+                    }
+                  })}
                 <AnimatePresence>
                   {isLoading && (
                     <m.div
