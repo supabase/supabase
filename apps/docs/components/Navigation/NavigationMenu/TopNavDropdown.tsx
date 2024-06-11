@@ -1,4 +1,6 @@
 import React from 'react'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +18,7 @@ import {
   themes,
 } from 'ui'
 
-import Link from 'next/link'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
-import { useTheme } from 'next-themes'
 
 const menu = [
   [

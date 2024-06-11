@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
-export const ThemeImage = ({ src, ...props }: any) => {
+export const ThemeImage = ({ src, containerClassName, ...props }: any) => {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -16,7 +16,7 @@ export const ThemeImage = ({ src, ...props }: any) => {
   }
 
   return (
-    <span className="next-image--dynamic-fill">
+    <span className={cn('next-image--dynamic-fill', containerClassName)}>
       <Image
         sizes="(max-width: 768px) 120vw, (max-width: 1200px) 100vw, 2000px"
         {...props}

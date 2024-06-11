@@ -1,12 +1,12 @@
 import { FC, memo, useState } from 'react'
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { SearchButton } from 'ui-patterns/Cmdk'
-import GlobalMobileMenu from './GlobalMobileMenu'
-import { ThemeToggle } from 'ui-patterns'
-import { Button, IconCommand, IconGitHub, IconMenu, IconSearch, buttonVariants, cn } from 'ui'
+
 import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { SearchButton } from 'ui-patterns/Cmdk'
+import { ThemeImage } from 'ui-patterns'
+import { Button, buttonVariants, cn, IconCommand, IconMenu, IconSearch } from 'ui'
+
+import GlobalMobileMenu from './GlobalMobileMenu'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import TopNavDropdown from './TopNavDropdown'
 
@@ -14,7 +14,6 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { resolvedTheme } = useTheme()
 
   return (
     <>
@@ -111,7 +110,6 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
-  const { resolvedTheme } = useTheme()
   return (
     <Link
       href="/"
@@ -120,11 +118,10 @@ const HeaderLogo = memo(() => {
         'flex h-auto items-center !bg-transparent !border-none !shadow-none'
       )}
     >
-      <Image
-        className="cursor-pointer"
-        src={
-          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
-        }
+      <ThemeImage
+        containerClassName="!w-[96px]"
+        src={{ dark: '/docs/supabase-dark.svg', light: '/docs/supabase-light.svg' }}
+        priority
         width={96}
         height={24}
         alt="Supabase Logo"

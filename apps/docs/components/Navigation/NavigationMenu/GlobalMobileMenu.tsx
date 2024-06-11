@@ -2,7 +2,7 @@ import React, { Dispatch, Fragment, SetStateAction } from 'react'
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useKey } from 'react-use'
+import { useLockBodyScroll, useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, IconX, cn } from 'ui'
@@ -23,7 +23,6 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   const isUserLoading = useIsUserLoading()
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
-  console.log('activeLabel', activeLabel)
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -37,6 +36,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   }
 
   useKey('Escape', () => setOpen(false))
+  useLockBodyScroll(open)
 
   const itemClassName =
     'block py-2 pl-1 pr-4 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
@@ -131,7 +131,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                   height={24}
                   alt="Supabase Logo"
                 />
-                <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
+                <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
               </Link>
               <div className="flex gap-4 items-center">
                 <ThemeToggle />
