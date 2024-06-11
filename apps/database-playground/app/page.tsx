@@ -301,11 +301,13 @@ export default function Page() {
                                     <ErrorBoundary
                                       key={toolInvocation.toolCallId}
                                       fallbackRender={() => (
-                                        <div className="bg-warning-300">Error loading chart</div>
+                                        <div className="bg-destructive-300 px-6 py-4 rounded-md">
+                                          Error loading chart
+                                        </div>
                                       )}
                                     >
                                       <m.div
-                                        className="relative w-full"
+                                        className="relative w-full max-w-2xl h-[50vw] max-h-96 my-8"
                                         variants={{
                                           hidden: {
                                             opacity: 0,
@@ -317,7 +319,15 @@ export default function Page() {
                                         initial="hidden"
                                         animate="show"
                                       >
-                                        <ChartWrapper type={type} data={data} options={options} />
+                                        <ChartWrapper
+                                          className="max-w-full max-h-full"
+                                          type={type}
+                                          data={data}
+                                          options={{
+                                            ...options,
+                                            maintainAspectRatio: false,
+                                          }}
+                                        />
                                       </m.div>
                                     </ErrorBoundary>
                                   )
