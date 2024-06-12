@@ -57,11 +57,12 @@ export function doPermissionsCheck(
   const orgPermissions = permissions
     // filter out org-level permission
     .filter((permission) => !permission.project_ids || permission.project_ids.length === 0)
-    .filter((permission) =>
-      permission.organization_id === organizationId &&
-      permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
-      permission.resources.some((res) => resource.match(toRegexpString(res)))
-    );
+    .filter(
+      (permission) =>
+        permission.organization_id === organizationId &&
+        permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
+        permission.resources.some((res) => resource.match(toRegexpString(res)))
+    )
   return doPermissionConditionCheck(orgPermissions, { resource_name: resource, ...data })
 }
 
@@ -117,20 +118,25 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
-  return useCheckProjectPermissions(action, resource, data, organizationId, undefined, permissions)
+  return useCheckProjectPermissions(action, resource, data, {
+    organizationId,
+    projectId: undefined,
+    permissions,
+  })
 }
 
 export function useCheckProjectPermissions(
   action: string,
   resource: string,
   data?: object,
-  // [Joshen] Pass the variables if you want to avoid hooks in this
-  // e.g If you want to use useCheckPermissions in a loop like organization settings
-  organizationId?: number,
-  projectId?: number,
-  permissions?: Permission[]
+  overrides?: {
+    organizationId?: number
+    projectId?: number
+    permissions?: Permission[]
+  }
 ) {
   const isLoggedIn = useIsLoggedIn()
+  const { organizationId, projectId, permissions } = overrides ?? {}
 
   const {
     permissions: allPermissions,

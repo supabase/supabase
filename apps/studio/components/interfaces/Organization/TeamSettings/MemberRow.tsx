@@ -74,7 +74,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )}
           </div>
           <div>
-            {member.gotrue_id}
             <p className="text-foreground">{getUserDisplayName(member)}</p>
             {isInvitedUser === undefined && (
               <p className="text-foreground-light">{member.primary_email}</p>
