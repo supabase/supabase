@@ -111,10 +111,10 @@ export const InviteMemberButton = () => {
         slug,
         email: values.email.toLowerCase(),
         roleId: Number(values.role),
-        ...(values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
+        ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           toast.success('Successfully sent invitation to new member')
           setIsOpen(!isOpen)
 
@@ -211,13 +211,19 @@ export const InviteMemberButton = () => {
                         <SelectContent_Shadcn_>
                           <SelectGroup_Shadcn_>
                             {orgScopedRoles.map((role) => {
+                              const canAssignRole = rolesAddable.includes(role.id)
+
                               return (
                                 <SelectItem_Shadcn_
                                   key={role.id}
                                   value={role.id.toString()}
-                                  className="text-sm"
+                                  className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
+                                  disabled={!canAssignRole}
                                 >
-                                  {role.name}
+                                  <span>{role.name}</span>
+                                  {!canAssignRole && (
+                                    <span>Additional permissions required to assign role</span>
+                                  )}
                                 </SelectItem_Shadcn_>
                               )
                             })}
@@ -238,7 +244,7 @@ export const InviteMemberButton = () => {
                       <FormControl_Shadcn_>
                         <Select_Shadcn_
                           value={field.value}
-                          onValueChange={(value) => form.setValue('role', value)}
+                          onValueChange={(value) => form.setValue('projectRef', value)}
                         >
                           <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
                             {(projects ?? []).find((project) => project.ref === field.value)

@@ -11,6 +11,8 @@ export type OrganizationMemberInviteDeleteVariables = {
   invalidateDetail?: boolean
 }
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function deleteOrganizationMemberInvite({
   slug,
   invitedId,

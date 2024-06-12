@@ -9,6 +9,8 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { Loading } from 'ui'
 import { MemberRow } from './MemberRow'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
+import { useCheckPermissions } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export interface MembersViewProps {
   searchString: string
@@ -16,6 +18,8 @@ export interface MembersViewProps {
 
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
+  const canReadRoles = useCheckPermissions(PermissionAction.READ, 'auth.roles')
+  console.log({ canReadRoles })
 
   const {
     data: members,
@@ -76,12 +80,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
               ]}
               body={[
                 ...filteredMembers.map((member) => (
-                  <MemberRow
-                    key={member.gotrue_id}
-                    member={member}
-                    // setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
-                    // setSelectedMember={setSelectedMember}
-                  />
+                  <MemberRow key={member.gotrue_id} member={member} />
                 )),
                 ...(searchString.length > 0 && filteredMembers.length === 0
                   ? [

@@ -4,10 +4,10 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
@@ -67,8 +67,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
-    useOrganizationMemberInviteCreateMutation({
+  const { mutate: inviteMember, isLoading: isCreatingInvite } =
+    useOrganizationCreateInvitationMutation({
       onSuccess: () => {
         toast.success('Resent the invitation.')
       },
@@ -77,54 +77,57 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: deleteMemberInvite, isLoading: isDeletingInvite } =
-    useOrganizationMemberInviteDeleteMutation()
+  const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
+    useOrganizationDeleteInvitationMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
-  const handleMemberDelete = async () => {
+  const handleMemberDelete = () => {
     if (!slug) return console.error('slug is required')
     if (!member.gotrue_id) return console.error('gotrue_id is required')
     deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
   }
 
-  const handleResendInvite = async (member: OrganizationMember) => {
+  const handleResendInvite = (member: OrganizationMember) => {
     const roleId = (member?.role_ids ?? [])[0]
     const invitedId = member.invited_id
 
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    deleteMemberInvite(
-      { slug, invitedId, invalidateDetail: false },
+    deleteInvitation(
+      { slug, id: invitedId, skipInvalidation: true },
       {
         onSuccess: () => {
-          createOrganizationMemberInvite({
-            slug,
-            invitedEmail: member.primary_email!,
-            ownerId: invitedId,
-            roleId: roleId,
-          })
+          if (!member.primary_email) return toast.error('Email is required')
+          const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+          if (projectScopedRole !== undefined) {
+            const projects = projectScopedRole.description.split(',').map((x) => x.trim())
+            inviteMember({
+              slug,
+              email: member.primary_email,
+              roleId: projectScopedRole.base_role_id,
+              projects,
+            })
+          } else {
+            inviteMember({ slug, email: member.primary_email, roleId })
+          }
         },
       }
     )
   }
 
-  const handleRevokeInvitation = async (member: OrganizationMember) => {
+  const handleRevokeInvitation = (member: OrganizationMember) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    console.log('member', member)
-
-    deleteMemberInvite(
-      { slug, invitedId },
+    deleteInvitation(
+      { slug, id: invitedId },
       {
         onSuccess: () => {
-          console.log('HEL:LO')
           toast.success('Successfully revoked the invitation.')
         },
-        onError: () => console.log('OI'),
       }
     )
   }
@@ -134,7 +137,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       <div className="flex items-center justify-end">
         <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild>
-            <Button type="text" icon={<MoreVertical size={18} />} />
+            <Button type="text" className="px-1.5" icon={<MoreVertical size={18} />} />
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">
             You need additional permissions to manage this team member
