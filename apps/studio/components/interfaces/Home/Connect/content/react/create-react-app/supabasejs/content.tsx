@@ -21,7 +21,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 REACT_APP_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-REACT_APP_SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+REACT_APP_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
