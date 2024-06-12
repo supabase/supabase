@@ -13,7 +13,7 @@ export const organizationKeys = {
   ) => ['organizations', slug, 'audit-logs', { date_start, date_end }] as const,
   subscriptionPreview: (slug: string | undefined, tier: string | undefined) =>
     ['organizations', slug, 'subscription', 'preview', tier] as const,
-  taxIds: (slug: string | undefined) => ['organizations', slug, 'tax-ids'] as const,
+  taxId: (slug: string | undefined) => ['organizations', slug, 'tax-ids'] as const,
   tokenValidation: (slug: string | undefined, token: string | undefined) =>
     ['organizations', slug, 'validate-token', token] as const,
 }

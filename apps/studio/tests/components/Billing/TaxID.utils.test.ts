@@ -1,4 +1,4 @@
-import { sanitizeTaxID } from 'components/interfaces/Organization/BillingSettings/TaxID/TaxID.utils'
+import { sanitizeTaxIdValue } from 'components/interfaces/Organization/BillingSettings/TaxID/TaxID.utils'
 
 /**
  * We're sanitizing EU tax ids. Stripe expects a prefixed tax id (ATU12345678),
@@ -19,7 +19,7 @@ describe('TaxID utils: sanitizeTaxID', () => {
       name: 'AT VAT',
     }
 
-    const sanitizedID = sanitizeTaxID(austriaTaxID)
+    const sanitizedID = sanitizeTaxIdValue(austriaTaxID)
     expect(sanitizedID.value).toBe('ATU12345678')
   })
 
@@ -31,7 +31,7 @@ describe('TaxID utils: sanitizeTaxID', () => {
       name: 'AT VAT',
     }
 
-    const sanitizedID = sanitizeTaxID(austriaTaxID)
+    const sanitizedID = sanitizeTaxIdValue(austriaTaxID)
     expect(sanitizedID.value).toBe('ATU12345678')
   })
 
@@ -43,7 +43,7 @@ describe('TaxID utils: sanitizeTaxID', () => {
       name: 'US EIN',
     }
 
-    const sanitizedID = sanitizeTaxID(unitedStatesID)
+    const sanitizedID = sanitizeTaxIdValue(unitedStatesID)
     expect(sanitizedID.value).toBe('12-3456789')
   })
 })
