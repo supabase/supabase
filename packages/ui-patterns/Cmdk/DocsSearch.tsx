@@ -1,3 +1,5 @@
+'use client'
+
 import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
@@ -13,7 +15,7 @@ import {
   MessageSquare,
   Search,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'

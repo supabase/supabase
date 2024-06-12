@@ -2,6 +2,7 @@ import { ArrowDown, Check } from 'lucide-react'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
+import SqlToRest from 'ui-patterns/SqlToRest'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { Button } from 'ui'
 import { Admonition } from 'ui'
@@ -71,6 +72,7 @@ const components = {
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  SqlToRest,
   StepHikeCompact,
   Tabs,
   TabPanel,
