@@ -192,6 +192,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "button-sizes": {
+      name: "button-sizes",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-sizes")),
+      source: "",
+      files: ["registry/default/example/button-sizes.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-default": {
+      name: "button-default",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-default")),
+      source: "",
+      files: ["registry/default/example/button-default.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-warning": {
+      name: "button-warning",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-warning")),
+      source: "",
+      files: ["registry/default/example/button-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "button-secondary": {
       name: "button-secondary",
       type: "components:example",
