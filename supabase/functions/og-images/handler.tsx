@@ -24,18 +24,30 @@ const FONT_MONO = fetch(new URL(FONT_URLS['MONO'], import.meta.url)).then((res) 
 const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
 const MONO_FONT_DATA = await FONT_MONO
 
-const getParamValue = (url, value) =>
-  url.searchParams.get(value)?.toLowerCase() ?? url.searchParams.get(`amp;${value}`)?.toLowerCase()
+const getParamValue = (
+  url: string,
+  value: string,
+  options?: {
+    lowercase?: boolean
+    decodeURI?: boolean
+  }
+) => {
+  const param = url.searchParams.get(value) ?? url.searchParams.get(`amp;${value}`)
+  const maybeDecoded = options?.decodeURI ? decodeURIComponent(param) : param
+  const maybeLowercased = options?.lowercase ? maybeDecoded?.toLowerCase() : maybeDecoded
+
+  return maybeLowercased
+}
 
 export async function handler(req: Request) {
   const url = new URL(req.url)
 
-  const site = getParamValue(url, 'site')
-  const icon = getParamValue(url, 'icon')
-  const customer = getParamValue(url, 'customer')
+  const site = getParamValue(url, 'site', { lowercase: true })
+  const icon = getParamValue(url, 'icon', { lowercase: true })
+  const customer = getParamValue(url, 'customer', { lowercase: true })
   const type = getParamValue(url, 'type')
-  const title = getParamValue(url, 'title')
-  const description = getParamValue(url, 'description')
+  const title = getParamValue(url, 'title', { decodeURI: true })
+  const description = getParamValue(url, 'description', { decodeURI: true })
 
   if (!site || !title) {
     return new Response(JSON.stringify({ message: 'missing params' }), {

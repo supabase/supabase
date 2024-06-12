@@ -38,7 +38,7 @@ const Docs = (props: Props) => {
       }}
     >
       <div tw="w-full flex flex-row items-center justify-between">
-        <div tw="flex flex-row items-center justify-center">
+        <div tw="flex flex-row items-center" style={{ lineHeight: '100%' }}>
           {icon && (
             <img
               src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/${icon}-icon.svg`}
@@ -49,14 +49,12 @@ const Docs = (props: Props) => {
           {type && icon && <div tw="h-[50px] border-[1px] border-white mx-4"></div>}
           {type && (
             <>
-              <div tw="w-[50px] h-[50px] bg-[#164430] rounded-md flex items-center justify-center">
-                <img
-                  src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${typeIcon}.svg`}
-                  width="80%"
-                  height="80%"
-                />
-              </div>
-              <span tw="text-[36px] text-[#ededed] ml-[16px]">{typeName}</span>
+              <img
+                src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${typeIcon}.svg`}
+                width="40px"
+                height="40px"
+              />
+              <span tw="text-[36px] text-[#ededed] ml-4">{typeName}</span>
             </>
           )}
         </div>
@@ -71,8 +69,8 @@ const Docs = (props: Props) => {
           </span>
         </div>
       </div>
-      <div tw="flex flex-col border-t border-[#4D4D4D] mt-10">
-        <div tw="flex flex-col mt-5 w-full">
+      <div tw="w-full flex flex-col border-t border-[#4D4D4D] mt-10">
+        <div tw="w-full flex flex-col mt-5">
           <h1 tw="my-0 mb-2 text-[60px]" style={{ lineHeight: '115%' }}>
             {!title ? 'Supabase' : title}
           </h1>
