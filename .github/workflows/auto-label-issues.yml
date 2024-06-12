@@ -36,7 +36,7 @@ jobs:
         USERNAME: ${{ github.event.issue.user.login }}
         GH_REPO: ${{ github.repository }}
         NUMBER: ${{ github.event.issue.number }}
-        LABELS: contributor-issue
+        LABELS: external-issue
       run: |
         echo "applying external label"
         gh issue edit $NUMBER --add-label $LABELS
