@@ -101,10 +101,12 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 name="autoConfirmUser"
                 label="Auto Confirm User?"
                 size="medium"
-                description="Creates the user without sending them a confirmation email"
                 defaultChecked={true}
                 disabled={isCreatingUser || isLoading}
               />
+              <p className="text-sm text-foreground-lighter">
+                A confirmation email will not be sent when creating a user through this modal.
+              </p>
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content>
