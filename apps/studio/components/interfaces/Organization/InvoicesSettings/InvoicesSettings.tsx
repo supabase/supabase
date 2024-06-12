@@ -52,7 +52,11 @@ const InvoicesSettings = () => {
   }
 
   if (!canReadInvoices) {
-    return <NoPermission resourceText="view invoices" />
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view invoices" />
+      </ScaffoldContainerLegacy>
+    )
   }
 
   return (

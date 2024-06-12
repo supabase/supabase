@@ -20,14 +20,6 @@ import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
   const { slug } = useParams()
-  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
-    slug,
-  })
-  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
-    useOrganizationCustomerProfileUpdateMutation()
-
-  const formId = 'billing-address-form'
-  const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
 
   const canReadBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -38,6 +30,15 @@ const BillingAddress = () => {
     'stripe.customer'
   )
 
+  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery(
+    { slug },
+    { enabled: canReadBillingAddress }
+  )
+  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
+
+  const formId = 'billing-address-form'
+  const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
   const initialValues = { city, country, line1, line2, postal_code, state }
 
   const validate = (values: any) => {

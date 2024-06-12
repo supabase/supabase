@@ -11,7 +11,18 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import Link from 'next/link'
-import { Badge, Button, cn, IconArrowRight, IconExternalLink, IconGitHub } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  IconArrowRight,
+  IconExternalLink,
+  IconGitHub,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
+import { ArrowRight } from 'lucide-react'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -250,7 +261,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
@@ -272,34 +283,42 @@ const EmptyIntegrationConnection = React.forwardRef<
     showNode?: boolean
     orgSlug?: string
     onClick: () => void
+    disabled?: boolean
   }
->(({ className, showNode = true, onClick, ...props }, ref) => {
+>(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
   return (
     <div
       ref={ref}
       {...props}
       className={cn(
         showNode && 'ml-6 pl-8  border-l',
-        'pb-2 ',
+        'relative pb-2',
         'last:border-l-transparent',
-        'relative',
         className
       )}
     >
       {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
       )}
       <div
         className={cn(
-          'w-full',
+          'w-full mt-4',
           'border border-dashed bg-surface-100 border-overlay',
-          '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Button type="default" onClick={() => onClick()}>
-          Add new project connection
-        </Button>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button disabled={disabled} type="default" onClick={() => onClick()}>
+              Add new project connection
+            </Button>
+          </TooltipTrigger_Shadcn_>
+          {disabled && (
+            <TooltipContent_Shadcn_ side="bottom">
+              Additional permissions required to add connection
+            </TooltipContent_Shadcn_>
+          )}
+        </Tooltip_Shadcn_>
       </div>
     </div>
   )
@@ -319,8 +338,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         ref={ref}
         className={cn(
           showNode && 'border-l border-muted ml-6 pl-8',
-          'pt-6 pb-3',
-          'prose text-sm',
+          'py-4 prose text-sm',
           className
         )}
       >

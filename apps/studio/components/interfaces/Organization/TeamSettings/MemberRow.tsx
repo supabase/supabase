@@ -1,4 +1,4 @@
-import { Check, User, X } from 'lucide-react'
+import { Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useState } from 'react'
 
@@ -32,6 +32,25 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
+  // [Joshen] From project role POV, mask any roles for other projects
+  const isObfuscated =
+    member.role_ids.filter((id) => {
+      const role = [
+        ...(roles?.org_scoped_roles ?? []),
+        ...(roles?.project_scoped_roles ?? []),
+      ].find((role) => role.id === id)
+      const isOrgScope = role?.project_ids === null
+      if (isOrgScope) return false
+
+      const appliedProjects = (role?.project_ids ?? [])
+        .map((id) => {
+          return projects?.find((p) => p.id === id)?.name ?? ''
+        })
+        .filter((x) => x.length > 0)
+
+      return appliedProjects.length === 0
+    }).length > 0
+
   return (
     <Table.tr>
       <Table.td>
@@ -55,6 +74,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             )}
           </div>
           <div>
+            {member.gotrue_id}
             <p className="text-foreground">{getUserDisplayName(member)}</p>
             {isInvitedUser === undefined && (
               <p className="text-foreground-light">{member.primary_email}</p>
@@ -84,6 +104,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       <Table.td>
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
+        ) : isObfuscated ? (
+          <Minus strokeWidth={1.5} size={20} />
         ) : (
           member.role_ids.map((id) => {
             const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
@@ -95,9 +117,13 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const projectsApplied =
               role?.project_ids === null
                 ? projects?.map((p) => p.name) ?? []
-                : (role?.project_ids ?? []).map((id) => {
-                    return projects?.find((p) => p.id === id)?.name ?? ''
-                  })
+                : (role?.project_ids ?? [])
+                    .map((id) => {
+                      return projects?.find((p) => p.id === id)?.name ?? ''
+                    })
+                    .filter((x) => x.length > 0)
+
+            if (projectsApplied.length === 0) return null
 
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
@@ -109,8 +135,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_ asChild>
                       <span className="text-foreground">
-                        {role?.project_ids === null ? 'All' : projectsApplied.length} project
-                        {projectsApplied.length > 1 ? 's' : ''}
+                        {role?.project_ids === null
+                          ? 'Organization'
+                          : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                       </span>
                     </TooltipTrigger_Shadcn_>
                     <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">

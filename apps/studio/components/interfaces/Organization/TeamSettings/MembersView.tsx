@@ -18,8 +18,6 @@ export interface MembersViewProps {
 
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
-  const canReadRoles = useCheckPermissions(PermissionAction.READ, 'auth.roles')
-  console.log({ canReadRoles })
 
   const {
     data: members,

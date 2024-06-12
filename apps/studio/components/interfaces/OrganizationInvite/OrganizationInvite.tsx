@@ -60,7 +60,7 @@ export const OrganizationInvite = () => {
   }
 
   return (
-    <Loading active={isLoading}>
+    <Loading active={profile !== undefined && isLoading}>
       <div className="flex flex-col gap-2 px-6 py-8">
         <p className="text-sm text-foreground">You have been invited to join </p>
         <p className="text-3xl text-foreground">{organizationName}</p>
@@ -69,6 +69,21 @@ export const OrganizationInvite = () => {
 
       <div className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}>
         <div className="flex flex-col gap-4 px-6 py-4">
+          {profile === undefined && (
+            <div className="flex flex-col gap-3">
+              <p className="text-xs text-foreground-lighter">
+                You will need to sign in to accept this invitation
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button asChild type="default">
+                  <Link href={loginRedirectLink}>Sign in</Link>
+                </Button>
+                <Button asChild type="default">
+                  <Link href={loginRedirectLink}>Create an account</Link>
+                </Button>
+              </div>
+            </div>
+          )}
           {hasError && (
             <OrganizationInviteError
               data={data}
@@ -77,43 +92,25 @@ export const OrganizationInvite = () => {
             />
           )}
           {isSuccess && (
-            <>
-              {profile !== undefined ? (
-                <div className="flex flex-row items-center justify-center gap-3">
-                  <Button
-                    type="default"
-                    loading={isDeclining}
-                    disabled={isJoining || isDeclining}
-                    onClick={handleDeclineJoinOrganization}
-                  >
-                    Decline
-                  </Button>
-                  <Button
-                    type="primary"
-                    loading={isJoining}
-                    disabled={isJoining || isDeclining}
-                    onClick={handleJoinOrganization}
-                    icon={<CheckSquare />}
-                  >
-                    Join organization
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  <p className="text-xs text-foreground-lighter">
-                    You will need to sign in to accept this invitation
-                  </p>
-                  <div className="flex justify-center gap-3">
-                    <Button asChild type="default">
-                      <Link href={loginRedirectLink}>Sign in</Link>
-                    </Button>
-                    <Button asChild type="default">
-                      <Link href={loginRedirectLink}>Create an account</Link>
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
+            <div className="flex flex-row items-center justify-center gap-3">
+              <Button
+                type="default"
+                loading={isDeclining}
+                disabled={isJoining || isDeclining}
+                onClick={handleDeclineJoinOrganization}
+              >
+                Decline
+              </Button>
+              <Button
+                type="primary"
+                loading={isJoining}
+                disabled={isJoining || isDeclining}
+                onClick={handleJoinOrganization}
+                icon={<CheckSquare />}
+              >
+                Join organization
+              </Button>
+            </div>
           )}
         </div>
       </div>
