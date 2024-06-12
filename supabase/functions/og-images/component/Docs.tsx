@@ -50,11 +50,11 @@ const Docs = (props: Props) => {
           {type && (
             <>
               <img
-                src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${typeIcon}.svg`}
+                src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/grayscale/${typeIcon}.svg`}
                 width="40px"
                 height="40px"
               />
-              <span tw="text-[36px] text-[#ededed] ml-4">{typeName}</span>
+              <span tw="text-[36px] text-[#ededed] ml-4 -mt-[2px]">{typeName}</span>
             </>
           )}
         </div>
