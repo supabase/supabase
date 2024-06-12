@@ -112,7 +112,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "next": "*",
     "sql-formatter": "^12.2.0",
-    "storybook": "^7.5.3",
     "style-dictionary": "^3.7.1",
     "ts-jest": "^29.1.1",
     "tsconfig": "*",
