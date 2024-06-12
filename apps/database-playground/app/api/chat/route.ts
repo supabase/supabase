@@ -55,7 +55,6 @@ export async function POST(req: Request) {
         description: codeBlock`
           Generates a chart using Chart.js for a given SQL query.
           - Label both axises
-          - Line charts should default to \`cubicInterpolationMode: 'monotone'\`
           - Plugins are not available
           
           Call \`executeSql\` first.
@@ -67,11 +66,6 @@ export async function POST(req: Request) {
               'The `config` passed to `new Chart(ctx, config). Includes `type`, `data`, `options`, etc.'
             ),
         }),
-      },
-      appendSqlToMigration: {
-        description:
-          'Appends schema changes to a SQL migration file. Always call this after modifying database structure.',
-        parameters: z.object({ sql: z.string() }),
       },
     },
   })

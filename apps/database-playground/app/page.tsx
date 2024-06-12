@@ -4,6 +4,7 @@ import 'chartjs-adapter-date-fns'
 
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
@@ -20,13 +21,14 @@ import remarkMath from 'remark-math'
 import { format } from 'sql-formatter'
 import { AiIconAnimation, markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
+import SchemaGraph from '~/components/schema/graph'
 import { Report } from './api/chat/route'
 
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
 
 // React's double-rendering in dev mode causes pglite errors
 // Temp: storing single instance in module scope
-let db: PGlite = new PGlite('idb://local')
+export let db: PGlite = new PGlite('idb://local')
 
 function useReportSuggestions(db: PGlite) {
   const [schema, setSchema] = useState<any[]>()
@@ -87,10 +89,12 @@ export default function Page() {
   const [isEditorVisible, setIsEditorVisible] = useState(false)
   const { reports } = useReportSuggestions(db)
 
+  const queryClient = useQueryClient()
+
   const { messages, input, setInput, handleInputChange, handleSubmit, append, stop, isLoading } =
     useChat({
       api: 'api/chat',
-      maxToolRoundtrips: 5,
+      maxToolRoundtrips: 10,
       async onToolCall({ toolCall }) {
         console.log('tool call', toolCall)
         switch (toolCall.toolName) {
@@ -112,6 +116,22 @@ export default function Page() {
               const { sql } = toolCall.args as any
               console.log(sql)
               const results = await db.exec(sql)
+
+              setSql((s) => {
+                const newSql = (s + '\n' + sql).trim()
+                return format(newSql, {
+                  language: 'postgresql',
+                  keywordCase: 'lower',
+                  identifierCase: 'lower',
+                  dataTypeCase: 'lower',
+                  functionCase: 'lower',
+                })
+              })
+
+              queryClient.invalidateQueries({
+                queryKey: ['tables'],
+              })
+
               console.log(results)
               return results
             } catch (err) {
@@ -147,24 +167,6 @@ export default function Page() {
               canvas.remove()
             }
           }
-          case 'appendSqlToMigration': {
-            const { sql } = toolCall.args as any
-            setSql((s) => {
-              const newSql = (s + '\n' + sql).trim()
-              return format(newSql, {
-                language: 'postgresql',
-                keywordCase: 'lower',
-                identifierCase: 'lower',
-                dataTypeCase: 'lower',
-                functionCase: 'lower',
-              })
-            })
-            setIsEditorVisible(true)
-            return {
-              success: true,
-              message: 'SQL has successfully been appended to the migration file.',
-            }
-          }
         }
       },
     })
@@ -186,7 +188,10 @@ export default function Page() {
 
   return (
     <LazyMotion features={loadFramerFeatures}>
-      <div className="w-full h-full flex p-6">
+      <div className="w-full h-full flex p-6 gap-8">
+        <div className="h-full w-[40rem] py-4 rounded-md bg-[#1e1e1e]">
+          <SchemaGraph schema="public" />
+        </div>
         {isEditorVisible && (
           <div className="h-full w-[50rem] py-4 rounded-md bg-[#1e1e1e]">
             <Editor
@@ -506,13 +511,14 @@ export default function Page() {
                 </m.div>
               )}
               <input
-                className="flex-grow border-none focus-visible:ring-0 text-base bg-inherit placeholder:text-neutral-400"
+                id="input"
                 name="prompt"
+                autoComplete="off"
+                className="flex-grow border-none focus-visible:ring-0 text-base bg-inherit placeholder:text-neutral-400"
                 value={input}
                 onChange={handleInputChange}
                 placeholder="Message Supabase AI"
                 autoFocus
-                id="input"
               />
               <Button
                 className="rounded-full w-8 h-8 p-1.5 text-white bg-neutral-800"
