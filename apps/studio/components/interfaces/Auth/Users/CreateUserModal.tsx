@@ -103,7 +103,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 disabled={isCreatingUser || isLoading}
               />
               <p className="text-sm text-foreground-lighter">
-                A confirmation email will not be sent when creating a user through this modal.
+                A confirmation email will not be sent when creating a user via this form.
               </p>
             </Modal.Content>
             <Modal.Separator />
