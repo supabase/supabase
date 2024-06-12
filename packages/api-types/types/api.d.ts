@@ -155,6 +155,8 @@ export interface paths {
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
+    /** Updates the billing customer */
+    put: operations['updateCustomerV2']
     /** Updates the Stripe customer */
     patch: operations['CustomerController_updateCustomer']
   }
@@ -577,6 +579,10 @@ export interface paths {
   '/platform/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
@@ -1447,6 +1453,10 @@ export interface paths {
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
@@ -2555,12 +2565,12 @@ export interface components {
       opt_in_tags: string[]
     }
     CustomerBillingAddress: {
-      city: string | null
-      country: string | null
-      line1: string | null
-      line2: string | null
-      postal_code: string | null
-      state: string | null
+      city?: string
+      country: string
+      line1: string
+      line2?: string
+      postal_code?: string
+      state?: string
     }
     CustomerResponse: {
       email: string
@@ -2568,6 +2578,9 @@ export interface components {
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
+    }
+    BillingCustomerUpdateBody: {
+      address?: components['schemas']['CustomerBillingAddress']
     }
     CustomerUpdateResponse: {
       id: string
@@ -3914,6 +3927,11 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -6846,6 +6864,32 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve the Stripe customer */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the billing customer */
+  updateCustomerV2: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BillingCustomerUpdateBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update the billing customer */
       500: {
         content: never
       }
@@ -10090,6 +10134,22 @@ export interface operations {
       /** @description Failed to pause the project */
       500: {
         content: never
+      }
+    }
+  }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
       }
     }
   }

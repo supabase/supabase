@@ -636,7 +636,7 @@ export const auth = {
       name: 'Auth UI',
       url: undefined,
       items: [
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
@@ -1317,6 +1317,11 @@ export const realtime: NavMenuConstant = {
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
   ],
 }
