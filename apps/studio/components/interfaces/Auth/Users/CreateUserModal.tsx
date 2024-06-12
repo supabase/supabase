@@ -55,7 +55,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   return (
     <Modal
-      closable
       hideFooter
       size="small"
       key="create-user-modal"
@@ -101,7 +100,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 name="autoConfirmUser"
                 label="Auto Confirm User?"
                 size="medium"
-                defaultChecked={true}
                 disabled={isCreatingUser || isLoading}
               />
               <p className="text-sm text-foreground-lighter">
