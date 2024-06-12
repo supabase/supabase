@@ -665,10 +665,7 @@ Upon sign up, an email will be sent to the user with a unique hash code. This ke
 
 
 
-Before we proceed, Let's change the Auth confirmation path
-If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
-
-Change the email template to support a server-side authentication flow following these steps:
+Before we proceed, let's change the email template to support sending a PKCE code:
 
 - Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard. 
 - Select `Confirm signup` template.
