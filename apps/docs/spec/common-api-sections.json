@@ -82,9 +82,9 @@
         "type": "operation"
       },
       {
-        "id": "get-postgres-config",
+        "id": "v1-get-postgres-config",
         "title": "Get postgres config",
-        "slug": "get-postgres-config",
+        "slug": "v1-get-postgres-config",
         "type": "operation"
       },
       {
@@ -103,6 +103,12 @@
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-supavisor-config",
+        "title": "Get supavisor config",
+        "slug": "v1-get-supavisor-config",
         "type": "operation"
       },
       {
@@ -142,15 +148,21 @@
         "type": "operation"
       },
       {
-        "id": "update-postgres-config",
+        "id": "v1-update-postgres-config",
         "title": "Update postgres config",
-        "slug": "update-postgres-config",
+        "slug": "v1-update-postgres-config",
         "type": "operation"
       },
       {
         "id": "v1-update-ssl-enforcement-config",
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-supavisor-config",
+        "title": "Update supavisor config",
+        "slug": "v1-update-supavisor-config",
         "type": "operation"
       }
     ]
@@ -178,9 +190,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-deactive-vanity-subdomain-config",
-        "title": "Deactive vanity subdomain config",
-        "slug": "v1-deactive-vanity-subdomain-config",
+        "id": "v1-deactivate-vanity-subdomain-config",
+        "title": "Deactivate vanity subdomain config",
+        "slug": "v1-deactivate-vanity-subdomain-config",
         "type": "operation"
       },
       {
@@ -358,12 +370,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-all-projects",
-        "title": "Get all projects",
-        "slug": "v1-get-all-projects",
-        "type": "operation"
-      },
-      {
         "id": "v1-get-network-restrictions",
         "title": "Get network restrictions",
         "slug": "v1-get-network-restrictions",
@@ -391,6 +397,12 @@
         "id": "v1-list-all-network-bans",
         "title": "List all network bans",
         "slug": "v1-list-all-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-projects",
+        "title": "List all projects",
+        "slug": "v1-list-all-projects",
         "type": "operation"
       },
       {

@@ -137,7 +137,7 @@ const EnableBranchingModal = () => {
         hideFooter
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="!bg !max-w-[40rem]"
+        className="block"
         size="medium"
         hideClose
       >
