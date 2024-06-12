@@ -54,12 +54,14 @@ export function doPermissionsCheck(
     }
   }
 
-  const orgPermissions = permissions.filter(
-    (permission) =>
+  const orgPermissions = permissions
+    // filter out org-level permission
+    .filter((permission) => !permission.project_ids || permission.project_ids.length === 0)
+    .filter((permission) =>
       permission.organization_id === organizationId &&
       permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
       permission.resources.some((res) => resource.match(toRegexpString(res)))
-  )
+    );
   return doPermissionConditionCheck(orgPermissions, { resource_name: resource, ...data })
 }
 
