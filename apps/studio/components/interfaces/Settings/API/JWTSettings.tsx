@@ -15,6 +15,7 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
+import { AlertCircle } from 'lucide-react'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -26,7 +27,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
   IconEye,
@@ -95,7 +95,7 @@ const JWTSettings = () => {
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
           {isError ? (
             <div className="flex items-center justify-center py-8 space-x-2">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
+              <AlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
             </div>
           ) : (

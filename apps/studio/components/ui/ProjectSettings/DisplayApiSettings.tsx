@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Button, IconAlertCircle, IconBookOpen, IconLoader, Input } from 'ui'
+import { Button, IconAlertCircle, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
@@ -8,6 +8,7 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { BookOpen, Loader2 } from 'lucide-react'
 
 const DisplayApiSettings = () => {
   const { ref: projectRef } = useParams()
@@ -47,7 +48,7 @@ const DisplayApiSettings = () => {
             You can use the keys below in the Supabase client libraries.
             <br />
             <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
-              <Button icon={<IconBookOpen />} type="default" className="mt-4">
+              <Button icon={<BookOpen />} type="default" className="mt-4">
                 Client Docs
               </Button>
             </a>
@@ -64,7 +65,7 @@ const DisplayApiSettings = () => {
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
