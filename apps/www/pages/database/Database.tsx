@@ -82,7 +82,7 @@ function Database() {
           ]}
           subheader={[
             'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
-            'PostgreSQL is one of the worlds most scalable databases.',
+            "PostgreSQL is one of the world's most scalable databases.",
           ]}
           image={[
             <ThemeImage
