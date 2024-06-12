@@ -317,16 +317,16 @@ secret = "env(SEND_SMS_HOOK_SECRET)"
 
 `host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
 
-Fill in the Hook Secret
+Fill in the Hook Secret in `supabase/functions/.env`
 
 ```jsx
-SEND_SMS_HOOK_SECRET = 'v1,whsec_<base64_standard_secret>'
+SEND_SMS_HOOK_SECRET = '<base64_standard_secret>'
 ```
 
 Start the function locally:
 
 ```bash
-supabase functions serve send-sms --no-verify-jwt --env-file ./supabase/functions/.env.local
+supabase functions serve send-sms --no-verify-jwt
 ```
 
 Disable JWT verification via the `--no-verify-jwt` to accommodate hooks which are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
@@ -342,7 +342,7 @@ In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/au
 
 ## Available Hooks
 
-Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload.
+Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
 
 ## Hook: MFA verification attempt
 
@@ -511,78 +511,6 @@ revoke execute
 revoke all
   on table public.mfa_failed_verification_attempts
   from authenticated, anon;
-```
-
-</TabPanel>
-</Tabs>
-
-**HTTP Examples**
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="sql-limit-failed-mfa-verification-attempts"
-  queryGroup="language"
->
-<TabPanel id="sql-limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
-
-Your company requires that a user can make an incorrect MFA verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in the company setup.
-
-Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli) to track verification attempts.
-
-Select the Global type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file. Also ensure that you have `AUTH_MFA_VERIFICATION_ATTEMPT_SECRET` set.
-
-Create a hook to read and write information from Redis, which will record the last time a user had an incorrect MFA verification attempt for a factor. For example:
-
-```js
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
-import { Redis } from 'https://deno.land/x/upstash_redis@v1.31.3/mod.ts'
-
-console.log(`Function "upstash-redis-mfa-verification-counter" up and running!`)
-
-Deno.serve(async (req) => {
-  const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_MFA_VERIFICATION_ATTEMPT_SECRET')
-  const headers = Object.fromEntries(req.headers)
-  const wh = new Webhook(base64_secret);
-  const secondsBeforeNextRetry = 3600;
-
-  try {
-    const { user_id, factor_id, valid } = wh.verify(payload, headers);
-
-    const redis = new Redis({
-      url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
-      token: Deno.env.get('UPSTASH_REDIS_REST_TOKEN')!,
-    })
-
-    const userKey = `${user_id}:mfa_fail`;
-    const timestampKey = `${user_id}:last_attempt`;
-
-    if (!valid) {
-      await redis.hincrby('mfa-attempts', userKey, 1);
-
-      const failedAttemptsCount = await redis.hget('mfa-attempts', userKey);
-      const currentTimestamp = Date.now();
-      await redis.set(timestampKey, currentTimestamp);
-
-      await redis.expire(userKey, secondsBeforeNextRetry);
-      await redis.expire(timestampKey, secondsBeforeNextRetry);
-
-      if (failedAttemptsCount >= 3) {
-        return new Response(JSON.stringify({ decision: 'reject' }), { status: 403, headers: { "Content-Type": "application/json" } });
-      }
-    } else {
-      // Reset the counter if the attempt is valid
-      await redis.hdel('mfa-attempts', userKey);
-      await redis.del(timestampKey);
-    }
-
-    return new Response(JSON.stringify({ decision: 'continue' }), { status: 200, headers: { "Content-Type": "application/json" } });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
-  }
-});
 ```
 
 </TabPanel>
@@ -861,99 +789,6 @@ grant all
 revoke all
   on table public.password_sign_in_attempts
   from authenticated, anon;
-```
-
-</TabPanel>
-</Tabs>
-
-**HTTP Examples**
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="http-limit-failed-password-verification-attempts"
-  queryGroup="language"
->
-<TabPanel id="http-limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
-Your company requires that a user can make an incorrect password verification attempt no more than three times in an hour. Redis is chosen as a backing store out of convenience since it is already present in our company setup.
-
-Create a Redis database using the [Upstash Console](https://console.upstash.com/) or [Upstash CLI](https://github.com/upstash/cli) to track verification attempts.
-
-Select the Global type to minimize the latency from all edge locations. Copy the `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to your .env file. Also ensure that you have `AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET` set.
-
-Create a hook to read and write information from Redis, which will record the number of occasions where the user had an invalid verification attempt. For example:
-
-```javascript
-import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
-import { Redis } from 'https://deno.land/x/upstash_redis@v1.31.3/mod.ts';
-
-console.log(`Function "upstash-redis-password-counter" up and running!`);
-
-Deno.serve(async (req) => {
-    const payload = await req.text();
-    const base64_secret = Deno.env.get('AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET');
-    const headers = Object.fromEntries(req.headers);
-    const wh = new Webhook(base64_secret);
-    const secondsBeforeNextRetry = 3;
-
-    try {
-        const { user_id, valid } = wh.verify(payload, headers);
-
-        const redis = new Redis({
-            url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
-            token: Deno.env.get('UPSTASH_REDIS_REST_TOKEN')!,
-        });
-
-        const userKey = `${user_id}:password_fail`;
-        const timestampKey = `${user_id}:last_password_attempt`;
-
-        if (!valid) {
-            await redis.hincrby('password-attempts', userKey, 1);
-            const passwordFailedAttemptsCount = await redis.hget('password-attempts', userKey);
-            const currentTimestamp = Date.now();
-            await redis.set(timestampKey, currentTimestamp);
-
-            await redis.expire(userKey, secondsBeforeNextRetry);
-            await redis.expire(timestampKey, secondsBeforeNextRetry);
-
-            if (passwordFailedAttemptsCount >= 3) {
-                return new Response(JSON.stringify({
-                    decision: 'reject',
-                    message: 'You have exceeded maximum number of password sign-in attempts.',
-                    should_logout_user: false
-                }), {
-                    status: 403,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-            }
-        } else {
-            // Reset the counter if the attempt is valid
-            await redis.hdel('password-attempts', userKey);
-            await redis.del(timestampKey);
-        }
-
-        return new Response(JSON.stringify({
-            decision: 'continue'
-        }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-    } catch (error) {
-        return new Response(JSON.stringify({
-            error: error.message
-        }), {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-    }
-});
 ```
 
 </TabPanel>
