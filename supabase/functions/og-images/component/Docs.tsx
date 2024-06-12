@@ -60,7 +60,7 @@ const Docs = (props: Props) => {
         </div>
         <div tw="flex flex-row items-center justify-center">
           <img
-            src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.png"
+            src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg"
             width={180}
             height={34}
           />
