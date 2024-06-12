@@ -144,7 +144,7 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
   if (focused) {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
       const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+      Promise.resolve(navigator?.clipboard?.writeText(text)).then(callback)
 
       return
     }

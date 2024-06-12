@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
@@ -9,13 +8,13 @@ import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStor
 import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
+import { useCopyUrl } from './useCopyUrl'
 
 interface ItemContextMenuProps {
   id: string
-  onCopyUrl: (name: string, url: string) => void
 }
 
-const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) => {
+const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
@@ -26,6 +25,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
     setSelectedItemsToMove,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -34,7 +34,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, await getFileUrl(item, expiresIn))
+        else return onCopyUrl(item.name, getFileUrl(item, expiresIn))
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':
