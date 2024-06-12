@@ -663,17 +663,28 @@ When you enter your email and password, you will receive an email with the title
 
 Upon sign up, an email will be sent to the user with a unique hash code. This key can then be sent back to the application for verification, thus authenticating the user. The method is referred to as Proof Key for Code Exchange (PKCE). As we are employing PKCE in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
-In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
-- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
-- Finally, we redirect the user to the `account` page.
+
+Before we proceed, Let's change the Auth confirmation path
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
+
+Change the email template to support a server-side authentication flow following these steps:
+
+- Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard. 
+- Select `Confirm signup` template.
+- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 <Admonition type="tip">
 
 Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
+
+In the following code snippet, we perform the following steps:
+
+- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
+- Finally, we redirect the user to the `account` page.
 
 <Tabs
   scrollable
@@ -693,18 +704,23 @@ import { createClient } from '@/utils/supabase/server'
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
   const next = '/account'
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone()
   redirectTo.pathname = next
-  redirectTo.searchParams.delete('code')
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
 
-  if (code) {
+  if (token_hash && type) {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
     if (!error) {
       redirectTo.searchParams.delete('next')
       return NextResponse.redirect(redirectTo)
@@ -722,6 +738,7 @@ export async function GET(request) {
 <TabPanel id="ts" label="TypeScript">
 
 ```ts app/auth/confirm/route.ts
+import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
@@ -729,18 +746,23 @@ import { createClient } from '@/utils/supabase/server'
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
   const next = '/account'
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone()
   redirectTo.pathname = next
-  redirectTo.searchParams.delete('code')
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
 
-  if (code) {
+  if (token_hash && type) {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
     if (!error) {
       redirectTo.searchParams.delete('next')
       return NextResponse.redirect(redirectTo)
