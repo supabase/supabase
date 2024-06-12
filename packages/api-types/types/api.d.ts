@@ -993,6 +993,10 @@ export interface paths {
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
+  '/system/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['SystemProjectRunLintsController_runProjectLints']
+  }
   '/system/projects/{ref}/secrets': {
     /**
      * List all secrets
@@ -2701,6 +2705,11 @@ export interface components {
         | 'COMPUTE_HOURS_8XL'
         | 'COMPUTE_HOURS_12XL'
         | 'COMPUTE_HOURS_16XL'
+        | 'CUSTOM_DOMAIN'
+        | 'PITR_7'
+        | 'PITR_14'
+        | 'PITR_28'
+        | 'IPV4'
       /** @enum {string} */
       pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
       pricing_free_units?: number
@@ -4106,11 +4115,6 @@ export interface components {
       name: string
       limit: number
     }
-    PreviewTransferInvoiceItem: {
-      description: string
-      quantity: number
-      amount: number
-    }
     PreviewProjectTransferResponse: {
       source_subscription_plan: components['schemas']['BillingPlanId']
       target_subscription_plan: components['schemas']['BillingPlanId']
@@ -4123,11 +4127,6 @@ export interface components {
       source_project_eligible: boolean
       target_organization_eligible: boolean | null
       target_organization_has_free_project_slots: boolean | null
-      credits_on_source_organization: number
-      costs_on_target_organization: number
-      charge_on_target_organization: number
-      source_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
-      target_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
     }
     AnalyticsResponse: {
       error?: OneOf<
@@ -5012,10 +5011,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       db_host: string
       db_user?: string
       db_pass?: string
@@ -5088,10 +5090,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -5890,17 +5895,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -6001,17 +6009,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -7058,6 +7069,11 @@ export interface operations {
           | 'COMPUTE_HOURS_8XL'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
         interval: string
         endDate: string
         startDate: string
@@ -12586,6 +12602,25 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  SystemProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }

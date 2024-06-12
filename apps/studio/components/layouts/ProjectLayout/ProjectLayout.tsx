@@ -221,6 +221,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
+  const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectBuilding =
@@ -237,6 +238,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
+  }
+
+  if (isRestarting) {
+    return <LoadingState />
   }
 
   if (isProjectUpgrading) {

@@ -14,6 +14,9 @@ export const inferProjectStatus = (project: ProjectInfo) => {
     case PROJECT_STATUS.INACTIVE:
       status = 'isPaused'
       break
+    case PROJECT_STATUS.RESTARTING:
+      status = 'isRestarting'
+      break
     case PROJECT_STATUS.RESTORING:
       status = 'isRestoring'
       break
@@ -29,6 +32,7 @@ export type InferredProjectStatus =
   | 'isHealthy'
   | 'isPausing'
   | 'isPaused'
+  | 'isRestarting'
   | 'isRestoring'
   | 'isComingUp'
   | undefined
