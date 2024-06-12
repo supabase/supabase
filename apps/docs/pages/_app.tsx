@@ -25,6 +25,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <MetaFaviconsPagesRouter applicationName="Supabase Docs" />
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Supabase Docs</title>
       </Head>
       <QueryClientProvider>
         <AuthContainer>
