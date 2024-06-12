@@ -342,6 +342,8 @@ In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/au
 
 ## Available Hooks
 
+Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload.
+
 ## Hook: MFA verification attempt
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
@@ -890,7 +892,7 @@ console.log(`Function "upstash-redis-password-counter" up and running!`);
 
 Deno.serve(async (req) => {
     const payload = await req.text();
-    const base57_secret = Deno.env.get('AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET');
+    const base64_secret = Deno.env.get('AUTH_PASSWORD_VERIFICATION_ATTEMPT_SECRET');
     const headers = Object.fromEntries(req.headers);
     const wh = new Webhook(base64_secret);
     const secondsBeforeNextRetry = 3;
