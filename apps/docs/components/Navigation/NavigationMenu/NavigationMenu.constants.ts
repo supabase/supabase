@@ -1715,6 +1715,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
         {
+          name: 'Pausing and Restoring',
+          url: '/guides/platform/pause-restore',
+        },
+        {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
         },

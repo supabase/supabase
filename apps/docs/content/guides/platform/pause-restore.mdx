@@ -1,0 +1,48 @@
+---
+id: 'pause-restore'
+title: 'Pausing and Restoring'
+description: 'Pausing and restoring projects.'
+---
+
+# Free Tier
+
+Free tier organizations can [pause](https://supabase.com/dashboard/project/_/settings/general) and later restore projects. This method can be used to upgrade a project to the latest versions of each component, or to reduce resource consumption of projects that are not in use.
+
+## Pausing a Project
+
+When a project is paused, a backup is created. Users then have a 90-day window to restore the project on the platform from within Supabase Studio.
+
+The 90-day window is necessary to allow Supabase to introduce platform changes that may not be backward compatible with older backups. Active databases can be updated by working with users to implement required updates. However, static backups may face issues if restored after the platform undergos changes.
+
+## Restore Period
+
+During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](https://supabase.com/dashboard/projects).
+
+<div>
+  <Image
+    alt="Project Paused: 90 Days Remaining"
+    src="/docs/img/guides/platform/paused-90-day.png"
+  />
+</div>
+
+## Post-Restore Period
+
+After the 90-day period has elapsed, the restore functionality is replaced with an option to download the project's backup file. This backup is compatible with [pg_restore](https://www.postgresql.org/docs/current/app-pgrestore.html), and gives the user the option to extract data, or attempt to manually restore the project directly.
+
+<div>
+  <Image
+    alt="Project Paused: 90 Days Remaining"
+    src="/docs/img/guides/platform/paused-dl-backup.png"
+  />
+</div>
+
+## Non-Free Tier Projects
+
+If a project is in paused status when an organization upgrades to pro tier, the restore option is reenabled. However, the risk of the backup failing to restore sucessfully due to changes is still present. If a backup fails to restore after upgrading, contact [support](supabase.com/support) for assitance.
+
+<div>
+  <Image
+    alt="Project Paused: 90 Days Remaining"
+    src="/docs/img/guides/platform/paused-paid-tier.png"
+  />
+</div>
