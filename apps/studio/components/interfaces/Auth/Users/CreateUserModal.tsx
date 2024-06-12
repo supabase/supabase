@@ -55,7 +55,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   return (
     <Modal
-      closable
       hideFooter
       size="small"
       key="create-user-modal"
@@ -101,10 +100,11 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 name="autoConfirmUser"
                 label="Auto Confirm User?"
                 size="medium"
-                description="Creates the user without sending them a confirmation email"
-                defaultChecked={true}
                 disabled={isCreatingUser || isLoading}
               />
+              <p className="text-sm text-foreground-lighter">
+                A confirmation email will not be sent when creating a user via this form.
+              </p>
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content>
