@@ -32,15 +32,15 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-400 dark:bg-brand-500 
-            hover:bg-brand/80 dark:hover:bg-brand/50
-            text-foreground
-            border-brand-500/75 dark:border-brand/75
-            hover:border-brand-600 dark:hover:border-brand-600
-            focus-visible:outline-brand-600
-            data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
-            data-[state=open]:outline-brand-600
-            `,
+          bg-brand-400 dark:bg-brand-500 
+          hover:bg-brand/80 dark:hover:bg-brand/50
+          text-foreground
+          border-brand-500/75 dark:border-brand/30
+          hover:border-brand-600 dark:hover:border-brand
+          focus-visible:outline-brand-600
+          data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
+          data-[state=open]:outline-brand-600
+          `,
         default: `
           text-foreground
           bg-alternative dark:bg-muted  hover:bg-selection
@@ -51,83 +51,83 @@ const buttonVariants = cva(
           data-[state=open]:border-button-hover
           `,
         secondary: `
-            bg-foreground
-            text-background hover:text-border-stronger
-            focus-visible:text-border-control
-            border-foreground-light hover:border-foreground-lighter
-            focus-visible:outline-border-strong
-            data-[state=open]:border-foreground-lighter
-            data-[state=open]:outline-border-strong
+          bg-foreground
+          text-background hover:text-border-stronger
+          focus-visible:text-border-control
+          border-foreground-light hover:border-foreground-lighter
+          focus-visible:outline-border-strong
+          data-[state=open]:border-foreground-lighter
+          data-[state=open]:outline-border-strong
         `,
         // @deprecated use 'primary' instead
         alternative: `
-            text-foreground
-            bg-brand-400 hover:bg-brand-500
-            border-brand-500
-            focus-visible:border-brand-500
-            focus-visible:outline-brand-600
-            data-[state=open]:bg-brand-500
-            data-[state=open]:border-brand-500
-            data-[state=open]:outline-brand-600
+          text-foreground
+          bg-brand-400 hover:bg-brand-500
+          border-brand-500
+          focus-visible:border-brand-500
+          focus-visible:outline-brand-600
+          data-[state=open]:bg-brand-500
+          data-[state=open]:border-brand-500
+          data-[state=open]:outline-brand-600
         `,
         outline: `
-            text-foreground
-            bg-transparent
-            border-strong hover:border-foreground-muted
-            focus-visible:outline-border-strong
-            data-[state=open]:border-stronger
-            data-[state=open]:outline-border-strong
+          text-foreground
+          bg-transparent
+          border-strong hover:border-foreground-muted
+          focus-visible:outline-border-strong
+          data-[state=open]:border-stronger
+          data-[state=open]:outline-border-strong
         `,
         dashed: `
-            text-foreground
-            border
-            border-dashed
-            border-strong hover:border-stronger
-            bg-transparent
-            focus-visible:outline-border-strong
-            data-[state=open]:border-stronger
-            data-[state=open]:outline-border-strong
+          text-foreground
+          border
+          border-dashed
+          border-strong hover:border-stronger
+          bg-transparent
+          focus-visible:outline-border-strong
+          data-[state=open]:border-stronger
+          data-[state=open]:outline-border-strong
         `,
         link: `
-            text-brand-600
-            border
-            border-transparent
-            hover:bg-brand-400
-            border-opacity-0
-            bg-opacity-0
-            shadow-none
-            focus-visible:outline-border-strong
-            data-[state=open]:bg-brand-400
-            data-[state=open]:outline-border-strong
+          text-brand-600
+          border
+          border-transparent
+          hover:bg-brand-400
+          border-opacity-0
+          bg-opacity-0
+          shadow-none
+          focus-visible:outline-border-strong
+          data-[state=open]:bg-brand-400
+          data-[state=open]:outline-border-strong
         `,
         text: `
-            text-foreground
-            hover:bg-surface-300
-            shadow-none
-            focus-visible:outline-border-strong
-            data-[state=open]:bg-surface-300
-            data-[state=open]:outline-border-strong
-            border-transparent
+          text-foreground
+          hover:bg-surface-300
+          shadow-none
+          focus-visible:outline-border-strong
+          data-[state=open]:bg-surface-300
+          data-[state=open]:outline-border-strong
+          border-transparent
         `,
         danger: `
-            text-foreground
-            bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-            border-destructive-500 hover:border-destructive
-            hover:text-hi-contrast
-            focus-visible:outline-amber-700
-            data-[state=open]:border-destructive
-            data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
-            data-[state=open]:outline-destructive
+          text-foreground
+          bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
+          border-destructive-500 hover:border-destructive
+          hover:text-hi-contrast
+          focus-visible:outline-amber-700
+          data-[state=open]:border-destructive
+          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
+          data-[state=open]:outline-destructive
         `,
         warning: `
-            text-foreground
-            bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-            border-warning-500 hover:border-warning
-            hover:text-hi-contrast
-            focus-visible:outline-amber-700
-            data-[state=open]:border-warning
-            data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
-            data-[state=open]:outline-warning
+          text-foreground
+          bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
+          border-warning-500 hover:border-warning
+          hover:text-hi-contrast
+          focus-visible:outline-amber-700
+          data-[state=open]:border-warning
+          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
+          data-[state=open]:outline-warning
         `,
       },
       block: {
