@@ -89,7 +89,7 @@ export const CommandDialog = ({
           '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
           '!border-overlay/90',
           'transition ease-out',
-          'place-self-start mx-auto top-24',
+          'place-self-start mx-auto top-20',
           animateBounce ? 'scale-[101.5%]' : 'scale-100'
         )}
       >
