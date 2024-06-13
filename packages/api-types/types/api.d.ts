@@ -166,13 +166,13 @@ export interface paths {
   }
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
-    get: operations['TaxIdsController_getTaxId']
-    /** Creates a tax ID for the given organization */
+    get: operations['TaxIdsController_getTaxIds']
+    /** Creates or updates a tax ID for the given organization */
     put: operations['TaxIdsController_updateTaxId']
     /** Creates a tax ID for the given organization */
     post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
-    delete: operations['TaxIdsController_deleteTaxIdV2']
+    delete: operations['TaxIdsController_deleteTaxId']
   }
   '/platform/organizations/{slug}/transfer': {
     /** Transfers the organization to the given member */
@@ -581,6 +581,10 @@ export interface paths {
   '/platform/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
@@ -1455,6 +1459,10 @@ export interface paths {
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
@@ -2635,6 +2643,14 @@ export interface components {
       org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
       project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
+    TaxIdV2: {
+      country: string
+      type: string
+      value: string
+    }
+    TaxIdV2Response: {
+      tax_id: components['schemas']['TaxIdV2'] | null
+    }
     TaxId: {
       id: string
       country: string
@@ -2657,14 +2673,6 @@ export interface components {
     }
     DeleteTaxIdBody: {
       id: string
-    }
-    TaxIdV2: {
-      country: string
-      type: string
-      value: string
-    }
-    TaxIdV2Response: {
-      tax_id?: components['schemas']['TaxIdV2']
     }
     TransferOrganizationBody: {
       member_gotrue_id: string
@@ -3938,6 +3946,11 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -6947,7 +6960,7 @@ export interface operations {
     }
   }
   /** Gets the given organization's tax IDs */
-  TaxIdsController_getTaxId: {
+  TaxIdsController_getTaxIds: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6957,7 +6970,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['TaxIdV2Response']
+          'application/json': components['schemas']['TaxIdResponse']
         }
       }
       403: {
@@ -6969,7 +6982,7 @@ export interface operations {
       }
     }
   }
-  /** Creates a tax ID for the given organization */
+  /** Creates or updates a tax ID for the given organization */
   TaxIdsController_updateTaxId: {
     parameters: {
       path: {
@@ -7026,11 +7039,16 @@ export interface operations {
     }
   }
   /** Delete the tax ID with the given ID */
-  TaxIdsController_deleteTaxIdV2: {
+  TaxIdsController_deleteTaxId: {
     parameters: {
       path: {
         /** @description Organization slug */
         slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DeleteTaxIdBody']
       }
     }
     responses: {
@@ -10170,6 +10188,22 @@ export interface operations {
       /** @description Failed to pause the project */
       500: {
         content: never
+      }
+    }
+  }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
       }
     }
   }

@@ -29,6 +29,7 @@ export async function updateOrganizationTaxId({ slug, taxId }: OrganizationTaxId
 
     return data
   } else {
+    // @ts-ignore wrong type due to API versioning
     const { data, error } = await del(`/platform/organizations/{slug}/tax-ids`, {
       params: {
         path: {

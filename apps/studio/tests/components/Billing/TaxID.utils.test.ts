@@ -20,7 +20,7 @@ describe('TaxID utils: sanitizeTaxID', () => {
     }
 
     const sanitizedID = sanitizeTaxIdValue(austriaTaxID)
-    expect(sanitizedID.value).toBe('ATU12345678')
+    expect(sanitizedID).toBe('ATU12345678')
   })
 
   test('should check that EU prefix is correct', () => {
@@ -32,7 +32,7 @@ describe('TaxID utils: sanitizeTaxID', () => {
     }
 
     const sanitizedID = sanitizeTaxIdValue(austriaTaxID)
-    expect(sanitizedID.value).toBe('ATU12345678')
+    expect(sanitizedID).toBe('ATU12345678')
   })
 
   test('should not prefix an non-EU tax ID', () => {
@@ -44,6 +44,6 @@ describe('TaxID utils: sanitizeTaxID', () => {
     }
 
     const sanitizedID = sanitizeTaxIdValue(unitedStatesID)
-    expect(sanitizedID.value).toBe('12-3456789')
+    expect(sanitizedID).toBe('12-3456789')
   })
 })

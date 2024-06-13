@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { organizationKeys } from './keys'
 import type { ResponseError } from 'types'
+import { components } from 'api-types'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -22,7 +23,8 @@ export async function getOrganizationTaxId(
   })
   if (error) throw handleError(error)
 
-  return data.tax_id
+  // @ts-ignore wrong typing due to mgmt api versioning
+  return (data as components['schemas']['TaxIdV2Response']).tax_id
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>
