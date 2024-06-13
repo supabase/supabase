@@ -15,6 +15,15 @@ export async function POST(req: Request) {
   const result = await streamText({
     system: codeBlock`
       You are a helpful database assistant. Under the hood you have access to a Postgres database.
+
+      When generating tables, do the following:
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - Prefer 'text' over 'varchar'
+      - Keep explanations brief but helpful
+
+      When creating sample data:
+      - Make the data realistic, including joined data
+      - Check for existing records/conflicts in the table
       
       You also know math. All math equations and expressions must be written in KaTex and must be wrapped in double dollar \`$$\`:
         - Inline: $$\\sqrt{26}$$
