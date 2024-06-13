@@ -208,7 +208,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <Tooltip.Trigger asChild>
                       <Button
                         size="tiny"
-                        type="primary"
+                        type="default"
                         disabled={!canResumeProject}
                         onClick={onSelectRestore}
                       >
@@ -234,7 +234,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     )}
                   </Tooltip.Root>
                   {isFreePlan ? (
-                    <Button asChild type="default">
+                    <Button asChild type="primary">
                       <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
                         Upgrade to Pro
                       </Link>
