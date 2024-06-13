@@ -15,7 +15,7 @@ Sentry.init({
 
     if (IS_PLATFORM && consent === 'true') {
       // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-      const isInvalidUrlEvent = hint.originalException?.message?.includes(
+      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
         `Failed to construct 'URL': Invalid URL`
       )
       if (isInvalidUrlEvent && Math.random() > 0.01) {
