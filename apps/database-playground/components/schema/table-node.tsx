@@ -76,7 +76,7 @@ export const TableNode = ({
 
   return (
     <m.div
-      className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm bg-surface-100"
+      className="overflow-hidden rounded-[4px] shadow-md bg-scale-400"
       style={{ width: TABLE_NODE_WIDTH / 2 }}
       variants={{
         hidden: {
@@ -95,15 +95,22 @@ export const TableNode = ({
     >
       <header
         className={cn(
-          'text-[0.55rem] px-2 bg-alternative text-default flex gap-1 items-center',
+          'text-[0.55rem] px-2 bg-brand-600 text-white flex gap-1 items-center',
           itemHeight
         )}
       >
-        <Table2 strokeWidth={1} size={12} className="text-light" />
+        <Table2 strokeWidth={1} size={12} className="" />
 
         {/* Animate the old title out and new title in */}
         <AnimatePresence mode="popLayout">
-          <m.span key={data.name} variants={inOutTop} initial="hidden" animate="show" exit="hidden">
+          <m.span
+            key={data.name}
+            className="font-medium"
+            variants={inOutTop}
+            initial="hidden"
+            animate="show"
+            exit="hidden"
+          >
             {data.name}
           </m.span>
         </AnimatePresence>
@@ -114,10 +121,9 @@ export const TableNode = ({
           key={column.id}
           className={cn(
             'text-[8px] leading-5 relative flex flex-row justify-items-start',
-            'bg-surface-100',
-            'border-t',
+            'bg-neutral-300',
+            'border-t border-neutral-200',
             'border-t-[0.5px]',
-            'hover:bg-scale-500 transition cursor-default',
             'overflow-hidden',
             itemHeight
           )}

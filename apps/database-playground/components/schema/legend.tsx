@@ -2,7 +2,7 @@ import { DiamondIcon, Fingerprint, Hash, Key } from 'lucide-react'
 
 const SchemaGraphLegend = () => {
   return (
-    <div className="absolute bottom-0 left-0 border-t flex justify-center px-1 py-2 shadow-md bg-surface-100 w-full z-10">
+    <div className="absolute bottom-0 left-0 border-t flex justify-center p-4 shadow-md bg-surface-100 w-full z-10">
       <ul className="flex flex-wrap  items-center justify-center gap-4">
         <li className="flex items-center text-xs font-mono gap-1">
           <Key size={15} strokeWidth={1.5} className="flex-shrink-0 text-light" />

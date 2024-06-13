@@ -189,7 +189,7 @@ export default function Page() {
   return (
     <LazyMotion features={loadFramerFeatures}>
       <div className="w-full h-full flex p-6 gap-8">
-        <div className="h-full w-[40rem] py-4 rounded-md bg-[#1e1e1e]">
+        <div className="h-full flex-1">
           <SchemaGraph schema="public" />
         </div>
         {isEditorVisible && (

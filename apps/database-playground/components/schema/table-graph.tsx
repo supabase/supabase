@@ -49,42 +49,41 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
   }, [reactFlowInstance, tables, resolvedTheme])
 
   return (
-    <div className="w-full h-full">
-      <ReactFlow
-        defaultNodes={[]}
-        defaultEdges={[]}
-        defaultEdgeOptions={{
-          type: 'smoothstep',
-          deletable: false,
-          style: {
-            stroke: 'hsl(var(--border-stronger))',
-            strokeWidth: 1,
-            strokeDasharray: 5,
-            // Manually create animation so that it doesn't interfere with our custom edge component
-            animation: 'dashdraw 0.5s linear infinite',
-          },
-        }}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        minZoom={0.8}
-        maxZoom={1.8}
-        proOptions={{ hideAttribution: true }}
-        onInit={(flow) => {
-          // Call `fitView` imperatively in order to set padding
-          flow.fitView({
-            padding: 0.4,
-          })
-        }}
-      >
-        <Background
-          gap={16}
-          className="[&>*]:stroke-foreground-muted opacity-[25%]"
-          variant={BackgroundVariant.Dots}
-          color={'inherit'}
-        />
-        <SchemaGraphLegend />
-      </ReactFlow>
-    </div>
+    <ReactFlow
+      className="bg-neutral-800 rounded-md border-[0.5px] border-neutral-800 overflow-hidden"
+      defaultNodes={[]}
+      defaultEdges={[]}
+      defaultEdgeOptions={{
+        type: 'smoothstep',
+        deletable: false,
+        style: {
+          stroke: 'hsl(var(--border-stronger))',
+          strokeWidth: 1,
+          strokeDasharray: 5,
+          // Manually create animation so that it doesn't interfere with our custom edge component
+          animation: 'dashdraw 0.5s linear infinite',
+        },
+      }}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      minZoom={0.8}
+      maxZoom={1.8}
+      proOptions={{ hideAttribution: true }}
+      onInit={(flow) => {
+        // Call `fitView` imperatively in order to set padding
+        flow.fitView({
+          padding: 0.4,
+        })
+      }}
+    >
+      <Background
+        gap={16}
+        className="text-neutral-500 bg-neutral-800"
+        variant={BackgroundVariant.Dots}
+        color="currentColor"
+      />
+      <SchemaGraphLegend />
+    </ReactFlow>
   )
 }
 
