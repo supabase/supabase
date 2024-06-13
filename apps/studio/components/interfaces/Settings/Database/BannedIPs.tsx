@@ -3,21 +3,21 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Globe } from 'lucide-react'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
-  IconAlertTriangle,
   IconExternalLink,
-  IconGlobe,
-  Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 const BannedIPs = () => {
@@ -29,6 +29,8 @@ const BannedIPs = () => {
 
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
+
+  const canUnbanNetworks = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
@@ -87,14 +89,28 @@ const BannedIPs = () => {
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-foreground-lighter" />
+                <Globe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
                 {ip === userIPAddress && <Badge>Your IP address</Badge>}
               </div>
               <div>
-                <Button type="default" onClick={() => openConfirmationModal(ip)}>
-                  Unban IP
-                </Button>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Button
+                      type="default"
+                      className="pointer-events-auto"
+                      disabled={!canUnbanNetworks}
+                      onClick={() => openConfirmationModal(ip)}
+                    >
+                      Unban IP
+                    </Button>
+                  </TooltipTrigger_Shadcn_>
+                  {!canUnbanNetworks && (
+                    <TooltipContent_Shadcn_>
+                      You need additional permissions to unban networks
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
               </div>
             </div>
           ))

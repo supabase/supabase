@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Badge, Button, IconDownload } from 'ui'
+import { Download } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
@@ -47,10 +48,10 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
           {!backup.isPhysicalBackup && (
             <Button
               type="default"
+              loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}
               onClick={() => downloadBackup({ ref: projectRef, backup })}
-              loading={isDownloading}
-              icon={<IconDownload />}
+              icon={<Download />}
             >
               Download
             </Button>

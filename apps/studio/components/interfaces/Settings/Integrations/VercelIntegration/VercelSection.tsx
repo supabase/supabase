@@ -48,6 +48,8 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
     'integrations.vercel_connections'
   )
 
+  console.log({ canReadVercelConnection, canCreateVercelConnection })
+
   const isBranch = project?.parent_project_ref !== undefined
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(

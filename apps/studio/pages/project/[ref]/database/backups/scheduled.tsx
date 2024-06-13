@@ -28,8 +28,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   } = useBackupsQuery({ projectRef: ref })
 
   const isPitrEnabled = backups?.pitr_enabled
-  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
   const isPermissionsLoaded = usePermissionsLoaded()
+
+  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <ScaffoldContainer>

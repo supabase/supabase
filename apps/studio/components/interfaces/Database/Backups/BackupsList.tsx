@@ -23,7 +23,6 @@ import BackupsStorageAlert from './BackupsStorageAlert'
 const BackupsList = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const organization = useSelectedOrganization()
 
   const { project: selectedProject } = useProjectContext()
   const projectRef = selectedProject?.ref || 'default'
