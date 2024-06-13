@@ -243,7 +243,7 @@ const GenerateSQL = () => {
             <StatusIcon variant="warning" />
             <div>
               <p className="text-sm text-foreground text-center">
-                Sorry, looks like Clippy is having a hard time!
+                Sorry, looks like Supabase AI is having a hard time!
               </p>
               <p className="text-sm text-foreground-lighter text-center">
                 Please try again in a bit.
