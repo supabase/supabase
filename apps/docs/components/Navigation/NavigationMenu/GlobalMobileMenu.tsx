@@ -2,7 +2,7 @@ import React, { Dispatch, Fragment, SetStateAction } from 'react'
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useLockBodyScroll, useKey } from 'react-use'
+import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, IconX, cn } from 'ui'
@@ -36,15 +36,14 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   }
 
   useKey('Escape', () => setOpen(false))
-  useLockBodyScroll(open)
 
   const itemClassName =
-    'block py-2 pl-1 pr-4 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
+    'block py-2 pl-1 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
 
   const AccordionMenuItem = ({ section }: any) => (
     <m.div
       variants={listItem}
-      className="border-b border-muted [&>div]:!rounded-none"
+      className="border-b border-muted [&>div]:!rounded-none [&_div[data-state=open]>div]:py-1"
       key={section[0].label}
     >
       {section[0].menuItems ? (
