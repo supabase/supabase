@@ -204,8 +204,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <TooltipTrigger_Shadcn_ asChild>
                       <Button
                         size="tiny"
-                        type="primary"
-                        className="pointer-events-auto"
+                        type="default"
                         disabled={!canResumeProject}
                         onClick={onSelectRestore}
                       >
@@ -219,7 +218,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     )}
                   </Tooltip_Shadcn_>
                   {isFreePlan ? (
-                    <Button asChild type="default">
+                    <Button asChild type="primary">
                       <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
                         Upgrade to Pro
                       </Link>
