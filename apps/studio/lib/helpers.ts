@@ -148,7 +148,7 @@ export const snakeToCamel = (str: string) =>
 export const copyToClipboard = async (str: string | Promise<string>, callback = noop) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    if (typeof ClipboardItem && navigator.clipboard.write) {
+    if (typeof ClipboardItem && navigator.clipboard?.write) {
       // NOTE: Safari locks down the clipboard API to only work when triggered
       // by a direct user interaction. You can't use it async in a promise.
       // But! You can wrap the promise in a ClipboardItem, and give that to
@@ -164,7 +164,7 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
       // Good news is that other than Safari, Firefox does not care about
       // Clipboard API being used async in a Promise.
       Promise.resolve(str)
-        .then((text) => navigator.clipboard.writeText(text))
+        .then((text) => navigator.clipboard?.writeText(text))
         .then(callback)
     }
   } else {
