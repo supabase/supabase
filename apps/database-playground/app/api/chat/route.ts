@@ -36,17 +36,16 @@ export async function POST(req: Request) {
     tools: {
       getDatabaseSchema: {
         description:
-          'Executes Postgres SQL using information_schema and other meta tables to retrieve the requested schema info. When requesting tables, go ahead and also fetch basic column info via join. Present it in a table.',
-        parameters: z.object({ sql: z.string() }),
+          'Gets all table and column data within the public schema in the Postgres database.',
+        parameters: z.object({}),
       },
       executeSql: {
         description:
-          "Executes Postgres SQL against the user's database. Don't assume schema. If uncertain, call `getDatabaseSchema` first. Perform joins automatically.",
+          "Executes Postgres SQL against the user's database. Perform joins automatically. Always add limits for safety.",
         parameters: z.object({ sql: z.string() }),
       },
       brainstormReports: {
-        description:
-          'Brainstorms some interesting reports to show to the user. Call `getDatabaseSchema` first.',
+        description: 'Brainstorms some interesting reports to show to the user.',
         parameters: z.object({
           reports: z.array(reportSchema),
         }),

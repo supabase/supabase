@@ -28,6 +28,7 @@ export const useTablesQuery = <TData = TablesData>(
     ...options,
     queryKey: getTablesQueryKey({ schemas, includeColumns }),
     queryFn: () => getTablesForQuery({ schemas, includeColumns }),
+    staleTime: Infinity,
   })
 
 export const getTablesQueryKey = ({ schemas, includeColumns }: TablesVariables) => [

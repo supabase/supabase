@@ -222,8 +222,6 @@ function findTablesHandleIds(
     for (const column of table.columns || []) {
       if (column_name !== column.name) continue
 
-      console.log({ column })
-
       return [String(table.id), column.id]
     }
   }

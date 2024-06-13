@@ -4,14 +4,13 @@ import 'chartjs-adapter-date-fns'
 
 import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
-import { useQueryClient } from '@tanstack/react-query'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
 import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
-import { codeBlock } from 'common-tags'
 import { AnimatePresence, LazyMotion, m } from 'framer-motion'
 import { ArrowUp, Square } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Chart as ChartWrapper } from 'react-chartjs-2'
 import { ErrorBoundary } from 'react-error-boundary'
 import ReactMarkdown from 'react-markdown'
@@ -22,7 +21,8 @@ import { format } from 'sql-formatter'
 import { AiIconAnimation, markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
 import SchemaGraph from '~/components/schema/graph'
-import { Report } from './api/chat/route'
+import { useTablesQuery } from '~/data/tables/tables-query'
+import { useReportSuggestions } from '~/lib/hooks'
 
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
 
@@ -30,146 +30,117 @@ const loadFramerFeatures = () => import('./framer-features').then((res) => res.d
 // Temp: storing single instance in module scope
 export let db: PGlite = new PGlite('idb://local')
 
-function useReportSuggestions(db: PGlite) {
-  const [schema, setSchema] = useState<any[]>()
-  const [reports, setReports] = useState<Report[]>()
+export default function Page() {
+  const [migrationSql, setMigrationSql] = useState(
+    '-- Migrations will appear here as you chat with Supabase AI'
+  )
+  const [brainstormIdeas] = useState(false)
+  const { reports } = useReportSuggestions(db, { enabled: brainstormIdeas })
 
-  useEffect(() => {
-    async function run() {
-      const result = await db.query(
-        "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public'"
-      )
+  const { data: tables, refetch } = useTablesQuery({ schemas: ['public'], includeColumns: true })
 
-      setSchema(result.rows)
-    }
-    run()
-  }, [])
-
-  const { append } = useChat({
+  const { messages, input, setInput, handleInputChange, append, stop, isLoading } = useChat({
     api: 'api/chat',
+    maxToolRoundtrips: 10,
+    // Provide the LLM with the current schema before the chat starts
+    initialMessages: [
+      {
+        id: nanoid(),
+        role: 'assistant',
+        content: '',
+        toolInvocations: [
+          {
+            toolCallId: nanoid(),
+            toolName: 'getDatabaseSchema',
+            args: {},
+            result: tables,
+          },
+        ],
+      },
+    ],
     async onToolCall({ toolCall }) {
-      console.log('initial ask', toolCall)
+      console.log('tool call', toolCall)
       switch (toolCall.toolName) {
+        case 'getDatabaseSchema': {
+          const { data: tables, error } = await refetch()
+
+          // TODO: handle this error in the UI
+          if (error) {
+            throw error
+          }
+
+          return tables
+        }
         case 'brainstormReports': {
-          console.log(toolCall.args)
-          const { reports } = toolCall.args as any
-          setReports(reports)
+          return {
+            success: true,
+            message: 'Reports have been brainstormed. Relay this info to the user.',
+          }
+        }
+        case 'executeSql': {
+          try {
+            const { sql } = toolCall.args as any
+            console.log(sql)
+            const results = await db.exec(sql)
+
+            setMigrationSql((s) => {
+              const newSql = (s + '\n' + sql).trim()
+              return format(newSql, {
+                language: 'postgresql',
+                keywordCase: 'lower',
+                identifierCase: 'lower',
+                dataTypeCase: 'lower',
+                functionCase: 'lower',
+              })
+            })
+
+            const { data: tables, error } = await refetch()
+
+            // TODO: handle this error in the UI
+            if (error) {
+              throw error
+            }
+
+            return {
+              queryResults: results,
+              updatedSchema: tables,
+            }
+          } catch (err) {
+            if (err instanceof Error) {
+              console.log(err.message)
+              return { success: false, error: err.message }
+            }
+            throw err
+          }
+        }
+        case 'generateChart': {
+          const { config } = toolCall.args as any
+
+          // Validate that the chart can be rendered without error
+          const canvas = document.createElement('canvas', {})
+          canvas.className = 'invisible'
+          document.body.appendChild(canvas)
+
+          try {
+            const chart = new Chart(canvas, config)
+            chart.destroy()
+            return {
+              success: true,
+              message:
+                "The chart has been generated and displayed to the user above. Acknowledge the user's request.",
+            }
+          } catch (err) {
+            if (err instanceof Error) {
+              return { success: false, error: err.message }
+            }
+            throw err
+          } finally {
+            canvas.remove()
+          }
         }
       }
     },
   })
-
-  useEffect(() => {
-    if (!schema) {
-      return
-    }
-
-    append({
-      id: 'initial',
-      role: 'user',
-      content: codeBlock`
-        getDatabaseSchema has been invoked already and here are the results:
-        ${JSON.stringify(schema)}
-
-        Brainstorm 5 interesting charts that can be generated based on tables and their columns in the database.
-
-        Keep descriptions short and concise. Don't say "eg.". Descriptions should mention charting or visualizing.
-
-        Titles should be 4 words or less.
-      `,
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema])
-
-  return { reports }
-}
-
-export default function Page() {
-  const [sql, setSql] = useState('')
-  const [isEditorVisible, setIsEditorVisible] = useState(false)
-  const { reports } = useReportSuggestions(db)
-
-  const queryClient = useQueryClient()
-
-  const { messages, input, setInput, handleInputChange, handleSubmit, append, stop, isLoading } =
-    useChat({
-      api: 'api/chat',
-      maxToolRoundtrips: 10,
-      async onToolCall({ toolCall }) {
-        console.log('tool call', toolCall)
-        switch (toolCall.toolName) {
-          case 'getDatabaseSchema': {
-            const { sql } = toolCall.args as any
-            console.log(sql)
-            const results = await db.exec(sql)
-            console.log(results)
-            return results
-          }
-          case 'brainstormReports': {
-            return {
-              success: true,
-              message: 'Reports have been brainstormed. Relay this info to the user.',
-            }
-          }
-          case 'executeSql': {
-            try {
-              const { sql } = toolCall.args as any
-              console.log(sql)
-              const results = await db.exec(sql)
-
-              setSql((s) => {
-                const newSql = (s + '\n' + sql).trim()
-                return format(newSql, {
-                  language: 'postgresql',
-                  keywordCase: 'lower',
-                  identifierCase: 'lower',
-                  dataTypeCase: 'lower',
-                  functionCase: 'lower',
-                })
-              })
-
-              queryClient.invalidateQueries({
-                queryKey: ['tables'],
-              })
-
-              console.log(results)
-              return results
-            } catch (err) {
-              if (err instanceof Error) {
-                console.log(err.message)
-                return { success: false, error: err.message }
-              }
-              throw err
-            }
-          }
-          case 'generateChart': {
-            const { config } = toolCall.args as any
-
-            // Validate that the chart can be rendered without error
-            const canvas = document.createElement('canvas', {})
-            canvas.className = 'invisible'
-            document.body.appendChild(canvas)
-
-            try {
-              const chart = new Chart(canvas, config)
-              chart.destroy()
-              return {
-                success: true,
-                message:
-                  "The chart has been generated and displayed to the user above. Acknowledge the user's request.",
-              }
-            } catch (err) {
-              if (err instanceof Error) {
-                return { success: false, error: err.message }
-              }
-              throw err
-            } finally {
-              canvas.remove()
-            }
-          }
-        }
-      },
-    })
 
   const lastMessage = messages.at(-1)
 
@@ -189,14 +160,18 @@ export default function Page() {
   return (
     <LazyMotion features={loadFramerFeatures}>
       <div className="w-full h-full flex p-6 gap-8">
-        <div className="h-full flex-1">
-          <SchemaGraph schema="public" />
-        </div>
-        {isEditorVisible && (
-          <div className="h-full w-[50rem] py-4 rounded-md bg-[#1e1e1e]">
+        <Tabs className="flex-1 h-full flex flex-col items-stretch" defaultValue="diagram">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="diagram">Diagram</TabsTrigger>
+            <TabsTrigger value="migrations">Migrations</TabsTrigger>
+          </TabsList>
+          <TabsContent value="diagram" className="h-full">
+            <SchemaGraph schema="public" />
+          </TabsContent>
+          <TabsContent value="migrations" className="h-full py-4 rounded-md bg-[#1e1e1e]">
             <Editor
               language="pgsql"
-              value={sql}
+              value={migrationSql}
               theme="vs-dark"
               options={{
                 tabSize: 2,
@@ -204,6 +179,7 @@ export default function Page() {
                   enabled: false,
                 },
                 fontSize: 13,
+                readOnly: true,
               }}
               onMount={async (editor, monaco) => {
                 // Register pgsql formatter
@@ -232,8 +208,9 @@ export default function Page() {
                 await editor.getAction('editor.action.formatDocument').run()
               }}
             />
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
+
         <div className="flex-1 h-full flex flex-col items-stretch">
           <div
             className="flex-1 flex flex-col items-center overflow-y-auto"
@@ -258,7 +235,7 @@ export default function Page() {
               }
             }}
           >
-            {messages.length > 0 ? (
+            {messages.some((message) => message.role === 'user') ? (
               <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
                 {messages
                   .filter(
@@ -411,65 +388,71 @@ export default function Page() {
                   What would you like to do?
                 </m.h3>
                 <div>
-                  {reports ? (
-                    <m.div
-                      className="flex flex-row gap-6 flex-wrap justify-center items-start"
-                      variants={{
-                        show: {
-                          transition: {
-                            staggerChildren: 0.05,
-                          },
-                        },
-                      }}
-                      initial="hidden"
-                      animate="show"
-                    >
-                      {reports.map((report) => (
+                  {brainstormIdeas && (
+                    <>
+                      {reports ? (
                         <m.div
-                          key={report.name}
-                          layoutId={`report-suggestion-${report.name}`}
-                          className="w-64 h-32 flex flex-col overflow-ellipsis rounded-md cursor-pointer"
-                          onMouseDown={() => append({ role: 'user', content: report.description })}
+                          className="flex flex-row gap-6 flex-wrap justify-center items-start"
                           variants={{
-                            hidden: { scale: 0 },
-                            show: { scale: 1 },
+                            show: {
+                              transition: {
+                                staggerChildren: 0.05,
+                              },
+                            },
                           }}
+                          initial="hidden"
+                          animate="show"
                         >
-                          <div className="p-4 bg-neutral-200 text-sm rounded-t-md text-neutral-600 font-bold text-center">
-                            {report.name}
-                          </div>
-                          <div className="flex-1 p-4 flex flex-col justify-center border border-neutral-200 text-neutral-500 text-xs font-normal italic rounded-b-md text-center overflow-hidden">
-                            {report.description}
-                          </div>
+                          {reports.map((report) => (
+                            <m.div
+                              key={report.name}
+                              layoutId={`report-suggestion-${report.name}`}
+                              className="w-64 h-32 flex flex-col overflow-ellipsis rounded-md cursor-pointer"
+                              onMouseDown={() =>
+                                append({ role: 'user', content: report.description })
+                              }
+                              variants={{
+                                hidden: { scale: 0 },
+                                show: { scale: 1 },
+                              }}
+                            >
+                              <div className="p-4 bg-neutral-200 text-sm rounded-t-md text-neutral-600 font-bold text-center">
+                                {report.name}
+                              </div>
+                              <div className="flex-1 p-4 flex flex-col justify-center border border-neutral-200 text-neutral-500 text-xs font-normal italic rounded-b-md text-center overflow-hidden">
+                                {report.description}
+                              </div>
+                            </m.div>
+                          ))}
                         </m.div>
-                      ))}
-                    </m.div>
-                  ) : (
-                    <m.div
-                      className="flex flex-row gap-4 justify-center items-center"
-                      variants={{
-                        hidden: {
-                          opacity: 0,
-                          y: -10,
-                        },
-                        show: {
-                          opacity: 1,
-                          y: 0,
-                          transition: {
-                            delay: 0.5,
-                          },
-                        },
-                      }}
-                      initial="hidden"
-                      animate="show"
-                    >
-                      <m.div layoutId="ai-loading-icon">
-                        <AiIconAnimation loading />
-                      </m.div>
-                      <h3 className="text-lg italic font-light text-neutral-500">
-                        Brainstorming some ideas
-                      </h3>
-                    </m.div>
+                      ) : (
+                        <m.div
+                          className="flex flex-row gap-4 justify-center items-center"
+                          variants={{
+                            hidden: {
+                              opacity: 0,
+                              y: -10,
+                            },
+                            show: {
+                              opacity: 1,
+                              y: 0,
+                              transition: {
+                                delay: 0.5,
+                              },
+                            },
+                          }}
+                          initial="hidden"
+                          animate="show"
+                        >
+                          <m.div layoutId="ai-loading-icon">
+                            <AiIconAnimation loading />
+                          </m.div>
+                          <h3 className="text-lg italic font-light text-neutral-500">
+                            Brainstorming some ideas
+                          </h3>
+                        </m.div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
