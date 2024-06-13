@@ -6,6 +6,7 @@ import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
+  Controls,
   Edge,
   Node,
   Position,
@@ -82,6 +83,14 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
         variant={BackgroundVariant.Dots}
         color="currentColor"
       />
+
+      {tables.length === 0 && (
+        <div className="absolute w-full h-full flex justify-center items-center text-neutral-50 text-center p-4">
+          <h2 className="text-4xl text-light font-light">Ask AI to create a table</h2>
+        </div>
+      )}
+
+      <Controls showZoom={false} showInteractive={false} position="top-right" />
       <SchemaGraphLegend />
     </ReactFlow>
   )
