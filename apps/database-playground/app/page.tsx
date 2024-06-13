@@ -34,6 +34,7 @@ export default function Page() {
   const [migrationSql, setMigrationSql] = useState(
     '-- Migrations will appear here as you chat with Supabase AI'
   )
+  const [tab, setTab] = useState('diagram')
   const [brainstormIdeas] = useState(false)
   const { reports } = useReportSuggestions(db, { enabled: brainstormIdeas })
 
@@ -138,6 +139,16 @@ export default function Page() {
             canvas.remove()
           }
         }
+        case 'switchTab': {
+          const { tab } = toolCall.args as any
+
+          setTab(tab)
+
+          return {
+            success: true,
+            message: `The UI successfully switch to the '${tab}' tab. Acknowledge the user's request.`,
+          }
+        }
       }
     },
   })
@@ -160,7 +171,11 @@ export default function Page() {
   return (
     <LazyMotion features={loadFramerFeatures}>
       <div className="w-full h-full flex p-6 gap-8">
-        <Tabs className="flex-1 h-full flex flex-col items-stretch" defaultValue="diagram">
+        <Tabs
+          className="flex-1 h-full flex flex-col items-stretch"
+          value={tab}
+          onValueChange={(tab) => setTab(tab)}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="diagram">Diagram</TabsTrigger>
             <TabsTrigger value="migrations">Migrations</TabsTrigger>
@@ -385,7 +400,7 @@ export default function Page() {
             ) : (
               <div className="flex-1 w-full max-w-4xl flex flex-col gap-10 justify-center items-center">
                 <m.h3 layout className="text-2xl font-light">
-                  What would you like to do?
+                  What would you like to create?
                 </m.h3>
                 <div>
                   {brainstormIdeas && (

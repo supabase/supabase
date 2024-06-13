@@ -66,6 +66,14 @@ export async function POST(req: Request) {
             ),
         }),
       },
+      switchTab: {
+        description: codeBlock`
+          Switches to a different tab.
+        `,
+        parameters: z.object({
+          tab: z.enum(['diagram', 'migrations']),
+        }),
+      },
     },
   })
 
