@@ -4,16 +4,7 @@ import {
   DocsSearchResultType as PageType,
   useDocsSearch,
 } from 'common'
-import {
-  AlertTriangle,
-  Book,
-  ChevronRight,
-  Github,
-  Hash,
-  Loader2,
-  MessageSquare,
-  Search,
-} from 'lucide-react'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'

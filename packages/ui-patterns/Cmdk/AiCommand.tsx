@@ -14,7 +14,6 @@ import { SSE } from 'sse.js'
 import {
   AiIconAnimation,
   Button,
-  IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
   Input,
