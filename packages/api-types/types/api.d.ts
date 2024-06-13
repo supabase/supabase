@@ -167,6 +167,8 @@ export interface paths {
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
     get: operations['TaxIdsController_getTaxIds']
+    /** Creates or updates a tax ID for the given organization */
+    put: operations['TaxIdsController_updateTaxId']
     /** Creates a tax ID for the given organization */
     post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
@@ -236,11 +238,13 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member role */
-    patch: operations['MembersController_updateMemberRoleV2']
+    /** Assign organization member with new role */
+    patch: operations['MembersController_assignMemberRoleV2']
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Removes organization member */
+    /** Update organization member role */
+    put: operations['MembersController_UpdateMemberRole']
+    /** Removes organization member role */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/platform/organizations/{slug}/members/reached-free-project-limit': {
@@ -1232,11 +1236,13 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member role */
-    patch: operations['MembersController_updateMemberRoleV2']
+    /** Assign organization member with new role */
+    patch: operations['MembersController_assignMemberRoleV2']
   }
   '/v0/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Removes organization member */
+    /** Update organization member role */
+    put: operations['MembersController_UpdateMemberRole']
+    /** Removes organization member role */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/v0/pg-meta/{ref}/column-privileges': {
@@ -2641,6 +2647,14 @@ export interface components {
       org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
       project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
+    TaxIdV2: {
+      country: string
+      type: string
+      value: string
+    }
+    TaxIdV2Response: {
+      tax_id: components['schemas']['TaxIdV2'] | null
+    }
     TaxId: {
       id: string
       country: string
@@ -2651,7 +2665,7 @@ export interface components {
       data: components['schemas']['TaxId'][]
     }
     CreateTaxIdBody: {
-      type: Record<string, never>
+      type: string
       value: string
     }
     CreateTaxIdResponse: {
@@ -2705,6 +2719,11 @@ export interface components {
         | 'COMPUTE_HOURS_8XL'
         | 'COMPUTE_HOURS_12XL'
         | 'COMPUTE_HOURS_16XL'
+        | 'CUSTOM_DOMAIN'
+        | 'PITR_7'
+        | 'PITR_14'
+        | 'PITR_28'
+        | 'IPV4'
       /** @enum {string} */
       pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
       pricing_free_units?: number
@@ -2767,9 +2786,14 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
-    UpdateMemberRoleBodyV2: {
+    AssignMemberRoleBodyV2: {
       role_id: number
       role_scoped_projects?: string[]
+    }
+    UpdateMemberRoleBody: {
+      name: string
+      description?: string
+      role_scoped_projects: string[]
     }
     MemberWithFreeProjectLimit: {
       free_project_limit: number
@@ -2789,6 +2813,7 @@ export interface components {
       organization_name: string
       invite_id?: number
       token_does_not_exist: boolean
+      sso_mismatch: boolean
       email_match: boolean
       authorized_user: boolean
       expired_token: boolean
@@ -6967,6 +6992,34 @@ export interface operations {
       }
     }
   }
+  /** Creates or updates a tax ID for the given organization */
+  TaxIdsController_updateTaxId: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaxIdBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['TaxIdV2Response']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create the tax ID */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Creates a tax ID for the given organization */
   TaxIdsController_createTaxId: {
     parameters: {
@@ -7064,6 +7117,11 @@ export interface operations {
           | 'COMPUTE_HOURS_8XL'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
         interval: string
         endDate: string
         startDate: string
@@ -7358,8 +7416,8 @@ export interface operations {
       }
     }
   }
-  /** Updates organization member role */
-  MembersController_updateMemberRoleV2: {
+  /** Assign organization member with new role */
+  MembersController_assignMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7369,7 +7427,32 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
+        'application/json': components['schemas']['AssignMemberRoleBodyV2']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to assign organization member with new role */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update organization member role */
+  MembersController_UpdateMemberRole: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        gotrue_id: string
+        role_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateMemberRoleBody']
       }
     }
     responses: {
@@ -7382,7 +7465,7 @@ export interface operations {
       }
     }
   }
-  /** Removes organization member */
+  /** Removes organization member role */
   MembersController_deleteMemberRole: {
     parameters: {
       path: {
@@ -7396,7 +7479,7 @@ export interface operations {
       200: {
         content: never
       }
-      /** @description Failed to remove organization member */
+      /** @description Failed to remove organization member role */
       500: {
         content: never
       }

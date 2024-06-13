@@ -4,8 +4,8 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { organizationKeys } from 'data/organization-members/keys'
-import { useOrganizationMemberUnassignRoleMutation } from 'data/organization-members/organization-member-unassign-role-mutation'
-import { useOrganizationMemberUpdateRoleMutation } from 'data/organization-members/organization-member-update-mutation'
+import { useOrganizationMemberUnassignRoleMutation } from 'data/organization-members/organization-member-role-unassign-mutation'
+import { useOrganizationMemberAssignRoleMutation } from 'data/organization-members/organization-member-role-assign-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
@@ -17,6 +17,8 @@ import {
   deriveChanges,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { partition } from 'lodash'
+import { useOrganizationMemberUpdateRoleMutation } from 'data/organization-members/organization-member-role-update-mutation'
 
 interface UpdateRolesConfirmationModal {
   visible: boolean
@@ -39,10 +41,11 @@ export const UpdateRolesConfirmationModal = ({
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps
   const [saving, setSaving] = useState(false)
-  const { mutateAsync: updateRole } = useOrganizationMemberUpdateRoleMutation()
+  const { mutateAsync: assignRole } = useOrganizationMemberAssignRoleMutation()
   const { mutateAsync: removeRole } = useOrganizationMemberUnassignRoleMutation({
     onError: () => {},
   })
+  const { mutateAsync: updateRole } = useOrganizationMemberUpdateRoleMutation()
 
   const availableRoles = allRoles?.org_scoped_roles ?? []
   const { org_scoped_roles, project_scoped_roles } = allRoles ?? {
@@ -51,7 +54,9 @@ export const UpdateRolesConfirmationModal = ({
   }
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const originalConfiguration =
-    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
+    allRoles !== undefined
+      ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
+      : []
   const changesToRoles = deriveChanges(originalConfiguration, projectsRoleConfiguration)
 
   const onConfirmUpdateMemberRoles = async () => {
@@ -59,6 +64,9 @@ export const UpdateRolesConfirmationModal = ({
 
     setSaving(true)
     const gotrueId = member.gotrue_id
+    const existingRoles = member.role_ids.map((id) => {
+      return [...org_scoped_roles, ...project_scoped_roles].find((r) => r.id === id)
+    })
     const isOrgScope =
       projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
 
@@ -66,7 +74,7 @@ export const UpdateRolesConfirmationModal = ({
     // Everything else below is just project level role changes then
     if (isOrgScope) {
       try {
-        await updateRole({
+        await assignRole({
           slug,
           gotrueId,
           roleId: projectsRoleConfiguration[0].roleId,
@@ -93,15 +101,41 @@ export const UpdateRolesConfirmationModal = ({
       return toast.error(`Failed to update role: ${error.message}`)
     }
 
-    // Then add roles from added
-    const roleIdsToAdd = added.reduce((a, b) => {
+    // Then amongst the roles to add, we sift out what already has an existing base role (project level)
+    const [rolesToUpdate, rolesToAdd] = partition(
+      added,
+      (role) => role.ref !== undefined && existingRoles.some((r) => r?.base_role_id === role.roleId)
+    )
+    try {
+      await Promise.all(
+        rolesToUpdate.map((role) => {
+          const existingRole = existingRoles.find((r) => r?.base_role_id === role.roleId)
+          const scopedProjects = existingRole?.project_ids
+            .map((id) => (projects ?? []).find((p) => p.id === id)?.ref)
+            .filter(Boolean) as string[]
+          updateRole({
+            slug,
+            gotrueId,
+            // Using ! check here as it should already be validated in the partition above
+            roleId: existingRole!.id,
+            roleName: existingRole!.name,
+            projects: scopedProjects.concat([role.ref] as string[]),
+          })
+        })
+      )
+    } catch (error: any) {
+      setSaving(false)
+      return toast.error(`Failed to update role: ${error.message}`)
+    }
+
+    const roleIdsToAdd = rolesToAdd.reduce((a, b) => {
       if (!a.includes(b.roleId)) return [...a, b.roleId]
       return a
     }, [] as number[])
     try {
       await Promise.all(
         roleIdsToAdd.map((roleId) =>
-          updateRole({
+          assignRole({
             slug,
             gotrueId,
             roleId,
@@ -130,7 +164,7 @@ export const UpdateRolesConfirmationModal = ({
         await Promise.all([
           ...(role.ref !== undefined
             ? [
-                updateRole({
+                assignRole({
                   slug,
                   gotrueId,
                   roleId: role.updatedRole,
@@ -141,7 +175,7 @@ export const UpdateRolesConfirmationModal = ({
             : []),
           ...(originalRoleMeta?.base_role_id !== undefined && projectsToKeepRole.length > 0
             ? [
-                updateRole({
+                assignRole({
                   slug,
                   gotrueId,
                   roleId: originalRoleMeta.base_role_id,

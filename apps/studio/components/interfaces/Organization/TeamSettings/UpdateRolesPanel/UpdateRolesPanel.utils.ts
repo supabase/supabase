@@ -1,5 +1,6 @@
 import { OrganizationRolesResponse } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
+import { ProjectInfo } from 'data/projects/projects-query'
 
 export interface ProjectRoleConfiguration {
   ref?: string
@@ -9,7 +10,8 @@ export interface ProjectRoleConfiguration {
 
 export const formatMemberRoleToProjectRoleConfiguration = (
   member: OrganizationMember,
-  allRoles: OrganizationRolesResponse
+  allRoles: OrganizationRolesResponse,
+  projects: ProjectInfo[]
 ) => {
   const { org_scoped_roles, project_scoped_roles } = allRoles
 
@@ -21,7 +23,9 @@ export const formatMemberRoleToProjectRoleConfiguration = (
       }
       const projectRole = project_scoped_roles.find((role) => role.id === id)
       if (projectRole !== undefined) {
-        const projectRefs = projectRole.description.split(',').map((x) => x.trim())
+        const projectRefs = projectRole.project_ids.map(
+          (id) => projects.find((p) => p.id === id)?.ref
+        )
         return projectRefs.map((ref) => ({
           ref,
           roleId: projectRole.id,

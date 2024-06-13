@@ -9,7 +9,6 @@ import TableEditorMenu from './TableEditorMenu'
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
-  console.log({ canReadTables })
 
   const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
 

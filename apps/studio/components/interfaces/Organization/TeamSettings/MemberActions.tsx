@@ -25,6 +25,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -38,6 +39,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
+  const { data: allProjects } = useProjectsQuery()
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -102,7 +104,9 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           if (!member.primary_email) return toast.error('Email is required')
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
           if (projectScopedRole !== undefined) {
-            const projects = projectScopedRole.description.split(',').map((x) => x.trim())
+            const projects = projectScopedRole.project_ids
+              .map((id) => allProjects?.find((p) => p.id === id)?.ref)
+              .filter(Boolean) as string[]
             inviteMember({
               slug,
               email: member.primary_email,

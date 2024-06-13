@@ -83,7 +83,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   >([])
 
   const originalConfiguration =
-    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
+    allRoles !== undefined
+      ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
+      : []
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
@@ -146,7 +148,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   useEffect(() => {
     if (visible && isSuccessRoles) {
-      const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(member, allRoles)
+      const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(
+        member,
+        allRoles,
+        projects ?? []
+      )
       setProjectsRoleConfiguration(roleConfiguration)
     } else {
       setShowRolesAccessMatrix(false)
