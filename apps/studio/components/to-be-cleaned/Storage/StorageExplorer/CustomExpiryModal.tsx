@@ -34,9 +34,9 @@ const CustomExpiryModal = () => {
       <Form
         validateOnBlur
         initialValues={{ expiresIn: '', units: 'days' }}
-        onSubmit={(values: any, { setSubmitting }: any) => {
+        onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
-          onCopyUrl(
+          await onCopyUrl(
             selectedFileCustomExpiry!.name,
             getFileUrl(
               selectedFileCustomExpiry!,

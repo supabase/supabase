@@ -21,7 +21,7 @@ export const useCopyUrl = (ref: string) => {
         : url
     })
 
-    copyToClipboard(formattedUrl, () => {
+    return copyToClipboard(formattedUrl, () => {
       toast.success(`Copied URL for ${name} to clipboard.`)
     })
   }

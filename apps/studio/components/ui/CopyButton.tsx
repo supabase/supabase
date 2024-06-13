@@ -1,6 +1,6 @@
-import { Button, ButtonProps, IconCheck, IconClipboard } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
 import { useEffect, useState } from 'react'
+import { Button, ButtonProps, IconCheck, IconClipboard } from 'ui'
 
 export interface CopyButtonProps extends ButtonProps {
   text: string
@@ -27,9 +27,9 @@ const CopyButton = ({
 
   return (
     <Button
-      onClick={(e) => {
+      onClick={async (e) => {
         setShowCopied(true)
-        copyToClipboard(text)
+        await copyToClipboard(text)
         onClick?.(e)
       }}
       icon={
