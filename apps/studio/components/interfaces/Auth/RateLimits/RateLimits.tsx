@@ -175,7 +175,7 @@ const RateLimits = () => {
                     control={form.control}
                     name="RATE_LIMIT_EMAIL_SENT"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ disabled={!canUpdateEmailLimit} type="number" {...field} />
                         </FormControl_Shadcn_>
@@ -240,7 +240,7 @@ const RateLimits = () => {
                     control={form.control}
                     name="RATE_LIMIT_SMS_SENT"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             disabled={!canUpdateSMSRateLimit}
@@ -363,7 +363,7 @@ const RateLimits = () => {
                     control={form.control}
                     name="RATE_LIMIT_ANONYMOUS_USERS"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             disabled={!canUpdateAnonymousUsersRateLimit}

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Info } from 'lucide-react'
 
 import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
@@ -13,7 +14,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { IconInfo } from 'ui'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -59,7 +59,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                     <InformationBox
                       hideCollapse
                       defaultVisibility
-                      icon={<IconInfo strokeWidth={2} />}
+                      icon={<Info strokeWidth={2} />}
                       title="Point-In-Time-Recovery (PITR) enabled"
                       description={
                         <div>

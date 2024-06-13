@@ -101,6 +101,7 @@ const PostgrestConfig = () => {
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
+
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
