@@ -1,7 +1,7 @@
 import { TAX_IDS } from './TaxID.constants'
 
 export const sanitizeTaxIdValue = (taxId: { type: string; value: string }) => {
-  const selectedTaxId = TAX_IDS.find((option) => option.code === taxId.type)
+  const selectedTaxId = TAX_IDS.find((option) => option.type === taxId.type)
 
   const vatIdPrefix = selectedTaxId?.vatPrefix
 
@@ -15,5 +15,5 @@ export const sanitizeTaxIdValue = (taxId: { type: string; value: string }) => {
 
 /** Ignore id property amongst tax ids */
 export const checkTaxIdEqual = (a: any, b: any) => {
-  return a?.type === b?.type && a?.value === b?.value && a?.name === b?.name
+  return a?.type === b?.type && a?.value === b?.value
 }

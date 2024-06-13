@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -9,20 +9,20 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
 import {
   Button,
   Form,
-  IconPlus,
-  IconX,
-  Input,
-  Listbox,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -32,6 +32,11 @@ import {
 } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { checkTaxIdEqual as checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
+import * as z from 'zod'
+import { X as IconX } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Panel from 'components/ui/Panel'
 
 const TaxID = () => {
   const { slug } = useParams()
@@ -42,10 +47,12 @@ const TaxID = () => {
     },
   })
 
-  const [taxIdValue, setTaxIdValue] = useState<{ type: string; value: string; name: string }>({
-    type: '',
-    value: '',
-    name: '',
+  const FormSchema = z.object({ type: z.string(), value: z.string(), name: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { type: '', value: '', name: '' },
   })
 
   const formattedTaxId = taxId
@@ -55,57 +62,65 @@ const TaxID = () => {
         name:
           taxId.type === 'eu_vat'
             ? `${taxId.country} VAT`
-            : TAX_IDS.find((option) => option.code === taxId.type)?.name ?? '',
+            : TAX_IDS.find((option) => option.type === taxId.type)?.name ?? '',
       }
     : { type: '', value: '', name: '' }
 
-  const formId = 'tax-id-form'
-  const hasChanges = !checkTaxIdEqual(taxIdValue, formattedTaxId)
-  const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+  const hasChanges = !checkTaxIdEqual(form.getValues(), formattedTaxId)
+  const canReadTaxId = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const canUpdateTaxId = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
   useEffect(() => {
-    if (isSuccess) {
-      if (taxId) {
-        setTaxIdValue(formattedTaxId)
-      }
+    if (isSuccess && formattedTaxId) {
+      form.setValue('type', formattedTaxId.type)
+      form.setValue('value', formattedTaxId.value)
+      form.setValue('name', formattedTaxId.name)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
 
-  const onUpdateTaxId = (key: string, value: string) => {
-    if (key === 'name') {
-      const selectedTaxIdOption = TAX_IDS.find((option) => option.name === value)
-      return setTaxIdValue({ ...taxIdValue, [key]: value, type: selectedTaxIdOption!.code })
-    } else {
-      return setTaxIdValue({ ...taxIdValue, [key]: value })
-    }
-  }
-
-  const onSaveTaxIds = async () => {
+  const onSaveTaxId = async () => {
     if (!slug) return console.error('Slug is required')
+
+    const { type, value } = form.getValues()
+
+    if (type?.length && !value?.length) {
+      form.setError('value', { message: 'Value is required' })
+      return
+    }
 
     updateTaxId({
       slug,
       taxId:
-        taxIdValue.type && taxIdValue.value
+        type?.length && value?.length
           ? {
-              type: taxIdValue.type,
-              value: sanitizeTaxIdValue(taxIdValue),
+              type: type,
+              value: sanitizeTaxIdValue({ type, value }),
             }
           : null,
     })
   }
 
   const onResetTaxIds = () => {
-    setTaxIdValue(formattedTaxId)
+    form.setValue('type', formattedTaxId.type)
+    form.setValue('value', formattedTaxId.value)
+  }
+
+  const onSelectTaxIdType = (name: string) => {
+    const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
+    if (!selectedTaxIdOption) return
+    form.setValue('type', selectedTaxIdOption.type)
+    form.setValue('value', '')
+    form.setValue('name', name)
   }
 
   const onRemoveTaxId = () => {
-    setTaxIdValue({ name: '', type: '', value: '' })
+    form.reset()
   }
 
-  const selectedTaxId = TAX_IDS.find((option) => option.code === taxIdValue?.type)
+  const { name } = form.watch()
+
+  const selectedTaxId = TAX_IDS.find((option) => option.name === name)
 
   return (
     <ScaffoldSection>
@@ -113,7 +128,7 @@ const TaxID = () => {
         <div className="sticky space-y-2 top-12">
           <p className="text-foreground text-base m-0">Tax ID</p>
           <p className="text-sm text-foreground-light pr-4 m-0">
-            Add tax ID to have them appear in your invoices. Old invoices are not affected.
+            Add a tax ID to your invoices. Changes only apply to future invoices.
           </p>
           <p className="text-sm text-foreground-light m-0">
             Make sure the tax ID looks exactly like the placeholder text.
@@ -121,8 +136,8 @@ const TaxID = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadTaxIds ? (
-          <NoPermission resourceText="view this organization's tax IDs" />
+        {!canReadTaxId ? (
+          <NoPermission resourceText="view this organization's tax ID" />
         ) : (
           <>
             {isLoading && (
@@ -138,38 +153,44 @@ const TaxID = () => {
             )}
 
             {isSuccess && (
-              <Form validateOnBlur id={formId} initialValues={{}} onSubmit={onSaveTaxIds}>
-                {() => (
-                  <FormPanel
-                    footer={
-                      <div className="flex py-4 px-8">
-                        <FormActions
-                          form={formId}
-                          isSubmitting={isUpdating}
-                          hasChanges={hasChanges}
-                          handleReset={() => onResetTaxIds()}
-                          helper={
-                            !canUpdateTaxIds
-                              ? "You need additional permissions to manage this organization's tax IDs"
-                              : undefined
-                          }
-                        />
-                      </div>
+              <Panel
+                className="mb-8"
+                footer={
+                  <FormActions
+                    form="tax-id-form"
+                    isSubmitting={isUpdating}
+                    hasChanges={hasChanges}
+                    handleReset={() => onResetTaxIds()}
+                    helper={
+                      !canUpdateTaxId
+                        ? "You need additional permissions to manage this organization's tax ID"
+                        : undefined
                     }
+                  />
+                }
+              >
+                <Form_Shadcn_ {...form}>
+                  <form
+                    id="tax-id-form"
+                    className="grid grid-cols-2 gap-2 w-full py-8 px-8"
+                    onSubmit={form.handleSubmit(() => onSaveTaxId())}
                   >
-                    <FormSection>
-                      <FormSectionContent fullWidth loading={false}>
-                        <div className="w-full space-y-2">
-                          <div className="flex items-center space-x-2">
+                    <FormField_Shadcn_
+                      name="name"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_>
+                          <FormControl_Shadcn_>
                             <Select_Shadcn_
-                              value={taxIdValue?.name}
-                              onValueChange={(e: any) => onUpdateTaxId('name', e)}
-                              disabled={!canUpdateTaxIds}
+                              {...field}
+                              disabled={!canUpdateTaxId}
+                              value={field.value}
+                              onValueChange={(value) => onSelectTaxIdType(value)}
                             >
-                              <SelectTrigger_Shadcn_ className="w-[300px]">
-                                <SelectValue_Shadcn_ placeholder="Select tax id type" />
+                              <SelectTrigger_Shadcn_>
+                                <SelectValue_Shadcn_ placeholder="None" />
                               </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_ className="max-h-[20rem] overflow-y-auto">
+                              <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
                                   {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
                                     (option) => (
@@ -181,30 +202,40 @@ const TaxID = () => {
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                            {selectedTaxId && (
-                              <Input
-                                value={taxId?.value}
-                                placeholder={selectedTaxId?.placeholder ?? 'Select type first'}
-                                onChange={(e: any) => onUpdateTaxId('value', e.target.value)}
-                                disabled={!canUpdateTaxIds}
-                              />
-                            )}
+                          </FormControl_Shadcn_>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
 
-                            {taxIdValue?.type && (
-                              <Button
-                                type="text"
-                                className="px-1"
-                                icon={<IconX />}
-                                onClick={() => onRemoveTaxId()}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </FormSectionContent>
-                    </FormSection>
-                  </FormPanel>
-                )}
-              </Form>
+                    {selectedTaxId && (
+                      <div className="flex items-center space-x-2">
+                        <FormField_Shadcn_
+                          name="value"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem_Shadcn_ className="w-full">
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  placeholder={selectedTaxId?.placeholder}
+                                  disabled={!canUpdateTaxId}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+
+                        <Button
+                          type="text"
+                          className="px-1"
+                          icon={<IconX />}
+                          onClick={() => onRemoveTaxId()}
+                        />
+                      </div>
+                    )}
+                  </form>
+                </Form_Shadcn_>
+              </Panel>
             )}
           </>
         )}
