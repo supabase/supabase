@@ -95,5 +95,6 @@ Supabase would not be possible without the work of some other amazing open sourc
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
 - Phoenix - https://www.phoenixframework.org/
 - GoTrue - https://github.com/netlify/gotrue

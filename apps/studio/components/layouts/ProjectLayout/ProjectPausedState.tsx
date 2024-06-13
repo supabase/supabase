@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { ExternalLink, PauseCircle } from 'lucide-react'
@@ -24,7 +23,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
-  cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
@@ -42,13 +40,13 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const { data: pauseStatus } = useProjectPauseStatusQuery(
-    { ref },
-    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
-  )
+  // const { data: pauseStatus } = useProjectPauseStatusQuery(
+  //   { ref },
+  //   { enabled: project?.status === PROJECT_STATUS.INACTIVE }
+  // )
 
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = !pauseStatus?.can_restore
+  const isRestoreDisabled = false // !pauseStatus?.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -119,7 +117,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {isRestoreDisabled ? (
+                {/* {isRestoreDisabled ? (
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
@@ -136,7 +134,11 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
                       <Tooltip_Shadcn_>
                         <TooltipTrigger_Shadcn_ asChild>
-                          <Button type="default" disabled={latestBackup === undefined}>
+                          <Button
+                            type="default"
+                            disabled={latestBackup === undefined}
+                            className="pointer-events-auto"
+                          >
                             Download backup
                           </Button>
                         </TooltipTrigger_Shadcn_>
@@ -146,12 +148,6 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                           </TooltipContent_Shadcn_>
                         )}
                       </Tooltip_Shadcn_>
-                      {/* [Joshen] To update this once we have docs ready */}
-                      {/* <Button asChild type="default" icon={<ExternalLink />}>
-                        <a href="/" target="_blank" rel="noreferrer">
-                          Documentation
-                        </a>
-                      </Button> */}
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 ) : isFreePlan ? (
@@ -175,7 +171,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   </>
-                ) : null}
+                ) : null} */}
 
                 {!isFreePlan && (
                   <Alert_Shadcn_>
@@ -204,37 +200,25 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
               {!isRestoreDisabled && (
                 <div className="flex items-center justify-center gap-4">
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
                       <Button
                         size="tiny"
-                        type="primary"
+                        type="default"
                         disabled={!canResumeProject}
                         onClick={onSelectRestore}
                       >
                         Restore project
                       </Button>
-                    </Tooltip.Trigger>
+                    </TooltipTrigger_Shadcn_>
                     {!canResumeProject && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={cn(
-                              'border border-background',
-                              'rounded bg-alternative py-1 px-2 leading-none shadow'
-                            )}
-                          >
-                            <span className="text-xs text-foreground">
-                              You need additional permissions to resume this project
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
+                      <TooltipContent_Shadcn_ side="bottom">
+                        You need additional permissions to resume this project
+                      </TooltipContent_Shadcn_>
                     )}
-                  </Tooltip.Root>
+                  </Tooltip_Shadcn_>
                   {isFreePlan ? (
-                    <Button asChild type="default">
+                    <Button asChild type="primary">
                       <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
                         Upgrade to Pro
                       </Link>
@@ -250,6 +234,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           </div>
         </div>
       </div>
+
       <ConfirmModal
         visible={showConfirmRestore}
         title="Restore this project"
@@ -259,6 +244,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         onSelectCancel={() => setShowConfirmRestore(false)}
         onSelectConfirm={onConfirmRestore}
       />
+
       <Modal
         hideFooter
         visible={showFreeProjectLimitWarning}
