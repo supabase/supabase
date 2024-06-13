@@ -1,4 +1,4 @@
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 
@@ -27,7 +27,7 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
     deleteDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: role.id.toString(),
+      id: role.id,
     })
   }
 
@@ -41,14 +41,12 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
       header={<h3>Confirm to delete role "{role?.name}"</h3>}
       loading={isDeleting}
     >
-      <div className="py-4">
-        <Modal.Content>
-          <p className="text-sm">
-            This will automatically revoke any membership of this role in other roles, and this
-            action cannot be undone.
-          </p>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <p className="text-sm">
+          This will automatically revoke any membership of this role in other roles, and this action
+          cannot be undone.
+        </p>
+      </Modal.Content>
     </Modal>
   )
 }

@@ -1,20 +1,19 @@
 import { noop, pull } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, IconChevronLeft, IconExternalLink, Modal } from 'ui'
-
-import { useStore } from 'hooks'
-import {
-  applyBucketIdToTemplateDefinition,
-  createPayloadsForAddPolicy,
-  createSQLPolicies,
-} from '../Storage.utils'
-import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
+import toast from 'react-hot-toast'
 
 import {
   POLICY_MODAL_VIEWS,
   PolicySelection,
   PolicyTemplates,
 } from 'components/interfaces/Auth/Policies'
+import { Button, IconChevronLeft, IconExternalLink, Modal } from 'ui'
+import {
+  applyBucketIdToTemplateDefinition,
+  createPayloadsForAddPolicy,
+  createSQLPolicies,
+} from '../Storage.utils'
+import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
@@ -33,7 +32,6 @@ const StoragePoliciesEditPolicyModal = ({
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
 }: any) => {
-  const { ui } = useStore()
   const [previousView, setPreviousView] = useState('') // Mainly to decide which view to show when back from templates
   const [view, setView] = useState('')
 
@@ -122,20 +120,14 @@ const StoragePoliciesEditPolicyModal = ({
   const validatePolicyEditorFormFields = () => {
     const { name, definition, allowedOperations } = policyFormFields
     if (name.length === 0) {
-      return ui.setNotification({ category: 'info', message: 'Do give your policy a name' })
+      return toast.error('Please provide a name for your policy')
     }
     if (definition.length === 0) {
       // Will need to figure out how to strip away comments or something
-      return ui.setNotification({
-        category: 'info',
-        message: 'Did you forget to provide a definition for your policy?',
-      })
+      return toast.error('Please provide a definition for your policy')
     }
     if (allowedOperations.length === 0) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'You will need to allow at least one operation in your policy',
-      })
+      return toast.error('Please allow at least one operation in your policy')
     }
 
     const policySQLStatements = createSQLPolicies(bucketName, policyFormFields)

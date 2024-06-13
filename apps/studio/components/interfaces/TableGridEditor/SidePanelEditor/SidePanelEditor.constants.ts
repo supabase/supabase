@@ -1,5 +1,5 @@
 import { sortBy, concat } from 'lodash'
-import { PostgresDataTypeOption } from './SidePanelEditor.types'
+import type { PostgresDataTypeOption } from './SidePanelEditor.types'
 
 export const NUMERICAL_TYPES = [
   'int2',
@@ -18,7 +18,7 @@ export const DATE_TYPES = ['date']
 export const TIME_TYPES = ['time', 'timetz']
 export const DATETIME_TYPES = concat(TIMESTAMP_TYPES, DATE_TYPES, TIME_TYPES)
 
-const OTHER_DATA_TYPES = ['uuid', 'bool', 'vector']
+export const OTHER_DATA_TYPES = ['uuid', 'bool', 'vector']
 export const POSTGRES_DATA_TYPES = sortBy(
   concat(NUMERICAL_TYPES, JSON_TYPES, TEXT_TYPES, DATETIME_TYPES, OTHER_DATA_TYPES)
 )

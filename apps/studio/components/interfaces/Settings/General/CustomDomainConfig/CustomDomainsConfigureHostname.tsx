@@ -1,10 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Button, Form, IconExternalLink, Input } from 'ui'
 import * as yup from 'yup'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
@@ -17,6 +15,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useCheckPermissions } from 'hooks'
+import { Button, Form, IconExternalLink, Input } from 'ui'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -131,4 +130,4 @@ const CustomDomainsConfigureHostname = () => {
   )
 }
 
-export default observer(CustomDomainsConfigureHostname)
+export default CustomDomainsConfigureHostname

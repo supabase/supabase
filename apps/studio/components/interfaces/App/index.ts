@@ -1,5 +1,3 @@
-import AppBannerWrapper from './AppBannerWrapper'
-import CommandMenuWrapper from './CommandMenuWrapper'
-import RouteValidationWrapper from './RouteValidationWrapper'
-
-export { AppBannerWrapper, CommandMenuWrapper, RouteValidationWrapper }
+export { default as AppBannerWrapper } from './AppBannerWrapper'
+export { default as CommandMenuWrapper } from './CommandMenuWrapper'
+export { default as RouteValidationWrapper } from './RouteValidationWrapper'

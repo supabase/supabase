@@ -1,12 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  DialogSectionSeparator,
   Form,
   IconAlertCircle,
   IconExternalLink,
@@ -15,19 +18,16 @@ import {
 } from 'ui'
 import { object, string } from 'yup'
 
-import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'
-import Link from 'next/link'
 
 const RedirectUrls = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -65,26 +65,18 @@ const RedirectUrls = () => {
     const payloadString = payload.toString()
 
     if (payloadString.length > 2 * 1024) {
-      ui.setNotification({
-        message: 'Too many redirect URLs, please remove some or try to use wildcards',
-        category: 'error',
-      })
-      return
+      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
     }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to update URL: ${error?.message}`,
-          })
+          toast.error(`Failed to update URL: ${error?.message}`)
         },
         onSuccess: () => {
           setOpen(false)
-          ui.setNotification({ category: 'success', message: 'Successfully added URL' })
+          toast.success('Successfully added URL')
         },
       }
     )
@@ -100,15 +92,11 @@ const RedirectUrls = () => {
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
       {
         onError: (error) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to remove URL: ${error?.message}`,
-          })
+          toast.error(`Failed to remove URL: ${error?.message}`)
         },
         onSuccess: () => {
           setSelectedUrlToDelete(undefined)
-          ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
+          toast.success('Successfully removed URL')
         },
       }
     )
@@ -186,7 +174,8 @@ const RedirectUrls = () => {
         size="small"
         visible={open}
         onCancel={() => setOpen(!open)}
-        header={<h3 className="text-sm">Add a new URL</h3>}
+        header="Add a new URL"
+        description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
       >
         <Form
           validateOnBlur
@@ -197,31 +186,24 @@ const RedirectUrls = () => {
         >
           {() => {
             return (
-              <div className="mb-4 space-y-4 pt-4">
-                <div className="px-5">
-                  <p className="text-sm text-foreground-light">
-                    This will add a URL to a list of allowed URLs that can interact with your
-                    Authentication services for this project.
-                  </p>
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
+              <>
+                <Modal.Content>
                   <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
+                </Modal.Content>
+                <DialogSectionSeparator />
+                <Modal.Content>
                   <Button
                     block
                     form="new-redirect-url-form"
                     htmlType="submit"
-                    size="medium"
+                    size="small"
                     disabled={isUpdatingConfig}
                     loading={isUpdatingConfig}
                   >
                     Add URL
                   </Button>
-                </div>
-              </div>
+                </Modal.Content>
+              </>
             )
           }}
         </Form>
@@ -233,40 +215,38 @@ const RedirectUrls = () => {
         header={<h3 className="text-sm">Remove URL</h3>}
         onCancel={() => setSelectedUrlToDelete(undefined)}
       >
-        <div className="mb-4 space-y-4 pt-4">
-          <div className="px-5">
-            <p className="mb-2 text-sm text-foreground-light">
-              Are you sure you want to remove{' '}
-              <span className="text-foreground">{selectedUrlToDelete}</span>?
-            </p>
-            <p className="text-foreground-light text-sm">
-              This URL will no longer work with your authentication configuration.
-            </p>
-          </div>
-          <div className="border-overlay-border border-t"></div>
-          <div className="flex gap-3 px-5">
-            <Button
-              block
-              type="default"
-              size="medium"
-              onClick={() => setSelectedUrlToDelete(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              block
-              size="medium"
-              type="warning"
-              loading={isUpdatingConfig}
-              onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
-            >
-              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-            </Button>
-          </div>
-        </div>
+        <Modal.Content>
+          <p className="mb-2 text-sm text-foreground-light">
+            Are you sure you want to remove{' '}
+            <span className="text-foreground">{selectedUrlToDelete}</span>?
+          </p>
+          <p className="text-foreground-light text-sm">
+            This URL will no longer work with your authentication configuration.
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <Button
+            block
+            type="default"
+            size="medium"
+            onClick={() => setSelectedUrlToDelete(undefined)}
+          >
+            Cancel
+          </Button>
+          <Button
+            block
+            size="medium"
+            type="warning"
+            loading={isUpdatingConfig}
+            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
+          >
+            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+          </Button>
+        </Modal.Content>
       </Modal>
     </div>
   )
 }
 
-export default observer(RedirectUrls)
+export default RedirectUrls

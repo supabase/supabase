@@ -389,21 +389,19 @@ create or replace function match_documents_adaptive(
 returns setof documents
 language sql
 as $$
-begin
-  with shortlist as (
-    select *
-    from documents,
-    order by
-      sub_vector(embedding, 512)::vector(512) <#> (
-        select sub_vector(query_embedding, 512)::vector(512)
-      ) asc
-    limit match_count * 8
-  )
+with shortlist as (
   select *
-  from shortlist
-  order by embedding <#> query_embedding asc
-  limit least(match_count, 200);
-end;
+  from documents
+  order by
+    sub_vector(embedding, 512)::vector(512) <#> (
+      select sub_vector(query_embedding, 512)::vector(512)
+    ) asc
+  limit match_count * 8
+)
+select *
+from shortlist
+order by embedding <#> query_embedding asc
+limit least(match_count, 200);
 $$;
 ```
 

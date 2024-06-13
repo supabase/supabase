@@ -15,9 +15,10 @@ import {
   IconLoader,
   IconTrash,
   IconXCircle,
+  cn,
 } from 'ui'
 
-import { Bucket } from 'data/storage/buckets-query'
+import type { Bucket } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {
@@ -50,7 +51,7 @@ const BucketRow = ({
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className="py-1 px-3 w-full"
+        className={cn('py-1 px-3', isSelected ? 'w-[88%]' : 'w-full')}
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
@@ -61,25 +62,19 @@ const BucketRow = ({
           >
             {bucket.name}
           </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
+          {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </Link>
-      {/* [JOSHEN TODO] need to change this */}
-      {false ? (
-        <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-      ) : canUpdateBuckets && isSelected ? (
+      {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              asChild
               type="text"
               icon={
                 <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
               }
               className="mr-1 p-0.5"
-            >
-              <span></span>
-            </Button>
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
             <DropdownMenuItem

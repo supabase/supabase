@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconEye, IconEyeOff, IconHelpCircle, IconLoader, Input } from 'ui'
 
-import { ServerOption } from './Wrappers.types'
+import type { ServerOption } from './Wrappers.types'
 
 interface InputFieldProps {
   option: ServerOption

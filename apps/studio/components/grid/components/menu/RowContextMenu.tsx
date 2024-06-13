@@ -1,13 +1,12 @@
 import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
 import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
-import { SupaRow } from 'components/grid/types'
+import type { SupaRow } from 'components/grid/types'
 import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
-
-export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
+import { ROW_CONTEXT_MENU_ID } from '.'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]

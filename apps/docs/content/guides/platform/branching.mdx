@@ -18,20 +18,11 @@ When you're ready to ship your changes, merge your branch to update your product
 
 If you understand Git, you already understand Supabase Branching.
 
-<Admonition
-  type="note"
-  label="Branching is Early Access only, and only available on the Pro Plan and above."
->
-
-Branching will move to Public Beta in future, but only available for Pro plan and above.
-
-</Admonition>
-
 ## How branching works
 
 Supabase Branching works with Git. You can test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after 5 minutes of inactivity.
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -119,7 +110,7 @@ For security reasons, Preview Branches do not contain production data. Future ve
 
 ### Merging production changes
 
-When you merge your Git branch into the production branch, all changes will be applied to your Production environment.
+When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment.
 
 ### Git providers
 
@@ -438,7 +429,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
 
             The Supabase integration detects the new migration and runs it on the remote Preview Branch. It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
 
-            If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
+            If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it by closing, and reopening your pull request.
 
      </StepHikeCompact.Details>
 
@@ -546,7 +537,7 @@ We highly recommend turning on a 'required check' for the Supabase integration. 
 
 ### Disable branching
 
-You can disable branching at any time. Navigate to the [Branches](https://supabase.green/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
+You can disable branching at any time. Navigate to the [Branches](/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
 
 ## Migration and seeding behavior
 
@@ -566,7 +557,7 @@ The new preview branch is reseeded from your `./supabase/seed.sql` file. Any add
 
 Your Preview Branches are seeded with sample data from the file `./supabase/seed.sql`.
 
-The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it.
+The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it by closing, and reopening your pull request.
 
 ## Troubleshooting
 

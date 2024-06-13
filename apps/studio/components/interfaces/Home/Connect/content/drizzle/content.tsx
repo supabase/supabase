@@ -1,4 +1,4 @@
-import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
+import type { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
 
 import {
   ConnectTabs,
@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ projectKeys }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -20,7 +20,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
-DATABASE_URL='your-database-url'
+DATABASE_URL="${connectionStringPooler.transaction}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

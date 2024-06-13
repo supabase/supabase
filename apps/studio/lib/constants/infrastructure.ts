@@ -1,4 +1,4 @@
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
@@ -31,7 +31,7 @@ export const FLY_REGIONS = {
 } as const
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
 const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
@@ -50,8 +50,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
 
 export const PROVIDERS = {
   FLY: {

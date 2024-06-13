@@ -1,10 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
+import { lintKeys } from 'data/lint/keys'
 
 export type UpdateTableBody = components['schemas']['UpdateTableBody']
 
@@ -35,7 +36,7 @@ export async function updateTable({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -59,6 +60,7 @@ export const useTableUpdateMutation = ({
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
           queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
+          queryClient.invalidateQueries(lintKeys.lint(projectRef)),
         ])
         await onSuccess?.(data, variables, context)
       },

@@ -9,7 +9,7 @@ import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 export interface ChooseFunctionFormProps {
   triggerFunctions: DatabaseFunction[]

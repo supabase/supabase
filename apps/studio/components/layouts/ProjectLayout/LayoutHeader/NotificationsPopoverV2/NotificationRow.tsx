@@ -1,23 +1,23 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { ArchiveRestoreIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button, IconArchive, IconExternalLink } from 'ui'
+import { Button, IconArchive, IconExternalLink, cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
-import { ItemRenderer } from 'components/ui/InfiniteList'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
   getProject: (ref: string) => ProjectInfo
-  getOrganization: (id: number) => Organization
+  getOrganizationById: (id: number) => Organization
+  getOrganizationBySlug: (slug: string) => Organization
   onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
   queueMarkRead: (id: string) => void
 }
@@ -28,7 +28,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   item: notification,
   setRowHeight,
   getProject,
-  getOrganization,
+  getOrganizationById,
+  getOrganizationBySlug,
   onUpdateNotificationStatus,
   queueMarkRead,
 }) => {
@@ -38,7 +39,12 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
 
   const data = notification.data as NotificationData
   const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
-  const organization = project !== undefined ? getOrganization(project.organization_id) : undefined
+  const organization =
+    data.org_slug !== undefined
+      ? getOrganizationBySlug(data.org_slug)
+      : project !== undefined
+        ? getOrganizationById(project.organization_id)
+        : undefined
 
   const daysFromNow = dayjs().diff(dayjs(notification.inserted_at), 'day')
   const formattedTimeFromNow = dayjs(notification.inserted_at).fromNow()
@@ -65,7 +71,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   return (
     <div
       ref={ref}
-      className={clsx(
+      className={cn(
         `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t border-overlay' : '',
         status === 'new' ? 'bg-surface-100/50' : 'bg-background'

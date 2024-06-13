@@ -34,7 +34,7 @@ describe(`destructive query check`, () => {
     const match = checkDestructiveQuery(stripIndent`
       create policy "Users can delete their own files"
       on storage.objects for delete to authenticated using (
-        bucket id = 'files' and auth.uid () = owner
+        bucket id = 'files' and (select auth.uid()) = owner
       );
     `)
 

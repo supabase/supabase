@@ -1,4 +1,4 @@
-import { ResponseError } from '~/types/fetch'
+import type { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 

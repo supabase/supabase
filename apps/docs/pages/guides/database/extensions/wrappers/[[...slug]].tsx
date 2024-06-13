@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 import components from '~/components'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { getGuidesStaticPaths, getGuidesStaticProps } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -34,11 +35,11 @@ const pageMap = [
     remoteFile: 'airtable.md',
   },
   {
-    slug: 's3',
+    slug: 'auth0',
     meta: {
-      title: 'AWS S3',
+      title: 'Auth0',
     },
-    remoteFile: 's3.md',
+    remoteFile: 'auth0.md',
   },
   {
     slug: 'bigquery',
@@ -55,6 +56,13 @@ const pageMap = [
     remoteFile: 'clickhouse.md',
   },
   {
+    slug: 'cognito',
+    meta: {
+      title: 'AWS Cognito',
+    },
+    remoteFile: 'cognito.md',
+  },
+  {
     slug: 'firebase',
     meta: {
       title: 'Firebase',
@@ -67,6 +75,27 @@ const pageMap = [
       title: 'Logflare',
     },
     remoteFile: 'logflare.md',
+  },
+  {
+    slug: 'mssql',
+    meta: {
+      title: 'MSSQL',
+    },
+    remoteFile: 'mssql.md',
+  },
+  {
+    slug: 'redis',
+    meta: {
+      title: 'Redis',
+    },
+    remoteFile: 'redis.md',
+  },
+  {
+    slug: 's3',
+    meta: {
+      title: 'AWS S3',
+    },
+    remoteFile: 's3.md',
   },
   {
     slug: 'stripe',
@@ -83,7 +112,7 @@ export default function WrappersDocs({
   editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout meta={meta} editLink={editLink}>
+    <Layout meta={meta} editLink={editLink} menuId={MenuId.Database}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )

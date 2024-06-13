@@ -1,4 +1,4 @@
-import { OrgMetricsUsage } from 'data/usage/org-usage-query'
+import type { OrgMetricsUsage } from 'data/usage/org-usage-query'
 
 export const getResourcesExceededLimitsOrg = (usageMetrics: OrgMetricsUsage[]): string[] => {
   if (!usageMetrics.length) return []

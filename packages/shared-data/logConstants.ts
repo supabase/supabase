@@ -6,6 +6,8 @@ const schemas = [
       { path: 'id', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
       { path: 'event_message', type: 'string' },
+      { path: 'identifier', type: 'string' },
+      { path: 'metadata.load_balancer_redirect_identifier', type: 'string' },
       { path: 'metadata.request.cf.asOrganization', type: 'string' },
       { path: 'metadata.request.cf.asn', type: 'number' },
       { path: 'metadata.request.cf.botManagement.corporateProxy', type: 'boolean' },
@@ -181,6 +183,7 @@ const schemas = [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
+      { path: 'identifier', type: 'string' },
       { path: 'metadata.host', type: 'string' },
       { path: 'metadata.parsed.backend_type', type: 'string' },
       { path: 'metadata.parsed.command_tag', type: 'string' },
@@ -220,13 +223,14 @@ const schemas = [
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
+      { path: 'identifier', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.host', type: 'string' },
     ],
   },
   {
-    name: 'PgBouncer',
-    reference: 'pgbouncer_logs',
+    name: 'Supavisor',
+    reference: 'supavisor_logs',
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },

@@ -5,6 +5,7 @@ import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/python'
@@ -12,6 +13,7 @@ const libraryPath = '/python'
 export default function PyReference(props) {
   return (
     <RefSectionHandler
+      menuId={MenuId.RefPythonV2}
       sections={sections}
       spec={spec}
       typeSpec={typeSpec}

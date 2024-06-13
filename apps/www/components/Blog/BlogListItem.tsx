@@ -2,8 +2,8 @@ import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import Author from '~/types/author'
-import PostTypes from '~/types/post'
+import type Author from '~/types/author'
+import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
 
 interface Props {
@@ -54,7 +54,10 @@ const BlogListItem = ({ post }: Props) => {
             {post.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <p className="border border-muted py-1 px-2 rounded text-center w-auto capitalize">
+                  <p
+                    key={category}
+                    className="border border-muted py-1 px-2 rounded text-center w-auto capitalize"
+                  >
                     {category}
                   </p>
                 )

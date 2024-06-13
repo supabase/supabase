@@ -4,29 +4,23 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 import components from '~/components'
-import TableOfContents from '~/components/TableOfContents'
-import HomePageCover from '../components/HomePageCover'
+import HomePageCover from '~/components/HomePageCover'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { LayoutMainContent } from './DefaultLayout'
+import { MainSkeleton } from './MainSkeleton'
 
 interface Props {
   meta: {
     title: string
-    description?: string
-    hide_table_of_contents?: boolean
-    video?: string
     canonical?: string
+    description?: string
+    video?: string
   }
   children: any
-  toc?: any
-  menuItems: any
 }
 
 const HomeLayout: FC<Props> = (props: Props) => {
   const { asPath } = useRouter()
-
-  const hasTableOfContents =
-    props.toc !== undefined &&
-    props.toc.json.filter((item) => item.lvl !== 1 && item.lvl <= 3).length > 0
 
   return (
     <>
@@ -61,26 +55,18 @@ const HomeLayout: FC<Props> = (props: Props) => {
           },
         }}
       />
-      <article>
-        <HomePageCover meta={props.meta} />
-        <LayoutMainContent>
-          <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-            <div className="prose max-w-none">
-              <MDXProvider components={components}>{props.children}</MDXProvider>
+      <MainSkeleton menuId={MenuId.Home}>
+        <article>
+          <HomePageCover meta={props.meta} />
+          <LayoutMainContent>
+            <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
+              <div className="prose max-w-none">
+                <MDXProvider components={components}>{props.children}</MDXProvider>
+              </div>
             </div>
-          </div>
-          {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-            <div
-              className={[
-                'border-default bg-background table-of-contents-height border-l',
-                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-              ].join(' ')}
-            >
-              <TableOfContents toc={props.toc} video={props.meta.video} />
-            </div>
-          )}
-        </LayoutMainContent>
-      </article>
+          </LayoutMainContent>
+        </article>
+      </MainSkeleton>
     </>
   )
 }

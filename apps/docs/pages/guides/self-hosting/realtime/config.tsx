@@ -3,6 +3,7 @@ import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 
 import components from '~/components'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Param from '~/components/Params'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { getRealtimeConfigV0 } from '~/lib/mdx/getConfig'
@@ -27,6 +28,7 @@ export const Page = (props: InferGetStaticPropsType<typeof getStaticProps>) => (
   <Layout
     meta={meta}
     editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/analytics/config.tsx"
+    menuId={MenuId.SelfHosting}
   >
     <MDXRemote {...props.descriptionSource} components={components} />
 

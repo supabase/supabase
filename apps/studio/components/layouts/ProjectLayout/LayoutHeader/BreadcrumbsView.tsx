@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { Fragment } from 'react'
 
 interface BreadcrumbsViewProps {
@@ -44,4 +43,4 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
   )
 }
 
-export default observer(BreadcrumbsView)
+export default BreadcrumbsView

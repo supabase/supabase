@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { CalculatedColumn } from 'react-data-grid'
+import type { CalculatedColumn } from 'react-data-grid'
 import {
   Button,
   Divider,
@@ -12,6 +12,7 @@ import {
   IconLock,
   IconTrash,
   IconUnlock,
+  Separator,
 } from 'ui'
 
 import { useDispatch, useTrackedState } from '../../store'
@@ -92,7 +93,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         </DropdownMenuItem>
         {state.editable && onDeleteColumn !== undefined && (
           <>
-            <Divider light />
+            <Separator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
               <IconTrash size="tiny" stroke="red" />
               <p>Delete column</p>

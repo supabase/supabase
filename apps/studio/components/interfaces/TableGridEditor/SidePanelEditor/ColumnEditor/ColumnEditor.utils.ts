@@ -1,9 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { find, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -92,8 +92,8 @@ export const generateCreateColumnPayload = (
   const payload: CreateColumnPayload = {
     tableId,
     isIdentity,
-    name: field.name,
-    comment: field.comment,
+    name: field.name.trim(),
+    comment: field.comment?.trim(),
     type: field.isArray ? `${field.format}[]` : field.format,
     check: field.check?.trim() || undefined,
     isUnique: field.isUnique,

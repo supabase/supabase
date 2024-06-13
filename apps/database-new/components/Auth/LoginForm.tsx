@@ -10,8 +10,8 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
     'use server'
 
     const origin = headers().get('origin')
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+
+    const supabase = createClient()
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',

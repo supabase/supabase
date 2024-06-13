@@ -32,9 +32,7 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
 
 export default async function getFileNames(req: NextApiRequest, res: NextApiResponse) {
   const folderPath = path.join(process.cwd(), 'components/interfaces/Home/Connect/content')
-
   const filepaths = getFilePaths(folderPath)
-  console.log({ filepaths })
   res.statusCode = 200
   res.json(filepaths)
 }

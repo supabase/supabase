@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import { viewKeys } from 'data/views/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {
@@ -33,7 +33,7 @@ export async function deleteTable({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -55,7 +55,8 @@ export const useTableDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { id, projectRef, schema } = variables
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, schema, true)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, schema, false)),
           queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           // invalidate all views from this schema

@@ -3,4 +3,5 @@
 
 /apps/studio/ @supabase/Dashboard
 /apps/www/ @supabase/Website
+/apps/www/_blog
 /docker/ @supabase/cli

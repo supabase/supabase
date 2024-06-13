@@ -1,16 +1,10 @@
-import { useParams } from 'common'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
-import { Database } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
+
+import { useParams } from 'common'
+import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
+import type { Database } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
@@ -25,9 +19,9 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutateAsync: removeReadReplica } = useReadReplicaRemoveMutation({
+  const { mutate: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
-      toast.success(`Successfully removed read replica (ID: ${formattedId})`)
+      toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
       onCancel()
     },
@@ -37,38 +31,36 @@ const DropReplicaConfirmationModal = ({
     if (!projectRef) return console.error('Project is required')
     if (selectedReplica === undefined) return toast.error('No replica selected')
 
-    await removeReadReplica({ projectRef, identifier: selectedReplica.identifier })
+    removeReadReplica({
+      projectRef,
+      identifier: selectedReplica.identifier,
+      invalidateReplicaQueries: true,
+    })
   }
 
   return (
     <ConfirmationModal
-      danger
+      variant="destructive"
       size="medium"
+      loading={isRemoving}
       visible={selectedReplica !== undefined}
-      header={`Confirm to drop selected replica? (ID: ${formattedId})`}
-      buttonLabel="Drop replica"
-      buttonLoadingLabel="Dropping replica"
-      onSelectCancel={() => onCancel()}
-      onSelectConfirm={() => onConfirmRemove()}
+      title={`Confirm to drop selected replica? (ID: ${formattedId})`}
+      confirmLabel="Drop replica"
+      confirmLabelLoading="Dropping replica"
+      onCancel={() => onCancel()}
+      onConfirm={() => onConfirmRemove()}
+      alert={{
+        title: 'This action cannot be undone',
+        description: 'You may still deploy a new replica in this region thereafter',
+      }}
     >
-      <Modal.Content className="py-3">
-        <Alert_Shadcn_ variant="warning">
-          <IconAlertTriangle strokeWidth={2} />
-          <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            You may still deploy a new replica in this region thereafter
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-        <div className="text-sm px-1 pt-4">
-          <p>Before deleting this replica, consider:</p>
-          <ul className="text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down, especially if you have no other
-              replicas in this region
-            </li>
-          </ul>
-        </div>
-      </Modal.Content>
+      <p className="text-sm">Before deleting this replica, consider:</p>
+      <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+        <li>
+          Network traffic from this region may slow down, especially if you have no other replicas
+          in this region
+        </li>
+      </ul>
     </ConfirmationModal>
   )
 }

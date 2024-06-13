@@ -1,4 +1,4 @@
-import { Feature } from 'data/profile/types'
+import type { Feature } from 'data/profile/types'
 import { useProfile } from 'lib/profile'
 
 function checkFeature(feature: Feature, features?: Feature[]) {

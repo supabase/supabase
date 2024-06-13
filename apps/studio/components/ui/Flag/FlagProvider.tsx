@@ -1,4 +1,4 @@
-import { User } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { IS_PLATFORM } from 'lib/constants'

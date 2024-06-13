@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { ALL_TIMEZONES } from './PITR.constants'
-import { Time } from './PITR.types'
-import { ProjectSelectedAddon } from 'data/subscriptions/types'
+import type { Time } from './PITR.types'
+import type { ProjectSelectedAddon } from 'data/subscriptions/types'
 
 export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
   const pitrAddon = addons.find((addon) => addon.type === 'pitr')

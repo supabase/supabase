@@ -1,7 +1,7 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {
@@ -82,11 +82,13 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
           { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
           { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
+          { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
+          { key: EgressType.SUPAVISOR, name: 'Supavisor Egress', color: 'red' },
         ],
         name: 'Total Egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (egress) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+          'Contains any outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],

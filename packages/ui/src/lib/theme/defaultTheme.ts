@@ -431,6 +431,7 @@ export default {
       focus-visible:border-foreground-muted
       focus-visible:ring-background-control
       ${defaults.placeholder}
+      group
     `,
     variants: {
       standard: `
@@ -848,7 +849,7 @@ export default {
 
   sidepanel: {
     base: `
-      z-40
+      z-50
       bg-overlay
       flex flex-col
       fixed
@@ -901,7 +902,7 @@ export default {
       bg-border
     `,
     overlay: `
-      z-40
+      z-50
       fixed
       bg-alternative
       h-full w-full
@@ -1389,7 +1390,17 @@ export default {
     left-0 pl-3 flex
     items-center pointer-events-none
     text-foreground-light
+    [&_svg]:stroke-[1.5]
     `,
+    size: {
+      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
+      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
+      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+    },
   },
 
   // Icon

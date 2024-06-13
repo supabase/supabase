@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'

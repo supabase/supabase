@@ -1,24 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import dayjs, { Dayjs } from 'dayjs'
+import meanBy from 'lodash/meanBy'
+import sumBy from 'lodash/sumBy'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { Button } from 'ui'
+
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
 import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
 import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import dayjs, { Dayjs } from 'dayjs'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import sumBy from 'lodash/sumBy'
-import meanBy from 'lodash/meanBy'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-import { ChartIntervals, NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -281,4 +280,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

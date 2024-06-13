@@ -1,6 +1,6 @@
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { DataPoint } from 'data/analytics/constants'
-import { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'

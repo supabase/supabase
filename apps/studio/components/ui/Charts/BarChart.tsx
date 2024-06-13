@@ -1,14 +1,13 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
-import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis } from 'recharts'
-import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import { Bar, Cell, Legend, BarChart as RechartBarChart, Tooltip, XAxis } from 'recharts'
+
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
+import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import ChartNoData from './NoDataPlaceholder'
-dayjs.extend(utc)
+import NoDataPlaceholder from './NoDataPlaceholder'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -16,6 +15,9 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   customDateFormat?: string
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  emptyStateMessage?: string
+  showLegend?: boolean
+  xAxisIsDate?: boolean
 }
 
 const BarChart = ({
@@ -32,23 +34,47 @@ const BarChart = ({
   valuePrecision,
   className = '',
   size = 'normal',
+  emptyStateMessage,
   onBarClick,
+  showLegend = false,
+  xAxisIsDate = true,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData size={size} className={className} />
-
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-  const resolvedHighlightedLabel =
-    (focusDataIndex !== null &&
-      data &&
-      data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
-    highlightedLabel
+
+  function getHeaderLabel() {
+    if (!xAxisIsDate) {
+      if (!focusDataIndex) return highlightedLabel
+      return data[focusDataIndex]?.[xAxisKey]
+    }
+    return (
+      (focusDataIndex !== null &&
+        data &&
+        data[focusDataIndex] !== undefined &&
+        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      highlightedLabel
+    )
+  }
+
+  const resolvedHighlightedLabel = getHeaderLabel()
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
+
+  if (data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        message={emptyStateMessage}
+        description="It may take up to 24 hours for data to show"
+        size={size}
+        className={className}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>
@@ -87,6 +113,7 @@ const BarChart = ({
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
+          {showLegend && <Legend />}
           <XAxis
             dataKey={xAxisKey}
             interval={data.length - 2}
@@ -122,8 +149,14 @@ const BarChart = ({
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
-          <span>{day(data[0][xAxisKey]).format(customDateFormat)}</span>
-          <span>{day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
+          <span>
+            {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
+          </span>
+          <span>
+            {xAxisIsDate
+              ? day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)
+              : data[data?.length - 1]?.[xAxisKey]}
+          </span>
         </div>
       )}
     </div>

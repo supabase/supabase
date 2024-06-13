@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import ReportsMenu from './ReportsMenu'
 
 interface ReportsLayoutProps {
@@ -9,7 +9,7 @@ interface ReportsLayoutProps {
 
 const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps>) => {
   return (
-    <ProjectLayout title={title} product="Reports" productMenu={<ReportsMenu />}>
+    <ProjectLayout title={title} product="Reports" productMenu={<ReportsMenu />} isBlocking={false}>
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>

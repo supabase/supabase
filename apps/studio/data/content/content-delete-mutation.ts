@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
 type DeleteContentVariables = { projectRef: string; ids: string[] }
@@ -20,7 +20,7 @@ export async function deleteContents(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data.map((x) => x.id)
 }
 

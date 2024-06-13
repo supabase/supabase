@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
@@ -45,19 +45,26 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         ['policies'],
         []
       )
-      await Promise.all(
-        bucketPolicies.map((policy: any) =>
-          deletePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            id: policy.id,
-          })
-        )
-      )
 
-      toast.success(`Successfully deleted bucket ${bucket!.name}`)
-      router.push(`/project/${projectRef}/storage/buckets`)
-      onClose()
+      try {
+        await Promise.all(
+          bucketPolicies.map((policy: any) =>
+            deletePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              id: policy.id,
+            })
+          )
+        )
+
+        toast.success(`Successfully deleted bucket ${bucket?.name}`)
+        router.push(`/project/${projectRef}/storage/buckets`)
+        onClose()
+      } catch (error) {
+        toast.success(
+          `Successfully deleted bucket ${bucket?.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+        )
+      }
     },
   })
 
@@ -71,6 +78,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
 
   return (
     <TextConfirmModal
+      variant={'destructive'}
       visible={visible}
       title={`Confirm deletion of ${bucket?.name}`}
       confirmPlaceholder="Type in name of bucket"
@@ -80,12 +88,15 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
       loading={isDeleting}
       text={
         <>
-          Your bucket <span className="font-bold">{bucket?.name}</span> and all its contents will be
-          permanently deleted.
+          Your bucket <span className="font-bold text-foreground">{bucket?.name}</span> and all its
+          contents will be permanently deleted.
         </>
       }
-      alert="You cannot recover this bucket once it is deleted."
-      confirmLabel={`Delete bucket ${bucket?.name}`}
+      alert={{
+        title: 'You cannot recover this bucket once deleted.',
+        description: 'All bucket data will be lost.',
+      }}
+      confirmLabel="Delete bucket"
     />
   )
 }

@@ -1,3 +1,1 @@
-import ProjectList from './ProjectList'
-
-export default ProjectList
+export { default as ProjectList } from './ProjectList'

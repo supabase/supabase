@@ -1,10 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+
+import { IS_PLATFORM } from 'common'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { components } from 'data/api'
-import { useFlag } from 'hooks'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export type ReadReplicasVariables = {
   projectRef?: string
@@ -20,7 +20,7 @@ export async function getReadReplicas({ projectRef }: ReadReplicasVariables, sig
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -31,18 +31,11 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
   { projectRef }: ReadReplicasVariables,
   { enabled = true, ...options }: UseQueryOptions<ReadReplicasData, ReadReplicasError, TData> = {}
 ) => {
-  const readReplicasEnabled = useFlag('readReplicas')
-  const { data } = useProjectDetailQuery({ ref: projectRef })
-
   return useQuery<ReadReplicasData, ReadReplicasError, TData>(
     replicaKeys.list(projectRef),
     ({ signal }) => getReadReplicas({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        data?.is_read_replicas_enabled &&
-        readReplicasEnabled &&
-        typeof projectRef !== 'undefined',
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )

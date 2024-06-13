@@ -6,26 +6,33 @@ import {
 } from 'components/interfaces/Settings/General'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
 
-  // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-      <General />
-      {!isBranch ? (
-        <>
-          <CustomDomainConfig />
-          {projectTransferEnabled && <TransferProjectPanel />}
-          <DeleteProjectPanel />
-        </>
-      ) : null}
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Project Settings</ScaffoldTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        <General />
+        {!isBranch ? (
+          <>
+            <CustomDomainConfig />
+            {projectTransferEnabled && <TransferProjectPanel />}
+            <DeleteProjectPanel />
+          </>
+        ) : null}
+      </ScaffoldContainer>
+    </>
   )
 }
 

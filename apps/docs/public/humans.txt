@@ -15,26 +15,31 @@ Bruno Andrade
 Chandana Anumula
 Charis Lam
 Chase Granberry
+Chris Caruso
 Chris Copplestone
 Chris Gwilliams
 Dave Wilson
+Deji I
 Div Arora
 Divit D
 Egor Romanov
 Fabrizio Fenoglio
 Francesco Sansalvadore
 Greg Richardson
+Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
 Jess Shears
 Joel Lee
+John Pena
 Jon M
 Jonny Summers-Muir
 Jordi Enric
 Joshen Lim
 Kamil Ogórek
 Kang Ming Tay
+Karan S
 Karlo Ison
 Kevin Brolly
 Kevin Grüneberg
@@ -45,16 +50,18 @@ Margarita Sandomirskaia
 Marijana Pavlinić
 Mark Burggraf
 Monica El Khoury
-Nikita Kotlyarov
 Oli R
 Pamela Chia
+Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Peter Lyn
 Qiao Han
 Raminder Singh
 Rodrigo Mansueli
 Rory Wilding
+Sam Rose
 Sreyas Udayavarman
 Stanislav M
 Steve Chavez
@@ -88,5 +95,6 @@ Supabase would not be possible without the work of some other amazing open sourc
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
 - Phoenix - https://www.phoenixframework.org/
 - GoTrue - https://github.com/netlify/gotrue

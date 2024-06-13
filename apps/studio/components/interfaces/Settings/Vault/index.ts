@@ -1,6 +1,4 @@
-import VaultToggle from './VaultToggle'
-import SecretsManagement from './Secrets/SecretsManagement'
-import EncryptionKeySelector from './Keys/EncryptionKeySelector'
-import EncryptionKeysManagement from './Keys/EncryptionKeysManagement'
-
-export { VaultToggle, SecretsManagement, EncryptionKeySelector, EncryptionKeysManagement }
+export { default as VaultToggle } from './VaultToggle'
+export { default as SecretsManagement } from './Secrets/SecretsManagement'
+export { default as EncryptionKeySelector } from './Keys/EncryptionKeySelector'
+export { default as EncryptionKeysManagement } from './Keys/EncryptionKeysManagement'

@@ -89,7 +89,7 @@ async function generate() {
               <url>
                   <loc>${`https://supabase.com${route}`}</loc>
                   <changefreq>weekly</changefreq>
-                  <changefreq>0.5</changefreq>
+                  <priority>0.5</priority>
               </url>
             `
           })

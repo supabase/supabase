@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -18,10 +18,17 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 export default function IndexPage() {
   const router = useRouter()
   const { asPath } = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMounted(true)
+    }, 200)
+  }, [])
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -118,14 +125,16 @@ export default function IndexPage() {
         <PricingFAQs />
       </div>
       <CTABanner />
-      <ReactTooltip
-        wrapper="span"
-        effect="solid"
-        backgroundColor="hsl(var(--background-alternative-default))"
-        textColor="hsl(var(--foreground-light))"
-        className="!max-w-[320px] !px-3 whitespace-pre-line"
-        uuid="pricingtt"
-      />
+      {mounted && (
+        <ReactTooltip
+          wrapper="span"
+          effect="solid"
+          backgroundColor="hsl(var(--background-alternative-default))"
+          textColor="hsl(var(--foreground-light))"
+          className="!max-w-[320px] !px-3 whitespace-pre-line"
+          uuid="pricing-tt"
+        />
+      )}
     </DefaultLayout>
   )
 }

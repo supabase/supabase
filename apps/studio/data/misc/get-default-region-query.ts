@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { getDistanceLatLonKM } from 'lib/helpers'
@@ -8,12 +8,12 @@ import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
+import { AWS_REGIONS, CloudProvider, FLY_REGIONS } from 'lib/constants'
 
 const RESTRICTED_POOL = ['WEST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
 
 export type DefaultRegionVariables = {
-  cloudProvider?: 'AWS' | 'FLY'
+  cloudProvider?: CloudProvider
   useRestrictedPool?: boolean
 }
 

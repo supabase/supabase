@@ -90,6 +90,8 @@ Sensitive information like access tokens and keys are encrypted at the applicati
 
 Members of organizations in Supabase can be granted access to specific resources.
 
+Read more about [fine grained access controls](/docs/guides/platform/access-control) including Read-Only and Billing-Only access.
+
 </Section>
 
 <Section icon={<RewindIcon strokeWidth={1}/>}>
@@ -119,6 +121,16 @@ Stripe is a certified PCI Service Provider Level 1, which is the highest level 
 Supabase works with industry experts to conduct regular penetration tests.
 
 In addition to internal security reviews, we use various tools to scan our code for vulnerabilities including [GitHub](https://github.com), [Vanta](https://www.vanta.com/), and [Snyk](https://snyk.io/).
+
+</Section>
+
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### DDoS Protection
+
+Supabase combats Distributed Denial of Service attacks in several ways to mitigate resource abuse and prevent runaway bills.
+
+In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](https://github.com/fail2ban/fail2ban) to prevent brute force logins. Users can [customize rate limits](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention) for critical API routes and set [spend caps](/docs/guides/platform/spend-cap) to prevent surprise bills.
 
 </Section>
 

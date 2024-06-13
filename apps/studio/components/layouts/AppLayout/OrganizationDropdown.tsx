@@ -47,7 +47,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   }
 
   return (
-    <div className="flex items-center px-2">
+    <div className="flex items-center px-2 py-1">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <div className="flex items-center space-x-2 cursor-pointer">
@@ -60,7 +60,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
             >
               <div className="flex items-center space-x-2">
                 <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
+                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
           </div>

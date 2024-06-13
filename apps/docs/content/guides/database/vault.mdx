@@ -79,7 +79,7 @@ updated_at  | 2022-12-14 02:34:23.85159+00
 
 </details>
 
-Alternatively, you can create a secret by `insert`ing data into the `vault.secret` table:
+Alternatively, you can create a secret by inserting data into the `vault.secret` table:
 
 {/* prettier-ignore */}
 ```sql
@@ -206,11 +206,11 @@ updated_at       | 2022-12-14 02:51:13.938396+00
   ></iframe>
 </div>
 
-As we mentioned, the Vault uses pgsodium's Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.
+As we mentioned, the Vault uses `pgsodium`'s Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.
 
 ### Authenticated encryption with associated data
 
-The first important feature of TCE is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on libsodium).
+The first important feature of TCE is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on `libsodium`).
 
 ### Encryption key location
 
@@ -218,7 +218,7 @@ The first important feature of TCE is that it uses an [Authenticated Encryption 
 
 **Associated Data** means that you can include any other columns from the same row as part of the signature computation. This doesn't encrypt those other columns - rather it ensures that your encrypted value is only associated with columns from that row. If an attacker were to copy an encrypted value from another row to the current one, the signature would be rejected (assuming you used a unique column in the associated data).
 
-Another important feature of pgsodium is that the encryption keys are never stored in the database alongside the encrypted data. Instead, only a **Key ID** is stored, which is a reference to the key that is only accessible outside of SQL. Even if an attacker can capture a dump of your entire database, they will see only encrypted data and key IDs, _never the raw key itself_.
+Another important feature of `pgsodium` is that the encryption keys are never stored in the database alongside the encrypted data. Instead, only a **Key ID** is stored, which is a reference to the key that is only accessible outside of SQL. Even if an attacker can capture a dump of your entire database, they will see only encrypted data and key IDs, _never the raw key itself_.
 
 This is an important safety precaution - there is little value in storing the encryption key in the database itself as this would be like locking your front door but leaving the key in the lock! Storing the key outside the database fixes this issue.
 

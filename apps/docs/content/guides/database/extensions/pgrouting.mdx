@@ -4,7 +4,7 @@ title: 'pgrouting: Geospatial Routing'
 description: 'Extends PostGIS with Geospatial Routing'
 ---
 
-[pgRouting](http://pgrouting.org) is PostgreSQL and [PostGIS](http://postgis.net) extension adding geospatial routing functionality.
+[`pgRouting`](http://pgrouting.org) is PostgreSQL and [PostGIS](http://postgis.net) extension adding geospatial routing functionality.
 
 The core functionality of `pgRouting` is a set of path finding algorithms including:
 
@@ -33,7 +33,7 @@ The core functionality of `pgRouting` is a set of path finding algorithms includ
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgrouting" and enable the extension.
+3. Search for `pgrouting` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -47,7 +47,7 @@ create extension pgrouting cascade;
 drop extension if exists pgRouting;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 </TabPanel>
@@ -55,9 +55,9 @@ To disable an extension you can call `drop extension`.
 
 ## Example
 
-As an example, we'll solve the [traveling salesman problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the pgRouting's `pgr_TSPeuclidean` function from some PostGIS coordinates.
+As an example, we'll solve the [traveling salesperson problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the `pgRouting`'s `pgr_TSPeuclidean` function from some PostGIS coordinates.
 
-A summary of the traveling salesman problem is, given a set of city coordinates, solve for a path that goes through each city and minimizes the total distance traveled.
+A summary of the traveling salesperson problem is, given a set of city coordinates, solve for a path that goes through each city and minimizes the total distance traveled.
 
 First we populate a table with some X, Y coordinates
 

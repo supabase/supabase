@@ -123,9 +123,20 @@ npm update supabase --save-dev
 </TabPanel>
 </Tabs>
 
-If you have any Supabase containers running locally, remember to restart them after upgrading to use the new features.
+If you have any Supabase containers running locally, stop them and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
 
-```bash
+<Admonition type="tip" label="Logical backup">
+
+Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
+
+```sh
+supabase db diff my_schema
+supabase db dump --local --data-only > supabase/seed.sql
+```
+
+</Admonition>
+
+```sh
 supabase stop --no-backup
 supabase start
 ```

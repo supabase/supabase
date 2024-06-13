@@ -2,8 +2,9 @@ import { PostgresTable } from '@/lib/types'
 import dagre from '@dagrejs/dagre'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
+import { TableNodeData } from 'ui-patterns/SchemaTableNode'
+
 import { NODE_ROW_HEIGHT, NODE_WIDTH } from './SchemaFlow.constants'
-import { TableNodeData } from './TableNode'
 
 export async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
   nodes: Node<TableNodeData>[]

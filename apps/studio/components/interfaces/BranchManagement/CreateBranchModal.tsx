@@ -4,6 +4,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,15 +30,6 @@ import {
   Input_Shadcn_,
   Modal,
 } from 'ui'
-import * as z from 'zod'
-
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -51,13 +51,13 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isSuccess: isSuccessIntegrations,
-    isError: isErrorIntegrations,
-  } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({
+    organizationId: selectedOrg?.id,
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
@@ -73,17 +73,10 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     },
   })
 
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.connections.some(
-        (connection) => connection.supabase_project_ref === projectDetails?.parentRef
-      )
+  const githubConnection = connections?.find(
+    (connection) => connection.project.ref === projectDetails?.parentRef
   )
-  const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === projectDetails?.parentRef
-  )
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
+  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const formId = 'create-branch-form'
   const FormSchema = z.object({
@@ -98,10 +91,10 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
       if (val.length > 0) {
         try {
+          if (!githubConnection?.id) throw new Error('No GitHub connection found')
+
           await checkGithubBranchValidity({
-            organizationIntegrationId: githubIntegration?.id,
-            repoOwner,
-            repoName,
+            connectionId: githubConnection.id,
             branchName: val,
           })
           setIsValid(true)
@@ -147,27 +140,26 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
         <Modal
           hideFooter
           size="medium"
-          modal={false}
           visible={visible}
           onCancel={onClose}
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="pt-3 pb-1">
-            {isLoadingIntegrations && <GenericSkeletonLoader />}
-            {isErrorIntegrations && (
+          <Modal.Content className="">
+            {isLoadingConnections && <GenericSkeletonLoader />}
+            {isErrorConnections && (
               <AlertError
-                error={integrationsError}
+                error={connectionsError}
                 subject="Failed to retrieve Github repository information"
               />
             )}
-            {isSuccessIntegrations && (
+            {isSuccessConnections && (
               <div>
                 <p className="text-sm text-foreground-light">
                   Your project is currently connected to the repository:
                 </p>
                 <div className="flex items-center space-x-2">
-                  <p>{githubConnection?.metadata.name}</p>
+                  <p>{githubConnection?.repository.name}</p>
                   <Link
                     href={`https://github.com/${repoOwner}/${repoName}`}
                     target="_blank"
@@ -182,7 +174,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Separator />
 
-          <Modal.Content className="pt-1 pb-3 space-y-3">
+          <Modal.Content className="space-y-3">
             <p className="text-sm">
               Choose a Git Branch to base your Preview Branch on. Any migration changes added to
               this Git Branch will be run on this new Preview Branch.
@@ -227,21 +219,19 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
           <Modal.Separator />
 
-          <Modal.Content>
-            <div className="flex items-center justify-end space-x-2 py-2 pb-4">
-              <Button disabled={isCreating} type="default" onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button
-                form={formId}
-                disabled={isCreating || !canSubmit}
-                loading={isCreating}
-                type="primary"
-                htmlType="submit"
-              >
-                Create Preview branch
-              </Button>
-            </div>
+          <Modal.Content className="flex items-center justify-end space-x-2">
+            <Button disabled={isCreating} type="default" onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              disabled={isCreating || !canSubmit}
+              loading={isCreating}
+              type="primary"
+              htmlType="submit"
+            >
+              Create Preview branch
+            </Button>
           </Modal.Content>
         </Modal>
       </form>

@@ -1,4 +1,4 @@
-import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
+import type { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
 
 import {
   ConnectTabs,

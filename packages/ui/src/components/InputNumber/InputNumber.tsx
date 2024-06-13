@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 
 // import { IconChevronDown } from '../Icon/icons/IconChevronDown'
@@ -24,6 +26,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ with type="number" instead or ./ui-patterns/data-inputs/input with type="number"
+ */
 function InputNumber({
   defaultValue,
   descriptionText,
@@ -146,6 +151,7 @@ function InputNumber({
       >
         <div className={__styles.container}>
           <input
+            data-size={size}
             id={id}
             name={name}
             onChange={onInputChange}
@@ -172,7 +178,7 @@ function InputNumber({
               }}
             />
           </div> */}
-          {icon && <InputIconContainer icon={icon} />}
+          {icon && <InputIconContainer size={size} icon={icon} />}
           {error || actions ? (
             <div className={__styles.actions_container}>
               {error && <InputErrorIcon size={size} />}

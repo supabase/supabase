@@ -1,5 +1,26 @@
 import { CalculatedColumn } from 'react-data-grid'
-import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
+
+import {
+  BooleanEditor,
+  DateEditor,
+  DateTimeEditor,
+  DateTimeWithTimezoneEditor,
+  JsonEditor,
+  NumberEditor,
+  SelectEditor,
+  TextEditor,
+  TimeEditor,
+  TimeWithTimezoneEditor,
+} from 'components/grid/components/editor'
+import {
+  BooleanFormatter,
+  DefaultFormatter,
+  ForeignKeyFormatter,
+  JsonFormatter,
+} from 'components/grid/components/formatter'
+import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
@@ -13,26 +34,6 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
-import {
-  BooleanEditor,
-  DateEditor,
-  DateTimeEditor,
-  DateTimeWithTimezoneEditor,
-  JsonEditor,
-  NumberEditor,
-  SelectEditor,
-  TextEditor,
-  TimeEditor,
-  TimeWithTimezoneEditor,
-} from 'components/grid/components/editor'
-import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
-import {
-  BooleanFormatter,
-  DefaultFormatter,
-  ForeignKeyFormatter,
-  JsonFormatter,
-} from 'components/grid/components/formatter'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 

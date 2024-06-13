@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { AnalyticsData } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
@@ -10,6 +11,8 @@ export enum EgressType {
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
+  FUNCTIONS = 'egress_functions',
+  SUPAVISOR = 'egress_supavisor',
   UNIFIED = 'egress',
 }
 

@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import toast from 'react-hot-toast'
 import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -13,7 +13,6 @@ export type CreateUserModalProps = {
 }
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
@@ -41,29 +40,21 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
     async onSuccess(res) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created user: ${res.email}`,
-      })
+      toast.success(`Successfully created user: ${res.email}`)
       setVisible(false)
     },
   })
 
   const onCreateUser = async (values: any) => {
     if (!isSuccess) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to create user: Error loading project config`,
-      })
+      return toast.error(`Failed to create user: Error loading project config`)
     }
-
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
     createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="small"
       key="create-user-modal"
@@ -80,56 +71,53 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
       >
         {() => (
           <Loading active={isLoading}>
-            <div className="space-y-6 py-4">
-              <Modal.Content>
-                <div className="space-y-4">
-                  <Input
-                    id="email"
-                    autoComplete="off"
-                    label="User Email"
-                    icon={<IconMail />}
-                    type="email"
-                    name="email"
-                    placeholder="user@example.com"
-                    disabled={isCreatingUser || isLoading}
-                  />
+            <Modal.Content className="space-y-4">
+              <Input
+                id="email"
+                autoComplete="off"
+                label="User Email"
+                icon={<IconMail />}
+                type="email"
+                name="email"
+                placeholder="user@example.com"
+                disabled={isCreatingUser || isLoading}
+              />
 
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    label="User Password"
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    icon={<IconLock />}
-                    disabled={isCreatingUser || isLoading}
-                    autoComplete="new-password"
-                  />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                label="User Password"
+                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                icon={<IconLock />}
+                disabled={isCreatingUser || isLoading}
+                autoComplete="new-password"
+              />
 
-                  <Checkbox
-                    value="true"
-                    id="autoConfirmUser"
-                    name="autoConfirmUser"
-                    label="Auto Confirm User?"
-                    size="medium"
-                    description="Creates the user without sending them a confirmation email"
-                    defaultChecked={true}
-                    disabled={isCreatingUser || isLoading}
-                  />
-                </div>
-              </Modal.Content>
-
-              <Modal.Content>
-                <Button
-                  block
-                  size="small"
-                  htmlType="submit"
-                  loading={isCreatingUser}
-                  disabled={!canCreateUsers || isCreatingUser || isLoading}
-                >
-                  Create user
-                </Button>
-              </Modal.Content>
-            </div>
+              <Checkbox
+                value="true"
+                id="autoConfirmUser"
+                name="autoConfirmUser"
+                label="Auto Confirm User?"
+                size="medium"
+                disabled={isCreatingUser || isLoading}
+              />
+              <p className="text-sm text-foreground-lighter">
+                A confirmation email will not be sent when creating a user via this form.
+              </p>
+            </Modal.Content>
+            <Modal.Separator />
+            <Modal.Content>
+              <Button
+                block
+                size="small"
+                htmlType="submit"
+                loading={isCreatingUser}
+                disabled={!canCreateUsers || isCreatingUser || isLoading}
+              >
+                Create user
+              </Button>
+            </Modal.Content>
           </Loading>
         )}
       </Form>
@@ -137,4 +125,4 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   )
 }
 
-export default observer(CreateUserModal)
+export default CreateUserModal

@@ -10,11 +10,25 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
   : ''
 const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
-const GOTRUE_URL = process.env.NEXT_PUBLIC_API_URL
+const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
   : ''
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
+
+// construct the URL for the Websocket Local URLs
+let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
+if (SUPABASE_URL) {
+  const url = new URL(SUPABASE_URL)
+  const wsUrl = `${url.hostname}:${url.port}`
+  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
+}
+
+// Needed to test docs search in local dev
+const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+  : ''
+
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -37,7 +51,7 @@ const VERCEL_LIVE_URL = 'https://vercel.live'
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
 const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
 const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL}`
@@ -49,7 +63,7 @@ const csp = [
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
@@ -84,9 +98,7 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: 'standalone',
   experimental: {
-    // [Kevin] Next polyfills Node modules like Crypto by default, blowing up the bundle size. We use generate-password-browser (safe to use in browser) and the polyfills are not needed for us
-    // Revisit on Next 14 upgrade (PR #19909)
-    fallbackNodePolyfills: false,
+    webpackBuildWorker: true,
   },
   async redirects() {
     return [
@@ -175,6 +187,11 @@ const nextConfig = {
       {
         source: '/project/:ref/database',
         destination: '/project/:ref/database/tables',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/database/replication',
+        destination: '/project/:ref/database/publications',
         permanent: true,
       },
       {
@@ -335,6 +352,36 @@ const nextConfig = {
         destination: '/project/:ref/sql/new',
         permanent: true,
       },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/linter',
+        destination: '/project/:ref/database/linter',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/database/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/auth/column-privileges',
+        destination: '/project/:ref/database/column-privileges',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/linter',
+        destination: '/project/:ref/database/security-advisor',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/security-advisor',
+        destination: '/project/:ref/advisors/security',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/performance-advisor',
+        destination: '/project/:ref/advisors/performance',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -362,7 +409,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: csp,
+            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
@@ -390,7 +437,15 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'libpg-query',
+  ],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)

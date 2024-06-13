@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { subscriptionKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -18,7 +18,7 @@ export async function getOrgSubscription(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

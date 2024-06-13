@@ -36,7 +36,7 @@ drop
   extension pgtap;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension call `drop extension`.
 
 </TabPanel>
@@ -48,7 +48,7 @@ Most extensions are installed under the `extensions` schema, which is accessible
 
 If you need to restrict user access to tables managed by extensions, we recommend creating a separate schema for installing that specific extension.
 
-Some extensions can only be created under a specific schema, for eg. `postgis_tiger_geocoder` extension creates a schema named `tiger`. Before enabling such extensions, make sure you have not created a conflicting schema with the same name.
+Some extensions can only be created under a specific schema, for example, `postgis_tiger_geocoder` extension creates a schema named `tiger`. Before enabling such extensions, make sure you have not created a conflicting schema with the same name.
 
 In addition to the pre-configured extensions, you can also install your own SQL extensions directly in the database using Supabase's SQL editor. The SQL code for the extensions, including plpgsql extensions, can be added through the SQL editor.
 

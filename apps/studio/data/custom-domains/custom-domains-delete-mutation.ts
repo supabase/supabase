@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { del } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
+
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {
@@ -15,7 +16,7 @@ export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVaria
     },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -1,5 +1,4 @@
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
 import HookList from './HookList'
@@ -57,4 +56,4 @@ const SchemaTable = ({
   )
 }
 
-export default observer(SchemaTable)
+export default SchemaTable

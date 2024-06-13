@@ -1,5 +1,5 @@
-import { Integration } from 'data/integrations/integrations.types'
-import { SupaResponse } from 'types'
+import type { Integration } from 'data/integrations/integrations.types'
+import type { SupaResponse } from 'types'
 import { isResponseOk } from './common/fetch'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {

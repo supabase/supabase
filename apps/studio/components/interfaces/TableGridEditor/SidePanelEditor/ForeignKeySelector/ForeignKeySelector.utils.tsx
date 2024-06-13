@@ -2,9 +2,9 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { IconHelpCircle } from 'ui'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
-import { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKey } from './ForeignKeySelector.types'
 
 export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
   return fks.map((x) => {

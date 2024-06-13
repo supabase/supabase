@@ -1,3 +1,1 @@
-import LayoutHeader from './LayoutHeader'
-
-export default LayoutHeader
+export { default as LayoutHeader } from './LayoutHeader'

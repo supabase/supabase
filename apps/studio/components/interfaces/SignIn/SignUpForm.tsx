@@ -1,20 +1,32 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { CheckCircle } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
+import toast from 'react-hot-toast'
 import * as yup from 'yup'
+import * as Sentry from '@sentry/nextjs'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconEye,
+  IconEyeOff,
+  Input,
+} from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+
+const WHITELIST_ERRORS = ['A user with this email already exists']
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
 })
 
 const SignUpForm = () => {
-  const { ui } = useStore()
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -23,19 +35,17 @@ const SignUpForm = () => {
 
   const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Signed up successfully!`,
-      })
+      toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
     },
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to sign up: ${error.message}`,
-      })
+      toast.error(`Failed to sign up: ${error.message}`)
+
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign up: ' + error.message)
+      }
     },
   })
 
@@ -65,10 +75,14 @@ const SignUpForm = () => {
           isSubmitted ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <Alert className="w-full" withIcon variant="success" title="Check your email to confirm">
-          You've successfully signed up. Please check your email to confirm your account before
-          signing in to the Supabase dashboard
-        </Alert>
+        <Alert_Shadcn_ variant="default">
+          <CheckCircle />
+          <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_ className="text-xs">
+            You've successfully signed up. Please check your email to confirm your account before
+            signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       </div>
       <Form
         validateOnBlur

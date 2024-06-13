@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 
 interface DeleteTriggerProps {
@@ -37,6 +37,7 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
 
   return (
     <TextConfirmModal
+      variant={'warning'}
       visible={visible}
       onCancel={() => setVisible(!visible)}
       onConfirm={handleDelete}
@@ -45,8 +46,16 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
       confirmLabel={`Delete trigger ${name}`}
       confirmPlaceholder="Type in name of trigger"
       confirmString={name}
-      text={`This will delete your trigger called ${name} of schema ${schema}.`}
-      alert="You cannot recover this trigger once it is deleted!"
+      text={
+        <>
+          This will delete your trigger called{' '}
+          <span className="text-bold text-foreground">{name}</span> of schema{' '}
+          <span className="text-bold text-foreground">{schema}</span>
+        </>
+      }
+      alert={{
+        title: 'You cannot recover this trigger once deleted.',
+      }}
     />
   )
 }

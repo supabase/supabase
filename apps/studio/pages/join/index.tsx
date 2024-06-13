@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useOrganizationJoinDeclineMutation } from 'data/organizations/organization-join-decline-mutation'
@@ -10,14 +11,12 @@ import {
   TokenInfo,
   validateTokenInformation,
 } from 'data/organizations/organization-join-token-validation-query'
-import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 
 const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = useParams()
-  const { ui } = useStore()
   const { profile } = useProfile()
   const signOut = useSignOut()
 
@@ -25,8 +24,14 @@ const JoinOrganizationPage = () => {
   const [error, setError] = useState<any>()
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
-  const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
-    tokenValidationInfo || {}
+  const {
+    token_does_not_exist,
+    sso_mismatch,
+    email_match,
+    expired_token,
+    organization_name,
+    invite_id,
+  } = tokenValidationInfo || {}
 
   const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
@@ -36,11 +41,7 @@ const JoinOrganizationPage = () => {
       router.push('/')
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to join organization: ${error.message}`,
-      })
+      toast.error(`Failed to join organization: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -51,11 +52,7 @@ const JoinOrganizationPage = () => {
       router.push('/')
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to decline invitation: ${error.message}`,
-      })
+      toast.error(`Failed to decline invitation: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -102,6 +99,7 @@ const JoinOrganizationPage = () => {
 
   const isError =
     error ||
+    !!(tokenInfoLoaded && sso_mismatch) ||
     !!(tokenInfoLoaded && token_does_not_exist) ||
     (tokenInfoLoaded && !email_match) ||
     (tokenInfoLoaded && expired_token)
@@ -120,6 +118,14 @@ const JoinOrganizationPage = () => {
 
     const message = error ? (
       <p>There was an error requesting details for this invitation. ({error.message})</p>
+    ) : sso_mismatch ? (
+      <>
+        <p>SSO providers do not match.</p>
+        <p className="text-foreground-lighter">
+          This invitation comes from a different identity provider than the one you are currently
+          logged in with. Please use the same SSO provider instead.
+        </p>
+      </>
     ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>

@@ -1,4 +1,4 @@
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
 

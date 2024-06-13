@@ -1,17 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
-
 import { useParams } from 'common'
-import { components } from 'data/api'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
+
+import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import { Provider } from './AuthProvidersForm.types'
+import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
 export interface ProviderFormProps {
@@ -20,7 +22,6 @@ export interface ProviderFormProps {
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const { ui } = useStore()
   const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -28,7 +29,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
+  const { data: settings } = useProjectApiQuery({ projectRef })
+  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -87,7 +92,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          toast.success('Successfully updated settings')
         },
       }
     )
@@ -176,7 +181,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         value={
                           customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${projectRef}.supabase.co/auth/v1/callback`
+                            : `${apiUrl}/auth/v1/callback`
                         }
                         descriptionText={
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>

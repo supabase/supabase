@@ -55,7 +55,7 @@ function TwitterSocialProof() {
         >
           {showButton && (
             <div
-              className={`absolute bottom-0 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-background via-background`}
+              className={`absolute bottom-0 left-0 z-10 w-full h-[400px] bg-gradient-to-t from-background via-background`}
             />
           )}
           {tweets.map((tweet: any, i: number) => (

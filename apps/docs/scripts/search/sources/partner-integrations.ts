@@ -2,7 +2,7 @@ import { type SupabaseClient, createClient } from '@supabase/supabase-js'
 import { upperFirst } from 'lodash'
 
 import { BaseLoader, BaseSource } from './base'
-import { processMdxForSearch } from './markdown'
+import { processMdx } from '../../helpers.mdx'
 
 type PartnerData = {
   slug: string // The partner slug corresponding to the last part of the URL
@@ -59,7 +59,7 @@ export class IntegrationSource extends BaseSource {
   }
 
   process() {
-    const { checksum, sections } = processMdxForSearch(this.partnerData.overview)
+    const { checksum, sections } = processMdx(this.partnerData.overview)
     const meta = {
       title: upperFirst(this.partnerData.slug),
       subtitle: 'Integration',

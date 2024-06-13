@@ -1,33 +1,52 @@
 import dagre from '@dagrejs/dagre'
+import { groupBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 
+import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { Database } from 'data/read-replicas/replicas-query'
 import {
   AVAILABLE_REPLICA_REGIONS,
   NODE_ROW_HEIGHT,
   NODE_SEP,
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
-import { groupBy } from 'lodash'
-import { Database } from 'data/read-replicas/replicas-query'
 
-export const generateNodes = (
-  primary: Database,
-  replicas: Database[],
-  {
-    onSelectRestartReplica,
-    onSelectResizeReplica,
-    onSelectDropReplica,
-  }: {
-    onSelectRestartReplica: (database: Database) => void
-    onSelectResizeReplica: (database: Database) => void
-    onSelectDropReplica: (database: Database) => void
-  }
-): Node[] => {
+// [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
+// Will need to change if this eventually becomes otherwise
+
+export const generateNodes = ({
+  primary,
+  replicas,
+  loadBalancers,
+  onSelectRestartReplica,
+  onSelectDropReplica,
+}: {
+  primary: Database
+  replicas: Database[]
+  loadBalancers: LoadBalancer[]
+  onSelectRestartReplica: (database: Database) => void
+  onSelectDropReplica: (database: Database) => void
+}): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
     return region?.key
   })
+
+  const loadBalancer = loadBalancers.find((x) =>
+    x.databases.some((db) => db.identifier === primary.identifier)
+  )
+  const loadBalancerNode: Node | undefined =
+    loadBalancer !== undefined
+      ? {
+          position,
+          id: 'load-balancer',
+          type: 'LOAD_BALANCER',
+          data: {
+            numDatabases: loadBalancer.databases.length,
+          },
+        }
+      : undefined
 
   const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
     primary.region.includes(region.region)
@@ -38,13 +57,17 @@ export const generateNodes = (
     type: 'PRIMARY',
     data: {
       id: primary.identifier,
-      region: primaryRegion,
+      region:
+        primary.cloud_provider === 'FLY'
+          ? { name: 'Singapore (sin)', key: 'SOUTHEAST_ASIA' }
+          : primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,
       status: primary.status,
       numReplicas: replicas.length,
       numRegions: Object.keys(regions).length,
+      hasLoadBalancer: loadBalancer !== undefined,
     },
   }
 
@@ -67,23 +90,29 @@ export const generateNodes = (
           computeSize: database.size,
           status: database.status,
           onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectResizeReplica: () => onSelectResizeReplica(database),
           onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
 
-  return [primaryNode, ...replicaNodes]
+  return [
+    ...(loadBalancerNode !== undefined ? [loadBalancerNode] : []),
+    primaryNode,
+    ...replicaNodes,
+  ]
 }
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 200, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
 
-  nodes.forEach((node) =>
-    dagreGraph.setNode(node.id, { width: NODE_WIDTH / 2, height: NODE_ROW_HEIGHT / 2 })
-  )
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, {
+      width: NODE_WIDTH / 2,
+      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+    })
+  })
 
   edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target))
 
@@ -140,4 +169,12 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   })
 
   return { nodes: [...regionNodes, ...nodes], edges }
+}
+
+export const formatSeconds = (value: number) => {
+  const hours = ~~(value / 3600)
+  const minutes = Math.floor((value % 3600) / 60)
+  const seconds = Math.floor(value % 60)
+
+  return `${hours > 0 ? `${hours}h` : ''} ${minutes > 0 ? `${minutes}m` : ''} ${seconds > 0 ? `${seconds}s` : ''}`.trim()
 }
