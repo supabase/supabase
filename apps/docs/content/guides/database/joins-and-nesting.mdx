@@ -364,6 +364,11 @@ const { data, error } = await supabase.from('shifts').select(
       id,
       user_id,
       badge_scan_time
+    ),
+   scans:scan_id_end (
+     id, 
+     user_id,
+     badge_scan_time
     )
   `
 )
@@ -376,6 +381,11 @@ const { data, error } = await supabase.from('shifts').select(
 final data = await supabase.from('shifts').select('''
   *,
   scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+scans:scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -422,7 +432,12 @@ let shifts: [Shift] = try await supabase
         id,
         user_id,
         badge_scan_time
-      )
+      ),
+     scans: scan_id_end (
+        id,
+        user_id,
+        badge_scan_time
+     )
     """
   )
   .execute()
@@ -431,3 +446,5 @@ let shifts: [Shift] = try await supabase
 
 </TabPanel>
 </Tabs>
+
+
