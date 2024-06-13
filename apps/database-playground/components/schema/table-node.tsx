@@ -1,7 +1,14 @@
 import { AnimatePresence, m } from 'framer-motion'
 import { DiamondIcon, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import { useState } from 'react'
-import { Handle, NodeProps, useUpdateNodeInternals } from 'reactflow'
+import {
+  EdgeProps,
+  Handle,
+  NodeProps,
+  Position,
+  getSmoothStepPath,
+  useUpdateNodeInternals,
+} from 'reactflow'
 import { cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
@@ -33,6 +40,9 @@ const inOutTop = {
   },
 }
 
+/**
+ * Custom node to display database tables.
+ */
 export const TableNode = ({
   id,
   data,
@@ -256,5 +266,62 @@ export const TableNode = ({
         </m.div>
       ))}
     </m.div>
+  )
+}
+
+/**
+ * Custom edge that animates its path length.
+ */
+export function TableEdge({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  style,
+  sourcePosition = Position.Bottom,
+  targetPosition = Position.Top,
+  markerEnd,
+  markerStart,
+  pathOptions,
+}: EdgeProps) {
+  const [path] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    borderRadius: pathOptions?.borderRadius,
+    offset: pathOptions?.offset,
+  })
+
+  return (
+    <>
+      <defs>
+        {/* Create a mask with the same shape that animates its path length */}
+        <mask id={`mask-${id}`}>
+          <m.path
+            d={path}
+            fill="none"
+            stroke="white"
+            strokeWidth={10}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.25 }}
+          />
+        </mask>
+      </defs>
+      <path
+        id={id}
+        d={path}
+        style={style}
+        className={cn(['react-flow__edge-path'])}
+        fill="none"
+        mask={`url(#mask-${id})`}
+        markerEnd={markerEnd}
+        markerStart={markerStart}
+      />
+    </>
   )
 }

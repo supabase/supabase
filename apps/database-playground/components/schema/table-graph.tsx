@@ -12,7 +12,7 @@ import ReactFlow, {
   useReactFlow,
 } from 'reactflow'
 import SchemaGraphLegend from './legend'
-import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from './table-node'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableEdge, TableNode } from './table-node'
 
 export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
   const { resolvedTheme } = useTheme()
@@ -21,6 +21,12 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
   const nodeTypes = useMemo(
     () => ({
       table: TableNode,
+    }),
+    []
+  )
+  const edgeTypes = useMemo(
+    () => ({
+      table: TableEdge,
     }),
     []
   )
@@ -49,14 +55,17 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
         defaultEdges={[]}
         defaultEdgeOptions={{
           type: 'smoothstep',
-          animated: true,
           deletable: false,
           style: {
             stroke: 'hsl(var(--border-stronger))',
-            strokeWidth: 0.5,
+            strokeWidth: 1,
+            strokeDasharray: 5,
+            // Manually create animation so that it doesn't interfere with our custom edge component
+            animation: 'dashdraw 0.5s linear infinite',
           },
         }}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         minZoom={0.8}
         maxZoom={1.8}
         proOptions={{ hideAttribution: true }}
@@ -103,18 +112,20 @@ async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
   }
 
   const nodes = tables.map((table) => {
-    const columns = (table.columns || []).map((column) => {
-      return {
-        id: column.id,
-        isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
-        name: column.name,
-        format: column.format,
-        isNullable: column.is_nullable,
-        isUnique: column.is_unique,
-        isUpdateable: column.is_updatable,
-        isIdentity: column.is_identity,
-      }
-    })
+    const columns = (table.columns || [])
+      .sort((a, b) => a.ordinal_position - b.ordinal_position)
+      .map((column) => {
+        return {
+          id: column.id,
+          isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
+          name: column.name,
+          format: column.format,
+          isNullable: column.is_nullable,
+          isUnique: column.is_unique,
+          isUpdateable: column.is_updatable,
+          isIdentity: column.is_identity,
+        }
+      })
 
     return {
       id: `${table.id}`,
@@ -163,6 +174,7 @@ async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
       if (source) {
         edges.push({
           id: String(rel.id),
+          type: 'table',
           source,
           sourceHandle,
           target: rel.constraint_name,
@@ -188,6 +200,7 @@ async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
     if (source && target) {
       edges.push({
         id: String(rel.id),
+        type: 'table',
         source,
         sourceHandle,
         target,
