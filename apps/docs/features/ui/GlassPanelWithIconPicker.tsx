@@ -7,15 +7,9 @@ type GlassPanelWithIconPickerProps = PropsWithChildren<
   Omit<ComponentProps<typeof GlassPanel>, 'icon'> & { icon: string }
 >
 
-function GlassPanelWithIconPicker({ children, ...props }: GlassPanelWithIconPickerProps) {
+function GlassPanelWithIconPicker({ children, icon, ...props }: GlassPanelWithIconPickerProps) {
   return (
-    <GlassPanel
-      {...props}
-      icon={<HomeMenuIconPicker icon={props.icon} width={18} height={18} />}
-      background={true}
-      showIconBg={true}
-      showLink={false}
-    >
+    <GlassPanel icon={<HomeMenuIconPicker icon={icon} width={18} height={18} />} {...props}>
       {children}
     </GlassPanel>
   )

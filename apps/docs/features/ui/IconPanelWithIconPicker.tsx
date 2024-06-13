@@ -7,15 +7,8 @@ type IconPanelWithIconPickerProps = Omit<ComponentProps<typeof IconPanel>, 'icon
   icon: string
 }
 
-function IconPanelWithIconPicker(props: IconPanelWithIconPickerProps) {
-  return (
-    <IconPanel
-      {...props}
-      icon={<HomeMenuIconPicker icon={props.icon} width={18} height={18} />}
-      background={true}
-      showLink={false}
-    />
-  )
+function IconPanelWithIconPicker({ icon, ...props }: IconPanelWithIconPickerProps) {
+  return <IconPanel icon={<HomeMenuIconPicker icon={icon} width={18} height={18} />} {...props} />
 }
 
 export { IconPanelWithIconPicker }
