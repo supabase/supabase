@@ -388,14 +388,14 @@ By default, database functions can be executed by any role. There are two main w
     ```
 
     To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
-    
+
     ```sql
     alter default privileges in schema public revoke execute on functions from public;
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
-    
+
     You can then regrant permissions for a specific function to a specific role:
-    
+
     ```sql
     grant execute on function public.hello_world to authenticated;
     ```
