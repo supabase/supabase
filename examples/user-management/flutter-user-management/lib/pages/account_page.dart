@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
 import 'package:supabase_quickstart/main.dart';
+import 'package:supabase_quickstart/pages/login_page.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -31,9 +32,11 @@ class _AccountPageState extends State<AccountPage> {
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
-      _showSnackBar(error.message, isError: true);
+      if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
-      _showSnackBar('Unexpected error occurred', isError: true);
+      if (mounted) {
+        context.showSnackBar('Unexpected error occurred', isError: true);
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -59,11 +62,13 @@ class _AccountPageState extends State<AccountPage> {
     };
     try {
       await supabase.from('profiles').upsert(updates);
-      _showSnackBar('Successfully updated profile!');
+      if (mounted) context.showSnackBar('Successfully updated profile!');
     } on PostgrestException catch (error) {
-      _showSnackBar(error.message, isError: true);
+      if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
-      _showSnackBar('Unexpected error occurred', isError: true);
+      if (mounted) {
+        context.showSnackBar('Unexpected error occurred', isError: true);
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -77,12 +82,16 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      _showSnackBar(error.message, isError: true);
+      if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
-      _showSnackBar('Unexpected error occurred', isError: true);
+      if (mounted) {
+        context.showSnackBar('Unexpected error occurred', isError: true);
+      }
     } finally {
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/login');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
       }
     }
   }
@@ -101,10 +110,10 @@ class _AccountPageState extends State<AccountPage> {
         );
       }
     } on PostgrestException catch (error) {
-      _showSnackBar(error.message, isError: true);
+      if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
       if (mounted) {
-        _showSnackBar('Unexpected error occurred', isError: true);
+        context.showSnackBar('Unexpected error occurred', isError: true);
       }
     }
     if (!mounted) {
@@ -133,45 +142,32 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-              children: [
-                Avatar(
-                  imageUrl: _avatarUrl,
-                  onUpload: _onUpload,
-                ),
-                const SizedBox(height: 18),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'User Name'),
-                ),
-                const SizedBox(height: 18),
-                TextFormField(
-                  controller: _websiteController,
-                  decoration: const InputDecoration(labelText: 'Website'),
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: _loading ? null : _updateProfile,
-                  child: Text(_loading ? 'Saving...' : 'Update'),
-                ),
-                const SizedBox(height: 18),
-                TextButton(onPressed: _signOut, child: const Text('Sign Out')),
-              ],
-            ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        children: [
+          Avatar(
+            imageUrl: _avatarUrl,
+            onUpload: _onUpload,
+          ),
+          const SizedBox(height: 18),
+          TextFormField(
+            controller: _usernameController,
+            decoration: const InputDecoration(labelText: 'User Name'),
+          ),
+          const SizedBox(height: 18),
+          TextFormField(
+            controller: _websiteController,
+            decoration: const InputDecoration(labelText: 'Website'),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton(
+            onPressed: _loading ? null : _updateProfile,
+            child: Text(_loading ? 'Saving...' : 'Update'),
+          ),
+          const SizedBox(height: 18),
+          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
+        ],
+      ),
     );
-  }
-
-  void _showSnackBar(String message, {bool isError = false}) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(isError ? "Error: $message" : message),
-        backgroundColor: isError
-            ? Theme.of(context).colorScheme.error
-            : Theme.of(context).snackBarTheme.backgroundColor,
-      ));
-    }
   }
 }
