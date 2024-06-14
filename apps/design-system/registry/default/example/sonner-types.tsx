@@ -61,6 +61,9 @@ export default function SonnerDemo() {
       >
         Action
       </Button>
+      <Button type="default" onClick={() => toast.loading('Event has been created')}>
+        Loading
+      </Button>
       <Button
         type="default"
         onClick={() =>
@@ -75,25 +78,6 @@ export default function SonnerDemo() {
         }
       >
         Promise
-      </Button>
-      <Button
-        type="default"
-        onClick={() =>
-          toast.promise(promise, {
-            loading: (
-              <>
-                <p>Loading...</p>
-              </>
-            ),
-            success: (data) => {
-              // @ts-expect-error
-              return `${data.name} toast has been added`
-            },
-            error: 'Error',
-          })
-        }
-      >
-        Promise custom
       </Button>
       <Button
         type="default"

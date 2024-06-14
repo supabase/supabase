@@ -678,6 +678,12 @@ export const examples: Registry = [
     files: ['example/sonner-types.tsx'],
   },
   {
+    name: 'sonner-upload',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-upload.tsx'],
+  },
+  {
     name: 'switch-demo',
     type: 'components:example',
     registryDependencies: ['switch'],
