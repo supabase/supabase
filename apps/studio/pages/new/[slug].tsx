@@ -773,7 +773,7 @@ const Wizard: NextPageWithLayout = () => {
                                   <TableBody className="[&_td]:py-2">
                                     <TableRow className="text-foreground">
                                       <TableCell colSpan={2}>
-                                        Additional Monthly Compute Costs
+                                        Total Monthly Compute Costs
                                         {/**
                                          * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
                                          *
