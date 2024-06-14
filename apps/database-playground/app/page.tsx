@@ -9,6 +9,7 @@ import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
 import { AnimatePresence, LazyMotion, m } from 'framer-motion'
+import { throttle } from 'lodash'
 import { ArrowUp, Square } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Chart as ChartWrapper } from 'react-chartjs-2'
@@ -159,12 +160,41 @@ export default function Page() {
   const nextMessageId = useMemo(() => nanoid(), [messages])
 
   const scrollRef = useRef<HTMLDivElement>()
-  const prevScrollHeightRef = useRef<number>()
 
   const scrollToBottom = useCallback(() => {
     const scrollElement = scrollRef.current
     if (scrollElement) {
-      scrollElement.scrollTo({ top: scrollElement.scrollHeight })
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight,
+        behavior: 'instant',
+      })
+    }
+  }, [])
+
+  const scrollDivRef = useCallback((element: HTMLDivElement | null) => {
+    if (element) {
+      scrollRef.current = element
+
+      const debounceScroll = throttle((top: number) => {
+        element.scrollTo({
+          top,
+          behavior: 'instant',
+        })
+      }, 500)
+
+      let prevScrollHeight: number
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (element.scrollHeight !== prevScrollHeight) {
+          prevScrollHeight = element.scrollHeight
+
+          debounceScroll(element.scrollHeight - element.clientHeight)
+        }
+      })
+
+      for (const child of Array.from(element.children)) {
+        resizeObserver.observe(child)
+      }
     }
   }, [])
 
@@ -227,29 +257,7 @@ export default function Page() {
         </Tabs>
 
         <div className="flex-1 h-full flex flex-col items-stretch">
-          <div
-            className="flex-1 flex flex-col items-center overflow-y-auto"
-            ref={(element) => {
-              if (element) {
-                scrollRef.current = element
-
-                const resizeObserver = new ResizeObserver(() => {
-                  if (element.scrollHeight !== prevScrollHeightRef.current) {
-                    prevScrollHeightRef.current = element.scrollHeight
-                    console.log('resize scroll')
-                    element.scrollTo({
-                      top: element.scrollHeight - element.clientHeight,
-                      behavior: 'smooth',
-                    })
-                  }
-                })
-
-                for (const child of Array.from(element.children)) {
-                  resizeObserver.observe(child)
-                }
-              }
-            }}
-          >
+          <div className="flex-1 flex flex-col items-center overflow-y-auto" ref={scrollDivRef}>
             {messages.some((message) => message.role === 'user') ? (
               <div className="flex flex-col gap-4 w-full max-w-4xl p-10">
                 {messages
