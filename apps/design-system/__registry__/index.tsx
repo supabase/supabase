@@ -1072,6 +1072,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "sonner-demo": {
+      name: "sonner-demo",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-demo")),
+      source: "",
+      files: ["registry/default/example/sonner-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "switch-demo": {
       name: "switch-demo",
       type: "components:example",

@@ -665,12 +665,12 @@ export const examples: Registry = [
     registryDependencies: ['slider'],
     files: ['example/slider-demo.tsx'],
   },
-  // {
-  //   name: 'sonner-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['sonner'],
-  //   files: ['example/sonner-demo.tsx'],
-  // },
+  {
+    name: 'sonner-demo',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-demo.tsx'],
+  },
   {
     name: 'switch-demo',
     type: 'components:example',
