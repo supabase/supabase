@@ -244,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       _showSnackBar(error.message, isError: true);
     } catch (error) {
-      _showSnackBar('Unexpected error occurred');
+      _showSnackBar('Unexpected error occurred', isError: true);
     } finally {
       if (mounted) {
         setState(() {
