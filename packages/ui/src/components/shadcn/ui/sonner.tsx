@@ -2,6 +2,9 @@
 
 import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
+import { cn } from '../../../lib/utils'
+import { buttonVariants } from './../../Button'
+import { StatusIcon } from './../../../../../ui-patterns/icons/StatusIcons'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
@@ -10,15 +13,38 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
 
   return (
     <Sonner
+      icons={{
+        warning: <StatusIcon variant="warning" />,
+        error: <StatusIcon variant="destructive" />,
+        info: <StatusIcon variant="default" />,
+      }}
       theme={theme as ToasterProps['theme']}
       className="toaster group"
       toastOptions={{
+        unstyled: true,
         classNames: {
-          toast:
-            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
-          description: 'group-[.toast]:text-muted-foreground',
-          actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
-          cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
+          toast: cn(
+            'group',
+            'toast',
+            'w-full',
+            'rounded-md',
+            'py-3',
+            'px-5',
+            'flex',
+            'gap-3',
+            'items-start',
+            'text-sm',
+            'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:shadow-lg'
+          ),
+          description:
+            'group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:!opacity-100',
+          actionButton: cn('block', buttonVariants({ type: 'primary', size: 'tiny' })),
+          cancelButton: cn('block', buttonVariants({ type: 'default', size: 'tiny' })),
+          // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
+          warning:
+            'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:border-warning-500',
+          error:
+            'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:border-destructive-500',
         },
       }}
       {...props}

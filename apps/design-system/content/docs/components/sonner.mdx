@@ -57,3 +57,37 @@ import { toast } from 'sonner'
 ```tsx
 toast('Event has been created.')
 ```
+
+## Expand
+
+You can change the amount of toasts visible through the visibleToasts prop.
+
+```tsx
+<Toaster expand={true | false} />
+```
+
+You can use the Input below to try it out.
+
+<SonnerExpandConfig />
+
+## Position
+
+You can change the amount of toasts visible through the visibleToasts prop.
+
+```tsx
+<Toaster
+  position={
+    'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center'
+  }
+/>
+```
+
+You can use the Input below to try it out.
+
+<SonnerPositionConfig />
+
+## Types
+
+You can customize the type of toast you want to render, and pass an options object as the second argument.
+
+<ComponentPreview name="sonner-types" />

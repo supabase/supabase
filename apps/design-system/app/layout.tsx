@@ -2,7 +2,8 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from './Providers'
-import { Toaster, SonnerToaster } from 'ui'
+import { Toaster } from 'ui'
+import { SonnerToaster } from './SonnerToast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,16 +17,8 @@ interface RootLayoutProps {
 }
 
 export default async function Layout({ children }: RootLayoutProps) {
-  // console.log('Root Layout mounted or re-rendered')
-
   return (
-    <html
-      // className="dark"
-      lang="en"
-      // data-theme="dark"
-      // style={{ colorScheme: 'dark' }}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>
         <ThemeProvider themes={['dark', 'light', 'deep-dark']} defaultTheme="system" enableSystem>
@@ -33,6 +26,7 @@ export default async function Layout({ children }: RootLayoutProps) {
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
           <Toaster />
+          <SonnerToaster />
         </ThemeProvider>
       </body>
     </html>
