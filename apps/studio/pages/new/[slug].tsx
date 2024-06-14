@@ -62,6 +62,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -717,51 +718,61 @@ const Wizard: NextPageWithLayout = () => {
                                   <span>${additionalMonthlySpend}</span>
                                 </>
                               )}
-                              <InfoTooltip side="top" className="max-w-[450px]">
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
+                              <InfoTooltip side="top" className="max-w-[450px] p-0">
+                                <Table className="mt-2">
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow className="py-2">
                                       <TableHead className="w-[170px]">Project</TableHead>
                                       <TableHead>Compute Size</TableHead>
                                       <TableHead className="text-right">Monthly Costs</TableHead>
                                     </TableRow>
                                   </TableHeader>
-                                  <TableBody className="text-foreground-light text-xs">
+                                  <TableBody className="[&_td]:py-2">
                                     {organizationProjects.map((project) => (
                                       <TableRow key={project.id}>
-                                        <TableCell className="p-2 w-[170px]">
-                                          {project.name}
-                                        </TableCell>
-                                        <TableCell className="p-2 text-center">
+                                        <TableCell className="w-[170px]">{project.name}</TableCell>
+                                        <TableCell className="text-center">
                                           {instanceLabel(project.infra_compute_size)}
                                         </TableCell>
-                                        <TableCell className="p-2 text-right">
+                                        <TableCell className="text-right">
                                           ${monthlyInstancePrice(project.infra_compute_size)}
                                         </TableCell>
                                       </TableRow>
                                     ))}
 
                                     <TableRow>
-                                      <TableCell className="p-2 w-[170px]">
-                                        <Badge variant={'brand'}>NEW</Badge>
+                                      <TableCell className="w-[170px] flex gap-2">
+                                        <span className="truncate">
+                                          {form.getValues('projectName')
+                                            ? form.getValues('projectName')
+                                            : 'New project'}
+                                        </span>
+                                        <Badge size={'small'} variant={'default'}>
+                                          NEW
+                                        </Badge>
                                       </TableCell>
-                                      <TableCell className="p-2 text-center">
+                                      <TableCell className="text-center">
                                         {instanceLabel(instanceSize)}
                                       </TableCell>
-                                      <TableCell className="p-2 text-right">
+                                      <TableCell className="text-right">
                                         ${monthlyInstancePrice(instanceSize)}
                                       </TableCell>
                                     </TableRow>
-                                    <TableRow className="p-2 text-foreground-light ">
-                                      <TableCell colSpan={2} className="p-2 pt-8">
-                                        <span>Compute Credits</span>
-                                      </TableCell>
-                                      <TableCell colSpan={1} className="p-2 pt-8 text-right">
+                                  </TableBody>
+                                </Table>
+                                <PopoverSeparator />
+                                <Table className="mt-3">
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow>
+                                      <TableHead colSpan={2}>Compute Credits</TableHead>
+                                      <TableHead colSpan={1} className="text-right">
                                         -$10
-                                      </TableCell>
+                                      </TableHead>
                                     </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="[&_td]:py-2">
                                     <TableRow className="text-foreground">
-                                      <TableCell colSpan={2} className="p-2">
+                                      <TableCell colSpan={2}>
                                         Additional Monthly Compute Costs
                                         {/**
                                          * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
@@ -774,14 +785,14 @@ const Wizard: NextPageWithLayout = () => {
                                           </p>
                                         )}
                                       </TableCell>
-                                      <TableCell colSpan={1} className="p-2 text-right">
+                                      <TableCell colSpan={1} className="text-right">
                                         ${monthlyComputeCosts}
                                       </TableCell>
                                     </TableRow>
                                   </TableBody>
                                 </Table>
 
-                                <div className="p-2 text-xs text-foreground-light mt-2 space-y-1">
+                                <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
                                   <p>
                                     Compute is charged usage-based whenever your billing cycle
                                     resets. Given compute charges are hourly, your invoice will
