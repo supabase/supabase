@@ -677,7 +677,7 @@ const Wizard: NextPageWithLayout = () => {
                         )}
                       />
                     </Panel.Content>
-                    {orgSubscription?.plan?.id !== 'free' && (
+                    {orgSubscription && orgSubscription.plan.id !== 'free' && (
                       <Panel.Content>
                         <FormItemLayout
                           label={
