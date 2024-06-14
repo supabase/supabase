@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 18),
           ElevatedButton(
             onPressed: _isLoading ? null : _signIn,
-            child: Text(_isLoading ? 'Loading' : 'Send Magic Link'),
+            child: Text(_isLoading ? 'Sending...' : 'Send Magic Link'),
           ),
         ],
       ),
