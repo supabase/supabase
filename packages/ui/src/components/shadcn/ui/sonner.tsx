@@ -31,13 +31,16 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
             'py-3',
             'px-5',
             'flex',
-            'gap-3',
+            'gap-2',
             'items-start',
+            'font-normal',
             'text-sm',
             'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:shadow-lg'
           ),
+          icon: 'mt-0.5',
+          title: '!font-normal',
           description:
-            'group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:!opacity-100',
+            'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:!opacity-100',
           actionButton: cn('block', buttonVariants({ type: 'primary', size: 'tiny' })),
           cancelButton: cn('block', buttonVariants({ type: 'default', size: 'tiny' })),
           // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
