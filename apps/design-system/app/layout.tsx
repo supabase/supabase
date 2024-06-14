@@ -2,6 +2,7 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from './Providers'
+import { ToastProvider, Toaster } from 'ui'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +32,7 @@ export default async function Layout({ children }: RootLayoutProps) {
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
