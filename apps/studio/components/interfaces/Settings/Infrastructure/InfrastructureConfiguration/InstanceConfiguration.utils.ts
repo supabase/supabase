@@ -1,17 +1,15 @@
 import dagre from '@dagrejs/dagre'
+import { groupBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 
+import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { Database } from 'data/read-replicas/replicas-query'
 import {
   AVAILABLE_REPLICA_REGIONS,
   NODE_ROW_HEIGHT,
   NODE_SEP,
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
-import { groupBy } from 'lodash'
-import type { Database } from 'data/read-replicas/replicas-query'
-import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
-import { DatabaseStatus } from 'data/read-replicas/replicas-status-query'
-import { AWS_REGIONS } from 'lib/constants'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise

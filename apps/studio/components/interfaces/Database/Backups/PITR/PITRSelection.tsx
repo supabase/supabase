@@ -380,44 +380,40 @@ const PITRSelection = () => {
           </div>
         }
       >
-        <div className="space-y-4 py-3">
-          <Modal.Content>
-            <div className="py-2 space-y-1">
-              <p className="text-sm text-foreground-light">Your database will be restored to:</p>
+        <Modal.Content>
+          <div className="py-2 space-y-1">
+            <p className="text-sm text-foreground-light">Your database will be restored to:</p>
+          </div>
+          <div className="py-2 flex flex-col gap-3">
+            <div>
+              <p className="text-sm font-mono text-foreground-lighter">{selectedTimezone?.text}</p>
+              <p className="text-2xl">{recoveryTimeString}</p>
             </div>
-            <div className="py-2 flex flex-col gap-3">
-              <div>
-                <p className="text-sm font-mono text-foreground-lighter">
-                  {selectedTimezone?.text}
-                </p>
-                <p className="text-2xl">{recoveryTimeString}</p>
-              </div>
-              <div>
-                <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
-                <p className="text-2xl">{recoveryTimeStringUtc}</p>
-              </div>
+            <div>
+              <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
+              <p className="text-2xl">{recoveryTimeStringUtc}</p>
             </div>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <Alert
-              withIcon
-              variant="warning"
-              title="This action cannot be undone, not cancelled once started"
-            >
-              Any changes made to your database after this point in time will be lost. This includes
-              any changes to your project's storage and authentication.
-            </Alert>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <p className="text-sm text-foreground-light">
-              Restores may take from a few minutes up to several hours depending on the size of your
-              database. During this period, your project will not be available, until the
-              restoration is completed.
-            </p>
-          </Modal.Content>
-        </div>
+          </div>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <Alert
+            withIcon
+            variant="warning"
+            title="This action cannot be undone, not canceled once started"
+          >
+            Any changes made to your database after this point in time will be lost. This includes
+            any changes to your project's storage and authentication.
+          </Alert>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <p className="text-sm text-foreground-light">
+            Restores may take from a few minutes up to several hours depending on the size of your
+            database. During this period, your project will not be available, until the restoration
+            is completed.
+          </p>
+        </Modal.Content>
       </Modal>
     </>
   )

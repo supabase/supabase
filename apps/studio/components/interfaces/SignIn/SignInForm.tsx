@@ -1,4 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -55,8 +56,9 @@ const SignInForm = () => {
         const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
         router.push(returnTo === '/sign-in' ? '/projects' : returnTo)
-      } catch (error) {
-        toast.error((error as AuthError).message, { id: toastId })
+      } catch (error: any) {
+        toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)
       }
     } else {
       setCaptchaToken(null)

@@ -190,7 +190,8 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
         const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-      } finally {
+      } catch (error) {
+        // [Joshen] No error handler required as fetching these info are nice to haves, not necessary
       }
     }
 
