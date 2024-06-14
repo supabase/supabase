@@ -1,6 +1,7 @@
 import dagre from '@dagrejs/dagre'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
+import { Loader } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
@@ -12,11 +13,22 @@ import ReactFlow, {
   Position,
   useReactFlow,
 } from 'reactflow'
+import { cn } from 'ui'
+import { useTablesQuery } from '~/data/tables/tables-query'
 import SchemaGraphLegend from './legend'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableEdge, TableNode } from './table-node'
 
-export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
+export default function TablesGraph({ schema }: { schema: string }) {
   const { resolvedTheme } = useTheme()
+
+  const {
+    data: tables,
+    error,
+    isError,
+    isLoading,
+  } = useTablesQuery({ schemas: [schema], includeColumns: true })
+
+  const isEmpty = tables && tables.length === 0
 
   const reactFlowInstance = useReactFlow<TableNodeData>()
   const nodeTypes = useMemo(
@@ -33,20 +45,22 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
   )
 
   useEffect(() => {
-    getGraphDataFromTables(tables).then(({ nodes, edges }) => {
-      reactFlowInstance.setNodes(nodes)
-      reactFlowInstance.setEdges(edges)
+    if (tables) {
+      getGraphDataFromTables(tables).then(({ nodes, edges }) => {
+        reactFlowInstance.setNodes(nodes)
+        reactFlowInstance.setEdges(edges)
 
-      // it needs to happen during next event tick
-      setTimeout(
-        () =>
-          reactFlowInstance.fitView({
-            padding: 0.4,
-            duration: 500,
-          }),
-        100
-      )
-    })
+        // it needs to happen during next event tick
+        setTimeout(
+          () =>
+            reactFlowInstance.fitView({
+              padding: 0.4,
+              duration: 500,
+            }),
+          100
+        )
+      })
+    }
   }, [reactFlowInstance, tables, resolvedTheme])
 
   return (
@@ -79,16 +93,31 @@ export default function TablesGraph({ tables }: { tables: PostgresTable[] }) {
     >
       <Background
         gap={16}
-        className="text-neutral-500 bg-neutral-800"
+        className={cn(
+          'bg-neutral-800 transition-colors',
+          isLoading || isError || isEmpty ? 'text-neutral-700' : 'text-neutral-500'
+        )}
         variant={BackgroundVariant.Dots}
         color="currentColor"
       />
 
-      {tables.length === 0 && (
-        <div className="absolute w-full h-full flex justify-center items-center text-neutral-50 text-center p-4">
-          <h2 className="text-4xl text-light font-light">Ask AI to create a table</h2>
-        </div>
-      )}
+      <div className="absolute w-full h-full flex justify-center items-center text-center p-4 font-medium">
+        {isLoading && (
+          <div className="flex gap-4 items-center text-lighter">
+            <Loader className="animate-spin" size={28} />
+            <p className="text-xl">Loading schema...</p>
+          </div>
+        )}
+
+        {isError && (
+          <div className="flex gap-2 text-lighter">
+            <p>Error loading schema from the database:</p>
+            <p>{`${error?.message ?? 'Unknown error'}`}</p>
+          </div>
+        )}
+
+        {isEmpty && <h2 className="text-4xl text-lighter font-light">Ask AI to create a table</h2>}
+      </div>
 
       <Controls showZoom={false} showInteractive={false} position="top-right" />
       <SchemaGraphLegend />
