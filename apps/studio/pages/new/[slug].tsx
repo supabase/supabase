@@ -571,8 +571,7 @@ const Wizard: NextPageWithLayout = () => {
                               description={
                                 <>
                                   <p>
-                                    Select the size for your dedicated database. You can always
-                                    change this later.
+                                    The size for your dedicated database. You can change this later.
                                   </p>
                                 </>
                               }
