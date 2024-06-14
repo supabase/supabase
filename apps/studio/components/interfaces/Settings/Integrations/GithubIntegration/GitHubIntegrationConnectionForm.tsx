@@ -41,10 +41,14 @@ import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface GitHubIntegrationConnectionFormProps {
+  disabled?: boolean
   connection: IntegrationProjectConnection
 }
 
-const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnectionFormProps) => {
+const GitHubIntegrationConnectionForm = ({
+  disabled,
+  connection,
+}: GitHubIntegrationConnectionFormProps) => {
   const org = useSelectedOrganization()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)

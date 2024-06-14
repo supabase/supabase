@@ -1,8 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { Mail, MoreHorizontal, ShieldOff, Trash, User as UserIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
@@ -18,11 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMail,
-  IconMoreVertical,
-  IconShieldOff,
-  IconTrash,
-  IconUser,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -113,32 +109,30 @@ const UserDropdown = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" loading={isLoading} className="hover:border-muted flex">
-            <IconMoreVertical />
-          </Button>
+          <Button type="text" loading={isLoading} className="px-1.5" icon={<MoreHorizontal />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <>
             <DropdownMenuItem className="space-x-2" onClick={handleViewUserInfo}>
-              <IconUser size="tiny" />
+              <UserIcon size={14} />
               <p>View user info</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {user.email !== null ? (
               <>
                 <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
-                  <IconMail size="tiny" />
+                  <Mail size={14} />
                   <p>Send password recovery</p>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="space-x-2" onClick={handleSendMagicLink}>
-                  <IconMail size="tiny" />
+                  <Mail size={14} />
                   <p>Send magic link</p>
                 </DropdownMenuItem>
               </>
             ) : null}
             {user.phone !== null ? (
               <DropdownMenuItem className="space-x-2" onClick={handleSendOtp}>
-                <IconMail size="tiny" />
+                <Mail size={14} />
                 <p>Send OTP</p>
               </DropdownMenuItem>
             ) : null}
@@ -153,7 +147,7 @@ const UserDropdown = ({
                   disabled={!canRemoveMFAFactors}
                   className="space-x-2"
                 >
-                  <IconShieldOff size="tiny" />
+                  <ShieldOff size={14} />
                   <p>Remove MFA factors</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
@@ -188,7 +182,7 @@ const UserDropdown = ({
                   disabled={!canRemoveUser}
                   className="space-x-2"
                 >
-                  <IconTrash size="tiny" />
+                  <Trash size={14} />
                   <p>Delete user</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>

@@ -146,7 +146,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="">
+          <Modal.Content>
             {isLoadingConnections && <GenericSkeletonLoader />}
             {isErrorConnections && (
               <AlertError

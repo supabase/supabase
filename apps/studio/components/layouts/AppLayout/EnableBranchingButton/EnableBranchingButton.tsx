@@ -1,12 +1,7 @@
-import {
-  Button,
-  IconGitBranch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 import { useFlag, useSelectedProject } from 'hooks'
+import { GitBranch } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import BranchingWaitListPopover from './BranchingWaitListPopover'
 
@@ -29,7 +24,7 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
       <TooltipTrigger_Shadcn_ asChild>
         <Button
           type={isNewNav ? 'default' : 'text'}
-          icon={<IconGitBranch strokeWidth={1.5} />}
+          icon={<GitBranch strokeWidth={1.5} />}
           disabled={project?.status !== 'ACTIVE_HEALTHY'}
           onClick={() => snap.setShowEnableBranchingModal(true)}
         >

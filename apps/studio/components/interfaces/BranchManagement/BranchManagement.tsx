@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
+import { ExternalLink, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -41,6 +41,8 @@ const BranchManagement = () => {
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  console.log({ showCreateBranch })
 
   const {
     data: connections,
@@ -181,7 +183,7 @@ const BranchManagement = () => {
                       Branching Feedback
                     </a>
                   </Button>
-                  <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link
                       target="_blank"
                       rel="noreferrer"
@@ -219,7 +221,7 @@ const BranchManagement = () => {
                       type="text"
                       size="small"
                       className="text-light hover:text py-1 px-1.5"
-                      iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+                      iconRight={<ExternalLink size={14} strokeWidth={1.5} />}
                     >
                       <Link
                         passHref

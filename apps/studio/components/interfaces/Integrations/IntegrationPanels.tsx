@@ -291,7 +291,7 @@ const EmptyIntegrationConnection = React.forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        showNode && 'ml-6 pl-8  border-l',
+        showNode && 'ml-6 pl-8 mt-4 border-l',
         'relative pb-2',
         'last:border-l-transparent',
         className
@@ -302,14 +302,19 @@ const EmptyIntegrationConnection = React.forwardRef<
       )}
       <div
         className={cn(
-          'w-full mt-4',
+          'w-full',
           'border border-dashed bg-surface-100 border-overlay',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
         <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild>
-            <Button disabled={disabled} type="default" onClick={() => onClick()}>
+            <Button
+              disabled={disabled}
+              className="pointer-events-auto"
+              type="default"
+              onClick={() => onClick()}
+            >
               Add new project connection
             </Button>
           </TooltipTrigger_Shadcn_>

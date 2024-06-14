@@ -44,11 +44,13 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
     'integrations.vercel_connections'
   )
   const canCreateVercelConnection = useCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.vercel_connections'
+  )
+  const canUpdateVercelConnection = useCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
-
-  console.log({ canReadVercelConnection, canCreateVercelConnection })
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -163,7 +165,6 @@ You can change the scope of the access for Supabase by configuring
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>
-              {' '}
               <Markdown content={VercelContentSectionTop} />
               {vercelIntegration ? (
                 <div key={vercelIntegration.id}>
@@ -184,6 +185,7 @@ You can change the scope of the access for Supabase by configuring
                           >
                             <IntegrationConnectionItem
                               connection={connection}
+                              disabled={!canUpdateVercelConnection}
                               type={'Vercel' as IntegrationName}
                               onDeleteConnection={onDeleteVercelConnection}
                               className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
@@ -194,6 +196,7 @@ You can change the scope of the access for Supabase by configuring
                                   <VercelIntegrationConnectionForm
                                     connection={connection}
                                     integration={vercelIntegration}
+                                    disabled={!canUpdateVercelConnection}
                                   />
                                 </div>
                               </div>
