@@ -1,7 +1,6 @@
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import {
   SelectContent_Shadcn_,
@@ -22,38 +21,33 @@ interface RegionSelectorProps {
 
 export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorProps) => {
   const router = useRouter()
+  const showNonProdFields =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
 
-  const {
-    data: region,
-    isSuccess,
-    isError,
-  } = useDefaultRegionQuery(
-    { cloudProvider },
-    { refetchOnMount: false, refetchOnWindowFocus: false, refetchInterval: false }
-  )
-
-  useEffect(() => {
-    // only pick a region if one hasn't already been selected
-    if (isError && !field.value) {
-      // if an error happened, and the user haven't selected a region, just select the default one for him
-      form.setValue('dbRegion', PROVIDERS[cloudProvider].default_region)
-    }
-  }, [cloudProvider, isError, isSuccess, field.value, form])
+  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
+    cloudProvider,
+  })
 
   return (
     <FormItemLayout
       layout="horizontal"
       label="Region"
-      description="Select the region closest to your users for the best performance."
+      description={
+        <>
+          <p>Select the region closest to your users for the best performance.</p>
+          {showNonProdFields && (
+            <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
+          )}
+        </>
+      }
     >
       <Select_Shadcn_
         value={field.value}
-        onValueChange={(value) => {
-          if (isSuccess && region && !field.value) {
-            field.onChange(value)
-          }
-        }}
+        onValueChange={field.onChange}
+        disabled={isLoadingDefaultRegion}
       >
         <SelectTrigger_Shadcn_>
           <SelectValue_Shadcn_ placeholder="Select a region for your project.." />

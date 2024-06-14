@@ -53,6 +53,9 @@ export interface ICommonCategory extends ICommonBase {
 
 export interface ICommonMarkdown extends ICommonBaseSection {
   type: 'markdown'
+  meta?: {
+    shared?: boolean
+  }
 }
 
 export interface ICommonFunctionGroup extends ICommonBaseSection {

@@ -192,6 +192,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "button-sizes": {
+      name: "button-sizes",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-sizes")),
+      source: "",
+      files: ["registry/default/example/button-sizes.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-default": {
+      name: "button-default",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-default")),
+      source: "",
+      files: ["registry/default/example/button-default.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-warning": {
+      name: "button-warning",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-warning")),
+      source: "",
+      files: ["registry/default/example/button-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "button-secondary": {
       name: "button-secondary",
       type: "components:example",
@@ -1750,6 +1783,50 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/tree-view-multi-select")),
       source: "",
       files: ["registry/default/example/tree-view-multi-select.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "modal-demo": {
+      name: "modal-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/modal-demo")),
+      source: "",
+      files: ["registry/default/example/modal-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "modal-aligned-footer": {
+      name: "modal-aligned-footer",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/modal-aligned-footer")),
+      source: "",
+      files: ["registry/default/example/modal-aligned-footer.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "modal-custom-footer": {
+      name: "modal-custom-footer",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/modal-custom-footer")),
+      source: "",
+      files: ["registry/default/example/modal-custom-footer.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "modal-hide-footer": {
+      name: "modal-hide-footer",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/modal-hide-footer")),
+      source: "",
+      files: ["registry/default/example/modal-hide-footer.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

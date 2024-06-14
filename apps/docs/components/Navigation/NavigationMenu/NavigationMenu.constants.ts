@@ -636,7 +636,7 @@ export const auth = {
       name: 'Auth UI',
       url: undefined,
       items: [
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
@@ -1128,10 +1128,6 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/ai-models',
         },
         {
-          name: 'Regional invocations',
-          url: '/guides/functions/regional-invocation',
-        },
-        {
           name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
@@ -1142,7 +1138,11 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Debugging Edge Functions',
+          name: 'Local Debugging with DevTools',
+          url: '/guides/functions/debugging-tools',
+        },
+        {
+          name: 'Logging and Troubleshooting',
           url: '/guides/functions/debugging',
         },
         {
@@ -1163,6 +1163,10 @@ export const functions: NavMenuConstant = {
       name: 'Platform',
       url: undefined,
       items: [
+        {
+          name: 'Regional invocations',
+          url: '/guides/functions/regional-invocation',
+        },
         {
           name: 'Status codes',
           url: '/guides/functions/status-codes',
@@ -1313,6 +1317,11 @@ export const realtime: NavMenuConstant = {
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
   ],
 }

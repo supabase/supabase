@@ -356,10 +356,10 @@ const PlanUpdateSidePanel = () => {
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
-        overlayClassName="pointer-events-none"
+        dialogOverlayProps={{ className: 'pointer-events-none' }}
         header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
-        <Modal.Content className="mt-4">
+        <Modal.Content>
           {subscriptionPreviewError && (
             <AlertError
               error={subscriptionPreviewError}

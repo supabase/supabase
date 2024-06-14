@@ -9,6 +9,7 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  DialogSectionSeparator,
   Form,
   IconAlertCircle,
   IconExternalLink,
@@ -173,7 +174,8 @@ const RedirectUrls = () => {
         size="small"
         visible={open}
         onCancel={() => setOpen(!open)}
-        header={<h3 className="text-sm">Add a new URL</h3>}
+        header="Add a new URL"
+        description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
       >
         <Form
           validateOnBlur
@@ -184,31 +186,24 @@ const RedirectUrls = () => {
         >
           {() => {
             return (
-              <div className="mb-4 space-y-4 pt-4">
-                <div className="px-5">
-                  <p className="text-sm text-foreground-light">
-                    This will add a URL to a list of allowed URLs that can interact with your
-                    Authentication services for this project.
-                  </p>
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
+              <>
+                <Modal.Content>
                   <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
+                </Modal.Content>
+                <DialogSectionSeparator />
+                <Modal.Content>
                   <Button
                     block
                     form="new-redirect-url-form"
                     htmlType="submit"
-                    size="medium"
+                    size="small"
                     disabled={isUpdatingConfig}
                     loading={isUpdatingConfig}
                   >
                     Add URL
                   </Button>
-                </div>
-              </div>
+                </Modal.Content>
+              </>
             )
           }}
         </Form>
@@ -220,37 +215,35 @@ const RedirectUrls = () => {
         header={<h3 className="text-sm">Remove URL</h3>}
         onCancel={() => setSelectedUrlToDelete(undefined)}
       >
-        <div className="mb-4 space-y-4 pt-4">
-          <div className="px-5">
-            <p className="mb-2 text-sm text-foreground-light">
-              Are you sure you want to remove{' '}
-              <span className="text-foreground">{selectedUrlToDelete}</span>?
-            </p>
-            <p className="text-foreground-light text-sm">
-              This URL will no longer work with your authentication configuration.
-            </p>
-          </div>
-          <div className="border-overlay-border border-t"></div>
-          <div className="flex gap-3 px-5">
-            <Button
-              block
-              type="default"
-              size="medium"
-              onClick={() => setSelectedUrlToDelete(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              block
-              size="medium"
-              type="warning"
-              loading={isUpdatingConfig}
-              onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
-            >
-              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-            </Button>
-          </div>
-        </div>
+        <Modal.Content>
+          <p className="mb-2 text-sm text-foreground-light">
+            Are you sure you want to remove{' '}
+            <span className="text-foreground">{selectedUrlToDelete}</span>?
+          </p>
+          <p className="text-foreground-light text-sm">
+            This URL will no longer work with your authentication configuration.
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <Button
+            block
+            type="default"
+            size="medium"
+            onClick={() => setSelectedUrlToDelete(undefined)}
+          >
+            Cancel
+          </Button>
+          <Button
+            block
+            size="medium"
+            type="warning"
+            loading={isUpdatingConfig}
+            onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
+          >
+            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+          </Button>
+        </Modal.Content>
       </Modal>
     </div>
   )

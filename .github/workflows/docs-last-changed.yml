@@ -1,0 +1,45 @@
+name: '[Docs] Update last-changed dates'
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: 'Reset last-updated dates using Git commit dates'
+        required: false
+        type: boolean
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            apps/docs
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download dependencies
+        run: npm ci
+
+      - name: Update last-changed dates
+        working-directory: ./apps/docs
+        if: ${{ !inputs.reset }}
+        run: npm run last-changed
+
+      - name: Reset last-changed dates
+        working-directory: ./apps/docs
+        if: ${{ inputs.reset }}
+        run: npm run last-changed:reset

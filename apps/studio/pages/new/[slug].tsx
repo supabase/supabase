@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { components } from 'api-types'
 import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
@@ -10,7 +11,7 @@ import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import type { components } from 'data/api'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -45,6 +46,8 @@ import {
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Form_Shadcn_,
+  Input_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -69,16 +72,22 @@ const Wizard: NextPageWithLayout = () => {
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-  // const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-
-  // const [instanceSize, setInstanceSize] = useState<DbInstanceSize>('micro')
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
   const { data: orgSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
+  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+    {
+      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+    },
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+    }
+  )
 
   const {
     mutate: createProject,
@@ -102,11 +111,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
-  // const canSubmit =
-  //   projectName !== '' &&
-  //   passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-  //   dbRegion !== undefined
-
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
   ).current
@@ -121,33 +125,6 @@ const Wizard: NextPageWithLayout = () => {
     setPasswordStrengthWarning(warning)
     setPasswordStrengthMessage(message)
   }
-
-  useEffect(() => {
-    /*
-     * Handle no org
-     * redirect to new org route
-     */
-    if (isEmptyOrganizations) {
-      router.push(`/new`)
-    }
-  }, [isEmptyOrganizations, router])
-
-  useEffect(() => {
-    /*
-     * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /new/new-project url, which is redirected from database.new
-     */
-    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
-    }
-  }, [isInvalidSlug, organizations])
-
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      toast.success('Successfully added new payment method')
-    }
-  }, [router.query.redirect_status, router.query.setup_intent])
 
   const sizes: DesiredInstanceSize[] = [
     'micro',
@@ -270,15 +247,14 @@ const Wizard: NextPageWithLayout = () => {
     resolver: zodResolver(FormSchema),
     mode: 'onChange',
     defaultValues: {
-      organization: currentOrg?.slug,
+      organization: slug,
       projectName: '',
       postgresVersion: '',
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
       dbPassStrength: 0,
-      dbRegion: ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-        ? PROVIDERS[PROVIDERS[DEFAULT_PROVIDER].id].default_region
-        : '',
+      dbRegion: defaultRegion || undefined,
+      instanceSize: sizes[0],
       dataApi: true,
     },
   })
@@ -293,7 +269,6 @@ const Wizard: NextPageWithLayout = () => {
     })
 
     form.setValue('dbPass', password)
-    form.trigger('dbPass')
     delayedCheckPasswordStrength(password)
   }
 
@@ -330,6 +305,39 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  useEffect(() => {
+    // Handle no org: redirect to new org route
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [isEmptyOrganizations, router])
+
+  useEffect(() => {
+    // [Joshen] Cause slug depends on router which doesnt load immediately on render
+    // While the form data does load immediately
+    if (slug) form.setValue('organization', slug)
+  }, [slug])
+
+  useEffect(() => {
+    // Redirect to first org if the slug doesn't match an org slug
+    // this is mainly to capture the /new/new-project url, which is redirected from database.new
+    if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
+      router.push(`/new/${organizations?.[0].slug}`)
+    }
+  }, [isInvalidSlug, isOrganizationsSuccess, organizations])
+
+  useEffect(() => {
+    if (form.getValues('dbRegion') === undefined && defaultRegion) {
+      form.setValue('dbRegion', defaultRegion)
+    }
+  }, [defaultRegion])
+
+  useEffect(() => {
+    if (defaultRegionError) {
+      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
+    }
+  }, [defaultRegionError])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -396,7 +404,7 @@ const Wizard: NextPageWithLayout = () => {
                           >
                             <FormControl_Shadcn_>
                               <SelectTrigger_Shadcn_>
-                                <SelectValue_Shadcn_ placeholder="Select a fruit" />
+                                <SelectValue_Shadcn_ placeholder="Select an organization" />
                               </SelectTrigger_Shadcn_>
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
@@ -471,19 +479,7 @@ const Wizard: NextPageWithLayout = () => {
                           render={({ field }) => (
                             <FormItemLayout label="Cloud provider" layout="horizontal">
                               <Select_Shadcn_
-                                onValueChange={(value: CloudProvider) => {
-                                  field.onChange(value)
-
-                                  // on local/staging quick-select the default region, don't wait for the cloudflare location
-                                  form.setValue(
-                                    'dbRegion',
-                                    ['staging', 'local'].includes(
-                                      process.env.NEXT_PUBLIC_ENVIRONMENT ?? ''
-                                    )
-                                      ? PROVIDERS[value].default_region
-                                      : ''
-                                  )
-                                }}
+                                onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <FormControl_Shadcn_>
@@ -511,7 +507,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {orgSubscription?.plan.id !== 'free' && (
+                    {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -627,10 +623,10 @@ const Wizard: NextPageWithLayout = () => {
                                 type="password"
                                 placeholder="Type in a strong password"
                                 {...field}
+                                autoComplete="off"
                                 onChange={async (event) => {
                                   field.onChange(event)
                                   form.trigger('dbPassStrength')
-                                  form.trigger('dbPass')
                                   const value = event.target.value
                                   if (event.target.value === '') {
                                     await form.setValue('dbPassStrength', 0)
@@ -647,7 +643,6 @@ const Wizard: NextPageWithLayout = () => {
                     </Panel.Content>
 
                     <Panel.Content>
-                      <></>
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbRegion"

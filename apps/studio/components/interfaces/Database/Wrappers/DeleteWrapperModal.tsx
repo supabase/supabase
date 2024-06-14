@@ -44,14 +44,12 @@ const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProp
       onConfirm={() => onConfirmDelete()}
       header={`Confirm to disable ${selectedWrapper?.name}`}
     >
-      <div className="py-4">
-        <Modal.Content>
-          <p className="text-sm">
-            Are you sure you want to disable {selectedWrapper?.name}? This will also remove all
-            tables created with this wrapper.
-          </p>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <p className="text-sm">
+          Are you sure you want to disable {selectedWrapper?.name}? This will also remove all tables
+          created with this wrapper.
+        </p>
+      </Modal.Content>
     </Modal>
   )
 }
