@@ -22,6 +22,8 @@ const Docs = (props: Props) => {
   } else if (type === 'cli') {
     typeName = 'CLI'
     typeIcon = 'reference-cli'
+  } else if (type === 'ai') {
+    typeName = 'AI & Vectors'
   }
 
   return (
