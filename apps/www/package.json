@@ -8,6 +8,7 @@
     "build": "npm run content:build && next build",
     "export": "next export",
     "start": "next start",
+    "lint": "next lint",
     "typecheck": "npm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
