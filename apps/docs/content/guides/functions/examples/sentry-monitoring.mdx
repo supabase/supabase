@@ -78,3 +78,12 @@ supabase functions deploy sentryfied --no-verify-jwt
 ### 4. Try it yourself
 
 Find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/sentryfied/index.ts).
+
+## Working With Scopes
+
+Sentry Deno SDK currently do not support `Deno.serve` instrumentation, which means that there is no scope separation between requests.
+Because of that, when the Edge Functions runtime is reused between multiple requests, all globally captured breadcrumbs and contextual data
+will be shared, which is not the desired behavior. To work around this, all default integrations in the example code above are disabled,
+and you should be relying on [`withScope`](https://docs.sentry.io/platforms/javascript/enriching-events/scopes/#using-withscope) to encapsulate
+all Sentry SDK API calls, or [pass context directly](https://docs.sentry.io/platforms/javascript/enriching-events/context/#passing-context-directly)
+to the `captureException` or `captureMessage` calls.

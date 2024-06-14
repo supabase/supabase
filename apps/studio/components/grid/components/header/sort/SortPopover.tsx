@@ -143,11 +143,13 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
             align="start"
           >
             <Button
+              asChild
               type="text"
               iconRight={<ChevronDown size="14" className="text-foreground-light" />}
               className="sb-grid-dropdown__item-trigger"
+              data-testid="table-editor-pick-column-to-sort-button"
             >
-              Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by
+              <span>Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by</span>
             </Button>
           </DropdownControl>
         ) : (

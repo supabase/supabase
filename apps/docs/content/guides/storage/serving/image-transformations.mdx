@@ -17,6 +17,8 @@ Image Resizing is currently enabled for [Pro plan and above](https://supabase.co
 
 ## Get a public URL for a transformed image
 
+Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
+
 <Tabs
   scrollable
   size="small"
@@ -26,8 +28,6 @@ Image Resizing is currently enabled for [Pro plan and above](https://supabase.co
 >
 <TabPanel id="js" label="JavaScript">
 
-Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
-
 ```ts
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
   transform: {
@@ -35,6 +35,19 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
     height: 600,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = supabase.storage.from('bucket').getPublicUrl(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 500,
+        height: 600,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -87,6 +100,20 @@ supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final url = await supabase.storage.from('bucket').createSignedUrl(
+      'image.jpg',
+      60000,
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+      ),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -135,6 +162,19 @@ supabase.storage.from('bucket').download('image.jpg', {
     height: 300,
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -195,13 +235,27 @@ In case you'd like to return the original format of the image and **opt-out** fr
 <TabPanel id="js" label="JavaScript">
 
 ```ts
-await storage.from('bucket').download('image.jpeg', {
+await supabase.storage.from('bucket').download('image.jpeg', {
   transform: {
     width: 200,
     height: 200,
     format: 'origin',
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpeg',
+      transform: const TransformOptions(
+        width: 200,
+        height: 200,
+        format: RequestImageFormat.origin,
+      ),
+    );
 ```
 
 </TabPanel>
@@ -302,6 +356,18 @@ supabase.storage.from('bucket').download('image.jpg', {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        quality: 50,
+      ),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -367,6 +433,20 @@ supabase.storage.from('bucket').download('image.jpg', {
     resize: 'contain', // 'cover' | 'fill'
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = supabase.storage.from('bucket').download(
+      'image.jpg',
+      transform: const TransformOptions(
+        width: 800,
+        height: 300,
+        resize: ResizeMode.contain, // 'cover' | 'fill'
+      ),
+    );
 ```
 
 </TabPanel>
