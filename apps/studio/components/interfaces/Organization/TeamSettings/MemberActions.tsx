@@ -53,6 +53,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
+  const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
@@ -117,6 +118,15 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
         },
       }
     )
+  }
+
+  const showWarningModal = () => {
+    setIsWarningModalOpen(true)
+  }
+
+  const handleWarningModalConfirm = () => {
+    setIsWarningModalOpen(false)
+    setIsDeleteModalOpen(true)
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -187,7 +197,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                   <DropdownMenuItem
                     className="space-x-2"
                     onClick={() => {
-                      setIsDeleteModalOpen(true)
+                      showWarningModal()
                     }}
                   >
                     <IconTrash size={16} />
@@ -200,6 +210,28 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
         </DropdownMenu>
       </div>
 
+      <Modal
+        visible={isWarningModalOpen}
+        hideFooter
+        title="Warning"
+        size="small"
+        onCancel={() => setIsWarningModalOpen(false)}
+        header="Critical warning"
+      >
+        <Modal.Content className="space-y-2">
+          <p className="text-sm text-foreground-light">
+            Removing a member is permanent and will delete all their content, including SQL
+            snippets, reports, etc. Are you sure you want to proceed?
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <Button block type="primary" size="medium" onClick={handleWarningModalConfirm}>
+            Understood
+          </Button>
+        </Modal.Content>
+      </Modal>
+
       <ConfirmationModal
         visible={isDeleteModalOpen}
         title="Confirm to remove"
@@ -210,7 +242,8 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove {member.primary_email}
+          You are about to remove {member.primary_email}. This action is permanent and cannot be
+          undone.
         </p>
       </ConfirmationModal>
     </>
