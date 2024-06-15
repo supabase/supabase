@@ -2634,13 +2634,13 @@ export interface components {
     OrganizationRole: {
       id: number
       name: string
-      description: string
+      description: string | null
     }
     OrganizationRoleV2: {
       id: number
       name: string
-      description: string
-      project_ids: number[]
+      description: string | null
+      project_ids: number[] | null
       base_role_id: number
     }
     OrganizationRoleResponseV2: {

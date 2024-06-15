@@ -7,6 +7,7 @@ import { organizationKeys } from './keys'
 
 export type OrganizationRolesVariables = { slug?: string }
 export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponseV2']
+export type OrganizationRole = components['schemas']['OrganizationRoleV2']
 
 export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,
