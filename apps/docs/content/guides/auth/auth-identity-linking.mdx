@@ -38,6 +38,15 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/dart/auth-linkidentity):
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/swift/auth-linkidentity):
@@ -84,6 +93,23 @@ const googleIdentity = identities.find((identity) => identity.provider === 'goog
 
 // unlink the google identity from the user
 const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+You can use [`getUserIdentities()`](/docs/reference/dart/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/dart/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
+```dart
+// retrieve all identities linked to a user
+final List<UserIdentity> identities = await supabase.auth.getUserIdentities();
+
+// find the google identity linked to the user
+final UserIdentity googleIdentity =
+    identities.singleWhere((identity) => identity.provider == 'google');
+
+// unlink the google identity from the user
+await supabase.auth.unlinkIdentity(googleIdentity);
 ```
 
 </TabPanel>

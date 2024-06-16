@@ -1,13 +1,13 @@
-import { useParams } from 'common'
-import { AiIconAnimation, Button } from 'ui'
+import { Loader2 } from 'lucide-react'
 
+import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { AiIconAnimation, Button } from 'ui'
 import Results from './Results'
-import { Loader2 } from 'lucide-react'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -29,10 +29,7 @@ const UtilityTabResults = ({
   const state = useDatabaseSelectorStateSnapshot()
   const organization = useSelectedOrganization()
 
-  const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
-  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
-
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -41,8 +38,6 @@ const UtilityTabResults = ({
   const isTimeout =
     result?.error?.message?.includes('canceling statement due to statement timeout') ||
     result?.error?.message?.includes('upstream request timeout')
-
-  if (isUtilityPanelCollapsed) return null
 
   if (isExecuting) {
     return (
@@ -96,15 +91,19 @@ const UtilityTabResults = ({
                   </pre>
                 ))
               ) : (
-                <>
-                  <p className="font-mono text-sm">Error: {result.error?.message}</p>
-                  {readReplicaError && (
-                    <p className="text-sm text-foreground-light">
-                      Note: Read replicas are for read only queries. Run write queries on the
-                      primary database instead.
-                    </p>
-                  )}
-                </>
+                <p className="font-mono text-sm">Error: {result.error?.message}</p>
+              )}
+              {result.autoLimit && (
+                <p className="text-sm text-foreground-light">
+                  Note: A limit of {result.autoLimit} was applied to your query. If this was the
+                  cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                </p>
+              )}
+              {readReplicaError && (
+                <p className="text-sm text-foreground-light">
+                  Note: Read replicas are for read only queries. Run write queries on the primary
+                  database instead.
+                </p>
               )}
             </div>
           )}

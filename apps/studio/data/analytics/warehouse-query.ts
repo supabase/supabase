@@ -26,7 +26,7 @@ export async function getWarehouseQuery(
   }
 
   // TODO!: Remove type assertion when we have a proper type for the response
-  return data as any
+  return data as { result: any[] }
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>
@@ -34,16 +34,13 @@ export type WarehouseQueryError = ResponseError
 
 export const useWarehouseQueryQuery = <TData = WarehouseQueryData>(
   { ref, sql }: WarehouseQueryVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseQueryOptions<WarehouseQueryData, WarehouseQueryError, TData> = {}
+  { enabled, ...options }: UseQueryOptions<WarehouseQueryData, WarehouseQueryError, TData> = {}
 ) =>
   useQuery<WarehouseQueryData, WarehouseQueryError, TData>(
     analyticsKeys.warehouseQuery(ref, sql),
     ({ signal }) => getWarehouseQuery({ ref, sql }, signal),
     {
-      enabled: enabled && typeof ref !== 'undefined',
+      enabled,
       staleTime: Infinity,
       cacheTime: 15 * 60 * 1000, // 15 mins cache time
       refetchOnMount: false,

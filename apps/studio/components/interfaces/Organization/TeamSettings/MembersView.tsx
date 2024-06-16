@@ -165,43 +165,38 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         onCancel={() => setUserRoleChangeModalVisible(false)}
         header="Change role of member"
       >
-        <div className="flex flex-col gap-2 py-4">
-          <Modal.Content>
-            <p className="text-sm text-foreground-light">
-              You are changing the role of{' '}
-              <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
-              <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}
-              to{' '}
-              <span className="text-foreground">{getRoleNameById(selectedMember?.newRoleId)}</span>
-            </p>
-            <p className="mt-3 text-sm text-foreground">
-              By changing the role of this member their permissions will change.
-            </p>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <div className="flex gap-3">
-              <Button
-                type="default"
-                block
-                size="medium"
-                onClick={() => setUserRoleChangeModalVisible(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                block
-                type="warning"
-                size="medium"
-                disabled={isLoading}
-                loading={isLoading}
-                onClick={() => handleRoleChange()}
-              >
-                Confirm
-              </Button>
-            </div>
-          </Modal.Content>
-        </div>
+        <Modal.Content>
+          <p className="text-sm text-foreground-light">
+            You are changing the role of{' '}
+            <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
+            <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span> to{' '}
+            <span className="text-foreground">{getRoleNameById(selectedMember?.newRoleId)}</span>
+          </p>
+          <p className="mt-3 text-sm text-foreground">
+            By changing the role of this member their permissions will change.
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content className="flex gap-3">
+          <Button
+            type="default"
+            block
+            size="medium"
+            onClick={() => setUserRoleChangeModalVisible(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            block
+            type="warning"
+            size="medium"
+            disabled={isLoading}
+            loading={isLoading}
+            onClick={() => handleRoleChange()}
+          >
+            Confirm
+          </Button>
+        </Modal.Content>
       </Modal>
     </>
   )

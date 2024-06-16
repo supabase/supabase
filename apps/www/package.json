@@ -33,7 +33,7 @@
     "cobe": "^0.6.2",
     "common": "*",
     "config": "*",
-    "contentlayer2": "0.4.5",
+    "contentlayer2": "^0.4.5",
     "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
     "framer-motion": "^11.0.3",

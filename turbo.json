@@ -13,11 +13,11 @@
         "SUPABASE_URL",
         "GITHUB_OAUTH_CLIENT_SECRET"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_API_KEY"],
+      "env": ["OPENAI_API_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {

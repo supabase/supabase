@@ -43,6 +43,7 @@ type MultiSelectorProps = {
   values: string[]
   onValuesChange: (value: string[]) => void
   loop?: boolean
+  disabled?: boolean
 } & React.ComponentPropsWithoutRef<typeof Command> &
   VariantProps<typeof MultiSelectorVariants>
 
@@ -56,6 +57,7 @@ interface MultiSelectContextProps {
   activeIndex: number
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
   size: MultiSelectorProps['size']
+  disabled?: boolean
 }
 
 const MultiSelectContext = createContext<MultiSelectContextProps | null>(null)
@@ -76,6 +78,7 @@ const MultiSelector = ({
   children,
   dir,
   size = 'small',
+  disabled,
   ...props
 }: MultiSelectorProps) => {
   const [inputValue, setInputValue] = useState('')
@@ -154,6 +157,7 @@ const MultiSelector = ({
         activeIndex,
         setActiveIndex,
         size: size || 'small',
+        disabled,
       }}
     >
       <CommandPrimitive
@@ -202,7 +206,7 @@ const MultiSelectorTriggerBadgeVariants = cva(
 
 const MultiSelectorTrigger = forwardRef<HTMLDivElement, ButtonVariantProps>(
   ({ className, children, ...props }, ref) => {
-    const { value, onValueChange, activeIndex, size } = useMultiSelect()
+    const { value, onValueChange, activeIndex, size, disabled } = useMultiSelect()
 
     const mousePreventDefault = useCallback((e: React.MouseEvent) => {
       e.preventDefault()
@@ -214,6 +218,7 @@ const MultiSelectorTrigger = forwardRef<HTMLDivElement, ButtonVariantProps>(
         ref={ref}
         className={cn(
           'flex flex-wrap gap-1 border border-control bg-foreground/[.026] rounded-lg px-1',
+          disabled && 'cursor-not-allowed opacity-50',
           className
         )}
         {...props}
@@ -264,7 +269,8 @@ const MultiSelectorInput = forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput>
 >(({ className, ...props }, ref) => {
-  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size } = useMultiSelect()
+  const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
+    useMultiSelect()
   return (
     <CommandInput
       {...props}
@@ -274,6 +280,7 @@ const MultiSelectorInput = forwardRef<
       onBlur={() => setOpen(false)}
       onFocus={() => setOpen(true)}
       onClick={() => setActiveIndex(-1)}
+      disabled={disabled}
       className={cn(
         MultiSelectorInputVariants({ size }),
         'text-sm bg-transparent border-none outline-none placeholder:text-foreground-muted flex-1',

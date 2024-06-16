@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -43,7 +44,9 @@ export const IndexAdvisorDisabledState = () => {
           version: indexAdvisorExtension.default_version,
         })
       }
-    } finally {
+      toast.success('Successfully enabled index advisor!')
+    } catch (error: any) {
+      toast.error(`Failed to enable index advisor: ${error.message}`)
     }
   }
 

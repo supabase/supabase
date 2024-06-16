@@ -138,15 +138,18 @@ const PaymentMethods = () => {
                   >
                     <FormSection>
                       <FormSectionContent fullWidth loading={false}>
-                        {(paymentMethods?.length ?? 0) === 0 ? (
+                        {(paymentMethods?.data?.length ?? 0) === 0 ? (
                           <div className="flex items-center space-x-2 opacity-50">
                             <IconCreditCard />
                             <p className="text-sm">No payment methods</p>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {paymentMethods?.map((paymentMethod) => {
-                              const isActive = subscription?.payment_method_id === paymentMethod.id
+                            {paymentMethods?.data?.map((paymentMethod) => {
+                              const isActive = paymentMethod.is_default
+
+                              if (!paymentMethod.card) return null
+
                               return (
                                 <div
                                   key={paymentMethod.id}
@@ -161,7 +164,7 @@ const PaymentMethods = () => {
                                       width="32"
                                     />
                                     <p className="prose text-sm font-mono">
-                                      **** **** **** {paymentMethod.card.last4}
+                                      **** **** **** {paymentMethod.card!.last4}
                                     </p>
                                     <p className="text-sm tabular-nums">
                                       Expires: {paymentMethod.card.exp_month}/
@@ -177,20 +180,17 @@ const PaymentMethods = () => {
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
-                                        {subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card' && (
-                                            <>
-                                              <DropdownMenuItem
-                                                key="make-default"
-                                                onClick={() =>
-                                                  setSelectedMethodForUse(paymentMethod)
-                                                }
-                                              >
-                                                <p>Use this card</p>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuSeparator />
-                                            </>
-                                          )}
+                                        {subscription?.payment_method_type === 'card' && (
+                                          <>
+                                            <DropdownMenuItem
+                                              key="make-default"
+                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
+                                            >
+                                              <p>Use this card</p>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                          </>
+                                        )}
                                         <DropdownMenuItem
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}

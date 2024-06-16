@@ -183,7 +183,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant all
   on table public.user_roles
@@ -191,7 +191,7 @@ to supabase_auth_admin;
 
 revoke all
   on table public.user_roles
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 create policy "Allow auth admin to read user roles" ON public.user_roles
 as permissive for select

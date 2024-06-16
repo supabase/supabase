@@ -636,7 +636,7 @@ export const auth = {
       name: 'Auth UI',
       url: undefined,
       items: [
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Auth UI (Deprecated)', url: '/guides/auth/auth-helpers/auth-ui' },
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
@@ -1081,11 +1081,11 @@ export const functions: NavMenuConstant = {
       url: '/guides/functions',
     },
     {
-      name: 'Quickstart',
+      name: 'Getting started',
       url: undefined,
       items: [
         {
-          name: 'Getting started',
+          name: 'Create an Edge Function',
           url: '/guides/functions/quickstart',
         },
         {
@@ -1128,10 +1128,6 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/ai-models',
         },
         {
-          name: 'Regional invocations',
-          url: '/guides/functions/regional-invocation',
-        },
-        {
           name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
@@ -1142,16 +1138,42 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Debugging Edge Functions',
-          url: '/guides/functions/debugging',
+          name: 'Local Debugging with DevTools',
+          url: '/guides/functions/debugging-tools',
         },
         {
-          name: 'Logging and Using Headers',
-          url: '/guides/functions/functions-headers',
+          name: 'Logging',
+          url: '/guides/functions/logging',
+        },
+        {
+          name: 'Troubleshooting Common Issues',
+          url: '/guides/functions/troubleshooting',
         },
         {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
+        },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
+      ],
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Regional invocations',
+          url: '/guides/functions/regional-invocation',
+        },
+        {
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
         },
       ],
     },
@@ -1170,6 +1192,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Sending Push Notifications',
           url: '/guides/functions/examples/push-notifications',
+        },
+        {
+          name: 'Generating AI images',
+          url: '/guides/functions/examples/amazon-bedrock-image-generator',
         },
         {
           name: 'Generating OG images ',
@@ -1291,6 +1317,11 @@ export const realtime: NavMenuConstant = {
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
   ],
 }

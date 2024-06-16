@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
-import { useFunctionsQuery } from 'data/database/functions-query'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
@@ -59,7 +59,7 @@ const SqlEditor: NextPageWithLayout = () => {
     },
     { enabled: intellisenseEnabled }
   )
-  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery(
+  const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -99,7 +99,7 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.tableColumns = tableColumns?.result
     pgInfoRef.current.schemas = schemas
     pgInfoRef.current.keywords = keywords?.result
-    pgInfoRef.current.functions = functions?.result
+    pgInfoRef.current.functions = functions
   }
 
   useEffect(() => {
