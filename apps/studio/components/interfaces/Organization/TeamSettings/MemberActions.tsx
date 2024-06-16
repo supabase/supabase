@@ -212,7 +212,8 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
         }}
         alert={{
           title: 'This action is permanent and cannot be undone',
-          description: 'Removing a member is permanent and will delete all their content, including SQL snippets, reports, etc. Are you sure you want to proceed?',
+          description:
+            'Removing a member is permanent and will delete all their content, including SQL snippets, reports, etc. Are you sure you want to proceed?',
         }}
       >
         <p className="text-sm text-foreground-light">
