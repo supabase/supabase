@@ -453,5 +453,13 @@
     "position": "Partnerships",
     "author_url": "https://github.com/chrischandler",
     "author_image_url": "https://github.com/chrischandler.png"
+  },
+  {
+    "author_id": "bdon",
+    "author": "Brandon Liu",
+    "username": "bdon",
+    "position": "Guest Author",
+    "author_url": "https://github.com/bdon",
+    "author_image_url": "https://github.com/bdon.png"
   }
 ]
