@@ -3456,6 +3456,7 @@ functions:
           }
           ```
         hideCodeBlock: true
+  
   - id: filter
     title: filter()
     params:
@@ -3568,7 +3569,6 @@ functions:
           }
           ```
         hideCodeBlock: true
-
   - id: using-modifiers
     title: Using Modifiers
     description: |
@@ -3583,15 +3583,35 @@ functions:
 
   - id: order
     title: order()
+    description: Order the query result by `column`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to order by
+      - name: desc
+        isOptional: true
+        type: bool
+        description: Whether the rows should be ordered in descending order or not.
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Foreign table name whose results are to be ordered.
+      - name: nullsfirst
+        isOptional: true
+        type: bool
+        description: Order by showing nulls first
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .order('name', desc=True)
-            .execute()
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .order("name", desc=True)
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -3607,14 +3627,24 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(
-            data=[
-              {'id': 1, 'name': None},
-              {'id': 3, 'name': 'Algeria'},
-              {'id': 2, 'name': 'Albania'}],
-            count=None
-          )
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -3622,10 +3652,12 @@ functions:
         name: On a foreign table
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('name, cities(name)')
-              .order('name', desc=True, foreign_table='cities')
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .order("name", desc=True, foreign_table="cities")
               .execute()
+          )
           ```
         data:
           sql: |
@@ -3649,8 +3681,27 @@ functions:
               (1, 1, 'Atlanta'),
               (2, 1, 'New York City');
         response: |
-          ```
-          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'New York City'}, {'name': 'Atlanta'}]}, {'name': 'Vanuatu', 'cities': []}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "New York City"
+                  },
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              },
+              {
+                "name": "Vanuatu",
+                "cities": []
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           Ordering on foreign tables doesn't affect the ordering of
@@ -3658,15 +3709,21 @@ functions:
         hideCodeBlock: true
   - id: limit
     title: limit()
+    params:
+      - name: size
+        isOptional: false
+        type: number
+        description: The maximum number of rows to return
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Set this to limit rows of foreign tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .limit(1)
-            .execute()
+          response = supabase.table("countries").select("name").limit(1).execute()
           ```
         data:
           sql: |
@@ -3682,8 +3739,15 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -3691,10 +3755,12 @@ functions:
         name: On a foreign table
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('name, cities(name)')
-              .limit(1, foreign_table='cities')
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .limit(1, foreign_table="cities")
               .execute()
+          )
           ```
         data:
           sql: |
@@ -3719,54 +3785,301 @@ functions:
               (2, 1, 'New York City');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'Atlanta'}]}], count=None)
-          ```
-        hideCodeBlock: true
-  - id: single
-    title: single()
-    examples:
-      - id: with-select()
-        name: With `select()`
-        code: |
-          ```python
-          data, count = supabase.table('countries')
-            .select('name')
-            .limit(1)
-            .single()
-            .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-        response: |
-          ```
-          SingleAPIResponse(data={'name': 'Afghanistan'}, count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
-        isSpotlight: true
-  - id: maybe-single
-    title: maybe_single()
+  - id: range
+    title: range()
+    params:
+      - name: start
+        isOptional: false
+        type: number
+        description: The starting index from which to limit the result.
+      - name: end
+        isOptional: false
+        type: number
+        description: The last index to which to limit the result.
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Set this to limit rows of foreign tables instead of the parent table.
+    notes: |
+      Limit the query result by starting at an offset (`from`) and ending at the offset (`from + to`). Only records within this range are returned. This respects the query order and if there is no order clause the range could behave unexpectedly.
+      
+      The `from` and `to` values are 0-based and inclusive: `range(1, 3)` will include the second, third and fourth rows of the query.
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .eq('name', 'Albania')
-            .maybe_single()
-            .execute()
+          response = supabase.table("countries").select("name").range(0, 1).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .range(0, 1, foreign_table="cities")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Kabul'),
+              (2, 1, 'Herat'),
+              (3, 2, 'Berat');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan",
+                "cities": [
+                  {
+                    "name": "Kabul"
+                  },
+                  {
+                    "name": "Herat"
+                  }
+                ]
+              },
+              {
+                "name": "Albania",
+                "cities": [
+                  {
+                    "name": "Berat"
+                  }
+                ]
+              },
+              {
+                "name": "Algeria",
+                "cities": []
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+  - id: single
+    title: single()
+    notes: Return `data` as a single object instead of an array of objects.
+    examples:
+      - id: with-select()
+        name: With `select()`
+        code: |
+          ```python
+          response = supabase.table("countries").select("name").limit(1).single().execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: maybe-single
+    title: maybe_single()
+    notes: Return `data` as a single object instead of an array of objects.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .eq("name", "Albania")
+              .maybe_single()
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 2,
+              "name": "Albania"
+            },
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: csv
+    title: csv()
+    notes: Return `data` as a string in CSV format.
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```python
+          response = supabase.table("countries").select("*").csv().execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "count": null
+          }
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: explain
+    title: Using Explain
+    params:
+      - name: wal
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on WAL record generation.
+      - name: verbose
+        isOptional: true
+        type: boolean
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query.
+      - name: settings
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on configuration parameters that affect query planning.
+      - name: format
+        isOptional: true
+        type: boolean
+        description: The format of the output, can be `"text"` (default) or `"json"`.
+      - name: format
+        isOptional: true
+        type: '"text" | "json"'
+        description: The format of the output, can be `"text"` (default) or `"json"`.
+      - name: buffers
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on buffer usage.
+      - name: analyze
+        isOptional: true
+        type: boolean
+        description: If `true`, the query will be executed and the actual run time will be returned.
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```python
+          response = supabase.table("countries").select("*").explain().execute()
           ```
         data:
           sql: |
@@ -3783,10 +4096,55 @@ functions:
             ```
         response: |
           ```
-          SingleAPIResponse(data={'id': 2, 'name': 'Albania'}, count=None)
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
           ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .explain(analyze=True, verbose=True)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
 
   - id: invoke
     title: 'invoke()'
@@ -3801,11 +4159,8 @@ functions:
         description:
         code: |
           ```python
-          resp = supabase.functions.invoke(
-            "hello-world",
-            invoke_options={
-              "body": { "foo": "bar" }
-            },
+          response = supabase.functions.invoke(
+              "hello-world", invoke_options={"body": {"name": "Functions"}}
           )
           ```
       - id: error-handling
@@ -3821,7 +4176,7 @@ functions:
           from supafunc.errors import FunctionsRelayError, FunctionsHttpError
 
           try:
-            resp = supabase.functions.invoke(
+            response = supabase.functions.invoke(
                 "hello-world",
                 invoke_options={
                     "body": {"foo": "bar"},
@@ -3844,7 +4199,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          resp = supabase.functions.invoke(
+          response = supabase.functions.invoke(
             "hello-world", 
             invoke_options={
               "headers": {
