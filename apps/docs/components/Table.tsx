@@ -1,9 +1,9 @@
-import React, { FC, TableHTMLAttributes, useRef, useState } from 'react'
+import React, { TableHTMLAttributes, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 type TableProps = TableHTMLAttributes<HTMLTableElement>
 
-const Table: FC<TableProps> = ({ children, ...props }) => {
+const Table = ({ children, ...props }: TableProps) => {
   const containerRef = useRef(null)
   const [showShadow, setShowShadow] = useState(true)
 
