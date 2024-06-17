@@ -38,6 +38,7 @@
     "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",
+    "eslint-config-supabase": "*",
     "framer-motion": "^11.0.3",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",

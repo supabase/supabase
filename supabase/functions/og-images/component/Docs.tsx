@@ -22,6 +22,8 @@ const Docs = (props: Props) => {
   } else if (type === 'cli') {
     typeName = 'CLI'
     typeIcon = 'reference-cli'
+  } else if (type === 'ai') {
+    typeName = 'AI & Vectors'
   }
 
   return (
@@ -29,50 +31,52 @@ const Docs = (props: Props) => {
       style={{
         height: '100%',
         width: '100%',
+        padding: '64px',
         display: 'flex',
         flexDirection: 'column',
-        color: 'white',
-        backgroundColor: '#1c1c1c',
+        color: '#EDEDED',
+        backgroundColor: '#181818',
         fontFamily: 'Circular',
-        backgroundImage:
-          'url(https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/og-images/gradient.svg)',
-        backgroundRepeat: 'no-repeat',
       }}
     >
-      <div tw="flex flex-row items-center justify-center absolute top-[60px] left-[64px]">
-        {icon && (
-          <img
-            src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/${icon}-icon.svg`}
-            width="50px"
-            height="50px"
-          />
-        )}
-        {type && icon && <div tw="h-[50px] border-[1px] border-white mx-4"></div>}
-        {type && (
-          <>
-            <div tw="w-[50px] h-[50px] bg-[#164430] rounded-md flex items-center justify-center">
+      <div tw="w-full flex flex-row items-center justify-between">
+        <div tw="flex flex-row items-center" style={{ lineHeight: '100%' }}>
+          {icon && (
+            <img
+              src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/${icon}-icon.svg`}
+              width="50px"
+              height="50px"
+            />
+          )}
+          {type && icon && <div tw="h-[50px] border-[1px] border-white mx-4"></div>}
+          {type && (
+            <>
               <img
-                src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/${typeIcon}.svg`}
-                width="80%"
-                height="80%"
+                src={`https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/icons/menu/grayscale/${typeIcon}.svg`}
+                width="40px"
+                height="40px"
               />
-            </div>
-            <span tw="text-[36px] text-[#ededed] ml-[16px]">{typeName}</span>
-          </>
-        )}
-      </div>
-      <div tw="flex flex-col">
-        <div tw="flex flex-col absolute left-[64px] top-[154px] w-[1072px]">
-          <h1 tw="my-0 mb-2 text-[60px]">{!title ? 'Supabase' : title}</h1>
-          <p tw="my-0 mt-2 text-[40px] text-[#f2fff9] opacity-50">{description}</p>
+              <span tw="text-[36px] text-[#ededed] ml-4 -mt-[2px]">{typeName}</span>
+            </>
+          )}
         </div>
-        <div tw="flex flex-row items-center justify-center absolute left-[64px] top-[500px]">
+        <div tw="flex flex-row items-center justify-center">
           <img
-            src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.png"
+            src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg"
             width={180}
             height={34}
           />
-          <span tw="text-lg font-normal text-[#3ecf8e] ml-2">DOCS</span>
+          <span tw="text-2xl font-normal text-[#3ecf8e] ml-4" style={{ fontFamily: 'SourceCode' }}>
+            DOCS
+          </span>
+        </div>
+      </div>
+      <div tw="w-full flex flex-col border-t border-[#4D4D4D] mt-10">
+        <div tw="w-full flex flex-col mt-5">
+          <h1 tw="my-0 mb-2 text-[60px]" style={{ lineHeight: '115%' }}>
+            {!title ? 'Supabase' : title}
+          </h1>
+          <p tw="my-0 mt-2 text-[40px] text-[#f2fff9] opacity-50">{description}</p>
         </div>
       </div>
     </div>
