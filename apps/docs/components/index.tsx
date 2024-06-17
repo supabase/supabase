@@ -121,7 +121,7 @@ const components = {
   table: (props: any) => (
     <div className="relative">
       <span className="block md:hidden absolute inset-y-0 -right-5 left-auto w-5 bg-gradient-to-r from-transparent to-background" />
-      <div className="overflow-x-auto break-normal -mr-5 md:mr-0 pr-5 md:pr-0">
+      <div className="w-full overflow-x-auto break-normal -mr-5 md:mr-0 pr-5 md:pr-0">
         <table {...props}>{props.children}</table>
       </div>
     </div>
