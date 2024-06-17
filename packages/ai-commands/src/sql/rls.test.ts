@@ -1,6 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
-import OpenAI from 'openai'
 import {
   assertAndRenderColumn,
   assertAndUnwrapNode,
@@ -8,14 +7,14 @@ import {
   assertEachSideOfExpression,
   assertEitherSideOfExpression,
   assertNodeType,
-  getPolicies,
-  getPolicyInfo,
   parseConstant,
   renderFields,
   renderJsonExpression,
   renderTargets,
   unwrapNode,
-} from '../../test/sql-util'
+} from 'common/sql-util'
+import OpenAI from 'openai'
+import { getPolicies, getPolicyInfo } from '../../test/sql-util'
 import { collectStream, extractMarkdownSql, withMetadata } from '../../test/util'
 import { chatRlsPolicy } from './rls'
 

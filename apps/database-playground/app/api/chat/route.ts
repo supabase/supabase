@@ -9,6 +9,9 @@ export const maxDuration = 30
 const reportSchema = z.object({ name: z.string(), description: z.string() })
 export type Report = typeof reportSchema._type
 
+export const tabsSchema = z.enum(['diagram', 'migrations', 'seeds'])
+export type TabValue = typeof tabsSchema._type
+
 export async function POST(req: Request) {
   const { messages } = await req.json()
 
@@ -80,7 +83,7 @@ export async function POST(req: Request) {
           Switches to a different tab.
         `,
         parameters: z.object({
-          tab: z.enum(['diagram', 'migrations']),
+          tab: tabsSchema,
         }),
       },
     },

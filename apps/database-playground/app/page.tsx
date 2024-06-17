@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/
 import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
+import { assertDefined } from 'common/sql-util'
 import { AnimatePresence, LazyMotion, m } from 'framer-motion'
+import { parseQuery } from 'libpg-query/wasm'
 import { throttle } from 'lodash'
 import { ArrowUp, Square } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
@@ -24,6 +26,8 @@ import { Button } from 'ui/src/components/shadcn/ui/button'
 import SchemaGraph from '~/components/schema/graph'
 import { useTablesQuery } from '~/data/tables/tables-query'
 import { useReportSuggestions } from '~/lib/hooks'
+import { groupStatements } from '~/lib/sql-util'
+import { TabValue, tabsSchema } from './api/chat/route'
 
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
 
@@ -35,13 +39,14 @@ export default function Page() {
   const [migrationSql, setMigrationSql] = useState(
     '-- Migrations will appear here as you chat with Supabase AI'
   )
-  const [tab, setTab] = useState('diagram')
+  const [seedSql, setSeedSql] = useState('-- Seeds will appear here as you chat with Supabase AI')
+  const [tab, setTab] = useState<TabValue>('diagram')
   const [brainstormIdeas] = useState(false)
   const { reports } = useReportSuggestions(db, { enabled: brainstormIdeas })
 
   const { data: tables, refetch } = useTablesQuery({ schemas: ['public'], includeColumns: true })
 
-  const { messages, input, setInput, handleInputChange, append, stop, isLoading } = useChat({
+  const { messages, input, setInput, handleInputChange, append, stop, isLoading, error } = useChat({
     api: 'api/chat',
     maxToolRoundtrips: 10,
     // Provide the LLM with the current schema before the chat starts
@@ -82,19 +87,43 @@ export default function Page() {
         case 'executeSql': {
           try {
             const { sql } = toolCall.args as any
+
             console.log(sql)
+
+            const parseResult = await parseQuery(sql)
+
+            assertDefined(parseResult.stmts, 'Expected parse result to contain statements')
+
+            const { seeds, migrations } = groupStatements(parseResult.stmts)
+
             const results = await db.exec(sql)
 
-            setMigrationSql((s) => {
-              const newSql = (s + '\n' + sql).trim()
-              return format(newSql, {
-                language: 'postgresql',
-                keywordCase: 'lower',
-                identifierCase: 'lower',
-                dataTypeCase: 'lower',
-                functionCase: 'lower',
+            // TODO: use libpg-query de-parser once released
+            // This assumes every statement is a seed or migration,
+            // which might not be true
+            if (seeds.length > 0) {
+              setSeedSql((s) => {
+                const newSql = (s + '\n' + sql).trim()
+                return format(newSql, {
+                  language: 'postgresql',
+                  keywordCase: 'lower',
+                  identifierCase: 'lower',
+                  dataTypeCase: 'lower',
+                  functionCase: 'lower',
+                })
               })
-            })
+            } else if (migrations.length > 0) {
+              setMigrationSql((s) => {
+                const newSql = (s + '\n' + sql).trim()
+                return format(newSql, {
+                  language: 'postgresql',
+                  keywordCase: 'lower',
+                  identifierCase: 'lower',
+                  dataTypeCase: 'lower',
+                  functionCase: 'lower',
+                })
+              })
+            }
 
             const { data: tables, error } = await refetch()
 
@@ -204,11 +233,12 @@ export default function Page() {
         <Tabs
           className="flex-1 h-full flex flex-col items-stretch"
           value={tab}
-          onValueChange={(tab) => setTab(tab)}
+          onValueChange={(tab) => setTab(tabsSchema.parse(tab))}
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="diagram">Diagram</TabsTrigger>
             <TabsTrigger value="migrations">Migrations</TabsTrigger>
+            <TabsTrigger value="seeds">Seeds</TabsTrigger>
           </TabsList>
           <TabsContent value="diagram" className="h-full">
             <SchemaGraph schema="public" />
@@ -217,6 +247,47 @@ export default function Page() {
             <Editor
               language="pgsql"
               value={migrationSql}
+              theme="vs-dark"
+              options={{
+                tabSize: 2,
+                minimap: {
+                  enabled: false,
+                },
+                fontSize: 13,
+                readOnly: true,
+              }}
+              onMount={async (editor, monaco) => {
+                // Register pgsql formatter
+                monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+                  async provideDocumentFormattingEdits(model) {
+                    const currentCode = editor.getValue()
+                    const formattedCode = format(currentCode, {
+                      language: 'postgresql',
+                      keywordCase: 'lower',
+                    })
+                    return [
+                      {
+                        range: model.getFullModelRange(),
+                        text: formattedCode,
+                      },
+                    ]
+                  },
+                })
+
+                // Format on cmd+s
+                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+                  await editor.getAction('editor.action.formatDocument').run()
+                })
+
+                // Run format on the initial value
+                await editor.getAction('editor.action.formatDocument').run()
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="seeds" className="h-full py-4 rounded-md bg-[#1e1e1e]">
+            <Editor
+              language="pgsql"
+              value={seedSql}
               theme="vs-dark"
               options={{
                 tabSize: 2,

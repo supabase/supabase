@@ -13,6 +13,7 @@
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "*",
     "ai": "^2.2.29",
+    "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",
     "js-tiktoken": "^1.0.10",
