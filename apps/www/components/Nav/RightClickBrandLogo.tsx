@@ -64,7 +64,7 @@ const RightClickBrandLogo = () => {
         </Link>
       </DropdownMenuTrigger>
       <DropdownMenuPortal container={triggerRef.current}>
-        <DropdownMenuContent ref={ref} align="start" side="bottom" className="mt-2 p-0">
+        <DropdownMenuContent ref={ref} align="start" side="bottom" className="mt-2 p-0 w-52">
           {menuItems.map((section, sectionIdx) => (
             <Fragment key={`cxtMenu-section-${sectionIdx}`}>
               {sectionIdx !== 0 && <Divider />}
@@ -139,7 +139,7 @@ const menuItems: MenuItem[][] = [
 `,
     },
     {
-      label: 'Download Supabase wordmark',
+      label: 'Download wordmark',
       type: 'download',
       icon: (
         <svg
