@@ -24,8 +24,7 @@
         "NEXT_PUBLIC_*",
         "NODE_ENV",
         "OPENAI_API_KEY",
-        "SKIP_BUILD_STATIC_GENERATION",
-        "SUPABASE_SERVICE_ROLE_KEY"
+        "SKIP_BUILD_STATIC_GENERATION"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
