@@ -4,7 +4,7 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, cn, markdownComponents } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
@@ -119,7 +119,6 @@ const components = {
       {props.children}
     </Heading>
   ),
-  table: Table,
   HuggingFaceDeployment,
   IconCheck,
   IconMenuApi,
@@ -165,6 +164,7 @@ const components = {
   SocialProviderSetup,
   SqlToRest,
   StepHikeCompact,
+  table: Table,
   TabPanel,
   Tabs,
 }
