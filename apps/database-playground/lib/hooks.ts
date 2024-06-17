@@ -1,8 +1,9 @@
 import { PGlite } from '@electric-sql/pglite'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import { codeBlock } from 'common-tags'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useTablesQuery } from '~/data/tables/tables-query'
 import { Report } from '~/lib/schema'
 
@@ -63,4 +64,43 @@ export function useReportSuggestions(
   }, [enabled, tables])
 
   return { reports }
+}
+
+/**
+ * Hook to load/store values from local storage with an API similar
+ * to `useState()`.
+ */
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const queryClient = useQueryClient()
+  const queryKey = ['local-storage', key]
+
+  const { data: storedValue = initialValue } = useQuery({
+    queryKey,
+    queryFn: () => {
+      if (typeof window === 'undefined') {
+        return initialValue
+      }
+
+      const item = window.localStorage.getItem(key)
+
+      if (!item) {
+        return initialValue
+      }
+
+      return JSON.parse(item) as T
+    },
+  })
+
+  const setValue: Dispatch<SetStateAction<T>> = (value) => {
+    const valueToStore = value instanceof Function ? value(storedValue) : value
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(key, JSON.stringify(valueToStore))
+    }
+
+    queryClient.setQueryData(queryKey, valueToStore)
+    queryClient.invalidateQueries({ queryKey })
+  }
+
+  return [storedValue, setValue] as const
 }

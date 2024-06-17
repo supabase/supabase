@@ -4,7 +4,7 @@ import 'chartjs-adapter-date-fns'
 
 import { Editor } from '@monaco-editor/react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
-import { nanoid } from 'ai'
+import { Message, nanoid } from 'ai'
 import { useChat } from 'ai/react'
 import Chart from 'chart.js/auto'
 import { assertDefined } from 'common/sql-util'
@@ -24,29 +24,28 @@ import { AiIconAnimation, markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
 import SchemaGraph from '~/components/schema/graph'
 import { useTablesQuery } from '~/data/tables/tables-query'
-import { db } from '~/lib/db'
-import { useReportSuggestions } from '~/lib/hooks'
+import { db, resetDb } from '~/lib/db'
+import { useLocalStorage, useReportSuggestions } from '~/lib/hooks'
 import { TabValue, tabsSchema } from '~/lib/schema'
 import { groupStatements } from '~/lib/sql-util'
 
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
 
+const initialMigrationSql = '-- Migrations will appear here as you chat with Supabase AI\n'
+const initialSeedSql = '-- Seeds will appear here as you chat with Supabase AI\n'
+
 export default function Page() {
-  const [migrationSql, setMigrationSql] = useState(
-    '-- Migrations will appear here as you chat with Supabase AI'
-  )
-  const [seedSql, setSeedSql] = useState('-- Seeds will appear here as you chat with Supabase AI')
+  const [migrationSql, setMigrationSql] = useLocalStorage('migrations', initialMigrationSql)
+  const [seedSql, setSeedSql] = useLocalStorage('seeds', initialSeedSql)
+
   const [tab, setTab] = useState<TabValue>('diagram')
   const [brainstormIdeas] = useState(false) // temporarily turn off for now
   const { reports } = useReportSuggestions(db, { enabled: brainstormIdeas })
 
   const { data: tables, refetch } = useTablesQuery({ schemas: ['public'], includeColumns: true })
 
-  const { messages, input, setInput, handleInputChange, append, stop, isLoading, error } = useChat({
-    api: 'api/chat',
-    maxToolRoundtrips: 10,
-    // Provide the LLM with the current schema before the chat starts
-    initialMessages: [
+  const initialMessages = useMemo<Message[]>(
+    () => [
       {
         id: nanoid(),
         role: 'assistant',
@@ -61,66 +60,19 @@ export default function Page() {
         ],
       },
     ],
-    async onToolCall({ toolCall }) {
-      console.log('tool call', toolCall)
-      switch (toolCall.toolName) {
-        case 'getDatabaseSchema': {
-          const { data: tables, error } = await refetch()
+    [tables]
+  )
 
-          // TODO: handle this error in the UI
-          if (error) {
-            throw error
-          }
-
-          return tables
-        }
-        case 'brainstormReports': {
-          return {
-            success: true,
-            message: 'Reports have been brainstormed. Relay this info to the user.',
-          }
-        }
-        case 'executeSql': {
-          try {
-            const { sql } = toolCall.args as any
-
-            console.log(sql)
-
-            const parseResult = await parseQuery(sql)
-
-            assertDefined(parseResult.stmts, 'Expected parse result to contain statements')
-
-            const { seeds, migrations } = groupStatements(parseResult.stmts)
-
-            const results = await db.exec(sql)
-
-            // TODO: use libpg-query de-parser once released
-            // This assumes every statement is a seed or migration,
-            // which might not be true
-            if (seeds.length > 0) {
-              setSeedSql((s) => {
-                const newSql = (s + '\n' + sql).trim()
-                return format(newSql, {
-                  language: 'postgresql',
-                  keywordCase: 'lower',
-                  identifierCase: 'lower',
-                  dataTypeCase: 'lower',
-                  functionCase: 'lower',
-                })
-              })
-            } else if (migrations.length > 0) {
-              setMigrationSql((s) => {
-                const newSql = (s + '\n' + sql).trim()
-                return format(newSql, {
-                  language: 'postgresql',
-                  keywordCase: 'lower',
-                  identifierCase: 'lower',
-                  dataTypeCase: 'lower',
-                  functionCase: 'lower',
-                })
-              })
-            }
-
+  const { messages, setMessages, input, setInput, handleInputChange, append, stop, isLoading } =
+    useChat({
+      api: 'api/chat',
+      maxToolRoundtrips: 10,
+      // Provide the LLM with the current schema before the chat starts
+      initialMessages,
+      async onToolCall({ toolCall }) {
+        console.log('tool call', toolCall)
+        switch (toolCall.toolName) {
+          case 'getDatabaseSchema': {
             const { data: tables, error } = await refetch()
 
             // TODO: handle this error in the UI
@@ -128,56 +80,112 @@ export default function Page() {
               throw error
             }
 
-            return {
-              queryResults: results,
-              updatedSchema: tables,
-            }
-          } catch (err) {
-            if (err instanceof Error) {
-              console.log(err.message)
-              return { success: false, error: err.message }
-            }
-            throw err
+            return tables
           }
-        }
-        case 'generateChart': {
-          const { config } = toolCall.args as any
-
-          // Validate that the chart can be rendered without error
-          const canvas = document.createElement('canvas', {})
-          canvas.className = 'invisible'
-          document.body.appendChild(canvas)
-
-          try {
-            const chart = new Chart(canvas, config)
-            chart.destroy()
+          case 'brainstormReports': {
             return {
               success: true,
-              message:
-                "The chart has been generated and displayed to the user above. Acknowledge the user's request.",
+              message: 'Reports have been brainstormed. Relay this info to the user.',
             }
-          } catch (err) {
-            if (err instanceof Error) {
-              return { success: false, error: err.message }
+          }
+          case 'executeSql': {
+            try {
+              const { sql } = toolCall.args as any
+
+              console.log(sql)
+
+              const parseResult = await parseQuery(sql)
+
+              assertDefined(parseResult.stmts, 'Expected parse result to contain statements')
+
+              const { seeds, migrations } = groupStatements(parseResult.stmts)
+
+              const results = await db.exec(sql)
+
+              // TODO: use libpg-query de-parser once released
+              // This assumes every statement is a seed or migration,
+              // which might not be true
+              if (seeds.length > 0) {
+                setSeedSql((s) => {
+                  const newSql = (s + '\n' + sql).trim()
+                  return format(newSql, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                    identifierCase: 'lower',
+                    dataTypeCase: 'lower',
+                    functionCase: 'lower',
+                  })
+                })
+              } else if (migrations.length > 0) {
+                setMigrationSql((s) => {
+                  const newSql = (s + '\n' + sql).trim()
+                  return format(newSql, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                    identifierCase: 'lower',
+                    dataTypeCase: 'lower',
+                    functionCase: 'lower',
+                  })
+                })
+              }
+
+              const { data: tables, error } = await refetch()
+
+              // TODO: handle this error in the UI
+              if (error) {
+                throw error
+              }
+
+              return {
+                queryResults: results,
+                updatedSchema: tables,
+              }
+            } catch (err) {
+              if (err instanceof Error) {
+                console.log(err.message)
+                return { success: false, error: err.message }
+              }
+              throw err
             }
-            throw err
-          } finally {
-            canvas.remove()
+          }
+          case 'generateChart': {
+            const { config } = toolCall.args as any
+
+            // Validate that the chart can be rendered without error
+            const canvas = document.createElement('canvas', {})
+            canvas.className = 'invisible'
+            document.body.appendChild(canvas)
+
+            try {
+              const chart = new Chart(canvas, config)
+              chart.destroy()
+              return {
+                success: true,
+                message:
+                  "The chart has been generated and displayed to the user above. Acknowledge the user's request.",
+              }
+            } catch (err) {
+              if (err instanceof Error) {
+                return { success: false, error: err.message }
+              }
+              throw err
+            } finally {
+              canvas.remove()
+            }
+          }
+          case 'switchTab': {
+            const { tab } = toolCall.args as any
+
+            setTab(tab)
+
+            return {
+              success: true,
+              message: `The UI successfully switch to the '${tab}' tab. Acknowledge the user's request.`,
+            }
           }
         }
-        case 'switchTab': {
-          const { tab } = toolCall.args as any
-
-          setTab(tab)
-
-          return {
-            success: true,
-            message: `The UI successfully switch to the '${tab}' tab. Acknowledge the user's request.`,
-          }
-        }
-      }
-    },
-  })
+      },
+    })
 
   const lastMessage = messages.at(-1)
 
@@ -231,10 +239,11 @@ export default function Page() {
           value={tab}
           onValueChange={(tab) => setTab(tabsSchema.parse(tab))}
         >
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="diagram">Diagram</TabsTrigger>
             <TabsTrigger value="migrations">Migrations</TabsTrigger>
             <TabsTrigger value="seeds">Seeds</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="diagram" className="h-full">
             <SchemaGraph schema="public" />
@@ -320,6 +329,20 @@ export default function Page() {
                 await editor.getAction('editor.action.formatDocument').run()
               }}
             />
+          </TabsContent>
+          <TabsContent value="settings" className="h-full">
+            <Button
+              onClick={async () => {
+                setSeedSql(initialSeedSql)
+                setMigrationSql(initialMigrationSql)
+                setTab('diagram')
+                setMessages(initialMessages)
+                await resetDb()
+                await refetch()
+              }}
+            >
+              Reset database
+            </Button>
           </TabsContent>
         </Tabs>
 
