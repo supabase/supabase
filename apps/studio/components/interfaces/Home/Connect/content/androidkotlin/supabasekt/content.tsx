@@ -16,7 +16,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <ConnectTabTrigger value="MainActivity.kt" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value="lib/main.dart">
+      <ConnectTabContent value="TodoItem.kt">
         <SimpleCodeBlock className="kotlin" parentClassName="min-h-72">
           {`
 @Serializable
