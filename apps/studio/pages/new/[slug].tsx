@@ -15,6 +15,7 @@ import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
+  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
@@ -49,12 +50,110 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
+
+const sizes: DesiredInstanceSize[] = [
+  'micro',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+  '2xlarge',
+  '4xlarge',
+  '8xlarge',
+  '12xlarge',
+  '16xlarge',
+]
+
+const instanceSizeSpecs: Record<
+  DesiredInstanceSize,
+  { label: string; ram: string; cpu: string; priceHourly: number; priceMonthly: number }
+> = {
+  micro: {
+    label: 'Micro',
+    ram: '1 GB',
+    cpu: '2-core ARM',
+    priceHourly: 0.01344,
+    priceMonthly: 10,
+  },
+  small: {
+    label: 'Small',
+    ram: '2 GB',
+    cpu: '2-core ARM',
+    priceHourly: 0.0206,
+    priceMonthly: 15,
+  },
+  medium: {
+    label: 'Medium',
+    ram: '4 GB',
+    cpu: '2-core ARM',
+    priceHourly: 0.0822,
+    priceMonthly: 60,
+  },
+  large: {
+    label: 'Large',
+    ram: '8 GB',
+    cpu: '2-core ARM',
+    priceHourly: 0.1517,
+    priceMonthly: 110,
+  },
+  xlarge: {
+    label: 'XL',
+    ram: '16 GB',
+    cpu: '4-core ARM',
+    priceHourly: 0.2877,
+    priceMonthly: 210,
+  },
+  '2xlarge': {
+    label: '2XL',
+    ram: '32 GB',
+    cpu: '8-core ARM',
+    priceHourly: 0.562,
+    priceMonthly: 410,
+  },
+  '4xlarge': {
+    label: '4XL',
+    ram: '64 GB',
+    cpu: '16-core ARM',
+    priceHourly: 1.32,
+    priceMonthly: 960,
+  },
+  '8xlarge': {
+    label: '8XL',
+    ram: '128 GB',
+    cpu: '32-core ARM',
+    priceHourly: 2.562,
+    priceMonthly: 1870,
+  },
+  '12xlarge': {
+    label: '12XL',
+    ram: '192 GB',
+    cpu: '48-core ARM',
+    priceHourly: 3.836,
+    priceMonthly: 2800,
+  },
+  '16xlarge': {
+    label: '16XL',
+    ram: '256 GB',
+    cpu: '64-core ARM',
+    priceHourly: 5.12,
+    priceMonthly: 3730,
+  },
+}
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -70,6 +169,13 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
+
+  const { data: allProjects } = useProjectsQuery({})
+  const organizationProjects =
+    allProjects?.filter(
+      (project) => project.organization_id === currentOrg?.id && project.status !== 'paused'
+    ) ?? []
+
   const { data: orgSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
@@ -119,85 +225,6 @@ const Wizard: NextPageWithLayout = () => {
 
     setPasswordStrengthWarning(warning)
     setPasswordStrengthMessage(message)
-  }
-
-  const sizes: DesiredInstanceSize[] = [
-    'micro',
-    'small',
-    'medium',
-    'large',
-    'xlarge',
-    '2xlarge',
-    '4xlarge',
-    '8xlarge',
-    '12xlarge',
-    '16xlarge',
-  ]
-
-  const instanceSizeSpecs: Record<
-    DesiredInstanceSize,
-    { label: string; ram: string; cpu: string; price: string }
-  > = {
-    micro: {
-      label: 'Micro',
-      ram: '1 GB',
-      cpu: '2-core ARM',
-      price: '$0.01344/hour (~$10/month)',
-    },
-    small: {
-      label: 'Small',
-      ram: '2 GB',
-      cpu: '2-core ARM',
-      price: '$0.0206/hour (~$15/month)',
-    },
-    medium: {
-      label: 'Medium',
-      ram: '4 GB',
-      cpu: '2-core ARM',
-      price: '$0.0822/hour (~$60/month)',
-    },
-    large: {
-      label: 'Large',
-      ram: '8 GB',
-      cpu: '2-core ARM',
-      price: '$0.1517/hour (~$110/month)',
-    },
-    xlarge: {
-      label: 'XL',
-      ram: '16 GB',
-      cpu: '4-core ARM',
-      price: '$0.2877/hour (~$210/month)',
-    },
-    '2xlarge': {
-      label: '2XL',
-      ram: '32 GB',
-      cpu: '8-core ARM',
-      price: '$0.562/hour (~$410/month)',
-    },
-    '4xlarge': {
-      label: '4XL',
-      ram: '64 GB',
-      cpu: '16-core ARM',
-      price: '$1.32/hour (~$960/month)',
-    },
-    '8xlarge': {
-      label: '8XL',
-      ram: '128 GB',
-      cpu: '32-core ARM',
-      price: '$2.562/hour (~$1,870/month)',
-    },
-    '12xlarge': {
-      label: '12XL',
-      ram: '192 GB',
-      cpu: '48-core ARM',
-      price: '$3.836/hour (~$2,800/month)',
-    },
-    '16xlarge': {
-      label: '16XL',
-      ram: '256 GB',
-      cpu: '64-core ARM',
-      price: '$5.12/hour (~$3,730/month)',
-    },
   }
 
   const FormSchema = z
@@ -251,6 +278,20 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: sizes[0],
     },
   })
+
+  const { instanceSize } = form.watch()
+
+  // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
+  const monthlyComputeCosts =
+    // current project costs
+    organizationProjects.reduce(
+      (prev, acc) => prev + monthlyInstancePrice(acc.infra_compute_size),
+      0
+    ) +
+    // selected instance size
+    monthlyInstancePrice(instanceSize) -
+    // compute credits
+    10
 
   // [Joshen] Refactor: DB Password could be a common component
   // used in multiple pages with repeated logic
@@ -329,6 +370,11 @@ const Wizard: NextPageWithLayout = () => {
       form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
     }
   }, [defaultRegionError])
+
+  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+
+  const additionalMonthlySpend =
+    instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
   return (
     <Form_Shadcn_ {...form}>
@@ -508,7 +554,7 @@ const Wizard: NextPageWithLayout = () => {
                               layout="horizontal"
                               label={
                                 <div className="space-y-4">
-                                  <span>Instance Size</span>
+                                  <span>Compute Size</span>
 
                                   <div className="flex flex-col space-y-2">
                                     <Link
@@ -520,28 +566,13 @@ const Wizard: NextPageWithLayout = () => {
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
-
-                                    <Link
-                                      href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                                      target="_blank"
-                                    >
-                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Billing</p>
-                                        <ExternalLink size={16} strokeWidth={1.5} />
-                                      </div>
-                                    </Link>
                                   </div>
                                 </div>
                               }
                               description={
                                 <>
                                   <p>
-                                    Select the size for your dedicated database. You can always
-                                    change this later.
-                                  </p>
-                                  <p className="mt-1">
-                                    Your organization has $10/month in Compute Credits to cover one
-                                    instance on Micro Compute or parts of any other instance size.
+                                    The size for your dedicated database. You can change this later.
                                   </p>
                                 </>
                               }
@@ -573,7 +604,8 @@ const Wizard: NextPageWithLayout = () => {
                                                 {instanceSizeSpecs[option].cpu} CPU
                                               </span>
                                               <p className="text-xs text-muted instance-details">
-                                                {instanceSizeSpecs[option].price}
+                                                ${instanceSizeSpecs[option].priceHourly}/hour (~$
+                                                {instanceSizeSpecs[option].priceMonthly}/month)
                                               </p>
                                             </div>
                                           </div>
@@ -646,6 +678,163 @@ const Wizard: NextPageWithLayout = () => {
                         )}
                       />
                     </Panel.Content>
+                    {orgSubscription && orgSubscription.plan.id !== 'free' && (
+                      <Panel.Content>
+                        <FormItemLayout
+                          label={
+                            <div className="space-y-4">
+                              <span>Compute Billing</span>
+                              <div className="flex flex-col space-y-2">
+                                <Link
+                                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                                  target="_blank"
+                                >
+                                  <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                    <p className="text-sm m-0">Docs</p>
+                                    <ExternalLink size={16} strokeWidth={1.5} />
+                                  </div>
+                                </Link>
+                              </div>
+                            </div>
+                          }
+                          layout="horizontal"
+                        >
+                          <div className="flex justify-between mr-2">
+                            <span>Additional Monthly Compute Costs</span>
+                            <div className="text-brand flex gap-1 items-center">
+                              {organizationProjects.length > 0 ? (
+                                <>
+                                  <span>${additionalMonthlySpend}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-foreground-lighter line-through">
+                                    $
+                                    {
+                                      instanceSizeSpecs[instanceSize as DbInstanceSize]!
+                                        .priceMonthly
+                                    }
+                                  </span>
+                                  <span>${additionalMonthlySpend}</span>
+                                </>
+                              )}
+                              <InfoTooltip side="top" className="max-w-[450px] p-0">
+                                <Table className="mt-2">
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow className="py-2">
+                                      <TableHead className="w-[170px]">Project</TableHead>
+                                      <TableHead>Compute Size</TableHead>
+                                      <TableHead className="text-right">Monthly Costs</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="[&_td]:py-2">
+                                    {organizationProjects.map((project) => (
+                                      <TableRow key={project.id} className="text-foreground-light">
+                                        <TableCell className="w-[170px]">{project.name}</TableCell>
+                                        <TableCell className="text-center">
+                                          {instanceLabel(project.infra_compute_size)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                          ${monthlyInstancePrice(project.infra_compute_size)}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+
+                                    <TableRow>
+                                      <TableCell className="w-[170px] flex gap-2">
+                                        <span className="truncate">
+                                          {form.getValues('projectName')
+                                            ? form.getValues('projectName')
+                                            : 'New project'}
+                                        </span>
+                                        <Badge size={'small'} variant={'default'}>
+                                          NEW
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        {instanceLabel(instanceSize)}
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        ${monthlyInstancePrice(instanceSize)}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                                <PopoverSeparator />
+                                <Table className="mt-3">
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow>
+                                      <TableHead colSpan={2}>Compute Credits</TableHead>
+                                      <TableHead colSpan={1} className="text-right">
+                                        -$10
+                                      </TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="[&_td]:py-2">
+                                    <TableRow className="text-foreground">
+                                      <TableCell colSpan={2}>
+                                        Total Monthly Compute Costs
+                                        {/**
+                                         * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                         *
+                                         * Will be adjusted in the future [kevin]
+                                         */}
+                                        {organizationProjects.length > 0 && (
+                                          <p className="text-xs text-foreground-lighter">
+                                            Excluding Read replicas
+                                          </p>
+                                        )}
+                                      </TableCell>
+                                      <TableCell colSpan={1} className="text-right">
+                                        ${monthlyComputeCosts}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+
+                                <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
+                                  <p>
+                                    Compute is charged usage-based whenever your billing cycle
+                                    resets. Given compute charges are hourly, your invoice will
+                                    contain "Compute Hours" for each hour a project ran on a
+                                    specific instance size.
+                                  </p>
+                                  {monthlyComputeCosts > 0 && (
+                                    <p>
+                                      Compute costs are applied on top of your subscription plan
+                                      costs.
+                                    </p>
+                                  )}
+                                </div>
+                              </InfoTooltip>
+                            </div>
+                          </div>
+
+                          <div className="mt-2 text-foreground-lighter space-y-1">
+                            {additionalMonthlySpend > 0 && availableComputeCredits === 0 ? (
+                              <p>
+                                Your monthly spend will increase, and can be more than above if you
+                                exceed your plan's usage quota. Your organization includes $10/month
+                                of compute credits, which you already exceed with your existing
+                                projects.
+                              </p>
+                            ) : additionalMonthlySpend > 0 && availableComputeCredits > 0 ? (
+                              <p>
+                                Your monthly spend will increase, and can be more than above if you
+                                exceed your plan's usage quota. Your organization includes $10/month
+                                of compute credits, which you exceed with the selected compute size.
+                              </p>
+                            ) : (
+                              <p>
+                                Your monthly spend won't increase, unless you exceed your plan's
+                                usage quota. Your organization includes $10/month of compute
+                                credits, which cover this project.
+                              </p>
+                            )}
+                          </div>
+                        </FormItemLayout>
+                      </Panel.Content>
+                    )}
                   </>
                 )}
 
@@ -664,6 +853,20 @@ const Wizard: NextPageWithLayout = () => {
       </form>
     </Form_Shadcn_>
   )
+}
+
+/**
+ * When launching new projects, they only get assigned a compute size once successfully launched,
+ * this might assume wrong instance size, but only for projects being rapidly launched after one another on non-default compute sizes.
+ *
+ * Needs to be in the API in the future [kevin]
+ */
+const monthlyInstancePrice = (instance: string | undefined): number => {
+  return instanceSizeSpecs[instance as DbInstanceSize]?.priceMonthly || 10
+}
+
+const instanceLabel = (instance: string | undefined): string => {
+  return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {

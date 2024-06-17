@@ -122,6 +122,24 @@ export const examples: Registry = [
     files: ['example/button-demo.tsx'],
   },
   {
+    name: 'button-sizes',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-sizes.tsx'],
+  },
+  {
+    name: 'button-default',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-default.tsx'],
+  },
+  {
+    name: 'button-warning',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-warning.tsx'],
+  },
+  {
     name: 'button-secondary',
     type: 'components:example',
     registryDependencies: ['button'],
