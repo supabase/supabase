@@ -5,15 +5,15 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "www#build": {
+    "database-design#build": {
       "dependsOn": ["^build"],
-      "env": [
-        "SUPABASE_SERVICE_ROLE_SECRET",
-        "EMAIL_TO_ID_SECRET",
-        "SUPABASE_URL",
-        "GITHUB_OAUTH_CLIENT_SECRET"
-      ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "env": ["NEXT_PUBLIC_*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "design-system#build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_*"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
@@ -43,6 +43,16 @@
         "NEXT_PUBLIC_SITE_URL"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "www#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "SUPABASE_SERVICE_ROLE_SECRET",
+        "EMAIL_TO_ID_SECRET",
+        "SUPABASE_URL",
+        "GITHUB_OAUTH_CLIENT_SECRET"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
