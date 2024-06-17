@@ -56,5 +56,5 @@ COPY --from=builder /app/apps/studio/.next/standalone ./
 COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
-HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+HEALTHCHECK --interval=15s --timeout=20s --retries=3 CMD ["node", "apps/studio/docker-healthcheck.js"]
 CMD ["node", "apps/studio/server.js"]
