@@ -41,7 +41,7 @@ export default function Page() {
   )
   const [seedSql, setSeedSql] = useState('-- Seeds will appear here as you chat with Supabase AI')
   const [tab, setTab] = useState<TabValue>('diagram')
-  const [brainstormIdeas] = useState(false)
+  const [brainstormIdeas] = useState(false) // temporarily turn off for now
   const { reports } = useReportSuggestions(db, { enabled: brainstormIdeas })
 
   const { data: tables, refetch } = useTablesQuery({ schemas: ['public'], includeColumns: true })
