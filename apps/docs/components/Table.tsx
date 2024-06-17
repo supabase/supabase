@@ -1,4 +1,4 @@
-import React, { TableHTMLAttributes, useRef, useState } from 'react'
+import React, { TableHTMLAttributes, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 type TableProps = TableHTMLAttributes<HTMLTableElement>
@@ -17,7 +17,10 @@ const Table = ({ children, ...props }: TableProps) => {
     }
   }
 
-  containerRef?.current?.addEventListener('scroll', handleScroll)
+  useEffect(() => {
+    containerRef?.current?.addEventListener('scroll', handleScroll)
+    return () => containerRef?.current?.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <div className="relative">
