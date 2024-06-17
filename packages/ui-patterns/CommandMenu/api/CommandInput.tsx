@@ -21,7 +21,7 @@ const CommandInput = forwardRef<
       className={cn(
         'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
         'focus:shadow-none focus:ring-transparent',
-        'text-foreground-light placeholder:text-border-stronger disabled:cursor-not-allowed disabled:opacity-50 border-0',
+        'text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
         className
       )}
       {...props}

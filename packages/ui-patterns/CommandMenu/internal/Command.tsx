@@ -58,13 +58,13 @@ px-2
 transition-all
 outline-none
 aria-selected:border-overlay
-aria-selected:bg-overlay-hover/90
+aria-selected:bg-selection/90
 aria-selected:shadow-sm
 aria-selected:scale-[100.3%]
 data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
       : `
 px-2
-aria-selected:bg-overlay-hover/80
+aria-selected:bg-selection/80
 aria-selected:backdrop-filter
 aria-selected:backdrop-blur-md
 data-[disabled]:pointer-events-none

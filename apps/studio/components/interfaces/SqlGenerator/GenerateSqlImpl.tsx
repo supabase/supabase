@@ -16,6 +16,7 @@ import {
   Tabs,
   cn,
 } from 'ui'
+import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   BadgeExperimental,
   generateCommandClassNames,
@@ -280,14 +281,14 @@ const GenerateSql = () => {
           )}
           {hasError && (
             <div className="p-6 flex flex-col items-center gap-6 mt-4">
-              <AlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-              <p className="text-lg text-foreground text-center">
-                Sorry, looks like Clippy is having a hard time!
+              <StatusIcon variant="warning" />
+              <p className="text-sm text-foreground text-center">
+                Sorry, looks like Supabase AI is having a hard time!
               </p>
-              <p className="text-sm text-foreground-muted text-center">
+              <p className="text-sm text-foreground-lighter text-center">
                 Please try again in a bit.
               </p>
-              <Button size="tiny" type="secondary" onClick={handleReset}>
+              <Button size="tiny" type="default" onClick={handleReset}>
                 Try again?
               </Button>
             </div>

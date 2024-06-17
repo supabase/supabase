@@ -23,9 +23,7 @@ const TextHighlighter = ({ children, ...props }: PropsWithChildren<TextHighlight
   return (
     <span {...props}>
       {child.substring(0, idx)}
-      <span className="text-foreground font-semibold">
-        {child.substring(idx, idx + query.length)}
-      </span>
+      <span className="text-foreground">{child.substring(idx, idx + query.length)}</span>
       {child.substring(idx + query.length)}
     </span>
   )

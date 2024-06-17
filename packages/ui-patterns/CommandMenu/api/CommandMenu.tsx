@@ -112,13 +112,7 @@ const CommandMenu = ({ children }: PropsWithChildren) => {
           return query ? setQuery('') : page ? popPage() : setOpen(false)
         }}
         size={size}
-        className={cn(
-          '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
-          '!border-overlay/90',
-          'transition ease-out',
-          'place-self-start mx-auto top-24',
-          animateBounce ? 'scale-[101.5%]' : 'scale-100'
-        )}
+        className={cn('place-self-start mx-auto top-24')}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>

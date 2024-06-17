@@ -1,4 +1,4 @@
-import { AlertTriangle, CornerDownLeft, User } from 'lucide-react'
+import { CornerDownLeft, User } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -13,6 +13,7 @@ import {
   markdownComponents,
 } from 'ui'
 
+import { StatusIcon } from '../../../Icons/StatusIcons'
 import { AiWarning } from '../ai'
 
 import { CommandWrapper } from '../../api/CommandMenu'
@@ -158,13 +159,15 @@ const DocsAiPage = () => {
         )}
 
         {hasError && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <AlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-foreground text-center">
-              Sorry, looks like Clippy is having a hard time!
+          <div className="p-6 flex flex-col items-center gap-2 mt-4">
+            <StatusIcon variant="warning" />
+            <p className="text-sm text-foreground text-center">
+              Sorry, looks like Supabase AI is having a hard time!
             </p>
-            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleReset}>
+            <p className="text-sm text-foreground-lighter text-center">
+              Please try again in a bit.
+            </p>
+            <Button size="tiny" type="default" onClick={handleReset}>
               Try again?
             </Button>
           </div>

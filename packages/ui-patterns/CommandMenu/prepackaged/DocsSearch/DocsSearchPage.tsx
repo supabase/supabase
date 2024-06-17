@@ -5,17 +5,11 @@ import {
   useDocsSearch,
 } from 'common'
 import { useRouter } from 'next/navigation'
-import {
-  AlertTriangle,
-  Book,
-  ChevronRight,
-  Github,
-  Hash,
-  MessageSquare,
-  Search,
-} from 'lucide-react'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+
+import { StatusIcon } from '../../../Icons/StatusIcons'
 import { CommandInput } from '../../api/CommandInput'
 import { CommandWrapper } from '../../api/CommandMenu'
 import { TextHighlighter } from '../../api/TextHighlighter'
@@ -54,11 +48,11 @@ const IconContainer = (
     className="
         transition
         w-6 h-6
-        bg-alternative
-        group-aria-selected:scale-[105%]
-        group-aria-selected:bg-foreground
-        text-foreground
-        group-aria-selected:text-background
+        bg-surface-100
+        border
+        group-aria-selected:bg-surface-200
+        group-aria-selected:text-foreground-lighter
+        text-foreground-muted
         rounded flex
         items-center
         justify-center
@@ -203,7 +197,7 @@ const DocsSearchPage = () => {
                   <ChevronArrow />
                 </CommandItem_Shadcn_>
                 {page.sections.length > 0 && (
-                  <div className="border-l border-default ml-3 pt-3">
+                  <div className="border-l border-muted ml-3 pt-3">
                     {page.sections.map((section, i) => (
                       <CommandItem_Shadcn_
                         className={cn(
@@ -220,9 +214,9 @@ const DocsSearchPage = () => {
                       >
                         <div className="grow flex gap-3 items-center">
                           <IconContainer>{getPageSectionIcon(page)}</IconContainer>
-                          <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-0">
                             <cite>
-                              <TextHighlighter className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground">
+                              <TextHighlighter className="not-italic text-[10px] rounded-full px-2 py-1 bg-surface-300 text-foreground-muted">
                                 {page.title}
                               </TextHighlighter>
                             </cite>
@@ -263,27 +257,28 @@ const DocsSearchPage = () => {
           </CommandGroup_Shadcn_>
         )}
         {state.status === 'loading' && state.staleResults.length === 0 && (
-          <div className="p-6 grid gap-6 my-4">
-            <p className="text-lg text-foreground-muted text-center">Searching for results</p>
+          <div className="flex items-center gap-3 my-4 justify-center">
+            <Loader2 className="animate animate-spin text-foreground-muted" size={14} />
+            <p className="text-sm text-foreground-muted text-center">Searching for results</p>
           </div>
         )}
         {state.status === 'noResults' && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
-            <AlertTriangle strokeWidth={1.5} size={40} />
-            <p className="text-lg text-center">No results found.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            <StatusIcon variant="default" />
+            <p className="text-sm text-foreground-light text-center">No results found.</p>
+            <Button size="tiny" type="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
         )}
         {state.status === 'error' && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <AlertTriangle strokeWidth={1.5} size={40} />
-            <p className="text-lg text-center">
+            <StatusIcon variant="warning" />
+            <p className="text-lg text-foreground-light">
               Sorry, looks like we&apos;re having some issues with search!
             </p>
-            <p className="text-sm text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
+            <Button size="tiny" type="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
