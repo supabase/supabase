@@ -106,6 +106,47 @@ functions:
 
   - id: sign-up
     title: 'sign_up()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignUpWithPasswordCredentials
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: password
+            type: string
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: email_redirect_to
+                isOptional: true
+                type: string
+                description: >
+                  Only for email signups.
+                  The redirect URL embedded in the email link.
+                  Must be a configured redirect URL for your Supabase instance.
+              - name: data
+                isOptional: true
+                type: object
+                description: >
+                  A custom data object to store additional user metadata.
+              - name: captcha_token
+                isOptional: true
+                type: string
+              - name: channel
+                isOptional: true
+                type: sms | whatsapp
+                description: >
+                  The channel to use for sending messages.
+                  Only for phone signups.
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -118,76 +159,146 @@ functions:
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/python/auth-getuser).
     examples:
       - id: signup
-        name: Sign up
+        name: Sign up with an email and password
         code: |
-          ```
-          credentials = {
-              "email": "users_email@email.com",
-              "password": "users_password"
-            }
-          user = supabase.auth.sign_up(credentials)
+          ```python          
+          response = supabase.auth.sign_up(
+              credentials={"email": "hello@example.com", "password": "password"}
+          )
           ```
         response: |
-          ```
-          User(
-            id='11111111-1111-1111-1111-111111111111',
-            app_metadata={
-              'provider': 'email',
-              'providers': ['email']
-            }, 
-            user_metadata={
-              'email': 'users_email@email.com',
-              'email_verified': False,
-              'phone_verified': False,
-              'sub': '11111111-1111-1111-1111-111111111111'
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "hello@example.com",
+              "phone": "",
+              "created_at": "2024-06-17T00:19:25.760110Z",
+              "confirmed_at": null,
+              "email_confirmed_at": "2024-06-17T00:19:25.779181Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-17T00:19:25.785489Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-17T00:19:25.794650Z",
+              "identities": [
+                {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "hello@example.com",
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "created_at": "2024-06-17T00:19:25.774522Z",
+                  "last_sign_in_at": "2024-06-17T00:19:25.774498Z",
+                  "updated_at": "2024-06-17T00:19:25.774522Z"
+                }
+              ],
+              "factors": null
             },
-            aud='authenticated', 
-            confirmation_sent_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)),
-            recovery_sent_at=None,
-            email_change_sent_at=None, 
-            new_email=None,
-            invited_at=None,
-            action_link=None,
-            email='users_email@email.com', 
-            phone='',
-            created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-            confirmed_at=None,
-            email_confirmed_at=None, 
-            phone_confirmed_at=None,
-            last_sign_in_at=None,
-            role='authenticated', 
-            updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-            identities=[
-              UserIdentity(
-                id='22222222-2222-2222-2222-222222222222', 
-                user_id='11111111-1111-1111-1111-111111111111', 
-                identity_data={
-                  'email': 'users_email@email.com', 
-                  'email_verified': False,
-                  'phone_verified': False, 
-                  'sub': '11111111-1111-1111-1111-111111111111'
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4NTg3MTY1LCJpYXQiOjE3MTg1ODM1NjUsImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6NTQzMjEvYXV0aC92MSIsInN1YiI6ImU0MTBkMTBmLTZlNTktNDBlNS1hMmRlLTY5NGE5MzVlNzJlZCIsImVtYWlsIjoiaGVsbG9AZXhhbXBsZS5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODU4MzU2NX1dLCJzZXNzaW9uX2lkIjoiMjRmOGFlMmMtYWM4Mi00NzdhLWIxMTMtZTkwNmRlNzFiMDIxIn0.5KrE1AL4koBJs5dvNQfThMV1HxV8nPP-GPU24aRL9xI",
+              "refresh_token": "mNUp4-LDuYq-kNG61t-2Xw",
+              "expires_in": 3600,
+              "expires_at": 1718587165,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
                 },
-                provider='email', 
-                created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-                last_sign_in_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-                updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC))
-              )
-            ],
-            factors=None
-          ) 
-          session=None
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "hello@example.com",
+                "phone": "",
+                "created_at": "2024-06-17T00:19:25.760110Z",
+                "confirmed_at": null,
+                "email_confirmed_at": "2024-06-17T00:19:25.779181Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-17T00:19:25.785489Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-17T00:19:25.794650Z",
+                "identities": [
+                  {
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "hello@example.com",
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "created_at": "2024-06-17T00:19:25.774522Z",
+                    "last_sign_in_at": "2024-06-17T00:19:25.774498Z",
+                    "updated_at": "2024-06-17T00:19:25.774522Z"
+                  }
+                ],
+                "factors": null
+              }
+            }
+          }
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "phone": "123456789",
+                  "password": "password",
+              }
+          )
+          ```
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        description: |
+          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "phone": "123456789",
+                  "password": "password",
+                  "options": {"channel": "whatsapp"},
+              }
+          )
           ```
       - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         code: |
-          ```
-          res = supabase.auth.sign_up(
-            email= 'example@email.com',
-            password= 'example-password',
-            data= {
-              first_name= 'John',
-              age= 27,
-            }
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "email": "hello@example.com",
+                  "password": "password",
+                  "options": {"data": {"first_name": "John", "age": 27}},
+              }
           )
           ```
       - id: sign-up-with-redirect
@@ -195,11 +306,15 @@ functions:
         description: |
           - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls) to add additional redirect URLs to your project.
         code: |
-          ```
-          res = supabase.auth.sign_up(
-            email= 'example@email.com',
-            password= 'example-password',
-            redirect_to= 'https://example.com/welcome'
+          ```python
+          response = await supabase.auth.sign_up(
+              credentials={
+                  "email": "hello1@example.com",
+                  "password": "password",
+                  "options": {
+                      "email_redirect_to": "https://example.com/welcome",
+                  },
+              }
           )
           ```
   - id: sign-in-with-password
