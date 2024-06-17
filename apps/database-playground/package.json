@@ -12,6 +12,7 @@
     "@ai-sdk/openai": "^0.0.21",
     "@dagrejs/dagre": "^1.1.2",
     "@electric-sql/pglite": "^0.1.5",
+    "@gregnr/postgres-meta": "^0.82.0-dev.2",
     "@monaco-editor/react": "^4.6.0",
     "@supabase/postgres-meta": "^0.81.2",
     "@tanstack/react-query": "^5.45.0",

@@ -1,7 +1,12 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import {
+  PostgresMetaBase,
+  PostgresMetaErr,
+  PostgresTable,
+  wrapError,
+  wrapResult,
+} from '@gregnr/postgres-meta/base'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { db } from '~/app/page'
-import { PostgresMetaErr, getTables } from '~/lib/pg-meta'
 
 export type TablesVariables = {
   schemas?: string[]
@@ -10,8 +15,20 @@ export type TablesVariables = {
 export type TablesData = PostgresTable[]
 export type TablesError = PostgresMetaErr['error']
 
+const pgMeta = new PostgresMetaBase({
+  query: async (sql) => {
+    try {
+      const res = await db.query(sql)
+      return wrapResult<any[]>(res.rows)
+    } catch (error) {
+      return wrapError(error, sql)
+    }
+  },
+  end: async () => {},
+})
+
 export async function getTablesForQuery({ schemas, includeColumns = false }: TablesVariables) {
-  const { data, error } = await getTables(db, { includedSchemas: schemas, includeColumns })
+  const { data, error } = await pgMeta.tables.list({ includedSchemas: schemas, includeColumns })
 
   if (error) {
     throw error

@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable } from '@gregnr/postgres-meta/base'
 import { uniqBy } from 'lodash'
 import { Loader } from 'lucide-react'
 import { useTheme } from 'next-themes'
