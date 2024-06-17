@@ -4,7 +4,7 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, cn, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
@@ -28,6 +28,7 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import Table from '~/components/Table'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -118,14 +119,7 @@ const components = {
       {props.children}
     </Heading>
   ),
-  table: (props: any) => (
-    <div className="relative">
-      <span className="block md:hidden absolute inset-y-0 -right-5 left-auto w-5 bg-gradient-to-r from-transparent to-background" />
-      <div className="w-full overflow-x-auto break-normal -mr-5 md:mr-0 pr-5 md:pr-0">
-        <table {...props}>{props.children}</table>
-      </div>
-    </div>
-  ),
+  table: Table,
   HuggingFaceDeployment,
   IconCheck,
   IconMenuApi,
