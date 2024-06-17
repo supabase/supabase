@@ -8,9 +8,9 @@ const nextConfig = {
         module: false,
       },
     }
-
     return config
   },
+  swcMinify: false,
 }
 
 export default nextConfig

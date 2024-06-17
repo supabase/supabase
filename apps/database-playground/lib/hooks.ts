@@ -4,7 +4,7 @@ import { useChat } from 'ai/react'
 import { codeBlock } from 'common-tags'
 import { useEffect, useState } from 'react'
 import { useTablesQuery } from '~/data/tables/tables-query'
-import { Report } from '../app/api/chat/route'
+import { Report } from '~/lib/schema'
 
 export type UseReportSuggestionsOptions = {
   enabled?: boolean

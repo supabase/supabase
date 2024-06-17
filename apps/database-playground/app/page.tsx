@@ -2,7 +2,6 @@
 
 import 'chartjs-adapter-date-fns'
 
-import { PGlite } from '@electric-sql/pglite'
 import { Editor } from '@monaco-editor/react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
 import { nanoid } from 'ai'
@@ -25,15 +24,12 @@ import { AiIconAnimation, markdownComponents } from 'ui'
 import { Button } from 'ui/src/components/shadcn/ui/button'
 import SchemaGraph from '~/components/schema/graph'
 import { useTablesQuery } from '~/data/tables/tables-query'
+import { db } from '~/lib/db'
 import { useReportSuggestions } from '~/lib/hooks'
+import { TabValue, tabsSchema } from '~/lib/schema'
 import { groupStatements } from '~/lib/sql-util'
-import { TabValue, tabsSchema } from './api/chat/route'
 
 const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
-
-// React's double-rendering in dev mode causes pglite errors
-// Temp: storing single instance in module scope
-export let db: PGlite = new PGlite('idb://local')
 
 export default function Page() {
   const [migrationSql, setMigrationSql] = useState(

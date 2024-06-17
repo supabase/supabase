@@ -6,7 +6,7 @@ import {
   wrapResult,
 } from '@gregnr/postgres-meta/base'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { db } from '~/app/page'
+import { db } from '~/lib/db'
 
 export type TablesVariables = {
   schemas?: string[]

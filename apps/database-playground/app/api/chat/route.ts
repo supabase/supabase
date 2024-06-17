@@ -2,15 +2,10 @@ import { openai } from '@ai-sdk/openai'
 import { convertToCoreMessages, streamText } from 'ai'
 import { codeBlock } from 'common-tags'
 import { z } from 'zod'
+import { reportSchema, tabsSchema } from '~/lib/schema'
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
-
-const reportSchema = z.object({ name: z.string(), description: z.string() })
-export type Report = typeof reportSchema._type
-
-export const tabsSchema = z.enum(['diagram', 'migrations', 'seeds'])
-export type TabValue = typeof tabsSchema._type
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
