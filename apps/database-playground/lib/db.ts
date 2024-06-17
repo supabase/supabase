@@ -24,12 +24,20 @@ export async function resetDb() {
 }
 
 export function getDbId() {
-  const dbId = localStorage.getItem('current-db-id')
+  if (typeof window === 'undefined') {
+    return newDbId()
+  }
+
+  const dbId = window.localStorage.getItem('current-db-id')
   return dbId ?? newDbId()
 }
 
 export function newDbId() {
   const dbId = nanoid()
-  localStorage.setItem('current-db-id', dbId)
+
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem('current-db-id', dbId)
+  }
+
   return dbId
 }
