@@ -5,6 +5,7 @@ import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
@@ -14,7 +15,6 @@ import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, SidePanel } from 'ui'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -39,8 +39,11 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     useGitHubAuthorizationQuery()
 
   // [Alaister]: temp override with <any> until the typegen is fixed
-  const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
-    useGitHubRepositoriesQuery<any[]>()
+  const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
+    any[]
+  >({
+    enabled: Boolean(gitHubAuthorization),
+  })
 
   /**
    * Supabase projects available

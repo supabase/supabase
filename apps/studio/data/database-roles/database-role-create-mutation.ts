@@ -1,12 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
-import type { components } from 'data/api'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { invalidateRolesQuery } from './database-roles-query'
 
-type CreateRoleBody = components['schemas']['CreateRoleBody']
+type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
 
 export type DatabaseRoleCreateVariables = {
   projectRef: string
@@ -19,20 +19,14 @@ export async function createDatabaseRole({
   connectionString,
   payload,
 }: DatabaseRoleCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await post('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: payload,
-    headers,
+  const sql = pgMeta.roles.create(payload).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['roles', 'create'],
   })
-
-  if (error) throw error
-  return data
+  return result
 }
 
 type DatabaseRoleCreateData = Awaited<ReturnType<typeof createDatabaseRole>>
@@ -52,7 +46,7 @@ export const useDatabaseRoleCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseRolesKeys.list(projectRef))
+        await invalidateRolesQuery(queryClient, projectRef)
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, FileWarning } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import {
-  Badge_Shadcn_,
+  Badge,
   Button,
   Checkbox_Shadcn_,
   Form_Shadcn_,
@@ -28,7 +28,7 @@ import {
 } from 'ui'
 import { z } from 'zod'
 import { Input } from '../DataInputs/Input'
-import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
+import { InfoTooltip } from '../info-tooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
 
 const items = [
@@ -205,11 +205,7 @@ export const Page = () => {
                     layout="flex"
                   >
                     <FormControl_Shadcn_>
-                      <Switch
-                        placeholder="mildtomato"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -296,10 +292,10 @@ export const Page = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     afterLabel={
-                      <Badge_Shadcn_ variant={'destructive'} className="flex gap-1">
+                      <Badge variant={'destructive'} className="flex gap-1">
                         <FileWarning size={14} strokeWidth={1.5} className="text-destructive-500" />
                         Danger zone!
-                      </Badge_Shadcn_>
+                      </Badge>
                     }
                     label="Use consistent settings"
                     description="This is your public display name."

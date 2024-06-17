@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Admonition } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import { ICommonSection } from './Reference.types'
 

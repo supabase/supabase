@@ -16,8 +16,6 @@ interface UsersListProps {
   page: number
   setPage: (page: number) => void
   keywords: string
-  verified?: 'verified' | 'unverified'
-
   total: number
   users: User[]
   isLoading: boolean

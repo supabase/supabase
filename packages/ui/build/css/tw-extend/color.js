@@ -437,7 +437,7 @@ module.exports = {
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(0, 0%, 25.9%)"
+  value: "hsl(0, 0%, 19.2%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",
@@ -478,6 +478,10 @@ module.exports = {
 "background-button-DEFAULT": {
   cssVariable: "var(--background-button-default)",
   value: "hsl(0, 0%, 18%)"
+},
+"background-dialog-DEFAULT": {
+  cssVariable: "var(--background-dialog-default)",
+  value: "hsl(0, 0%, 7.1%)"
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",

@@ -20,7 +20,7 @@ import {
 type Results = { rows: readonly any[] }
 
 export type ChartConfig = {
-  type: 'bar' | 'line'
+  type: 'bar'
   cumulative: boolean
   xKey: string
   yKey: string
@@ -67,9 +67,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
       <div className="p-2">
         <NoDataPlaceholder
           size="normal"
-          message="
-          Execute a query and configure the chart options.
-        "
+          description="Execute a query and configure the chart options."
         />
       </div>
     )
@@ -87,7 +85,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <>
-        <ResizablePanel className="p-4 h-full" defaultSize={85}>
+        <ResizablePanel className="p-4 h-full" defaultSize={75}>
           {config.type === 'bar' && (
             <BarChart
               showLegend
@@ -101,7 +99,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={15} minSize={15} className="px-3 py-3 space-y-4">
+        <ResizablePanel defaultSize={25} minSize={15} className="px-3 py-3 space-y-4">
           <>
             <div className="flex justify-between items-center h-5">
               <h2 className="text-sm text-foreground-lighter">Chart options</h2>
@@ -164,10 +162,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
                 id="cumulative"
                 name="cumulative"
                 checked={config.cumulative}
-                onClick={(e) => {
-                  console.log(e)
-                  onConfigChange({ ...config, cumulative: !config.cumulative })
-                }}
+                onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
               />
               <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="cumulative">
                 Cumulative

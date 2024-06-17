@@ -73,7 +73,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       },
     })
 
-  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
+  const { mutate: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
     useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
@@ -89,13 +89,19 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
-    createOrganizationMemberInvite({
-      slug,
-      invitedEmail: member.primary_email!,
-      ownerId: invitedId,
-      roleId: roleId,
-    })
+    asyncDeleteMemberInvite(
+      { slug, invitedId, invalidateDetail: false },
+      {
+        onSuccess: () => {
+          createOrganizationMemberInvite({
+            slug,
+            invitedEmail: member.primary_email!,
+            ownerId: invitedId,
+            roleId: roleId,
+          })
+        },
+      }
+    )
   }
 
   const handleRevokeInvitation = async (member: OrganizationMember) => {
@@ -103,8 +109,14 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    await asyncDeleteMemberInvite({ slug, invitedId })
-    toast.success('Successfully revoked the invitation.')
+    asyncDeleteMemberInvite(
+      { slug, invitedId },
+      {
+        onSuccess: () => {
+          toast.success('Successfully revoked the invitation.')
+        },
+      }
+    )
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -190,18 +202,16 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to remove"
-        buttonLabel="Remove"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to remove"
+        confirmLabel="Remove"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleMemberDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to remove {member.primary_email}
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to remove {member.primary_email}
+        </p>
       </ConfirmationModal>
     </>
   )

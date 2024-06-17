@@ -106,21 +106,24 @@ const StoragePolicies = () => {
       return true
     }
 
-    return await Promise.all(
-      payloads.map(async (payload) => {
-        try {
-          await createDatabasePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            payload,
-          })
-          return false
-        } catch (error: any) {
-          toast.error(`Error adding policy: ${error.message}`)
-          return true
-        }
-      })
-    )
+    try {
+      return await Promise.all(
+        payloads.map(async (payload) => {
+          try {
+            await createDatabasePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              payload,
+            })
+            return false
+          } catch (error: any) {
+            toast.error(`Error adding policy: ${error.message}`)
+            return true
+          }
+        })
+      )
+    } finally {
+    }
   }
 
   const onCreatePolicy = async (payload: any) => {
@@ -209,7 +212,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="!mb-4 w-full border-b border-gray-600" />
+          <div className="!mb-4 w-full border-b border-muted" />
           <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control

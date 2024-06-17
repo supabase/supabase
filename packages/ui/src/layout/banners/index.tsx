@@ -1,2 +1,2 @@
 export { default as Announcement } from './Announcement'
-export { default as LW8CountdownBanner } from './LW8CountdownBanner/LW8CountdownBanner'
+export { default as LW11CountdownBanner } from './LW11CountdownBanner/LW11CountdownBanner'

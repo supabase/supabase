@@ -67,14 +67,14 @@ const WrappersDisabledState = () => {
       }
     } finally {
       setIsEnabling(false)
-      if (!hasError) toast.success('Wrappers is now enabled!')
+      if (!hasError) toast.success('Wrappers are now enabled!')
     }
   }
 
   return (
     <div>
       <div
-        className="w-full px-12 py-12 bg-no-repeat border rounded bg-studio border-default"
+        className="w-full px-12 py-12 bg-no-repeat border rounded-md bg-studio border-default"
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',

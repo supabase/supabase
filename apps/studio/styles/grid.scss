@@ -115,7 +115,7 @@
 
 .rdg-row {
   @apply bg-studio transition-colors;
-  @apply hover:bg-surface-100;
+  @apply hover:bg-surface-200;
 }
 
 /* edit button */
@@ -560,30 +560,6 @@
 
 .sb-grid-empty-value {
   @apply block;
-}
-
-/*
-  header/filter/FilterDropdown
-*/
-
-.sb-grid-filter-popover {
-  @apply overflow-visible;
-}
-
-.sb-grid-filter-popover__misc {
-  @apply py-2;
-}
-
-.sb-grid-filter-popover__misc__text {
-  @apply block;
-}
-
-/*
-header/filter/FilterRow
-*/
-
-.sb-grid-filter-row {
-  @apply flex w-full items-center justify-between space-x-1;
 }
 
 /*

@@ -3,9 +3,6 @@ import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +13,6 @@ import {
   IconLoader,
   IconRefreshCw,
   IconTrash,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -27,7 +23,6 @@ import {
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -49,6 +44,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const onConfirm = useCallback(async () => {
       try {
         await onDeleteConnection(connection)
+      } catch (error) {
+        // [Joshen] No need for error handler
       } finally {
         setIsOpen(false)
       }
@@ -137,29 +134,26 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
         />
 
         <ConfirmationModal
-          danger
+          variant="destructive"
           size={type === 'GitHub' && isBranchingEnabled ? 'medium' : 'small'}
           visible={isOpen}
-          header={`Confirm to delete ${type} connection`}
-          buttonLabel="Delete connection"
-          onSelectCancel={onCancel}
-          onSelectConfirm={onConfirm}
+          title={`Confirm to delete ${type} connection`}
+          confirmLabel="Delete connection"
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          alert={
+            type === 'GitHub' && isBranchingEnabled
+              ? {
+                  title: 'Branching will be disabled for this project',
+                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
+                and also disable branching for ${project.name}`,
+                }
+              : undefined
+          }
         >
-          <Modal.Content className="py-4 flex flex-col gap-y-4">
-            {type === 'GitHub' && isBranchingEnabled && (
-              <Alert_Shadcn_ variant="warning">
-                <WarningIcon />
-                <AlertTitle_Shadcn_>Branching will be disabled for this project</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Deleting this GitHub connection will remove all preview branches on this project,
-                  and also disable branching for {project.name}
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-            <p className="text-sm text-foreground-light">
-              This action cannot be undone. Are you sure you want to delete this {type} connection?
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            This action cannot be undone. Are you sure you want to delete this {type} connection?
+          </p>
         </ConfirmationModal>
       </>
     )

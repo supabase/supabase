@@ -166,8 +166,7 @@ export const getAddForeignKeySQL = ({
         const onUpdateSql = getOnUpdateSql(updateAction)
         return `
       ALTER TABLE "${table.schema}"."${table.name}"
-      ADD CONSTRAINT "${table.schema}_${table.name}_${relation.columns.map((x) => x.source).join('_')}_fkey"
-      FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
+      ADD FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
       REFERENCES "${relation.schema}"."${relation.table}" (${relation.columns.map((column) => `"${column.target}"`).join(',')})
       ${onUpdateSql}
       ${onDeleteSql}
@@ -858,7 +857,7 @@ export const insertRowsViaSpreadsheet = async (
               formattedRow[header] = tryParseJson(row[header])
             } else if (row[header] === '') {
               // if the cell is empty string, convert it to NULL
-              formattedRow[header] = null
+              formattedRow[header] = column?.is_nullable ? null : ''
             } else {
               formattedRow[header] = row[header]
             }
@@ -907,6 +906,8 @@ export const insertTableRows = async (
       const column = table.columns?.find((c) => c.name === header)
       if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(row[header])
+      } else if (row[header] === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
       } else {
         formattedRow[header] = row[header]
       }

@@ -3,8 +3,6 @@ import { useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
-  IconArchive,
-  IconInbox,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -26,6 +24,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
+import { ArchiveIcon, InboxIcon } from 'lucide-react'
 
 const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -108,9 +107,9 @@ const NotificationsPopoverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <CriticalIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <CriticalIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasWarning ? (
-              <WarningIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <WarningIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
                 className={clsx(
@@ -124,7 +123,7 @@ const NotificationsPopoverV2 = () => {
             ) : null
           }
           iconRight={
-            <IconInbox
+            <InboxIcon
               size={18}
               strokeWidth={1.5}
               className="transition group-hover:text-foreground text-foreground-light"
@@ -226,7 +225,7 @@ const NotificationsPopoverV2 = () => {
                 />
               ) : (
                 <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
-                  <IconInbox size={32} className="text-foreground-light" />
+                  <InboxIcon size={32} className="text-foreground-light" />
                   <div className="flex flex-col gap-y-1">
                     <p className="text-foreground-light text-sm mx-auto text-center">
                       {activeTab === 'archived'
@@ -260,7 +259,7 @@ const NotificationsPopoverV2 = () => {
               disabled={isArchiving}
               loading={isArchiving}
               type="text"
-              icon={<IconArchive />}
+              icon={<ArchiveIcon />}
               onClick={() => archiveAllNotifications()}
             >
               Archive all

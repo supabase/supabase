@@ -2,6 +2,7 @@ import { Button, Form, Input, Modal } from 'ui'
 
 export type FeedbackFields = {
   page: string
+  title: string
   comment: string
 }
 
@@ -21,6 +22,10 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
         validate={(vals) => {
           const errors: Partial<FeedbackFields> = {}
 
+          if (!vals.title) {
+            errors.title = 'Required'
+          }
+
           if (!vals.comment) {
             errors.comment = 'Required'
           }
@@ -32,8 +37,9 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
           <>
-            <Modal.Content className="pt-4 pb-2">
+            <Modal.Content className="pt-4 pb-2 flex flex-col gap-2">
               <Input type="hidden" id="page" name="page" value={page} />
+              <Input type="text" id="title" name="title" label="Title" className="mb-2" />
               <Input.TextArea
                 label="Comment"
                 id="comment"

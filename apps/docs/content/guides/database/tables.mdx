@@ -79,8 +79,7 @@ You must define the "data type" when you create a column.
 
 ### Data types
 
-Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions)
-if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
+Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -228,6 +227,28 @@ await supabase
     name: 'Return of the Jedi',
     description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
   }]);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.from("movies")
+  .insert(
+    [
+      [
+        "name": "The Empire Strikes Back",
+        "description":
+          "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.",
+      ],
+      [
+        "name": "Return of the Jedi",
+        "description":
+          "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.",
+      ],
+    ]
+  )
+  .execute()
 ```
 
 </TabPanel>
@@ -380,12 +401,6 @@ create table private.salaries (
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
 
-<Admonition type="caution">
-
-By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/supabase/supabase/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
-
-</Admonition>
-
 Say we have the following tables from a database of a university:
 
 **`students`**
@@ -436,6 +451,21 @@ Once done, we can now access the underlying query with:
 
 ```sql
 select * from transcripts;
+```
+
+### View security
+
+By default, views are accessed with their creator's permission ("security definer"). If a privileged role creates a view, others accessing it will use that role's elevated permissions. To enforce row level security policies, define the view with the "security invoker" modifier.
+
+```sql
+-- alter a security_definer view to be security_invoker
+alter view <view name>
+set (security_invoker = true);
+
+-- create a view with the security_invoker modifier
+create view <view name> with(security_invoker=true) as (
+  select * from <some table>
+);
 ```
 
 ### When to use views

@@ -107,9 +107,9 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                 <div className="flex items-center space-x-2">
                   <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (
-                    <Badge color="amber">Production</Badge>
+                    <Badge variant="warning">Production</Badge>
                   ) : (
-                    <Badge color="green">Preview Branch</Badge>
+                    <Badge variant="brand">Preview Branch</Badge>
                   )}
                 </div>
               </Button>

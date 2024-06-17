@@ -12,17 +12,8 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconGitHub,
-  Modal,
-} from 'ui'
+import { useSelectedOrganization, useSelectedProject, useUrlState } from 'hooks'
+import { Button, IconExternalLink, IconGitHub } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -33,6 +24,8 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+
+type Tab = 'overview' | 'prs' | 'branches'
 
 const BranchManagement = () => {
   const router = useRouter()
@@ -46,7 +39,10 @@ const BranchManagement = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const [view, setView] = useState<'overview' | 'prs' | 'branches'>('overview')
+  const [urlParams, setParams] = useUrlState<{ tab: Tab }>()
+  const tab = urlParams.tab ?? 'overview'
+  const setTab = (tab: Tab) => setParams({ tab })
+
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
@@ -155,27 +151,27 @@ const BranchManagement = () => {
                   <Button
                     type="default"
                     className={`rounded-r-none transition hover:opacity-90 ${
-                      view === 'overview' ? 'opacity-100' : 'opacity-60'
+                      tab === 'overview' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('overview')}
+                    onClick={() => setTab('overview')}
                   >
                     Overview
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-none transition hover:opacity-90 ${
-                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                      tab === 'prs' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('prs')}
+                    onClick={() => setTab('prs')}
                   >
                     Pull requests
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-l-none transition hover:opacity-90 ${
-                      view === 'branches' ? 'opacity-100' : 'opacity-60'
+                      tab === 'branches' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('branches')}
+                    onClick={() => setTab('branches')}
                   >
                     All branches
                   </Button>
@@ -246,26 +242,26 @@ const BranchManagement = () => {
                 </div>
               )}
 
-              {isErrorBranches && view === 'overview' && (
+              {isErrorBranches && tab === 'overview' && (
                 <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
               )}
 
               {!isError && (
                 <>
-                  {view === 'overview' && (
+                  {tab === 'overview' && (
                     <Overview
                       isLoading={isLoading}
                       isSuccess={isSuccess}
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      onViewAllBranches={() => setView('branches')}
+                      onViewAllBranches={() => setTab('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
                       generateCreatePullRequestURL={generateCreatePullRequestURL}
                     />
                   )}
-                  {view === 'prs' && (
+                  {tab === 'prs' && (
                     <BranchManagementSection
                       header={`${branchesWithPRs.length} branches with pull requests found`}
                     >
@@ -289,7 +285,7 @@ const BranchManagement = () => {
                       )}
                     </BranchManagementSection>
                   )}
-                  {view === 'branches' && (
+                  {tab === 'branches' && (
                     <BranchManagementSection header={`${previewBranches.length} branches found`}>
                       {isLoadingBranches && <BranchLoader />}
                       {isErrorBranches && (
@@ -344,44 +340,28 @@ const BranchManagement = () => {
       />
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="medium"
         loading={isDisabling}
         visible={showDisableBranching}
-        header="Confirm disable branching for project"
-        buttonLabel="Confirm disable branching"
-        buttonLoadingLabel="Disabling branching..."
-        onSelectConfirm={() => onConfirmDisableBranching()}
-        onSelectCancel={() => setShowDisableBranching(false)}
+        title="Confirm disable branching for project"
+        confirmLabel="Confirm disable branching"
+        confirmLabelLoading="Disabling branching..."
+        onConfirm={() => onConfirmDisableBranching()}
+        onCancel={() => setShowDisableBranching(false)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'All database preview branches will be removed upon disabling branching. You may still re-enable branching again thereafter, but your existing preview branches will not be restored.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                All database preview branches will be removed upon disabling branching. You may
-                still re-enable branching again thereafter, but your existing preview branches will
-                not be restored.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before you disable branching, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">
-                      Your project no longer requires database previews.
-                    </li>
-                    <li className="list-disc ml-6">
-                      None of your database previews are currently being used in any app.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <p className="text-sm">Before you disable branching, consider:</p>
+        <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+          <li className="list-disc ml-6">Your project no longer requires database previews.</li>
+          <li className="list-disc ml-6">
+            None of your database previews are currently being used in any app.
+          </li>
+        </ul>
       </ConfirmationModal>
 
       <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />

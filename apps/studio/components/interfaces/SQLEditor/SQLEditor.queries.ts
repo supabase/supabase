@@ -220,7 +220,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Central African Republic','CF','CAF','Centrafrique','Africa'),
   ('Chad','TD','TCD','Tchad/Tshad','Africa'),
   ('Chile','CL','CHL','Chile','South America'),
-  ('China','CN','CHN','Zhongquo','Asia'),
+  ('China','CN','CHN','Zhongguo','Asia'),
   ('Christmas Island','CX','CXR','Christmas Island','Oceania'),
   ('Cocos (Keeling) Islands','CC','CCK','Cocos (Keeling) Islands','Oceania'),
   ('Colombia','CO','COL','Colombia','South America'),
@@ -517,29 +517,29 @@ alter table public.role_permissions
 create policy "Allow logged-in read access" on public.users
   for select using (auth.role() = 'authenticated');
 create policy "Allow individual insert access" on public.users
-  for insert with check (auth.uid() = id);
+  for insert with check ((select auth.uid()) = id);
 create policy "Allow individual update access" on public.users
-  for update using ( auth.uid() = id );
+  for update using ( (select auth.uid()) = id );
 create policy "Allow logged-in read access" on public.channels
   for select using (auth.role() = 'authenticated');
 create policy "Allow individual insert access" on public.channels
-  for insert with check (auth.uid() = created_by);
+  for insert with check ((select auth.uid()) = created_by);
 create policy "Allow individual delete access" on public.channels
-  for delete using (auth.uid() = created_by);
+  for delete using ((select auth.uid()) = created_by);
 create policy "Allow authorized delete access" on public.channels
   for delete using (authorize('channels.delete', auth.uid()));
 create policy "Allow logged-in read access" on public.messages
   for select using (auth.role() = 'authenticated');
 create policy "Allow individual insert access" on public.messages
-  for insert with check (auth.uid() = user_id);
+  for insert with check ((select auth.uid()) = user_id);
 create policy "Allow individual update access" on public.messages
-  for update using (auth.uid() = user_id);
+  for update using ((select auth.uid()) = user_id);
 create policy "Allow individual delete access" on public.messages
-  for delete using (auth.uid() = user_id);
+  for delete using ((select auth.uid()) = user_id);
 create policy "Allow authorized delete access" on public.messages
   for delete using (authorize('messages.delete', auth.uid()));
 create policy "Allow individual read access" on public.user_roles
-  for select using (auth.uid() = user_id);
+  for select using ((select auth.uid()) = user_id);
 
 -- Send "previous data" on change
 alter table public.users
@@ -638,11 +638,11 @@ alter table todos enable row level security;
 create policy "Individuals can create todos." on todos for
     insert with check (auth.uid() = user_id);
 create policy "Individuals can view their own todos. " on todos for
-    select using (auth.uid() = user_id);
+    select using ((select auth.uid()) = user_id);
 create policy "Individuals can update their own todos." on todos for
-    update using (auth.uid() = user_id);
+    update using ((select auth.uid()) = user_id);
 create policy "Individuals can delete their own todos." on todos for
-    delete using (auth.uid() = user_id);
+    delete using ((select auth.uid()) = user_id);
 `.trim(),
   },
   {
@@ -668,9 +668,9 @@ create table users (
 alter table users
   enable row level security;
 create policy "Can view own user data." on users
-  for select using (auth.uid() = id);
+  for select using ((select auth.uid()) = id);
 create policy "Can update own user data." on users
-  for update using (auth.uid() = id);
+  for update using ((select auth.uid()) = id);
 
 /**
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
@@ -693,7 +693,7 @@ create trigger on_auth_user_created
 
 /**
 * CUSTOMERS
-* Note: this is a private table that contains a mapping of user IDs to Strip customer IDs.
+* Note: this is a private table that contains a mapping of user IDs to Stripe customer IDs.
 */
 create table customers (
   -- UUID from auth.users
@@ -801,7 +801,7 @@ create table subscriptions (
 alter table subscriptions
   enable row level security;
 create policy "Can only view own subs data." on subscriptions
-  for select using (auth.uid() = user_id);
+  for select using ((select auth.uid()) = user_id);
 
 /**
  * REALTIME SUBSCRIPTIONS
@@ -838,10 +838,10 @@ create policy "Public profiles are viewable by everyone." on profiles
   for select using (true);
 
 create policy "Users can insert their own profile." on profiles
-  for insert with check (auth.uid() = id);
+  for insert with check ((select auth.uid()) = id);
 
 create policy "Users can update own profile." on profiles
-  for update using (auth.uid() = id);
+  for update using ((select auth.uid()) = id);
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
 -- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
@@ -1234,8 +1234,20 @@ $$;
     id: 24,
     type: 'template',
     title: 'Install dbdev',
-    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    description:
+      'dbdev is a client for installing Trusted Language Extensions (TLE) into your database.',
     sql: `
+/*---------------------
+---- install dbdev ----
+-----------------------
+Requires:
+  - pg_tle: https://github.com/aws/pg_tle
+  - pgsql-http: https://github.com/pramsey/pgsql-http
+
+Warning:
+Restoring a logical backup of a database with a TLE installed can fail.
+For this reason, dbdev should only be used with databases with physical backups enabled.
+*/
 create extension if not exists http with schema extensions;
 create extension if not exists pg_tle;
 select pgtle.uninstall_extension_if_exists('supabase-dbdev');
@@ -1361,11 +1373,11 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1433,11 +1445,11 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1487,7 +1499,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1511,7 +1523,7 @@ end;
 $$;
 -- Permissions for the hook
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
-revoke execute on function public.custom_access_token_hook from authenticated, anon;
+revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
   },
 ]

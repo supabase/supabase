@@ -13,21 +13,21 @@ The Firestore `collection` is "flattened" and converted to a table with basic co
 
 1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
 
-```bash
-git clone https://github.com/supabase-community/firebase-to-supabase.git
-```
+   ```bash
+   git clone https://github.com/supabase-community/firebase-to-supabase.git
+   ```
 
 1. In the `/firestore` directory, create a file named `supabase-service.json` with the following contents:
 
-```json
-{
-  "host": "database.server.com",
-  "password": "secretpassword",
-  "user": "postgres",
-  "database": "postgres",
-  "port": 5432
-}
-```
+   ```json
+   {
+     "host": "database.server.com",
+     "password": "secretpassword",
+     "user": "postgres",
+     "database": "postgres",
+     "port": 5432
+   }
+   ```
 
 1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under `Connection parameters`, enable `Use connection pooling` and set the mode to `Session`. Replace the `Host` and `User` fields with the values shown.
@@ -208,3 +208,7 @@ The result is two separate JSON files:
 - [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
 - [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
 - [Firebase Auth Migration](/docs/guides/migrations/firebase-auth)
+
+## Enterprise
+
+[Contact us](https://forms.supabase.com/enterprise) if you need more help migrating your project.

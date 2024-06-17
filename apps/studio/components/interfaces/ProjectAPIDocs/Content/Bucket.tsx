@@ -26,7 +26,7 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
           <h2 className="text-xl">{bucket.name}</h2>
-          <Badge color={bucket.public ? 'amber' : 'scale'}>
+          <Badge variant={bucket.public ? 'warning' : 'default'}>
             {bucket.public ? 'Public' : 'Private'}
           </Badge>
         </div>

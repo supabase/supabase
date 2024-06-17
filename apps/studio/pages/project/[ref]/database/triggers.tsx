@@ -5,6 +5,7 @@ import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -41,7 +42,7 @@ const TriggersPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className="mb-4 text-xl text-foreground">Database Triggers</h3>
+            <FormHeader title="Database Triggers" />
             <TriggersList
               createTrigger={createTrigger}
               editTrigger={editTrigger}

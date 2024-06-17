@@ -12,12 +12,7 @@ export const CreateFunctionHeader = ({
   setAssistantVisible: (v: boolean) => void
 }) => {
   return (
-    <SheetHeader
-      className={cn(
-        selectedFunction !== undefined ? 'pt-3 pb-0' : 'py-3',
-        'flex flex-row justify-between items-center border-b-0'
-      )}
-    >
+    <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
         <SheetClose
           className={cn(

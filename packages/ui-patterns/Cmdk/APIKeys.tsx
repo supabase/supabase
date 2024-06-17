@@ -1,6 +1,6 @@
 import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
-import { Badge } from 'ui/src/components/Badge'
+import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import { CommandItem, copyToClipboard } from './Command.utils'
 import { IconAlertCircle } from 'ui/src/components/Icon/icons/IconAlertCircle'
 import ChildItem from './ChildItem'
@@ -21,7 +21,7 @@ const APIKeys = ({ isSubItem = false }) => {
           className="space-x-2"
         >
           <p>Copy anonymous key</p>
-          <Badge color="gray">Public</Badge>
+          <Badge>Public</Badge>
         </ChildItem>
       )}
       {apiKeys?.service !== undefined && (
@@ -34,7 +34,7 @@ const APIKeys = ({ isSubItem = false }) => {
           className="space-x-2"
         >
           <p>Copy service key</p>
-          <Badge color="red">Secret</Badge>
+          <Badge variant="destructive">Secret</Badge>
         </ChildItem>
       )}
       {apiKeys?.anon === undefined && apiKeys?.service === undefined && (

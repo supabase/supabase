@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ToastLoader } from 'components/ui/ToastLoader'
@@ -176,6 +175,8 @@ const SidePanelEditor = ({
     if (payload !== undefined && configuration !== undefined) {
       try {
         await saveRow(payload, isNewRecord, configuration, () => {})
+      } catch (error) {
+        // [Joshen] No error handler required as error is handled within saveRow
       } finally {
         resolve()
       }
@@ -246,11 +247,8 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [
             'table-definition',
@@ -260,6 +258,11 @@ const SidePanelEditor = ({
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
+
+      await queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      )
+
       setIsEdited(false)
       snap.closeSidePanel()
     }
@@ -351,7 +354,6 @@ const SidePanelEditor = ({
         })
       }
     } catch (error: any) {
-      console.log({ error })
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }
   }
@@ -610,7 +612,7 @@ const SidePanelEditor = ({
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
+        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.value) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         readOnly={!editable}
@@ -619,6 +621,8 @@ const SidePanelEditor = ({
       />
       <TextEditor
         visible={snap.sidePanel?.type === 'cell'}
+        column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
+        row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
         closePanel={onClosePanel}
         onSaveField={onSaveColumnValue}
       />
@@ -642,21 +646,19 @@ const SidePanelEditor = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => setIsClosingPanel(false)}
-        onSelectConfirm={() => {
+        title="Discard changes"
+        confirmLabel="Discard"
+        onCancel={() => setIsClosingPanel(false)}
+        onConfirm={() => {
           setIsClosingPanel(false)
           setIsEdited(false)
           snap.closeSidePanel()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+          lost.
+        </p>
       </ConfirmationModal>
     </>
   )

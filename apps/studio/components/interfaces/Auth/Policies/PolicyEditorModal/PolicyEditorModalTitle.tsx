@@ -1,9 +1,8 @@
 import { noop } from 'lodash'
+import { FlaskConical } from 'lucide-react'
 import { Button, IconChevronLeft, IconExternalLink } from 'ui'
 
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
-import { FlaskConical } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicyEditorModalTitleProps {
   view: string
@@ -24,8 +23,6 @@ const PolicyEditorModalTitle = ({
   onSelectBackFromTemplates = noop,
   onToggleFeaturePreviewModal,
 }: PolicyEditorModalTitleProps) => {
-  const snap = useAppStateSnapshot()
-
   const getTitle = () => {
     if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
       return `${isNewPolicy ? 'Adding new policy to' : 'Editing policy from'} ${schema}.${table}`

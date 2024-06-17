@@ -26,7 +26,7 @@ const BillingEmail = () => {
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
-  const { mutateAsync: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -35,24 +35,27 @@ const BillingEmail = () => {
     if (!slug) return console.error('Slug is required')
     if (!name) return console.error('Organization name is required')
 
-    try {
-      const { billing_email } = await updateOrganization({
+    updateOrganization(
+      {
         slug,
         name,
         billing_email: values.billing_email,
-      })
-      resetForm({ values: { billing_email }, initialValues: { billing_email } })
-      invalidateOrganizationsQuery(queryClient)
-      toast.success('Successfully saved settings')
-    } finally {
-    }
+      },
+      {
+        onSuccess: ({ billing_email }) => {
+          resetForm({ values: { billing_email }, initialValues: { billing_email } })
+          invalidateOrganizationsQuery(queryClient)
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
 
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-foreground text-base m-0">Email Recipient</p>
           <p className="text-sm text-foreground-light m-0">
             All billing correspondence will go to this email
           </p>

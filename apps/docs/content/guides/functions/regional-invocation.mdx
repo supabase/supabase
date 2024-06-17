@@ -45,7 +45,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 </CH.Code>
 
-You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/debugging).
+You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
 
 ## Available regions
 
@@ -65,6 +65,20 @@ These are the currently supported region values you can provide for `x-region` h
 - `us-east-1`
 - `us-west-1`
 - `us-west-2`
+
+## Using the client library
+
+You can also specify the region when invoking a Function using the Supabase client library:
+
+```js
+const { createClient, FunctionRegion } = require('@supabase/supabase-js')
+const { data: ret, error } = await supabase.functions.invoke('my-function-name', {
+  headers: { 'Content-Type': 'application/json' },
+  method: 'GET',
+  body: {},
+  region: FunctionRegion.UsEast1,
+})
+```
 
 ## Handling regional outages
 

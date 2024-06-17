@@ -103,9 +103,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
                     integration.metadata?.gitHubConnectionOwner)}
               </span>
 
-              <Badge color="scale" className="capitalize">
-                {integration.metadata?.account.type}
-              </Badge>
+              <Badge className="capitalize">{integration.metadata?.account.type}</Badge>
             </div>
             <div className="flex flex-col gap-0">
               <span className="text-foreground-lighter text-xs">

@@ -49,6 +49,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
       session_id: uuidv4(),
       sub: user.id,
       user_metadata: user.raw_user_meta_data,
+      is_anonymous: user.is_anonymous,
     }
   }
 

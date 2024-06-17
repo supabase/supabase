@@ -28,9 +28,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     : undefined
 
   const anonRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.serviceApiKey
+    ? apiService.defaultApiKey
     : undefined
-
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     {
       projectRef: config.projectRef,
@@ -59,27 +58,30 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   }, [snap.role])
 
   useEffect(() => {
-    let token: string | undefined
-    let bearer: string | null = null
+    const triggerUpdateTokenBearer = async () => {
+      let token: string | undefined
+      let bearer: string | null = null
 
-    if (
-      config.projectRef !== undefined &&
-      jwtSecret !== undefined &&
-      snap.role !== undefined &&
-      snap.role.type === 'postgrest'
-    ) {
-      token = anonRoleKey
-      getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
-        .then((token) => (bearer = token))
-        .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
-    } else {
-      token = serviceRoleKey
+      if (
+        config.projectRef !== undefined &&
+        jwtSecret !== undefined &&
+        snap.role !== undefined &&
+        snap.role.type === 'postgrest'
+      ) {
+        token = anonRoleKey
+        await getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+          .then((b) => (bearer = b))
+          .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
+      } else {
+        token = serviceRoleKey
+      }
+      if (token) {
+        onChangeConfig({ ...config, token, bearer })
+      }
     }
 
-    if (token) {
-      onChangeConfig({ ...config, token, bearer })
-    }
-  }, [config.projectRef, jwtSecret, serviceRoleKey, snap.role])
+    triggerUpdateTokenBearer()
+  }, [snap.role, anonRoleKey, serviceRoleKey])
 
   return <RoleImpersonationPopover align="start" variant="connected-on-both" />
 }

@@ -77,7 +77,7 @@ const SchemaSelector = ({
             Failed to load schemas
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
-            Error: {schemasError?.message}
+            Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas
@@ -92,7 +92,6 @@ const SchemaSelector = ({
               size={size}
               disabled={disabled}
               type="default"
-              // className="w-full justify-start"
               className={`w-full [&>span]:w-full`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />

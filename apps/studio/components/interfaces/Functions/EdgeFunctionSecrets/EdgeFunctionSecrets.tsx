@@ -38,13 +38,6 @@ const EdgeFunctionSecrets = () => {
 
   return (
     <>
-      <div>
-        <h3 className="mb-2 text-xl text-foreground">Edge Function Secrets Management</h3>
-        <div className="text-sm text-foreground-lighter">
-          Manage the secrets for your project's edge functions
-        </div>
-      </div>
-
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
@@ -121,22 +114,20 @@ const EdgeFunctionSecrets = () => {
       <ConfirmationModal
         loading={isDeleting}
         visible={selectedSecret !== undefined}
-        buttonLabel="Delete secret"
-        buttonLoadingLabel="Deleting secret"
-        header={`Confirm to delete secret "${selectedSecret?.name}"`}
-        onSelectCancel={() => setSelectedSecret(undefined)}
-        onSelectConfirm={() => {
+        confirmLabel="Delete secret"
+        confirmLabelLoading="Deleting secret"
+        title={`Confirm to delete secret "${selectedSecret?.name}"`}
+        onCancel={() => setSelectedSecret(undefined)}
+        onConfirm={() => {
           if (selectedSecret !== undefined) {
             deleteSecret({ projectRef, secrets: [selectedSecret.name] })
           }
         }}
       >
-        <Modal.Content className="py-4">
-          <p className="text-sm">
-            Before removing this secret, do ensure that none of your edge functions are currently
-            actively using this secret. This action cannot be undone.
-          </p>
-        </Modal.Content>
+        <p className="text-sm">
+          Before removing this secret, do ensure that none of your edge functions are currently
+          actively using this secret. This action cannot be undone.
+        </p>
       </ConfirmationModal>
     </>
   )

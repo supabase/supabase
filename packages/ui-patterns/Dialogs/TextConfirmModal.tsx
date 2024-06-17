@@ -1,19 +1,16 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef } from 'react'
+import { ReactNode, forwardRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Admonition,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogContent,
-  DialogSectionSeparator,
-  DialogSection,
-  DialogTitle,
   Dialog,
+  DialogContent,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -21,15 +18,11 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
   cn,
 } from 'ui'
-import {
-  DIALOG_PADDING_X_SMALL,
-  DIALOG_PADDING_Y_SMALL,
-  DialogHeader,
-} from 'ui/src/components/shadcn/ui/dialog'
+import { Admonition } from './../admonition'
+import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 export interface TextConfirmModalProps {
@@ -44,7 +37,7 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
   alert?: {
     base?: React.ComponentProps<typeof Alert_Shadcn_>
     title?: string
@@ -107,6 +100,10 @@ const TextConfirmModal = forwardRef<
       onConfirm()
     }
 
+    useEffect(() => {
+      if (confirmString) form.reset()
+    }, [confirmString])
+
     return (
       <Dialog
         open={visible}
@@ -117,7 +114,7 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
@@ -164,13 +161,14 @@ const TextConfirmModal = forwardRef<
                   </FormItem_Shadcn_>
                 )}
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button size="medium" block type="default" disabled={loading}>
+                  <Button size="medium" block type="default" disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}
                 <Button
+                  block
                   size="medium"
                   type={
                     variant === 'destructive'
@@ -180,9 +178,9 @@ const TextConfirmModal = forwardRef<
                         : 'primary'
                   }
                   htmlType="submit"
-                  block
                   loading={loading}
                   disabled={loading}
+                  className="truncate"
                 >
                   {confirmLabel}
                 </Button>

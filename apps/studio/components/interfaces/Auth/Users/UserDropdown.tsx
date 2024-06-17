@@ -23,7 +23,6 @@ import {
   IconShieldOff,
   IconTrash,
   IconUser,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -43,6 +42,8 @@ const UserDropdown = ({
   setUserSidePanelOpen,
 }: UserDropdownProps) => {
   const { ref } = useParams()
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
     onSuccess: () => {
@@ -59,9 +60,20 @@ const UserDropdown = ({
       toast.success(`Sent OTP to ${user.phone}`)
     },
   })
-  const { mutateAsync: deleteUser, isLoading: isDeleting } = useUserDeleteMutation()
-  const { mutateAsync: deleteUserMFAFactors, isLoading: isDeletingFactors } =
-    useUserDeleteMFAFactorsMutation()
+  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted ${user.email}`)
+      setIsDeleteModalOpen(false)
+    },
+  })
+  const { mutate: deleteUserMFAFactors, isLoading: isDeletingFactors } =
+    useUserDeleteMFAFactorsMutation({
+      onSuccess: () => {
+        toast.success("Successfully deleted the user's factors")
+        setIsDeleteFactorsModalOpen(false)
+      },
+    })
+
   const isLoading = isResetting || isSendingLink || isSendingOTP || isDeleting || isDeletingFactors
 
   const handleResetPassword = async () => {
@@ -79,37 +91,17 @@ const UserDropdown = ({
     sendOTP({ projectRef: ref, user })
   }
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-
   async function handleDelete() {
     await timeout(200)
-
     if (!ref) return console.error('Project ref is required')
-    try {
-      await deleteUser({ projectRef: ref, user })
-      toast.success(`Successfully deleted ${user.email}`)
-      setIsDeleteModalOpen(false)
-    } catch (error: any) {
-      toast.error(error?.message ?? 'Something went wrong while trying to delete user')
-    }
+    deleteUser({ projectRef: ref, user })
   }
-
-  const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   async function handleDeleteFactors() {
     await timeout(200)
-
     if (!ref) return console.error('Project ref is required')
     if (!user.id) return console.error('User id is required')
-
-    try {
-      await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
-      toast.success("Successfully deleted the user's factors")
-      setIsDeleteFactorsModalOpen(false)
-    } catch (error: any) {
-      toast.error(error?.message ?? "Something went wrong while trying to delete user's factors")
-    } finally {
-    }
+    deleteUserMFAFactors({ projectRef: ref, userId: user.id })
   }
 
   const handleViewUserInfo = () => {
@@ -121,7 +113,7 @@ const UserDropdown = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
+          <Button type="text" loading={isLoading} className="hover:border-muted flex">
             <IconMoreVertical />
           </Button>
         </DropdownMenuTrigger>
@@ -224,35 +216,30 @@ const UserDropdown = ({
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        buttonLoadingLabel="Delete"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete user {user.email}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete user {user.email}?
+        </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        onSelectCancel={() => setIsDeleteFactorsModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteFactorsModalOpen(false)}
+        onConfirm={() => {
           handleDeleteFactors()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete the user's MFA factors?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete the user's MFA factors?
+        </p>
       </ConfirmationModal>
     </>
   )
