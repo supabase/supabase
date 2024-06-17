@@ -1128,10 +1128,6 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/ai-models',
         },
         {
-          name: 'Regional invocations',
-          url: '/guides/functions/regional-invocation',
-        },
-        {
           name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
@@ -1142,16 +1138,16 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Debugging Edge Functions',
-          url: '/guides/functions/debugging',
-        },
-        {
-          name: 'Debugging Tools',
+          name: 'Local Debugging with DevTools',
           url: '/guides/functions/debugging-tools',
         },
         {
-          name: 'Logging and Using Headers',
-          url: '/guides/functions/functions-headers',
+          name: 'Logging',
+          url: '/guides/functions/logging',
+        },
+        {
+          name: 'Troubleshooting Common Issues',
+          url: '/guides/functions/troubleshooting',
         },
         {
           name: 'Testing your Edge Functions',
@@ -1167,6 +1163,10 @@ export const functions: NavMenuConstant = {
       name: 'Platform',
       url: undefined,
       items: [
+        {
+          name: 'Regional invocations',
+          url: '/guides/functions/regional-invocation',
+        },
         {
           name: 'Status codes',
           url: '/guides/functions/status-codes',
