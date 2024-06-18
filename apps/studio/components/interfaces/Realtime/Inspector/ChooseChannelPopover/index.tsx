@@ -20,6 +20,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import { useFlag } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
