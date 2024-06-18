@@ -3,15 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useClickAway, useKey } from 'react-use'
-import {
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconCheck,
-  IconClipboard,
-} from 'ui'
+import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
+import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -121,7 +114,7 @@ const RightClickBrandLogo = () => {
                   autoFocus
                   asChild
                   key={menuItem.label}
-                  className="w-full flex justify-between gap-2 items-center p-2"
+                  className="w-full flex justify-between gap-2 items-center !p-2"
                 >
                   {menuItem.type === 'download' || menuItem.type === 'link' ? (
                     <Link
@@ -157,16 +150,14 @@ interface MenuItemProps {
   label: string
   type: 'clipboard' | 'download' | 'link'
   icon?: ReactNode
-  onClick?: VoidFunction
   href?: string
   clipboard?: string
-  className?: string
 }
 
 /**
  * Brand assets dropdown menu items.
- * First array is to divide the menu by sections
- * Second array is the list of items inside each section
+ * First array is to divide the menu by sections;
+ * Second array is the list of items inside each section.
  */
 const menuItems: MenuItemProps[][] = [
   [
@@ -301,16 +292,18 @@ const MenuItemContent = ({ icon, type, label, copied }: MenuItemContentProps) =>
     {icon && <span className="text-foreground-lighter">{icon}</span>}
     <span className="grow">{label}</span>
     {type === 'clipboard' && (
-      <span className="opacity-0 flex items-center justify-end group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
+      <span className="w-4 opacity-0 flex items-center justify-center group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
         {!copied ? (
-          <IconClipboard
+          <ClipboardIcon
+            strokeWidth={1}
             className={cn(
               'h-3 transition-opacity opacity-0 duration-300',
               !copied && 'opacity-100'
             )}
           />
         ) : (
-          <IconCheck
+          <CheckIcon
+            strokeWidth={1}
             className={cn('h-3 transition-opacity opacity-0 duration-300', copied && 'opacity-100')}
           />
         )}
