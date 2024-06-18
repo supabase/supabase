@@ -179,7 +179,7 @@ const Nav = (props: Props) => {
                         <Button type="default" className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Sign in</Link>
                         </Button>
-                        <Button className="hidden text-white lg:block" asChild>
+                        <Button className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Start your project</Link>
                         </Button>
                       </>
