@@ -37,6 +37,7 @@ services:
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
 
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_URL: http://analytics:4000
@@ -294,7 +295,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.45.2
+    image: supabase/edge-runtime:v1.54.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -359,7 +360,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.1.41
+    image: supabase/postgres:15.1.1.61
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

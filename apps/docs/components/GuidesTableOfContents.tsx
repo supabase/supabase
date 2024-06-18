@@ -6,7 +6,7 @@ import { proxy, useSnapshot } from 'valtio'
 import {
   highlightSelectedTocItem,
   removeAnchor,
-} from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+} from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from '~/components/Feedback'
 import useHash from '~/hooks/useHash'
 

@@ -11,6 +11,13 @@ import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Link from 'next/link'
 import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
+import {
+  ScaffoldColumn,
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -25,23 +32,30 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
-      <FormHeader title="Vault" description="Application level encryption for your project" />
-      {isLoading ? (
-        <div className="border rounded border-default p-12 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </div>
-      ) : !isEnabled ? (
-        <VaultToggle />
-      ) : (
-        <>
-          <VaultNavTabs projRef={ref || ''} activeTab={'keys'} />
-          <EncryptionKeysManagement />
-        </>
-      )}
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Vault</ScaffoldTitle>
+          <ScaffoldDescription>Application level encryption for your project</ScaffoldDescription>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        {isLoading ? (
+          <div className="border rounded border-default p-12 space-y-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        ) : !isEnabled ? (
+          <VaultToggle />
+        ) : (
+          <>
+            <VaultNavTabs projRef={ref || ''} activeTab={'keys'} />
+            <EncryptionKeysManagement />
+          </>
+        )}
+      </ScaffoldContainer>
+    </>
   )
 }
 

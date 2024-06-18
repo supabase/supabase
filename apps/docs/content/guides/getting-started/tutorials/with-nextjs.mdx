@@ -663,17 +663,23 @@ When you enter your email and password, you will receive an email with the title
 
 Upon sign up, an email will be sent to the user with a unique hash code. This key can then be sent back to the application for verification, thus authenticating the user. The method is referred to as Proof Key for Code Exchange (PKCE). As we are employing PKCE in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
-In the following code snippet, we perform the following steps:
+Before we proceed, let's change the email template to support sending a PKCE code:
 
-- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
-- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
-- Finally, we redirect the user to the `account` page.
+- Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
+- Select `Confirm signup` template.
+- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 <Admonition type="tip">
 
 Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
+
+In the following code snippet, we perform the following steps:
+
+- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
+- Finally, we redirect the user to the `account` page.
 
 <Tabs
   scrollable

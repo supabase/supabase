@@ -1234,8 +1234,20 @@ $$;
     id: 24,
     type: 'template',
     title: 'Install dbdev',
-    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    description:
+      'dbdev is a client for installing Trusted Language Extensions (TLE) into your database.',
     sql: `
+/*---------------------
+---- install dbdev ----
+-----------------------
+Requires:
+  - pg_tle: https://github.com/aws/pg_tle
+  - pgsql-http: https://github.com/pramsey/pgsql-http
+
+Warning:
+Restoring a logical backup of a database with a TLE installed can fail.
+For this reason, dbdev should only be used with databases with physical backups enabled.
+*/
 create extension if not exists http with schema extensions;
 create extension if not exists pg_tle;
 select pgtle.uninstall_extension_if_exists('supabase-dbdev');
@@ -1361,11 +1373,11 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1433,11 +1445,11 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
   
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1487,7 +1499,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1511,7 +1523,7 @@ end;
 $$;
 -- Permissions for the hook
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
-revoke execute on function public.custom_access_token_hook from authenticated, anon;
+revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
   },
 ]

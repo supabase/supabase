@@ -33,7 +33,7 @@ export async function fetchSources() {
     'api',
     '/reference/api',
     { title: 'Management API Reference' },
-    'spec/transforms/api_v0_openapi_deparsed.json',
+    'spec/transforms/api_v1_openapi_deparsed.json',
     'spec/common-api-sections.json'
   ).load()
 

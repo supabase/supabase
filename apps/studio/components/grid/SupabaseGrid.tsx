@@ -1,10 +1,10 @@
-import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks'
@@ -22,10 +22,10 @@ import Footer from './components/footer/Footer'
 import { Grid } from './components/grid'
 import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
-import { StoreProvider, useDispatch, useTrackedState } from './store'
-import type { SupabaseGridProps } from './types'
-import { InitialStateType } from './store/reducers'
 import { STORAGE_KEY_PREFIX } from './constants'
+import { StoreProvider, useDispatch, useTrackedState } from './store'
+import { InitialStateType } from './store/reducers'
+import type { SupabaseGridProps } from './types'
 import { getGridColumns } from './utils/gridColumns'
 
 function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
@@ -133,7 +133,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const [{ sort, filter }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
-  const sorts = formatSortURLParams(sort as string[])
+  const sorts = formatSortURLParams(props.table.name, sort as string[] | undefined)
   const filters = formatFilterURLParams(filter as string[])
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()

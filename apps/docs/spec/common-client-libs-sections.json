@@ -400,6 +400,15 @@
         "type": "function"
       },
       {
+        "id": "auth-error-codes",
+        "title": "Error codes",
+        "slug": "auth-error-codes",
+        "type": "markdown",
+        "meta": {
+          "shared": true
+        }
+      },
+      {
         "id": "sign-up",
         "title": "Create a new user",
         "slug": "auth-signup",

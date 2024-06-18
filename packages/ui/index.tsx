@@ -173,6 +173,8 @@ export {
   SelectSeparator as SelectSeparator_Shadcn_,
   SelectTrigger as SelectTrigger_Shadcn_,
   SelectValue as SelectValue_Shadcn_,
+  SelectScrollUpButton as SelectScrollUpButton_Shadcn_,
+  SelectScrollDownButton as SelectScrollDownButton_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
 export {
@@ -241,6 +243,8 @@ export * from './src/components/shadcn/ui/resizable'
 
 export * from './src/components/radio-group-stacked'
 export * from './src/components/radio-group-card'
+
+export * from './src/components/TreeView'
 
 // links
 

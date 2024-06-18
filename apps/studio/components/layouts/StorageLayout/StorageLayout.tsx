@@ -33,7 +33,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
     if (apiService.endpoint) {
       storageExplorerStore.initStore(
-        projectRef,
+        projectRef!,
         apiService.endpoint,
         apiService.serviceApiKey,
         apiService.protocol
@@ -43,7 +43,6 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
         'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io'
       )
     }
-    storageExplorerStore.setLoaded(true)
   }
 
   return (

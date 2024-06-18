@@ -15,7 +15,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import type { StorageColumn } from '../Storage.types'
+import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
@@ -54,12 +54,12 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 
 export interface FileExplorerColumnProps {
   index: number
-  view: string
+  view: STORAGE_VIEWS
   column: StorageColumn
   fullWidth?: boolean
-  openedFolders?: any[]
-  selectedItems: any[]
-  selectedFilePreview: any
+  openedFolders?: StorageItem[]
+  selectedItems: StorageItemWithColumn[]
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -75,7 +75,7 @@ const FileExplorerColumn = ({
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview = {},
+  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -105,7 +105,7 @@ const FileExplorerColumn = ({
     (item) => item.type === STORAGE_ROW_TYPES.FILE
   )
 
-  const columnItems = column.items
+  const columnItems = column.items.map((item, index) => ({ ...item, columnIndex: index }))
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const isEmpty =

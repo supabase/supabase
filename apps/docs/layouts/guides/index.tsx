@@ -48,7 +48,7 @@ const Layout: FC<Props> = (props) => {
   const ogImageUrl = encodeURI(
     `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=docs${
       ogPageType ? `&type=${ogPageType}` : ''
-    }&title=${props.meta?.title}&description=${props.meta?.description}`
+    }&title=${encodeURIComponent(props.meta?.title)}&description=${encodeURIComponent(props.meta?.description)}`
   )
 
   return (
