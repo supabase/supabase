@@ -6,7 +6,7 @@ function SideNavigation() {
     <nav className="min-w-[220px]">
       {docsConfig.sidebarNav.map((section, i) => (
         <div key={`${section.title}-${i}`} className="pb-10 space-y-0.5">
-          <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-wider">
+          <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
             {section.title}
           </div>
           {section.items.map((item, i) => (
