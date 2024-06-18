@@ -23,6 +23,7 @@ import {
 
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
+  Braces,
   Calendar,
   Check,
   ChevronsUpDown,
@@ -32,7 +33,7 @@ import {
   ToggleRight,
   Type,
 } from 'lucide-react'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -77,11 +78,8 @@ const ColumnType = ({
       case 'text':
         return <Type size={14} className="text-foreground" strokeWidth={1.5} />
       case 'json':
-        return (
-          <div className="text-foreground" style={{ padding: '0px 1px' }}>
-            {'{ }'}
-          </div>
-        )
+        return <Braces size={14} className="text-foreground" strokeWidth={1.5} />
+
       case 'jsonb':
         return (
           <div className="text-foreground" style={{ padding: '0px 1px' }}>
@@ -179,14 +177,14 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
-            className="w-full justify-between"
-            iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+            className="w-full justify-between flex gap-2"
+            iconRight={<ChevronsUpDown />}
           >
             {value ? (
-              <div className="flex gap-2">
+              <span className="flex gap-2">
                 <span>{inferIcon(availableTypes.find((type) => type === value) ?? '')}</span>
                 {availableTypes.find((type) => type === value)}
-              </div>
+              </span>
             ) : (
               'Choose a column type...'
             )}
@@ -216,11 +214,7 @@ const ColumnType = ({
                         <span className="text-foreground-lighter">{option.description}</span>
                       </div>
                       <span className="absolute right-3 top-2">
-                        {option.name === value ? (
-                          <Check className="text-brand-500" size={14} />
-                        ) : (
-                          ''
-                        )}
+                        {option.name === value ? <Check className="text" size={14} /> : ''}
                       </span>
                     </CommandItem_Shadcn_>
                   ))}
@@ -233,26 +227,29 @@ const ColumnType = ({
                         <CommandItem_Shadcn_
                           key={option.name}
                           value={option.name}
-                          className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
+                          // className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
+                          className={cn(
+                            'relative flex items-center gap-2',
+                            option.name === value ? 'bg-surface-200' : ''
+                          )}
                           onSelect={(value: string) => {
                             onOptionSelect(value)
                             setOpen(false)
                           }}
                         >
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
-                            </div>
-                            <span className="text-foreground">{option.name}</span>
-                            {option.comment !== undefined && (
-                              <span title={option.comment} className="text-foreground-lighter">
-                                {option.comment}
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1.5">
-                              {option.name === value ? <Check size={13} /> : ''}
+                          <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+
+                          <span className="text-foreground">{option.name}</span>
+
+                          {option.comment !== undefined && (
+                            <span title={option.comment} className="text-foreground-lighter">
+                              {option.comment}
                             </span>
-                          </div>
+                          )}
+
+                          <span className="flex items-center gap-1.5 ml-auto mr-2">
+                            {option.name === value ? <Check size={13} /> : ''}
+                          </span>
                         </CommandItem_Shadcn_>
                       ))}
                     </CommandGroup_Shadcn_>
@@ -266,13 +263,13 @@ const ColumnType = ({
 
       {showRecommendation && recommendation !== undefined && (
         <Alert_Shadcn_ variant="warning">
-          <CriticalIcon />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             {' '}
             It is recommended to use <code className="text-xs">
               {recommendation.alternative}
             </code>{' '}
-            insteadn
+            instead
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p>
