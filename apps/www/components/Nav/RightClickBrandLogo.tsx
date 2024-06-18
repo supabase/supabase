@@ -82,7 +82,6 @@ const RightClickBrandLogo = () => {
       <DropdownMenuTrigger asChild>
         <Link
           href="/"
-          tabIndex={1}
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router.push('/')}
@@ -115,7 +114,7 @@ const RightClickBrandLogo = () => {
       >
         {menuItems.map((section, sectionIdx) => (
           <Fragment key={`cxtMenu-section-${sectionIdx}`}>
-            {sectionIdx !== 0 && <Divider />}
+            {sectionIdx !== 0 && <DropdownSeperator />}
             <div className="p-1">
               {section.map((menuItem, i) => (
                 <DropdownMenuItem
@@ -152,7 +151,7 @@ const RightClickBrandLogo = () => {
   )
 }
 
-const Divider = () => <div className="h-px w-full bg-border" />
+const DropdownSeperator = () => <div className="h-px w-full bg-border" />
 
 interface MenuItemProps {
   label: string
@@ -302,19 +301,19 @@ const MenuItemContent = ({ icon, type, label, copied }: MenuItemContentProps) =>
     {icon && <span className="text-foreground-lighter">{icon}</span>}
     <span className="grow">{label}</span>
     {type === 'clipboard' && (
-      <span className="relative w-3 opacity-0 flex items-center justify-end group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
-        <IconClipboard
-          className={cn(
-            'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
-            !copied && 'opacity-100'
-          )}
-        />
-        <IconCheck
-          className={cn(
-            'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
-            copied && 'opacity-100'
-          )}
-        />
+      <span className="opacity-0 flex items-center justify-end group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
+        {!copied ? (
+          <IconClipboard
+            className={cn(
+              'h-3 transition-opacity opacity-0 duration-300',
+              !copied && 'opacity-100'
+            )}
+          />
+        ) : (
+          <IconCheck
+            className={cn('h-3 transition-opacity opacity-0 duration-300', copied && 'opacity-100')}
+          />
+        )}
       </span>
     )}
   </>
