@@ -1,5 +1,9 @@
-import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
-import { sortBy, take } from 'lodash'
+import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js-next'
+import {
+  DEFAULT_GLOBAL_OPTIONS,
+  DEFAULT_REALTIME_OPTIONS,
+} from '@supabase/supabase-js/dist/main/lib/constants'
+import { merge, sortBy, take } from 'lodash'
 import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -63,6 +67,7 @@ export const useRealtimeMessages = (
     token,
     schema,
     table,
+    isChannelPrivate,
     filter,
     bearer,
     enablePresence,
@@ -77,40 +82,43 @@ export const useRealtimeMessages = (
     ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
     : `https://${projectRef}.supabase.co`
 
+  const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
+
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {
     dispatch({ type: 'add', payload: { messageType, metadata } })
   }
 
   // Instantiate our client with the Realtime server and params to connect with
-  let [client, setClient] = useState<SupabaseClient<any, 'public', any> | undefined>()
+  let [client, setClient] = useState<RealtimeClient>()
   let [channel, setChannel] = useState<RealtimeChannel | undefined>()
 
   useEffect(() => {
     if (!enabled) {
       return
     }
-    const opts = {
-      global: {
-        headers: {
-          'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
-        },
+
+    const globalOptions = merge(DEFAULT_GLOBAL_OPTIONS, {
+      headers: {
+        'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
       },
-      realtime: {
-        params: {
-          log_level: logLevel,
-        },
-      },
+    })
+    const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
+
+    const options = {
+      headers: globalOptions.headers,
+      ...realtimeOptions,
+      params: { apikey: token, ...realtimeOptions.params },
     }
-    const newClient = new SupabaseClient(host, token, opts)
+    const realtimeClient = new RealtimeClient(realtimeUrl, options)
 
     if (bearer) {
-      newClient.realtime.setAuth(bearer)
+      realtimeClient.setAuth(bearer)
     }
 
-    setClient(newClient)
+    setClient(realtimeClient)
     return () => {
-      client?.realtime.disconnect()
+      realtimeClient.disconnect()
       setClient(undefined)
     }
   }, [enabled, bearer, host, logLevel, token])
