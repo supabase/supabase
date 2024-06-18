@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.0.5",
-    "contentlayer2": "0.4.5",
+    "contentlayer2": "0.4.6",
     "eslint-config-supabase": "*",
     "fs": "^0.0.1-security",
     "jotai": "^2.8.0",
@@ -22,7 +22,7 @@
     "lucide-react": "^0.338.0",
     "markdown-wasm": "^1.2.0",
     "next": "^14.2.3",
-    "next-contentlayer2": "0.4.5",
+    "next-contentlayer2": "0.4.6",
     "react": "^18.2.0",
     "react-docgen": "^7.0.3",
     "react-dom": "^18.2.0",
