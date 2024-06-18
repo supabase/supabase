@@ -104,19 +104,22 @@ const InvoicesSettings = () => {
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
-                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(
-                            x.status as InvoiceStatus
-                          ) && (
-                            <Button asChild>
-                              <Link
-                                href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Pay Now
-                              </Link>
-                            </Button>
-                          )}
+                          {x.subtotal > 0 &&
+                            [
+                              InvoiceStatus.UNCOLLECTIBLE,
+                              InvoiceStatus.OPEN,
+                              InvoiceStatus.ISSUED,
+                            ].includes(x.status as InvoiceStatus) && (
+                              <Button asChild>
+                                <Link
+                                  href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Pay Now
+                                </Link>
+                              </Button>
+                            )}
 
                           <Button
                             type="outline"

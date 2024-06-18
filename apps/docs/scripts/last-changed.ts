@@ -30,7 +30,6 @@ interface Options {
 
 interface Stats {
   sectionsUpdated: number
-  sectionsRemoved: number
   sectionsErrored: number
 }
 
@@ -61,7 +60,6 @@ async function main() {
 
   const stats: Stats = {
     sectionsUpdated: 0,
-    sectionsRemoved: 0,
     sectionsErrored: 0,
   }
 
@@ -71,8 +69,9 @@ async function main() {
 
   console.log('Content timestamps successfully updated')
   console.log(`  - ${stats.sectionsUpdated} sections updated`)
-  console.log(`  - ${stats.sectionsRemoved} old sections removed`)
   console.log(`  - ${stats.sectionsErrored} sections errored when updating`)
+
+  if (stats.sectionsErrored) process.exit(1)
 }
 
 function checkEnv() {
@@ -124,8 +123,6 @@ async function updateContentDates({ reset, ctx }: { reset: boolean; ctx: Ctx }) 
     updateTasks.push(...tasks)
   }
   await Promise.all(updateTasks)
-
-  await cleanupObsoleteRows(ctx)
 }
 
 function getContentDir() {
@@ -273,18 +270,6 @@ async function getGitUpdatedAt(filePath: string, { git }: { git: SimpleGit }) {
 function getContentDirParentPage(filePath: string) {
   const contentDir = getContentDir()
   return `/content${filePath.replace(contentDir, '')}`
-}
-
-async function cleanupObsoleteRows(ctx: Ctx) {
-  try {
-    const { data: count, error } = await ctx.supabase.rpc('cleanup_last_changed_pages')
-    if (error) {
-      throw Error(error.message ?? 'Failed to delete rows')
-    }
-    ctx.stats.sectionsRemoved = count
-  } catch (err) {
-    console.error(`Error cleanup obsolete rows: ${err}`)
-  }
 }
 
 main()

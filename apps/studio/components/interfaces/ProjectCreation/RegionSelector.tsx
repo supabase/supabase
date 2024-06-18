@@ -12,7 +12,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { getAvailableRegions } from './ProjectCreation.utils'
-import { useEffect } from 'react'
 
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
@@ -22,7 +21,9 @@ interface RegionSelectorProps {
 
 export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorProps) => {
   const router = useRouter()
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const showNonProdFields =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
 
@@ -36,10 +37,10 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
       label="Region"
       description={
         <>
+          <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <p>Select the region closest to your users for the best performance.</p>
+            <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
           )}
-          <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
         </>
       }
     >

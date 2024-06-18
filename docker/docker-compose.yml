@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240514-6f5cabd
+    image: supabase/studio:20240422-5cf8f30
     restart: unless-stopped
     healthcheck:
       test:
@@ -295,7 +295,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.53.3
+    image: supabase/edge-runtime:v1.54.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -360,7 +360,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.1.41
+    image: supabase/postgres:15.1.1.61
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
