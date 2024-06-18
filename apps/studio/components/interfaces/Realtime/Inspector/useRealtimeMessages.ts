@@ -43,6 +43,7 @@ export interface RealtimeConfig {
   token: string
   schema: string
   table: string
+  isChannelPrivate: boolean
   filter: string | undefined
   bearer: string | null
   enableBroadcast: boolean
@@ -120,7 +121,7 @@ export const useRealtimeMessages = (
     }
     dispatch({ type: 'clear' })
     const newChannel = client?.channel(channelName, {
-      config: { broadcast: { self: true } },
+      config: { broadcast: { self: true }, private: isChannelPrivate },
     })
     // Hack to confirm Postgres is subscribed
     // Need to add 'extension' key in the 'payload'
