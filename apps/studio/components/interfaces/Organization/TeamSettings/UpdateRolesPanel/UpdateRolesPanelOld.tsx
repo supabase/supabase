@@ -24,9 +24,9 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
-import { RolesAccessMatrix } from './RolesAccessMatrix'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import { RolesAccessMatrix } from './RolesAccessMatrix'
 
 interface UpdateRolesPanelProps {
   visible: boolean
