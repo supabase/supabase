@@ -10,8 +10,12 @@ import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/or
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import Link from 'next/link'
 import type { Role } from 'types'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +24,9 @@ import {
   DropdownMenuTrigger,
   IconMoreHorizontal,
   IconTrash,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface MemberActionsProps {
@@ -209,9 +213,32 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           handleMemberDelete()
         }}
       >
-        <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove {member.primary_email}
-        </p>
+        <div className="grid gap-2">
+          <p className="text-sm text-foreground-light">
+            This is permanent! Are you sure you want to remove {member.primary_email}?
+          </p>
+
+          <Alert_Shadcn_ variant="destructive">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>User content will be deleted</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="grid gap-2">
+              <p>
+                Any SQL Editor snippets created by this user will also be deleted. To preserve these
+                snippets, share them to the project before deleting this user.
+              </p>
+              <Button type="default" asChild>
+                <Link
+                  target="_blank"
+                  className="justify-self-start"
+                  href="https://github.com/supabase/supabase/pull/17814"
+                >
+                  Learn more
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3"></AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </div>
       </ConfirmationModal>
     </>
   )
