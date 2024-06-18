@@ -172,7 +172,7 @@ const TaxID = () => {
                 <Form_Shadcn_ {...form}>
                   <form
                     id="tax-id-form"
-                    className="grid grid-cols-2 gap-2 w-full py-8 px-8"
+                    className="grid grid-cols-2 gap-2 w-full py-8 px-8 items-center"
                     onSubmit={form.handleSubmit(() => onSaveTaxId())}
                   >
                     <FormField_Shadcn_
