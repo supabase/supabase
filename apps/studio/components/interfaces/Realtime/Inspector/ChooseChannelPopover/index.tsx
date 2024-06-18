@@ -9,12 +9,14 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
+  FormLabel_Shadcn_,
   Form_Shadcn_,
   IconChevronDown,
   Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Switch,
 } from 'ui'
 import * as z from 'zod'
 
@@ -26,17 +28,18 @@ interface ChooseChannelPopoverProps {
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
 }
 
+const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
+
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
   const telemetryProps = useTelemetryProps()
   const router = useRouter()
 
-  const FormSchema = z.object({ channel: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
-    defaultValues: { channel: '' },
+    defaultValues: { channel: '', isPrivate: false },
   })
 
   const onOpen = (v: boolean) => {
@@ -58,7 +61,12 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
       telemetryProps,
       router
     )
-    onChangeConfig({ ...config, channelName: form.getValues('channel'), enabled: true })
+    onChangeConfig({
+      ...config,
+      channelName: form.getValues('channel'),
+      isChannelPrivate: form.getValues('isPrivate'),
+      enabled: true,
+    })
   }
 
   return (
@@ -83,14 +91,18 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           {config.channelName.length === 0 ? (
             <>
               <Form_Shadcn_ {...form}>
-                <form id="realtime-channel" onSubmit={form.handleSubmit(() => onSubmit())}>
+                <form
+                  id="realtime-channel"
+                  onSubmit={form.handleSubmit(() => onSubmit())}
+                  className="flex flex-col gap-y-4"
+                >
                   <FormField_Shadcn_
                     name="channel"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <label className="text-foreground text-xs mb-2">Name of channel</label>
-                        <div className="flex">
+                        <div className="flex flex-row">
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
@@ -99,6 +111,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                               placeholder="Enter a channel name"
                             />
                           </FormControl_Shadcn_>
+
                           <Button
                             type="primary"
                             className="rounded-l-none"
@@ -108,27 +121,54 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             Listen to channel
                           </Button>
                         </div>
+                        <p className="text-xs text-foreground-lighter mt-2">
+                          The channel you initialize with the Supabase Realtime client. Learn more
+                          in{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline hover:text-foreground transition"
+                          >
+                            our docs
+                          </Link>
+                        </p>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+
+                  <FormField_Shadcn_
+                    key="isPrivate"
+                    control={form.control}
+                    name="isPrivate"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="flex items-center gap-x-2">
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={field.disabled}
+                          />
+                        </FormControl_Shadcn_>
+                        <FormLabel_Shadcn_ className="text-xs">
+                          Is channel private?
+                        </FormLabel_Shadcn_>
                       </FormItem_Shadcn_>
                     )}
                   />
                 </form>
               </Form_Shadcn_>
-              <p className="text-xs text-foreground-lighter mt-2">
-                The channel you initialize with the Supabase Realtime client. Learn more in{' '}
-                <Link
-                  href="https://supabase.com/docs/guides/realtime/concepts#channels"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground transition"
-                >
-                  our docs
-                </Link>
-              </p>
             </>
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-x-2">
-                <p className="text-foreground text-xs">Currently joined channel:</p>
+                <p className="text-foreground text-xs">
+                  Currently joined{' '}
+                  <span className={config.isChannelPrivate ? 'text-brand' : 'text-warning'}>
+                    {config.isChannelPrivate ? 'private' : 'public'}
+                  </span>{' '}
+                  channel:
+                </p>
                 <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
                   {config.channelName}
                 </p>
