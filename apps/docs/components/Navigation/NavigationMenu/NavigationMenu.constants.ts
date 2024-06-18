@@ -1142,12 +1142,12 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging-tools',
         },
         {
-          name: 'Logging and Troubleshooting',
-          url: '/guides/functions/debugging',
+          name: 'Logging',
+          url: '/guides/functions/logging',
         },
         {
-          name: 'Logging and Using Headers',
-          url: '/guides/functions/functions-headers',
+          name: 'Troubleshooting Common Issues',
+          url: '/guides/functions/troubleshooting',
         },
         {
           name: 'Testing your Edge Functions',
