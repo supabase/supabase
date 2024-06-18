@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
@@ -123,7 +124,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             Listen to channel
                           </Button>
                         </div>
-                        <p className="text-xs text-foreground-lighter mt-2">
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
                           The channel you initialize with the Supabase Realtime client. Learn more
                           in{' '}
                           <Link
@@ -134,7 +135,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                           >
                             our docs
                           </Link>
-                        </p>
+                        </FormDescription_Shadcn_>
                       </FormItem_Shadcn_>
                     )}
                   />
@@ -145,17 +146,23 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                       control={form.control}
                       name="isPrivate"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex items-center gap-x-2">
-                          <FormControl_Shadcn_>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={field.disabled}
-                            />
-                          </FormControl_Shadcn_>
-                          <FormLabel_Shadcn_ className="text-xs">
-                            Is channel private?
-                          </FormLabel_Shadcn_>
+                        <FormItem_Shadcn_ className="">
+                          <div className="flex flex-row items-center gap-x-2">
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={field.disabled}
+                              />
+                            </FormControl_Shadcn_>
+                            <FormLabel_Shadcn_ className="text-xs">
+                              Is channel private?
+                            </FormLabel_Shadcn_>
+                          </div>
+                          <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
+                            If the channel is marked as private, it will use RLS policies to filter
+                            messages.
+                          </FormDescription_Shadcn_>
                         </FormItem_Shadcn_>
                       )}
                     />
