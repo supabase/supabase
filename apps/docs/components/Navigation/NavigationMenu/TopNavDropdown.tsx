@@ -1,4 +1,6 @@
 import React from 'react'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +18,7 @@ import {
   themes,
 } from 'ui'
 
-import Link from 'next/link'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
-import { useTheme } from 'next-themes'
 
 const menu = [
   [
@@ -62,7 +62,7 @@ const TopNavDropdown = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            'text-foreground-light w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-default data-[state=open]:border-strong hover:!bg-overlay-hover/50 bg-transparent'
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
           )}
         >
           <IconMenu />
