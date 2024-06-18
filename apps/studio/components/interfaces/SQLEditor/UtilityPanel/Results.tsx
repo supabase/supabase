@@ -46,7 +46,6 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     return (
       <span
         className="font-mono text-xs w-full whitespace-pre"
-        style={{ whiteSpace: 'pre' }}
         onContextMenu={(e) =>
           showContextMenu(e, {
             id: SQL_CONTEXT_EDITOR_ID,
