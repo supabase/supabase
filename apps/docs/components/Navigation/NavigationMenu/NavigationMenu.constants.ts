@@ -230,16 +230,87 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Local Dev / CLI',
+            label: 'Local Development',
             icon: 'dev-cli',
             href: '/guides/cli',
             level: 'reference_javascript',
           },
+        ],
+        [
           {
-            label: 'Platform',
-            icon: 'platform',
-            href: '/guides/platform',
-            level: 'platform',
+            label: 'Deployment & Production',
+          },
+          {
+            label: 'Branching',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Terraform',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Production Readiness',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+        ],
+        [
+          {
+            label: 'Monitoring and Troubleshooting',
+          },
+          {
+            label: 'Logging & Observability',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'HTTP Status Codes',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Troubleshooting',
+            icon: 'troubleshooting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+        ],
+        [
+          {
+            label: 'Platform Management',
+          },
+          {
+            label: 'Add-ons',
+            icon: 'addons',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Billing',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Migrations',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+        ],
+        [
+          {
+            label: 'Integrations',
+            icon: 'integrations',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
           },
           {
             label: 'Self-Hosting',

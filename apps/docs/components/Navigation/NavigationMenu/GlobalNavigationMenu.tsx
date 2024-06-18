@@ -92,7 +92,7 @@ const GlobalNavigationMenu: FC = () => {
                   <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] border-y w-screen md:w-64 overflow-hidden rounded-none md:rounded-md md:border border-overlay bg-overlay p-3 md:p-1 text-foreground-light shadow-md !duration-0">
                     {section[0].menuItems?.map((menuItem, menuItemIndex) => (
                       <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-                        {menuItemIndex !== 0 && <MenubarSeparator />}
+                        {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
                         {menuItem.map((item) =>
                           !item.href ? (
                             <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
