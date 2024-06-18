@@ -1,13 +1,13 @@
-import React, { Fragment, MouseEvent, PropsWithChildren, ReactNode, useRef, useState } from 'react'
+import React, { Fragment, MouseEvent, ReactNode, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useClickAway } from 'react-use'
+import { useRouter } from 'next/router'
+import { useClickAway, useKey } from 'react-use'
 import {
   cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuTrigger,
   IconCheck,
   IconClipboard,
@@ -22,9 +22,25 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
  */
 const RightClickBrandLogo = () => {
   const ref = useRef(null)
-  const triggerRef = useRef(null)
+  const router = useRouter()
   const [open, setOpen] = useState<boolean>(false)
+  const [copied, setCopied] = useState<boolean>(false)
 
+  /**
+   * Close dropdown by clicking outside
+   */
+  useClickAway(ref, () => {
+    setOpen(false)
+  })
+
+  /**
+   * Close dropdown by using the Escape key
+   */
+  useKey('Escape', () => setOpen(false))
+
+  /**
+   * Open dropdown by right clicking on the Supabase logo
+   */
   const handleRightClick = (e: MouseEvent) => {
     e.preventDefault()
 
@@ -33,16 +49,43 @@ const RightClickBrandLogo = () => {
     }
   }
 
-  useClickAway(ref, () => {
-    setOpen(false)
-  })
+  /**
+   * A11y open dropdown by typing Shift+Enter when the logo is focused
+   */
+  const handleKeyboardOpen = () => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key === 'Enter') {
+        setOpen(true)
+      }
+    }
+
+    document?.addEventListener('keydown', onKeyDown)
+    return () => {
+      document?.removeEventListener('keydown', onKeyDown)
+    }
+  }
+
+  /**
+   * Copy to clipboard logo SVG
+   */
+  const handleCopyToClipboard = (menuItem: MenuItemProps) => {
+    navigator.clipboard.writeText(menuItem.clipboard ?? '').then(() => {
+      setCopied(true)
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    })
+  }
 
   return (
     <DropdownMenu open={open}>
-      <DropdownMenuTrigger onContextMenu={handleRightClick} asChild>
+      <DropdownMenuTrigger asChild>
         <Link
-          ref={triggerRef}
           href="/"
+          tabIndex={1}
+          onContextMenu={handleRightClick}
+          onFocus={handleKeyboardOpen}
+          onKeyDown={(e) => e.key === 'Enter' && router.push('/')}
           className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
         >
           <Image
@@ -63,46 +106,70 @@ const RightClickBrandLogo = () => {
           />
         </Link>
       </DropdownMenuTrigger>
-      <DropdownMenuPortal container={triggerRef.current}>
-        <DropdownMenuContent ref={ref} align="start" side="bottom" className="mt-2 p-0 w-52">
-          {menuItems.map((section, sectionIdx) => (
-            <Fragment key={`cxtMenu-section-${sectionIdx}`}>
-              {sectionIdx !== 0 && <Divider />}
-              <div className="p-1">
-                {section.map((menuItem) => (
-                  <DropdownMenuItem
-                    key={menuItem.label}
-                    className="group/menu-item w-full flex justify-between gap-2 items-center p-2"
-                  >
-                    <MenuItem
-                      className="w-full text-left flex justify-between gap-2 items-center"
-                      {...menuItem}
+      <DropdownMenuContent
+        autoFocus
+        ref={ref}
+        align="start"
+        side="bottom"
+        className="mt-2 p-0 w-52"
+      >
+        {menuItems.map((section, sectionIdx) => (
+          <Fragment key={`cxtMenu-section-${sectionIdx}`}>
+            {sectionIdx !== 0 && <Divider />}
+            <div className="p-1">
+              {section.map((menuItem, i) => (
+                <DropdownMenuItem
+                  autoFocus
+                  asChild
+                  key={menuItem.label}
+                  className="w-full flex justify-between gap-2 items-center p-2"
+                >
+                  {menuItem.type === 'download' || menuItem.type === 'link' ? (
+                    <Link
+                      href={menuItem.href ?? ''}
+                      download={menuItem.type === 'download'}
+                      className="group/menu-item w-full text-left flex justify-between gap-2 items-center"
                     >
-                      {menuItem.label}
-                    </MenuItem>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </Fragment>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
+                      <MenuItemContent {...menuItem} />
+                    </Link>
+                  ) : (
+                    menuItem.type === 'clipboard' && (
+                      <button
+                        className="group/menu-item w-full text-left flex justify-between gap-2 items-center"
+                        onClick={() => handleCopyToClipboard(menuItem)}
+                      >
+                        <MenuItemContent copied={copied} {...menuItem} />
+                      </button>
+                    )
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </div>
+          </Fragment>
+        ))}
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }
 
 const Divider = () => <div className="h-px w-full bg-border" />
 
-interface MenuItem extends PropsWithChildren {
+interface MenuItemProps {
   label: string
   type: 'clipboard' | 'download' | 'link'
-  icon?: ReactNode | undefined
+  icon?: ReactNode
   onClick?: VoidFunction
   href?: string
   clipboard?: string
+  className?: string
 }
 
-const menuItems: MenuItem[][] = [
+/**
+ * Brand assets dropdown menu items.
+ * First array is to divide the menu by sections
+ * Second array is the list of items inside each section
+ */
+const menuItems: MenuItemProps[][] = [
   [
     {
       label: 'Copy logo as SVG',
@@ -220,62 +287,37 @@ const menuItems: MenuItem[][] = [
   ],
 ]
 
-const MenuItem = ({
-  type,
-  children,
-  className,
-  icon,
-  ...menuItem
-}: MenuItem & { className?: string }) => {
-  const [copied, setCopied] = useState<boolean>(false)
-
-  const Children = () => (
-    <>
-      {icon && <span className="text-foreground-lighter">{icon}</span>}
-      <span className="grow">{children}</span>
-      {type === 'clipboard' && (
-        <span className="relative w-3 opacity-0 flex items-center justify-end group-hover/menu-item:opacity-100">
-          <IconClipboard
-            className={cn(
-              'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
-              !copied && 'opacity-100'
-            )}
-          />
-          <IconCheck
-            className={cn(
-              'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
-              copied && 'opacity-100'
-            )}
-          />
-        </span>
-      )}
-    </>
-  )
-
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(menuItem.clipboard ?? '').then(() => {
-      setCopied(true)
-      setTimeout(() => {
-        setCopied(false)
-      }, 2000)
-    })
-  }
-
-  switch (type) {
-    case 'clipboard':
-      return (
-        <button {...menuItem} className={className} onClick={handleCopyToClipboard}>
-          <Children />
-        </button>
-      )
-    case 'download':
-    case 'link':
-      return (
-        <Link href={menuItem.href ?? ''} download={type === 'download'} className={className}>
-          <Children />
-        </Link>
-      )
-  }
+interface MenuItemContentProps {
+  icon?: ReactNode
+  type: string
+  label: string
+  copied?: boolean
 }
+
+/**
+ * MenuItem content
+ */
+const MenuItemContent = ({ icon, type, label, copied }: MenuItemContentProps) => (
+  <>
+    {icon && <span className="text-foreground-lighter">{icon}</span>}
+    <span className="grow">{label}</span>
+    {type === 'clipboard' && (
+      <span className="relative w-3 opacity-0 flex items-center justify-end group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
+        <IconClipboard
+          className={cn(
+            'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
+            !copied && 'opacity-100'
+          )}
+        />
+        <IconCheck
+          className={cn(
+            'absolute right-0 h-3 transition-opacity opacity-0 duration-300',
+            copied && 'opacity-100'
+          )}
+        />
+      </span>
+    )}
+  </>
+)
 
 export default RightClickBrandLogo
