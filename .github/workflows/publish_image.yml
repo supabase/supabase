@@ -1,9 +1,6 @@
 name: Publish to Image Registry
 
 on:
-  push:
-    tags:
-      - '*'
   # run this action every Monday at 04:00 UTC (Singapore noon)
   schedule:
     - cron: '0 4 * * 1'
@@ -28,7 +25,6 @@ jobs:
           flavor: |
             latest=false
           tags: |
-            type=ref,event=tag
             type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'schedule' }}
             type=raw,value=${{ inputs.version }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
