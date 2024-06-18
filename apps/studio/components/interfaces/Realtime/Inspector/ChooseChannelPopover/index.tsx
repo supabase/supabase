@@ -34,6 +34,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   const [open, setOpen] = useState(false)
   const telemetryProps = useTelemetryProps()
   const router = useRouter()
+  const authzEnabled = useFlag('authzRealtime')
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -137,25 +138,27 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     )}
                   />
 
-                  <FormField_Shadcn_
-                    key="isPrivate"
-                    control={form.control}
-                    name="isPrivate"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex items-center gap-x-2">
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={field.disabled}
-                          />
-                        </FormControl_Shadcn_>
-                        <FormLabel_Shadcn_ className="text-xs">
-                          Is channel private?
-                        </FormLabel_Shadcn_>
-                      </FormItem_Shadcn_>
-                    )}
-                  />
+                  {authzEnabled ? (
+                    <FormField_Shadcn_
+                      key="isPrivate"
+                      control={form.control}
+                      name="isPrivate"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex items-center gap-x-2">
+                          <FormControl_Shadcn_>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={field.disabled}
+                            />
+                          </FormControl_Shadcn_>
+                          <FormLabel_Shadcn_ className="text-xs">
+                            Is channel private?
+                          </FormLabel_Shadcn_>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  ) : null}
                 </form>
               </Form_Shadcn_>
             </>
