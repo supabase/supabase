@@ -26,12 +26,17 @@ import {
   IconMenuDevCli,
   IconGitHub,
   IconSupport,
+  IconTerraform,
+  IconTroubleshooting,
+  IconBranching,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className: string) {
   switch (menuKey) {
     case 'home':
       return <IconMenuHome width={width} height={height} className={className} />
+    case 'branching':
+      return <IconBranching width={width} height={height} className={className} />
     case 'getting-started':
       return <IconMenuGettingStarted width={width} height={height} className={className} />
     case 'database':
@@ -82,6 +87,10 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconGitHub width={width} height={height} className={className} />
     case 'support':
       return <IconSupport width={width} height={height} className={className} />
+    case 'terraform':
+      return <IconTerraform width={width} height={height} className={className} />
+    case 'troubleshooting':
+      return <IconTroubleshooting width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }
