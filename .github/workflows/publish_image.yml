@@ -18,7 +18,7 @@ jobs:
           images: |
             supabase/studio
           flavor: |
-            latest=false
+            latest=true
           tags: |
             type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'schedule' }}
             type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'workflow_dispatch' }}
