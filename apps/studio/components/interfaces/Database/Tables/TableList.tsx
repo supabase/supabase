@@ -33,6 +33,7 @@ import {
   IconTrash,
   IconX,
   Input,
+  IconCopy,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
@@ -279,7 +280,7 @@ const TableList = ({
                                   <IconMoreVertical />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-32">
+                              <DropdownMenuContent side="bottom" align="end" className="w-36">
                                 <DropdownMenuItem
                                   disabled={!canUpdateTables}
                                   onClick={() => onEditTable(x)}
@@ -318,7 +319,17 @@ const TableList = ({
                                   <IconEye size="tiny" />
                                   <p>View table</p>
                                 </DropdownMenuItem>
-
+                                <DropdownMenuItem
+                                  key="duplicate-table"
+                                  className="space-x-2"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    snap.onDuplicateTable()
+                                  }}
+                                >
+                                  <IconCopy size="tiny" />
+                                  <span>Duplicate Table</span>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   disabled={!canUpdateTables || isLocked}
                                   onClick={() => onDeleteTable(x)}
