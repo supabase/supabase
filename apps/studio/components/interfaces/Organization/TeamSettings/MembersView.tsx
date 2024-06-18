@@ -9,8 +9,7 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { Loading } from 'ui'
 import { MemberRow } from './MemberRow'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
-import { useCheckPermissions } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProfile } from 'lib/profile'
 
 export interface MembersViewProps {
   searchString: string
@@ -18,6 +17,7 @@ export interface MembersViewProps {
 
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
+  const { profile } = useProfile()
 
   const {
     data: members,
@@ -46,7 +46,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         })
   )
     .slice()
-    .sort((a, b) => a.username.localeCompare(b.username))
+    .sort((a, b) => {
+      // [Joshen] Have own account show up top
+      if (a.primary_email === profile?.primary_email) return -1
+      return a.username.localeCompare(b.username)
+    })
 
   return (
     <>

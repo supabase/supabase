@@ -73,11 +73,13 @@ export const MemberRow = ({ member }: MemberRowProps) => {
               />
             )}
           </div>
-          <div>
-            <p className="text-foreground">{getUserDisplayName(member)}</p>
-            {isInvitedUser === undefined && (
-              <p className="text-foreground-light">{member.primary_email}</p>
+          <div className="flex item-center gap-x-2">
+            {isInvitedUser === undefined ? (
+              <p className="text-foreground-light truncate">{member.primary_email}</p>
+            ) : (
+              <p className="text-foreground truncate">{getUserDisplayName(member)}</p>
             )}
+            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
         </div>
       </Table.td>
@@ -100,7 +102,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         </div>
       </Table.td>
 
-      <Table.td>
+      <Table.td className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
         ) : isObfuscated ? (
@@ -126,10 +128,12 @@ export const MemberRow = ({ member }: MemberRowProps) => {
 
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
-                <span>{roleName}</span>
+                <p>{roleName}</p>
                 <span>•</span>
                 {projectsApplied.length === 1 ? (
-                  <span className="text-foreground">{projectsApplied[0]}</span>
+                  <span className="text-foreground truncate" title={projectsApplied[0]}>
+                    {projectsApplied[0]}
+                  </span>
                 ) : (
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_ asChild>

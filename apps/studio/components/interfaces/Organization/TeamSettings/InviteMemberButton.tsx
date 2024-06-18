@@ -57,21 +57,28 @@ export const InviteMemberButton = () => {
     (a, b) => b.base_role_id - a.base_role_id
   )
 
+  const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
+  const hasOrgRole =
+    (userMemberData?.role_ids ?? []).length === 1 &&
+    orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
+
   const { rolesAddable } = useGetRolesManagementPermissions(
     organization?.id,
     orgScopedRoles,
     permissions ?? []
   )
 
-  const canInviteMembers = orgScopedRoles.some(({ id: role_id }) =>
-    doPermissionsCheck(
-      permissions,
-      PermissionAction.CREATE,
-      'user_invites',
-      { resource: { role_id } },
-      organization?.id
+  const canInviteMembers =
+    hasOrgRole &&
+    orgScopedRoles.some(({ id: role_id }) =>
+      doPermissionsCheck(
+        permissions,
+        PermissionAction.CREATE,
+        'user_invites',
+        { resource: { role_id } },
+        organization?.id
+      )
     )
-  )
 
   const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
 
@@ -151,12 +158,16 @@ export const InviteMemberButton = () => {
       <DialogTrigger asChild>
         <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild>
-            <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
+            <Button
+              disabled={!canInviteMembers}
+              className="pointer-events-auto"
+              onClick={() => setIsOpen(true)}
+            >
               Invite
             </Button>
           </TooltipTrigger_Shadcn_>
           {!canInviteMembers && (
-            <TooltipContent_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">
               You need additional permissions to invite a member to this organization
             </TooltipContent_Shadcn_>
           )}

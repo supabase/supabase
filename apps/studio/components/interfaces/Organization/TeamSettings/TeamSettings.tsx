@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -17,7 +16,7 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Button, Input } from 'ui'
+import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -95,37 +94,24 @@ const TeamSettings = () => {
                 selectedOrganization !== undefined && <InviteMemberButton />}
               {/* if organizationMembersDeletionEnabled is false, you also can't delete yourself */}
               {organizationMembersDeletionEnabled && (
-                <div>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="default"
-                        disabled={!canLeave}
-                        onClick={() => setIsLeaveTeamModalOpen(true)}
-                        loading={isLeaving}
-                      >
-                        Leave team
-                      </Button>
-                    </Tooltip.Trigger>
-                    {!canLeave && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              An organization requires at least 1 owner
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
-                </div>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Button
+                      type="default"
+                      className="pointer-events-auto"
+                      disabled={!canLeave}
+                      onClick={() => setIsLeaveTeamModalOpen(true)}
+                      loading={isLeaving}
+                    >
+                      Leave team
+                    </Button>
+                  </TooltipTrigger_Shadcn_>
+                  {!canLeave && (
+                    <TooltipContent_Shadcn_ side="bottom">
+                      An organization requires at least 1 owner
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
               )}
             </ScaffoldActionsGroup>
           </ScaffoldActionsContainer>

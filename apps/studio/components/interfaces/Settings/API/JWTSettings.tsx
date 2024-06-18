@@ -1,10 +1,19 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
+import {
+  AlertCircle,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  Key,
+  Loader2,
+  PenTool,
+  RefreshCw,
+} from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -15,7 +24,6 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { AlertCircle } from 'lucide-react'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -27,18 +35,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconAlertTriangle,
-  IconChevronDown,
-  IconEye,
-  IconEyeOff,
-  IconKey,
-  IconLoader,
-  IconPenTool,
-  IconRefreshCw,
   Input,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -125,7 +129,7 @@ const JWTSettings = () => {
                 <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
-                      <IconLoader className="animate-spin" size={14} />
+                      <Loader2 className="animate-spin" size={14} />
                       <p className="text-sm">
                         Updating JWT secret: {jwtSecretUpdateProgressMessage}
                       </p>
@@ -145,32 +149,25 @@ const JWTSettings = () => {
                               Updating JWT secret...
                             </Button>
                           ) : !canGenerateNewJWTSecret ? (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger asChild>
-                                <Button disabled type="default" iconRight={<IconChevronDown />}>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild>
+                                <Button
+                                  disabled
+                                  type="default"
+                                  className="pointer-events-auto"
+                                  iconRight={<ChevronDown size={14} />}
+                                >
                                   Generate a new secret
                                 </Button>
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">
-                                      You need additional permissions to generate a new JWT secret
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
+                              </TooltipTrigger_Shadcn_>
+                              <TooltipContent_Shadcn_ side="bottom">
+                                You need additional permissions to generate a new JWT secret
+                              </TooltipContent_Shadcn_>
+                            </Tooltip_Shadcn_>
                           ) : (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button type="default" iconRight={<IconChevronDown />}>
+                                <Button type="default" iconRight={<ChevronDown size={14} />}>
                                   <span>Generate a new secret</span>
                                 </Button>
                               </DropdownMenuTrigger>
@@ -179,7 +176,7 @@ const JWTSettings = () => {
                                   className="space-x-2"
                                   onClick={() => setIsGeneratingKey(true)}
                                 >
-                                  <IconRefreshCw size={16} />
+                                  <RefreshCw size={16} />
                                   <p>Generate a random secret</p>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -187,7 +184,7 @@ const JWTSettings = () => {
                                   className="space-x-2"
                                   onClick={() => setIsCreatingKey(true)}
                                 >
-                                  <IconPenTool size={16} />
+                                  <PenTool size={16} />
                                   <p>Create my own secret</p>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -241,7 +238,6 @@ const JWTSettings = () => {
       </ConfirmationModal>
 
       <Modal
-        closable
         header="Create a custom JWT secret"
         visible={isCreatingKey}
         size="medium"
@@ -271,7 +267,7 @@ const JWTSettings = () => {
             cannot be guessed easily.
           </p>
           <Alert_Shadcn_ variant="warning">
-            <IconAlertTriangle />
+            <WarningIcon />
             <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
@@ -283,7 +279,7 @@ const JWTSettings = () => {
           <Input
             onChange={(e: any) => setCustomToken(e.target.value)}
             value={customToken}
-            icon={<IconKey />}
+            icon={<Key />}
             type={showCustomTokenInput ? 'text' : 'password'}
             className="w-full text-left"
             label="Custom JWT secret"
@@ -292,7 +288,7 @@ const JWTSettings = () => {
               <div className="flex items-center justify-center mr-1">
                 <Button
                   type="default"
-                  icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
+                  icon={showCustomTokenInput ? <Eye /> : <EyeOff />}
                   onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
                 />
               </div>

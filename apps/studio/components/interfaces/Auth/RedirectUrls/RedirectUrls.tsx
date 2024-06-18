@@ -212,7 +212,7 @@ const RedirectUrls = () => {
         hideFooter
         size="small"
         visible={selectedUrlToDelete !== undefined}
-        header={<h3 className="text-sm">Remove URL</h3>}
+        header="Remove URL"
         onCancel={() => setSelectedUrlToDelete(undefined)}
       >
         <Modal.Content>
@@ -225,7 +225,7 @@ const RedirectUrls = () => {
           </p>
         </Modal.Content>
         <Modal.Separator />
-        <Modal.Content>
+        <Modal.Content className="flex items-center gap-x-2">
           <Button
             block
             type="default"

@@ -1,24 +1,17 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Globe } from 'lucide-react'
-import {
-  Badge,
-  Button,
-  IconExternalLink,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Badge, Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -59,6 +52,7 @@ const BannedIPs = () => {
 
   const [userIPAddress, setUserIPAddress] = useState<string | null>(null)
 
+  // [TODO] Convert this to a react query
   useEffect(() => {
     // Fetch user's IP address
     fetch(`${BASE_PATH}/api/get-ip-address`)
@@ -74,7 +68,7 @@ const BannedIPs = () => {
           description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
         <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/reference/cli/supabase-network-bans"
               target="_blank"

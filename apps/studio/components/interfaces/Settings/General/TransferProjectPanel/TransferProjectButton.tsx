@@ -15,6 +15,9 @@ import {
   Listbox,
   Loading,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -80,39 +83,27 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <Button
-            onClick={toggle}
             type="default"
+            onClick={toggle}
+            className="pointer-events-auto"
             disabled={!canTransferProject || disableProjectTransfer}
           >
             Transfer project
           </Button>
-        </Tooltip.Trigger>
+        </TooltipTrigger_Shadcn_>
         {(!canTransferProject || disableProjectTransfer) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canTransferProject
-                    ? 'You need additional permissions to transfer this project'
-                    : 'Project transfers are temporarily disabled, please try again later.'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+          <TooltipContent_Shadcn_ side="bottom">
+            {!canTransferProject
+              ? 'You need additional permissions to transfer this project'
+              : 'Project transfers are temporarily disabled, please try again later.'}
+          </TooltipContent_Shadcn_>
         )}
-      </Tooltip.Root>
+      </Tooltip_Shadcn_>
 
       <Modal
-        closable
         onCancel={() => toggle()}
         visible={isOpen}
         loading={isTransferring}

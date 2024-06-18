@@ -8,9 +8,14 @@ import { useOrganizationCreateInvitationMutation } from 'data/organization-membe
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import type { OrganizationMember } from 'data/organizations/organization-members-query'
+import {
+  useOrganizationMembersQuery,
+  type OrganizationMember,
+} from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
@@ -25,7 +30,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -33,6 +37,7 @@ interface MemberActionsProps {
 
 export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
+  const { profile } = useProfile()
   const [showAccessModal, setShowAccessModal] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
@@ -40,11 +45,17 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
   const { data: allProjects } = useProjectsQuery()
+  const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
   const isPendingInviteAcceptance = !!member.invited_id
+
+  const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
+  const hasOrgRole =
+    (userMemberData?.role_ids ?? []).length === 1 &&
+    orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
@@ -54,12 +65,14 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
-  const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
-    resource: { role_id: roleId },
-  })
-  const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
-    resource: { role_id: roleId },
-  })
+  const canResendInvite =
+    useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
+      resource: { role_id: roleId },
+    }) && hasOrgRole
+  const canRevokeInvite =
+    useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
+      resource: { role_id: roleId },
+    }) && hasOrgRole
 
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
@@ -104,7 +117,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           if (!member.primary_email) return toast.error('Email is required')
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
           if (projectScopedRole !== undefined) {
-            const projects = projectScopedRole.project_ids
+            const projects = (projectScopedRole?.project_ids ?? [])
               .map((id) => allProjects?.find((p) => p.id === id)?.ref)
               .filter(Boolean) as string[]
             inviteMember({
@@ -158,6 +171,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="default"
+              className="pointer-events-auto"
               disabled={isPendingInviteAcceptance || !canRemoveMember}
               onClick={() => setShowAccessModal(true)}
             >

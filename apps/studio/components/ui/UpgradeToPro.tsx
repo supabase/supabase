@@ -54,7 +54,7 @@ const UpgradeToPro = ({
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <Button disabled type="primary" className="pointer-events-auto">
-                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
+                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
                 </Button>
               </TooltipTrigger_Shadcn_>
               <TooltipContent_Shadcn_ side="bottom">
@@ -84,7 +84,7 @@ const UpgradeToPro = ({
                     : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
                 }
               >
-                {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
+                {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
               </Link>
             </Button>
           )}

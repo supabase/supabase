@@ -237,7 +237,7 @@ const GitHubIntegrationConnectionForm = ({
                 <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
                   Total number of branches that can be automatically created for this connection.
                 </FormDescription_Shadcn_>
-                <FormControl_Shadcn_ className="flex gap-3">
+                <FormControl_Shadcn_ className="flex gap-3 items-center">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
@@ -290,7 +290,7 @@ const GitHubIntegrationConnectionForm = ({
                   Path in your repository where <code>supabase</code> directory for this connection
                   lives.
                 </FormDescription_Shadcn_>
-                <FormControl_Shadcn_ className="flex gap-3">
+                <FormControl_Shadcn_ className="flex gap-3 items-center">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
