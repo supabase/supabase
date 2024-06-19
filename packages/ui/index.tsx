@@ -252,6 +252,8 @@ export * from './src/components/TextLink'
 
 export * from './src/layout/banners'
 
+export * from './src/components/StatusIcon'
+
 // config
 
 // export { default as Config } from './../ui.config'

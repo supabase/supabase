@@ -29,7 +29,7 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink, Plus } from 'lucide-react'
 import type { Dictionary } from 'types'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'

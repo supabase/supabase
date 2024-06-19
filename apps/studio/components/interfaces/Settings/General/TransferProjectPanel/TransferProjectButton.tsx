@@ -21,7 +21,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
-import { InfoIcon } from 'ui-patterns/Icons/StatusIcons'
+import { InfoIcon } from 'ui'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()

@@ -20,7 +20,7 @@ import {
   Listbox,
   SidePanel,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually

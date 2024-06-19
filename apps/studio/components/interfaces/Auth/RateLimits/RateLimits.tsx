@@ -31,7 +31,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
 import toast from 'react-hot-toast'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 const RateLimits = () => {

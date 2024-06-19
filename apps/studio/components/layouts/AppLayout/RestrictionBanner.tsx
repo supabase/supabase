@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedProject } from 'hooks'
 import { AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 /**
  * Shown on projects in organization which are above their qouta

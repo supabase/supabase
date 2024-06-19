@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
-import { StatusIcon } from '../Icons/StatusIcons'
+import { StatusIcon } from 'ui'
 
 const questions = [
   'How do I get started with Supabase?',

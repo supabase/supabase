@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
 import { cn } from '../../../lib/utils'
 import { buttonVariants } from './../../Button'
-import { StatusIcon } from './../../../../../ui-patterns/icons/StatusIcons'
+import { StatusIcon } from './../../StatusIcon'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 

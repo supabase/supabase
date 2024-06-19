@@ -12,7 +12,7 @@ import {
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 
