@@ -23,6 +23,7 @@ import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestartingState from './RestartingState'
+import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 
@@ -225,6 +226,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
+  const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
   const isProjectBuilding =
     selectedProject?.status === PROJECT_STATUS.COMING_UP ||
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
@@ -259,6 +261,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (requiresDbConnection && isProjectRestoring) {
     return <RestoringState />
+  }
+
+  if (isProjectRestoreFailed) {
+    return <RestoreFailedState />
   }
 
   if (requiresDbConnection && isProjectBuilding) {
