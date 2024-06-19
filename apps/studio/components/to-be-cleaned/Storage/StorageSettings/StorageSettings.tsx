@@ -127,7 +127,7 @@ const StorageSettings = () => {
                 </div>
 
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2">
+                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
                     <div className="col-span-8">
                       <FormField_Shadcn_
                         control={form.control}
@@ -138,7 +138,12 @@ const StorageSettings = () => {
                               size
                             </FormLabel_Shadcn_>
                             <FormControl_Shadcn_ className="col-span-8">
-                              <Input_Shadcn_ type="number" {...field} className="w-full" />
+                              <Input_Shadcn_
+                                type="number"
+                                {...field}
+                                className="w-full"
+                                disabled={!canUpdateStorageSettings}
+                              />
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                           </FormItem_Shadcn_>
@@ -154,9 +159,9 @@ const StorageSettings = () => {
                             <FormLabel_Shadcn_ className="hidden">Unit</FormLabel_Shadcn_>
                             <FormControl_Shadcn_ className="col-span-8">
                               <Select_Shadcn_
-                                disabled={isFreeTier}
                                 value={field.value}
                                 onValueChange={field.onChange}
+                                disabled={isFreeTier || !canUpdateStorageSettings}
                               >
                                 <SelectTrigger_Shadcn_ className="w-[180px]">
                                   <SelectValue_Shadcn_ placeholder="Choose a prefix">
@@ -218,7 +223,7 @@ const StorageSettings = () => {
                     type="default"
                     htmlType="reset"
                     onClick={() => form.reset()}
-                    disabled={isUpdating}
+                    disabled={!canUpdateStorageSettings || isUpdating}
                   >
                     Cancel
                   </Button>

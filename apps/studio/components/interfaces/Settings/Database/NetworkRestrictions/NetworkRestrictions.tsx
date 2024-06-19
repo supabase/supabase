@@ -48,7 +48,12 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip_Shadcn_>
     <TooltipTrigger_Shadcn_ asChild>
-      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
+      <Button
+        type="default"
+        className="pointer-events-auto"
+        disabled={disabled}
+        onClick={() => onClick(true)}
+      >
         Restrict all access
       </Button>
     </TooltipTrigger_Shadcn_>
@@ -110,7 +115,12 @@ const NetworkRestrictions = () => {
             {!canUpdateNetworkRestrictions ? (
               <Tooltip_Shadcn_>
                 <TooltipTrigger_Shadcn_ asChild>
-                  <Button disabled type="primary" iconRight={<ChevronDown size={14} />}>
+                  <Button
+                    disabled
+                    type="primary"
+                    className="pointer-events-auto"
+                    iconRight={<ChevronDown size={14} />}
+                  >
                     Add restriction
                   </Button>
                 </TooltipTrigger_Shadcn_>

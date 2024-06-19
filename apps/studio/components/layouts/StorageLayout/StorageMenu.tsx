@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -14,7 +13,16 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { ArrowUpRight, Edit } from 'lucide-react'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Menu,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -42,13 +50,14 @@ const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
-        <div className="mb-6 px-2">
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
+      <Menu type="pills" className="my-6 flex flex-grow flex-col">
+        <div className="mb-6 mx-5">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
                 block
                 type="default"
+                className="pointer-events-auto"
                 icon={
                   <div className="text-foreground-light">
                     <Edit size={14} />
@@ -60,28 +69,17 @@ const StorageMenu = () => {
               >
                 New bucket
               </Button>
-            </Tooltip.Trigger>
+            </TooltipTrigger_Shadcn_>
             {!canCreateBuckets && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to create buckets
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
+              <TooltipContent_Shadcn_ side="bottom">
+                You need additional permissions to create buckets
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip.Root>
+          </Tooltip_Shadcn_>
         </div>
+
         <div className="space-y-6">
-          <div>
+          <div className="mx-3">
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
@@ -138,8 +136,10 @@ const StorageMenu = () => {
               </>
             )}
           </div>
-          <div className="h-px w-full bg-border"></div>
-          <div>
+
+          <div className="h-px w-full bg-border" />
+
+          <div className="mx-3">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>

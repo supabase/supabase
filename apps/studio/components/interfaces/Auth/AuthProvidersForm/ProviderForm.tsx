@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
@@ -11,7 +10,17 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
+import { Check, ChevronUp } from 'lucide-react'
+import {
+  Alert,
+  Button,
+  Collapsible,
+  Form,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -110,7 +119,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
           <div className="flex items-center gap-3">
-            <IconChevronUp
+            <ChevronUp
               className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
               width={14}
@@ -126,7 +135,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             {isActive ? (
               <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
                 <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                  <IconCheck strokeWidth={2} size={12} />
+                  <Check strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
               </div>
@@ -203,34 +212,23 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     >
                       Cancel
                     </Button>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger type="button">
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
                         <Button
                           htmlType="submit"
+                          className="pointer-events-auto"
                           loading={isUpdatingConfig}
                           disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>
-                      </Tooltip.Trigger>
+                      </TooltipTrigger_Shadcn_>
                       {!canUpdateConfig && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                You need additional permissions to update provider settings
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
+                        <TooltipContent_Shadcn_ side="bottom">
+                          You need additional permissions to update provider settings
+                        </TooltipContent_Shadcn_>
                       )}
-                    </Tooltip.Root>
+                    </Tooltip_Shadcn_>
                   </div>
                 </div>
               </div>

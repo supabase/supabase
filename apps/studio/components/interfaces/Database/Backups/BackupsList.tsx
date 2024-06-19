@@ -1,19 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { AlertCircle, Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BackupItem from './BackupItem'
@@ -80,12 +79,6 @@ const BackupsList = () => {
           <BackupsEmpty />
         ) : (
           <>
-            {!canTriggerScheduledBackups && (
-              <InformationBox
-                icon={<AlertCircle size={16} className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to trigger a scheduled backup"
-              />
-            )}
             <BackupsStorageAlert />
             <Panel>
               {sortedBackups?.map((x, i: number) => {
@@ -105,7 +98,7 @@ const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="medium"
+        size="small"
         confirmLabel="Confirm restore"
         confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
@@ -117,7 +110,7 @@ const BackupsList = () => {
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <p>
+        <p className="text-sm">
           Are you sure you want to restore from{' '}
           {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
           written since this backup was made.

@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -10,10 +11,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import { useSelectedOrganization } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { IS_PLATFORM } from 'lib/constants'
 
@@ -33,7 +37,8 @@ export const AddHookDropdown = ({
     { orgSlug: organization?.slug },
     { enabled: IS_PLATFORM }
   )
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -48,6 +53,21 @@ export const AddHookDropdown = ({
 
   const nonEnterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && !h.enterprise)
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
+
+  if (!canUpdateConfig) {
+    return (
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
+          <Button disabled type="primary" className="pointer-events-auto">
+            {buttonText}
+          </Button>
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="bottom">
+          You need additional permissions to add auth hooks
+        </TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
+    )
+  }
 
   return (
     <DropdownMenu modal={false}>

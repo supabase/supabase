@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Button, IconAlertCircle, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
@@ -8,7 +8,7 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { BookOpen, Loader2 } from 'lucide-react'
+import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 
 const DisplayApiSettings = () => {
   const { ref: projectRef } = useParams()
@@ -58,7 +58,7 @@ const DisplayApiSettings = () => {
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
@@ -73,7 +73,7 @@ const DisplayApiSettings = () => {
           </p>
         </div>
       ) : (
-        apiKeys.map((x: any, i: number) => (
+        apiKeys.map((x, i: number) => (
           <Panel.Content
             key={x.api_key}
             className={
@@ -89,7 +89,7 @@ const DisplayApiSettings = () => {
               // @ts-ignore
               label={
                 <>
-                  {x.tags?.split(',').map((x: any, i: number) => (
+                  {x.tags?.split(',').map((x, i: number) => (
                     <code key={`${x}${i}`} className="text-xs text-code">
                       {x}
                     </code>
@@ -111,7 +111,7 @@ const DisplayApiSettings = () => {
                     ? 'JWT secret update failed, new API key may have issues'
                     : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                       ? 'Updating JWT secret...'
-                      : x.api_key
+                      : x?.api_key ?? 'You need additional permissions to view API keys'
               }
               onChange={() => {}}
               descriptionText={

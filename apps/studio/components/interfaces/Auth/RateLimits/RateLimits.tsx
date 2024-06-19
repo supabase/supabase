@@ -177,7 +177,11 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ disabled={!canUpdateEmailLimit} type="number" {...field} />
+                          <Input_Shadcn_
+                            disabled={!canUpdateConfig || !canUpdateEmailLimit}
+                            type="number"
+                            {...field}
+                          />
                         </FormControl_Shadcn_>
                         {!authConfig.EXTERNAL_EMAIL_ENABLED ? (
                           <Alert_Shadcn_>
@@ -243,7 +247,7 @@ const RateLimits = () => {
                       <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
-                            disabled={!canUpdateSMSRateLimit}
+                            disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
                             type="number"
                             {...field}
                           />
@@ -294,7 +298,7 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <>
@@ -331,7 +335,7 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
                           <p className="text-foreground-lighter text-sm">
@@ -366,7 +370,7 @@ const RateLimits = () => {
                       <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
-                            disabled={!canUpdateAnonymousUsersRateLimit}
+                            disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
                             type="number"
                             {...field}
                           />

@@ -40,7 +40,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
             <FormHeader className="!mb-0" title="Database Backups" />
 
             <DatabaseBackupsNav active="scheduled" projRef={ref} />
-            <div className="space-y-8">
+            <div className="flex flex-col gap-y-4">
               {isLoading && <GenericSkeletonLoader />}
 
               {isError && (

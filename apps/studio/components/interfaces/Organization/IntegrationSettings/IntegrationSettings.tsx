@@ -46,6 +46,14 @@ const IntegrationSettings = () => {
     PermissionAction.READ,
     'integrations.github_connections'
   )
+  const canCreateGitHubConnection = useCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
+  )
+  const canUpdateGitHubConnection = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.github_connections'
+  )
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
@@ -117,6 +125,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
                 {connections?.map((connection) => (
                   <IntegrationConnectionItem
                     key={connection.id}
+                    disabled={!canUpdateGitHubConnection}
                     connection={{
                       id: String(connection.id),
                       added_by: {
@@ -143,6 +152,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
                   onClick={onAddGitHubConnection}
                   orgSlug={org?.slug}
                   showNode={false}
+                  disabled={!canCreateGitHubConnection}
                 >
                   Add new project connection
                 </EmptyIntegrationConnection>

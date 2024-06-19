@@ -1,5 +1,12 @@
 import { Check, Webhook } from 'lucide-react'
-import { Badge, Button, Input } from 'ui'
+import {
+  Badge,
+  Button,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
@@ -84,21 +91,35 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
           )}
         </div>
         <div className="flex flex-row gap-2">
-          <Button type="default" disabled={!canUpdateConfig} onClick={() => onSelect()}>
-            Configure hook
-          </Button>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button
+                type="default"
+                className="pointer-events-auto"
+                disabled={!canUpdateConfig}
+                onClick={() => onSelect()}
+              >
+                Configure hook
+              </Button>
+            </TooltipTrigger_Shadcn_>
+            {!canUpdateConfig && (
+              <TooltipContent_Shadcn_ side="bottom">
+                You need additional permissions to configure auth hooks
+              </TooltipContent_Shadcn_>
+            )}
+          </Tooltip_Shadcn_>
         </div>
       </div>
       <div className="flex-1">
         {hook.enabled ? (
-          <Badge className="space-x-1" size="large" variant="brand">
+          <Badge className="space-x-1" variant="brand">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
               <Check className="h-2 w-2 text-background-overlay " strokeWidth={6} />
             </div>
             <span>Enabled</span>
           </Badge>
         ) : (
-          <Badge variant="warning" size="large">
+          <Badge variant="warning">
             <span>Disabled</span>
           </Badge>
         )}

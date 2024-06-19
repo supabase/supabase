@@ -208,6 +208,7 @@ const PostgrestConfig = () => {
                         <FormControl_Shadcn_>
                           <Switch
                             size="large"
+                            disabled={!canUpdatePostgrestConfig}
                             checked={field.value}
                             onCheckedChange={(value) => {
                               field.onChange(value)

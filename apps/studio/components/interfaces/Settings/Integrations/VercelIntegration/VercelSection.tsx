@@ -213,9 +213,9 @@ You can change the scope of the access for Supabase by configuring
                     />
                   )}
                   <EmptyIntegrationConnection
-                    onClick={() => onAddVercelConnection(vercelIntegration.id)}
                     orgSlug={org?.slug}
                     disabled={!canCreateVercelConnection}
+                    onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >
                     Add new project connection
                   </EmptyIntegrationConnection>

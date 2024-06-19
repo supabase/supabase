@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Plus } from 'lucide-react'
@@ -15,7 +14,15 @@ import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-que
 import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -107,40 +114,28 @@ const TableEditorMenu = () => {
 
           <div className="grid gap-3 mx-4">
             {!isLocked ? (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger className="w-full" asChild>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <Button
+                    block
                     title="Create a new table"
                     name="New table"
-                    block
                     disabled={!canCreateTables}
                     size="tiny"
                     icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                     type="default"
-                    className="justify-start"
+                    className="justify-start pointer-events-auto"
                     onClick={snap.onAddTable}
                   >
                     New table
                   </Button>
-                </Tooltip.Trigger>
+                </TooltipTrigger_Shadcn_>
                 {!canCreateTables && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create tables
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
+                  <TooltipContent_Shadcn_ side="bottom">
+                    You need additional permissions to create tables
+                  </TooltipContent_Shadcn_>
                 )}
-              </Tooltip.Root>
+              </Tooltip_Shadcn_>
             ) : (
               <Alert_Shadcn_>
                 <AlertTitle_Shadcn_ className="text-sm">

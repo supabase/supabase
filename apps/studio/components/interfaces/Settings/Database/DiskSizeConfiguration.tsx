@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Info } from 'lucide-react'
@@ -23,6 +22,9 @@ import {
   Form,
   InputNumber,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
@@ -109,34 +111,23 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                   </p>
                 </div>
                 <div className="flex items-end justify-end">
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
                       <Button
                         type="default"
+                        className="pointer-events-auto"
                         disabled={!canUpdateDiskSizeConfig || disabled}
                         onClick={() => setShowResetDbPass(true)}
                       >
                         Increase disk size
                       </Button>
-                    </Tooltip.Trigger>
+                    </TooltipTrigger_Shadcn_>
                     {!canUpdateDiskSizeConfig && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              You need additional permissions to increase the disk size
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
+                      <TooltipContent_Shadcn_ side="bottom">
+                        You need additional permissions to increase the disk size
+                      </TooltipContent_Shadcn_>
                     )}
-                  </Tooltip.Root>
+                  </Tooltip_Shadcn_>
                 </div>
               </div>
             </Panel.Content>

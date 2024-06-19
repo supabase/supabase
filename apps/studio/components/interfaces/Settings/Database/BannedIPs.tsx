@@ -12,9 +12,11 @@ import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const BannedIPs = () => {
   const { ref } = useParams()
+  const { project } = useProjectContext()
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
   const { data: ipList } = useBannedIPsQuery({
     projectRef: ref,
@@ -23,7 +25,11 @@ const BannedIPs = () => {
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
-  const canUnbanNetworks = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUnbanNetworks = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
@@ -69,12 +75,9 @@ const BannedIPs = () => {
         />
         <div className="flex items-center space-x-2 mb-6">
           <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/reference/cli/supabase-network-bans"
-              target="_blank"
-            >
+            <a target="_blank" href="https://supabase.com/docs/reference/cli/supabase-network-bans">
               Documentation
-            </Link>
+            </a>
           </Button>
         </div>
       </div>

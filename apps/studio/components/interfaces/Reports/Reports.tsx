@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Loading } from 'components/ui/Loading'
@@ -36,7 +35,6 @@ const DEFAULT_CHART_ROW_COUNT = 4
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
 
   const [config, setConfig] = useState<any>(undefined)
   const [startDate, setStartDate] = useState<any>(null)
@@ -205,7 +203,7 @@ const Reports = () => {
   }
 
   if (!canReadReport) {
-    return <NoPermission isFullPage resourceText="access this project's report" />
+    return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
   return (
@@ -274,12 +272,17 @@ const Reports = () => {
           ) : (
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
-                <Button disabled type="default" iconRight={<Settings size={14} />}>
+                <Button
+                  disabled
+                  type="default"
+                  className="pointer-events-auto"
+                  iconRight={<Settings size={14} />}
+                >
                   Add / Remove charts
                 </Button>
               </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="w-56 text-center" align="end">
-                You need additional permissions to update this project's report
+              <TooltipContent_Shadcn_ side="bottom" className="w-56 text-center">
+                You need additional permissions to update custom reports
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           )}
@@ -314,6 +317,7 @@ const Reports = () => {
               endDate={endDate}
               interval={config.interval}
               editableReport={config}
+              disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
               setEditableReport={setConfig}
             />
