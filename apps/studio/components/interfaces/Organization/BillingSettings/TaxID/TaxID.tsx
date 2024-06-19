@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -9,127 +9,118 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { TaxId, useOrganizationTaxIDsQuery } from 'data/organizations/organization-tax-ids-query'
-import {
-  TaxIdValue,
-  useOrganizationTaxIDsUpdateMutation,
-} from 'data/organizations/organization-tax-ids-update-mutation'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+} from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utils'
+import { checkTaxIdEqual as checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
+import * as z from 'zod'
+import { X as IconX } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Panel from 'components/ui/Panel'
 
 const TaxID = () => {
   const { slug } = useParams()
-  const {
-    data: taxIds,
-    error,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useOrganizationTaxIDsQuery({ slug })
-  const { mutate: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation({
-    onSuccess: (res) => {
-      const { created, errors } = res
-      setErrors(errors?.map((taxId) => taxId.id) ?? [])
-      const updatedTaxIds =
-        created?.map((x) => {
-          return {
-            id: x.id,
-            type: x.type,
-            value: x.value,
-            name:
-              x.type === 'eu_vat'
-                ? `${x.country} VAT`
-                : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
-          }
-        }) ?? []
-      setTaxIdValues(updatedTaxIds)
-
-      if (errors !== undefined && errors.length > 0) {
-        errors.forEach((taxId: any) => {
-          toast.error(taxId.result.error.message)
-        })
-      } else {
-        toast.success('Successfully updated tax IDs')
-      }
+  const { data: taxId, error, isLoading, isSuccess, isError } = useOrganizationTaxIdQuery({ slug })
+  const { mutate: updateTaxId, isLoading: isUpdating } = useOrganizationTaxIdUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated tax id')
     },
   })
 
-  const [errors, setErrors] = useState<string[]>([])
-  const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
+  const FormSchema = z.object({ type: z.string(), value: z.string(), name: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { type: '', value: '', name: '' },
+  })
 
-  const formattedTaxIds =
-    taxIds?.map((taxId: TaxId) => {
-      return {
-        id: taxId.id,
+  const formattedTaxId = taxId
+    ? {
         type: taxId.type,
         value: taxId.value,
         name:
           taxId.type === 'eu_vat'
             ? `${taxId.country} VAT`
-            : TAX_IDS.find((option) => option.code === taxId.type)?.name ?? '',
+            : TAX_IDS.find((option) => option.type === taxId.type)?.name ?? '',
       }
-    }) ?? []
+    : { type: '', value: '', name: '' }
 
-  const formId = 'tax-id-form'
-  const hasChanges = !checkTaxIdsEqual(taxIdValues, formattedTaxIds)
-  const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+  const hasChanges = !checkTaxIdEqual(form.getValues(), formattedTaxId)
+  const canReadTaxId = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const canUpdateTaxId = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
   useEffect(() => {
-    if (isSuccess) {
-      if (taxIdValues.length === 0) {
-        setTaxIdValues(formattedTaxIds)
-      } else {
-        const erroredTaxIds = taxIdValues.filter((taxId: any) => errors.includes(taxId.id))
-        setTaxIdValues(formattedTaxIds.concat(erroredTaxIds))
-      }
+    if (isSuccess && formattedTaxId) {
+      form.setValue('type', formattedTaxId.type)
+      form.setValue('value', formattedTaxId.value)
+      form.setValue('name', formattedTaxId.name)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
 
-  const onUpdateTaxId = (id: string, key: string, value: string) => {
-    const updatedTaxIds = taxIdValues.map((taxId: any) => {
-      if (taxId.id === id) {
-        if (key === 'name') {
-          const selectedTaxIdOption = TAX_IDS.find((option) => option.name === value)
-          return { ...taxId, [key]: value, type: selectedTaxIdOption?.code }
-        } else {
-          return { ...taxId, [key]: value }
-        }
-      }
-      return taxId
+  const onSaveTaxId = async () => {
+    if (!slug) return console.error('Slug is required')
+
+    const { type, value } = form.getValues()
+
+    if (type?.length && !value?.length) {
+      form.setError('value', { message: 'Value is required' })
+      return
+    }
+
+    updateTaxId({
+      slug,
+      taxId:
+        type?.length && value?.length
+          ? {
+              type: type,
+              value: sanitizeTaxIdValue({ type, value }),
+            }
+          : null,
     })
-    setTaxIdValues(updatedTaxIds)
-  }
-
-  const onAddNewTaxId = () => {
-    const newTaxId = { id: uuidv4(), type: TAX_IDS[0].code, value: '', name: TAX_IDS[0].name }
-    const updatedTaxIds = taxIdValues.concat([newTaxId])
-    setTaxIdValues(updatedTaxIds)
-  }
-
-  const onRemoveTaxId = (id: string) => {
-    const updatedTaxIds = taxIdValues.filter((taxId) => taxId.id !== id)
-    setTaxIdValues(updatedTaxIds)
   }
 
   const onResetTaxIds = () => {
-    setTaxIdValues(formattedTaxIds)
+    form.setValue('type', formattedTaxId.type)
+    form.setValue('value', formattedTaxId.value)
+    form.setValue('name', formattedTaxId.name)
   }
 
-  const onSaveTaxIds = async (values: any) => {
-    if (!slug) return console.error('Slug is required')
-    if (taxIds === undefined) return console.error('Tax IDs are required')
-
-    const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
-    updateTaxIDs({ slug, existingIds: taxIds, newIds })
+  const onSelectTaxIdType = (name: string) => {
+    const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
+    if (!selectedTaxIdOption) return
+    form.setValue('type', selectedTaxIdOption.type)
+    form.setValue('value', '')
+    form.setValue('name', name)
   }
+
+  const onRemoveTaxId = () => {
+    form.reset()
+  }
+
+  const { name } = form.watch()
+
+  const selectedTaxId = TAX_IDS.find((option) => option.name === name)
 
   return (
     <ScaffoldSection>
@@ -137,7 +128,7 @@ const TaxID = () => {
         <div className="sticky space-y-2 top-12">
           <p className="text-foreground text-base m-0">Tax ID</p>
           <p className="text-sm text-foreground-light pr-4 m-0">
-            Add tax ID(s) to have them appear in your invoices. Old invoices are not affected.
+            Add a tax ID to your invoices. Changes only apply to future invoices.
           </p>
           <p className="text-sm text-foreground-light m-0">
             Make sure the tax ID looks exactly like the placeholder text.
@@ -145,8 +136,8 @@ const TaxID = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadTaxIds ? (
-          <NoPermission resourceText="view this organization's tax IDs" />
+        {!canReadTaxId ? (
+          <NoPermission resourceText="view this organization's tax ID" />
         ) : (
           <>
             {isLoading && (
@@ -158,98 +149,93 @@ const TaxID = () => {
             )}
 
             {isError && (
-              <AlertError error={error} subject="Failed to retrieve organization tax IDs" />
+              <AlertError error={error} subject="Failed to retrieve organization tax Id" />
             )}
 
             {isSuccess && (
-              <Form validateOnBlur id={formId} initialValues={{}} onSubmit={onSaveTaxIds}>
-                {() => (
-                  <FormPanel
-                    footer={
-                      <div className="flex py-4 px-8">
-                        <FormActions
-                          form={formId}
-                          isSubmitting={isUpdating}
-                          hasChanges={hasChanges}
-                          handleReset={() => onResetTaxIds()}
-                          helper={
-                            !canUpdateTaxIds
-                              ? "You need additional permissions to manage this organization's tax IDs"
-                              : undefined
-                          }
+              <Panel
+                className="mb-8"
+                footer={
+                  <FormActions
+                    form="tax-id-form"
+                    isSubmitting={isUpdating}
+                    hasChanges={hasChanges}
+                    handleReset={() => onResetTaxIds()}
+                    helper={
+                      !canUpdateTaxId
+                        ? "You need additional permissions to manage this organization's tax ID"
+                        : undefined
+                    }
+                  />
+                }
+              >
+                <Form_Shadcn_ {...form}>
+                  <form
+                    id="tax-id-form"
+                    className="grid grid-cols-2 gap-2 w-full py-8 px-8 items-center"
+                    onSubmit={form.handleSubmit(() => onSaveTaxId())}
+                  >
+                    <FormField_Shadcn_
+                      name="name"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_>
+                          <FormControl_Shadcn_>
+                            <Select_Shadcn_
+                              {...field}
+                              disabled={!canUpdateTaxId}
+                              value={field.value}
+                              onValueChange={(value) => onSelectTaxIdType(value)}
+                            >
+                              <SelectTrigger_Shadcn_>
+                                <SelectValue_Shadcn_ placeholder="None" />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectGroup_Shadcn_>
+                                  {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
+                                    (option) => (
+                                      <SelectItem_Shadcn_ key={option.name} value={option.name}>
+                                        {option.country} - {option.name}
+                                      </SelectItem_Shadcn_>
+                                    )
+                                  )}
+                                </SelectGroup_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          </FormControl_Shadcn_>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
+                    {selectedTaxId && (
+                      <div className="flex items-center space-x-2">
+                        <FormField_Shadcn_
+                          name="value"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem_Shadcn_ className="w-full">
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  placeholder={selectedTaxId?.placeholder}
+                                  disabled={!canUpdateTaxId}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+
+                        <Button
+                          type="text"
+                          className="px-1"
+                          icon={<IconX />}
+                          onClick={() => onRemoveTaxId()}
                         />
                       </div>
-                    }
-                  >
-                    <FormSection>
-                      <FormSectionContent fullWidth loading={false}>
-                        {taxIdValues.length >= 1 ? (
-                          <div className="w-full space-y-2">
-                            {taxIdValues.map((taxId, idx: number) => {
-                              const selectedTaxId = TAX_IDS.find(
-                                (option) => option.name === taxId.name
-                              )
-                              return (
-                                <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
-                                  <Listbox
-                                    value={selectedTaxId?.name}
-                                    onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e)}
-                                    disabled={!canUpdateTaxIds}
-                                    className="w-[200px]"
-                                  >
-                                    {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
-                                      (option) => (
-                                        <Listbox.Option
-                                          key={option.name}
-                                          value={option.name}
-                                          label={option.name}
-                                        >
-                                          {option.country} - {option.name}
-                                        </Listbox.Option>
-                                      )
-                                    )}
-                                  </Listbox>
-                                  <Input
-                                    value={taxId.value}
-                                    placeholder={selectedTaxId?.placeholder ?? ''}
-                                    onChange={(e: any) =>
-                                      onUpdateTaxId(taxId.id, 'value', e.target.value)
-                                    }
-                                    disabled={!canUpdateTaxIds}
-                                  />
-                                  {canUpdateTaxIds && (
-                                    <Button
-                                      type="text"
-                                      className="px-1"
-                                      icon={<IconX />}
-                                      onClick={() => onRemoveTaxId(taxId.id)}
-                                    />
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="flex items-center space-x-2 text-sm text-foreground-lighter">
-                              No tax IDs
-                            </p>
-                          </div>
-                        )}
-                        {canUpdateTaxIds && (
-                          <div
-                            className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
-                            onClick={() => onAddNewTaxId()}
-                          >
-                            <IconPlus size={14} />
-                            <p className="text-sm">Add another ID</p>
-                          </div>
-                        )}
-                      </FormSectionContent>
-                    </FormSection>
-                  </FormPanel>
-                )}
-              </Form>
+                    )}
+                  </form>
+                </Form_Shadcn_>
+              </Panel>
             )}
           </>
         )}

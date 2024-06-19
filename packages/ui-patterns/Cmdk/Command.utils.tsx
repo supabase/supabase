@@ -85,13 +85,7 @@ export const CommandDialog = ({
         }}
         hideClose
         size={'xlarge'}
-        className={cn(
-          '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
-          '!border-overlay/90',
-          'transition ease-out',
-          'place-self-start mx-auto top-24',
-          animateBounce ? 'scale-[101.5%]' : 'scale-100'
-        )}
+        className={cn('place-self-start mx-auto top-24')}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command
@@ -101,7 +95,6 @@ export const CommandDialog = ({
               '[&_[cmdk-item]_svg]:w-5',
               '[&_[cmdk-input-wrapper]_svg]:h-5',
               '[&_[cmdk-input-wrapper]_svg]:w-5',
-
               '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
             ].join(' ')}
           >
@@ -134,7 +127,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'text-foreground-light placeholder:text-border-stronger disabled:cursor-not-allowed disabled:opacity-50 border-0',
+          'text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className
         )}
         {...props}
@@ -187,7 +180,7 @@ export const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
+      'overflow-hidden py-3 px-2 text-foreground-muted [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
       className
     )}
     {...props}
@@ -210,7 +203,7 @@ export const CommandSeparator = React.forwardRef<
     className={cn(
       `h-px
     w-full
-    bg-alternative
+    bg-border
     `,
       className
     )}
@@ -245,27 +238,25 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         'flex',
         type === 'block-link'
           ? `
-        bg-transparent
-        border
-        border-overlay/90
+        bg-surface-200 dark:bg-surface-100 
         px-5
         transition-all
         outline-none
-        aria-selected:border-overlay
-        aria-selected:bg-overlay-hover/90
+        aria-selected:border-foreground-muted
+        aria-selected:bg-selection
+        dark:aria-selected:bg-selection
         aria-selected:shadow-sm
-        aria-selected:scale-[100.3%]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
             ? `
         px-2
         transition-all
         outline-none
-        aria-selected:bg-overlay-hover/90
+        aria-selected:bg-selection/90
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
             : `
         px-2
-        aria-selected:bg-overlay-hover/80
+        aria-selected:bg-selection/80
         aria-selected:backdrop-filter
         aria-selected:backdrop-blur-md
         data-[disabled]:pointer-events-none
@@ -351,7 +342,7 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
 
     // Add back the wrapped `query` (if it's not the last element)
     if (index !== parts.length - 1) {
-      returnValue.push(<span className="font-semibold text-foreground">{query}</span>)
+      returnValue.push(<span className="text-foreground">{query}</span>)
     }
 
     return returnValue
