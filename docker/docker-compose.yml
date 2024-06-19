@@ -17,7 +17,8 @@ services:
         [
           "CMD",
           "node",
-          "docker-healthcheck.js"
+          "-e",
+          "\"require('http').get('http://studio:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})\""
         ]
       timeout: 15s
       interval: 15s
