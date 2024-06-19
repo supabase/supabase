@@ -121,6 +121,9 @@ jobs:
           docker buildx imagetools create -t supabase/studio:${{ needs.settings.outputs.image_version }} \
           supabase/studio@${{ needs.release_x86.outputs.image_digest }} \
           supabase/studio@${{ needs.release_arm.outputs.image_digest }}
+          docker buildx imagetools create -t supabase/studio:latest \
+          supabase/studio@${{ needs.release_x86.outputs.image_digest }} \
+          supabase/studio@${{ needs.release_arm.outputs.image_digest }}
 
   publish:
     needs:
