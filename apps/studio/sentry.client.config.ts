@@ -7,13 +7,20 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   tracesSampleRate: 0.01,
   debug: false,
-  beforeSend(event) {
+  beforeSend(event, hint) {
     const consent =
       typeof window !== 'undefined'
         ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
         : null
 
     if (IS_PLATFORM && consent === 'true') {
+      // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+        `Failed to construct 'URL': Invalid URL`
+      )
+      if (isInvalidUrlEvent && Math.random() > 0.01) {
+        return null
+      }
       return event
     }
     return null
