@@ -1,0 +1,298 @@
+{
+  "tools": [
+    {
+      "label": "Table Editor",
+      "url": "/project/_/editor"
+    },
+    {
+      "label": "SQL Editor",
+      "url": "/project/_/sql"
+    },
+    {
+      "label": "Database",
+      "url": "/project/_/database/tables",
+      "subItems": [
+        {
+          "label": "Tables",
+          "url": "/project/_/database/tables"
+        },
+        {
+          "label": "Triggers",
+          "url": "/project/_/database/triggers"
+        },
+        {
+          "label": "Functions",
+          "url": "/project/_/database/functions"
+        },
+        {
+          "label": "Extensions",
+          "url": "/project/_/database/extensions"
+        },
+        {
+          "label": "Roles",
+          "url": "/project/_/database/roles"
+        },
+        {
+          "label": "Publications",
+          "url": "/project/_/database/publications"
+        },
+        {
+          "label": "Replication",
+          "url": "/project/_/database/publications"
+        },
+        {
+          "label": "Webhooks",
+          "url": "/project/_/database/hooks"
+        },
+        {
+          "label": "Backups",
+          "url": "/project/_/database/backups/scheduled"
+        }
+      ]
+    },
+    {
+      "label": "Auth",
+      "url": "/project/_/auth/users",
+      "subItems": [
+        {
+          "label": "Users",
+          "url": "/project/_/auth/users"
+        },
+        {
+          "label": "Policies",
+          "url": "/project/_/auth/policies"
+        },
+        {
+          "label": "Providers",
+          "url": "/project/_/auth/providers"
+        },
+        {
+          "label": "Email Templates",
+          "url": "/project/_/auth/templates"
+        },
+        {
+          "label": "URL Configuration",
+          "url": "/project/_/auth/url-configuration"
+        }
+      ]
+    },
+    {
+      "label": "Storage",
+      "url": "/project/_/storage"
+    },
+    {
+      "label": "Edge Functions",
+      "url": "/project/_/functions"
+    },
+    {
+      "label": "Logs",
+      "url": "/project/_/logs/explorer",
+      "subItems": [
+        {
+          "label": "Postgres logs",
+          "url": "/project/_/logs/postgres-logs"
+        },
+        {
+          "label": "PostgREST logs",
+          "url": "/project/_/logs/postgrest-logs"
+        },
+        {
+          "label": "Pooler logs",
+          "url": "/project/_/logs/pooler-logs"
+        },
+        {
+          "label": "Auth logs",
+          "url": "/project/_/logs/auth-logs"
+        },
+        {
+          "label": "Storage logs",
+          "url": "/project/_/logs/storage-logs"
+        },
+        {
+          "label": "Realtime logs",
+          "url": "/project/_/logs/realtime-logs"
+        }
+      ]
+    },
+    {
+      "label": "Reports",
+      "url": "/project/_/reports",
+      "subItems": [
+        {
+          "label": "API reports",
+          "url": "/project/_/reports/api-overview"
+        },
+        {
+          "label": "Storage reports",
+          "url": "/project/_/reports/storage"
+        },
+        {
+          "label": "Database reports",
+          "url": "/project/_/reports/database"
+        },
+        {
+          "label": "Query performance reports",
+          "url": "/project/_/reports/query-performance"
+        }
+      ]
+    },
+    {
+      "label": "API Docs",
+      "url": "/project/_/api",
+      "subItems": [
+        {
+          "label": "Auth docs",
+          "url": "/project/_/api?page=auth"
+        },
+        {
+          "label": "User management docs",
+          "url": "/project/_/api?page=users"
+        },
+        {
+          "label": "GraphQL",
+          "url": "/project/_/api/graphiql"
+        }
+      ]
+    },
+    {
+      "label": "Project Settings",
+      "url": "/project/_/settings/general",
+      "subItems": [
+        {
+          "label": "General settings",
+          "url": "/project/_/settings/general"
+        },
+        {
+          "label": "Database settings",
+          "url": "/project/_/settings/database"
+        },
+        {
+          "label": "API settings",
+          "url": "/project/_/settings/api"
+        },
+        {
+          "label": "Auth settings",
+          "url": "/project/_/settings/auth"
+        },
+        {
+          "label": "Storage settings",
+          "url": "/project/_/settings/storage"
+        },
+        {
+          "label": "Custom Domains",
+          "url": "/project/_/settings/general#custom-domains"
+        },
+        {
+          "label": "Restart project",
+          "url": "/project/_/settings/general#restart-project"
+        },
+        {
+          "label": "Pause project",
+          "url": "/project/_/settings/general#pause-project"
+        },
+        {
+          "label": "Transfer project",
+          "url": "/project/_/settings/general#transfer-project"
+        },
+        {
+          "label": "Delete project",
+          "url": "/project/_/settings/general#delete-project"
+        },
+        {
+          "label": "Database password",
+          "url": "/project/_/settings/database#database-password"
+        },
+        {
+          "label": "Connection string",
+          "url": "/project/_/settings/database#connection-string"
+        },
+        {
+          "label": "Connection pooling",
+          "url": "/project/_/settings/database#connection-pooling"
+        },
+        {
+          "label": "SSL Configuration",
+          "url": "/project/_/settings/database#ssl-configuration"
+        },
+        {
+          "label": "Network Restrictions",
+          "url": "/project/_/settings/database#network-restrictions"
+        },
+        {
+          "label": "Banned IPs",
+          "url": "/project/_/settings/database#banned-ips"
+        }
+      ]
+    }
+  ],
+  "projectTools": [
+    {
+      "label": "Your Projects",
+      "url": "/projects"
+    },
+    {
+      "label": "Project API Keys",
+      "url": "/project/_/settings/api"
+    }
+  ],
+  "support": [
+    {
+      "label": "Support",
+      "url": "https://supabase.com/support"
+    },
+    {
+      "label": "System Status",
+      "url": "https://status.supabase.com/"
+    },
+    {
+      "label": "Github Discussions",
+      "url": "https://github.com/supabase/supabase/discussions"
+    }
+  ],
+  "quickstarts": [
+    {
+      "label": "React",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/reactjs"
+    },
+    {
+      "label": "Next.js",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nextjs"
+    },
+    {
+      "label": "Nuxt.js",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs"
+    },
+    {
+      "label": "Flutter",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
+    },
+    {
+      "label": "Kotlin",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/android"
+    },
+    {
+      "label": "SvelteKit",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit"
+    },
+    {
+      "label": "SolidJS",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/solidjs"
+    },
+    {
+      "label": "Vue",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/vue"
+    }
+  ],
+  "docsGeneral": [
+    {
+      "icon": "arrowRight",
+      "label": "Go to the Dashboard",
+      "url": "https://app.supabase.io"
+    },
+    {
+      "icon": "inbox",
+      "label": "Read the Changelog",
+      "url": "https://supabase.com/changelog"
+    }
+  ]
+}

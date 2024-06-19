@@ -38,6 +38,7 @@ export function TicketBrick({ user }: Props) {
             isLoading ? 'grayscale blur-2xl scale-110' : 'grayscale-0 blur-0 scale-100',
           ].join(' ')}
           onLoadingComplete={() => setLoading(false)}
+          alt=""
         />
         <div className="z-20 relative">
           <TicketHeader size="small" />
@@ -48,10 +49,8 @@ export function TicketBrick({ user }: Props) {
               className="w-20 h-20 rounded-full mx-auto"
             />
             <div className="text-center">
-              <h3 className="gradient-text-scale-100 text-xl">
-                {user.name ? user.name : user.username}
-              </h3>
-              {user.name && <p className="gradient-text-scale-100 text-sm">@{user.username}</p>}
+              <h3 className="gradient-text-100 text-xl">{user.name ? user.name : user.username}</h3>
+              {user.name && <p className="gradient-text-100 text-sm">@{user.username}</p>}
             </div>
           </div>
           <TicketNumber number={user.ticketNumber} size="small" />

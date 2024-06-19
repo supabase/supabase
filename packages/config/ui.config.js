@@ -142,7 +142,7 @@ const uiConfig = {
         },
         colors: { ...variables.root },
       },
-      '.dark': {
+      "[data-theme*='dark']": {
         colors: { ...variables.dark },
       },
     },
@@ -166,12 +166,12 @@ const uiConfig = {
           '100%': { transform: 'scale(0.95)', opacity: 0 },
         },
         overlayContentShow: {
-          '0%': { opacity: 0, transform: 'translate(0%, -2%) scale(.96)' },
+          '0%': { opacity: 0, transform: 'translate(0%, -2%) scale(1)' },
           '100%': { opacity: 1, transform: 'translate(0%, 0%) scale(1)' },
         },
         overlayContentHide: {
           '0%': { opacity: 1, transform: 'translate(0%, 0%) scale(1)' },
-          '100%': { opacity: 0, transform: 'translate(0%, -2%) scale(.96)' },
+          '100%': { opacity: 0, transform: 'translate(0%, -2%) scale(1)' },
         },
         dropdownFadeIn: {
           '0%': { transform: 'scale(0.95)', opacity: 0 },
@@ -281,6 +281,7 @@ const uiConfig = {
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
         'line-loading': 'lineLoading 1.8s infinite',
+        'line-loading-slower': 'lineLoading 2.3s infinite',
 
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
@@ -289,8 +290,8 @@ const uiConfig = {
       },
       colors: {
         ...colorClasses,
-        'hi-contrast': `var(--colors-fixed-scale12)`,
-        'lo-contrast': `var(--colors-fixed-scale1)`,
+        'hi-contrast': `hsl(var(--foreground-default))`,
+        'lo-contrast': `hsl(var(--background-alternative-default))`,
         warning: {
           default: 'red',
           100: '#342355',
@@ -319,12 +320,12 @@ const uiConfig = {
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-        "[data-state='open'] .accordion-content-animation": {
-          animation: 'slideDown 200ms ease-out',
-        },
-        "[data-state='closed'] .accordion-content-animation": {
-          animation: 'slideUp 200ms ease-in',
-        },
+        // "[data-state='open'] .accordion-content-animation": {
+        //   animation: 'slideDown 200ms ease-out',
+        // }
+        // "[data-state='closed'] .accordion-content-animation": {
+        //   animation: 'slideUp 200ms ease-in',
+        // },
         '.text-code': {
           margin: '0 0.2em',
           padding: '0.2em 0.4em 0.1em',

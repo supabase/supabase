@@ -1,0 +1,438 @@
+/* Brought over from platform to be cleaned if needed */
+
+/* Form panels */
+
+.Form,
+.Form button {
+  animation: fade 200ms ease-out;
+}
+
+.Form .form-control,
+.Form select {
+  min-width: 250px;
+  width: calc(67% - 0.5rem);
+  margin-left: 0.5rem;
+}
+
+.Form .form-group,
+.Form .checkbox {
+  @apply w-full;
+}
+
+.form-group {
+  @apply mb-2 p-0 leading-5 border-0 bg-transparent;
+  font-size: 15px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// TO DO: REMOVE
+.form-group label {
+  @apply inline-block text-foreground-light text-sm py-2;
+  width: 33%;
+  align-self: top;
+}
+
+.Form .checkbox .form-check-label {
+  @apply flex items-center;
+}
+
+.Form .checkbox .form-check-label input[type='checkbox'] {
+  @apply mr-4;
+  width: auto;
+}
+
+.Form input[type='checkbox'] {
+  min-width: inherit;
+  width: inherit;
+}
+
+.Form .form-text,
+.Form .form-error {
+  @apply block text-sm text-foreground-lighter my-1;
+  display: block;
+  margin-left: calc(33% + 0.5rem);
+  width: 100%;
+}
+
+.Form .form-error {
+  @apply text-red-400;
+}
+
+.Form .text-danger {
+  @apply text-red-900;
+}
+
+.Form .form-help {
+  @apply text-border-muted;
+}
+
+.Form hr {
+  @apply mt-4 mb-4;
+}
+
+.section-block {
+  @apply p-0 rounded bg-surface-100 border border-overlay;
+}
+
+.section-block--header {
+  @apply border-b border-overlay;
+}
+
+.section-block--header h1,
+.section-block--header h2,
+.section-block--header h3,
+.section-block--header h4 {
+  @apply m-0;
+}
+
+.section-block--header p {
+  @apply text-gray-300;
+}
+
+.section-block--footer {
+  @apply border-overlay bg-surface-100;
+}
+
+.section-block--footer button:not(.mr-0) {
+  @apply mr-2;
+}
+
+/*
+  Table
+*/
+
+.table-container table {
+  @apply w-full;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-container table span {
+  @apply truncate;
+}
+
+.table-container thead th {
+  @apply text-foreground-light font-normal text-sm;
+  @apply bg-surface-200;
+  @apply border-t border-b border-default;
+}
+
+.table-container thead th:first-child {
+  @apply pl-6 rounded rounded-r-none rounded-b-none;
+  @apply border-l;
+}
+
+.table-container thead th:last-child {
+  @apply pr-6 rounded rounded-l-none rounded-b-none;
+  @apply border-r;
+}
+
+.table-container tbody tr {
+  @apply bg-surface-100;
+}
+
+.table-container tbody .tr--link {
+  @apply cursor-pointer transition-colors;
+}
+
+.table-container tbody .tr--link:hover {
+  @apply bg-surface-200;
+}
+
+.table-container tbody td {
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-default;
+}
+
+.table-container tbody td:first-child {
+  @apply pl-6 border-b border-l border-default;
+}
+
+.table-container tbody td:last-child {
+  @apply pr-6 border-b border-r border-default;
+}
+
+.table-container tbody tr:last-child td:first-child {
+  @apply rounded rounded-r-none rounded-t-none;
+}
+
+.table-container tbody tr:last-child td:last-child {
+  @apply rounded rounded-l-none rounded-t-none;
+}
+
+.table-container--borderless thead th {
+  border-top: none;
+}
+
+.table-container--borderless thead th:first-child {
+  border-left: none;
+}
+
+.table-container--borderless thead th:last-child {
+  border-right: none;
+}
+
+.table-container--borderless tbody td:first-child {
+  border-left: none;
+}
+
+.table-container--borderless tbody td:last-child {
+  border-right: none;
+}
+
+.table-container--borderless tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Docs */
+.Docs {
+  &--inner-wrapper {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--background-alternative-default)) 50%,
+      hsl(var(--background-surface-100)) 50%
+    );
+    width: 100%;
+  }
+
+  .dark &--inner-wrapper {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--background-surface-100)) 50%,
+      hsl(var(--background-default)) 50%
+    );
+  }
+
+  // h1,
+  // h2,
+  // h3 {
+  //   @apply p-4 m-0;
+  // }
+
+  .doc-heading {
+    @apply text-foreground capitalize mt-4 px-6 w-1/2;
+    hyphens: auto;
+    max-width: 50%;
+  }
+
+  .doc-section {
+    @apply border-b flex border-default;
+  }
+
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--introduction {
+    .text {
+      width: 85%;
+    }
+  }
+
+  &.Docs--table-editor .doc-section--client-libraries {
+    flex-direction: column;
+    margin-bottom: 40px;
+
+    .text,
+    .code {
+      width: 100%;
+      max-width: none;
+    }
+    .code {
+      margin-bottom: 20px;
+    }
+  }
+
+  .doc-section article:first-child {
+    @apply prose prose-docs prose-sm max-w-none;
+  }
+
+  &.Docs--table-editor .doc-section__table-name {
+    @apply mt-4;
+  }
+
+  .code-column {
+    @apply p-4 px-6 w-1/2;
+    max-width: 50%;
+
+    // a:not(.btn-primary):not(.btn-secondary) {
+    //   @apply text-green-500;
+    // }
+
+    a {
+      @apply transition;
+    }
+
+    a:hover {
+      @apply text-brand-600;
+    }
+
+    p:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  .code {
+    @apply flex-1 p-2 px-6 w-1/2 pb-4;
+    max-width: 50%;
+
+    h4 {
+      @apply uppercase font-normal m-1 p-0 text-sm text-foreground-light;
+    }
+
+    h4:not(:first-child) {
+      @apply mt-6;
+    }
+
+    code {
+      @apply m-1 p-0;
+      background-color: none;
+    }
+
+    .is-highlighted {
+      @apply text-brand;
+    }
+  }
+  .codeblock-container + .codeblock-container {
+    @apply mt-12;
+  }
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  @apply bg-brand;
+  color: #333 !important;
+}
+
+::selection {
+  background-color: #6ee7b7;
+  color: #333 !important;
+}
+
+.has-hidden-children {
+  .visible-child {
+    transition: opacity 0.2s ease;
+    opacity: 100;
+  }
+  .hidden-child {
+    transition: opacity 0.2s ease;
+    opacity: 0;
+  }
+}
+
+.has-hidden-children:hover {
+  .visible-child {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hidden-child {
+    opacity: 100;
+  }
+}
+
+.SQLTabNav {
+  overflow-x: auto;
+  overflow-y: hidden !important;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  // for Firefox
+  scrollbar-width: none; // auto | thin | none | <length>;
+}
+
+.radix-tooltip-arrow {
+  polygon {
+    @apply fill-background-alternative [[data-theme*=dark]_&]:fill-background-alternative;
+    // fill: #eeeeee;
+  }
+}
+
+.pitr-listbox {
+  @apply md:gap-x-2;
+}
+
+.roles-toggle {
+  label {
+    @apply mt-1;
+  }
+}
+
+.thin-scrollbars {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--foreground-muted)) hsl(var(--background-alternative-default));
+
+  .dark & {
+    scrollbar-color: hsl(var(--foreground-lighter)) hsl(var(--background-surface-100));
+  }
+
+  ::-webkit-scrollbar {
+    background: hsl(var(--background-default));
+    height: 3px;
+    width: 0px;
+    border-radius: 0;
+
+    .dark & {
+      background: hsl(var(--border-control));
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px hsl(var(--border-control));
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px hsl(var(--border-stronger));
+    }
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: hsl(var(--foreground-muted));
+
+    .dark & {
+      -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
+    }
+  }
+}
+
+.form-field-markdown {
+  a {
+    @apply text-brand transition opacity-75 hover:opacity-100 underline;
+  }
+}
+
+.view-icon {
+  rect {
+    @apply fill-blue-500 stroke-blue-500;
+  }
+  path,
+  circle {
+    @apply stroke-blue-900 fill-blue-500;
+  }
+}
+
+.table-icon {
+  rect {
+    @apply fill-green-1000 stroke-green-500;
+  }
+  line {
+    @apply stroke-green-500;
+  }
+}
+
+.recharts-cartesian-axis-tick {
+  text {
+    @apply text-xs;
+  }
+}
+.recharts-reference-line {
+  line {
+    @apply stroke-foreground-lighter;
+  }
+}

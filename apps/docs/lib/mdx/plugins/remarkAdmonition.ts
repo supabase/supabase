@@ -109,7 +109,7 @@ function mapAdmonitionType(type: string): AdmonitionProps['type'] {
     case 'question':
     case 'info':
     default:
-      return 'info'
+      return 'note'
   }
 }
 

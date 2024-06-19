@@ -15,7 +15,7 @@ insert into storage.buckets (id, name)
   values ('Product Image', 'Product Image');
 
 -- Set up access controls for storage.
--- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+-- See https://supabase.com/docs/guides/storage/security/access-control#policy-examples for more details.
 CREATE POLICY "Enable read access for all users" ON "storage"."objects"
 AS PERMISSIVE FOR SELECT
 TO public

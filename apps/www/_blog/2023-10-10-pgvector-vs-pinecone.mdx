@@ -37,7 +37,7 @@ An index on Pinecone is made up of pods, which are units of cloud resources (vCP
 Pods can be scaled in 2 dimensions: vertically and horizontally:
 
 - **vertical scaling** can be used to fit more vectors on a single pod: x1, x2, x4, x8;
-- **horizontal scaling** increases the number of pods or creates replicas to boost QPS. This works linearly for Pinecone: doubling the number of replica pods doubles your QPS.
+- **horizontal scaling** increases the number of pods or creates replicas to boost queries per second (QPS). This works linearly for Pinecone: doubling the number of replica pods doubles your QPS.
 
 ## Benchmarking methodology
 
@@ -47,6 +47,8 @@ To compare Pinecone and pgvector on equal grounds, we opted for the following se
 
 - **pgvector**: A single Supabase 2XL instance approximating ~410$/month (8-core ARM CPU and 32 GB RAM). An HNSW index with the following build parameters: `m='36'`, `ef_construction='128'`.
 - **Pinecone**: Vertically scaled pod to the minimum option that fits the dbpedia dataset into the index on a single pod. We then added replicas to match the budget (slightly exceeding in all cases with ~$480/month).
+
+To reduce network latency, we placed our clients in the same cloud provider and region as the database. Experiments were run in a parallel configuration, varying the number of concurrent clients from 5 to 100 to determine the maximum QPS for each setup.
 
 ### Measuring accuracy in Pinecone
 
@@ -61,15 +63,12 @@ As the index can fit in a single s1.x1 pod ($80/month), we created five addition
 To match the measured .98 accuracy@10 of Pinecone s1 pods, we set `ef_search=32` for pgvector (HNSW) queries, and observed the following results:
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/s1x1--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/s1x1--dark.png"
+  <Img
+    alt="visual of an example skip list"
+    src={{
+      light: '/images/blog/2023-10-10-pgvector-vs-pinecone/s1x1--light.png',
+      dark: '/images/blog/2023-10-10-pgvector-vs-pinecone/s1x1--dark.png',
+    }}
   />
 </div>
 
@@ -78,15 +77,12 @@ The pgvector HNSW index can manage 1185% more queries per second while being $70
 Interestingly, we'd often heard that the pgvector IVFFlat was too slow until the HNSW support was introduced. However, even the pgvector IVFFlat index on the same compute exceeds the Pinecone s1 pod and manages 143% more queries per second:
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/ivfflat--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/ivfflat--dark.png"
+  <Img
+    alt="visual of an example skip list"
+    src={{
+      light: '/images/blog/2023-10-10-pgvector-vs-pinecone/ivfflat--light.png',
+      dark: '/images/blog/2023-10-10-pgvector-vs-pinecone/ivfflat--dark.png',
+    }}
   />
 </div>
 
@@ -97,15 +93,12 @@ With Pinecone p1 pods, we can fit the dbpedia dataset into the index on a single
 To match the .99 accuracy of Pinecone's p1.x2, we set `ef_search=40` for pgvector (HNSW) queries.
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/p1x2--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/p1x2--dark.png"
+  <Img
+    alt="visual of an example skip list"
+    src={{
+      light: '/images/blog/2023-10-10-pgvector-vs-pinecone/p1x2--light.png',
+      dark: '/images/blog/2023-10-10-pgvector-vs-pinecone/p1x2--dark.png',
+    }}
   />
 </div>
 
@@ -118,15 +111,12 @@ This is Pinecone's fastest pod type, but the increased QPS results in an accurac
 To match Pinecone's .94 accuracy, we set `ef_search=10` for pgvector ([HNSW](https://www.notion.so/Blogpost-pgvector-vs-Pinecone-cost-and-performance-5d5cc429818d45358ba2d3a8a06e1ecf?pvs=21)) queries. In this test, pgvector's accuracy was actually better by 1% with .95 accuracy@10, and it was still significantly faster despite the better accuracy.
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/p2x2--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-10-10-pgvector-vs-pinecone/p2x2--dark.png"
+  <Img
+    alt="visual of an example skip list"
+    src={{
+      light: '/images/blog/2023-10-10-pgvector-vs-pinecone/p2x2--light.png',
+      dark: '/images/blog/2023-10-10-pgvector-vs-pinecone/p2x2--dark.png',
+    }}
   />
 </div>
 

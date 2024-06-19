@@ -21,10 +21,11 @@ export function LaunchWeekLogoHeader() {
               src="/images/launchweek/seven/lw7-seven.svg"
               width={isMobile ? 36 : 40}
               height={isMobile ? 36 : 40}
+              alt="Launch Week 7"
             />
           </span>
         </h1>
-        <p className="text-white radial-gradient-text-scale-600 text-md sm:text-lg text-center">
+        <p className="text-white radial-gradient-text-600 text-md sm:text-lg text-center">
           April 10th – 14th at 7AM PT | 10AM ET
         </p>
       </motion.div>

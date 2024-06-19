@@ -9,5 +9,12 @@
     return <IconBase icon={BookOpen} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { bookOpen } from 'lucide-react'
+  */
   export default IconBookOpen
   

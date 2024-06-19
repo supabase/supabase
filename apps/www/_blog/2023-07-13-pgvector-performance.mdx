@@ -43,15 +43,12 @@ The key elements are:
 - **Pre-warming RAM:** We executed 10,000 to 50,000 “warm-up” queries before each benchmark, matching the number of probes as the benchmark. Additionally, we executed about 1,000 queries with probes ranging from three to ten times the benchmark's probes. Both of these help with RAM utilization.
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/vecs-bench--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/vecs-bench--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/vecs-bench--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/vecs-bench--dark.png',
+    }}
   />
 </div>
 
@@ -82,15 +79,12 @@ We also have some useful [benchmarks in our docs](https://supabase.com/docs/guid
 Let's start with NirantK's results as a baseline:
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/nirantk--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/nirantk--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/nirantk--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/nirantk--dark.png',
+    }}
   />
 </div>
 
@@ -122,15 +116,12 @@ With the changes above and probes set to 10, pgvector was faster and more accura
 - QPS (queries per second) of 380
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--dark.png',
+    }}
   />
 </div>
 
@@ -142,15 +133,12 @@ If we increase the probes from 10 to 40, pgvector was not just substantially fas
 - QPS of 140
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--dark.png',
+    }}
   />
 </div>
 
@@ -165,15 +153,12 @@ The Qdrant benchmark uses “default” configuration and is in not indicative o
 </div>
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-8xl--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/pgvector-8xl--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/pgvector-8xl--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/pgvector-8xl--dark.png',
+    }}
   />
 </div>
 
@@ -186,15 +171,12 @@ Putting it all together, we find that we can predictably scale our database to m
 With a 64-core, 256 GB server we achieve ~1800 QPS and 0.91 accuracy. This is for pgvector 0.4.0, and we've heard that the latest version (0.4.4) already has significant improvements. We'll release those benchmarks as soon as we have them.
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/size-to-rps--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/size-to-rps--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/size-to-rps--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/size-to-rps--dark.png',
+    }}
   />
 </div>
 
@@ -215,15 +197,12 @@ But as our experiment shows, we can improve QPS if we increase `lists` (i.e. wit
 - 13% of index data = 30 lists
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/lists-count--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/lists-count--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/lists-count--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/lists-count--dark.png',
+    }}
   />
 </div>
 
@@ -232,15 +211,12 @@ This also has an important caveat: building the index takes longer with more lis
 So if you can afford an index build time of 1 hour or more, you can go with `lists=5000` (`number of vectors / 200`) or more!
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/lists-for-1m--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/lists-for-1m--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/lists-for-1m--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/lists-for-1m--dark.png',
+    }}
   />
 </div>
 
@@ -263,15 +239,12 @@ Embeddings created from “real” data are more likely to be clustered together
 Embeddings generated for similarity search using “real world data” will be more correlated, so the accuracy will be higher as well. You can see the difference in this chart using 10,000 Wikipedia embeddings, vs 10,000 randomly-generated embeddings:
 
 <div>
-  <img
+  <Img
     alt="multi database"
-    className="dark:hidden"
-    src="/images/blog/2023-07-13-pgvector-performance/random-data--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/images/blog/2023-07-13-pgvector-performance/random-data--dark.png"
+    src={{
+      light: '/images/blog/2023-07-13-pgvector-performance/random-data--light.png',
+      dark: '/images/blog/2023-07-13-pgvector-performance/random-data--dark.png',
+    }}
   />
 </div>
 

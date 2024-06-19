@@ -11,8 +11,11 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
+import ProductsNav from '~/components/Products/ProductsNav'
 
-import 'swiper/swiper.min.css'
+import 'swiper/css'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -21,7 +24,7 @@ const Cursor = ({ className = '', color = 'none' }) => {
       fill={color}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={`h-10 w-10 stroke-black dark:stroke-white ${className}`}
+      className={`h-10 w-10 stroke-foreground ${className}`}
     >
       <path
         strokeLinecap="round"
@@ -57,21 +60,22 @@ function RealtimePage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader
           icon={Solutions['realtime']?.icon}
           title={Solutions['realtime']?.name}
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
-            <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
+            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
-                  'border-brand-300 relative h-12 w-48 bg-[#34B27B]',
+                  'border-brand-300 relative h-12 w-48 bg-brand',
                   `flex items-center justify-center ${RealtimeStyles['shape']}`,
                 ].join(' ')}
               >
                 <p
-                  className={`text-scale-1200 text-[18px] font-medium ${RealtimeStyles['button-text']}`}
+                  className={`text-foreground text-[18px] font-medium ${RealtimeStyles['button-text']}`}
                 >
                   Start a project
                 </p>
@@ -86,7 +90,7 @@ function RealtimePage() {
               />
               <div
                 className={[
-                  'border-scale-1200 absolute bottom-[40px] left-[175px] flex h-10 w-20',
+                  'border-foreground absolute bottom-[40px] left-[175px] flex h-10 w-20',
                   'items-center justify-center space-x-2 rounded-full border-[3px] bg-indigo-900',
                   `${RealtimeStyles['cursor-two-comment']}`,
                 ].join(' ')}
@@ -99,29 +103,23 @@ function RealtimePage() {
               />
               <div
                 className={[
-                  'border-scale-1200 absolute top-[72px] left-[320px] flex h-10 w-20',
+                  'border-foreground absolute top-[72px] left-[320px] flex h-10 w-20',
                   'items-center justify-center space-x-2 rounded-full border-[3px] bg-tomato-900',
                   `${RealtimeStyles['cursor-three-comment']}`,
                 ].join(' ')}
               >
                 <p className="text-lg">😄</p>
               </div>
-              {/* <div className="bg-scale-100 border-scale-500 absolute left-0 h-full w-24 border-r py-9 shadow">
-                <div className="border-scale-500 h-7 border-b" />
-              </div> */}
-              {/* <div className="bg-scale-100 border-scale-500 absolute right-0 h-full w-20 border-l py-9 shadow">
-                <div className="border-scale-500 h-7 border-b" />
-              </div> */}
-              <div className="bg-scale-200 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
+              <div className="bg-background border-default absolute top-0 flex h-9 w-full items-center justify-between border-b">
                 <div className="flex items-center">
-                  <IconMenu className="text-scale-1200 mx-3" strokeWidth={1} size={16} />
-                  <IconGrid className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
-                  <IconLayers className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
+                  <IconMenu className="text-foreground mx-3" strokeWidth={1} size={16} />
+                  <IconGrid className="text-foreground mx-3" strokeWidth={1} size={15} />
+                  <IconLayers className="text-foreground mx-3" strokeWidth={1} size={15} />
                 </div>
                 <div className="mx-3 flex items-center">
-                  <div className="border-scale-300 dark:border-scale-1200 bg-tomato-900 dark:bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-scale-300 dark:border-scale-1200 bg-yellow-900 dark:bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-scale-300 dark:border-scale-1200 bg-indigo-900 dark:bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
@@ -144,11 +142,9 @@ function RealtimePage() {
                 Listen to changes in the Database inserts, updates, and deletes and other changes.
               </p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/postgres-changes">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/postgres-changes">View docs</Link>
+                </Button>
               </div>
             </div>
             <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
@@ -162,11 +158,9 @@ function RealtimePage() {
               <h3>Presence</h3>
               <p>Store and synchronize online user state consistently across clients.</p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/presence">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/presence">View docs</Link>
+                </Button>
               </div>
             </div>
             <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
@@ -180,11 +174,9 @@ function RealtimePage() {
               <h3>Broadcast</h3>
               <p>Send any data to any client subscribed to the same Channel.</p>
               <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/realtime/broadcast">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
+                <Button asChild type="default">
+                  <Link href="/docs/guides/realtime/broadcast">View docs</Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -202,18 +194,18 @@ function RealtimePage() {
               return (
                 <>
                   <div className="flex flex-col gap-3">
-                    <img
-                      className="bg-scale-300 hidden rounded-lg dark:block"
-                      src={`/images/realtime/example-apps/dark/${example.img}?type=1`}
+                    <ThemeImage
                       alt={example.title}
-                    />
-                    <img
-                      className="bg-scale-300 block rounded-lg dark:hidden"
-                      src={`/images/realtime/example-apps/light/${example.img}`}
-                      alt={example.title}
+                      src={{
+                        light: `/images/realtime/example-apps/light/${example.img}?type=1`,
+                        dark: `/images/realtime/example-apps/dark/${example.img}`,
+                      }}
+                      className="bg-surface-100 rounded-lg"
+                      layout="fill"
+                      objectFit="contain"
                     />
                     <div className="prose">
-                      <h4 className="">{example.title}</h4>
+                      <h4>{example.title}</h4>
                       <p className="text-sm">{example.description}</p>
                     </div>
                   </div>

@@ -3,28 +3,42 @@ import CliGenerator from './cli'
 import ConfigGenerator from './config'
 import SdkGenerator from './sdk'
 import LegacyGenerator from './legacy'
-import * as minimist from 'minimist'
+import { parseArgs } from 'node:util'
+import { strict as assert } from 'node:assert'
 
-const main = (command: string[], options: any) => {
-  handleInput(command[0], options)
-}
+const args = parseArgs({
+  options: {
+    input: {
+      type: 'string',
+    },
+    output: {
+      type: 'string',
+      short: 'n',
+    },
+    type: {
+      type: 'string',
+      short: 'n',
+    },
+    url: {
+      type: 'string',
+      short: 'n',
+    },
+  },
+})
 
-// Run everything
-/* @ts-ignore - required for Next.js build */
-const argv = minimist(process.argv.slice(2))
-main(argv['_'], argv)
+const allowedTypes = ['cli', 'config', 'sdk', 'api', 'legacy'] as const
+type AllowedType = (typeof allowedTypes)[number]
 
-function handleInput(command: string, options: any) {
-  switch (command) {
-    case 'gen':
-      DocGenerator(options)
-      break
+assert(args.values.input, 'input is required')
+assert(args.values.output, 'output is required')
+assert(allowedTypes.includes(args.values.type as AllowedType), 'type is required')
 
-    default:
-      console.log('Unrecognized command:', command)
-      break
-  }
-}
+DocGenerator({
+  input: args.values.input,
+  output: args.values.output,
+  type: args.values.type as AllowedType,
+  url: args.values.url,
+})
 
 export default async function DocGenerator({
   input,
@@ -34,7 +48,7 @@ export default async function DocGenerator({
 }: {
   input: string
   output: string
-  type: 'cli' | 'config' | 'sdk' | 'api' | 'legacy'
+  type: AllowedType
   url?: string
 }) {
   switch (type) {

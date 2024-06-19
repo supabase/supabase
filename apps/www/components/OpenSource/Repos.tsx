@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Octokit } from 'octokit'
 import { cn } from 'ui'
 import LogoLoader from 'ui/src/components/LogoLoader'
 
@@ -19,7 +18,9 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
-      isActive ? 'text-strong bg-surface-300' : 'text-lighter bg-surface-200 hover:bg-overlay-hover'
+      isActive
+        ? 'text-strong bg-surface-300'
+        : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -32,7 +33,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
         >
           <path
             d={icon}
@@ -65,7 +66,6 @@ enum SWIPER_STATE {
 }
 
 const Repos = ({ tabs }: Props) => {
-  const octokit = new Octokit()
   const [repos, setRepos] = useState<any[] | null>(null)
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
@@ -73,6 +73,8 @@ const Repos = ({ tabs }: Props) => {
 
   useEffect(() => {
     async function fetchOctoData() {
+      const { Octokit } = await import('@octokit/core')
+      const octokit = new Octokit()
       const res = await octokit.request('GET /orgs/{org}/repos', {
         org: 'supabase',
         type: 'public',
@@ -104,17 +106,21 @@ const Repos = ({ tabs }: Props) => {
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
       <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
-        <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
-            <GitHubIcon />
-            How to contribute
-          </a>
+        <Link
+          href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md"
+          className="text-foreground-lighter hover:underline flex gap-1 items-center"
+          target="_blank"
+        >
+          <GitHubIcon />
+          How to contribute
         </Link>
-        <Link href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md">
-          <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
-            <GitHubIcon />
-            Code of Conduct
-          </a>
+        <Link
+          href="https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md"
+          className="text-foreground-lighter hover:underline flex gap-1 items-center"
+          target="_blank"
+        >
+          <GitHubIcon />
+          Code of Conduct
         </Link>
       </div>
       <div className="w-full gap-2 flex flex-col items-center">
@@ -132,8 +138,8 @@ const Repos = ({ tabs }: Props) => {
                 slider.isEnd
                   ? SWIPER_STATE.END
                   : slider.isBeginning
-                  ? SWIPER_STATE.START
-                  : SWIPER_STATE.MIDDLE
+                    ? SWIPER_STATE.START
+                    : SWIPER_STATE.MIDDLE
               )
             }
             className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
@@ -175,7 +181,7 @@ const Repos = ({ tabs }: Props) => {
         </div>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           {repos === null ? (
             <div className="col-span-full flex justify-center items-center min-h-[300px]">
               <LogoLoader />

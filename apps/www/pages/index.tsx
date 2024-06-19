@@ -1,14 +1,15 @@
+// Import Swiper styles if swiper used on page
+import 'swiper/swiper.min.css'
+
+import supabase from '../lib/supabase'
 import dynamic from 'next/dynamic'
-import PostTypes from '~/types/post'
-import { getSortedPosts } from '~/lib/posts'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
 
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
-import supabase from '../lib/supabase'
-
+const Products = dynamic(() => import('~/components/Products/index'))
+const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
+const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
@@ -17,10 +18,11 @@ const Integrations = dynamic(() => import('~/components/Sections/Integrations'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const Products = dynamic(() => import('~/components/Products/index'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
+const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
-type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[]; integrations: any[] }
+type Props = { integrations: any[] }
 
-const Index = ({ customerStories, integrations }: Props) => {
+const Index = ({ integrations }: Props) => {
   return (
     <Layout>
       <Hero />
@@ -30,15 +32,21 @@ const Index = ({ customerStories, integrations }: Props) => {
       <MadeForDevelopers />
       <AdminAccess />
       <Integrations {...content.integrations} integrations={integrations} />
-      <CustomerStories customerStories={customerStories} />
+      <CustomerStories />
       <CTABanner />
+      <ReactTooltip
+        effect="solid"
+        place="bottom"
+        backgroundColor="hsl(var(--background-alternative-default))"
+        textColor="hsl(var(--foreground-light))"
+        className="!max-w-[320px] !px-3 whitespace-pre-line"
+        uuid="homepage-tt"
+      />
     </Layout>
   )
 }
 
 export async function getStaticProps() {
-  const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
-
   const { data: integrations } = await supabase
     .from('partners')
     .select('*')
@@ -46,7 +54,6 @@ export async function getStaticProps() {
 
   return {
     props: {
-      customerStories,
       integrations,
     },
   }

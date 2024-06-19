@@ -42,17 +42,17 @@ const RevVersionDropdown = () => {
           className="
           group
           justify-between
-          bg-scaleA-200
+          bg-control
           border
-          hover:border-scale-600
-          hover:bg-scaleA-300
-          border-scale-500 px-2 h-[32px] rounded
+          hover:border-control
+          hover:bg-overlay-hover
+          border-control px-2 h-[32px] rounded
           font-mono
-          flex items-center gap-1 text-scale-900 text-xs group-hover:text-scale-1200 transition
+          flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
           "
         >
           {/* <span>version</span> */}
-          <span className="text-scale-1200 text-sm group-hover:text-scale-1200 transition">
+          <span className="text-foreground text-sm group-hover:text-foreground transition">
             {currentVersion}.0
           </span>
           <IconChevronDown size={14} strokeWidth={2} />

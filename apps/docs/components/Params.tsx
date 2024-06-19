@@ -1,30 +1,35 @@
-import { FC } from 'react'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 type IParamProps = any
 
-const Param: FC<IParamProps> = (paramItem) => {
+/**
+ * isPrimitive: Indicates whether the value is a basic type such as string or number. It does not refer to an object param.
+ * */
+const Param = ({ name, isOptional, type, description, children, isPrimitive }: IParamProps) => {
   return (
-    <li className="border-t border-b py-5 flex flex-col gap-3">
+    <div className="border-t border-b py-5 flex flex-col gap-3 debugger">
       <div className="flex gap-3 items-center">
-        <span className="text-sm text-scale-1200 font-mono font-medium">
-          {paramItem.name ?? 'no-name'}
-        </span>
+        {!isPrimitive && (
+          <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
+        )}
         <span>
-          {paramItem.isOptional ? (
-            <div className="text-[10px] px-3 tracking-wide font-mono text-scale-900">Optional</div>
+          {isOptional ? (
+            <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
+              Optional
+            </div>
           ) : (
             <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
               REQUIRED
             </div>
           )}
         </span>
-        <span className="text-scale-900 text-xs">{paramItem.type ?? 'no type'}</span>
+        <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
-      {paramItem.description && (
-        <p className="text-sm text-scale-1000 m-0">{paramItem.description} </p>
+      {description && (
+        <ReactMarkdown className="text-sm text-foreground-lighter m-0">{description}</ReactMarkdown>
       )}
-      {paramItem.children}
-    </li>
+      {children}
+    </div>
   )
 }
 

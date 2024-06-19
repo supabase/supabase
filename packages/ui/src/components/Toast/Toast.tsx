@@ -1,21 +1,26 @@
-import React, { ComponentProps } from 'react'
-import { Toaster as HotToaster, toast as hotToast, resolveValue } from 'react-hot-toast'
-import { Toast as HotToastProps, ToastType } from 'react-hot-toast/dist/core/types'
 import * as Portal from '@radix-ui/react-portal'
+import React, { ComponentProps } from 'react'
+import {
+  Toast as HotToastProps,
+  Toaster as HotToaster,
+  ToastType,
+  toast as hotToast,
+  resolveValue,
+} from 'react-hot-toast'
+import { IconAlertCircle } from '../Icon/icons/IconAlertCircle'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { IconLoader } from '../Icon/icons/IconLoader'
 import { IconX } from '../Icon/icons/IconX'
-import { IconAlertCircle } from '../Icon/icons/IconAlertCircle'
 // @ts-ignore
-import ToastStyles from './Toast.module.css'
 import Typography from '../Typography'
+import ToastStyles from './Toast.module.css'
 
 const icons: Partial<{ [key in ToastType]: any }> = {
   error: <IconAlertCircle size="medium" strokeWidth={2} />,
   success: <IconCheck size="medium" strokeWidth={2} />,
 }
 
-export interface ToastProps extends Partial<HotToastProps> {
+export interface ToastProps extends HotToastProps {
   description?: string
   closable?: boolean
   actions?: React.ReactNode
@@ -52,6 +57,7 @@ function Description({ children, ...props }: ComponentProps<typeof Typography.Te
  *
  * `Toast.toast('Message', { description: 'Description', actions: [<SomeButton />] })`
  */
+
 function Toast({
   id,
   visible,
@@ -84,7 +90,11 @@ function Toast({
   }
 
   const _message =
-    typeof message === 'string' ? <Message>{message}</Message> : resolveValue(message, rest)
+    typeof message === 'string' ? (
+      <Message>{message}</Message>
+    ) : (
+      resolveValue(message, { id, type, message, visible, ...rest })
+    )
 
   return (
     <div className={`${containerClasses.join(' ')} ${visible ? 'animate-enter' : 'animate-leave'}`}>
@@ -140,7 +150,7 @@ function Toaster({ children }: ToasterProps) {
           typeof message === 'string' ? (
             <Toast message={message} {...t} />
           ) : (
-            <>{resolveValue(message, t)}</>
+            <>{resolveValue(message, { message, ...t })}</>
           )
         }
       </HotToaster>
@@ -179,7 +189,7 @@ export function toast(message: string, opts?: ToastOptions) {
         closable={closable}
         actions={actions}
         actionsPosition={actionsPosition}
-        type={type}
+        type={type || 'success'}
         {...t}
       />
     ),

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { startCase } from 'lodash'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import BlogListItem from '~/components/Blog/BlogListItem'
+import BlogGridItem from '~/components/Blog/BlogGridItem'
 import PostTypes from '~/types/post'
 
 export async function getStaticProps({ params }: any) {
@@ -42,7 +42,7 @@ function TagBlogsPage(props: Props) {
       />
       <DefaultLayout>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
-          <div className="text-scale-1000 flex space-x-1">
+          <div className="text-foreground-lighter flex space-x-1">
             <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
               <span className="px-2">/</span>
@@ -55,7 +55,7 @@ function TagBlogsPage(props: Props) {
                 className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
                 key={idx}
               >
-                <BlogListItem post={blog} />
+                <BlogGridItem post={blog} />
               </div>
             ))}
           </ol>

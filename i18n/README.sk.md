@@ -58,7 +58,7 @@ Supabase je kombináciou nástrojov s otvoreným zdrojovým kódom. Funkcie Fire
 Supabase je [hostovaná platforma](https://supabase.com/dashboard). Môžete sa zaregistrovať a začať používať Supabase bez toho, aby ste čokoľvek inštalovali.
 Môžete tiež [samostatne hosťovať](https://supabase.com/docs/guides/hosting/overview) a [vyvíjať lokálne](https://supabase.com/docs/guides/local-development).
 
-![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) je objektovo-relačný databázový systém s viac ako 30 rokmi aktívneho vývoja, ktorý si získal dobrú povesť vďaka spoľahlivosti, robustnosti funkcií a výkonu.
 - [Realtime](https://github.com/supabase/realtime) je server Elixir, ktorý umožňuje počúvať vkladanie, aktualizáciu a mazanie údajov PostgreSQL pomocou webových soketov. Realtime vyhľadáva zmeny v databáze pomocou zabudovanej replikačnej funkcie Postgresu, konvertuje zmeny na JSON a potom vysiela JSON cez websockety autorizovaným klientom.
@@ -247,7 +247,7 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
 - [Zjednodušená čínština / 简体中文](/i18n/README.zh-cn.md)
 - [Švédčina / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Tradičná čínština / 繁体中文](/i18n/README.zh-tw.md)
+- [Tradičná čínština / 繁體中文](/i18n/README.zh-tw.md)
 - [Turečtina / Türkçe](/i18n/README.tr.md)
 - [Ukrajinčina / Українська](/i18n/README.uk.md)
 - [Vietnamčina / Tiếng Việt](/i18n/README.vi-vn.md)

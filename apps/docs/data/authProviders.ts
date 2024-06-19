@@ -123,7 +123,7 @@ const authProviders = [
   {
     name: 'MessageBird',
     logo: '/docs/img/icons/messagebird-icon',
-    href: '/guides/auth/phone-login/messagebird',
+    href: '/guides/auth/phone-login?showSmsProvider=MessageBird',
     official: false,
     supporter: 'MessageBird',
     platform: true,
@@ -182,6 +182,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'WorkOS',
+    logo: '/docs/img/icons/workos-icon',
+    href: '/guides/auth/social-login/auth-workos',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'Zoom',
     logo: '/docs/img/icons/zoom-icon',
     href: '/guides/auth/social-login/auth-zoom',
@@ -194,7 +204,7 @@ const authProviders = [
   {
     name: 'Twilio',
     logo: '/docs/img/icons/twilio-icon',
-    href: '/guides/auth/phone-login/twilio',
+    href: '/guides/auth/phone-login?showSmsProvider=Twilio',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -204,7 +214,7 @@ const authProviders = [
   {
     name: 'Vonage',
     logo: '/docs/img/icons/vonage-icon',
-    href: '/guides/auth/phone-login/vonage',
+    href: '/guides/auth/phone-login?showSmsProvider=Vonage',
     official: false,
     supporter: 'Supabase',
     platform: true,

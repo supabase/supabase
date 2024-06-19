@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import Image from 'next/image'
 import TextLink from '../TextLink'
@@ -95,7 +95,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             </Tabs>
           </div>
           <div
-            className={`overflow-hidden rounded-md border border-gray-100 bg-gray-800 dark:border-gray-600 ${ImageCarouselStyles['gradient-bg']}`}
+            className={`overflow-hidden rounded-md border border-control bg-border-stronger ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore
@@ -170,12 +170,14 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i} className="py-4">
-                <h4 className="text-scale-1200 mb-4 text-xl">{content.title}</h4>
+                <h4 className="text-foreground mb-4 text-xl">{content.title}</h4>
                 <p className="p text-base">{content.text}</p>
-                <TextLink
-                  label={content.cta ? content.cta : 'View documentation'}
-                  url={content.url}
-                />
+                {!!content.url && (
+                  <TextLink
+                    label={content.cta ? content.cta : 'View documentation'}
+                    url={content.url}
+                  />
+                )}
               </SwiperSlide>
             )
           })}

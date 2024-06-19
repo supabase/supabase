@@ -1,21 +1,17 @@
 'use client'
 
-import * as React from 'react'
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
+import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
-import { buttonVariants } from '@ui/components/shadcn/ui/button'
+import { cn } from '../../../lib/utils/cn'
+import { buttonVariants } from './../../Button'
 
 const AlertDialog = AlertDialogPrimitive.Root
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 
-const AlertDialogPortal = ({
-  className,
-  children,
-  ...props
-}: AlertDialogPrimitive.AlertDialogPortalProps) => (
-  <AlertDialogPrimitive.Portal className={cn(className)} {...props}>
+const AlertDialogPortal = ({ children, ...props }: AlertDialogPrimitive.AlertDialogPortalProps) => (
+  <AlertDialogPrimitive.Portal {...props}>
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       {children}
     </div>
@@ -87,7 +83,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
+    className={cn('text-sm text-foreground-muted', className)}
     {...props}
   />
 ))
@@ -97,7 +93,11 @@ const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
 >(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Action ref={ref} className={cn(buttonVariants(), className)} {...props} />
+  <AlertDialogPrimitive.Action
+    ref={ref}
+    className={cn(buttonVariants({ type: 'secondary', size: 'small' }), className)}
+    {...props}
+  />
 ))
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
 
@@ -107,7 +107,7 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Cancel
     ref={ref}
-    className={cn(buttonVariants({ variant: 'outline' }), 'mt-2 sm:mt-0', className)}
+    className={cn(buttonVariants({ type: 'default', size: 'small' }), 'mt-2 sm:mt-0', className)}
     {...props}
   />
 ))
@@ -115,12 +115,12 @@ AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
 export {
   AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 }

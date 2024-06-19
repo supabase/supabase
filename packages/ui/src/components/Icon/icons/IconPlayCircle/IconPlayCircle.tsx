@@ -9,5 +9,12 @@
     return <IconBase icon={PlayCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { playCircle } from 'lucide-react'
+  */
   export default IconPlayCircle
   

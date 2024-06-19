@@ -1,13 +1,9 @@
-import SidebarLayout from './layouts/SidebarLayout'
-
-export * from './Providers'
+export * from './auth'
 export * from './constants'
+export * from './database-types'
+export * from './gotrue'
 export * from './helpers'
 export * from './hooks'
-export * from './gotrue'
-export * from './auth'
+export * from './MetaFavicons/pages-router'
+export * from './Providers'
 export * from './telemetry'
-
-export const Layouts = {
-  SidebarLayout,
-}

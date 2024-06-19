@@ -20,7 +20,7 @@ const OSSHero = () => (
       )}
     >
       <div
-        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-60 dark:opacity-60"
+        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-60"
         style={{ transform: 'translateZ(0px)' }}
       />
       <div className="absolute bottom-0 z-[-2] w-full h-full bg-gradient-to-t from-background to-transparent" />
@@ -35,7 +35,7 @@ const HeroGrid = () => {
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: resolvedTheme === 'dark' ? '#00d4ad' : '#015a42',
+    color: resolvedTheme?.includes('dark') ? '#00d4ad' : '#015a42',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 49,

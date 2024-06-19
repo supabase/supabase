@@ -2,15 +2,14 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'std/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // read a text file from storage and print its contents
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') {
@@ -26,7 +25,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       // Create client with Auth context of the user that called the function.
       // This way your row-level-security (RLS) policies are applied.
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
     )
 
     const { data, error } = await supabaseClient.storage.from('my-bucket').download('sample.txt')

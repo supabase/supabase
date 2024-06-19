@@ -1,0 +1,15 @@
+{
+  "extends": "tsconfig/react-library.json",
+  "compilerOptions": {
+    "resolveJsonModule": true
+  },
+  "include": [
+    ".",
+    "./../../packages/ui/src/**/*.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules"
+  ]
+}

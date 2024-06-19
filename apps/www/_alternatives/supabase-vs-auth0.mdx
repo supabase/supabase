@@ -1,0 +1,121 @@
+---
+title: Supabase vs Auth0
+description: A comparison of Supabase Auth and Auth0 by Okta
+author: long
+tags:
+  - comparison
+date: '2023-11-24'
+toc_depth: 3
+---
+
+## What is Supabase Auth?
+
+Supabase Auth is part of a larger open-source offering by Supabase. Supabase Auth functions as a standalone solution or integrates seamlessly with other Supabase products. At its core, Supabase Auth uses Postgres and leverages Postgres' built-in Auth functionality wherever possible.
+
+## What is Auth0?
+
+Auth0 is a standalone identity and access management platform that offers a range of authentication and authorization solutions. Auth0 has been acquired by Okta and together they aim to widen their digital identity use cases.
+
+## Supabase Auth Highlights
+
+### Seamless Integration
+
+It’s likely that your application will require other dev building blocks like storage, realtime and serverless functions. By integrating these features into a single platform, Supabase simplifies your stack and ensures a cohesive developer experience.
+
+This [User Management Example](https://supabase.com/docs/guides/getting-started/tutorials/with-react) with React shows how Supabase Auth works together with other Supabase components such as Database, Storage and REST API via Postgrest.
+
+### Database native auth
+
+Row Level Security needs to be defined only once to implement authentication and authorization rules across the entire application stack. RLS is enforced on the database level, securing access to storage objects, REST API calls and Edge Functions, etc.
+
+```sql
+create policy "Users can only view their own documents."
+on docs for select
+using ( (select auth.uid()) = user_id );
+```
+
+The RLS policy above will be enforced, no matter if you use the REST API, edge functions or other methods of accessing your data.
+
+### Developer Experience
+
+Supabase is designed to be simple to integrate to web and mobile applications. Developer experience is a key focus on the company and the products are geared towards making developers as productive as possible.
+
+Supabase Auth has pre-built UI components and SDKs for various platforms (like React, Vue, Flutter, etc.), which significantly speeds up the development process. This allows developers to focus on more on the unique aspects of their application.
+
+```sql
+const { user, session, error } = await supabase.auth.signIn({
+  email: 'example@email.com'
+})
+```
+
+Sign-in via magic link in a [few lines of code](https://supabase.com/docs/guides/auth/passwordless-login/auth-magic-link?language=js#sign-in-with-magic-link).
+
+## Auth0 Highlights
+
+### Wide range of framework coverage
+
+Auth0 is more agnostic towards programming languages and frameworks. Auth0 doesn’t focus on web and mobile application to the same depth as like Supabase, however, offers a wider potential range of possible integration.
+
+For example, [PHP](https://github.com/auth0/auth0-PHP) and [Java](https://github.com/auth0/auth0-java) are officially supported by Auth0. As well as [Spring Boot](https://github.com/auth0-samples/auth0-spring-boot-login-samples) and [.NET](https://github.com/auth0/auth0-dotnet-templates) framework.
+
+### Machine-to-Machine (M2M) Authentication
+
+Auth0's M2M authentication capabilities are suitable for scenarios where applications need to communicate securely with other services and APIs. This opens up use-cases where it’s more important to distinguish between device identities than user identities.
+
+Auth0 simplifies authenticating service-to-service interactions, ideal for microservices architectures and IoT networks.
+
+### Anomaly Detection
+
+While both platforms provide secure infrastructure and measures to protect their services from abuse, Auth0 has an anomaly detection service build on top, to notify users, if for example a login-attempt has been made at an unusual time. Notifying users of login attempts can alert them to potential account takeover attempts.
+
+## Pricing
+
+The pricing structures of the two platforms differ significantly:
+
+| Supabase Auth                   | Auth0                           |
+| ------------------------------- | ------------------------------- |
+| Transparent Pricing             | Pricing not publicly available  |
+| Free for up to 50,000 MAU       | Free for up to 7,500 MAU        |
+| $0.00325 per MAU                | $0.07 per MAU                   |
+| Option to self-hosting for free | Only paid private cloud deploys |
+
+### Cost comparison
+
+Overall, Supabase Auth has a more generous free plan quota, while also charge significant lesser per monthly active user (MAU).
+
+Read more: **[Good Tape migrates to Supabase Auth for a 60% cost reduction.](https://supabase.com/customers/good-tape)**
+
+### Price transparency
+
+Supabase prices are predictable, as they are laid out open at a fixed price of $0.00325 per MAU. Auth0 list their MAU at $0.07, however, prices are not publicly available beyond 20,000 MAU, unless you schedule a call with Auth0’s sales team.
+
+## Feature comparison
+
+| Feature                             | Supabase                                    | Auth0                               |
+| ----------------------------------- | ------------------------------------------- | ----------------------------------- |
+| SSO                                 | ✅ SAML only                                | ✅                                  |
+| MFA                                 | ✅ TOTP only                                | ✅                                  |
+| Passwordless                        | ✅                                          | ✅                                  |
+| Machine-to-machine                  | ❌                                          | ✅                                  |
+| Custom SMTP Provider                | ✅                                          | ✅                                  |
+| Custom Email Templates              | ✅                                          | ✅                                  |
+| Custom Domains                      | ✅                                          | ✅                                  |
+| Account Linking                     | ✅ Automatic linking by same email          | ✅ Manual linking                   |
+| Retrieving logs                     | ✅ Can be viewed and queried                | 🔸 Can be retrieved but not queried |
+| Refresh token rotation              | ✅                                          | ✅                                  |
+| Bot Detection (Captcha)             | ✅                                          | ✅                                  |
+| Rate-limiting                       | ✅                                          | ✅                                  |
+| Email                               | ✅                                          | ✅                                  |
+| Phone                               | ✅ (twilio, messagebird, vonage, textlocal) | ✅                                  |
+| Passwordless (magiclinks / sms otp) | ✅                                          | ✅                                  |
+| OAuth2                              | ✅                                          | ✅                                  |
+| OIDC                                | ✅ (google, apple, azure)                   | ✅                                  |
+| SSO                                 | ✅                                          | ✅                                  |
+| SAML                                | ✅                                          | ✅                                  |
+| MFA                                 | ✅                                          | ✅                                  |
+
+## Final Thoughts
+
+Both solutions have their strengths and are well-suited for different use-cases. Supabase Auth stands out for its transparent pricing, tight integration, and developer-friendly approach. Supabase is ideally geared for web and mobile developers. Auth0, on the other hand, excels in a wider range of applications from frameworks like .NET and Spring Boot to Machine-2-Machine use-cases.
+
+Ultimately, your choice should align with your project's specific requirements and budget. Whether you opt for Supabase Auth or Auth0, both can help you secure user authentication effectively in your applications.

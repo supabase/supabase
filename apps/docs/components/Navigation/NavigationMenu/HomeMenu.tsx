@@ -12,45 +12,36 @@ const NavigationMenuHome = () => {
           return (
             <Fragment key={`section-container-${sectionIndex}-border`}>
               {sectionIndex !== 0 && (
-                <div
-                  className="h-px w-full bg-blackA-300 dark:bg-whiteA-300"
-                  key={`section-${sectionIndex}-border`}
-                ></div>
+                <div className="h-px w-full border-b" key={`section-${sectionIndex}-border`}></div>
               )}
               <div key={`section-${sectionIndex}`}>
                 <div className="flex flex-col gap-4">
                   {section.map((link, i) => {
                     if (!link.href) {
                       return (
-                        <div
+                        <h2
                           key={link.label}
                           className={cn(
-                            'font-mono uppercase text-xs text-scale-900 ',
+                            'font-mono uppercase text-xs text-foreground-lighter',
                             i !== 0 && 'mt-4'
                           )}
                         >
                           {link.label}
-                        </div>
+                        </h2>
                       )
                     } else {
                       return (
                         <Link href={link.href} passHref key={link.label}>
-                          <a>
-                            <li
-                              className={[
-                                'group flex items-center gap-2',
-                                'text-sm transition-all duration-150 text-scale-1100 hover:text-scale-1200  hover:cursor-pointer ',
-                              ].join(' ')}
-                            >
-                              {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
-                              {link.label}
-                              {link.community && (
-                                <Badge size="small" color="scale">
-                                  Community
-                                </Badge>
-                              )}
-                            </li>
-                          </a>
+                          <li
+                            className={[
+                              'group flex items-center gap-2',
+                              'text-sm transition-all duration-150 text-foreground-light hover:text-foreground hover:cursor-pointer ',
+                            ].join(' ')}
+                          >
+                            {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
+                            {link.label}
+                            {link.community && <Badge size="small">Community</Badge>}
+                          </li>
                         </Link>
                       )
                     }

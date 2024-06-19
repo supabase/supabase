@@ -1,0 +1,195 @@
+---
+id: 'user-management'
+title: 'User Management'
+subtitle: 'View, delete, and export user information.'
+---
+
+You can view your users on the [Users page](/dashboard/project/_/auth/users) of the Dashboard. You can also view the contents of the Auth schema in the [Table Editor](/dashboard/project/_/editor).
+
+## Accessing user data via API
+
+For security, the Auth schema is not exposed in the auto-generated API. If you want to access users data via the API, you can create your own user tables in the `public` schema.
+
+Make sure to protect the table by enabling [Row Level Security](/docs/guides/database/postgres/row-level-security). Reference the `auth.users` table to ensure data integrity. Specify `on delete cascade` in the reference. For example, a `public.profiles` table might look like this:
+
+```sql
+create table public.profiles (
+  id uuid not null references auth.users on delete cascade,
+  first_name text,
+  last_name text,
+
+  primary key (id)
+);
+
+alter table public.profiles enable row level security;
+```
+
+<Admonition type="caution">
+
+Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. PostgreSQL lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
+
+Primary keys are **guaranteed not to change**. Columns, indices, constraints or other database objects managed by Supabase **may change at any time** and you should be careful when referencing them directly.
+
+</Admonition>
+
+To update your `public.profiles` table every time a user signs up, set up a trigger. If the trigger fails, it could block signups, so test your code thoroughly.
+
+```sql
+-- inserts a row into public.profiles
+create function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, first_name, last_name)
+  values (new.id, new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data ->> 'last_name');
+  return new;
+end;
+$$;
+
+-- trigger the function every time a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
+
+## Adding and retrieving user metadata
+
+You can assign metadata to users on sign up:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+  options: {
+    data: {
+      first_name: 'John',
+      age: 27,
+    },
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final res = await supabase.auth.signUp(
+  email: 'example@email.com',
+  password: 'example-password',
+  data: {
+    'first_name': 'John',
+    'age': 27,
+  },
+);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.auth.signUp(
+  email: "example@email.com",
+  password: "example-password",
+  data: [
+    "first_name": .string("John"),
+    "age": .integer(27),
+  ]
+)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.auth.signUpWith(Email) {
+    email = "example@email.com"
+    password = "example-password"
+    data = buildJsonObject {
+        put("first_name", "John")
+        put("age", 27)
+    }
+}
+```
+
+</TabPanel>
+</Tabs>
+
+User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+let metadata = user.user_metadata
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final User? user = supabase.auth.currentUser;
+final Map<String, dynamic>? metadata = user?.userMetadata;
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let user = try await supabase.auth.user()
+let metadata = user.userMetadata
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val user = supabase.auth.retrieveUserForCurrentSession()
+//Or you can use the user from the current session:
+val user = supabase.auth.currentUserOrNull()
+val metadata = user?.userMetadata
+```
+
+</TabPanel>
+</Tabs>
+
+## Deleting users
+
+You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do consider making use of a Row Level Security policy as described below.
+
+<Admonition type="caution">
+
+You cannot delete a user if they are the owner of any objects in Supabase Storage.
+
+You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
+
+</Admonition>
+
+## Exporting users
+
+As Supabase is built on top of Postgres, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
+
+```sql
+select * from auth.users;
+```
+
+You can then export the results as CSV.

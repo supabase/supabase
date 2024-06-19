@@ -57,7 +57,7 @@ export default function TicketCopy({ username, isGolden }: Props) {
       className={cn(
         styleUtils.appear,
         styleUtils['appear-third'],
-        'bg-scaleA-200 h-8 rounded-full border border-[#E3E3E370] w-full overflow-hidden'
+        'bg-background h-8 rounded-full border border-[#E3E3E370] w-full overflow-hidden'
       )}
       id="wayfinding--ticket-copy"
     >

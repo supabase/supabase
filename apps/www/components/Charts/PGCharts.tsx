@@ -37,7 +37,7 @@ const CustomizedAxisTick = (props: any) => {
         y={-12}
         dy={16}
         textAnchor="end"
-        fill="var(--colors-scale10)"
+        fill="hsl(var(--foreground-lighter))"
         transform="rotate(-35)"
         className="text-xs"
       >
@@ -70,32 +70,40 @@ const Chart = () => {
         @ts-ignore */}
           <BarChart data={data[selection]} layout="vertical">
             <XAxis
-              axisLine={{ stroke: 'var(--colors-scale7)' }}
-              tickLine={{ stroke: 'var(--colors-scale7)' }}
+              axisLine={{ stroke: 'hsl(var(--border-default))' }}
+              tickLine={{ stroke: 'hsl(var(--border-default))' }}
               type="number"
               tickMargin={8}
-              style={{ fontSize: '14px', marginBottom: '32px', color: 'var(--colors-scale12)' }}
+              style={{
+                fontSize: '14px',
+                marginBottom: '32px',
+                color: 'hsl(var(--foreground-default))',
+              }}
               tick={<CustomizedAxisTick />}
               label={{
                 value:
                   selection === 'latency'
                     ? 'Latency (ms)'
                     : selection === 'avg_latency'
-                    ? 'Avg latency per result (ms)'
-                    : 'Number of results',
+                      ? 'Avg latency per result (ms)'
+                      : 'Number of results',
                 position: 'insideBottom',
                 offset: -32,
-                fill: 'var(--colors-scale12)',
+                fill: 'hsl(var(--foreground-default))',
               }}
             />
             <YAxis
               dataKey={'query'}
               type="category"
-              style={{ fontSize: '14px', marginBottom: '32px', color: 'var(--colors-scale10)' }}
+              style={{
+                fontSize: '14px',
+                marginBottom: '32px',
+                color: 'hsl(var(--foreground-lighter))',
+              }}
               minTickGap={16}
               tickMargin={8}
-              axisLine={{ stroke: 'var(--colors-scale7)' }}
-              tickLine={{ stroke: 'var(--colors-scale7)' }}
+              axisLine={{ stroke: 'hsl(var(--border-default))' }}
+              tickLine={{ stroke: 'hsl(var(--border-default))' }}
               tick={<CustomizedAxisTick />}
             />
             {dimensions.map((dimension: string, index: number) => {

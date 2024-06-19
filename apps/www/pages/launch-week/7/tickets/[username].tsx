@@ -46,7 +46,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
     document.body.className = '!dark bg-[#1C1C1C]'
 
     return () => {
-      document.body.className = resolvedTheme === 'dark' ? 'dark' : 'light'
+      document.body.className = resolvedTheme?.includes('dark') ? 'dark' : 'light'
     }
   }, [])
 

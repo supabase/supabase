@@ -11,6 +11,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -61,7 +62,7 @@ interface PythonClientDocsProps {
 
 export default function PythonClientDocs({ source, meta }: PythonClientDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId={MenuId.Ai}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )

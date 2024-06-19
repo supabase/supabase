@@ -6,6 +6,7 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import formStyles from './form.module.css'
 import ticketFormStyles from './ticket-form.module.css'
 import { Button, IconCheckCircle, IconLoader } from 'ui'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 type FormState = 'default' | 'loading' | 'error'
 type TicketGenerationState = 'default' | 'loading'
@@ -20,15 +21,15 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
   const [username, setUsername] = useState(defaultUsername)
   const [formState, setFormState] = useState<FormState>('default')
   const [errorMsg] = useState('')
-  const { supabase, session, setUserData, setPageState, userData } = useConfData()
+  const { supabase, session, setUserData, setTicketState, userData } = useConfData()
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
-    (typeof supabase)['channel']
+    SupabaseClient['channel']
   > | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
 
   useEffect(() => {
-    if (session?.user && !userData.id) {
+    if (supabase && session?.user && !userData.id) {
       document.body.classList.add('ticket-generated')
       const username = session.user.user_metadata.user_name
       setUsername(username)
@@ -57,7 +58,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
           new Image().src = `https://github.com/${username}.png`
 
           // Prefetch the twitter share URL to eagerly generate the page
-          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
+          fetch(`/launch-week/7/tickets/${username}`).catch((_) => {})
           // Prefetch ticket og image.
           fetch(
             `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(
@@ -65,7 +66,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             )}`
           ).catch((_) => {})
 
-          setPageState('ticket')
+          setTicketState('ticket')
 
           // Listen to realtime changes
           if (!realtimeChannel && !data?.golden) {
@@ -134,7 +135,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
         setFormState('loading')
         setTicketGenerationState('loading')
 
-        await supabase.auth.signInWithOAuth({
+        await supabase?.auth.signInWithOAuth({
           provider: 'github',
           options: {
             redirectTo: `${SITE_ORIGIN}/launch-week/${
@@ -153,7 +154,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             htmlType="submit"
             disabled={formState === 'loading' || Boolean(session)}
           >
-            <span className={`${username && 'text-scale-900'}`}>
+            <span className={`${username && 'text-muted'}`}>
               {session ? (
                 <>
                   <IconCheckCircle />
@@ -169,7 +170,7 @@ export default function TicketForm({ defaultUsername = '', setTicketGenerationSt
             {session ? <span className={ticketFormStyles.checkIcon}></span> : null}
           </Button>
         </div>
-        {/* {!session && <p className={'text-xs text-scale-900'}>Only public info will be used.</p>} */}
+        {/* {!session && <p className={'text-xs text-muted'}>Only public info will be used.</p>} */}
       </div>
     </form>
   )

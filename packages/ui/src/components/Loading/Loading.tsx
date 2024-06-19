@@ -1,6 +1,7 @@
 import React from 'react'
+
 import styleHandler from '../../lib/theme/styleHandler'
-import { IconLoader } from './../../../index'
+import IconLoader from '../Icon/icons/IconLoader/IconLoader'
 
 interface Props {
   children: React.ReactNode

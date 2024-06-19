@@ -1,0 +1,149 @@
+---
+title: 'Use Supabase with Vue'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+
+    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql SQL_EDITOR
+        -- Create the table
+        CREATE TABLE countries (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL
+        );
+        -- Insert some sample data into the table
+        INSERT INTO countries (name) VALUES ('United States');
+        INSERT INTO countries (name) VALUES ('Canada');
+        INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Vue app">
+
+    Create a Vue app using the `npm init` command.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sh Terminal
+      npm init vue@latest my-app
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Vue app.
+
+    Navigate to the Vue app and install `supabase-js`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      cd my-app && npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js src/lib/supabaseClient.js
+        import { createClient } from '@supabase/supabase-js'
+
+        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    Replace the existing content in your `App.vue` file with the following code.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```vue src/App.vue
+        <script setup>
+        import { ref, onMounted } from 'vue'
+        import { supabase } from './lib/supabaseClient'
+
+        const countries = ref([])
+
+        async function getCountries() {
+          const { data } = await supabase.from('countries').select()
+          countries.value = data
+        }
+
+        onMounted(() => {
+          getCountries()
+        })
+        </script>
+
+        <template>
+          <ul>
+            <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+          </ul>
+        </template>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of countries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>

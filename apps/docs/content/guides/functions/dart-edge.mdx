@@ -1,0 +1,170 @@
+---
+id: 'functions-dart-edge'
+title: 'Dart Edge'
+description: 'Write your functions using Dart.'
+tocVideo: '53jhgrDONW4'
+---
+
+[Dart Edge](https://docs.dartedge.dev/), a project built and maintained by [Invertase](https://invertase.io/), enables Dart code to be run on different edge environments. This guide will walk you through how you can start using Dart Edge to write your backend code using Dart and run it on Supabase.
+
+<Admonition type="caution">
+
+Dart Edge is an experimental project - it's probably not ready for production usage unless you're okay with living on the 'edge'. Open issues on [Dart Edge repo](https://github.com/invertase/dart_edge) if you encounter any issues.
+
+</Admonition>
+
+## Prerequisites
+
+Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) installed in addition to [the Supabase CLI](https://supabase.com/docs/guides/cli#installation).
+
+```bash
+# install the edge CLI
+dart pub global activate edge
+```
+
+## Setting up your first Dart Edge project
+
+Create a new Dart Edge project using the `new` command on the edge CLI. This will create a familiar boilerplate for your Dart Edge project such as `main.dart` and `pubspec.yaml` file.
+
+```bash
+edge new supabase_functions new_project
+```
+
+`cd` into the project and initialize a new Supabase project inside the project you just created.
+
+```bash
+cd new_project
+supabase init
+```
+
+Run `pub get` to install the dependencies.
+
+```bash
+dart pub get
+```
+
+Open the `lib/main.dart` and look at the initial template.
+
+```dart
+void main() {
+  SupabaseFunctions(fetch: (request) {
+    return Response("Hello from Supabase Edge Functions!");
+  });
+}
+```
+
+`SupabaseFunctions` class has a `fetch` handler, which is expected to return a `Response` object, and has a `request` parameter, which contains information about the request such as body and headers.
+
+## Supporting multiple edge functions
+
+By default, Dart Edge will create a single `main.dart` file in your project, which will be compiled into a function called `dart_edge`.
+You can override this behavior and create multiple functions by creating an `edge.yaml` file in the root of your project.
+Specify how to map which of your dart files should compile to what Supabase edge functions using the `functions` option.
+
+```yaml
+supabase:
+  functions:
+    api_handler: 'lib/api.dart'
+    webhook_handler: 'lib/webhooks.dart'
+```
+
+## Using Supabase client
+
+Now let’s try to interact with our Supabase database. We will start by installing the dependencies.
+
+### Add dependencies
+
+Add [`supabase`](https://pub.dev/packages/supabase) to interact with Supabase service.
+
+```bash
+dart pub add supabase
+```
+
+We also need to use a special HTTP client to HTTP requests in the edge environment.
+
+```bash
+dart pub add edge_http_client
+```
+
+### Initialize `SupabaseClient`
+
+At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary.
+
+Now we have the following sample functions code to query Supabase database using the Supabase client.
+
+```dart
+import 'dart:convert';
+
+import 'package:supabase_functions/supabase_functions.dart';
+import 'package:edge_http_client/edge_http_client.dart';
+import 'package:supabase/supabase.dart';
+
+void main() {
+  final supabase = SupabaseClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, // Use service role key to bypass RLS
+    httpClient: EdgeHttpClient(),
+  );
+
+  SupabaseFunctions(fetch: (request) async {
+		// You can query `public.users` table for example.
+    final List users = await supabase.from('users').select().limit(10);
+    return Response.json(users);
+  });
+}
+```
+
+## Run the Functions
+
+### Run locally
+
+Create a `edge.yaml` file if you don't have one yet in the root of your project. Then, add the following configuration to specify the path to your Supabase project.
+
+```yaml
+supabase:
+  project_path: './supabase'
+```
+
+Also, currently Dart Edge doesn't work with the latest versions of Flutter. If you do have the latest version of Flutter on your machine, you can use [Flutter Version Management (FVM)](https://fvm.app/) to use an older version of Flutter for your Dart Edge project.
+
+```bash
+fvm use 3.7.12 -f
+```
+
+You can read more about how to configure FVM for your project in the [FVM documentation](https://fvm.app/documentation/getting-started).
+
+Run the following command to compile your Dart code. This command will start a watcher that will recompile anytime you make changes to your code.
+
+```bash
+edge build supabase_functions --dev
+
+# Or with FVM
+fvm dart pub run edge build supabase_functions --dev
+```
+
+With docker running, start your local Supabase with the following command
+
+```bash
+supabase start
+```
+
+While you have the above code running, open another terminal and run the following to start the Supabase local development environment.
+
+```bash
+supabase functions serve dart_edge --no-verify-jwt
+```
+
+You should be able to access your local function here:
+
+[http://localhost:54321/functions/v1/dart_edge](http://localhost:54321/functions/v1/dart_edge)
+
+### Deploy to the Edge
+
+Run the following commands to compile and deploy your function on Supabase Edge functions.
+
+```bash
+edge build supabase_functions
+supabase functions deploy dart_edge
+```
+
+You will be asked to provide the project reference of your Supabase instance to which you want to deploy the function. You can [link your local project to your Supabase instance](https://supabase.com/docs/guides/getting-started/local-development#link-your-project) to avoid having to provide the Supabase reference every time you deploy.

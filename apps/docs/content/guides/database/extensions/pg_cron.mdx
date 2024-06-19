@@ -1,0 +1,193 @@
+---
+id: 'pg_cron'
+title: 'pg_cron: Job Scheduling'
+description: 'pgnet: a simple cron-based job scheduler for PostgreSQL that runs inside the database.'
+---
+
+The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that runs inside the database.
+
+<Admonition type="note">
+
+pg_cron is not fully supported on Fly Postgres. Read more about this [Fly Postgres limitation here](/docs/guides/platform/fly-postgres#limitations).
+
+</Admonition>
+
+## Usage
+
+### Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_cron" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Example: enable the "pg_cron" extension
+create extension pg_cron with schema extensions;
+
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
+
+-- Example: disable the "pg_cron" extension
+drop extension if exists pg_cron;
+```
+
+</TabPanel>
+</Tabs>
+
+### Syntax
+
+The schedule uses the standard cron syntax, in which \* means "run every time period", and a specific number means "but only at this time":
+
+```bash
+ ┌───────────── min (0 - 59)
+ │ ┌────────────── hour (0 - 23)
+ │ │ ┌─────────────── day of month (1 - 31)
+ │ │ │ ┌──────────────── month (1 - 12)
+ │ │ │ │ ┌───────────────── day of week (0 - 6) (0 to 6 are Sunday to
+ │ │ │ │ │                  Saturday, or use names; 7 is also Sunday)
+ │ │ │ │ │
+ │ │ │ │ │
+ * * * * *
+```
+
+You can use `[1-59] seconds` as the cron syntax to schedule sub-minute jobs. This is available on `pg_cron` v1.5.0+; upgrade your existing Supabase project to use this syntax.
+
+Head over to [crontab.guru](https://crontab.guru/) to validate your cron schedules.
+
+### Scheduling system maintenance
+
+Be extremely careful when setting up `pg_cron` jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
+
+Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.
+
+## Examples
+
+### Delete data every week
+
+Delete old data every Saturday at 3:30am (GMT):
+
+```sql
+select cron.schedule (
+    'saturday-cleanup', -- name of the cron job
+    '30 3 * * 6', -- Saturday at 3:30am (GMT)
+    $$ delete from events where event_time < now() - interval '1 week' $$
+);
+```
+
+### Run a vacuum every day
+
+Vacuum every day at 3:00am (GMT):
+
+```sql
+select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
+```
+
+### Call a database function every 5 minutes
+
+Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
+
+```sql
+select cron.schedule('call-db-function', '*/5 * * * *', 'SELECT hello_world()');
+```
+
+### Call a database stored procedure
+
+To use a stored procedure, you can call it like this:
+
+```sql
+select cron.schedule('call-db-procedure', '*/5 * * * *', 'CALL my_procedure()');
+```
+
+### Invoke Supabase Edge Function every 30 seconds
+
+<Admonition type="note">
+
+This requires `pg_cron` v1.5.0+ and the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
+
+</Admonition>
+
+Make a POST request to a Supabase Edge Function every 30 seconds:
+
+```sql
+select
+  cron.schedule(
+    'invoke-function-every-half-minute',
+    '30 seconds',
+    $$
+    select
+      net.http_post(
+          url:='https://project-ref.supabase.co/functions/v1/function-name',
+          headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
+          body:=concat('{"time": "', now(), '"}')::jsonb
+      ) as request_id;
+    $$
+  );
+```
+
+### Edit a job
+
+Changes the frequency of a job called `'vacuum'` to once every 5 minutes.
+
+```sql
+select cron.alter_job(
+  job_id := (select jobid from cron.job where jobname = 'vacuum'),
+  schedule := '*/5 * * * *'
+);
+```
+
+Full options for the `cron.alter_job()` function are:
+
+```sql
+cron.alter_job(
+  job_id bigint,
+  schedule text default null,
+  command text default null,
+  database text default null,
+  username text default null,
+  active boolean default null
+)
+```
+
+It is also possible to modify a job by using the `cron.schedule()` function, with the same job name. This will replace the existing job, in the manner of an upsert.
+
+### Unschedule a job
+
+Unschedules a job called `'nightly-vacuum'`
+
+```sql
+select cron.unschedule('nightly-vacuum');
+```
+
+### Viewing previously ran jobs
+
+View the last ten jobs that have ran
+
+```sql
+select
+  *
+from cron.job_run_details
+order by start_time desc
+limit 10;
+```
+
+<Admonition type="note">
+
+The records in cron.job_run_details are not cleaned automatically which will take up disk space in your database.
+
+</Admonition>
+
+## Resources
+
+- [`pg_cron` GitHub Repository](https://github.com/citusdata/pg_cron)

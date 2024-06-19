@@ -58,7 +58,7 @@ Supabase on avatud lähtekoodiga tööriistade kombinatsioon. Me ehitame Firebas
 Supabase on [hostitud platvorm](https://supabase.com/dashboard). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
 Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
 
-![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) on objekt-relatsiooniline andmebaasisüsteem, mille aktiivne arendamine on kestnud üle 30 aasta ja mis on saavutanud hea maine usaldusväärsuse, funktsioonide töökindluse ja jõudluse poolest.
 - [Realtime](https://github.com/supabase/realtime) on Elixir server, mis võimaldab kuulata PostgreSQL-i sisestusi, uuendusi ja kustutusi veebisokkide abil. Realtime küsib Postgres'i sisseehitatud replikatsioonifunktsioone andmebaasi muudatuste kohta, konverteerib muudatused JSON-iks ja edastab seejärel JSON-i üle websocketi volitatud klientidele.
@@ -247,7 +247,7 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
 - [Lihtsustatud hiina keel / 简体中文](/i18n/README.zh-cn.md)
 - [Rootsi / Svenska](/i18n/README.sv.md)
 - [Tai / ไทย](/i18n/README.th.md)
-- [Traditsiooniline hiina keel / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditsiooniline hiina keel / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukraina / Українська](/i18n/README.uk.md)
 - [Vietnami keel / Tiếng Việt](/i18n/README.vi-vn.md)
