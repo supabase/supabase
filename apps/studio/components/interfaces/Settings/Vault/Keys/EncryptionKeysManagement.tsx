@@ -292,32 +292,28 @@ const EncryptionKeysManagement = () => {
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
         loading={isDeleting}
-        header={<h5 className="text-sm text-foreground">Confirm to delete key</h5>}
+        header="Confirm to delete key"
       >
-        <div className="py-4">
-          <Modal.Content>
-            <div className="space-y-4">
-              <Alert
-                withIcon
-                variant="warning"
-                title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
-              >
-                Do ensure that the key is not currently in use to prevent any issues.
-              </Alert>
-              <p className="text-sm">
-                The following key will be permanently removed and cannot be recovered.
-              </p>
-              <div className="space-y-2">
-                <p className="text-sm text-foreground">
-                  {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
-                </p>
-                <p className="text-xs text-foreground-light">
-                  <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
-                </p>
-              </div>
-            </div>
-          </Modal.Content>
-        </div>
+        <Modal.Content className="space-y-4">
+          <Alert
+            withIcon
+            variant="warning"
+            title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
+          >
+            Do ensure that the key is not currently in use to prevent any issues.
+          </Alert>
+          <p className="text-sm">
+            The following key will be permanently removed and cannot be recovered.
+          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-foreground">
+              {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
+            </p>
+            <p className="text-xs text-foreground-light">
+              <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
+            </p>
+          </div>
+        </Modal.Content>
       </Modal>
 
       <Modal
@@ -326,7 +322,7 @@ const EncryptionKeysManagement = () => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-foreground">Add a new key</h5>}
+        header="Add a new key"
       >
         <Form
           id="add-new-key-form"
@@ -341,31 +337,25 @@ const EncryptionKeysManagement = () => {
         >
           {() => {
             return (
-              <div className="py-4">
-                <Modal.Content>
-                  <p className="text-sm mb-4">
-                    Provide a name for your key for easier identification.
-                  </p>
-                  <div className="space-y-4 pb-4">
-                    <Input id="name" label="Key Name" />
-                  </div>
+              <>
+                <Modal.Content className="space-y-4">
+                  <p className="text-sm">Provide a name for your key for easier identification.</p>
+                  <Input id="name" label="Key Name" />
                 </Modal.Content>
                 <Modal.Separator />
-                <Modal.Content>
-                  <div className="flex items-center justify-end space-x-2">
-                    <Button
-                      type="default"
-                      disabled={isCreating}
-                      onClick={() => setShowAddKeyModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
-                      Add key
-                    </Button>
-                  </div>
+                <Modal.Content className="flex items-center justify-end space-x-2">
+                  <Button
+                    type="default"
+                    disabled={isCreating}
+                    onClick={() => setShowAddKeyModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button htmlType="submit" disabled={isCreating} loading={isCreating}>
+                    Add key
+                  </Button>
                 </Modal.Content>
-              </div>
+              </>
             )
           }}
         </Form>

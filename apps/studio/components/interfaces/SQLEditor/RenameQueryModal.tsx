@@ -82,8 +82,8 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
         onSubmit={onSubmit}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
-            <Modal.Content>
+          <>
+            <Modal.Content className="space-y-4">
               <Input
                 label="Name"
                 id="name"
@@ -108,8 +108,6 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                   </Button>
                 )}
               </div>
-            </Modal.Content>
-            <Modal.Content>
               <Input.TextArea
                 label="Description"
                 id="description"
@@ -121,17 +119,15 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Rename query
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                Rename query
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>

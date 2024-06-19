@@ -14,7 +14,6 @@ import { SSE } from 'sse.js'
 import {
   AiIconAnimation,
   Button,
-  IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
   Input,
@@ -29,6 +28,7 @@ import { useCommandMenu } from './CommandMenuProvider'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
+import { StatusIcon } from '../Icons/StatusIcons'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -443,13 +443,17 @@ const AiCommand = () => {
           </CommandGroup>
         )}
         {hasError && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-foreground text-center">
-              Sorry, looks like Clippy is having a hard time!
-            </p>
-            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleReset}>
+          <div className="p-6 flex flex-col items-center gap-2 mt-4">
+            <StatusIcon variant="warning" />
+            <div>
+              <p className="text-sm text-foreground text-center">
+                Sorry, looks like Supabase AI is having a hard time!
+              </p>
+              <p className="text-sm text-foreground-lighter text-center">
+                Please try again in a bit.
+              </p>
+            </div>
+            <Button size="tiny" type="default" onClick={handleReset}>
               Try again?
             </Button>
           </div>

@@ -56,6 +56,10 @@
   --foreground-lighter: 0deg 0% 53.7%;
   --foreground-light: 0deg 0% 70.6%;
   --foreground-default: 0deg 0% 98%;
+  --background-dialog-default: 0deg 0% 11%;
+  --background-surface-75: 0deg 0% 12.5%;
+  --background-200: 0deg 0% 11%;
+  --foreground-contrast: 0deg 0% 11%;
   --border-button-hover: var(--colors-gray-dark-800);
   --border-button-default: var(--colors-gray-dark-700);
   --background-button-default: var(--colors-gray-dark-500);
