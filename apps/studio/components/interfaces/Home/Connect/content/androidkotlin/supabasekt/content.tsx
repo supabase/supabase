@@ -12,8 +12,8 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
-        <ConnectTabTrigger value="TodoItem.kt" />
         <ConnectTabTrigger value="MainActivity.kt" />
+        <ConnectTabTrigger value="TodoItem.kt" />
       </ConnectTabTriggers>
 
       <ConnectTabContent value="TodoItem.kt">
@@ -57,7 +57,7 @@ fun TodoList() {
     var items by remember { mutableStateOf<List<TodoItem>>(listOf()) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            todos = supabase.from("todos")
+            items = supabase.from("todos")
                               .select().decodeList<TodoItem>()
         }
     }
