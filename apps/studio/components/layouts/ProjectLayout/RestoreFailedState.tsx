@@ -18,7 +18,8 @@ const RestoreFailedState = () => {
             <div className="space-y-1">
               <p>Something went wrong while restoring your project</p>
               <p className="text-sm text-foreground-light">
-                Please contact support for assistance.
+                Your project's data is intact, but your project is inaccessible due to the
+                restoration failure. Please contact support for assistance.
               </p>
             </div>
           </div>

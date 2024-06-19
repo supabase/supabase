@@ -85,8 +85,6 @@ export const PROJECT_STATUS: {
   UPGRADING: 'UPGRADING',
   PAUSING: 'PAUSING',
   PAUSE_FAILED: 'PAUSE_FAILED',
-  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
