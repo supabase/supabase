@@ -167,6 +167,8 @@ export interface paths {
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
     get: operations['TaxIdsController_getTaxIds']
+    /** Creates or updates a tax ID for the given organization */
+    put: operations['TaxIdsController_updateTaxId']
     /** Creates a tax ID for the given organization */
     post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
@@ -2641,6 +2643,14 @@ export interface components {
       org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
       project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
+    TaxIdV2: {
+      country: string
+      type: string
+      value: string
+    }
+    TaxIdV2Response: {
+      tax_id: components['schemas']['TaxIdV2'] | null
+    }
     TaxId: {
       id: string
       country: string
@@ -2651,7 +2661,7 @@ export interface components {
       data: components['schemas']['TaxId'][]
     }
     CreateTaxIdBody: {
-      type: Record<string, never>
+      type: string
       value: string
     }
     CreateTaxIdResponse: {
@@ -6967,6 +6977,34 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve the organization's tax IDs */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates or updates a tax ID for the given organization */
+  TaxIdsController_updateTaxId: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaxIdBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['TaxIdV2Response']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create the tax ID */
       500: {
         content: never
       }
