@@ -155,12 +155,14 @@ export interface paths {
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
+    /** Updates the billing customer */
+    put: operations['updateCustomerV2']
     /** Updates the Stripe customer */
     patch: operations['CustomerController_updateCustomer']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_addMember']
+    get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
@@ -199,26 +201,33 @@ export interface paths {
     get: operations['OrgAuditLogsController_getAuditLogs']
   }
   '/platform/organizations/{slug}/members/invite': {
-    /** Gets invited users */
+    /**
+     * Gets invited users
+     * @deprecated
+     */
     get: operations['OrganizationInviteController_getInvitedUsers']
-    /** Invites user */
+    /**
+     * Invites user
+     * @deprecated
+     */
     post: operations['OrganizationInviteController_inviteUser']
-    /** Delete invited user */
+    /**
+     * Delete invited user
+     * @deprecated
+     */
     delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/platform/organizations/{slug}/members/join': {
-    /** Gets invite */
+    /**
+     * Gets invite
+     * @deprecated
+     */
     get: operations['JoinController_getInvite']
-    /** Joins organization */
+    /**
+     * Joins organization
+     * @deprecated
+     */
     post: operations['JoinController_joinOrganization']
-  }
-  '/platform/organizations/{slug}/members/leave': {
-    /** Leaves the given organization */
-    post: operations['MembersDeprecatedController_leaveOrganization']
-  }
-  '/platform/organizations/{slug}/members/remove': {
-    /** Leaves the given organization */
-    delete: operations['MembersDeprecatedController_removeMember']
   }
   '/platform/organizations/{slug}/members': {
     /** Gets organization's members */
@@ -227,18 +236,42 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
+  }
+  '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
+    /** Removes organization member */
+    delete: operations['MembersController_deleteMemberRole']
   }
   '/platform/organizations/{slug}/members/reached-free-project-limit': {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
   }
+  '/platform/organizations/{slug}/members/invitations': {
+    /** Gets organization invitations */
+    get: operations['InvitationsController_getAllInvitations']
+    /** Creates organization invitation */
+    post: operations['InvitationsController_createInvitation']
+  }
+  '/platform/organizations/{slug}/members/invitations/{token}': {
+    /** Gets organization invitation by token */
+    get: operations['InvitationsController_getInvitationByToken']
+    /** Accepts organization invitation by token */
+    post: operations['InvitationsController_acceptInvitationByToken']
+  }
+  '/platform/organizations/{slug}/members/invitations/{id}': {
+    /** Deletes organization invitation with given id */
+    delete: operations['InvitationsController_deleteInvitation']
+  }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
     get: operations['PaymentsController_getPaymentMethods']
-    /** Detach Stripe payment method with the given card ID */
+    /** Detach payment method with the given card ID */
     delete: operations['PaymentsController_detachPaymentMethod']
+  }
+  '/platform/organizations/{slug}/payments/default': {
+    /** Mark given payment method as default for organization */
+    put: operations['PaymentsController_markPaymentMethodAsDefault']
   }
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
@@ -547,6 +580,10 @@ export interface paths {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
   }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
+  }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
     post: operations['ResizeController_resizeDatabase']
@@ -695,9 +732,9 @@ export interface paths {
   }
   '/platform/projects/{ref}/config/postgres': {
     /** Gets project's Postgres config */
-    get: operations['get-postgres-config']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['update-postgres-config']
+    put: operations['v1-update-postgres-config']
   }
   '/platform/projects/{ref}/config/secrets': {
     /** Updates project's secrets config */
@@ -711,9 +748,9 @@ export interface paths {
   }
   '/platform/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
-    get: operations['SupavisorConfigController_getSupavisorConfig']
+    get: operations['v1-get-supavisor-config']
     /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch: operations['v1-update-supavisor-config']
   }
   '/platform/props/project/{ref}/api': {
     /**
@@ -1153,20 +1190,35 @@ export interface paths {
   }
   '/v0/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_addMember']
+    get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/v0/organizations/{slug}/members/invite': {
-    /** Gets invited users */
+    /**
+     * Gets invited users
+     * @deprecated
+     */
     get: operations['OrganizationInviteController_getInvitedUsers']
-    /** Invites user */
+    /**
+     * Invites user
+     * @deprecated
+     */
     post: operations['OrganizationInviteController_inviteUser']
-    /** Delete invited user */
+    /**
+     * Delete invited user
+     * @deprecated
+     */
     delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/v0/organizations/{slug}/members/join': {
-    /** Gets invite */
+    /**
+     * Gets invite
+     * @deprecated
+     */
     get: operations['JoinController_getInvite']
-    /** Joins organization */
+    /**
+     * Joins organization
+     * @deprecated
+     */
     post: operations['JoinController_joinOrganization']
   }
   '/v0/organizations/{slug}/members': {
@@ -1176,8 +1228,12 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
+  }
+  '/v0/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
+    /** Removes organization member */
+    delete: operations['MembersController_deleteMemberRole']
   }
   '/v0/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -1398,6 +1454,10 @@ export interface paths {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
   }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
+  }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
     post: operations['ResizeController_resizeDatabase']
@@ -1516,9 +1576,9 @@ export interface paths {
   }
   '/v0/projects/{ref}/config/postgres': {
     /** Gets project's Postgres config */
-    get: operations['get-postgres-config']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['update-postgres-config']
+    put: operations['v1-update-postgres-config']
   }
   '/v0/projects/{ref}/config/secrets': {
     /** Updates project's secrets config */
@@ -1532,9 +1592,9 @@ export interface paths {
   }
   '/v0/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
-    get: operations['SupavisorConfigController_getSupavisorConfig']
+    get: operations['v1-get-supavisor-config']
     /** Updates project's supavisor config */
-    patch: operations['SupavisorConfigController_updateSupavisorConfig']
+    patch: operations['v1-update-supavisor-config']
   }
   '/v0/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -1635,7 +1695,7 @@ export interface paths {
      * List all projects
      * @description Returns a list of all projects you've previously created.
      */
-    get: operations['v1-get-all-projects']
+    get: operations['v1-list-all-projects']
     /** Create a project */
     post: operations['v1-create-a-project']
   }
@@ -1744,7 +1804,7 @@ export interface paths {
     /** [Beta] Gets current vanity subdomain config */
     get: operations['v1-get-vanity-subdomain-config']
     /** [Beta] Deletes a project's vanity subdomain configuration */
-    delete: operations['v1-deactive-vanity-subdomain-config']
+    delete: operations['v1-deactivate-vanity-subdomain-config']
   }
   '/v1/projects/{ref}/vanity-subdomain/check-availability': {
     /** [Beta] Checks vanity subdomain availability */
@@ -1788,13 +1848,19 @@ export interface paths {
   }
   '/v1/projects/{ref}/config/database/postgres': {
     /** Gets project's Postgres config */
-    get: operations['get-postgres-config']
+    get: operations['v1-get-postgres-config']
     /** Updates project's Postgres config */
-    put: operations['update-postgres-config']
+    put: operations['v1-update-postgres-config']
   }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
     get: operations['v1-get-project-pgbouncer-config']
+  }
+  '/v1/projects/{ref}/config/database/pooler': {
+    /** Gets project's supavisor config */
+    get: operations['v1-get-supavisor-config']
+    /** Updates project's supavisor config */
+    patch: operations['v1-update-supavisor-config']
   }
   '/v1/projects/{ref}/config/auth': {
     /** Gets project's auth config */
@@ -2499,20 +2565,22 @@ export interface components {
       opt_in_tags: string[]
     }
     CustomerBillingAddress: {
-      city: string | null
-      country: string | null
-      line1: string | null
-      line2: string | null
-      postal_code: string | null
-      state: string | null
+      city?: string
+      country: string
+      line1: string
+      line2?: string
+      postal_code?: string
+      state?: string
     }
     CustomerResponse: {
-      id: string
       email: string
       address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
       invoice_settings: Record<string, never>
       billing_via_partner: boolean
+    }
+    BillingCustomerUpdateBody: {
+      address?: components['schemas']['CustomerBillingAddress']
     }
     CustomerUpdateResponse: {
       id: string
@@ -2553,35 +2621,30 @@ export interface components {
         stripeAccount?: string
       }
     }
-    Role: {
+    OrganizationRole: {
       id: number
       name: string
+      description: string
+    }
+    OrganizationRoleV2: {
+      id: number
+      name: string
+      description: string
+      project_ids: number[]
+      base_role_id: number
+    }
+    OrganizationRoleResponseV2: {
+      org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
+      project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
     TaxId: {
       id: string
-      object: string
       country: string
-      created: number
-      customer: Record<string, never>
-      deleted?: Record<string, never>
-      livemode: boolean
       type: string
       value: string
-      verification: Record<string, never>
     }
     TaxIdResponse: {
-      object: string
       data: components['schemas']['TaxId'][]
-      has_more: boolean
-      url: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     CreateTaxIdBody: {
       type: Record<string, never>
@@ -2589,38 +2652,13 @@ export interface components {
     }
     CreateTaxIdResponse: {
       id: string
-      object: string
       country: string
       created: number
-      customer: Record<string, never>
-      livemode: boolean
       type: string
       value: string
-      verification: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     DeleteTaxIdBody: {
       id: string
-    }
-    DeleteTaxIdResponse: {
-      id: string
-      object: string
-      deleted: boolean
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     TransferOrganizationBody: {
       member_gotrue_id: string
@@ -2715,9 +2753,6 @@ export interface components {
       slug: string
       stripe_customer_id: string
     }
-    RemoveMemberBody: {
-      member_id: number
-    }
     Member: {
       gotrue_id: string
       primary_email: string | null
@@ -2728,10 +2763,53 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
+    UpdateMemberRoleBodyV2: {
+      role_id: number
+      role_scoped_projects?: string[]
+    }
     MemberWithFreeProjectLimit: {
       free_project_limit: number
       primary_email: string
       username: string
+    }
+    Invitation: {
+      id: number
+      invited_at: string
+      invited_email: string
+      role_id: number
+    }
+    InvitationResponse: {
+      invitations: components['schemas']['Invitation'][]
+    }
+    InvitationByTokenResponse: {
+      organization_name: string
+      invite_id?: number
+      token_does_not_exist: boolean
+      email_match: boolean
+      authorized_user: boolean
+      expired_token: boolean
+    }
+    CreateInvitationBody: {
+      email: string
+      role_id: number
+      role_scoped_projects?: string[]
+    }
+    PaymentMethodCard: {
+      brand: string
+      exp_month: number
+      exp_year: number
+      last4: string
+    }
+    PaymentV2: {
+      id: string
+      card?: components['schemas']['PaymentMethodCard']
+      created: number
+      type: string
+      is_default: boolean
+    }
+    PaymentsResponseV2: {
+      defaultPaymentMethodId: string | null
+      data: components['schemas']['PaymentV2'][]
     }
     Payment: {
       id: string
@@ -2790,53 +2868,8 @@ export interface components {
     DetachPaymentMethodBody: {
       card_id: string
     }
-    DetachPaymentResponse: {
-      id: string
-      object: string
-      acss_debit?: Record<string, never>
-      affirm?: Record<string, never>
-      afterpay_clearpay?: Record<string, never>
-      alipay?: Record<string, never>
-      au_becs_debit?: Record<string, never>
-      bacs_debit?: Record<string, never>
-      bancontact?: Record<string, never>
-      billing_details: Record<string, never>
-      blik?: Record<string, never>
-      boleto?: Record<string, never>
-      card?: Record<string, never>
-      card_present?: Record<string, never>
-      created: number
-      customer: Record<string, never>
-      customer_balance?: Record<string, never>
-      eps?: Record<string, never>
-      fpx?: Record<string, never>
-      giropay?: Record<string, never>
-      grabpay?: Record<string, never>
-      ideal?: Record<string, never>
-      interac_present?: Record<string, never>
-      klarna?: Record<string, never>
-      konbini?: Record<string, never>
-      link?: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      oxxo?: Record<string, never>
-      p24?: Record<string, never>
-      paynow?: Record<string, never>
-      promptpay?: Record<string, never>
-      radar_options?: Record<string, never>
-      sepa_debit?: Record<string, never>
-      sofort?: Record<string, never>
-      type: string
-      us_bank_account?: Record<string, never>
-      wechat_pay?: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
+    MarkDefaultPaymentMethodBody: {
+      payment_method_id: string
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -2879,7 +2912,6 @@ export interface components {
     BillingSubscriptionPlan: {
       id: components['schemas']['BillingPlanId']
       name: string
-      price: number
     }
     BillingSubscriptionAddon: {
       name: string
@@ -2927,51 +2959,6 @@ export interface components {
       name: string
       ref: string
     }
-    BillingPricingOptionsUnit: {
-      perUnitPrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsPackage: {
-      packageSize: number
-      packagePrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsNone: {
-      freeUnits?: number
-    }
-    BillingUsageBasedPrice: {
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-      /** @enum {string} */
-      pricingStrategy: 'UNIT' | 'PACKAGE' | 'NONE'
-      pricingOptions:
-        | components['schemas']['BillingPricingOptionsUnit']
-        | components['schemas']['BillingPricingOptionsPackage']
-        | components['schemas']['BillingPricingOptionsNone']
-      name: string
-      unit: string
-    }
     PaymentMethodCardDetails: {
       last_4_digits: string
       brand: string
@@ -2993,7 +2980,6 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       addons: components['schemas']['BillingSubscriptionAddon'][]
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
-      usage_fees: components['schemas']['BillingUsageBasedPrice'][]
       payment_method_type: string
       payment_method_id?: string
       payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
@@ -3645,7 +3631,6 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -3700,7 +3685,6 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
@@ -3943,6 +3927,11 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -4028,7 +4017,6 @@ export interface components {
       lastDatabaseResizeAt?: string
       is_branch_enabled: boolean
       parent_project_ref?: string
-      is_read_replicas_enabled: boolean
       is_physical_backups_enabled: boolean
       v2MaintenanceWindow: {
         start?: string
@@ -4343,18 +4331,22 @@ export interface components {
       connectionString: string
       default_pool_size: number | null
       max_client_conn: number | null
-      /** @enum {string|null} */
-      pool_mode: 'transaction' | 'session' | 'statement' | null
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session'
     }
     UpdateSupavisorConfigBody: {
-      default_pool_size?: number
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      default_pool_size?: number | null
+      /**
+       * @deprecated
+       * @description This field is deprecated and is ignored in this request
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
-      default_pool_size?: number
+      default_pool_size: number | null
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode: 'transaction' | 'session'
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -5996,6 +5988,7 @@ export interface components {
       id: string
       supabase_org_id: string
       name: string
+      free_db_eligible: boolean
     }
     OrganizationExtensionStatus: {
       /** @description Supabase project instance compute size */
@@ -6025,7 +6018,13 @@ export interface components {
        */
       supabase_org_id: string
     }
-    UpdateFlyOrganizationSubscriptionBody: {
+    FlyUpdateOrganizationSubscriptionBody: {
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description The full request target URL */
+      url: string
       /** @example pro */
       plan: components['schemas']['SelfServePlanId']
     }
@@ -6870,6 +6869,32 @@ export interface operations {
       }
     }
   }
+  /** Updates the billing customer */
+  updateCustomerV2: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BillingCustomerUpdateBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update the billing customer */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Updates the Stripe customer */
   CustomerController_updateCustomer: {
     parameters: {
@@ -6894,7 +6919,7 @@ export interface operations {
     }
   }
   /** Gets the given organization's roles */
-  OrganizationRolesController_addMember: {
+  OrganizationRolesController_getAllRolesV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6904,7 +6929,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['Role'][]
+          'application/json': components['schemas']['OrganizationRoleResponseV2']
         }
       }
       /** @description Failed to retrieve the organization's roles */
@@ -6979,9 +7004,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['DeleteTaxIdResponse']
-        }
+        content: never
       }
       403: {
         content: never
@@ -7163,7 +7186,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invited users */
+  /**
+   * Gets invited users
+   * @deprecated
+   */
   OrganizationInviteController_getInvitedUsers: {
     parameters: {
       path: {
@@ -7183,7 +7209,10 @@ export interface operations {
       }
     }
   }
-  /** Invites user */
+  /**
+   * Invites user
+   * @deprecated
+   */
   OrganizationInviteController_inviteUser: {
     parameters: {
       path: {
@@ -7208,7 +7237,10 @@ export interface operations {
       }
     }
   }
-  /** Delete invited user */
+  /**
+   * Delete invited user
+   * @deprecated
+   */
   OrganizationInviteController_deleteInvitedUser: {
     parameters: {
       query: {
@@ -7229,7 +7261,10 @@ export interface operations {
       }
     }
   }
-  /** Gets invite */
+  /**
+   * Gets invite
+   * @deprecated
+   */
   JoinController_getInvite: {
     parameters: {
       query: {
@@ -7252,7 +7287,10 @@ export interface operations {
       }
     }
   }
-  /** Joins organization */
+  /**
+   * Joins organization
+   * @deprecated
+   */
   JoinController_joinOrganization: {
     parameters: {
       query: {
@@ -7270,51 +7308,6 @@ export interface operations {
         }
       }
       /** @description Failed to join organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Leaves the given organization */
-  MembersDeprecatedController_leaveOrganization: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Leaves the given organization */
-  MembersDeprecatedController_removeMember: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RemoveMemberBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
       500: {
         content: never
       }
@@ -7359,8 +7352,8 @@ export interface operations {
       }
     }
   }
-  /** Updates organization member */
-  MembersController_updateMember: {
+  /** Updates organization member role */
+  MembersController_updateMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7370,14 +7363,34 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateMemberBody']
+        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
       }
     }
     responses: {
       200: {
         content: never
       }
-      /** @description Failed to update organization member */
+      /** @description Failed to update organization member role */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes organization member */
+  MembersController_deleteMemberRole: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        gotrue_id: string
+        role_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to remove organization member */
       500: {
         content: never
       }
@@ -7398,6 +7411,108 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitations */
+  InvitationsController_getAllInvitations: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationResponse']
+        }
+      }
+      /** @description Failed to get organization invitations */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates organization invitation */
+  InvitationsController_createInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateInvitationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create organization invitation */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitation by token */
+  InvitationsController_getInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationByTokenResponse']
+        }
+      }
+      /** @description Failed to get organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Accepts organization invitation by token */
+  InvitationsController_acceptInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to accept organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes organization invitation with given id */
+  InvitationsController_deleteInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete organization invitation with given id */
       500: {
         content: never
       }
@@ -7426,8 +7541,14 @@ export interface operations {
       }
     }
   }
-  /** Detach Stripe payment method with the given card ID */
+  /** Detach payment method with the given card ID */
   PaymentsController_detachPaymentMethod: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['DetachPaymentMethodBody']
@@ -7435,14 +7556,38 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['DetachPaymentResponse']
-        }
+        content: never
       }
       403: {
         content: never
       }
       /** @description Failed to detach Stripe payment method */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Mark given payment method as default for organization */
+  PaymentsController_markPaymentMethodAsDefault: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MarkDefaultPaymentMethodBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to mark payment method as default */
       500: {
         content: never
       }
@@ -9992,6 +10137,22 @@ export interface operations {
       }
     }
   }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
+      }
+    }
+  }
   /** Resize database disk */
   ResizeController_resizeDatabase: {
     parameters: {
@@ -10891,7 +11052,7 @@ export interface operations {
     }
   }
   /** Gets project's Postgres config */
-  'get-postgres-config': {
+  'v1-get-postgres-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10911,7 +11072,7 @@ export interface operations {
     }
   }
   /** Updates project's Postgres config */
-  'update-postgres-config': {
+  'v1-update-postgres-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11012,7 +11173,7 @@ export interface operations {
     }
   }
   /** Gets project's supavisor config */
-  SupavisorConfigController_getSupavisorConfig: {
+  'v1-get-supavisor-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11032,7 +11193,7 @@ export interface operations {
     }
   }
   /** Updates project's supavisor config */
-  SupavisorConfigController_updateSupavisorConfig: {
+  'v1-update-supavisor-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12995,7 +13156,7 @@ export interface operations {
    * List all projects
    * @description Returns a list of all projects you've previously created.
    */
-  'v1-get-all-projects': {
+  'v1-list-all-projects': {
     responses: {
       200: {
         content: {
@@ -13553,7 +13714,7 @@ export interface operations {
     }
   }
   /** [Beta] Deletes a project's vanity subdomain configuration */
-  'v1-deactive-vanity-subdomain-config': {
+  'v1-deactivate-vanity-subdomain-config': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -14430,7 +14591,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateFlyOrganizationSubscriptionBody']
+        'application/json': components['schemas']['FlyUpdateOrganizationSubscriptionBody']
       }
     }
     responses: {
