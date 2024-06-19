@@ -10,6 +10,7 @@ import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWar
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -21,9 +22,9 @@ import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
+import RestartingState from './RestartingState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -241,7 +242,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   }
 
   if (isRestarting) {
-    return <LoadingState />
+    return <RestartingState />
   }
 
   if (isProjectUpgrading) {
