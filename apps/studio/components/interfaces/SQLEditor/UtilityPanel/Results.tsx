@@ -45,7 +45,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const formatter = (column: any, row: any) => {
     return (
       <span
-        className="font-mono text-xs w-full"
+        className="font-mono text-xs w-full whitespace-pre"
         onContextMenu={(e) =>
           showContextMenu(e, {
             id: SQL_CONTEXT_EDITOR_ID,
