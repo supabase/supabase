@@ -1,5 +1,4 @@
 import type { Filter, ServiceError, SupaTable } from 'components/grid'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { isNumericalColumn } from 'components/grid/utils'
 import type { Table } from 'data/tables/table-query'
 
@@ -24,7 +23,9 @@ export function getPrimaryKeys({ table }: { table: Table }): {
 } {
   const pkColumns = table.primary_keys
   if (!pkColumns || pkColumns.length == 0) {
-    return { error: { message: ERROR_PRIMARY_KEY_NOTFOUND } }
+    return {
+      error: { message: 'Please add a primary key column to your table to update or delete rows' },
+    }
   }
   return { primaryKeys: pkColumns.map((x) => x.name) }
 }
