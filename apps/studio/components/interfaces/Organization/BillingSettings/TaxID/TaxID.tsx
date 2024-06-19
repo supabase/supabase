@@ -17,7 +17,6 @@ import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organizat
 import { useCheckPermissions } from 'hooks'
 import {
   Button,
-  Form,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -104,6 +103,7 @@ const TaxID = () => {
   const onResetTaxIds = () => {
     form.setValue('type', formattedTaxId.type)
     form.setValue('value', formattedTaxId.value)
+    form.setValue('name', formattedTaxId.name)
   }
 
   const onSelectTaxIdType = (name: string) => {
