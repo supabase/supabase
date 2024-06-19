@@ -35,7 +35,7 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
             'items-start',
             'font-normal',
             'text-sm',
-            'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:shadow-lg'
+            'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay group-[.toaster]:shadow-lg'
           ),
           icon: 'mt-0.5',
           title: '!font-normal',
@@ -45,9 +45,9 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
           cancelButton: cn('block', buttonVariants({ type: 'default', size: 'tiny' })),
           // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
           warning:
-            'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:border-warning-500',
+            'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:!border-warning-500',
           error:
-            'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:border-destructive-500',
+            'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
         },
       }}
       {...props}

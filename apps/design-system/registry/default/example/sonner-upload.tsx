@@ -1,3 +1,5 @@
+'use client'
+
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -26,32 +28,32 @@ export default function SonnerUpload() {
           }
           return currentProgress
         })
-      }, 200) // Adjust the interval time as needed
+      }, 750) // Adjust the interval time as needed
     })
   }
 
-  useEffect(() => {
-    if (isUploading) {
-      if (progress < 100) {
-        toast(<UploadContent />, {
-          id: 'upload',
-        })
-      }
-    }
-    if (progress === 100) {
-      console.log('now at 100')
-      toast(<UploadContent />, {
-        id: 'upload',
-      })
+  // useEffect(() => {
+  //   if (isUploading) {
+  //     if (progress < 100) {
+  //       toast(<UploadContent />, {
+  //         id: 'upload',
+  //       })
+  //     }
+  //   }
+  //   if (progress === 100) {
+  //     console.log('now at 100')
+  //     toast(<UploadContent />, {
+  //       id: 'upload',
+  //     })
 
-      // wait for 5 seconds
-      setTimeout(() => {
-        toast.dismiss('upload')
-      }, 5000)
-    }
-  }, [progress])
+  //     // wait for 5 seconds
+  //     setTimeout(() => {
+  //       toast.dismiss('upload')
+  //     }, 5000)
+  //   }
+  // }, [progress])
 
-  const UploadContent = () => (
+  const UploadContent = ({ progress }: { progress: number }) => (
     <div className="flex gap-3 w-full">
       <Loader2 className="animate-spin text-foreground-muted mt-0.5" size={16} />
       <div className="flex flex-col gap-2 w-full">
@@ -69,9 +71,27 @@ export default function SonnerUpload() {
         disabled={isUploading}
         loading={isUploading}
         onClick={async () => {
-          toast.loading(<UploadContent />, {
+          await toast(<UploadContent progress={progress} />, {
             id: 'upload',
           })
+
+          // await toast(`Starting to upload file`, { id: 'upload' })
+
+          // toast.promise(uploadPromise, {
+          //   id: 'upload',
+          //   loading: `Uploading - ${progress}%`,
+          //   success: (data) => {
+          //     return `Upload complete`
+          //   },
+          //   error: 'Error',
+          // })
+
+          // toast.custom((t) => (
+          //   <div>
+          //     {progress}
+          //     This is a custom component <button onClick={() => toast.dismiss(t)}>close</button>
+          //   </div>
+          // ))
           try {
             uploadPromise()
           } catch (error) {}
