@@ -18,8 +18,9 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
         'relative',
         'flex',
         'items-center',
-        'h-8',
-        'text-foreground-light px-6',
+        'h-6',
+        'text-sm',
+        'text-foreground-lighter px-6',
         !isActive && 'hover:bg-surface-100 hover:text-foreground',
         isActive && 'bg-surface-200 text-foreground',
         'transition-all'

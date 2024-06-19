@@ -15,6 +15,7 @@
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "contentlayer2": "0.4.5",
+    "eslint-config-supabase": "*",
     "fs": "^0.0.1-security",
     "jotai": "^2.8.0",
     "lodash.template": "4.5.0",
@@ -45,14 +46,12 @@
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.0.1",
     "config": "*",
-    "tsconfig": "*",
-    "eslint": "^8",
-    "eslint-config-next": "14.1.4",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8",
     "rimraf": "^4.1.3",
     "shiki": "^1.1.7",
     "tailwindcss": "^3.3.0",
+    "tsconfig": "*",
     "typescript": "^5",
     "unist-builder": "3.0.0"
   }
