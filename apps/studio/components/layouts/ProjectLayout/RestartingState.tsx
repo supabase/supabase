@@ -29,8 +29,7 @@ const RestartingState = () => {
             <div className="space-y-1">
               <p>Restarting...</p>
               <p className="text-sm text-foreground-light">
-                Restarting can take a few minutes. Your project will be offline while the project
-                restarts.
+                Restarting can take a few minutes. Your project will be offline while it restarts.
               </p>
             </div>
           </div>
