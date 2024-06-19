@@ -8,14 +8,10 @@ import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolic
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useChannelsQuery } from 'data/realtime/channels-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Separator } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { formatPoliciesForRealtime } from './RealtimePolicies.utils'
-import { PolicyRow, RealtimePoliciesChannelRow } from './RealtimePoliciesChannelRow'
+import { PolicyRow } from './RealtimePoliciesChannelRow'
 import { RealtimePoliciesPlaceholder } from './RealtimePoliciesPlaceholder'
-import { useProjectConnectionData } from './useProjectConnectionData'
 
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
@@ -24,17 +20,6 @@ export const RealtimePolicies = () => {
   useEffect(() => {
     state.setSelectedSchemaName('realtime')
   }, [])
-
-  const { endpoint, accessToken, isReady } = useProjectConnectionData(projectRef!)
-  const { data, isLoading: isLoadingChannels } = useChannelsQuery(
-    {
-      projectRef: projectRef!,
-      endpoint: endpoint,
-      accessToken: accessToken!,
-    },
-    { enabled: isReady }
-  )
-  const channels = data || []
 
   const [channelDataForPolicy, setChannelDataForPolicy] = useState<{
     table: string
@@ -55,7 +40,7 @@ export const RealtimePolicies = () => {
   })
   const realtimePolicies = policiesData ?? []
 
-  const isLoading = isLoadingChannels || isLoadingPolicies
+  const isLoading = isLoadingPolicies
 
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: async () => {
@@ -74,8 +59,8 @@ export const RealtimePolicies = () => {
     })
   }
 
-  const groupedPolicies = formatPoliciesForRealtime(channels, realtimePolicies)
-  const ungroupedPolicies = groupedPolicies.find((gr) => gr.name === 'Ungrouped')
+  // const groupedPolicies = formatPoliciesForRealtime(channels, realtimePolicies)
+  // const ungroupedPolicies = groupedPolicies.find((gr) => gr.name === 'Ungrouped')
 
   return (
     <div className="flex min-h-full w-full flex-col p-4">
@@ -91,51 +76,13 @@ export const RealtimePolicies = () => {
         </div>
       ) : (
         <div className="mt-4 space-y-4">
-          {channels.length === 0 && <RealtimePoliciesPlaceholder />}
+          <RealtimePoliciesPlaceholder />
 
-          {/* Sections for policies grouped by buckets */}
-          {channels.map((channel) => {
-            const found = groupedPolicies.find((gr) => gr.name === channel.name) || { policies: [] }
-            const policies = [...found?.policies].sort((a, b) => a.name.localeCompare(b.name))
-
-            return (
-              <RealtimePoliciesChannelRow
-                key={channel.name}
-                channel={channel}
-                policies={policies}
-                onSelectPolicyAdd={(table) => {
-                  setSelectedPolicyToEdit(undefined)
-                  setChannelDataForPolicy({
-                    table: table,
-                    templateData: {
-                      channelName: channel.name,
-                      channelId: `${channel.id}`,
-                    },
-                  })
-                  showPolicyEditor(true)
-                }}
-                onSelectPolicyEdit={(policy) => {
-                  setSelectedPolicyToEdit(policy)
-                  setChannelDataForPolicy({
-                    table: policy.table,
-                    templateData: {
-                      channelName: channel.name,
-                      channelId: `${channel.id}`,
-                    },
-                  })
-                  showPolicyEditor(true)
-                }}
-                onSelectPolicyDelete={(policy) => setSelectedPolicyToDelete(policy)}
-              />
-            )
-          })}
-
-          <Separator />
           <p className="text-sm text-foreground-light">
             You may also write general policies for the <code>channels</code> table under the
             realtime schema directly for greater control
           </p>
-          {ungroupedPolicies?.policies.map((policy) => {
+          {realtimePolicies.map((policy) => {
             return (
               <PolicyRow
                 key={policy.id}
@@ -159,6 +106,7 @@ export const RealtimePolicies = () => {
         visible={policyEditorShown}
         searchString={channelDataForPolicy?.table}
         templateData={channelDataForPolicy?.templateData}
+        schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => {
           showPolicyEditor(false)
