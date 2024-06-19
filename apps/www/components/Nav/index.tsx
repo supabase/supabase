@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, cn, LW11CountdownBanner } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,9 +20,7 @@ import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import RightClickBrandLogo from './RightClickBrandLogo'
 
 interface Props {
   hideNavbar: boolean
@@ -38,11 +35,11 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isSpecialAnnouncementPage = router.pathname.includes('special-announcement')
-  const isLaunchWeekPage = router.pathname.includes('launch-week') || isSpecialAnnouncementPage
+  const isGAWeekSection = router.pathname.includes('/ga-week')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekSection
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isLaunchWeek11Page = router.pathname === '/special-announcement'
-  const showLaunchWeekNavMode = isLaunchWeekPage && !open
+  const isLaunchWeek11Page = router.pathname === '/ga-week'
+  const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -66,18 +63,19 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      <Announcement>
-        <LW11CountdownBanner />
-      </Announcement>
       <div
-        className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          (isLaunchWeekXPage || isLaunchWeek11Page) && 'relative'
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
           className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all'
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav
@@ -91,29 +89,9 @@ const Nav = (props: Props) => {
             <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
-                  <Link
-                    href="/"
-                    className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                  >
-                    <Image
-                      src={supabaseLogoWordmarkLight}
-                      width={124}
-                      height={24}
-                      alt="Supabase Logo"
-                      className="dark:hidden"
-                      priority
-                    />
-                    <Image
-                      src={supabaseLogoWordmarkDark}
-                      width={124}
-                      height={24}
-                      alt="Supabase Logo"
-                      className="hidden dark:block"
-                      priority
-                    />
-                  </Link>
+                  <RightClickBrandLogo />
 
-                  {!isSpecialAnnouncementPage &&
+                  {!isGAWeekSection &&
                     !isLaunchWeek11Page &&
                     isLaunchWeekPage &&
                     !isLaunchWeekXPage && (
@@ -135,11 +113,16 @@ const Nav = (props: Props) => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
+                          <NavigationMenuTrigger
+                            className={cn(
+                              buttonVariants({ type: 'text', size: 'small' }),
+                              '!bg-transparent hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground px-2 h-auto'
+                            )}
+                          >
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
-                            className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                          // className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
@@ -173,7 +156,7 @@ const Nav = (props: Props) => {
                         <Button type="default" className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Sign in</Link>
                         </Button>
-                        <Button className="hidden text-white lg:block" asChild>
+                        <Button className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Start your project</Link>
                         </Button>
                       </>

@@ -2340,11 +2340,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/functions/troubleshooting',
-    destination: '/docs/guides/functions/debugging',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/auth-magic-link',
     destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
   },
@@ -2385,6 +2380,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/column-level-security',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
+  {
+    permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-policies',
     destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
   },
@@ -2411,11 +2411,157 @@ module.exports = [
   {
     permanent: false,
     source: '/launch-week',
-    destination: '/special-announcement',
+    destination: '/ga-week',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement',
+    destination: '/ga-week',
   },
   {
     permanent: false,
     source: '/launch-week/tickets/:path*',
-    destination: '/special-announcement/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/sql-to-api',
+    destination: '/docs/guides/api/sql-to-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-linter',
+    destination: '/docs/guides/database/database-advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-email',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/auth-magic-link',
+    destination: '/docs/guides/auth/auth-email-passwordless',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/auth-email-otp',
+    destination: '/docs/guides/auth/auth-email-passwordless',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/native-mobile-login',
+    destination: '/docs/guides/auth/social-login',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/concepts/redirect-urls',
+    destination: '/docs/guides/auth/redirect-urls',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-user-management',
+    destination: '/docs/guides/auth/managing-user-data',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/guides/auth/jwts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/row-level-security',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/column-level-security',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/guides/auth/social-login/auth-google',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-gotrue',
+    destination: '/docs/guides/auth/architecture',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-policies',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side-rendering',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/overview',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/data-apis',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/debugging',
+    destination: '/docs/functions/logging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/functions-headers',
+    destination: '/docs/functions/logging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/messagebird',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/twilio',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Twilio',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/vonage',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Vonage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/textlocal',
+    destination:
+      '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
   },
 ]

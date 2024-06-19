@@ -42,19 +42,19 @@ const RolesList = () => {
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
-    filterType === 'active' ? roles.filter((role) => role.active_connections > 0) : roles
+    filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
   ).filter((role) => role.name.includes(filterString))
   const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) =>
     SUPABASE_ROLES.includes(role.name as SUPABASE_ROLE)
   )
 
   const totalActiveConnections = roles
-    .map((role) => role.active_connections)
+    .map((role) => role.activeConnections)
     .reduce((a, b) => a + b, 0)
   // order the roles with active connections by number of connections, most connections first
   const rolesWithActiveConnections = sortBy(
-    roles.filter((role) => role.active_connections > 0),
-    (r) => -r.active_connections
+    roles.filter((role) => role.activeConnections > 0),
+    (r) => -r.activeConnections
   )
 
   return (
@@ -145,7 +145,7 @@ const RolesList = () => {
                 <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
                 {rolesWithActiveConnections.map((role) => (
                   <div key={role.id} className="text-xs text-foreground">
-                    {role.name}: {role.active_connections}
+                    {role.name}: {role.activeConnections}
                   </div>
                 ))}
               </div>

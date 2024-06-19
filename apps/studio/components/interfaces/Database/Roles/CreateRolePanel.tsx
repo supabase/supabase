@@ -26,22 +26,22 @@ interface CreateRolePanelProps {
 
 const FormSchema = z.object({
   name: z.string().trim().min(1, 'You must provide a name').default(''),
-  is_superuser: z.boolean().default(false),
-  can_login: z.boolean().default(false),
-  can_create_role: z.boolean().default(false),
-  can_create_db: z.boolean().default(false),
-  is_replication_role: z.boolean().default(false),
-  can_bypass_rls: z.boolean().default(false),
+  isSuperuser: z.boolean().default(false),
+  canLogin: z.boolean().default(false),
+  canCreateRole: z.boolean().default(false),
+  canCreateDb: z.boolean().default(false),
+  isReplicationRole: z.boolean().default(false),
+  canBypassRls: z.boolean().default(false),
 })
 
 const initialValues = {
   name: '',
-  is_superuser: false,
-  can_login: false,
-  can_create_role: false,
-  can_create_db: false,
-  is_replication_role: false,
-  can_bypass_rls: false,
+  isSuperuser: false,
+  canLogin: false,
+  canCreateRole: false,
+  canCreateDb: false,
+  isReplicationRole: false,
+  canBypassRls: false,
 }
 
 const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
@@ -54,8 +54,8 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   })
 
   const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
-    onSuccess: (res) => {
-      toast.success(`Successfully created new role: ${res.name}`)
+    onSuccess: (_, vars) => {
+      toast.success(`Successfully created new role: ${vars.payload.name}`)
       handleClose()
     },
   })

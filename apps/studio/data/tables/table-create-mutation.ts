@@ -50,7 +50,10 @@ export const useTableCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, payload } = variables
 
-        await queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema))
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, true)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, false)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

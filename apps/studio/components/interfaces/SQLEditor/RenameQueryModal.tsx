@@ -56,8 +56,16 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
     }
   }
 
-  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
-    useSqlTitleGenerateMutation()
+  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+    onSuccess: (data) => {
+      const { title, description } = data
+      setNameInput(title)
+      if (!descriptionInput) setDescriptionInput(description)
+    },
+    onError: (error) => {
+      toast.error(`Failed to rename query: ${error.message}`)
+    },
+  })
 
   const isAiButtonVisible = !!snippet.content.sql
 
@@ -74,8 +82,8 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
         onSubmit={onSubmit}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
-            <Modal.Content>
+          <>
+            <Modal.Content className="space-y-4">
               <Input
                 label="Name"
                 id="name"
@@ -87,24 +95,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 {!hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
-                    onClick={async () => {
-                      try {
-                        const { title, description } = await titleSql({
-                          sql: snippet.content.sql,
-                        })
-
-                        setNameInput(title)
-
-                        // Only update description if it was empty
-                        if (!descriptionInput) {
-                          setDescriptionInput(description)
-                        }
-                      } catch (error: unknown) {
-                        if (isError(error)) {
-                          toast.error(`Failed to rename query: ${error.message}`)
-                        }
-                      }
-                    }}
+                    onClick={() => titleSql({ sql: snippet.content.sql })}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
                   >
@@ -117,8 +108,6 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                   </Button>
                 )}
               </div>
-            </Modal.Content>
-            <Modal.Content>
               <Input.TextArea
                 label="Description"
                 id="description"
@@ -130,17 +119,15 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Rename query
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                Rename query
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>

@@ -8,13 +8,24 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 
 const BillingSettings = () => {
   const {
-    billingAccountData: billingAccountDataEnabled,
-    billingPaymentMethods: billingPaymentMethodsEnabled,
-    billingCredits: billingCreditsEnabled,
+    billingAccountData: isBillingAccountDataEnabledOnProfileLevel,
+    billingPaymentMethods: isBillingPaymentMethodsEnabledOnProfileLevel,
+    billingCredits: isBillingCreditsEnabledOnProfileLevel,
   } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
+
+  const { slug: orgSlug } = useParams()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+
+  const billingAccountDataEnabled =
+    isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
+  const billingPaymentMethodsEnabled =
+    isBillingPaymentMethodsEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   return (
     <>
@@ -34,7 +45,7 @@ const BillingSettings = () => {
         <BillingBreakdown />
       </ScaffoldContainer>
 
-      {billingCreditsEnabled && (
+      {isBillingCreditsEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
 

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -91,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database replications"
+                title="You need additional permissions to update database publications"
               />
             </div>
           )}

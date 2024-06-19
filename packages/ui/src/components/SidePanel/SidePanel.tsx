@@ -1,3 +1,5 @@
+'use client'
+
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
@@ -119,7 +121,9 @@ const SidePanel = ({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange} defaultOpen={defaultOpen}>
       {triggerElement && (
-        <Dialog.Trigger className={__styles.trigger}>{triggerElement}</Dialog.Trigger>
+        <Dialog.Trigger asChild className={__styles.trigger}>
+          {triggerElement}
+        </Dialog.Trigger>
       )}
 
       <Dialog.Portal>

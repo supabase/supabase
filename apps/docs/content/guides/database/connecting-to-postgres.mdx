@@ -66,6 +66,10 @@ You can find the connection pool config in the [Database settings](/dashboard/pr
 2. Click `Database`.
 3. Under `Connection string`, make sure `Use connection pooling` is checked. Copy the URI.
 
+### Pre-requisites
+
+The connection pooler on Supabase projects currently uses the `pgbouncer` Postgres role to make an initial connection to the `postgres` database. If these permissions are revoked, you will not be able to use the pooler until the requisite permissions have been granted.
+
 ## Direct connections
 
 You can also use a direct connection to connect directly to your Postgres database. By default, you can connect to it via IPv6, which isn't supported by all networks. If you need an IPv4 address, use the [connection pooler](#connection-pooler) instead or enable the [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address).
@@ -224,7 +228,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Details title="Connect">
 
-    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters.
+    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters. Fill in your Database password that you made when creating your project (It can be reset in Database Settings above if you don't have it).
 
     </StepHikeCompact.Details>
 
@@ -240,7 +244,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Details title="SSL">
 
-    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database) and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
 
     </StepHikeCompact.Details>
 

@@ -11,7 +11,7 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { FileText, List, Settings } from 'lucide-react'
+import { FileText, Lightbulb, List, Settings } from 'lucide-react'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
@@ -103,6 +103,16 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
   const buildingUrl = `/project/${ref}/building`
 
   return [
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'advisors',
+            label: 'Advisors',
+            icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+          },
+        ]
+      : []),
     ...(IS_PLATFORM
       ? [
           {

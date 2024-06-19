@@ -2,7 +2,6 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { Loading, cn } from 'ui'
 
 interface PanelProps {
-  bodyClassName?: string
   className?: string
   footer?: JSX.Element | false
   loading?: boolean
@@ -25,8 +24,13 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       )}
     >
       {props.title && (
-        <div className={cn('bg-surface-100 border-b border-muted', props.titleClasses)}>
-          <div className="flex items-center px-6 py-4">{props.title}</div>
+        <div
+          className={cn(
+            'bg-surface-100 border-b border-muted flex items-center px-6 py-4',
+            props.titleClasses
+          )}
+        >
+          {props.title}
         </div>
       )}
       {props.children}

@@ -34,6 +34,8 @@ const BlogGridItem = ({ post }: Props) => {
           <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
             <Image
               fill
+              sizes="100%"
+              quality={100}
               src={
                 !post.thumb
                   ? `/images/blog/blog-placeholder.png`
@@ -60,22 +62,6 @@ const BlogGridItem = ({ post }: Props) => {
           <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
           <p className="text-foreground-light max-w-sm text-base !mb-0">{post.description}</p>
         </div>
-        {/* <div className="flex items-center -space-x-2">
-          {author.map((author: any, i: number) => {
-            return (
-              <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
-                {author.author_image_url && (
-                  <Image
-                    src={author.author_image_url}
-                    className="rounded-full object-cover border border-default w-full h-full"
-                    alt={`${author.author} avatar`}
-                    fill
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div> */}
       </div>
     </Link>
   )

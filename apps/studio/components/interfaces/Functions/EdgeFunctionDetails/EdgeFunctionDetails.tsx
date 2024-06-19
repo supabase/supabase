@@ -23,18 +23,8 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import {
-  Alert,
-  Button,
-  Form,
-  IconExternalLink,
-  IconMaximize2,
-  IconMinimize2,
-  IconTerminal,
-  Input,
-  Modal,
-  Toggle,
-} from 'ui'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { Alert, Button, Form, Input, Modal, Toggle } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
@@ -47,7 +37,7 @@ const EdgeFunctionDetails = () => {
   const { data: settings } = useProjectApiQuery({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
-  const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
@@ -60,9 +50,7 @@ const EdgeFunctionDetails = () => {
 
   // Get the API service
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : '[YOUR ANON KEY]'
+  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
   const functionUrl =
@@ -80,15 +68,19 @@ const EdgeFunctionDetails = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
-    try {
-      await updateEdgeFunction({
+    updateEdgeFunction(
+      {
         projectRef,
         slug: selectedFunction.slug,
         payload: values,
-      })
-      resetForm({ values, initialValues: values })
-      toast.success(`Successfully updated edge function`)
-    } catch (error) {}
+      },
+      {
+        onSuccess: () => {
+          resetForm({ values, initialValues: values })
+          toast.success(`Successfully updated edge function`)
+        },
+      }
+    )
   }
 
   const onConfirmDelete = async () => {
@@ -194,11 +186,7 @@ const EdgeFunctionDetails = () => {
                           explicit import URLs
                         </p>
                         <div className="!mt-4">
-                          <Button
-                            asChild
-                            type="default"
-                            icon={<IconExternalLink strokeWidth={1.5} />}
-                          >
+                          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                             <Link
                               href="https://supabase.com/docs/guides/functions/import-maps"
                               target="_blank"
@@ -224,15 +212,15 @@ const EdgeFunctionDetails = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
-                <IconTerminal strokeWidth={2} />
+                <Terminal size={18} strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
             </div>
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
               {showInstructions ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
+                <Minimize2 size={14} strokeWidth={1.5} />
               ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
+                <Maximize2 size={14} strokeWidth={1.5} />
               )}
             </div>
           </div>
@@ -301,13 +289,11 @@ const EdgeFunctionDetails = () => {
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={onConfirmDelete}
       >
-        <div className="py-6">
-          <Modal.Content>
-            <Alert withIcon variant="warning" title="This action cannot be undone">
-              Ensure that you have made a backup if you want to restore your edge function
-            </Alert>
-          </Modal.Content>
-        </div>
+        <Modal.Content>
+          <Alert withIcon variant="warning" title="This action cannot be undone">
+            Ensure that you have made a backup if you want to restore your edge function
+          </Alert>
+        </Modal.Content>
       </Modal>
     </>
   )

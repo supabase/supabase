@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { TextLink, cn } from 'ui'
+import { cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { ArrowRight } from 'lucide-react'
 
 export interface Meetup {
   id?: any
@@ -53,7 +54,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               .from('lw11_meetups')
               .select('*')
               .neq('isPublished', false)
-            console.log('newMeets', newMeets)
+
             setMeets(
               newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
             )
@@ -80,20 +81,16 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   if (!isMounted) return null
 
   return (
-    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-[#EDEDED]">
-      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-[#575E61]">
+    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-foreground-lighter">
+      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
-          Celebrate{' '}
-          <strong className="font-normal text-foreground-light">
-            Supabase Special Announcement
-          </strong>{' '}
-          at our live community-driven meetups. Network with the community, listen to tech talks and
-          grab some swag.
+          Join our live community-driven meetups to celebrate GA Week with the community, listen to
+          tech talks and grab some swag.
         </p>
-        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lw11" />
+        {/* <TextLink label="Read more about meetups" hasChevron url="" /> */}
       </div>
-      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
+      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
@@ -105,32 +102,59 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               const liveNow = after && before3H
 
               return (
-                <Link
-                  key={meetup.id}
-                  href={meetup.link ?? ''}
-                  target="_blank"
-                  onClick={() => handleSelectMeetup(meetup)}
-                  onMouseOver={() => handleSelectMeetup(meetup)}
-                  title={liveNow ? 'Live now' : undefined}
-                  className={cn(
-                    'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'hover:text-[#EDEDED] !leading-none transition-colors',
-                    meetup.id === activeMeetup.id ? 'text-[#EDEDED]' : 'text-[#575E61]',
-                    liveNow && 'text-[#B0B0B0]'
-                  )}
-                >
-                  {liveNow && (
-                    <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
-                  )}
-                  <span>{meetup.title}</span>
-                  {i !== meets.length - 1 && ', '}
-                </Link>
+                <>
+                  <button
+                    key={meetup.id}
+                    onClick={() => handleSelectMeetup(meetup)}
+                    onMouseDown={() => handleSelectMeetup(meetup)}
+                    title={liveNow ? 'Live now' : undefined}
+                    className={cn(
+                      'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
+                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
+                      meetup.id === activeMeetup.id && '!text-foreground',
+                      liveNow && 'text-foreground-light'
+                    )}
+                  >
+                    {liveNow && (
+                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                    )}
+                    <span>{meetup.title}</span>
+                    {i !== meets.length - 1 && ', '}
+                  </button>
+                  <Link
+                    key={`meetup-link-${meetup.id}`}
+                    href={meetup.link ?? ''}
+                    target="_blank"
+                    onClick={() => handleSelectMeetup(meetup)}
+                    onMouseOver={() => handleSelectMeetup(meetup)}
+                    title={liveNow ? 'Live now' : undefined}
+                    className={cn(
+                      'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
+                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
+                      meetup.id === activeMeetup.id && '!text-foreground',
+                      liveNow && 'text-foreground-light'
+                    )}
+                  >
+                    {liveNow && (
+                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                    )}
+                    <span>{meetup.title}</span>
+                    {i !== meets.length - 1 && ', '}
+                  </Link>
+                </>
               )
             })}
       </div>
-      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl text-sm flex-1">
-        {activeMeetup?.display_info}
-      </div>
+      <Link
+        href={activeMeetup.link ?? '#'}
+        target="_blank"
+        className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1 inline-flex flex-wrap items-center gap-1"
+      >
+        {activeMeetup?.display_info}{' '}
+        <span className="inline">
+          <ArrowRight className="w-3 md:hidden" />
+        </span>
+      </Link>
     </div>
   )
 }

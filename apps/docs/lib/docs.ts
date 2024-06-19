@@ -4,7 +4,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
-import { dirname, join, extname, sep } from 'node:path'
+import { dirname, join, extname, sep, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
@@ -19,11 +19,26 @@ type GuideFrontmatter = {
   title: string
   description?: string
   hideToc?: boolean
+  tocVideo?: string
 }
 
+/**
+ * Validate the frontmatter for guide MDX files.
+ *
+ * @throws Throws if frontmatter is invalid.
+ */
 export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
-  if (!('title' in obj) || typeof obj.title !== 'string') return false
-  if ('description' in obj && typeof obj.description !== 'string') return false
+  if (!('title' in obj) || typeof obj.title !== 'string') {
+    throw Error(
+      // @ts-expect-error - Getting undefined for unknown property is desired here.
+      `Invalid guide frontmatter: Title must exist and be a string. Received: ${obj.title}`
+    )
+  }
+  if ('description' in obj && typeof obj.description !== 'string') {
+    throw Error(
+      `Invalid guide frontmatter: Description must be a string. Received: ${obj.description}`
+    )
+  }
   return true
 }
 
@@ -31,7 +46,7 @@ export async function getGuidesStaticPaths(section: string) {
   const directory = join(GUIDES_DIRECTORY, section)
 
   const files = (await readdir(directory, { recursive: true }))
-    .filter((file) => extname(file) === '.mdx')
+    .filter((file) => extname(file) === '.mdx' && !basename(file).startsWith('_'))
     .map((file) => ({
       params: {
         slug: file.replace(/\.mdx$/, '').split(sep),
@@ -81,7 +96,8 @@ export async function getGuidesStaticProps(
 
   const { data: frontmatter, content } = matter(mdx)
   if (!isValidGuideFrontmatter(frontmatter)) {
-    throw Error('Type of frontmatter is not valid')
+    // Will have thrown
+    return
   }
 
   const codeHikeOptions: CodeHikeConfig = {

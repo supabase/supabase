@@ -1,7 +1,7 @@
 {
   "show": true,
-  "text": "Join us for a Special Announcement",
+  "text": "Supabase has reached General Availability",
   "launchDate": "2024-04-15T07:00:00.000-08:00",
-  "link": "https://supabase.com/special-announcement",
-  "badge": "Claim your ticket"
+  "link": "https://supabase.com/ga-week",
+  "badge": "Learn more"
 }

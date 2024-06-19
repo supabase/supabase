@@ -13,7 +13,7 @@
       "flags": {},
       "children": [
         {
-          "id": 214,
+          "id": 213,
           "name": "QueryData",
           "kind": 16777216,
           "kindString": "Reference",
@@ -21,14 +21,14 @@
           "sources": [
             {
               "fileName": "src/index.ts",
-              "line": 20,
+              "line": 22,
               "character": 50
             }
           ],
           "target": 112
         },
         {
-          "id": 215,
+          "id": 214,
           "name": "QueryError",
           "kind": 16777216,
           "kindString": "Reference",
@@ -36,14 +36,14 @@
           "sources": [
             {
               "fileName": "src/index.ts",
-              "line": 20,
+              "line": 22,
               "character": 61
             }
           ],
           "target": 116
         },
         {
-          "id": 213,
+          "id": 212,
           "name": "QueryResult",
           "kind": 16777216,
           "kindString": "Reference",
@@ -51,14 +51,14 @@
           "sources": [
             {
               "fileName": "src/index.ts",
-              "line": 20,
+              "line": 22,
               "character": 37
             }
           ],
           "target": 110
         },
         {
-          "id": 212,
+          "id": 211,
           "name": "SupabaseClientOptions",
           "kind": 16777216,
           "kindString": "Reference",
@@ -66,7 +66,7 @@
           "sources": [
             {
               "fileName": "src/index.ts",
-              "line": 20,
+              "line": 22,
               "character": 14
             }
           ],
@@ -1288,7 +1288,7 @@
               ]
             },
             {
-              "id": 187,
+              "id": 186,
               "name": "_getAccessToken",
               "kind": 2048,
               "kindString": "Method",
@@ -1298,13 +1298,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 244,
+                  "line": 246,
                   "character": 16
                 }
               ],
               "signatures": [
                 {
-                  "id": 188,
+                  "id": 187,
                   "name": "_getAccessToken",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1334,7 +1334,7 @@
               ]
             },
             {
-              "id": 204,
+              "id": 203,
               "name": "_handleTokenChanged",
               "kind": 2048,
               "kindString": "Method",
@@ -1344,20 +1344,20 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 295,
+                  "line": 297,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 205,
+                  "id": 204,
                   "name": "_handleTokenChanged",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 206,
+                      "id": 205,
                       "name": "event",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1365,12 +1365,12 @@
                       "type": {
                         "type": "reference",
                         "qualifiedName": "AuthChangeEvent",
-                        "package": "@supabase/gotrue-js",
+                        "package": "@supabase/auth-js",
                         "name": "AuthChangeEvent"
                       }
                     },
                     {
-                      "id": 207,
+                      "id": 206,
                       "name": "source",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1390,7 +1390,7 @@
                       }
                     },
                     {
-                      "id": 208,
+                      "id": 207,
                       "name": "token",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1411,7 +1411,7 @@
               ]
             },
             {
-              "id": 198,
+              "id": 197,
               "name": "_initRealtimeClient",
               "kind": 2048,
               "kindString": "Method",
@@ -1421,20 +1421,20 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 281,
+                  "line": 283,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 199,
+                  "id": 198,
                   "name": "_initRealtimeClient",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 200,
+                      "id": 199,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1457,7 +1457,7 @@
               ]
             },
             {
-              "id": 189,
+              "id": 188,
               "name": "_initSupabaseAuthClient",
               "kind": 2048,
               "kindString": "Method",
@@ -1467,20 +1467,20 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 250,
+                  "line": 252,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 190,
+                  "id": 189,
                   "name": "_initSupabaseAuthClient",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 191,
+                      "id": 190,
                       "name": "__namedParameters",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1505,14 +1505,14 @@
                           "extendedTypes": [
                             {
                               "type": "reference",
-                              "name": "GoTrueClientOptions"
+                              "name": "AuthClientOptions"
                             }
                           ]
                         }
                       }
                     },
                     {
-                      "id": 192,
+                      "id": 191,
                       "name": "headers",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1537,7 +1537,7 @@
                       }
                     },
                     {
-                      "id": 193,
+                      "id": 192,
                       "name": "fetch",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1547,21 +1547,21 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 194,
+                          "id": 193,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "signatures": [
                             {
-                              "id": 195,
+                              "id": 194,
                               "name": "__type",
                               "kind": 4096,
                               "kindString": "Call signature",
                               "flags": {},
                               "parameters": [
                                 {
-                                  "id": 196,
+                                  "id": 195,
                                   "name": "input",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -1585,7 +1585,7 @@
                                   }
                                 },
                                 {
-                                  "id": 197,
+                                  "id": 196,
                                   "name": "init",
                                   "kind": 32768,
                                   "kindString": "Parameter",
@@ -1628,7 +1628,7 @@
               ]
             },
             {
-              "id": 201,
+              "id": 200,
               "name": "_listenForAuthEvents",
               "kind": 2048,
               "kindString": "Method",
@@ -1638,13 +1638,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 288,
+                  "line": 290,
                   "character": 10
                 }
               ],
               "signatures": [
                 {
-                  "id": 202,
+                  "id": 201,
                   "name": "_listenForAuthEvents",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1652,7 +1652,7 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 203,
+                      "id": 202,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -1663,7 +1663,7 @@
               ]
             },
             {
-              "id": 176,
+              "id": 175,
               "name": "channel",
               "kind": 2048,
               "kindString": "Method",
@@ -1671,13 +1671,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 216,
+                  "line": 218,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 177,
+                  "id": 176,
                   "name": "channel",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -1687,7 +1687,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 178,
+                      "id": 177,
                       "name": "name",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1701,7 +1701,7 @@
                       }
                     },
                     {
-                      "id": 179,
+                      "id": 178,
                       "name": "opts",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -1948,62 +1948,11 @@
                     "package": "@supabase/postgrest-js",
                     "name": "default"
                   }
-                },
-                {
-                  "id": 160,
-                  "name": "from",
-                  "kind": 4096,
-                  "kindString": "Call signature",
-                  "flags": {},
-                  "comment": {
-                    "shortText": "Perform a query on a table or a view."
-                  },
-                  "parameters": [
-                    {
-                      "id": 161,
-                      "name": "relation",
-                      "kind": 32768,
-                      "kindString": "Parameter",
-                      "flags": {},
-                      "comment": {
-                        "shortText": "The table or view name to query\n"
-                      },
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "string"
-                      }
-                    }
-                  ],
-                  "type": {
-                    "type": "reference",
-                    "typeArguments": [
-                      {
-                        "type": "reference",
-                        "id": 124,
-                        "name": "Schema"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "any"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "any"
-                      },
-                      {
-                        "type": "intrinsic",
-                        "name": "unknown"
-                      }
-                    ],
-                    "qualifiedName": "PostgrestQueryBuilder",
-                    "package": "@supabase/postgrest-js",
-                    "name": "default"
-                  }
                 }
               ]
             },
             {
-              "id": 180,
+              "id": 179,
               "name": "getChannels",
               "kind": 2048,
               "kindString": "Method",
@@ -2011,13 +1960,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 223,
+                  "line": 225,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 181,
+                  "id": 180,
                   "name": "getChannels",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -2038,7 +1987,7 @@
               ]
             },
             {
-              "id": 185,
+              "id": 184,
               "name": "removeAllChannels",
               "kind": 2048,
               "kindString": "Method",
@@ -2046,13 +1995,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 240,
+                  "line": 242,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 186,
+                  "id": 185,
                   "name": "removeAllChannels",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -2092,7 +2041,7 @@
               ]
             },
             {
-              "id": 182,
+              "id": 181,
               "name": "removeChannel",
               "kind": 2048,
               "kindString": "Method",
@@ -2100,13 +2049,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 233,
+                  "line": 235,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 183,
+                  "id": 182,
                   "name": "removeChannel",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -2116,7 +2065,7 @@
                   },
                   "parameters": [
                     {
-                      "id": 184,
+                      "id": 183,
                       "name": "channel",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -2161,7 +2110,7 @@
               ]
             },
             {
-              "id": 166,
+              "id": 164,
               "name": "rpc",
               "kind": 2048,
               "kindString": "Method",
@@ -2169,13 +2118,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 190,
+                  "line": 191,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 167,
+                  "id": 165,
                   "name": "rpc",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -2185,7 +2134,7 @@
                   },
                   "typeParameter": [
                     {
-                      "id": 168,
+                      "id": 166,
                       "name": "FnName",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -2196,7 +2145,7 @@
                       }
                     },
                     {
-                      "id": 169,
+                      "id": 167,
                       "name": "Fn",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -2210,7 +2159,7 @@
                   ],
                   "parameters": [
                     {
-                      "id": 170,
+                      "id": 168,
                       "name": "fn",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -2220,13 +2169,13 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 168,
+                        "id": 166,
                         "name": "FnName",
                         "dereferenced": {}
                       }
                     },
                     {
-                      "id": 171,
+                      "id": 169,
                       "name": "args",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -2242,14 +2191,14 @@
                         },
                         "objectType": {
                           "type": "reference",
-                          "id": 169,
+                          "id": 167,
                           "name": "Fn"
                         }
                       },
                       "defaultValue": "{}"
                     },
                     {
-                      "id": 172,
+                      "id": 170,
                       "name": "options",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -2260,14 +2209,14 @@
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 173,
+                          "id": 171,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 175,
+                              "id": 174,
                               "name": "count",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2280,7 +2229,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 195,
+                                  "line": 197,
                                   "character": 6
                                 }
                               ],
@@ -2303,7 +2252,30 @@
                               }
                             },
                             {
-                              "id": 174,
+                              "id": 173,
+                              "name": "get",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "When set to `true`, the function will be called with\nread-only access mode."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/SupabaseClient.ts",
+                                  "line": 196,
+                                  "character": 6
+                                }
+                              ],
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              }
+                            },
+                            {
+                              "id": 172,
                               "name": "head",
                               "kind": 1024,
                               "kindString": "Property",
@@ -2316,7 +2288,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/SupabaseClient.ts",
-                                  "line": 194,
+                                  "line": 195,
                                   "character": 6
                                 }
                               ],
@@ -2331,8 +2303,9 @@
                               "title": "Properties",
                               "kind": 1024,
                               "children": [
-                                175,
-                                174
+                                174,
+                                173,
+                                172
                               ]
                             }
                           ]
@@ -2359,7 +2332,7 @@
                           },
                           "objectType": {
                             "type": "reference",
-                            "id": 169,
+                            "id": 167,
                             "name": "Fn"
                           }
                         },
@@ -2435,7 +2408,7 @@
                         },
                         "objectType": {
                           "type": "reference",
-                          "id": 169,
+                          "id": 167,
                           "name": "Fn"
                         }
                       },
@@ -2456,7 +2429,7 @@
               ]
             },
             {
-              "id": 162,
+              "id": 160,
               "name": "schema",
               "kind": 2048,
               "kindString": "Method",
@@ -2464,13 +2437,13 @@
               "sources": [
                 {
                   "fileName": "src/SupabaseClient.ts",
-                  "line": 158,
+                  "line": 157,
                   "character": 2
                 }
               ],
               "signatures": [
                 {
-                  "id": 163,
+                  "id": 161,
                   "name": "schema",
                   "kind": 4096,
                   "kindString": "Call signature",
@@ -2481,7 +2454,7 @@
                   },
                   "typeParameter": [
                     {
-                      "id": 164,
+                      "id": 162,
                       "name": "DynamicSchema",
                       "kind": 131072,
                       "kindString": "Type parameter",
@@ -2494,7 +2467,7 @@
                   ],
                   "parameters": [
                     {
-                      "id": 165,
+                      "id": 163,
                       "name": "schema",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -2504,7 +2477,7 @@
                       },
                       "type": {
                         "type": "reference",
-                        "id": 164,
+                        "id": 162,
                         "name": "DynamicSchema",
                         "dereferenced": {}
                       }
@@ -2520,7 +2493,7 @@
                       },
                       {
                         "type": "reference",
-                        "id": 164,
+                        "id": 162,
                         "name": "DynamicSchema"
                       },
                       {
@@ -2529,7 +2502,7 @@
                           "type": "indexedAccess",
                           "indexType": {
                             "type": "reference",
-                            "id": 164,
+                            "id": 162,
                             "name": "DynamicSchema"
                           },
                           "objectType": {
@@ -2607,18 +2580,18 @@
               "title": "Methods",
               "kind": 2048,
               "children": [
-                187,
-                204,
-                198,
-                189,
-                201,
-                176,
+                186,
+                203,
+                197,
+                188,
+                200,
+                175,
                 149,
-                180,
-                185,
-                182,
-                166,
-                162
+                179,
+                184,
+                181,
+                164,
+                160
               ]
             }
           ],
@@ -2631,7 +2604,7 @@
           ],
           "typeParameter": [
             {
-              "id": 209,
+              "id": 208,
               "name": "Database",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -2642,7 +2615,7 @@
               }
             },
             {
-              "id": 210,
+              "id": 209,
               "name": "SchemaName",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -2705,7 +2678,7 @@
               }
             },
             {
-              "id": 211,
+              "id": 210,
               "name": "Schema",
               "kind": 131072,
               "kindString": "Type parameter",
@@ -2765,7 +2738,7 @@
           "sources": [
             {
               "fileName": "src/index.ts",
-              "line": 25,
+              "line": 27,
               "character": 13
             }
           ],
@@ -3514,10 +3487,10 @@
           "title": "References",
           "kind": 16777216,
           "children": [
-            214,
-            215,
             213,
-            212
+            214,
+            212,
+            211
           ]
         },
         {
@@ -5679,7 +5652,7 @@
           "extendedTypes": [
             {
               "type": "reference",
-              "name": "GoTrueClientOptions"
+              "name": "AuthClientOptions"
             }
           ]
         },

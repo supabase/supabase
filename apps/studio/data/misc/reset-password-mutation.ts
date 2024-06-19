@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type ResetPasswordVariables = {
@@ -16,7 +16,7 @@ export async function resetPassword({ email, hcaptchaToken, redirectTo }: ResetP
     body: { email, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

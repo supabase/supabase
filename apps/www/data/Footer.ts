@@ -33,8 +33,8 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Special Announcement',
-        url: '/special-announcement',
+        text: 'GA Week',
+        url: '/ga-week',
       },
     ],
   },
@@ -134,6 +134,10 @@ const footerData = [
       {
         text: 'Company',
         url: '/company',
+      },
+      {
+        text: 'General Availability',
+        url: '/ga',
       },
       {
         text: 'Terms of Service',

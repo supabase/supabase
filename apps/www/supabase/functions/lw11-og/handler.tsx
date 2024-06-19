@@ -59,7 +59,7 @@ export async function handler(req: Request) {
       // Supabase API URL - env var exported by default when deployed.
       Deno.env.get('MISC_USE_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('MISC_USE_ANON_KEY') ?? ''
+      Deno.env.get('MISC_USE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Track social shares

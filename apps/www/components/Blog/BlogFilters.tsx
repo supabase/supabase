@@ -183,7 +183,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               <DropdownMenuContent side="bottom" align="start">
                 {allCategories.map((category: string) => (
                   <DropdownMenuItem
-                    key="custom-expiry"
+                    key={`item-${category}`}
                     onClick={() => handleSetCategory(category)}
                     className={cn(
                       (category === 'all' && !activeCategory) || category === activeCategory

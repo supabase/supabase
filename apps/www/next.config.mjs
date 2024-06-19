@@ -1,14 +1,16 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 
-import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
+import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
+import { withContentlayer } from 'next-contentlayer2'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -41,7 +43,9 @@ const nextConfig = {
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons'],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
+  reactStrictMode: true,
+  swcMinify: true,
   images: {
     dangerouslyAllowSVG: true,
     domains: [
@@ -93,6 +97,6 @@ const nextConfig = {
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer]
+  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }

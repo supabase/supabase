@@ -48,10 +48,10 @@ const UserListItem = ({
         <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
-        {!isUserConfirmed ? (
-          <Badge variant="warning">Waiting for verification..</Badge>
-        ) : user.last_sign_in_at ? (
+        {user?.last_sign_in_at ? (
           lastSignedIn?.format('DD MMM, YYYY HH:mm')
+        ) : !isUserConfirmed ? (
+          <Badge variant="warning">Waiting for verification..</Badge>
         ) : (
           'Never'
         )}

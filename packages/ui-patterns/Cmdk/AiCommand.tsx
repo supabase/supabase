@@ -14,7 +14,6 @@ import { SSE } from 'sse.js'
 import {
   AiIconAnimation,
   Button,
-  IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
   Input,
@@ -29,6 +28,7 @@ import { useCommandMenu } from './CommandMenuProvider'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
+import { StatusIcon } from '../Icons/StatusIcons'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -357,7 +357,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
+      <div className={cn('relative mb-[145px] py-4')}>
         {!hasError &&
           messages.map((message, index) => {
             switch (message.role) {
@@ -379,7 +379,7 @@ const AiCommand = () => {
                 )
               case MessageRole.Assistant:
                 return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-[150px]">
+                  <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
                     <div className="flex gap-6 [overflow-anchor:none] mb-6">
                       <AiIconChat
                         loading={
@@ -393,10 +393,14 @@ const AiCommand = () => {
                         ) : (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
-                            linkTarget="_blank"
+                            components={{
+                              ...markdownComponents,
+                              a: (props) => (
+                                <a {...props} target="_blank" rel="noopener noreferrer" />
+                              ),
+                            }}
                             className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
+                            urlTransform={(href: string) => {
                               const supabaseUrl = new URL('https://supabase.com')
                               const linkUrl = new URL(href, 'https://supabase.com')
 
@@ -439,13 +443,17 @@ const AiCommand = () => {
           </CommandGroup>
         )}
         {hasError && (
-          <div className="p-6 flex flex-col items-center gap-6 mt-4">
-            <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
-            <p className="text-lg text-foreground text-center">
-              Sorry, looks like Clippy is having a hard time!
-            </p>
-            <p className="text-sm text-foreground-muted text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleReset}>
+          <div className="p-6 flex flex-col items-center gap-2 mt-4">
+            <StatusIcon variant="warning" />
+            <div>
+              <p className="text-sm text-foreground text-center">
+                Sorry, looks like Supabase AI is having a hard time!
+              </p>
+              <p className="text-sm text-foreground-lighter text-center">
+                Please try again in a bit.
+              </p>
+            </div>
+            <Button size="tiny" type="default" onClick={handleReset}>
               Try again?
             </Button>
           </div>

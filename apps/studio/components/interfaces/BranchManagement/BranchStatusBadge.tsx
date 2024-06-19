@@ -14,6 +14,7 @@ const UNHEALTHY_STATUES: Status[] = [
   'INIT_FAILED',
   'UNKNOWN',
   'MIGRATIONS_FAILED',
+  'FUNCTIONS_FAILED',
 ]
 const WAITING_STATUSES: Status[] = [
   'COMING_UP',
@@ -40,6 +41,11 @@ const STATUS_TO_LABEL: Record<Status, string> = {
   RUNNING_MIGRATIONS: 'Running migrations',
   MIGRATIONS_FAILED: 'Migrations failed',
   MIGRATIONS_PASSED: 'Migrations applied successfully',
+  FUNCTIONS_DEPLOYED: 'Functions deployed',
+  FUNCTIONS_FAILED: 'Functions failed to deploy',
+  PAUSE_FAILED: 'Pause failed',
+  RESTORE_FAILED: 'Restore failed',
+  RESTARTING: 'Restarting',
 }
 
 const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {

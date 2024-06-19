@@ -23,7 +23,7 @@ const BillingAddress = () => {
   const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
     slug,
   })
-  const { mutateAsync: updateCustomerProfile, isLoading: isUpdating } =
+  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
     useOrganizationCustomerProfileUpdateMutation()
 
   const formId = 'billing-address-form'
@@ -48,17 +48,29 @@ const BillingAddress = () => {
     ) {
       errors['country'] = 'Please select a country'
     }
+    if (
+      (values.country || values.line2 || values.postal_code || values.state || values.city) &&
+      !values.line1
+    ) {
+      errors['line1'] = 'Please provide an address line'
+    }
     return errors
   }
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
-    try {
-      await updateCustomerProfile({ slug, address: values })
-      toast.success('Successfully updated billing address')
-      resetForm({ values, initialValues: values })
-    } catch (error) {}
+    const address = !values.line1 ? null : values
+
+    updateCustomerProfile(
+      { slug, address },
+      {
+        onSuccess: () => {
+          toast.success('Successfully updated billing address')
+          resetForm({ values, initialValues: values })
+        },
+      }
+    )
   }
 
   return (
