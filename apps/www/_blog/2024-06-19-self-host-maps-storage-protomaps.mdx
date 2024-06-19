@@ -120,7 +120,7 @@ A public Supabase Storage bucket allows access from any origin, which might not 
 
 In your Supabase Dashboard, create a new private storage bucket called `maps-private` and upload your `my_area.pmtiles` file there. Files in private buckets can only be accessed through either a short-lived signed URL, or by passing the secret service role key as an authorization header. Since our Edge Function is a secure server-side environment, we can utilize the latter approach here.
 
-Using the [Supabase CLI](https://github.com/supabase/cli), create a new Edge Function by running `supabase functions new `maps-private`, then add the following code to your newly created function:
+Using the [Supabase CLI](https://github.com/supabase/cli), create a new Edge Function by running `supabase functions new maps-private`, then add the following code to your newly created function:
 
 ```ts supabase/functions/maps-private/index.ts
 const ALLOWED_ORIGINS = ['http://localhost:8000']
@@ -160,7 +160,7 @@ If you want to further restrict access based on authenticated users, you can pai
 
 Lastly, we need to deploy our Edge Function to Supabase by running `supabase functions deploy maps-private --no-verify-jwt`. Note that the [`--no-verify-jwt` flag](https://supabase.com/docs/reference/cli/supabase-functions-deploy) is required if you want to allow public access from your website without any Supabase Auth User.
 
-Now we can simply replace the public storage URL with our Egde Functions URL to proxy the range requests to our private bucket:
+Now we can simply replace the public storage URL with our Edge Functions URL to proxy the range requests to our private bucket:
 
 ```js index.html
 // ...
@@ -188,7 +188,7 @@ Now go ahead and serve your `index.html` file, for example via Python SimpleHTTP
 
 ## Conclusion
 
-Protomaps is a fantastic open source project that allows you to host your own Google Maps alternative on Supabase Storage. You can further extend this this powerful PostGIS capabilities to programmatically generate MapBoc Vector Tiles which we will explore in the next post in this series. So make sure you subscribe to our [Twitter](https://x.com/supabase) and [YouTube](https://www.youtube.com/@Supabase) channels to not miss out! See you then!
+Protomaps is a fantastic open source project that allows you to host your own Google Maps alternative on Supabase Storage. You can further extend this with powerful PostGIS capabilities to programmatically generate [Vector Tiles](https://github.com/mapbox/vector-tile-spec) which we will explore in the next post in this series. So make sure you subscribe to our [Twitter](https://x.com/supabase) and [YouTube](https://www.youtube.com/@Supabase) channels to not miss out! See you then!
 
 ## More Supabase
 
