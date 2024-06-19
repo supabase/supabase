@@ -134,6 +134,7 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !hasComments &&
     !hasMultipleQueries &&
     cleanedSql.toLowerCase().startsWith('select') &&
+    !cleanedSql.toLowerCase().match(/fetch\s+first/) &&
     !cleanedSql.endsWith('limit') &&
     !cleanedSql.endsWith('limit;') &&
     !cleanedSql.match('limit [0-9]*[;]?$')
