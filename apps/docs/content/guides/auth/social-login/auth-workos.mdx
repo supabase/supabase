@@ -79,6 +79,26 @@ async function signInWithWorkOS() {
 Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `workos` as the `provider`:
+
+```dart
+Future<void> signInWithWorkOS() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.workos,
+    queryParams: {
+      'connection': '<your_connection>',
+      'organization': '<your_organization',
+      'workos_provider': '<your_provider>',
+    },
+  );
+}
+```
+
+Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `WorkOS` as the `Provider`:
@@ -118,9 +138,20 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
