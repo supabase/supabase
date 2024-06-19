@@ -7,7 +7,7 @@ any) => {
       className={`
         [&_img]:rounded-md
         [&_img]:border
-        [&_img]:bg-surface-100
+        [&_img]:bg-default
       `}
     >
       {img}
