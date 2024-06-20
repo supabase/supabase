@@ -108,7 +108,7 @@ const NavigationBar = () => {
         }}
       >
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <div className="sticky top-0 mb-1 py-1 px-2 flex h-[48px] bg-studio z-50">
+          <div className="sticky top-0 mb-1 py-1 px-2 flex h-[48px] bg-studio z-10">
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[48px]"
