@@ -80,6 +80,10 @@ const RateLimits = () => {
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
+    RATE_LIMIT_OTP: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -89,6 +93,7 @@ const RateLimits = () => {
       RATE_LIMIT_VERIFY: 0,
       RATE_LIMIT_EMAIL_SENT: 0,
       RATE_LIMIT_SMS_SENT: 0,
+      RATE_LIMIT_OTP: 0,
     },
   })
 
@@ -102,6 +107,7 @@ const RateLimits = () => {
       'RATE_LIMIT_EMAIL_SENT',
       'RATE_LIMIT_SMS_SENT',
       'RATE_LIMIT_ANONYMOUS_USERS',
+      'RATE_LIMIT_OTP',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -118,6 +124,7 @@ const RateLimits = () => {
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
+        RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -389,6 +396,35 @@ const RateLimits = () => {
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
                         )}
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection
+                id="otp"
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        Number of OTP sign-ins and sign up request that can be made per hour per IP
+                        address.
+                      </p>
+                    }
+                  >
+                    Rate limit for OTP sign ins
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_OTP"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ type="number" {...field} />
+                        </FormControl_Shadcn_>
                       </FormItem_Shadcn_>
                     )}
                   />
