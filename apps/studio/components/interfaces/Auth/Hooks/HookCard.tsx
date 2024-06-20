@@ -1,12 +1,6 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Check, Webhook } from 'lucide-react'
-import {
-  Badge,
-  Button,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Badge, Input } from 'ui'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
@@ -91,23 +85,19 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
           )}
         </div>
         <div className="flex flex-row gap-2">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                type="default"
-                className="pointer-events-auto"
-                disabled={!canUpdateConfig}
-                onClick={() => onSelect()}
-              >
-                Configure hook
-              </Button>
-            </TooltipTrigger_Shadcn_>
-            {!canUpdateConfig && (
-              <TooltipContent_Shadcn_ side="bottom">
-                You need additional permissions to configure auth hooks
-              </TooltipContent_Shadcn_>
-            )}
-          </Tooltip_Shadcn_>
+          <ButtonTooltip
+            type="default"
+            disabled={!canUpdateConfig}
+            onClick={() => onSelect()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to configure auth hooks',
+              },
+            }}
+          >
+            Configure hook
+          </ButtonTooltip>
         </div>
       </div>
       <div className="flex-1">

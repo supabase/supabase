@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   FormActions,
   FormHeader,
@@ -31,9 +32,6 @@ import {
   Input,
   Modal,
   Toggle,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import CommandRender from '../CommandRender'
@@ -256,24 +254,20 @@ const EdgeFunctionDetails = () => {
               Make sure you have made a backup if you want to restore your edge function
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="danger"
-                    className="pointer-events-auto"
-                    disabled={!canUpdateEdgeFunction}
-                    loading={selectedFunction?.id === undefined}
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    Delete edge function
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                {!canUpdateEdgeFunction && (
-                  <TooltipContent_Shadcn_ side="bottom">
-                    You need additional permissions to delete edge functions
-                  </TooltipContent_Shadcn_>
-                )}
-              </Tooltip_Shadcn_>
+              <ButtonTooltip
+                type="danger"
+                disabled={!canUpdateEdgeFunction}
+                loading={selectedFunction?.id === undefined}
+                onClick={() => setShowDeleteModal(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to delete edge functions',
+                  },
+                }}
+              >
+                Delete edge function
+              </ButtonTooltip>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         </div>

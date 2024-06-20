@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -14,15 +15,7 @@ import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-que
 import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -33,7 +26,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -115,28 +107,25 @@ const TableEditorMenu = () => {
 
           <div className="grid gap-3 mx-4">
             {!isLocked ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    block
-                    title="Create a new table"
-                    name="New table"
-                    disabled={!canCreateTables}
-                    size="tiny"
-                    icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
-                    type="default"
-                    className="justify-start pointer-events-auto"
-                    onClick={snap.onAddTable}
-                  >
-                    New table
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                {!canCreateTables && (
-                  <TooltipContent_Shadcn_ side="bottom">
-                    You need additional permissions to create tables
-                  </TooltipContent_Shadcn_>
-                )}
-              </Tooltip_Shadcn_>
+              <ButtonTooltip
+                block
+                title="Create a new table"
+                name="New table"
+                disabled={!canCreateTables}
+                size="tiny"
+                icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                type="default"
+                className="justify-start"
+                onClick={snap.onAddTable}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to create tables',
+                  },
+                }}
+              >
+                New table
+              </ButtonTooltip>
             ) : (
               <Alert_Shadcn_>
                 <AlertTitle_Shadcn_ className="text-sm">

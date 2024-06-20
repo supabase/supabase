@@ -28,6 +28,7 @@ import {
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -270,21 +271,20 @@ const Reports = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  disabled
-                  type="default"
-                  className="pointer-events-auto"
-                  iconRight={<Settings size={14} />}
-                >
-                  Add / Remove charts
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="w-56 text-center">
-                You need additional permissions to update custom reports
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              disabled
+              type="default"
+              iconRight={<Settings size={14} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'w-56 text-center',
+                  text: 'You need additional permissions to update custom reports',
+                },
+              }}
+            >
+              Add / Remove charts
+            </ButtonTooltip>
           )}
           <DatabaseSelector />
         </div>

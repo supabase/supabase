@@ -6,12 +6,13 @@ import toast from 'react-hot-toast'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
@@ -77,22 +78,18 @@ const EdgeFunctionSecrets = () => {
                       Documentation
                     </a>
                   </Button>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        disabled={!canUpdateSecrets}
-                        className="pointer-events-auto"
-                        onClick={() => setShowCreateSecret(true)}
-                      >
-                        Add new secret
-                      </Button>
-                    </TooltipTrigger_Shadcn_>
-                    {!canUpdateSecrets && (
-                      <TooltipContent_Shadcn_ side="bottom">
-                        You need additional permissions to update edge function secrets
-                      </TooltipContent_Shadcn_>
-                    )}
-                  </Tooltip_Shadcn_>
+                  <ButtonTooltip
+                    disabled={!canUpdateSecrets}
+                    onClick={() => setShowCreateSecret(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to update edge function secrets',
+                      },
+                    }}
+                  >
+                    Add new secret
+                  </ButtonTooltip>
                 </div>
               </div>
               <Table

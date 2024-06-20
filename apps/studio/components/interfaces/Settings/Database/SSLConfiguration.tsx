@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   FormHeader,
   FormPanel,
@@ -173,22 +174,19 @@ const SSLConfiguration = () => {
           </div>
           <div className="flex items-end justify-end">
             {!hasSSLCertificate ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="default"
-                    disabled
-                    icon={<Download />}
-                    className="pointer-events-auto"
-                  >
-                    Download certificate
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" className="w-72 text-center">
-                  Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
-                  installed
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+              <ButtonTooltip
+                disabled
+                type="default"
+                icon={<Download />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
+                  },
+                }}
+              >
+                Download certificate
+              </ButtonTooltip>
             ) : (
               <Button type="default" icon={<Download />}>
                 <a

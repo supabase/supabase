@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
@@ -10,19 +11,9 @@ import type {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import Link from 'next/link'
-import {
-  Badge,
-  Button,
-  cn,
-  IconArrowRight,
-  IconExternalLink,
-  IconGitHub,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
 import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -307,23 +298,16 @@ const EmptyIntegrationConnection = React.forwardRef<
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              disabled={disabled}
-              className="pointer-events-auto"
-              type="default"
-              onClick={() => onClick()}
-            >
-              Add new project connection
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          {disabled && (
-            <TooltipContent_Shadcn_ side="bottom">
-              Additional permissions required to add connection
-            </TooltipContent_Shadcn_>
-          )}
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          type="default"
+          disabled={disabled}
+          onClick={() => onClick()}
+          tooltip={{
+            content: { side: 'bottom', text: 'Additional permissions required to add connection' },
+          }}
+        >
+          Add new project connection
+        </ButtonTooltip>
       </div>
     </div>
   )

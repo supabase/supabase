@@ -9,6 +9,8 @@ import toast from 'react-hot-toast'
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
@@ -19,13 +21,7 @@ import {
   useSelectedProject,
   useUrlState,
 } from 'hooks'
-import {
-  Button,
-  IconGitHub,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, IconGitHub } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -36,7 +32,6 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
-import NoPermission from 'components/ui/NoPermission'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -216,23 +211,19 @@ const BranchManagement = () => {
                       Documentation
                     </Link>
                   </Button>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        type="primary"
-                        className="pointer-events-auto"
-                        disabled={!canCreateBranches}
-                        onClick={() => setShowCreateBranch(true)}
-                      >
-                        Create branch
-                      </Button>
-                    </TooltipTrigger_Shadcn_>
-                    {!canCreateBranches && (
-                      <TooltipContent_Shadcn_>
-                        You need additional permissions to create branches
-                      </TooltipContent_Shadcn_>
-                    )}
-                  </Tooltip_Shadcn_>
+                  <ButtonTooltip
+                    type="primary"
+                    disabled={!canCreateBranches}
+                    onClick={() => setShowCreateBranch(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to create branches',
+                      },
+                    }}
+                  >
+                    Create branch
+                  </ButtonTooltip>
                 </div>
               </div>
 
@@ -275,23 +266,19 @@ const BranchManagement = () => {
                           </Link>
                         </Button>
                       </div>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            disabled={!canDisableBranching}
-                            className="pointer-events-auto"
-                            onClick={() => setShowDisableBranching(true)}
-                          >
-                            Disable branching
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        {!canDisableBranching && (
-                          <TooltipContent_Shadcn_ side="bottom">
-                            You need additional permissions to disable branching
-                          </TooltipContent_Shadcn_>
-                        )}
-                      </Tooltip_Shadcn_>
+                      <ButtonTooltip
+                        type="default"
+                        disabled={!canDisableBranching}
+                        onClick={() => setShowDisableBranching(true)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: 'You need additional permissions to disable branching',
+                          },
+                        }}
+                      >
+                        Disable branching
+                      </ButtonTooltip>
                     </div>
                   )}
 

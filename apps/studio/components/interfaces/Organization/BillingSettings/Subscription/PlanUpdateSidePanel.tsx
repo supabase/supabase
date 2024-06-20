@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -24,17 +25,7 @@ import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import {
-  Button,
-  IconCheck,
-  IconInfo,
-  Modal,
-  SidePanel,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
@@ -249,43 +240,41 @@ const PlanUpdateSidePanel = () => {
                         Current plan
                       </Button>
                     ) : (
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            block
-                            disabled={
-                              // No self-serve downgrades from Enterprise
-                              subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
-                            }
-                            type={isDowngradeOption ? 'default' : 'primary'}
-                            className="pointer-events-auto"
-                            onClick={() => {
-                              setSelectedTier(plan.id as any)
-                              Telemetry.sendActivity(
-                                {
-                                  activity: 'Popup Viewed',
-                                  source: 'Dashboard',
-                                  data: {
-                                    title: isDowngradeOption
-                                      ? 'Downgrade'
-                                      : 'Upgrade' + ' to ' + plan.name,
-                                    section: 'Subscription plan',
-                                  },
-                                  ...(slug && { orgSlug: slug }),
-                                },
-                                router
-                              )
-                            }}
-                          >
-                            {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        {!canUpdateSubscription && (
-                          <TooltipContent_Shadcn_ side="bottom">
-                            You do not have permission to change the subscription plan
-                          </TooltipContent_Shadcn_>
-                        )}
-                      </Tooltip_Shadcn_>
+                      <ButtonTooltip
+                        block
+                        type={isDowngradeOption ? 'default' : 'primary'}
+                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
+                        onClick={() => {
+                          setSelectedTier(plan.id as any)
+                          Telemetry.sendActivity(
+                            {
+                              activity: 'Popup Viewed',
+                              source: 'Dashboard',
+                              data: {
+                                title: isDowngradeOption
+                                  ? 'Downgrade'
+                                  : 'Upgrade' + ' to ' + plan.name,
+                                section: 'Subscription plan',
+                              },
+                              ...(slug && { orgSlug: slug }),
+                            },
+                            router
+                          )
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text:
+                              subscription?.plan?.id === 'enterprise'
+                                ? 'Reach out to us via support to update your plan from Enterprise'
+                                : !canUpdateSubscription
+                                  ? 'You do not have permission to change the subscription plan'
+                                  : undefined,
+                          },
+                        }}
+                      >
+                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                      </ButtonTooltip>
                     )}
 
                     <div className="border-t my-4" />

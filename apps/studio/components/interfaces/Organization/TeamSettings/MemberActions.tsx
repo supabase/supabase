@@ -172,28 +172,23 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   return (
     <>
       <div className="flex items-center justify-end gap-x-2">
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              type="default"
-              className="pointer-events-auto"
-              disabled={isPendingInviteAcceptance || !canRemoveMember}
-              onClick={() => setShowAccessModal(true)}
-            >
-              Manage access
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          {!canRemoveMember && (
-            <TooltipContent_Shadcn_ side="bottom">
-              You need additional permissions to manage this team member
-            </TooltipContent_Shadcn_>
-          )}
-          {isPendingInviteAcceptance && (
-            <TooltipContent_Shadcn_ side="bottom">
-              Role can only be changed after the user has accepted the invite
-            </TooltipContent_Shadcn_>
-          )}
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          type="default"
+          disabled={isPendingInviteAcceptance || !canRemoveMember}
+          onClick={() => setShowAccessModal(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: isPendingInviteAcceptance
+                ? 'Role can only be changed after the user has accepted the invite'
+                : !canRemoveMember
+                  ? 'You need additional permissions to manage this team member'
+                  : undefined,
+            },
+          }}
+        >
+          Manage access
+        </ButtonTooltip>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

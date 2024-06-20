@@ -1,10 +1,10 @@
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
-
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { GitBranch } from 'lucide-react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import BranchingWaitListPopover from './BranchingWaitListPopover'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface EnableBranchingButtonProps {
   isNewNav?: boolean
@@ -25,28 +25,25 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
   }
 
   return (
-    <Tooltip_Shadcn_>
-      <TooltipTrigger_Shadcn_ asChild>
-        <Button
-          type={isNewNav ? 'default' : 'text'}
-          icon={<GitBranch strokeWidth={1.5} />}
-          disabled={isDisabled}
-          className="pointer-events-auto"
-          onClick={() => snap.setShowEnableBranchingModal(true)}
-        >
-          <span>Enable branching</span>
-        </Button>
-      </TooltipTrigger_Shadcn_>
-      {isDisabled && (
-        <TooltipContent_Shadcn_ side="bottom">
-          {project?.status !== 'ACTIVE_HEALTHY'
-            ? 'Unpause your project to enable branching'
-            : !canEnableBranching
-              ? 'You need additional permissions to enable branching'
-              : ''}
-        </TooltipContent_Shadcn_>
-      )}
-    </Tooltip_Shadcn_>
+    <ButtonTooltip
+      disabled={isDisabled}
+      type={isNewNav ? 'default' : 'text'}
+      icon={<GitBranch strokeWidth={1.5} />}
+      onClick={() => snap.setShowEnableBranchingModal(true)}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text:
+            project?.status !== 'ACTIVE_HEALTHY'
+              ? 'Unpause your project to enable branching'
+              : !canEnableBranching
+                ? 'You need additional permissions to enable branching'
+                : undefined,
+        },
+      }}
+    >
+      Enable branching
+    </ButtonTooltip>
   )
 }
 

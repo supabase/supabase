@@ -3,16 +3,10 @@ import { ExternalLink, GitPullRequest } from 'lucide-react'
 import Link from 'next/link'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions, useFlag } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Button,
-  IconExternalLink,
-  IconGitBranch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, IconGitBranch } from 'ui'
 
 export const BranchingEmptyState = () => {
   const snap = useAppStateSnapshot()
@@ -31,23 +25,19 @@ export const BranchingEmptyState = () => {
       </p>
       <div className="flex items-center space-x-2 !mt-4">
         {hasAccessToBranching && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                disabled={!canEnableBranching}
-                className="pointer-events-auto"
-                icon={<IconGitBranch strokeWidth={1.5} />}
-                onClick={() => snap.setShowEnableBranchingModal(true)}
-              >
-                Enable branching
-              </Button>
-            </TooltipTrigger_Shadcn_>
-            {!canEnableBranching && (
-              <TooltipContent_Shadcn_ side="bottom">
-                You need additional permissions to enable branching
-              </TooltipContent_Shadcn_>
-            )}
-          </Tooltip_Shadcn_>
+          <ButtonTooltip
+            disabled={!canEnableBranching}
+            icon={<IconGitBranch strokeWidth={1.5} />}
+            onClick={() => snap.setShowEnableBranchingModal(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to enable branching',
+              },
+            }}
+          >
+            Enable branching
+          </ButtonTooltip>
         )}
         <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
           <a
@@ -137,7 +127,7 @@ export const PreviewBranchesEmptyState = ({
             <p>Not sure what to do?</p>
             <p className="text-foreground-light">Browse our documentation</p>
           </div>
-          <Button type="default" iconRight={<IconExternalLink />}>
+          <Button type="default" iconRight={<ExternalLink size={14} />}>
             <Link
               target="_blank"
               rel="noreferrer"

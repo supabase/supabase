@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -10,6 +9,7 @@ import { useState } from 'react'
 import DatePicker from 'react-datepicker'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 import { useBackupsQuery } from 'data/database/backups-query'
@@ -25,9 +25,6 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import BackupsEmpty from '../BackupsEmpty'
@@ -190,29 +187,23 @@ const PITRSelection = () => {
                     Cancel
                   </Button>
 
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        type="warning"
-                        className="pointer-events-auto"
-                        disabled={
-                          isSelectedOutOfRange || !selectedDate || !canTriggerPhysicalBackups
-                        }
-                        onClick={() => setShowConfirmation(true)}
-                      >
-                        Review restore details
-                      </Button>
-                    </TooltipTrigger_Shadcn_>
-                    {(!canTriggerPhysicalBackups || isSelectedOutOfRange) && (
-                      <TooltipContent_Shadcn_ side="bottom">
-                        {isSelectedOutOfRange
+                  <ButtonTooltip
+                    type="warning"
+                    disabled={isSelectedOutOfRange || !selectedDate || !canTriggerPhysicalBackups}
+                    onClick={() => setShowConfirmation(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isSelectedOutOfRange
                           ? 'Selected date is out of range where backups are available'
                           : !canTriggerPhysicalBackups
                             ? 'You need additional permissions to trigger a restore'
-                            : ''}
-                      </TooltipContent_Shadcn_>
-                    )}
-                  </Tooltip_Shadcn_>
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Review restore details
+                  </ButtonTooltip>
                 </div>
               }
             >

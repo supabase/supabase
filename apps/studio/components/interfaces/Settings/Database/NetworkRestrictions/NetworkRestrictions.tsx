@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -46,23 +47,19 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 )
 
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip_Shadcn_>
-    <TooltipTrigger_Shadcn_ asChild>
-      <Button
-        type="default"
-        className="pointer-events-auto"
-        disabled={disabled}
-        onClick={() => onClick(true)}
-      >
-        Restrict all access
-      </Button>
-    </TooltipTrigger_Shadcn_>
-    {disabled && (
-      <TooltipContent_Shadcn_ side="bottom">
-        You need additional permissions to update network restrictions
-      </TooltipContent_Shadcn_>
-    )}
-  </Tooltip_Shadcn_>
+  <ButtonTooltip
+    disabled={disabled}
+    type="default"
+    onClick={() => onClick(true)}
+    tooltip={{
+      content: {
+        side: 'bottom',
+        text: 'You need additional permissions to update network restrictions',
+      },
+    }}
+  >
+    Restrict all access
+  </ButtonTooltip>
 )
 
 const NetworkRestrictions = () => {
@@ -113,21 +110,18 @@ const NetworkRestrictions = () => {
               </a>
             </Button>
             {!canUpdateNetworkRestrictions ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    disabled
-                    type="primary"
-                    className="pointer-events-auto"
-                    iconRight={<ChevronDown size={14} />}
-                  >
-                    Add restriction
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom">
-                  You need additional permissions to update network restrictions
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+              <ButtonTooltip
+                disabled
+                type="primary"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to update network restrictions',
+                  },
+                }}
+              >
+                Add restriction
+              </ButtonTooltip>
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

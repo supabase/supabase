@@ -18,6 +18,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
@@ -37,9 +38,6 @@ import {
   DropdownMenuTrigger,
   Input,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
@@ -149,21 +147,19 @@ const JWTSettings = () => {
                               Updating JWT secret...
                             </Button>
                           ) : !canGenerateNewJWTSecret ? (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
-                                <Button
-                                  disabled
-                                  type="default"
-                                  className="pointer-events-auto"
-                                  iconRight={<ChevronDown size={14} />}
-                                >
-                                  Generate a new secret
-                                </Button>
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
-                                You need additional permissions to generate a new JWT secret
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                            <ButtonTooltip
+                              disabled
+                              type="default"
+                              iconRight={<ChevronDown size={14} />}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: 'You need additional permissions to generate a new JWT secret',
+                                },
+                              }}
+                            >
+                              Generate a new secret
+                            </ButtonTooltip>
                           ) : (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>

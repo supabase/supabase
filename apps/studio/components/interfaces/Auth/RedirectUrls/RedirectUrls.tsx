@@ -13,12 +13,10 @@ import {
   Form,
   Input,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { object, string } from 'yup'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -121,22 +119,18 @@ const RedirectUrls = () => {
               Documentation
             </Link>
           </Button>
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                disabled={!canUpdateConfig}
-                className="pointer-events-auto"
-                onClick={() => setOpen(true)}
-              >
-                Add URL
-              </Button>
-            </TooltipTrigger_Shadcn_>
-            {!canUpdateConfig && (
-              <TooltipContent_Shadcn_ side="bottom">
-                You need additional permissions to update redirect URLs
-              </TooltipContent_Shadcn_>
-            )}
-          </Tooltip_Shadcn_>
+          <ButtonTooltip
+            disabled={!canUpdateConfig}
+            onClick={() => setOpen(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to update redirect URLs',
+              },
+            }}
+          >
+            Add URL
+          </ButtonTooltip>
         </div>
       </div>
       {isLoading && (

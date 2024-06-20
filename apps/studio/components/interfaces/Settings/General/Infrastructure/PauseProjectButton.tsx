@@ -9,12 +9,12 @@ import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
@@ -55,22 +55,16 @@ const PauseProjectButton = () => {
 
   return (
     <>
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
-          <Button
-            type="default"
-            className="pointer-events-auto"
-            icon={<Pause />}
-            onClick={() => setIsModalOpen(true)}
-            loading={isPausing}
-            disabled={buttonDisabled}
-          >
-            Pause project
-          </Button>
-        </TooltipTrigger_Shadcn_>
-        {buttonDisabled ? (
-          <TooltipContent_Shadcn_ side="bottom">
-            {isPaused
+      <ButtonTooltip
+        type="default"
+        icon={<Pause />}
+        onClick={() => setIsModalOpen(true)}
+        loading={isPausing}
+        disabled={buttonDisabled}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: isPaused
               ? 'Your project is already paused'
               : !canPauseProject
                 ? 'You need additional permissions to pause this project'
@@ -78,10 +72,12 @@ const PauseProjectButton = () => {
                   ? 'Unable to pause project as project is not active'
                   : !isFreePlan
                     ? 'Projects on a paid plan will always be running'
-                    : ''}
-          </TooltipContent_Shadcn_>
-        ) : null}
-      </Tooltip_Shadcn_>
+                    : undefined,
+          },
+        }}
+      >
+        Pause project
+      </ButtonTooltip>
 
       <ConfirmationModal
         variant={'destructive'}

@@ -9,6 +9,7 @@ import { number, object } from 'yup'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
@@ -22,9 +23,6 @@ import {
   Form,
   InputNumber,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
@@ -111,23 +109,21 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                   </p>
                 </div>
                 <div className="flex items-end justify-end">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        type="default"
-                        className="pointer-events-auto"
-                        disabled={!canUpdateDiskSizeConfig || disabled}
-                        onClick={() => setShowResetDbPass(true)}
-                      >
-                        Increase disk size
-                      </Button>
-                    </TooltipTrigger_Shadcn_>
-                    {!canUpdateDiskSizeConfig && (
-                      <TooltipContent_Shadcn_ side="bottom">
-                        You need additional permissions to increase the disk size
-                      </TooltipContent_Shadcn_>
-                    )}
-                  </Tooltip_Shadcn_>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canUpdateDiskSizeConfig || disabled}
+                    onClick={() => setShowResetDbPass(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateDiskSizeConfig
+                          ? 'You need additional permissions to increase the disk size'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Increase disk size
+                  </ButtonTooltip>
                 </div>
               </div>
             </Panel.Content>

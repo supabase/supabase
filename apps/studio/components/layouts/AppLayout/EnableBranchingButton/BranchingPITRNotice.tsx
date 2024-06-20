@@ -2,17 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const BranchingPITRNotice = () => {
   const { ref } = useParams()
@@ -33,16 +26,20 @@ const BranchingPITRNotice = () => {
         example, if you accidentally delete a column or some of your production data.
       </AlertDescription_Shadcn_>
       {!canUpdateSubscription ? (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button disabled size="tiny" type="default" className="mt-4 pointer-events-auto">
-              Enable PITR add-on
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
-            You need additional permissions to amend subscriptions
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          disabled
+          size="tiny"
+          type="default"
+          className="mt-4"
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'You need additional permissions to amend subscriptions',
+            },
+          }}
+        >
+          Enable PITR add-on
+        </ButtonTooltip>
       ) : (
         <Button size="tiny" type="default" className="mt-4">
           <Link

@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Globe } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Badge, Button } from 'ui'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -91,23 +91,19 @@ const BannedIPs = () => {
                 {ip === userIPAddress && <Badge>Your IP address</Badge>}
               </div>
               <div>
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button
-                      type="default"
-                      className="pointer-events-auto"
-                      disabled={!canUnbanNetworks}
-                      onClick={() => openConfirmationModal(ip)}
-                    >
-                      Unban IP
-                    </Button>
-                  </TooltipTrigger_Shadcn_>
-                  {!canUnbanNetworks && (
-                    <TooltipContent_Shadcn_>
-                      You need additional permissions to unban networks
-                    </TooltipContent_Shadcn_>
-                  )}
-                </Tooltip_Shadcn_>
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canUnbanNetworks}
+                  onClick={() => openConfirmationModal(ip)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'You need additional permissions to unban networks',
+                    },
+                  }}
+                >
+                  Unban IP
+                </ButtonTooltip>
               </div>
             </div>
           ))

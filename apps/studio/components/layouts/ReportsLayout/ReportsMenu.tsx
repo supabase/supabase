@@ -1,17 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
+import { useProfile } from 'lib/profile'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,13 +25,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Menu,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useProfile } from 'lib/profile'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -140,27 +138,24 @@ const ReportsMenu = () => {
       ) : (
         <div className="flex flex-col px-2 gap-y-6">
           <div className="px-2">
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  block
-                  type="default"
-                  disabled={!canCreateCustomReport}
-                  className="justify-start flex-grow pointer-events-auto"
-                  onClick={() => {
-                    setShowNewReportModal(true)
-                  }}
-                  icon={<Plus size={12} />}
-                >
-                  New custom report
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {!canCreateCustomReport && (
-                <TooltipContent_Shadcn_ side="bottom">
-                  You need additional permissions to create custom reports
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              block
+              type="default"
+              icon={<Plus />}
+              disabled={!canCreateCustomReport}
+              className="justify-start flex-grow"
+              onClick={() => {
+                setShowNewReportModal(true)
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create custom reports',
+                },
+              }}
+            >
+              New custom report
+            </ButtonTooltip>
           </div>
 
           {reportMenuItems.length > 0 ? (

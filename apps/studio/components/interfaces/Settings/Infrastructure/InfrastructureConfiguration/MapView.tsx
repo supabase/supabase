@@ -27,6 +27,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks'
@@ -346,23 +347,19 @@ const MapView = ({
               databasesInSelectedRegion.length > 0 ? 'border-t' : ''
             }`}
           >
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="default"
-                  disabled={!canManageReplicas}
-                  className="pointer-events-auto"
-                  onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
-                >
-                  Deploy new replica here
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {!canManageReplicas && (
-                <TooltipContent_Shadcn_>
-                  You need additional permissions to deploy replicas
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              type="default"
+              disabled={!canManageReplicas}
+              onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to deploy replicas',
+                },
+              }}
+            >
+              Deploy new replica here
+            </ButtonTooltip>
             <Button
               type="default"
               onClick={() => {

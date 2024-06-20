@@ -13,14 +13,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import {
@@ -225,26 +223,20 @@ const InstanceConfigurationUI = () => {
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <div className="flex items-center justify-center">
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button
-                      type="default"
-                      disabled={!canManageReplicas}
-                      className={cn(
-                        replicas.length > 0 ? 'rounded-r-none' : '',
-                        'pointer-events-auto'
-                      )}
-                      onClick={() => setShowNewReplicaPanel(true)}
-                    >
-                      Deploy a new replica
-                    </Button>
-                  </TooltipTrigger_Shadcn_>
-                  {!canManageReplicas && (
-                    <TooltipContent_Shadcn_ side="bottom">
-                      You need additional permissions to deploy replicas
-                    </TooltipContent_Shadcn_>
-                  )}
-                </Tooltip_Shadcn_>
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canManageReplicas}
+                  className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
+                  onClick={() => setShowNewReplicaPanel(true)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: 'You need additional permissions to deploy replicas',
+                    },
+                  }}
+                >
+                  Deploy a new replica
+                </ButtonTooltip>
                 {replicas.length > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

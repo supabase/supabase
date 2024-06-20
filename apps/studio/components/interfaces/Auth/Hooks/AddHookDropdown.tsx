@@ -20,6 +20,7 @@ import { extractMethod, isValidHook } from './hooks.utils'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AddHookDropdownProps {
   buttonText?: string
@@ -56,16 +57,15 @@ export const AddHookDropdown = ({
 
   if (!canUpdateConfig) {
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
-          <Button disabled type="primary" className="pointer-events-auto">
-            {buttonText}
-          </Button>
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_ side="bottom">
-          You need additional permissions to add auth hooks
-        </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+      <ButtonTooltip
+        disabled
+        type="primary"
+        tooltip={{
+          content: { side: 'bottom', text: 'You need additional permissions to add auth hooks' },
+        }}
+      >
+        {buttonText}
+      </ButtonTooltip>
     )
   }
 

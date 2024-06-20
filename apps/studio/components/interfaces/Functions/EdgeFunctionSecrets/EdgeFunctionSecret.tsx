@@ -2,9 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Trash } from 'lucide-react'
 
 import Table from 'components/to-be-cleaned/Table'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -27,22 +27,19 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
       </Table.td>
       <Table.td>
         <div className="flex items-center justify-end">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                type="text"
-                icon={<Trash />}
-                className="px-1 pointer-events-auto"
-                disabled={!canUpdateSecrets}
-                onClick={() => onSelectDelete()}
-              />
-            </TooltipTrigger_Shadcn_>
-            {!canUpdateSecrets && (
-              <TooltipContent_Shadcn_ side="bottom">
-                You need additional permissions to delete edge function secrets
-              </TooltipContent_Shadcn_>
-            )}
-          </Tooltip_Shadcn_>
+          <ButtonTooltip
+            type="text"
+            icon={<Trash />}
+            className="px-1"
+            disabled={!canUpdateSecrets}
+            onClick={() => onSelectDelete()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to delete edge function secrets',
+              },
+            }}
+          />
         </div>
       </Table.td>
     </Table.tr>

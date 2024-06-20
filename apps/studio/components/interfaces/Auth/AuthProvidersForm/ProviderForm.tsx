@@ -4,6 +4,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -11,16 +12,7 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronUp } from 'lucide-react'
-import {
-  Alert,
-  Button,
-  Collapsible,
-  Form,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Alert, Button, Collapsible, Form, Input } from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -212,23 +204,21 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     >
                       Cancel
                     </Button>
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_ asChild>
-                        <Button
-                          htmlType="submit"
-                          className="pointer-events-auto"
-                          loading={isUpdatingConfig}
-                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                        >
-                          Save
-                        </Button>
-                      </TooltipTrigger_Shadcn_>
-                      {!canUpdateConfig && (
-                        <TooltipContent_Shadcn_ side="bottom">
-                          You need additional permissions to update provider settings
-                        </TooltipContent_Shadcn_>
-                      )}
-                    </Tooltip_Shadcn_>
+                    <ButtonTooltip
+                      htmlType="submit"
+                      loading={isUpdatingConfig}
+                      disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canUpdateConfig
+                            ? 'You need additional permissions to update provider settings'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      Save
+                    </ButtonTooltip>
                   </div>
                 </div>
               </div>
