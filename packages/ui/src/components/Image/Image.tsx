@@ -31,21 +31,21 @@ interface Props {
 export type ImageProps = Props & NextImageProps
 
 /**
- * An advanced Image component that extended next/image.
- * - It accepts all the next/image props
- * - 'src' prop can either be a simple string or an object that specifies theme alternatives {dark: string, light: string}
- * - optional "zoomable" {boolean} prop to make the image zoomable on click
- * - optional "caption" {string} to add a figcaption
- * - optional "captionAlign" {'left' | 'center' | 'right'} to align the caption
+ * An advanced Image component that extends next/image with:
+ * - src: prop can either be a string or an object with theme alternatives {dark: string, light: string}
+ * - zoomable: {boolean} (optional) to make the image zoomable on click
+ * - caption: {string} (optional) to add a figcaption
+ * - captionAlign: {'left' | 'center' | 'right'} (optional) to align the caption
  */
 const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
-  const isMobile = useBreakpoint()
+  const isLessThanLgBreakpoint = useBreakpoint()
+
   const Component = zoomable ? Zoom : 'span'
   const sizes = zoomable
     ? '(max-width: 768px) 200vw, (max-width: 1200px) 120vw, 200vw'
-    : '(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 100vw'
+    : '(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 33vw'
   const source =
     typeof src === 'string' ? src : resolvedTheme?.includes('dark') ? src.dark : src.light
 
@@ -58,7 +58,9 @@ const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   return (
     <figure className={cn('next-image--dynamic-fill', props.containerClassName)}>
       <Component
-        {...(zoomable ? { ZoomContent: ZoomContent, zoomMargin: isMobile ? 20 : 80 } : undefined)}
+        {...(zoomable
+          ? { ZoomContent: ZoomContent, zoomMargin: isLessThanLgBreakpoint ? 20 : 80 }
+          : undefined)}
       >
         <NextImage
           alt={alt}
