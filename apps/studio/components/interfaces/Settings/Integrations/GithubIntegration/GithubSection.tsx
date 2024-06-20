@@ -44,7 +44,7 @@ const GitHubSection = () => {
 
   const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
-  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+  const { mutateAsync: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted Github connection')
     },
@@ -71,7 +71,7 @@ const GitHubSection = () => {
         toast.error('Organization not found')
         return
       }
-      deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
+      await deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
     },
     [deleteGitHubConnection, org?.id]
   )
