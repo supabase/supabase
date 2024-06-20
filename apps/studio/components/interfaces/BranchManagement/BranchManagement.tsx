@@ -214,27 +214,32 @@ const BranchManagement = () => {
                     <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
                       <IconGitHub size={18} strokeWidth={2} />
                     </div>
-                    <p className="text-sm">GitHub branch workflow</p>
+                    <p className="text-sm">
+                      {repo ? 'GitHub branch workflow' : 'No GitHub integration connected'}
+                    </p>
                     <Button asChild type="default" iconRight={<IconExternalLink />}>
                       <Link passHref href={`/project/${ref}/settings/integrations`}>
                         Settings
                       </Link>
                     </Button>
-                    <Button
-                      type="text"
-                      size="small"
-                      className="text-light hover:text py-1 px-1.5"
-                      iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-                    >
-                      <Link
-                        passHref
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`https://github.com/${repo}`}
+                    {repo && (
+                      <Button
+                        type="text"
+                        size="small"
+                        className="text-light hover:text py-1 px-1.5"
+                        iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+                        asChild
                       >
-                        {repo}
-                      </Link>
-                    </Button>
+                        <Link
+                          passHref
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://github.com/${repo}`}
+                        >
+                          {repo}
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                   <Button type="default" onClick={() => setShowDisableBranching(true)}>
                     Disable branching
