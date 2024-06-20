@@ -3,9 +3,9 @@ import { noop } from 'lodash'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import Panel from 'components/ui/Panel'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 
