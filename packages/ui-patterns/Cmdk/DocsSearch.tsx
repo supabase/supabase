@@ -1,3 +1,4 @@
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
@@ -22,12 +23,13 @@ const questions = [
 ]
 
 const DocsSearch = () => {
+  const supabaseClient = useSupabaseClient()
   const {
     searchState: state,
     handleDocsSearch: handleSearch,
     handleDocsSearchDebounced: debouncedSearch,
     resetSearch,
-  } = useDocsSearch()
+  } = useDocsSearch(supabaseClient)
   const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const initialLoad = useRef(true)
   const router = useRouter()
