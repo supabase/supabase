@@ -509,7 +509,7 @@ module.exports = {
 },
 "border-strong": {
   cssVariable: "var(--border-strong)",
-  value: "hsl(0, 0%, 20%)"
+  value: "hsl(0, 0%, 21.2%)"
 },
 "border-stronger": {
   cssVariable: "var(--border-stronger)",

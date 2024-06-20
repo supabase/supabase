@@ -30,7 +30,7 @@
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
   --border-stronger: 0deg 0% 22%;
-  --border-strong: 0deg 0% 20%;
+  --border-strong: 0deg 0% 21.2%;
   --border-alternative: 0deg 0% 26.7%;
   --border-control: 0deg 0% 22.4%;
   --border-overlay: 0deg 0% 20%;
@@ -56,10 +56,6 @@
   --foreground-lighter: 0deg 0% 53.7%;
   --foreground-light: 0deg 0% 70.6%;
   --foreground-default: 0deg 0% 98%;
-  --background-dialog-default: 0deg 0% 11%;
-  --background-surface-75: 0deg 0% 12.5%;
-  --background-200: 0deg 0% 11%;
-  --foreground-contrast: 0deg 0% 11%;
   --border-button-hover: var(--colors-gray-dark-800);
   --border-button-default: var(--colors-gray-dark-700);
   --background-button-default: var(--colors-gray-dark-500);
