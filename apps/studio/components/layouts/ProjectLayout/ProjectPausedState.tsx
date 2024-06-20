@@ -6,24 +6,15 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
@@ -200,24 +191,20 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
               {!isRestoreDisabled && (
                 <div className="flex items-center justify-center gap-4">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        size="tiny"
-                        type="default"
-                        className="pointer-events-auto"
-                        disabled={!canResumeProject}
-                        onClick={onSelectRestore}
-                      >
-                        Restore project
-                      </Button>
-                    </TooltipTrigger_Shadcn_>
-                    {!canResumeProject && (
-                      <TooltipContent_Shadcn_ side="bottom">
-                        You need additional permissions to resume this project
-                      </TooltipContent_Shadcn_>
-                    )}
-                  </Tooltip_Shadcn_>
+                  <ButtonTooltip
+                    size="tiny"
+                    type="default"
+                    disabled={!canResumeProject}
+                    onClick={onSelectRestore}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to resume this project',
+                      },
+                    }}
+                  >
+                    Restore project
+                  </ButtonTooltip>
                   {isFreePlan ? (
                     <Button asChild type="primary">
                       <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
