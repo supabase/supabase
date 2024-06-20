@@ -10,13 +10,14 @@ import {
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -94,24 +95,22 @@ const TeamSettings = () => {
                 selectedOrganization !== undefined && <InviteMemberButton />}
               {/* if organizationMembersDeletionEnabled is false, you also can't delete yourself */}
               {organizationMembersDeletionEnabled && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button
-                      type="default"
-                      className="pointer-events-auto"
-                      disabled={!canLeave}
-                      onClick={() => setIsLeaveTeamModalOpen(true)}
-                      loading={isLeaving}
-                    >
-                      Leave team
-                    </Button>
-                  </TooltipTrigger_Shadcn_>
-                  {!canLeave && (
-                    <TooltipContent_Shadcn_ side="bottom">
-                      An organization requires at least 1 owner
-                    </TooltipContent_Shadcn_>
-                  )}
-                </Tooltip_Shadcn_>
+                <>
+                  <ButtonTooltip
+                    type="default"
+                    loading={isLeaving}
+                    disabled={!canLeave}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canLeave ? 'An organization requires at least 1 owner' : undefined,
+                      },
+                    }}
+                    onClick={() => setIsLeaveTeamModalOpen(true)}
+                  >
+                    Leave team
+                  </ButtonTooltip>
+                </>
               )}
             </ScaffoldActionsGroup>
           </ScaffoldActionsContainer>

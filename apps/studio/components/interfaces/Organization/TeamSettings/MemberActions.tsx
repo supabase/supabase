@@ -30,6 +30,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -152,14 +153,18 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button type="text" className="px-1.5" icon={<MoreVertical size={18} />} />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
-            You need additional permissions to manage this team member
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          disabled
+          type="text"
+          className="px-1.5"
+          icon={<MoreVertical size={18} />}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'You need additional permissions to manage this team member',
+            },
+          }}
+        />
       </div>
     )
   }

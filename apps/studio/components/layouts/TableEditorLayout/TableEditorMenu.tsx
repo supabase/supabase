@@ -33,6 +33,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const TableEditorMenu = () => {
   const router = useRouter()

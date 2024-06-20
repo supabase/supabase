@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ArrowUpRight, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -9,20 +10,11 @@ import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
 import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
-import { ArrowUpRight, Edit } from 'lucide-react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Menu,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Menu } from 'ui'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -52,30 +44,22 @@ const StorageMenu = () => {
     <>
       <Menu type="pills" className="my-6 flex flex-grow flex-col">
         <div className="mb-6 mx-5">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                block
-                type="default"
-                className="pointer-events-auto"
-                icon={
-                  <div className="text-foreground-light">
-                    <Edit size={14} />
-                  </div>
-                }
-                disabled={!canCreateBuckets}
-                style={{ justifyContent: 'start' }}
-                onClick={() => setShowCreateBucketModal(true)}
-              >
-                New bucket
-              </Button>
-            </TooltipTrigger_Shadcn_>
-            {!canCreateBuckets && (
-              <TooltipContent_Shadcn_ side="bottom">
-                You need additional permissions to create buckets
-              </TooltipContent_Shadcn_>
-            )}
-          </Tooltip_Shadcn_>
+          <ButtonTooltip
+            block
+            type="default"
+            icon={<Edit size={14} />}
+            disabled={!canCreateBuckets}
+            style={{ justifyContent: 'start' }}
+            onClick={() => setShowCreateBucketModal(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to create buckets',
+              },
+            }}
+          >
+            New bucket
+          </ButtonTooltip>
         </div>
 
         <div className="space-y-6">

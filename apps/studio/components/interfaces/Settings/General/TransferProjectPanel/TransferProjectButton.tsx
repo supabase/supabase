@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -6,8 +5,6 @@ import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
-  IconAlertCircle,
-  IconInfo,
   IconLoader,
   IconShield,
   IconTool,
@@ -15,11 +12,9 @@ import {
   Listbox,
   Loading,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
@@ -83,25 +78,21 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
-          <Button
-            type="default"
-            onClick={toggle}
-            className="pointer-events-auto"
-            disabled={!canTransferProject || disableProjectTransfer}
-          >
-            Transfer project
-          </Button>
-        </TooltipTrigger_Shadcn_>
-        {(!canTransferProject || disableProjectTransfer) && (
-          <TooltipContent_Shadcn_ side="bottom">
-            {!canTransferProject
+      <ButtonTooltip
+        type="default"
+        onClick={toggle}
+        disabled={!canTransferProject || disableProjectTransfer}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canTransferProject
               ? 'You need additional permissions to transfer this project'
-              : 'Project transfers are temporarily disabled, please try again later.'}
-          </TooltipContent_Shadcn_>
-        )}
-      </Tooltip_Shadcn_>
+              : 'Project transfers are temporarily disabled, please try again later.',
+          },
+        }}
+      >
+        Transfer project
+      </ButtonTooltip>
 
       <Modal
         onCancel={() => toggle()}

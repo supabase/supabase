@@ -5,6 +5,7 @@ import { ReactNode } from 'react'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_, cn } from 'ui'
+import { ButtonTooltip } from './ButtonTooltip'
 
 interface UpgradeToProProps {
   icon?: ReactNode
@@ -51,26 +52,22 @@ const UpgradeToPro = ({
             </div>
           </div>
           {!canUpdateSubscription || projectUpdateDisabled ? (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button disabled type="primary" className="pointer-events-auto">
-                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
-                {projectUpdateDisabled ? (
-                  <>
-                    Subscription changes are currently disabled.
-                    <br />
-                    Our engineers are working on a fix.
-                  </>
-                ) : !canUpdateSubscription ? (
-                  'You need additional permissions to amend subscriptions'
-                ) : (
-                  ''
-                )}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              disabled
+              type="primary"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: projectUpdateDisabled
+                    ? 'Subscription changes are currently disabled, our engineers are working on a fix'
+                    : !canUpdateSubscription
+                      ? 'You need additional permissions to amend subscriptions'
+                      : undefined,
+                },
+              }}
+            >
+              Reset database password
+            </ButtonTooltip>
           ) : (
             <Button
               asChild

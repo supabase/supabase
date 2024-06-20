@@ -23,6 +23,7 @@ import { useDatabasePasswordResetMutation } from 'data/database/database-passwor
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -111,27 +112,23 @@ const ResetDbPassword = ({ disabled = false }) => {
               </p>
             </div>
             <div className="flex items-end justify-end">
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="default"
-                    className="pointer-events-auto"
-                    disabled={!canResetDbPassword || !isProjectActive || disabled}
-                    onClick={() => setShowResetDbPass(true)}
-                  >
-                    Reset database password
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                {(!canResetDbPassword || !isProjectActive) && (
-                  <TooltipContent_Shadcn_ side="bottom">
-                    {!canResetDbPassword
+              <ButtonTooltip
+                type="default"
+                disabled={!canResetDbPassword || !isProjectActive || disabled}
+                onClick={() => setShowResetDbPass(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canResetDbPassword
                       ? 'You need additional permissions to reset the database password'
                       : !isProjectActive
                         ? 'Unable to reset database password as project is not active'
-                        : ''}
-                  </TooltipContent_Shadcn_>
-                )}
-              </Tooltip_Shadcn_>
+                        : undefined,
+                  },
+                }}
+              >
+                Reset database password
+              </ButtonTooltip>
             </div>
           </div>
         </Panel.Content>
