@@ -1,6 +1,6 @@
 import 'react-medium-image-zoom/dist/styles.css'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import { useTheme } from 'next-themes'
 import { useBreakpoint } from 'common'
@@ -19,13 +19,10 @@ type CaptionAlign = 'left' | 'center' | 'right'
 
 interface Props {
   src: SourceType
-  style?: React.CSSProperties
-  className?: string
-  containerClassName?: string
-  alt?: string
   zoomable?: boolean
   caption?: string
   captionAlign?: CaptionAlign
+  containerClassName?: string
 }
 
 export type ImageProps = Props & NextImageProps
@@ -36,6 +33,7 @@ export type ImageProps = Props & NextImageProps
  * - zoomable: {boolean} (optional) to make the image zoomable on click
  * - caption: {string} (optional) to add a figcaption
  * - captionAlign: {'left' | 'center' | 'right'} (optional) to align the caption
+ * - containerClassName: {string} (optional) to style the parent <figure> container
  */
 const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   const [mounted, setMounted] = useState(false)
