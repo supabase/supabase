@@ -174,243 +174,142 @@ for select using (
   },
 ]
 
-export const getRealtimePolicyTemplates = (
-  table: string,
-  templateData?: Record<string, string>
-): PolicyTemplate[] => {
-  if (table === 'broadcasts') {
-    const results = [
-      {
-        id: 'policy-broadcast-1',
-        preview: false,
-        templateName: 'Enable listening to broadcasts for authenticated users only',
-        description: 'This policy enables listening to broadcasts for authenticated users only.',
-        statement: `
-  create policy "Enable listening to broadcasts for authenticated users only"
-  on realtime.broadcasts for select
-  to authenticated
-  using ( true );`.trim(),
-        name: 'Enable listening to broadcasts for authenticated users only',
-        definition: 'true',
-        check: '',
-        command: 'SELECT',
-        roles: ['authenticated'],
-      },
-      {
-        id: 'policy-broadcast-2',
-        preview: false,
-        templateName: 'Enable pushing broadcasts for authenticated users only',
-        description: 'This policy enables pushing broadcasts for authenticated users only.',
-        statement: `
+export const getRealtimePolicyTemplates = (): PolicyTemplate[] => {
+  const templateData = { channelName: 'channel_name' }
+
+  const results = [
+    {
+      id: 'policy-broadcast-1',
+      preview: false,
+      templateName: 'Enable listening to broadcasts for authenticated users only',
+      description: 'This policy enables listening to broadcasts for authenticated users only.',
+      statement: `
+        create policy  "Enable listening to broadcasts for authenticated users only"
+on realtime.messages for select
+to authenticated
+using ( realtime.messages.extension = 'broadcast' );`.trim(),
+      name: 'Enable listening to broadcasts for authenticated users only',
+      definition: "realtime.messages.extension = 'broadcast'",
+      check: '',
+      command: 'SELECT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-broadcast-2',
+      preview: false,
+      templateName: 'Enable pushing broadcasts for authenticated users only',
+      description: 'This policy enables pushing broadcasts for authenticated users only.',
+      statement: `
         create policy "Enable pushing broadcasts for authenticated users only"
-ON realtime.broadcasts for update
+ON realtime.messages for update
 TO authenticated
-using ( true )
+using ( realtime.messages.extension = 'broadcast' )
 with check ( true );`.trim(),
-        name: 'Enable pushing broadcasts for authenticated users only',
-        definition: 'true',
-        check: 'true',
-        command: 'UPDATE',
-        roles: ['authenticated'],
-      },
-    ] as PolicyTemplate[]
-
-    if (templateData && templateData['channelName']) {
-      results.push(
-        {
-          id: 'policy-broadcast-3',
-          preview: false,
-          templateName: 'Enable listening to broadcasts from a specific channel',
-          description: 'This policy enables listening to broadcasts from a specific channel.',
-          statement: `
-    create policy "Enable listening to broadcasts from a specific channel"
-    on realtime.broadcasts for select
-    using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
-          name: 'Enable listening to broadcasts from a specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: '',
-          command: 'SELECT',
-          roles: [],
-        },
-        {
-          id: 'policy-broadcast-4',
-          preview: false,
-          templateName: 'Enable pushing broadcasts to specific channel',
-          description: 'This policy enables pushing broadcasts to specific channel.',
-          statement: `
-          create policy "Enable pushing broadcasts to specific channel"
-  ON realtime.broadcasts for update
-  using ( realtime.channel_name() = '${templateData['channelName']}' )
-  with check ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
-          name: 'Enable pushing broadcasts to specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: `realtime.channel_name() = '${templateData['channelName']}'`,
-          command: 'UPDATE',
-          roles: [],
-        }
-      )
-    }
-
-    return results
-  }
-
-  if (table === 'presences') {
-    const results = [
-      {
-        id: 'policy-presences-1',
-        preview: false,
-        templateName: 'Enable listening to presences on all channels for authenticated users only',
-        description:
-          'This policy enables listening to presences on all channels for all authenticated users only.',
-        statement: `
-  create policy "Enable listening to presences on all channels for authenticated users only"
-  on realtime.presences for select
-  to authenticated
-  using ( true );`.trim(),
-        name: 'Enable listening to presences on all channels for authenticated users only',
-        definition: 'true',
-        check: '',
-        command: 'SELECT',
-        roles: ['authenticated'],
-      },
-      {
-        id: 'policy-presences-2',
-        preview: false,
-        templateName: 'Enable broadcasting presences on all channels for authenticated users only',
-        description:
-          'This policy enables broadcasting presences on all channels for all authenticated users only.',
-        statement: `
-        create policy "Enable broadcasting presences on all channels for authenticated users only"
-ON realtime.presences for update
+      name: 'Enable pushing broadcasts for authenticated users only',
+      definition: "realtime.messages.extension = 'broadcast'",
+      check: 'true',
+      command: 'UPDATE',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-broadcast-3',
+      preview: false,
+      templateName: 'Enable listening to broadcasts from a specific channel',
+      description: 'This policy enables listening to broadcasts from a specific channel.',
+      statement: `
+create policy "Enable listening to broadcasts from a specific channel"
+on realtime.messages for select
+using ( realtime.topic() = '${templateData['channelName']}' );`.trim(),
+      name: 'Enable listening to broadcasts from a specific channel',
+      definition: `realtime.topic() = '${templateData['channelName']}'`,
+      check: '',
+      command: 'SELECT',
+      roles: [],
+    },
+    {
+      id: 'policy-broadcast-4',
+      preview: false,
+      templateName: 'Enable pushing broadcasts to specific channel',
+      description: 'This policy enables pushing broadcasts to specific channel.',
+      statement: `
+create policy "Enable pushing broadcasts to specific channel"
+ON realtime.messages for update
+using ( realtime.topic() = '${templateData['channelName']}' )
+with check ( realtime.topic() = '${templateData['channelName']}' );`.trim(),
+      name: 'Enable pushing broadcasts to specific channel',
+      definition: `realtime.topic() = '${templateData['channelName']}'`,
+      check: `realtime.topic() = '${templateData['channelName']}'`,
+      command: 'UPDATE',
+      roles: [],
+    },
+    {
+      id: 'policy-presences-1',
+      preview: false,
+      templateName: 'Enable listening to presences on all channels for authenticated users only',
+      description:
+        'This policy enables listening to presences on all channels for all authenticated users only.',
+      statement: `
+create policy "Enable listening to presences on all channels for authenticated users only"
+on realtime.messages for select
+to authenticated
+using ( true );`.trim(),
+      name: 'Enable listening to presences on all channels for authenticated users only',
+      definition: 'true',
+      check: '',
+      command: 'SELECT',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-presences-2',
+      preview: false,
+      templateName: 'Enable broadcasting presences on all channels for authenticated users only',
+      description:
+        'This policy enables broadcasting presences on all channels for all authenticated users only.',
+      statement: `
+create policy "Enable broadcasting presences on all channels for authenticated users only"
+ON realtime.messages for update
 TO authenticated
 using ( true )
 with check ( true );
   ;`.trim(),
-        name: 'Enable broadcasting presences on all channels for authenticated users only',
-        definition: 'true',
-        check: 'true',
-        command: 'UPDATE',
-        roles: ['authenticated'],
-      },
-    ] as PolicyTemplate[]
-
-    if (templateData && templateData['channelName']) {
-      results.push(
-        {
-          id: 'policy-presences-3',
-          preview: false,
-          templateName: 'Enable listening to presences from a specific channel',
-          description: 'This policy enables listening to presences from a specific channel.',
-          statement: `
-    create policy "Enable listening to presences from a specific channel"
-    on realtime.presences for select
-    using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
-          name: 'Enable listening to presences from a specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: '',
-          command: 'SELECT',
-          roles: [],
-        },
-        {
-          id: 'policy-presences-4',
-          preview: false,
-          templateName: 'Enable publishing presence to a specific channel',
-          description: 'This policy enables publishing presence to a specific channel.',
-          statement: `
-        create policy "Enable publishing presence to a specific channel"
-ON realtime.presences for update
-using ( realtime.channel_name() = '${templateData['channelName']}' )
-with check ( realtime.channel_name() = '${templateData['channelName']}' );
+      name: 'Enable broadcasting presences on all channels for authenticated users only',
+      definition: 'true',
+      check: 'true',
+      command: 'UPDATE',
+      roles: ['authenticated'],
+    },
+    {
+      id: 'policy-presences-3',
+      preview: false,
+      templateName: 'Enable listening to presences from a specific channel',
+      description: 'This policy enables listening to presences from a specific channel.',
+      statement: `
+create policy "Enable listening to presences from a specific channel"
+on realtime.messages for select
+using ( realtime.topic() = '${templateData['channelName']}' );`.trim(),
+      name: 'Enable listening to presences from a specific channel',
+      definition: `realtime.topic() = '${templateData['channelName']}'`,
+      check: '',
+      command: 'SELECT',
+      roles: [],
+    },
+    {
+      id: 'policy-presences-4',
+      preview: false,
+      templateName: 'Enable publishing presence to a specific channel',
+      description: 'This policy enables publishing presence to a specific channel.',
+      statement: `
+create policy "Enable publishing presence to a specific channel"
+ON realtime.messages for update
+using ( realtime.topic() = '${templateData['channelName']}' )
+with check ( realtime.topic() = '${templateData['channelName']}' );
   ;`.trim(),
-          name: 'Enable publishing presence to a specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: `realtime.channel_name() = '${templateData['channelName']}'`,
-          command: 'UPDATE',
-          roles: [],
-        }
-      )
-    }
-
-    return results
-  }
-
-  if (table === 'channels') {
-    const results = [
-      {
-        id: 'policy-channels-1',
-        preview: false,
-        templateName: 'Enable read access to all channels for authenticated users only',
-        description:
-          'This policy gives read access to all channels for all authenticated users only.',
-        statement: `
-  create policy "Enable read access for all channels for authenticated users only"
-  on realtime.channels for select
-  to authenticated
-  using ( true );`.trim(),
-        name: 'Enable read access for all channels for authenticated users only',
-        definition: 'true',
-        check: '',
-        command: 'SELECT',
-        roles: ['authenticated'],
-      },
-      {
-        id: 'policy-channels-2',
-        preview: false,
-        templateName: 'Enable update access to all channels for authenticated users only',
-        description:
-          'This policy gives update access to all channels for all authenticated users only.',
-        statement: `
-        create policy "Enable update access to all channels for authenticated users only"
-ON realtime.broadcasts for update
-TO authenticated
-using ( true )
-with check ( true );`.trim(),
-        name: 'Enable update access to all channels for authenticated users only',
-        definition: 'true',
-        check: 'true',
-        command: 'UPDATE',
-        roles: ['authenticated'],
-      },
-    ] as PolicyTemplate[]
-
-    if (templateData && templateData['channelName']) {
-      results.push(
-        {
-          id: 'policy-channels-3',
-          preview: false,
-          templateName: 'Enable read access to specific channel',
-          description: 'This policy gives read access to specific channel.',
-          statement: `
-  create policy "Enable read access to specific channel"
-  on realtime.channels for select
-  using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
-          name: 'Enable read access to specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: '',
-          command: 'SELECT',
-          roles: [],
-        },
-        {
-          id: 'policy-channels-4',
-          preview: false,
-          templateName: 'Enable update access to specific channel',
-          description: 'This policy gives update access to specific channel.',
-          statement: `
-        create policy "Enable update access to specific channel"
-ON realtime.channels for update
-using ( 'realtime.channel_name() = ${templateData['channelName']}' )
-with check ( 'realtime.channel_name() = ${templateData['channelName']}' );`.trim(),
-          name: 'Enable update access to specific channel',
-          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
-          check: `realtime.channel_name() = '${templateData['channelName']}'`,
-          command: 'UPDATE',
-          roles: [],
-        }
-      )
-    }
-
-    return results
-  }
-
-  return []
+      name: 'Enable publishing presence to a specific channel',
+      definition: `realtime.topic() = '${templateData['channelName']}'`,
+      check: `realtime.topic() = '${templateData['channelName']}'`,
+      command: 'UPDATE',
+      roles: [],
+    },
+  ] as PolicyTemplate[]
+  return results
 }

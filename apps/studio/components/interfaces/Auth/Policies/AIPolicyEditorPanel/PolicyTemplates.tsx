@@ -35,7 +35,7 @@ export const PolicyTemplates = ({
 
   let templates: PolicyTemplate[] = []
   if (schema === 'realtime') {
-    templates = getRealtimePolicyTemplates(table.length > 0 ? table : 'table_name', templateData)
+    templates = getRealtimePolicyTemplates()
   } else {
     templates = getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
   }

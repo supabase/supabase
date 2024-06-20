@@ -1,25 +1,17 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { useParams } from 'common'
 import { Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { PolicyRow } from './RealtimePoliciesChannelRow'
-import { RealtimePoliciesPlaceholder } from './RealtimePoliciesPlaceholder'
 
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
-  const { ref: projectRef } = useParams()
-  const state = useTableEditorStateSnapshot()
-  useEffect(() => {
-    state.setSelectedSchemaName('realtime')
-  }, [])
 
   const [channelDataForPolicy, setChannelDataForPolicy] = useState<{
     table: string
@@ -33,14 +25,12 @@ export const RealtimePolicies = () => {
     undefined
   )
 
-  const { data: policiesData, isLoading: isLoadingPolicies } = useDatabasePoliciesQuery({
+  const { data: policiesData, isLoading } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'realtime',
   })
   const realtimePolicies = policiesData ?? []
-
-  const isLoading = isLoadingPolicies
 
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: async () => {
@@ -59,9 +49,6 @@ export const RealtimePolicies = () => {
     })
   }
 
-  // const groupedPolicies = formatPoliciesForRealtime(channels, realtimePolicies)
-  // const ungroupedPolicies = groupedPolicies.find((gr) => gr.name === 'Ungrouped')
-
   return (
     <div className="flex min-h-full w-full flex-col p-4">
       <h3 className="text-xl">Realtime policies</h3>
@@ -76,8 +63,6 @@ export const RealtimePolicies = () => {
         </div>
       ) : (
         <div className="mt-4 space-y-4">
-          <RealtimePoliciesPlaceholder />
-
           <p className="text-sm text-foreground-light">
             You may also write general policies for the <code>channels</code> table under the
             realtime schema directly for greater control
@@ -104,7 +89,7 @@ export const RealtimePolicies = () => {
 
       <AIPolicyEditorPanel
         visible={policyEditorShown}
-        searchString={channelDataForPolicy?.table}
+        searchString="messages"
         templateData={channelDataForPolicy?.templateData}
         schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
