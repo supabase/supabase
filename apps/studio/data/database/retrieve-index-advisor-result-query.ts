@@ -26,10 +26,18 @@ export async function getIndexAdvisorResult({
 }: GetIndexAdvisorResultVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
+  const escapedQuery = query.replace(/'/g, "''")
+
+  const traceparent = "/* traceparent='00-xxx-01' */"
+  const queryWithTraceparent = `${escapedQuery} ${traceparent}`
+
+  console.log('Original query with traceparent:', `${query} ${traceparent}`)
+  console.log('Escaped query:', escapedQuery)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from index_advisor('${query}');`,
+    sql: `select * from index_advisor('${escapedQuery}');`,
   })
   return result[0] as GetIndexAdvisorResultResponse
 }
