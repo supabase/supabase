@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { ExternalLink, PauseCircle } from 'lucide-react'
+import { Download, ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useBackupsQuery } from 'data/database/backups-query'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -37,26 +37,23 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
+  const enableDisablingOfProjectRestores90DayLimit = useFlag('disableProjectRestores90DayLimit')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  // const { data: pauseStatus } = useProjectPauseStatusQuery(
-  //   { ref },
-  //   { enabled: project?.status === PROJECT_STATUS.INACTIVE }
-  // )
+  const { data: pauseStatus } = useProjectPauseStatusQuery(
+    { ref },
+    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
+  )
 
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = false // !pauseStatus?.can_restore
+  const isRestoreDisabled = enableDisablingOfProjectRestores90DayLimit && !pauseStatus?.can_restore
+  const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
     { enabled: isFreePlan }
   )
-  const { data: backups } = useBackupsQuery({ projectRef: ref })
-  const sortedBackups = (backups?.backups ?? []).sort(
-    (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-  )
-  const latestBackup = sortedBackups[0]
 
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -66,6 +63,19 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     onSuccess: (_, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
       toast.success('Restoring project')
+    },
+  })
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
     },
   })
 
@@ -86,6 +96,24 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       return toast.error('Unable to restore: project is required')
     }
     restoreProject({ ref: project.ref })
+  }
+
+  const onSelectDownloadBackup = () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (!latestBackup) return toast.error('No backups available for download')
+
+    downloadBackup({
+      ref,
+      backup: {
+        id: latestBackup,
+        // [Joshen] Just FYI these params aren't required for the download backup request
+        // API types need to be updated
+        project_id: -1,
+        inserted_at: '',
+        isPhysicalBackup: false,
+        status: {},
+      },
+    })
   }
 
   return (
@@ -117,7 +145,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {/* {isRestoreDisabled ? (
+                {isRestoreDisabled ? (
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
@@ -136,15 +164,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         <TooltipTrigger_Shadcn_ asChild>
                           <Button
                             type="default"
-                            disabled={latestBackup === undefined}
+                            icon={<Download />}
+                            loading={isDownloading}
+                            disabled={!latestBackup}
                             className="pointer-events-auto"
+                            onClick={() => onSelectDownloadBackup()}
                           >
                             Download backup
                           </Button>
                         </TooltipTrigger_Shadcn_>
-                        {latestBackup === undefined && (
+                        {!latestBackup && (
                           <TooltipContent_Shadcn_ side="bottom">
-                            No backups available
+                            No backups available, please reach out via support for assistance
                           </TooltipContent_Shadcn_>
                         )}
                       </Tooltip_Shadcn_>
@@ -158,20 +189,20 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     <Alert_Shadcn_>
                       <AlertTitle_Shadcn_>
                         Project can be restored through the dashboard within the next{' '}
-                        {pauseStatus.remaining_days_till_restore_disabled} day
+                        {pauseStatus?.remaining_days_till_restore_disabled} day
                         {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1 ? 's' : ''}
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Free projects cannot be restored through the dashboard if they are paused
                         for more than{' '}
                         <span className="text-foreground">
-                          {pauseStatus.max_days_till_restore_disabled} days
+                          {pauseStatus?.max_days_till_restore_disabled} days
                         </span>
                         . However, your database backup will still be available for download.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   </>
-                ) : null} */}
+                ) : null}
 
                 {!isFreePlan && (
                   <Alert_Shadcn_>
