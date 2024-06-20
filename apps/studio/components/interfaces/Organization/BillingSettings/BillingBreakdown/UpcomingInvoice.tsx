@@ -180,8 +180,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
                           {(() => {
-                            const matchingTooltipData = feeTooltipData.find((it) =>
-                              fee.usage_metric?.startsWith(it.identifier)
+                            const matchingTooltipData = feeTooltipData.find(
+                              (it) => fee.usage_metric?.startsWith(it.identifier)
                             )
                             return matchingTooltipData ? (
                               <InvoiceTooltip
@@ -265,7 +265,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
+                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Estimated costs only project predictable costs (like compute hours), but does not project metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
                   {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
