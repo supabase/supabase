@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
@@ -12,6 +13,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -22,6 +27,7 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
+import { useCheckPermissions } from 'hooks'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -51,6 +57,8 @@ const InstanceConfigurationUI = () => {
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
+
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
     data: loadBalancers,
@@ -217,13 +225,26 @@ const InstanceConfigurationUI = () => {
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <div className="flex items-center justify-center">
-                <Button
-                  type="default"
-                  className={replicas.length > 0 ? 'rounded-r-none' : ''}
-                  onClick={() => setShowNewReplicaPanel(true)}
-                >
-                  Deploy a new replica
-                </Button>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Button
+                      type="default"
+                      disabled={!canManageReplicas}
+                      className={cn(
+                        replicas.length > 0 ? 'rounded-r-none' : '',
+                        'pointer-events-auto'
+                      )}
+                      onClick={() => setShowNewReplicaPanel(true)}
+                    >
+                      Deploy a new replica
+                    </Button>
+                  </TooltipTrigger_Shadcn_>
+                  {!canManageReplicas && (
+                    <TooltipContent_Shadcn_ side="bottom">
+                      You need additional permissions to deploy replicas
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
                 {replicas.length > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

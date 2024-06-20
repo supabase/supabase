@@ -1,6 +1,8 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
+import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
@@ -20,12 +22,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { useCheckPermissions } from 'hooks'
 import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
-import { MoreVertical } from 'lucide-react'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 
@@ -51,6 +56,7 @@ const MapView = ({
     y: number
     region: { key: string; country?: string; name?: string }
   }>()
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -132,9 +138,8 @@ const MapView = ({
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)
@@ -310,12 +315,22 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-x-2"
-                              onClick={() => onSelectDropReplica(database)}
-                            >
-                              Drop replica
-                            </DropdownMenuItem>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild>
+                                <DropdownMenuItem
+                                  className="gap-x-2 !pointer-events-auto"
+                                  disabled={!canManageReplicas}
+                                  onClick={() => onSelectDropReplica(database)}
+                                >
+                                  Drop replica
+                                </DropdownMenuItem>
+                              </TooltipTrigger_Shadcn_>
+                              {!canManageReplicas && (
+                                <TooltipContent_Shadcn_ side="left">
+                                  You need additional permissions to drop replicas
+                                </TooltipContent_Shadcn_>
+                              )}
+                            </Tooltip_Shadcn_>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
@@ -331,9 +346,23 @@ const MapView = ({
               databasesInSelectedRegion.length > 0 ? 'border-t' : ''
             }`}
           >
-            <Button type="default" onClick={() => onSelectDeployNewReplica(selectedRegion.key)}>
-              Deploy new replica here
-            </Button>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  disabled={!canManageReplicas}
+                  className="pointer-events-auto"
+                  onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
+                >
+                  Deploy new replica here
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              {!canManageReplicas && (
+                <TooltipContent_Shadcn_>
+                  You need additional permissions to deploy replicas
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
             <Button
               type="default"
               onClick={() => {
