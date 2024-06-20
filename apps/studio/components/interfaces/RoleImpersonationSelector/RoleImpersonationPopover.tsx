@@ -47,11 +47,7 @@ const RoleImpersonationPopover = ({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        className="p-0 w-full overflow-hidden bg-overlay"
-        side="bottom"
-        align={align}
-      >
+      <PopoverContent_Shadcn_ className="p-0 w-full overflow-hidden" side="bottom" align={align}>
         <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

@@ -1,4 +1,4 @@
-import { ListTree, MessageCircle } from 'lucide-react'
+import { ChevronsUpDown, ListTree, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -19,7 +19,6 @@ import {
   Command_Shadcn_,
   IconAlertCircle,
   IconCheck,
-  IconCode,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -97,13 +96,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
         <div className="flex items-center px-2">
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
-              <Button
-                type="text"
-                className="pr-2"
-                iconRight={
-                  <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-                }
-              >
+              <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
                 <div className="flex items-center space-x-2">
                   <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (

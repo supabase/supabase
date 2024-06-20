@@ -13,7 +13,7 @@ export const alertVariants = cva(
     variants: {
       variant: {
         default:
-          'text-foreground bg-alternative border-alternative [&>svg]:text-background [&>svg]:bg-foreground',
+          'text-foreground bg-alternative border [&>svg]:text-background [&>svg]:bg-foreground',
         destructive:
           'text border-destructive-400 bg-destructive-200 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:

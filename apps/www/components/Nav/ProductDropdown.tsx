@@ -32,7 +32,7 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="bg-overlay border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l py-8 px-10 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[500px]">
         <div className="col-span-3 xl:w-auto">
           <Link
             href="/customers"
