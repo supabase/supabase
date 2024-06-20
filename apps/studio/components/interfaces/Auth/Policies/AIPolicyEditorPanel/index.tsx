@@ -68,7 +68,6 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
-  templateData?: Record<string, string>
   schema: string
   searchString?: string
   selectedTable?: string
@@ -81,7 +80,6 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
-  templateData,
   schema,
   searchString,
   selectedTable,
@@ -800,7 +798,6 @@ export const AIPolicyEditorPanel = memo(function ({
                         <PolicyTemplates
                           schema={schema}
                           table={table}
-                          templateData={templateData}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {

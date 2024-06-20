@@ -17,7 +17,6 @@ import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 interface PolicyTemplatesProps {
   schema: string
   table: string
-  templateData?: Record<string, string>
   selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
   onSelectTemplate: (template: any) => void
@@ -26,7 +25,6 @@ interface PolicyTemplatesProps {
 export const PolicyTemplates = ({
   schema,
   table,
-  templateData,
   selectedPolicy,
   selectedTemplate,
   onSelectTemplate,
