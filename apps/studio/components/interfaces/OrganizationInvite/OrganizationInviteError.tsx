@@ -8,7 +8,7 @@ import { ResponseError } from 'types'
 import { cn } from 'ui'
 
 interface OrganizationInviteError {
-  data: OrganizationInviteByToken
+  data?: OrganizationInviteByToken
   error?: ResponseError
   isError: boolean
 }
@@ -18,7 +18,8 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
   const signOut = useSignOut()
   const { profile } = useProfile()
 
-  const hasError = isError || data.token_does_not_exist || data.expired_token || !data.email_match
+  const hasError =
+    isError || data?.token_does_not_exist || data?.expired_token || !data?.email_match
 
   return (
     <div
@@ -31,9 +32,9 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
         <AlertError
           error={error}
           subject="Failed to retrieve token"
-          className="[&>h5]:text-left [&>div]:items-start"
+          className="[&>h5]:text-left [&>div]:items-start rounded-t-none"
         />
-      ) : data.token_does_not_exist ? (
+      ) : data?.token_does_not_exist ? (
         <>
           <p>The invite token is invalid.</p>
           <p className="text-foreground-lighter">
@@ -41,7 +42,7 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
             invite you again.
           </p>
         </>
-      ) : !data.email_match ? (
+      ) : !data?.email_match ? (
         <>
           <p>
             Your email address {profile?.primary_email} does not match the email address this

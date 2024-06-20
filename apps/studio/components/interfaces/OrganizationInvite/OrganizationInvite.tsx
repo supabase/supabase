@@ -17,12 +17,15 @@ export const OrganizationInvite = () => {
   const { profile } = useProfile()
   const { slug, token, name } = useParams()
 
-  const { data, error, isSuccess, isError, isLoading } = useOrganizationInvitationTokenQuery({
-    slug,
-    token,
-  })
+  const { data, error, isSuccess, isError, isLoading } = useOrganizationInvitationTokenQuery(
+    { slug, token },
+    {
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  )
   const hasError =
-    isSuccess && (isError || data.token_does_not_exist || data.expired_token || !data.email_match)
+    isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
 
   const organizationName = data?.organization_name ?? name ?? 'an organization'
   const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
@@ -68,7 +71,7 @@ export const OrganizationInvite = () => {
       </div>
 
       <div className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}>
-        <div className="flex flex-col gap-4 px-6 py-4">
+        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
           {profile === undefined && (
             <div className="flex flex-col gap-3">
               <p className="text-xs text-foreground-lighter">

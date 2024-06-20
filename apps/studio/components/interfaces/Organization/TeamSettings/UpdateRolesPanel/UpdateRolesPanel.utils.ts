@@ -115,7 +115,9 @@ export const deriveRoleChangeActions = (
   const groupByRemovedRoles = groupBy(removed, 'roleId')
   const groupByUpdatingFromRoles = groupBy(updated, 'originalRole')
   const groupByUpdatingToRoles = groupBy(updated, 'updatedRole')
-  const existingRolesBaseIds = existingRoles.map((r) => r.base_role_id)
+  const existingProjectRolesByBaseIds = existingRoles
+    .filter((r) => (r?.project_ids ?? []).length > 0)
+    .map((r) => r.base_role_id)
 
   existingRoles.forEach((role) => {
     const projectIdsApplied = role.project_ids
@@ -156,7 +158,7 @@ export const deriveRoleChangeActions = (
   })
 
   Object.keys(groupByAddedRoles).forEach((roleId) => {
-    if (!existingRolesBaseIds.includes(Number(roleId))) {
+    if (!existingProjectRolesByBaseIds.includes(Number(roleId))) {
       toAssign.push({
         roleId: Number(roleId),
         projectIds: (groupByAddedRoles[roleId].map((x) => x.projectId) as number[]).sort(
@@ -167,7 +169,7 @@ export const deriveRoleChangeActions = (
   })
 
   Object.keys(groupByUpdatingToRoles).forEach((roleId) => {
-    if (!existingRolesBaseIds.includes(Number(roleId))) {
+    if (!existingProjectRolesByBaseIds.includes(Number(roleId))) {
       toAssign.push({
         roleId: Number(roleId),
         projectIds: (groupByUpdatingToRoles[roleId].map((x) => x.projectId) as number[]).sort(

@@ -191,6 +191,27 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
     expect(toUpdate).toStrictEqual([])
     expect(toRemove).toStrictEqual([])
   })
+  test('Should assign project read only role from org developer role correctly', () => {
+    const existingRoles = [
+      {
+        id: 3,
+        name: 'Developer',
+        description: null,
+        project_ids: null,
+        base_role_id: 6,
+      },
+    ]
+    const changesToRoles = {
+      removed: [{ projectId: undefined, ref: undefined, roleId: 3 }],
+      added: [{ projectId: 1, ref: 'ref_1', roleId: 6 }],
+      updated: [],
+    }
+
+    const { toAssign, toRemove, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
+    expect(toAssign).toStrictEqual([{ roleId: 6, projectIds: [1] }])
+    expect(toUpdate).toStrictEqual([])
+    expect(toRemove).toStrictEqual([3])
+  })
   test('Myriad of updates to stress test function logic (I)', () => {
     // Given 6 projects 1, 2, 3, 4, 5, 6
     // Existing has developer role for 1, 2, 3, admin role for 4, owner role for 5

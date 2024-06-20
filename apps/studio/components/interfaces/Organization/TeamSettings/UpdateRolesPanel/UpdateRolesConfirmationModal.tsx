@@ -76,12 +76,12 @@ export const UpdateRolesConfirmationModal = ({
         return [...org_scoped_roles, ...project_scoped_roles].find((r) => r.id === id)
       })
       .filter(Boolean) as OrganizationRole[]
-    const isOrgScope =
+    const isChangeWithinOrgScope =
       projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
 
     // Early return if we're just updating org level roles
     // Everything else below is just project level role changes then
-    if (isOrgScope) {
+    if (isChangeWithinOrgScope) {
       try {
         await assignRole({
           slug,
@@ -101,7 +101,6 @@ export const UpdateRolesConfirmationModal = ({
 
     try {
       await Promise.all([
-        ...toRemove.map((roleId) => removeRole({ slug, gotrueId, roleId })),
         ...toAssign.map(({ roleId, projectIds }) =>
           assignRole({
             slug,
@@ -110,6 +109,9 @@ export const UpdateRolesConfirmationModal = ({
             projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
           })
         ),
+      ])
+      await Promise.all([
+        ...toRemove.map((roleId) => removeRole({ slug, gotrueId, roleId })),
         ...toUpdate.map(({ roleId, projectIds }) =>
           updateRole({
             slug,
