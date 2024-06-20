@@ -39,14 +39,17 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const isBranchingEnabled = project?.is_branch_enabled === true
 
     const [isOpen, setIsOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
 
     const onConfirm = useCallback(async () => {
       try {
+        setIsDeleting(true)
         await onDeleteConnection(connection)
       } catch (error) {
         // [Joshen] No need for error handler
       } finally {
+        setIsDeleting(false)
         setIsOpen(false)
       }
     }, [connection, onDeleteConnection])
@@ -141,6 +144,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           confirmLabel="Delete connection"
           onCancel={onCancel}
           onConfirm={onConfirm}
+          loading={isDeleting}
           alert={
             type === 'GitHub' && isBranchingEnabled
               ? {

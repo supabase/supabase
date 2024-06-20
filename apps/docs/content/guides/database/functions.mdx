@@ -369,15 +369,36 @@ This limits the potential damage if you allow access to schemas which the user e
 
 ### Function privileges
 
-By default, database functions can be executed by any role. You can restrict this by altering the default privileges and then choosing which roles can execute functions.
+By default, database functions can be executed by any role. There are two main ways to restrict this:
 
-```sql
-ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+1.  On a case-by-case basis. Specifically revoke permissions for functions you want to protect. Execution needs to be revoked for both `public` and the role you're restricting:
 
--- Choose which roles can execute functions
-GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
-GRANT EXECUTE ON FUNCTION hello_world TO service_role;
-```
+    ```sql
+    revoke execute on function public.hello_world from public;
+    revoke execute on function public.hello_world from anon;
+    ```
+
+1.  Restrict function execution by default. Specifically _grant_ access when you want a function to be executable by a specific role.
+
+    To restrict all existing functions, revoke execution permissions from both `public` _and_ the role you want to restrict:
+
+    ```sql
+    revoke execute on all functions in schema public from public;
+    revoke execute on all functions in schema public from anon, authenticated;
+    ```
+
+    To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
+
+    ```sql
+    alter default privileges in schema public revoke execute on functions from public;
+    alter default privileges in schema public revoke execute on functions from anon, authenticated;
+    ```
+
+    You can then regrant permissions for a specific function to a specific role:
+
+    ```sql
+    grant execute on function public.hello_world to authenticated;
+    ```
 
 ### Debugging functions
 

@@ -167,6 +167,8 @@ export interface paths {
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
     get: operations['TaxIdsController_getTaxIds']
+    /** Creates or updates a tax ID for the given organization */
+    put: operations['TaxIdsController_updateTaxId']
     /** Creates a tax ID for the given organization */
     post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
@@ -580,6 +582,10 @@ export interface paths {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
   }
+  '/platform/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
+  }
   '/platform/projects/{ref}/resize': {
     /** Resize database disk */
     post: operations['ResizeController_resizeDatabase']
@@ -988,6 +994,10 @@ export interface paths {
     post: operations['SystemFunctionsController_createFunction']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
+  }
+  '/system/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['SystemProjectRunLintsController_runProjectLints']
   }
   '/system/projects/{ref}/secrets': {
     /**
@@ -1449,6 +1459,10 @@ export interface paths {
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
     post: operations['PauseController_pauseProject']
+  }
+  '/v0/projects/{ref}/pause/status': {
+    /** Gets the latest pause event for a project if a project is paused */
+    get: operations['PauseController_getProject']
   }
   '/v0/projects/{ref}/resize': {
     /** Resize database disk */
@@ -2629,6 +2643,14 @@ export interface components {
       org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
       project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
+    TaxIdV2: {
+      country: string
+      type: string
+      value: string
+    }
+    TaxIdV2Response: {
+      tax_id: components['schemas']['TaxIdV2'] | null
+    }
     TaxId: {
       id: string
       country: string
@@ -2639,7 +2661,7 @@ export interface components {
       data: components['schemas']['TaxId'][]
     }
     CreateTaxIdBody: {
-      type: Record<string, never>
+      type: string
       value: string
     }
     CreateTaxIdResponse: {
@@ -2693,6 +2715,11 @@ export interface components {
         | 'COMPUTE_HOURS_8XL'
         | 'COMPUTE_HOURS_12XL'
         | 'COMPUTE_HOURS_16XL'
+        | 'CUSTOM_DOMAIN'
+        | 'PITR_7'
+        | 'PITR_14'
+        | 'PITR_28'
+        | 'IPV4'
       /** @enum {string} */
       pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
       pricing_free_units?: number
@@ -3919,6 +3946,11 @@ export interface components {
       databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
+    PauseStatusResponse: {
+      max_days_till_restore_disabled: number | null
+      remaining_days_till_restore_disabled: number | null
+      can_restore: boolean | null
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -4093,11 +4125,6 @@ export interface components {
       name: string
       limit: number
     }
-    PreviewTransferInvoiceItem: {
-      description: string
-      quantity: number
-      amount: number
-    }
     PreviewProjectTransferResponse: {
       source_subscription_plan: components['schemas']['BillingPlanId']
       target_subscription_plan: components['schemas']['BillingPlanId']
@@ -4110,11 +4137,6 @@ export interface components {
       source_project_eligible: boolean
       target_organization_eligible: boolean | null
       target_organization_has_free_project_slots: boolean | null
-      credits_on_source_organization: number
-      costs_on_target_organization: number
-      charge_on_target_organization: number
-      source_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
-      target_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
     }
     AnalyticsResponse: {
       error?: OneOf<
@@ -4999,10 +5021,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       db_host: string
       db_user?: string
       db_pass?: string
@@ -5075,10 +5100,13 @@ export interface components {
         | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
         | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -5877,17 +5905,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -5988,17 +6019,20 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
+        | 'COMING_UP'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
-        | 'RESTORING'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       /**
        * @description Supabase organization id
        * @example fly_123456789
@@ -6948,6 +6982,34 @@ export interface operations {
       }
     }
   }
+  /** Creates or updates a tax ID for the given organization */
+  TaxIdsController_updateTaxId: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTaxIdBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['TaxIdV2Response']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create the tax ID */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Creates a tax ID for the given organization */
   TaxIdsController_createTaxId: {
     parameters: {
@@ -7045,6 +7107,11 @@ export interface operations {
           | 'COMPUTE_HOURS_8XL'
           | 'COMPUTE_HOURS_12XL'
           | 'COMPUTE_HOURS_16XL'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
         interval: string
         endDate: string
         startDate: string
@@ -10124,6 +10191,22 @@ export interface operations {
       }
     }
   }
+  /** Gets the latest pause event for a project if a project is paused */
+  PauseController_getProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PauseStatusResponse']
+        }
+      }
+    }
+  }
   /** Resize database disk */
   ResizeController_resizeDatabase: {
     parameters: {
@@ -12557,6 +12640,25 @@ export interface operations {
     }
     responses: {
       200: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  SystemProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }

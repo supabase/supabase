@@ -186,6 +186,7 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
   - id: auth-api
     title: 'Overview'
     notes: |
@@ -895,7 +896,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
