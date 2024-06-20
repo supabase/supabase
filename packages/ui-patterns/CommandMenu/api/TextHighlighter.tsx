@@ -6,13 +6,14 @@ import {
 } from 'react'
 import { useQuery } from './hooks/queryHooks'
 
-interface TextHighlighterProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {}
+interface TextHighlighterBaseProps
+  extends PropsWithChildren<DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>> {
+  query: string
+  text?: string
+}
 
-const TextHighlighter = ({ children, ...props }: PropsWithChildren<TextHighlighterProps>) => {
-  const query = useQuery()
-
-  const child = Children.toArray(children)[0]
+const TextHighlighterBase = ({ children, text, query, ...props }: TextHighlighterBaseProps) => {
+  const child = text ?? Children.toArray(children)[0]
   if (typeof child !== 'string') return child
 
   const idx = child.toLowerCase().indexOf(query.toLowerCase())
@@ -29,4 +30,10 @@ const TextHighlighter = ({ children, ...props }: PropsWithChildren<TextHighlight
   )
 }
 
-export { TextHighlighter }
+const TextHighlighter = (props: Omit<TextHighlighterBaseProps, 'query'>) => {
+  const query = useQuery()
+
+  return <TextHighlighterBase query={query} {...props} />
+}
+
+export { TextHighlighter, TextHighlighterBase }

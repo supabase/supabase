@@ -1,4 +1,14 @@
-import { CLIENT_LIBRARIES } from 'common/constants'
+import * as Sentry from '@sentry/nextjs'
+import {
+  CLIENT_LIBRARIES,
+  DocsSearchResultType as PageType,
+  useDocsSearch,
+  useParams,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+} from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AlertCircle,
   Book,
@@ -13,33 +23,6 @@ import {
   Plus,
   X,
 } from 'lucide-react'
-
-import {
-  DocsSearchResultType as PageType,
-  useDocsSearch,
-  useParams,
-  type DocsSearchResult as Page,
-  type DocsSearchResultSection as PageSection,
-} from 'common'
-
-import * as Sentry from '@sentry/nextjs'
-
-import InformationBox from 'components/ui/InformationBox'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { getProjectAuthConfig } from 'data/auth/auth-config-query'
-import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Project } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag } from 'hooks'
-import useLatest from 'hooks/misc/useLatest'
-import { detectBrowser } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
@@ -54,12 +37,23 @@ import {
   Separator,
   cn,
 } from 'ui'
+import { TextHighlighterBase as TextHighlighter } from 'ui-patterns/CommandMenu'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
+
+import InformationBox from 'components/ui/InformationBox'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { Project } from 'data/projects/project-detail-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useFlag, useLatest } from 'hooks'
+import { detectBrowser } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-
-import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -178,7 +172,6 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     allowSupportAccess: false,
   }
 
-  const { site } = useCommandMenu()
   const router = useRouter()
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -316,19 +309,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        if (site === 'docs') {
-          return link
-        } else if (site === 'website') {
-          return `/docs${link}`
-        } else {
-          return `https://supabase.com/docs${link}`
-        }
+        return `https://supabase.com/docs${link}`
       case PageType.Integration:
-        if (site === 'website') {
-          return link
-        } else {
-          return `https://supabase.com${link}`
-        }
+        return `https://supabase.com${link}`
       case PageType.GithubDiscussion:
         return link
       default:
@@ -340,20 +323,10 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        if (site === 'docs') {
-          await router.push(link)
-        } else if (site === 'website') {
-          await router.push(`/docs${link}`)
-        } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank')
-        }
+        window.open(`https://supabase.com/docs${link}`, '_blank')
         break
       case PageType.Integration:
-        if (site === 'website') {
-          router.push(link)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank')
-        }
+        window.open(`https://supabase.com${link}`, '_blank')
         break
       case PageType.GithubDiscussion:
         window.open(link, '_blank')
