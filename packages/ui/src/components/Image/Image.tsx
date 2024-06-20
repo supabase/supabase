@@ -28,7 +28,7 @@ interface Props {
   captionAlign?: CaptionAlign
 }
 
-type ImageProps = Props & NextImageProps
+export type ImageProps = Props & NextImageProps
 
 /**
  * An advanced Image component that extended next/image.
