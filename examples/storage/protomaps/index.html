@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>Overture Places</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/protomaps-themes-base@2.0.0-alpha.5/dist/index.js"></script>
+    <script src="https://unpkg.com/pmtiles@3.0.6/dist/pmtiles.js"></script>
+    <style>
+      body {
+        margin: 0;
+      }
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      let protocol = new pmtiles.Protocol()
+      maplibregl.addProtocol('pmtiles', protocol.tile)
+
+      const map = new maplibregl.Map({
+        hash: true,
+        container: 'map',
+        style: {
+          version: 8,
+          glyphs: 'https://cdn.protomaps.com/fonts/pbf/{fontstack}/{range}.pbf',
+          sources: {
+            protomaps: {
+              attribution:
+                '<a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+              type: 'vector',
+              url: 'pmtiles://https://<project_ref>.supabase.co/functions/v1/maps-private/my_area.pmtiles',
+            },
+          },
+          layers: protomaps_themes_base.default('protomaps', 'dark'),
+        },
+      })
+    </script>
+  </body>
+</html>

@@ -34,6 +34,13 @@ type GetTableRowsArgs = {
 // [Joshen] We can probably make this reasonably high, but for now max aim to load 10kb
 export const MAX_CHARACTERS = 10 * KB
 
+// return the primary key column if exists, otherwise return the first column
+// to use as a default sort
+const getDefaultOrderByColumn = (table: SupaTable) => {
+  return table.columns.find((column) => column.isPrimaryKey)?.name || table.columns[0]?.name
+}
+
+// Updated fetchAllTableRows function
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
@@ -64,9 +71,18 @@ export const fetchAllTableRows = async ({
       const value = formatFilterValue(table, filter)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
-  sorts.forEach((sort) => {
-    queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
-  })
+
+  // If sorts is empty, use the primary key as the default sort
+  if (sorts.length === 0) {
+    const primaryKey = getDefaultOrderByColumn(table)
+    if (primaryKey) {
+      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    }
+  } else {
+    sorts.forEach((sort) => {
+      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+    })
+  }
 
   // Starting from page 0, fetch 500 records per call
   let page = -1
@@ -138,9 +154,19 @@ export const getTableRowsSqlQuery = ({
       const value = formatFilterValue(table, x)
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
-  sorts.forEach((x) => {
-    queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
-  })
+
+  // If sorts is empty, use the primary key as the default sort
+  if (sorts.length === 0) {
+    const primaryKey = getDefaultOrderByColumn(table)
+
+    if (primaryKey) {
+      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    }
+  } else {
+    sorts.forEach((x) => {
+      queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
+    })
+  }
 
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
