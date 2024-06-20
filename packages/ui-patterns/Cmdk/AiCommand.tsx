@@ -28,7 +28,7 @@ import { useCommandMenu } from './CommandMenuProvider'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
-import { StatusIcon } from '../Icons/StatusIcons'
+import { StatusIcon } from 'ui'
 
 const questions = [
   'How do I get started with Supabase?',

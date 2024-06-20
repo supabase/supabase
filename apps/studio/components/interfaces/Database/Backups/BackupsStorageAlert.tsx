@@ -1,5 +1,5 @@
 import { AlertDescription_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const BackupsStorageAlert = () => {
   return (

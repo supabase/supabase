@@ -26,7 +26,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 import { QueryItemActions } from './QueryItemActions'
 import { Eye, Unlock } from 'lucide-react'
 

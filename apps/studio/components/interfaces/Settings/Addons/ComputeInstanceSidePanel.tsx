@@ -34,7 +34,7 @@ import {
   Radio,
   SidePanel,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()

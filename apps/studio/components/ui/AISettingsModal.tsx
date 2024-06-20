@@ -12,7 +12,7 @@ import {
 import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()

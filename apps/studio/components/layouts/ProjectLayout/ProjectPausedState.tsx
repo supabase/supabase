@@ -25,7 +25,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
 export interface ProjectPausedStateProps {

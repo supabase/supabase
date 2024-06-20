@@ -38,7 +38,7 @@ import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 interface GitHubIntegrationConnectionFormProps {
   connection: IntegrationProjectConnection

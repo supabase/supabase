@@ -1,7 +1,7 @@
 import type { BranchData } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
 import { Badge } from 'ui'
-import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
+import { StatusIcon } from 'ui'
 
 type Status = Branch['status'] | BranchData['status']
 

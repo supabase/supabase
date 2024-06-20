@@ -31,7 +31,7 @@ import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const General = () => {
   const { project } = useProjectContext()

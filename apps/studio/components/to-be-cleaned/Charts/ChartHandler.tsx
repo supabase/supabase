@@ -12,7 +12,7 @@ import {
 import { useProjectDailyStatsQuery } from 'data/analytics/project-daily-stats-query'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import type { ChartData } from './ChartHandler.types'
 
 interface ChartHandlerProps {
