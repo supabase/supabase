@@ -7,16 +7,13 @@ import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolic
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { Button } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { PolicyRow } from './RealtimePoliciesChannelRow'
 
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
 
-  const [channelDataForPolicy, setChannelDataForPolicy] = useState<{
-    table: string
-    templateData: Record<string, string>
-  } | null>()
   const [policyEditorShown, showPolicyEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | undefined>(
     undefined
@@ -57,6 +54,7 @@ export const RealtimePolicies = () => {
         the channel level.
       </p>
 
+      <Button onClick={() => showPolicyEditor(true)}>create new policy</Button>
       {isLoading ? (
         <div className="flex h-full items-center justify-center">
           <Loader className="animate-spin" size={16} />
@@ -74,10 +72,6 @@ export const RealtimePolicies = () => {
                 policy={policy}
                 onSelectPolicyEdit={() => {
                   setSelectedPolicyToEdit(policy)
-                  setChannelDataForPolicy({
-                    table: policy.table,
-                    templateData: {},
-                  })
                   showPolicyEditor(true)
                 }}
                 onSelectPolicyDelete={(policy) => setSelectedPolicyToDelete(policy)}
@@ -90,7 +84,6 @@ export const RealtimePolicies = () => {
       <AIPolicyEditorPanel
         visible={policyEditorShown}
         searchString="messages"
-        templateData={channelDataForPolicy?.templateData}
         schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => {

@@ -7,18 +7,18 @@ import { ProjectLayout } from '../'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
 export interface RealtimeLayoutProps {
-  title?: string
+  title: string
 }
 
-const RealtimeLayout = ({ children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const router = useRouter()
-  const pathArr = router.pathname.split('/')
-  const page = pathArr[pathArr.length - 1]
+const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
+
+  const router = useRouter()
+  const page = router.pathname.split('/')[4]
 
   return (
     <ProjectLayout
-      title="Realtime"
+      title={title}
       product="Realtime"
       productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
     >
