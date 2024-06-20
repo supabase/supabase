@@ -58,8 +58,8 @@ const BillingBreakdown = () => {
         {invoiceFeatureEnabled && (
           <>
             <p className="text-sm text-foreground-light">
-              The table shows your accumulated costs in this billing cycle, excluding credits.
-              Depending on your usage, the final amount may vary. See{' '}
+              The table shows your upcoming invoice, excluding credits. Depending on your usage, the
+              final amount may vary. See{' '}
               <Link
                 className="text-green-900 transition hover:text-green-1000"
                 href={`/org/${orgSlug}/usage`}
