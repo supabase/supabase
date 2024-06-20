@@ -43,7 +43,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
   const { data: pauseStatus } = useProjectPauseStatusQuery(
     { ref },
-    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
+    {
+      enabled:
+        project?.status === PROJECT_STATUS.INACTIVE && enableDisablingOfProjectRestores90DayLimit,
+    }
   )
 
   const isFreePlan = subscription?.plan?.id === 'free'
