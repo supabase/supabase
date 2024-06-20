@@ -38,7 +38,7 @@
 
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
-  @apply border-secondary border-t border-r-0 border-l-0;
+  @apply border-t border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;
