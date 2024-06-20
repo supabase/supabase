@@ -217,7 +217,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               size={15}
               strokeWidth={1.5}
               className={cn(
-                'text-foreground-muted',
+                'text-foreground-muted group-hover:text-foreground-lighter',
                 isActive && 'text-foreground-lighter',
                 'transition-colors'
               )}
@@ -227,7 +227,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               size={15}
               strokeWidth={1.5}
               className={cn(
-                'text-foreground-muted',
+                'text-foreground-muted group-hover:text-foreground-lighter',
                 isActive && 'text-foreground-lighter',
                 'transition-colors'
               )}
