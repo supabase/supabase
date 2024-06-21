@@ -230,87 +230,16 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Local Development',
+            label: 'Local Dev / CLI',
             icon: 'dev-cli',
             href: '/guides/cli',
             level: 'reference_javascript',
           },
-        ],
-        [
           {
-            label: 'Deployment & Production',
-          },
-          {
-            label: 'Branching',
-            icon: 'branching',
-            href: '/guides/platform/branching',
-            level: 'self_hosting',
-          },
-          {
-            label: 'Terraform',
-            icon: 'terraform',
-            href: '/guides/platform/terraform',
-            level: 'self_hosting',
-          },
-          {
-            label: 'Production Readiness',
-            icon: 'self-hosting',
-            href: '/guides/platform/going-into-prod',
-            level: 'self_hosting',
-          },
-        ],
-        [
-          {
-            label: 'Monitoring and Troubleshooting',
-          },
-          {
-            label: 'Logging & Observability',
-            icon: 'self-hosting',
-            href: '/guides/platform/logs',
-            level: 'self_hosting',
-          },
-          {
-            label: 'HTTP Status Codes',
-            icon: 'self-hosting',
-            href: '/guides/platform/http-status-codes',
-            level: 'self_hosting',
-          },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/platform/troubleshooting',
-            level: 'self_hosting',
-          },
-        ],
-        [
-          {
-            label: 'Platform Management',
-          },
-          {
-            label: 'Add-ons',
-            icon: 'addons',
-            href: '/guides/platform/compute-add-ons',
-            level: 'self_hosting',
-          },
-          {
-            label: 'Billing',
-            icon: 'self-hosting',
-            href: '/guides/platform/org-based-billing',
-            level: 'self_hosting',
-          },
-          {
-            label: 'Migrations',
-            icon: 'self-hosting',
-            href: '/guides/self-hosting',
-            level: 'self_hosting',
-          },
-        ],
-        [
-          {
-            label: 'Integrations',
-            icon: 'integrations',
-            href: '/guides/self-hosting',
-            level: 'self_hosting',
+            label: 'Platform',
+            icon: 'platform',
+            href: '/guides/platform',
+            level: 'platform',
           },
           {
             label: 'Self-Hosting',
