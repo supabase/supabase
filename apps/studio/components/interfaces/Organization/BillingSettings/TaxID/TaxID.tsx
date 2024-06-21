@@ -30,7 +30,7 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { checkTaxIdEqual as checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
+import { checkTaxIdEqual as checkTaxIdEqual } from './TaxID.utils'
 import * as z from 'zod'
 import { X as IconX } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -59,9 +59,9 @@ const TaxID = () => {
         type: taxId.type,
         value: taxId.value,
         name:
-          taxId.type === 'eu_vat'
-            ? `${taxId.country} VAT`
-            : TAX_IDS.find((option) => option.type === taxId.type)?.name ?? '',
+          TAX_IDS.find(
+            (option) => option.countryIso2 === taxId.country && option.type === taxId.type
+          )?.name ?? '',
       }
     : { type: '', value: '', name: '' }
 
@@ -94,7 +94,7 @@ const TaxID = () => {
         type?.length && value?.length
           ? {
               type: type,
-              value: sanitizeTaxIdValue({ type, value }),
+              value,
             }
           : null,
     })
