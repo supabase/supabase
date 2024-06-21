@@ -41,7 +41,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const { data: pauseStatus } = useProjectPauseStatusQuery(
+  const { data: pauseStatus, isSuccess } = useProjectPauseStatusQuery(
     { ref },
     {
       enabled:
@@ -50,7 +50,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   )
 
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = enableDisablingOfProjectRestores90DayLimit && !pauseStatus?.can_restore
+  const isRestoreDisabled =
+    enableDisablingOfProjectRestores90DayLimit && isSuccess && !pauseStatus.can_restore
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
