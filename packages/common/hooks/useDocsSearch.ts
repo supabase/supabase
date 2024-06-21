@@ -1,4 +1,4 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
@@ -186,9 +186,8 @@ function reducer(state: SearchState, action: Action): SearchState {
   }
 }
 
-const useDocsSearch = () => {
+const useDocsSearch = (supabaseClient: SupabaseClient) => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
-  const supabaseClient = useSupabaseClient()
   const key = useRef(0)
 
   const handleSearch = useCallback(
@@ -199,24 +198,26 @@ const useDocsSearch = () => {
 
       let sourcesLoaded = 0
 
-      supabaseClient.rpc('docs_search_fts', { query: query.trim() }).then(({ data, error }) => {
-        sourcesLoaded += 1
-        if (error || !Array.isArray(data)) {
-          dispatch({
-            type: 'errored',
-            key: localKey,
-            sourcesLoaded,
-            message: error?.message ?? '',
-          })
-        } else {
-          dispatch({
-            type: 'resultsReturned',
-            key: localKey,
-            sourcesLoaded,
-            results: data,
-          })
-        }
-      })
+      supabaseClient
+        .rpc('docs_search_fts', { query: query.trim() })
+        .then(({ data, error }: { data: any; error: any }) => {
+          sourcesLoaded += 1
+          if (error || !Array.isArray(data)) {
+            dispatch({
+              type: 'errored',
+              key: localKey,
+              sourcesLoaded,
+              message: error?.message ?? '',
+            })
+          } else {
+            dispatch({
+              type: 'resultsReturned',
+              key: localKey,
+              sourcesLoaded,
+              results: data,
+            })
+          }
+        })
 
       fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
         method: 'POST',
