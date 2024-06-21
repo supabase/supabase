@@ -29,6 +29,7 @@ import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import dayjs from 'dayjs'
+import AlertError from 'components/ui/AlertError'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -45,6 +46,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
   const {
     data: pauseStatus,
+    error: pauseStatusError,
+    isError,
     isSuccess,
     isLoading,
   } = useProjectPauseStatusQuery(
@@ -156,6 +159,9 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 </div>
 
                 {isLoading && <GenericSkeletonLoader />}
+                {isError && (
+                  <AlertError error={pauseStatusError} subject="Failed to retrieve pause status" />
+                )}
                 {isSuccess && (
                   <>
                     {isRestoreDisabled ? (
