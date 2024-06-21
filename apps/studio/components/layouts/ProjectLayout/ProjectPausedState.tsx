@@ -28,6 +28,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import dayjs from 'dayjs'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -212,7 +213,15 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                             <span className="text-foreground">
                               {pauseStatus?.max_days_till_restore_disabled} days
                             </span>
-                            . However, your database backup will still be available for download.
+                            . The latest that your project can be restored is by{' '}
+                            <span className="text-foreground">
+                              {dayjs()
+                                .utc()
+                                .add(pauseStatus.max_days_till_restore_disabled ?? 0, 'day')
+                                .format('DD MMM YYYY')}
+                            </span>
+                            . However, your database backup will still be available for download
+                            thereafter.
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
                       </>
