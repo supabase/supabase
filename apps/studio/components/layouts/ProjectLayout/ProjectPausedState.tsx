@@ -239,6 +239,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       <Button
                         size="tiny"
                         type="default"
+                        className="pointer-events-auto"
                         disabled={!canResumeProject}
                         onClick={onSelectRestore}
                       >
