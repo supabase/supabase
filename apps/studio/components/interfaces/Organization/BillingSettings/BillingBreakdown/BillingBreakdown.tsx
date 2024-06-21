@@ -58,8 +58,9 @@ const BillingBreakdown = () => {
         {invoiceFeatureEnabled && (
           <>
             <p className="text-sm text-foreground-light">
-              The table shows your upcoming invoice, excluding credits. Depending on your usage, the
-              final amount may vary. See{' '}
+              The table shows your upcoming invoice, excluding credits. This invoice will continue
+              updating until the end of your billing period on {billingCycleEnd.format('MMMM DD')}.
+              See{' '}
               <Link
                 className="text-green-900 transition hover:text-green-1000"
                 href={`/org/${orgSlug}/usage`}
