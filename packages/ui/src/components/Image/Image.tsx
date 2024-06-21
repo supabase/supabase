@@ -8,24 +8,35 @@ import { cn } from '../../lib/utils'
 import Zoom from 'react-medium-image-zoom'
 import ZoomContent from './ZoomContent'
 
-type SourceType =
+export type CaptionAlign = 'left' | 'center' | 'right'
+export interface StaticImageData {
+  src: string
+  height: number
+  width: number
+  blurDataURL?: string
+  blurWidth?: number
+  blurHeight?: number
+}
+
+export interface StaticRequire {
+  default: StaticImageData
+}
+export type StaticImport = StaticRequire | StaticImageData
+
+export type SourceType =
   | string
   | {
-      dark: string
-      light: string
+      dark: string | StaticImport
+      light: string | StaticImport
     }
 
-type CaptionAlign = 'left' | 'center' | 'right'
-
-interface Props {
+export interface ImageProps extends Omit<NextImageProps, 'src'> {
   src: SourceType
   zoomable?: boolean
   caption?: string
   captionAlign?: CaptionAlign
   containerClassName?: string
 }
-
-export type ImageProps = Props & NextImageProps
 
 /**
  * An advanced Image component that extends next/image with:
