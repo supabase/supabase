@@ -27,6 +27,7 @@ import {
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -41,7 +42,11 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const { data: pauseStatus, isSuccess } = useProjectPauseStatusQuery(
+  const {
+    data: pauseStatus,
+    isSuccess,
+    isLoading,
+  } = useProjectPauseStatusQuery(
     { ref },
     {
       enabled:
@@ -149,91 +154,96 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {isRestoreDisabled ? (
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      Project cannot be restored through the dashboard
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      This project has been paused for over{' '}
-                      <span className="text-foreground">
-                        {pauseStatus?.max_days_till_restore_disabled ?? 90} days
-                      </span>{' '}
-                      and cannot be restored through the dashboard. However, your data remains
-                      intact and can be downloaded as a backup.
-                    </AlertDescription_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<Download />}
-                            loading={isDownloading}
-                            disabled={!latestBackup}
-                            className="pointer-events-auto"
-                            onClick={() => onSelectDownloadBackup()}
-                          >
-                            Download backup
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        {!latestBackup && (
-                          <TooltipContent_Shadcn_ side="bottom">
-                            No backups available, please reach out via support for assistance
-                          </TooltipContent_Shadcn_>
-                        )}
-                      </Tooltip_Shadcn_>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                ) : isFreePlan ? (
+                {isLoading && <GenericSkeletonLoader />}
+                {isSuccess && (
                   <>
-                    <p className="text-sm text-foreground-light text-center">
-                      To prevent future pauses, consider upgrading to Pro.
-                    </p>
-                    <Alert_Shadcn_>
-                      <AlertTitle_Shadcn_>
-                        Project can be restored through the dashboard within the next{' '}
-                        {pauseStatus?.remaining_days_till_restore_disabled} day
-                        {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1 ? 's' : ''}
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        Free projects cannot be restored through the dashboard if they are paused
-                        for more than{' '}
-                        <span className="text-foreground">
-                          {pauseStatus?.max_days_till_restore_disabled} days
-                        </span>
-                        . However, your database backup will still be available for download.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                    {isRestoreDisabled ? (
+                      <Alert_Shadcn_ variant="warning">
+                        <WarningIcon />
+                        <AlertTitle_Shadcn_>
+                          Project cannot be restored through the dashboard
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          This project has been paused for over{' '}
+                          <span className="text-foreground">
+                            {pauseStatus?.max_days_till_restore_disabled ?? 90} days
+                          </span>{' '}
+                          and cannot be restored through the dashboard. However, your data remains
+                          intact and can be downloaded as a backup.
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_ asChild>
+                              <Button
+                                type="default"
+                                icon={<Download />}
+                                loading={isDownloading}
+                                disabled={!latestBackup}
+                                className="pointer-events-auto"
+                                onClick={() => onSelectDownloadBackup()}
+                              >
+                                Download backup
+                              </Button>
+                            </TooltipTrigger_Shadcn_>
+                            {!latestBackup && (
+                              <TooltipContent_Shadcn_ side="bottom">
+                                No backups available, please reach out via support for assistance
+                              </TooltipContent_Shadcn_>
+                            )}
+                          </Tooltip_Shadcn_>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    ) : isFreePlan ? (
+                      <>
+                        <p className="text-sm text-foreground-light text-center">
+                          To prevent future pauses, consider upgrading to Pro.
+                        </p>
+                        <Alert_Shadcn_>
+                          <AlertTitle_Shadcn_>
+                            Project can be restored through the dashboard within the next{' '}
+                            {pauseStatus?.remaining_days_till_restore_disabled} day
+                            {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1
+                              ? 's'
+                              : ''}
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            Free projects cannot be restored through the dashboard if they are
+                            paused for more than{' '}
+                            <span className="text-foreground">
+                              {pauseStatus?.max_days_till_restore_disabled} days
+                            </span>
+                            . However, your database backup will still be available for download.
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      </>
+                    ) : (
+                      <Alert_Shadcn_>
+                        <WarningIcon />
+                        <AlertTitle_Shadcn_>
+                          Project will count towards compute usage once restored
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          For every hour your instance is active, we will bill you based on the
+                          instance size of your project.
+                        </AlertDescription_Shadcn_>
+                        <AlertDescription_Shadcn_ className="mt-3">
+                          <Button asChild type="default" icon={<ExternalLink />}>
+                            <a
+                              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              More information
+                            </a>
+                          </Button>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
                   </>
-                ) : null}
-
-                {!isFreePlan && (
-                  <Alert_Shadcn_>
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      Project will count towards compute usage once restored
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      For every hour your instance is active, we will bill you based on the instance
-                      size of your project.
-                    </AlertDescription_Shadcn_>
-                    <AlertDescription_Shadcn_ className="mt-3">
-                      <Button asChild type="default" icon={<ExternalLink />}>
-                        <a
-                          href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          More information
-                        </a>
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
                 )}
               </div>
 
-              {!isRestoreDisabled && (
+              {isSuccess && !isRestoreDisabled && (
                 <div className="flex items-center justify-center gap-4">
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_ asChild>
