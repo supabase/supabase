@@ -29,6 +29,7 @@
   --destructive-400: 6.7deg 60% 20.6%;
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
+  --background-dash-sidebar: 0deg 0% 11%;
   --background-dialog-default: 0deg 0% 11%;
   --background-surface-75: 0deg 0% 12.5%;
   --background-200: 0deg 0% 11%;
@@ -43,6 +44,7 @@
   --border-secondary: var(--colors-gray-dark-500);
   --border-muted: var(--colors-gray-dark-500);
   --border-default: var(--colors-gray-dark-600);
+  --background-dash-canvas: var(--colors-gray-dark-200);
   --background-button-default: var(--colors-gray-dark-500);
   --background-muted: var(--colors-gray-dark-400);
   --background-overlay-hover: var(--colors-gray-dark-500);
