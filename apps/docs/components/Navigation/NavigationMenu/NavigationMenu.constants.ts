@@ -253,7 +253,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'Reference',
+      label: 'API Reference',
       menuItems: [
         [
           {
@@ -300,21 +300,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
         ],
         [
-          // { label: 'Data API' },
-          {
-            label: 'REST',
-            icon: 'rest',
-            href: '/guides/api',
-            level: 'api',
-          },
-          {
-            label: 'GraphQL',
-            icon: 'graphql',
-            href: '/guides/graphql',
-            level: 'graphql',
-          },
-        ],
-        [
           // {
           //   label: 'Tools',
           // },
@@ -338,6 +323,21 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
     {
       label: 'Resources',
       menuItems: [
+        [
+          // { label: 'Data API' },
+          {
+            label: 'REST',
+            icon: 'rest',
+            href: '/guides/api',
+            level: 'api',
+          },
+          {
+            label: 'GraphQL',
+            icon: 'graphql',
+            href: '/guides/graphql',
+            level: 'graphql',
+          },
+        ],
         [
           {
             label: 'Guides and Examples',
