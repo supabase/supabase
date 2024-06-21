@@ -340,12 +340,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
+  const overview = await serialize(partner.overview.replace(
+    /postgres:\/\/\[db-user\]\.\[project-ref\]:\[db-password\]@aws-0-\[aws-region\]\.pooler\.supabase\.com:5432\/\[db-name\]/g,
+    'postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:5432/[db-name]?pgbouncer=true&connection_limit=1'
+  ), {
     mdxOptions: {
       useDynamicImport: true,
       remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
     },
-  })
+  });
 
   return {
     props: { partner, overview },
