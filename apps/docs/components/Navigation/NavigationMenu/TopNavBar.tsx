@@ -22,8 +22,9 @@ const TopNavBar: FC = () => {
         className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
       >
         <div className="w-full px-5 flex justify-between h-[var(--header-height,50px)] gap-3 lg:h-[var(--header-height,60px)]">
-          <div className="hidden px-5 lg:flex h-full items-center justify-center flex-col gap-8">
+          <div className="hidden pl-5 lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
+            <GlobalNavigationMenu />
           </div>
           <div className="w-full grow lg:w-auto max-w-7xl flex gap-3 justify-between lg:justify-end items-center h-full">
             <div className="lg:hidden">
@@ -32,7 +33,7 @@ const TopNavBar: FC = () => {
 
             <div className="flex gap-2 items-center">
               <SearchButton
-                className="flex-grow md:w-full lg:w-96 h-[30px]
+                className="flex-grow md:w-44 xl:w-56 h-[30px]
                           focus-visible:!outline-4 
                           focus-visible:outline-offset-1
                           focus-visible:outline-brand-600"
@@ -55,7 +56,7 @@ const TopNavBar: FC = () => {
                   <div className="flex items-center space-x-2">
                     <IconSearch size={18} strokeWidth={2} />
                     <p className="flex text-sm pr-2">
-                      Search<span className="hidden sm:inline ml-1"> docs...</span>
+                      Search<span className="hidden xl:inline ml-1"> docs...</span>
                     </p>
                   </div>
                   <div className="hidden md:flex items-center space-x-1">
@@ -102,7 +103,6 @@ const TopNavBar: FC = () => {
             <TopNavDropdown />
           </div>
         </div>
-        <GlobalNavigationMenu />
       </nav>
       <GlobalMobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
     </>
@@ -119,12 +119,20 @@ const HeaderLogo = memo(() => {
       )}
     >
       <ThemeImage
-        containerClassName="!w-[96px]"
+        containerClassName="!w-[18px] hidden lg:block xl:hidden"
+        src="/docs/supabase-logo-icon.svg"
+        priority
+        width={18}
+        height={18}
+        alt="Supabase Logo"
+      />
+      <ThemeImage
+        containerClassName="!w-[96px] block lg:hidden xl:block"
         src={{ dark: '/docs/supabase-dark.svg', light: '/docs/supabase-light.svg' }}
         priority
         width={96}
         height={24}
-        alt="Supabase Logo"
+        alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
     </Link>

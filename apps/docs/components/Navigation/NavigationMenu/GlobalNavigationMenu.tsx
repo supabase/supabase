@@ -56,25 +56,25 @@ const GlobalNavigationMenu: FC = () => {
   const isLowerThanMd = useBreakpoint('md')
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
   const triggerClassName =
-    'bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
+    'h-[60px] bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
 
   return (
-    <div className="hidden lg:flex relative gap-2 justify-start items-end w-full">
+    <div className="hidden lg:flex relative gap-2 justify-start items-end w-full h-full">
       <NavigationMenu
         delayDuration={0}
         skipDelayDuration={0}
-        className="w-full flex justify-start"
+        className="w-full flex justify-start h-full"
         renderViewport={isLowerThanMd}
         viewportClassName="mt-0 max-w-screen overflow-hidden border-0 rounded-none lg:mt-1.5 lg:rounded-md lg:!border-x"
         orientation="horizontal"
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
-          <NavigationMenuList className="px-5 lg:px-10 space-x-5 lg:space-x-6 h-[37px]">
+          <NavigationMenuList className="px-5 lg:px-6 space-x-5 lg:space-x-6 h-[60px]">
             {GLOBAL_MENU_ITEMS.map((section) =>
               section[0].menuItems ? (
                 <NavigationMenuItem
                   key={`desktop-docs-menu-section-${section[0].label}`}
-                  className="text-sm relative"
+                  className="text-sm relative h-full"
                 >
                   <NavigationMenuTrigger
                     className={cn(
