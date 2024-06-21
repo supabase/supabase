@@ -40,7 +40,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
-  const enableDisablingOfProjectRestores90DayLimit = useFlag('disableProjectRestores90DayLimit')
+  const enableDisablingOfProjectRestores90DayLimit = useFlag('enforceNinetyDayUnpauseExpiry')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
