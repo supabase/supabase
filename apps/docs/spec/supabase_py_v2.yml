@@ -306,7 +306,7 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```python
-          response = await supabase.auth.sign_up(
+          response = supabase.auth.sign_up(
               credentials={
                   "email": "hello1@example.com",
                   "password": "password",
@@ -567,7 +567,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.enroll({
+          res = supabase.auth.mfa.enroll({
             "factor_type": "totp",
             "friendly_name": "your_friendly_name"
           })
@@ -583,7 +583,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.challenge({
+          res = supabase.auth.mfa.challenge({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
           })
           ```
@@ -597,7 +597,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.verify({
+          res = supabase.auth.mfa.verify({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             "code": '123456'
@@ -614,7 +614,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.challenge_and_verify({
+          res = supabase.auth.mfa.challenge_and_verify({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             "code": '123456'
           })
@@ -627,7 +627,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.unenroll({
+          res = supabase.auth.mfa.unenroll({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
           })
           ```
@@ -643,7 +643,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.get_authenticator_assurance_level()
+          res = supabase.auth.mfa.get_authenticator_assurance_level()
           ```
   - id: get-user
     title: 'get_user'
@@ -2391,7 +2391,7 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = await supabase.table("countries").select("*").lte("id", 2).execute()
+          response = supabase.table("countries").select("*").lte("id", 2).execute()
           ```
         data:
           sql: |
