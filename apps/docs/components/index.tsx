@@ -28,6 +28,7 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import Table from '~/components/Table'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -163,6 +164,7 @@ const components = {
   SocialProviderSetup,
   SqlToRest,
   StepHikeCompact,
+  table: Table,
   TabPanel,
   Tabs,
 }
