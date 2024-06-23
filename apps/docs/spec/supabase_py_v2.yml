@@ -110,7 +110,6 @@ functions:
       - name: credentials
         isOptional: false
         type: SignUpWithPasswordCredentials
-        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
         subContent:
           - name: email
             isOptional: true
@@ -156,7 +155,7 @@ functions:
       - If sign_up() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
-      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/python/auth-getuser).
+      - To fetch the currently logged-in user, refer to [`get_user()`](/docs/reference/python/auth-getuser).
     examples:
       - id: signup
         name: Sign up with an email and password
@@ -315,6 +314,108 @@ functions:
                       "email_redirect_to": "https://example.com/welcome",
                   },
               }
+          )
+          ```
+  - id: sign-in-anonymously
+    title: 'sign_in_anonymously()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignInAnonymouslyCredentials
+        subContent:
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: data
+                isOptional: true
+                type: object
+                description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column. The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+              - name: captcha_token
+                isOptional: true
+                type: string
+                description: Verification token received when the user completes the captcha on the site.
+  
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.sign_in_anonymously(
+              credentials={"options": {"captcha_token": ""}}
+          )
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {},
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "",
+              "phone": "",
+              "created_at": "2024-06-23T22:35:47.518626Z",
+              "confirmed_at": null,
+              "email_confirmed_at": null,
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-23T22:35:47.522241Z",
+              "identities": [],
+              "factors": null
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 3600,
+              "expires_at": 1719185747,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {},
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "",
+                "phone": "",
+                "created_at": "2024-06-23T22:35:47.518626Z",
+                "confirmed_at": null,
+                "email_confirmed_at": null,
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-23T22:35:47.522241Z",
+                "identities": [],
+                "factors": null
+              }
+            }
+          }
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.sign_in_anonymously(
+              credentials={"options": {"data": {}}}
           )
           ```
   - id: sign-in-with-password
