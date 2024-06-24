@@ -313,7 +313,7 @@ const Wizard: NextPageWithLayout = () => {
     delayedCheckPasswordStrength(password)
   }
 
-  const onClickNext = async (values: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
     const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize, dataApi } =
@@ -387,7 +387,7 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onClickNext)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <Panel
           loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
           title={
@@ -699,7 +699,9 @@ const Wizard: NextPageWithLayout = () => {
                           >
                             <FormControl_Shadcn_>
                               <RadioGroupStacked
-                                onValueChange={(value) => field.onChange(Boolean(value))}
+                                // Due to radio group not supporting boolean values
+                                // value is converted to boolean
+                                onValueChange={(value) => field.onChange(value === 'true')}
                                 defaultValue={field.value.toString()}
                               >
                                 <FormItem_Shadcn_ asChild>
