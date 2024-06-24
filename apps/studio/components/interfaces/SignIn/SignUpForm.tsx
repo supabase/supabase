@@ -1,9 +1,8 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import * as yup from 'yup'
-import * as Sentry from '@sentry/nextjs'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
@@ -14,13 +13,9 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconEye,
-  IconEyeOff,
   Input,
 } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-
-const WHITELIST_ERRORS = ['A user with this email already exists']
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
@@ -42,10 +37,6 @@ const SignUpForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign up: ${error.message}`)
-
-      if (!WHITELIST_ERRORS.includes(error.message)) {
-        Sentry.captureMessage('[CRITICAL] Failed to sign up: ' + error.message)
-      }
     },
   })
 
@@ -118,7 +109,7 @@ const SignUpForm = () => {
                 onFocus={() => setShowConditions(true)}
                 actions={
                   <Button
-                    icon={passwordHidden ? <IconEye /> : <IconEyeOff />}
+                    icon={passwordHidden ? <Eye /> : <EyeOff />}
                     type="default"
                     className="!mr-1"
                     onClick={() => setPasswordHidden((prev) => !prev)}
