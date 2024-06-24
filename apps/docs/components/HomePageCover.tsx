@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { IconBackground, IconPlay } from 'ui'
 import { useBreakpoint } from 'common'
@@ -105,7 +107,7 @@ const HomePageCover = (props) => {
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-[33rem]">
           <DocsCoverLogo aria-hidden="true" />
           <div className="flex flex-col">
-            <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">{props.meta?.title}</h1>
+            <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">{props.title}</h1>
             <p className="m-0 text-foreground-light">
               Learn how to get up and running with Supabase through tutorials, APIs and platform
               resources.
