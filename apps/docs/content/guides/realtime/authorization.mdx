@@ -5,46 +5,50 @@ description: 'Authorization for Supabase Realtime'
 sidebar_label: 'Authorization'
 ---
 
-Realtime provides a system to set authorization per Channel and per Channel feature.
+In this section we detail how to set up Realtime authorization using RLS policies.
 
-In this section we detail how to set up Channel authorization using RLS policies.
+Realtime provides a system to set authorization per user per Channel topic and extension.
 
 <Admonition type="note">
 
-Realtime Channels Authorization is in public alpha.
+Realtime authorization is in public alpha.
 
 </Admonition>
 
 <Admonition type="note">
 
-Make sure to use realtime.js version `2.10.0` or greater.
+Use realtime.js version `2.10.0` or greater.
 
 </Admonition>
 
 ## How it works
 
-We use tables in the `realtime` schema to allow you to write RLS policies that will determine the access your users have to your Channel and features within a Channel.
+We use tables in the `realtime` schema to allow you to write RLS policies which will determine the access your users have to a Channel topic and features within a Channel topic.
 
-The validation itself is done on connect per each user, meaning that for each WebSocket connection we generate the policy of your user based on:
+The validation itself is done on connect per user. For each WebSocket connection we generate the policy for your user based on:
 
-- the RLS policies you provided with their connection context which will include JWT
-- Headers set on connect and
-- the Channel the user is trying to connect against
+- the RLS policies on tables in your `realtime` schema with the connection context including the JWT
+- request headers set on connect
+- the Channel topic the user is trying to connect to
 
-Increased RLS complexity can impact database performance and user connection time, leading to higher connection latency and decreased user join rates.
+<Admonition type="warning">
+
+Increased RLS complexity can impact database performance and connection time, leading to higher connection latency and decreased join rates.
+
+</Admonition>
 
 ## Helper functions
 
-We've included a helper function to facilitate building policies, making it easier to access user connection context.
+We've included a helper function to facilitate building policies.
 
 ### realtime.topic
 
-Returns the Channel topic to which the user is connecting against.
+Returns the Channel topic which the user is attempting to connect to.
 
 ```sql
-CREATE POLICY "authenticated users can view all profiles"
+CREATE POLICY "authenticated users can read all messages on a topic"
 ON "realtime"."messages"
-AS PERMISSIVE FOR SELECT
+FOR SELECT
 TO authenticated
 USING (
   realtime.topic = 'room_1'
@@ -53,7 +57,9 @@ USING (
 
 ## Authorize Channels
 
-Channels serve as our WebSocket representation, and here, we restrict joining capabilities by preventing WebSocket connections and terminating such connections.
+Channels serve as our WebSocket representation.
+
+With Realtime authorization we can authorize features within Channel topics or limit joining topics altogether.
 
 ### Example schema
 
@@ -64,6 +70,7 @@ CREATE TABLE public.profiles (
   email text NOT NULL,
   user_id uuid REFERENCES auth.users (id)
 );
+
 CREATE TABLE public.rooms_users (
   topic text REFERENCES realtime.messages (topic),
   user_id uuid REFERENCES auth.users (id),
@@ -87,11 +94,11 @@ GRANT EXECUTE ON FUNCTION insert_user () TO supabase_auth_admin;
 
 ### Authorize Channel joins
 
-To allow access clients must have at least one read or write permission on the Channel topic.
+To authorize access, clients must have at least one read or write permission on the Channel topic.
 
-We'll write an RLS policy for `SELECT` and determine which users are able to connect.
+Write an RLS policy for `SELECT` and determine which users are able to connect.
 
-You can implement the following policy to grant access to the Channel topic exclusively to users listed in the relationship table `public.rooms_users`.
+Implement the following policy to grant access to the Channel topic exclusively to users listed in the relationship table `public.rooms_users`.
 
 ```sql
 CREATE POLICY "authenticated users can join topic"
@@ -146,10 +153,10 @@ If a message is a Broadcast message the value of `realtime.messages.extension` w
 
 ### Broadcast read
 
-To grant users permission to read Broadcast messages on a Channel topic, you must create a policy for `SELECT` operations on `realtime.messages` where `extension` is `broadcast`.
+To grant users permission to read Broadcast messages on a Channel topic create a policy for `SELECT` operations on `realtime.messages` where `extension` is `broadcast`.
 
 ```sql
-CREATE POLICY "authenticated user can receive in room"
+CREATE POLICY "authenticated users can receive broadcast messages in a room"
 ON "realtime"."messages"
 FOR SELECT
 TO authenticated
@@ -169,10 +176,10 @@ USING (
 
 ### Broadcast write
 
-To authorize sending Broadcast messages you'll need to set a policy for `INSERT` where the value of `realtime.messages.extention` is `broadcast`.
+To authorize sending Broadcast messages create a policy for `INSERT` where the value of `realtime.messages.extention` is `broadcast`.
 
 ```sql
-CREATE POLICY "authenticated user can broadcast in room"
+CREATE POLICY "authenticated users can send broadcast messages in a room"
 ON "realtime"."messages"
 FOR INSERT
 TO authenticated
@@ -198,10 +205,10 @@ If a message is a Presence message the value of `realtime.messages.extension` wi
 
 ### Presence read
 
-Again, here we use a policy for `SELECT` on `realtime.messages` where `realtime.messages.extension` is `presence`.
+Create a policy for `SELECT` on `realtime.messages` where `realtime.messages.extension` is `presence`.
 
 ```sql
-CREATE POLICY "authenticated user can listen to Presence changes in room"
+CREATE POLICY "authenticated users can listen to presence changes in a room"
 ON "realtime"."messages"
 FOR SELECT
 TO authenticated
@@ -221,10 +228,10 @@ USING (
 
 ### Presence write
 
-To update the Presence status for a user we need to create a policy for `INSERT` on `realtime.messages` where the value of `realtime.messages.extension` is `presence`.
+To update the Presence status for a user create a policy for `INSERT` on `realtime.messages` where the value of `realtime.messages.extension` is `presence`.
 
 ```sql
-CREATE POLICY "authenticated user can register presence in room"
+CREATE POLICY "authenticated users can register and update their presence in a room"
 ON "realtime"."messages"
 FOR INSERT
 TO authenticated
@@ -244,7 +251,7 @@ WITH CHECK (
 
 ## Authorize Presence and Broadcast
 
-We can authorize Presence and Broadcast in two RLS policies by simply including both extensions in our where filter.
+Authorize Presence and Broadcast in two RLS policies by simply including both extensions in our where filter.
 
 ### Broadcast and Presence read
 
@@ -269,7 +276,7 @@ USING (
 );
 ```
 
-### Broadcast Presence write
+### Broadcast and Presence write
 
 Authorize Presence and Broadcast write in one RLS policy.
 
@@ -296,7 +303,7 @@ WITH CHECK (
 
 Realtime Postgres Changes are separate from Channel authorization.
 
-Postgres Changes with RLS Realtime Channl authorization is backwards compatible with your production application.
+Postgres Changes and Realtime Channl authorization are backwards compatible with your production application.
 
 ## Updating RLS policies
 
