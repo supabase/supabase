@@ -16,9 +16,9 @@ import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
-import * as Sentry from '@sentry/nextjs'
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import * as Sentry from '@sentry/nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
@@ -111,8 +111,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    Sentry.withScope(function (scope) {
+      scope.setTag('globalErrorBoundary', true)
+      Sentry.captureException(error)
+    })
+
     console.error(error.stack)
-    Sentry.captureMessage('Full page crash caught by error boundary')
   }
 
   useEffect(() => {
@@ -178,8 +182,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <HCaptchaLoadedStore />
-                <Toaster />
+                {!isTestEnv && <HCaptchaLoadedStore />}
+                {!isTestEnv && <Toaster />}
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>

@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type TableColumn = {
   schemaname: string
@@ -92,7 +92,7 @@ export type TableColumnsVariables = {
 }
 
 export type TableColumnsData = { result: TableColumn[] }
-export type TableColumnsError = unknown
+export type TableColumnsError = ExecuteSqlError
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
   { projectRef, connectionString, table, schema }: TableColumnsVariables,

@@ -101,4 +101,4 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
   )
 }
 
-export { WarningIcon, CriticalIcon }
+export { WarningIcon, CriticalIcon, InfoIcon }

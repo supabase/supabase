@@ -26,8 +26,12 @@ interface RootProps {
   header?: React.ReactNode
   footer?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
+  'data-testid'?: string
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Popover({
   align = 'center',
   ariaLabel,
@@ -46,6 +50,7 @@ function Popover({
   footer,
   size = 'content',
   disabled,
+  'data-testid': dataTestId,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -66,6 +71,7 @@ function Popover({
         disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
+        data-testid={dataTestId}
       >
         {children}
       </RadixPopover.Trigger>
@@ -93,6 +99,9 @@ function Popover({
   )
 }
 
+/**
+ * @deprecated Use ./Popover_shadcn_ instead
+ */
 function Close() {
   const __styles = styleHandler('popover')
 
@@ -103,6 +112,9 @@ function Close() {
   )
 }
 
+/**
+ * @deprecated Use ./PopoverSeparator_Shadcn_ instead
+ */
 function Separator() {
   const __styles = styleHandler('popover')
 

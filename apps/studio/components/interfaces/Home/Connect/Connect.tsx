@@ -171,7 +171,7 @@ const Connect = () => {
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')}>
-          <DialogHeader className="pb-0">
+          <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
               Get the connection strings and environment variables for your app

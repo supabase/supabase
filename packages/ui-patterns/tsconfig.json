@@ -3,6 +3,13 @@
   "compilerOptions": {
     "resolveJsonModule": true
   },
-  "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
+  "include": [
+    ".",
+    "./../../packages/ui/src/**/*.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules"
+  ]
 }

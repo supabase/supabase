@@ -22,15 +22,7 @@ If you understand Git, you already understand Supabase Branching.
 
 Supabase Branching works with Git. You can test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after 5 minutes of inactivity.
-
-<Admonition type="caution" label="Some features may not work as expected on Preview Branches">
-
-Due to Preview Branches running on Fly Postgres instances, some features like `pg-cron` are not fully supported.
-
-For a full list of limitations, see [Fly Postgres limitations](/docs/guides/platform/fly-postgres#limitations).
-
-</Admonition>
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -545,7 +537,7 @@ We highly recommend turning on a 'required check' for the Supabase integration. 
 
 ### Disable branching
 
-You can disable branching at any time. Navigate to the [Branches](https://supabase.green/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
+You can disable branching at any time. Navigate to the [Branches](/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
 
 ## Migration and seeding behavior
 

@@ -103,6 +103,10 @@ export const BranchRow = ({
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
 
+  const shouldRenderLogsButton =
+    branch.pr_number !== undefined && branch.latest_check_run_id !== undefined
+  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
+
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
     { projectRef, id: branch.id },
@@ -206,23 +210,32 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-8">
         {isMain ? (
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" iconRight={<IconExternalLink />}>
-              <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
-                View Repository
-              </Link>
-            </Button>
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-                  <DropdownMenuItem asChild className="gap-x-2">
-                    <a>Change production branch</a>
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {repo && (
+              <>
+                <Button asChild type="default" iconRight={<IconExternalLink />}>
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    passHref
+                    href={`https://github.com/${repo}`}
+                  >
+                    View Repository
+                  </Link>
+                </Button>
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                    <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+                      <DropdownMenuItem asChild className="gap-x-2">
+                        <a>Change production branch</a>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
@@ -259,6 +272,15 @@ export const BranchRow = ({
                 </Button>
               </div>
             )}
+
+            {shouldRenderLogsButton && (
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
+                  View Logs
+                </Link>
+              </Button>
+            )}
+
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />

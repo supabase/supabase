@@ -132,15 +132,13 @@ const AddNewPaymentMethodModal = ({
         onCancel={onLocalCancel}
         className="PAYMENT"
       >
-        <div className="py-4 space-y-4">
-          <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm
-              returnUrl={returnUrl}
-              onCancel={onLocalCancel}
-              onConfirm={onLocalConfirm}
-            />
-          </Elements>
-        </div>
+        <Elements stripe={stripePromise} options={options}>
+          <AddPaymentMethodForm
+            returnUrl={returnUrl}
+            onCancel={onLocalCancel}
+            onConfirm={onLocalConfirm}
+          />
+        </Elements>
       </Modal>
     </>
   )
