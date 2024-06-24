@@ -164,13 +164,12 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     </Tooltip_Shadcn_>
                     {isNullable && (
                       <Button
-                        asChild
-                        htmlType="button"
-                        type="default"
                         size="tiny"
+                        type="default"
+                        htmlType="button"
                         onClick={() => setIsConfirmNextModalOpen(true)}
                       >
-                        <div>Set to NULL</div>
+                        Set to NULL
                       </Button>
                     )}
                   </div>
@@ -191,15 +190,15 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
       </Popover>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}
-        title="Confirm setting value to null"
+        title="Confirm setting value to NULL"
         confirmLabel="Confirm"
         onCancel={() => setIsConfirmNextModalOpen(false)}
         onConfirm={() => {
           saveChanges(null)
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          Are you sure you wish to set this value to null? <br /> This can't be undone.
+        <p className="text-sm text-foreground-light">
+          Are you sure you wish to set this value to NULL? This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>
