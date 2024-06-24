@@ -58,7 +58,8 @@ const IntegrationSettings = () => {
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
       if (!org?.id) {
-        throw new Error('Organization not found')
+        toast.error('Organization not found')
+        return
       }
 
       deleteGitHubConnection({

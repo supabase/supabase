@@ -1,31 +1,17 @@
-import * as React from 'react'
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { compact, debounce, uniqBy } from 'lodash'
-
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
-  Button,
-  IconAlertTriangle,
-  IconBook,
-  IconChevronRight,
-  IconGitHub,
-  IconHash,
-  IconMessageSquare,
-  IconSearch,
-} from 'ui'
-import {
-  CommandGroup,
-  CommandItem,
-  CommandLabel,
-  TextHighlighter,
-  escapeDoubleQuotes,
-} from './Command.utils'
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+  DocsSearchResultType as PageType,
+  useDocsSearch,
+} from 'common'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
+import { Button } from 'ui'
+import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
-
-const NUMBER_SOURCES = 2
-
-const FUNCTIONS_URL = '/functions/v1/'
+import { StatusIcon } from '../Icons/StatusIcons'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -36,191 +22,15 @@ const questions = [
   'How do I set up authentication?',
 ]
 
-export enum PageType {
-  Markdown = 'markdown',
-  Reference = 'reference',
-  Integration = 'partner-integration',
-  GithubDiscussion = 'github-discussions',
-}
-
-interface PageSection {
-  heading: string
-  slug: string
-}
-
-export interface Page {
-  id: number
-  path: string
-  type: PageType
-  title: string
-  subtitle: string | null
-  description: string | null
-  sections: PageSection[]
-}
-
-type SearchState =
-  | {
-      status: 'initial'
-      key: number
-    }
-  | {
-      status: 'loading'
-      key: number
-      staleResults: Page[]
-    }
-  | {
-      status: 'partialResults'
-      key: number
-      results: Page[]
-    }
-  | {
-      status: 'fullResults'
-      key: number
-      results: Page[]
-    }
-  | {
-      status: 'noResults'
-      key: number
-    }
-  | {
-      status: 'error'
-      key: number
-      message: string
-    }
-
-type Action =
-  | {
-      type: 'resultsReturned'
-      key: number
-      sourcesLoaded: number
-      results: unknown[]
-    }
-  | {
-      type: 'newSearchDispatched'
-      key: number
-    }
-  | {
-      type: 'reset'
-      key: number
-    }
-  | {
-      type: 'errored'
-      key: number
-      sourcesLoaded: number
-      message: string
-    }
-
-function reshapeResults(result: unknown): Page | null {
-  if (typeof result !== 'object' || result === null) {
-    return null
-  }
-  if (!('id' in result && 'path' in result && 'type' in result && 'title' in result)) {
-    return null
-  }
-
-  const sections: PageSection[] = []
-  if (
-    'headings' in result &&
-    Array.isArray(result.headings) &&
-    'slugs' in result &&
-    Array.isArray(result.slugs) &&
-    result.headings.length === result.slugs.length
-  ) {
-    result.headings.forEach((heading, idx) => {
-      const slug = (result.slugs as Array<string>)[idx]
-      if (heading && slug) {
-        sections.push({ heading, slug })
-      }
-    })
-  }
-
-  return {
-    id: result.id as number,
-    path: result.path as string,
-    type: result.type as PageType,
-    title: result.title as string,
-    subtitle: 'subtitle' in result ? (result.subtitle as string) : null,
-    description: 'description' in result ? (result.description as string) : null,
-    sections,
-  }
-}
-
-function reducer(state: SearchState, action: Action): SearchState {
-  // Ignore responses from outdated async functions
-  if (state.key > action.key) {
-    return state
-  }
-  switch (action.type) {
-    case 'resultsReturned':
-      const allSourcesLoaded = action.sourcesLoaded === NUMBER_SOURCES
-      const newResults = compact(action.results.map(reshapeResults))
-      // If the new responses are from the same request as the current responses,
-      // combine the responses.
-      // If the new responses are from a fresher request, replace the current responses.
-      const allResults =
-        state.status === 'partialResults' && state.key === action.key
-          ? uniqBy(state.results.concat(newResults), (res) => res.id)
-          : newResults
-      if (!allResults.length) {
-        return allSourcesLoaded
-          ? {
-              status: 'noResults',
-              key: action.key,
-            }
-          : {
-              status: 'loading',
-              key: action.key,
-              staleResults:
-                'results' in state
-                  ? state.results
-                  : 'staleResults' in state
-                    ? state.staleResults
-                    : [],
-            }
-      }
-      return allSourcesLoaded
-        ? {
-            status: 'fullResults',
-            key: action.key,
-            results: allResults,
-          }
-        : {
-            status: 'partialResults',
-            key: action.key,
-            results: allResults,
-          }
-    case 'newSearchDispatched':
-      return {
-        status: 'loading',
-        key: action.key,
-        staleResults:
-          'results' in state ? state.results : 'staleResults' in state ? state.staleResults : [],
-      }
-    case 'reset':
-      return {
-        status: 'initial',
-        key: action.key,
-      }
-    case 'errored':
-      // At least one search has failed and all non-failing searches have come back empty
-      if (action.sourcesLoaded === NUMBER_SOURCES && !('results' in state)) {
-        return {
-          status: 'error',
-          key: action.key,
-          message: action.message,
-        }
-      }
-      return state
-    default:
-      return state
-  }
-}
-
 const DocsSearch = () => {
-  const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
+  const {
+    searchState: state,
+    handleDocsSearch: handleSearch,
+    handleDocsSearchDebounced: debouncedSearch,
+    resetSearch,
+  } = useDocsSearch(supabaseClient)
   const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
-  const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
 
@@ -262,74 +72,10 @@ const DocsSearch = () => {
     state.status === 'partialResults' ||
     (state.status === 'loading' && state.staleResults.length > 0)
 
-  const handleSearch = useCallback(
-    async (query: string) => {
-      key.current += 1
-      const localKey = key.current
-      dispatch({ type: 'newSearchDispatched', key: localKey })
-
-      let sourcesLoaded = 0
-
-      supabaseClient.rpc('docs_search_fts', { query: query.trim() }).then(({ data, error }) => {
-        sourcesLoaded += 1
-        if (error || !Array.isArray(data)) {
-          dispatch({
-            type: 'errored',
-            key: localKey,
-            sourcesLoaded,
-            message: error?.message ?? '',
-          })
-        } else {
-          dispatch({
-            type: 'resultsReturned',
-            key: localKey,
-            sourcesLoaded,
-            results: data,
-          })
-        }
-      })
-
-      fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
-        method: 'POST',
-        body: JSON.stringify({ query }),
-      })
-        .then((response) => response.json())
-        .then((results) => {
-          if (!Array.isArray(results)) {
-            throw Error("didn't get expected results array")
-          }
-          sourcesLoaded += 1
-          dispatch({
-            type: 'resultsReturned',
-            key: localKey,
-            sourcesLoaded,
-            results,
-          })
-        })
-        .catch((error) => {
-          sourcesLoaded += 1
-          dispatch({
-            type: 'errored',
-            key: localKey,
-            sourcesLoaded,
-            message: error.message ?? '',
-          })
-        })
-    },
-    [supabaseClient]
-  )
-
   function handleResetPrompt() {
     setSearch('')
-
-    key.current += 1
-    dispatch({
-      type: 'reset',
-      key: key.current,
-    })
+    resetSearch()
   }
-
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 150), [handleSearch])
 
   useEffect(() => {
     if (initialLoad.current) {
@@ -344,10 +90,9 @@ const DocsSearch = () => {
     } else {
       // If user clears search, reset results
       debouncedSearch.cancel()
-      key.current += 1
-      dispatch({ type: 'reset', key: key.current })
+      resetSearch()
     }
-  }, [search, handleSearch, debouncedSearch])
+  }, [search, handleSearch, debouncedSearch, resetSearch])
 
   // Immediately run search if user presses enter
   // and abort any debounced searches that are waiting
@@ -373,7 +118,7 @@ const DocsSearch = () => {
   }, [search, hasResults])
 
   const ChevronArrow = () => (
-    <IconChevronRight
+    <ChevronRight
       strokeWidth={1.5}
       className="
         text-foreground-muted
@@ -393,16 +138,14 @@ const DocsSearch = () => {
       className="
         transition
         w-6 h-6
-        bg-alternative
-        group-aria-selected:scale-[105%]
-        group-aria-selected:bg-foreground
-        text-foreground
-        group-aria-selected:text-background
+        bg-surface-100
+        border
+        group-aria-selected:bg-surface-200
+        group-aria-selected:text-foreground-lighter
+        text-foreground-muted
         rounded flex
         items-center
         justify-center
-
-        group-aria-selected:[&_svg]:scale-[103%]
         "
       {...props}
     />
@@ -416,12 +159,12 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${escapeDoubleQuotes(page.title)}-group-index-${i}`}
+              value={`${encodeURIComponent(page.title)}-group-index-${i}`}
               forceMount={true}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${escapeDoubleQuotes(page.title)}-item-index-${i}`}
+                value={`${encodeURIComponent(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -448,7 +191,7 @@ const DocsSearch = () => {
                 <ChevronArrow />
               </CommandItem>
               {page.sections.length > 0 && (
-                <div className="border-l border-default ml-3 pt-3">
+                <div className="border-l border-muted ml-3 pt-3">
                   {page.sections.map((section, i) => (
                     <CommandItem
                       className="ml-3 mb-3"
@@ -456,18 +199,18 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${escapeDoubleQuotes(
+                      value={`${encodeURIComponent(
                         page.title
-                      )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
+                      )}__${encodeURIComponent(section.heading)}-item-index-${i}`}
                       forceMount={true}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
                         <IconContainer>{getPageSectionIcon(page)}</IconContainer>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-0">
                           <cite>
                             <TextHighlighter
-                              className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
+                              className="not-italic text-[10px] rounded-full px-2 py-1 bg-surface-300 text-foreground-muted"
                               text={page.title}
                               query={search}
                             />
@@ -503,7 +246,7 @@ const DocsSearch = () => {
                 type="command"
                 key={key}
               >
-                <IconSearch />
+                <Search />
                 {question}
               </CommandItem>
             )
@@ -511,27 +254,30 @@ const DocsSearch = () => {
         </CommandGroup>
       )}
       {state.status === 'loading' && state.staleResults.length === 0 && (
-        <div className="p-6 grid gap-6 my-4">
-          <p className="text-lg text-foreground-muted text-center">Searching for results</p>
+        <div className="flex items-center gap-3 my-4 justify-center">
+          <Loader2 className="animate animate-spin text-foreground-muted" size={14} />
+          <p className="text-sm text-foreground-muted text-center">Searching for results</p>
         </div>
       )}
       {state.status === 'noResults' && (
-        <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
-          <IconAlertTriangle strokeWidth={1.5} size={40} />
-          <p className="text-lg text-center">No results found.</p>
-          <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+        <div className="p-6 flex flex-col items-center gap-3 mt-4 text-foreground-light">
+          <StatusIcon variant="default" />
+          <p className="text-sm text-foreground-light text-center">No results found.</p>
+          <Button size="tiny" type="default" onClick={handleResetPrompt}>
             Try again?
           </Button>
         </div>
       )}
       {state.status === 'error' && (
-        <div className="p-6 flex flex-col items-center gap-6 mt-4">
-          <IconAlertTriangle strokeWidth={1.5} size={40} />
-          <p className="text-lg text-center">
-            Sorry, looks like we&apos;re having some issues with search!
-          </p>
-          <p className="text-sm text-center">Please try again in a bit.</p>
-          <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+        <div className="p-6 flex flex-col items-center gap-3 mt-4">
+          <StatusIcon variant="warning" />
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-sm text-foreground-light">
+              Sorry, looks like we&apos;re having some issues with search.
+            </p>
+            <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
+          </div>
+          <Button size="tiny" type="default" onClick={handleResetPrompt}>
             Try again?
           </Button>
         </div>
@@ -574,9 +320,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
-      return <IconGitHub strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -587,9 +333,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
-      return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

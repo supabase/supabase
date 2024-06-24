@@ -122,7 +122,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  const isLaunchWeek7 = props.blog.launchweek === 7
+  const isLaunchWeek7 = props.blog.launchweek === '7'
   const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
 
@@ -323,6 +323,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
                               fill
+                              quality={100}
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover m-0"
                             />

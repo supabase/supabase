@@ -11,8 +11,6 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type {
@@ -45,22 +43,16 @@ const GitHubSection = () => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
-  const { data: branches } = useBranchesQuery({ projectRef })
 
-  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+  const { mutateAsync: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted Github connection')
     },
   })
 
-  const { mutate: disableBranching } = useBranchesDisableMutation()
-
   const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
-  const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
   const isBranch = project?.parent_project_ref !== undefined
-  const isBranchingEnabled =
-    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   const connections =
     allConnections?.filter((connection) =>
@@ -75,21 +67,13 @@ const GitHubSection = () => {
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      if (isBranchingEnabled) {
-        if (!projectRef) throw new Error('Project ref not found')
-        disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+      if (!org?.id) {
+        toast.error('Organization not found')
+        return
       }
-      if (!org?.id) throw new Error('Organization not found')
-      deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
+      await deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
     },
-    [
-      deleteGitHubConnection,
-      disableBranching,
-      isBranchingEnabled,
-      org?.id,
-      previewBranches,
-      projectRef,
-    ]
+    [deleteGitHubConnection, org?.id]
   )
 
   return (
@@ -149,7 +133,8 @@ const GitHubSection = () => {
                           name: connection.repository.name,
                           supabaseConfig: {
                             supabaseDirectory: connection.workdir,
-                            supabaseChangesOnly: (connection as any).supabase_changes_only, //[Joshen] potentially API codegen issue
+                            supabaseChangesOnly: connection.supabase_changes_only,
+                            branchLimit: connection.branch_limit,
                           },
                         } as any,
                       }}

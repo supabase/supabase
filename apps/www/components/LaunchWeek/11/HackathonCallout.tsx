@@ -4,6 +4,8 @@ import CountdownComponent from './Countdown'
 import { LW11_LAUNCH_DATE_END } from '~/lib/constants'
 
 const HackathonCallout = ({ className }: { className?: string }) => {
+  const isActive = new Date() < new Date(LW11_LAUNCH_DATE_END)
+
   return (
     <div
       className={cn(
@@ -12,7 +14,13 @@ const HackathonCallout = ({ className }: { className?: string }) => {
       )}
     >
       <div className="!text-foreground [&_*]:text-foreground text-sm flex flex-col sm:flex-row sm:items-center sm:gap-3">
-        Hackathon ends in <CountdownComponent date={LW11_LAUNCH_DATE_END} showCard={false} />
+        {isActive ? (
+          <>
+            Hackathon ends in <CountdownComponent date={LW11_LAUNCH_DATE_END} showCard={false} />
+          </>
+        ) : (
+          'Open Source Hackathon 2024'
+        )}
       </div>
       <div className="!m-0 flex items-center">
         <TextLink

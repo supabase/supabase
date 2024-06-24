@@ -1,5 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import type { AnalyticsData } from './constants'
@@ -27,6 +28,11 @@ export enum PricingMetric {
   STORAGE_IMAGES_TRANSFORMED = 'STORAGE_IMAGES_TRANSFORMED',
   REALTIME_MESSAGE_COUNT = 'REALTIME_MESSAGE_COUNT',
   REALTIME_PEAK_CONNECTIONS = 'REALTIME_PEAK_CONNECTIONS',
+  CUSTOM_DOMAIN = 'CUSTOM_DOMAIN',
+  IPV4 = 'IPV4',
+  PITR_7 = 'PITR_7',
+  PITR_14 = 'PITR_14',
+  PITR_28 = 'PITR_28',
 }
 
 export enum ComputeUsageMetric {

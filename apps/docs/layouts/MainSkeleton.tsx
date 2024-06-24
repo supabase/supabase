@@ -2,13 +2,12 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { type CSSProperties, type PropsWithChildren, memo, useEffect } from 'react'
-
 import { cn } from 'ui'
-
 import Footer from '~/components/Navigation/Footer'
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
@@ -96,6 +95,10 @@ const levelsData = {
     icon: 'reference-csharp',
     name: 'C# Reference v0.0',
   },
+  reference_csharp_v1: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v1.0',
+  },
   reference_python_v2: {
     icon: 'reference-python',
     name: 'Python Reference v2.0',
@@ -156,7 +159,7 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
         'transition-all ease-out z-10',
         'top-0',
         mobileMenuOpen && 'absolute',
-        'flex items-center h-[var(--mobile-header-height,40px)]',
+        'flex items-center h-[var(--header-height,40px)]',
         mobileMenuOpen ? 'gap-0' : 'gap-3'
       )}
     >
@@ -265,23 +268,23 @@ const HeaderLogo = memo(function HeaderLogo() {
 
 const Container = memo(function Container({
   children,
-  style,
-}: PropsWithChildren<{ style?: CSSProperties }>) {
+  className,
+}: PropsWithChildren<{ className?: string }>) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
     <div
-      // #docs-content-container is used by layout to scroll to top
-      id="docs-content-container"
+      // used by layout to scroll to top
+      id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
         // 'overflow-x-auto',
         'w-full transition-all ease-out',
         // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
-        'lg:ml-0'
+        'lg:ml-0',
+        className
       )}
-      style={style}
     >
       <div className="flex flex-col relative">{children}</div>
     </div>
@@ -358,14 +361,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
   return (
     <div className="flex flex-row h-full">
       <NavContainer menuId={menuId} />
-      <Container
-        style={
-          {
-            '--desktop-header-height': '60px',
-            '--mobile-header-height': '40px',
-          } as CSSProperties
-        }
-      >
+      <Container className="[--header-height:40px] lg:[--header-height:60px]">
         <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
           <TopNavBar />
         </div>

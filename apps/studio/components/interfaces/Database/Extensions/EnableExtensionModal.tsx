@@ -130,7 +130,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       >
         {({ values }: any) => {
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
@@ -218,19 +218,16 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                   </Alert_Shadcn_>
                 </Modal.Content>
               )}
-
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
-                    Enable extension
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
+                  Enable extension
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

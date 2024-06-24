@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, cn, LW11CountdownBanner } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,9 +20,7 @@ import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
 import { menu } from '~/data/nav'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import RightClickBrandLogo from './RightClickBrandLogo'
 
 interface Props {
   hideNavbar: boolean
@@ -66,9 +63,6 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      <Announcement>
-        <LW11CountdownBanner />
-      </Announcement>
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -95,27 +89,7 @@ const Nav = (props: Props) => {
             <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
-                  <Link
-                    href="/"
-                    className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                  >
-                    <Image
-                      src={supabaseLogoWordmarkLight}
-                      width={124}
-                      height={24}
-                      alt="Supabase Logo"
-                      className="dark:hidden"
-                      priority
-                    />
-                    <Image
-                      src={supabaseLogoWordmarkDark}
-                      width={124}
-                      height={24}
-                      alt="Supabase Logo"
-                      className="hidden dark:block"
-                      priority
-                    />
-                  </Link>
+                  <RightClickBrandLogo />
 
                   {!isGAWeekSection &&
                     !isLaunchWeek11Page &&
@@ -139,11 +113,16 @@ const Nav = (props: Props) => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
+                          <NavigationMenuTrigger
+                            className={cn(
+                              buttonVariants({ type: 'text', size: 'small' }),
+                              '!bg-transparent hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground px-2 h-auto'
+                            )}
+                          >
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
-                            className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                          // className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
@@ -177,7 +156,7 @@ const Nav = (props: Props) => {
                         <Button type="default" className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Sign in</Link>
                         </Button>
-                        <Button className="hidden text-white lg:block" asChild>
+                        <Button className="hidden lg:block" asChild>
                           <Link href="https://supabase.com/dashboard">Start your project</Link>
                         </Button>
                       </>

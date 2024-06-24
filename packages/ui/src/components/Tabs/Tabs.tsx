@@ -1,24 +1,21 @@
+'use client'
+
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { useRouter } from 'next/router'
 import {
   Children,
-  type KeyboardEvent,
-  type MouseEvent,
-  PropsWithChildren,
-  useEffect,
+  useMemo,
   useState,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type RefObject,
 } from 'react'
-
-import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
-import { useTabGroup } from './TabsProvider'
 
-interface TabsProps {
+export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
-  queryGroup?: string
   block?: boolean
   tabBarGutter?: number
   tabBarStyle?: React.CSSProperties
@@ -30,18 +27,24 @@ interface TabsProps {
   addOnAfter?: React.ReactNode
   listClassNames?: string
   baseClassNames?: string
+  refs?: {
+    base: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+  }
 }
 
 interface TabsSubComponents {
   Panel: React.FC<PropsWithChildren<PanelProps>>
 }
 
+/**
+ * @deprecated Use ./Tabs_shadcn_ instead
+ */
 const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
   size = 'tiny',
-  queryGroup,
   block,
   onChange,
   onClick,
@@ -51,81 +54,29 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   addOnAfter,
   listClassNames,
   baseClassNames,
+  refs,
   children: _children,
 }) => {
-  // toArray is used here to filter out invalid children
-  // another method would be to use React.Children.map
   const children = Children.toArray(_children) as PanelPropsProps[]
-  const tabIds = children.map((tab) => tab.props.id)
-
-  const router = useRouter()
-  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
-  const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
-  const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
 
   const [activeTab, setActiveTab] = useState(
-    queryTab ??
+    activeId ??
       defaultActiveId ??
       // if no defaultActiveId is set use the first panel
       children?.[0]?.props?.id
   )
 
-  useEffect(() => {
-    /**
-     * [Charis] The query param change is done by manual manipulation of window
-     * location and history, not by router.push (I think to avoid full-page
-     * rerenders). This doesn't reliably trigger rerender of all tabs on the
-     * page, possibly because it bypasses `useRouter`. The only way I could
-     * find of avoiding the full-page rerender but still reacting reliably to
-     * search param changes was to fire a CustomEvent.
-     */
-
-    function handleChange(e: CustomEvent) {
-      if (
-        e.detail.queryGroup &&
-        e.detail.queryGroup === queryGroup &&
-        tabIds.includes(e.detail.id)
-      ) {
-        setActiveTab(e.detail.id)
-        setGroupActiveId?.(e.detail.id)
-      }
-    }
-
-    window.addEventListener(TAB_CHANGE_EVENT_NAME, handleChange as EventListener)
-    return () => window.removeEventListener(TAB_CHANGE_EVENT_NAME, handleChange as EventListener)
-  }, [])
-
-  // If query param present for the query group, switch to that tab.
-  useEffect(() => {
-    if (queryTab) {
-      setActiveTab(queryTab)
-      setGroupActiveId?.(queryTab)
-    }
-  }, [queryTab])
+  useMemo(() => {
+    if (activeId && activeId !== activeTab) setActiveTab(activeId)
+  }, [activeId])
 
   let __styles = styleHandler('tabs')
 
-  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
-
-  const active = activeId ?? groupActiveId ?? activeTab
-
-  function onTabClick(currentTarget: EventTarget, id: string) {
-    setActiveTab(id)
-    setGroupActiveId?.(id)
-
-    if (queryGroup) {
-      const url = new URL(document.location.href)
-      url.searchParams.set(queryGroup, id)
-      window.history.replaceState(undefined, '', url)
-    }
-
-    currentTarget.dispatchEvent(
-      new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
-    )
-
+  function onTabClick(id: string) {
     onClick?.(id)
-    if (id !== active) {
+    if (id !== activeTab) {
       onChange?.(id)
+      setActiveTab(id)
     }
   }
 
@@ -135,11 +86,15 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   if (listClassNames) listClasses.push(listClassNames)
 
   return (
-    <TabsPrimitive.Root value={active} className={[__styles.base, baseClassNames].join(' ')}>
-      <TabsPrimitive.List className={listClasses.join(' ')}>
+    <TabsPrimitive.Root
+      value={activeTab}
+      className={[__styles.base, baseClassNames].join(' ')}
+      ref={refs?.base}
+    >
+      <TabsPrimitive.List className={listClasses.join(' ')} ref={refs?.list}>
         {addOnBefore}
         {children.map((tab) => {
-          const isActive = active === tab.props.id
+          const isActive = activeTab === tab.props.id
           const triggerClasses = [__styles[type].base, __styles.size[size]]
           if (isActive) {
             triggerClasses.push(__styles[type].active)
@@ -153,14 +108,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
           return (
             <TabsPrimitive.Trigger
               onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
                   e.preventDefault()
-                  onTabClick(e.currentTarget, tab.props.id)
+                  onTabClick(tab.props.id)
                 }
               }}
-              onClick={(e: MouseEvent<HTMLButtonElement>) =>
-                onTabClick(e.currentTarget, tab.props.id)
-              }
+              onClick={() => onTabClick(tab.props.id)}
               key={`${tab.props.id}-tab-button`}
               value={tab.props.id}
               className={triggerClasses.join(' ')}
@@ -191,6 +144,9 @@ interface PanelProps {
   className?: string
 }
 
+/**
+ * @deprecated Use ./TabsContent_Shadcn_ instead
+ */
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { ArrowRight } from 'lucide-react'
 
 export interface Meetup {
   id?: any
@@ -101,32 +102,59 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               const liveNow = after && before3H
 
               return (
-                <Link
-                  key={meetup.id}
-                  href={meetup.link ?? ''}
-                  target="_blank"
-                  onClick={() => handleSelectMeetup(meetup)}
-                  onMouseOver={() => handleSelectMeetup(meetup)}
-                  title={liveNow ? 'Live now' : undefined}
-                  className={cn(
-                    'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                    meetup.id === activeMeetup.id && '!text-foreground',
-                    liveNow && 'text-foreground-light'
-                  )}
-                >
-                  {liveNow && (
-                    <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
-                  )}
-                  <span>{meetup.title}</span>
-                  {i !== meets.length - 1 && ', '}
-                </Link>
+                <>
+                  <button
+                    key={meetup.id}
+                    onClick={() => handleSelectMeetup(meetup)}
+                    onMouseDown={() => handleSelectMeetup(meetup)}
+                    title={liveNow ? 'Live now' : undefined}
+                    className={cn(
+                      'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
+                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
+                      meetup.id === activeMeetup.id && '!text-foreground',
+                      liveNow && 'text-foreground-light'
+                    )}
+                  >
+                    {liveNow && (
+                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                    )}
+                    <span>{meetup.title}</span>
+                    {i !== meets.length - 1 && ', '}
+                  </button>
+                  <Link
+                    key={`meetup-link-${meetup.id}`}
+                    href={meetup.link ?? ''}
+                    target="_blank"
+                    onClick={() => handleSelectMeetup(meetup)}
+                    onMouseOver={() => handleSelectMeetup(meetup)}
+                    title={liveNow ? 'Live now' : undefined}
+                    className={cn(
+                      'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
+                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
+                      meetup.id === activeMeetup.id && '!text-foreground',
+                      liveNow && 'text-foreground-light'
+                    )}
+                  >
+                    {liveNow && (
+                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                    )}
+                    <span>{meetup.title}</span>
+                    {i !== meets.length - 1 && ', '}
+                  </Link>
+                </>
               )
             })}
       </div>
-      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1">
-        {activeMeetup?.display_info}
-      </div>
+      <Link
+        href={activeMeetup.link ?? '#'}
+        target="_blank"
+        className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1 inline-flex flex-wrap items-center gap-1"
+      >
+        {activeMeetup?.display_info}{' '}
+        <span className="inline">
+          <ArrowRight className="w-3 md:hidden" />
+        </span>
+      </Link>
     </div>
   )
 }

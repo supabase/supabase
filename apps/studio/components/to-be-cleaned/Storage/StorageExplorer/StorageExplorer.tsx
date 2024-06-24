@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { Bucket } from 'data/storage/buckets-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -58,6 +59,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+
+  // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
+  // Will be better once we deprecate the mobx store entirely, which we will get there
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+
   const apiService = (projectSettings?.services ?? []).find(
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
   )
@@ -100,7 +106,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           }
         }
       } else if (view === STORAGE_VIEWS.COLUMNS) {
-        const paths = openedFolders.map((folder: any) => folder.name)
+        const paths = openedFolders.map((folder) => folder.name)
         fetchFoldersByPath(paths, itemSearchString, true)
       }
     }
@@ -122,19 +128,19 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item: any) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item: any) => {
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
-    const selectedItemsFromColumn = selectedItems.filter((item: any) =>
-      columnFilesId.includes(item.id)
+    const columnFilesId = compact(columnFiles.map((item) => item.id))
+    const selectedItemsFromColumn = selectedItems.filter(
+      (item) => item.id && columnFilesId.includes(item.id)
     )
 
     if (selectedItemsFromColumn.length === columnFiles.length) {
       // Deselect all items from column
       const updatedSelectedItems = selectedItems.filter(
-        (item: any) => !columnFilesId.includes(item.id)
+        (item) => item.id && !columnFilesId.includes(item.id)
       )
       setSelectedItems(updatedSelectedItems)
     } else {

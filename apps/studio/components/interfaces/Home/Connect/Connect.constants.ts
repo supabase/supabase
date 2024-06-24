@@ -63,10 +63,30 @@ export const FRAMEWORKS: ConnectionType[] = [
     guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/reactjs',
     children: [
       {
-        key: 'supabasejs',
-        label: 'Supabase-js',
-        children: [],
-        icon: 'supabase',
+        key: 'create-react-app',
+        label: 'Create React App',
+        icon: 'react',
+        children: [
+          {
+            key: 'supabasejs',
+            label: 'supabase-js',
+            icon: 'supabase',
+            children: [],
+          },
+        ],
+      },
+      {
+        key: 'vite',
+        label: 'Vite',
+        icon: 'vite',
+        children: [
+          {
+            key: 'supabasejs',
+            label: 'Supabase-js',
+            children: [],
+            icon: 'supabase',
+          },
+        ],
       },
     ],
   },
@@ -155,6 +175,9 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+]
+
+export const MOBILES: ConnectionType[] = [
   {
     key: 'exporeactnative',
     label: 'Expo React Native',
@@ -205,5 +228,6 @@ export const ORMS: ConnectionType[] = [
 
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
+  { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
 ]

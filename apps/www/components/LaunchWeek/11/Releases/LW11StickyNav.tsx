@@ -77,7 +77,10 @@ const LWXStickyNav: FC = () => {
                 <li key={day.id}>
                   <Link
                     href={`#${day.id}`}
-                    className={cn('p-1 transition-colors hover:text-foreground flex items-center')}
+                    className={cn(
+                      'p-1 transition-colors hover:text-foreground flex items-center',
+                      day.isToday && 'text-foreground-light'
+                    )}
                   >
                     {day.dd}{' '}
                     {day.isToday && (
@@ -97,21 +100,23 @@ const LWXStickyNav: FC = () => {
             </ul>
           </div>
           <div>
-            <Link
-              href="#ticket"
-              className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground transition-colors"
-            >
-              {hasTicket ? `${DISPLAY_NAME}'s ticket` : 'Claim ticket'}
-              <Image
-                src={getTicketIcon()}
-                alt=""
-                width={24}
-                height={24}
-                aria-hidden
-                className="w-auto h-4 shadow"
-                priority
-              />
-            </Link>
+            {hasTicket && (
+              <Link
+                href="#ticket"
+                className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground transition-colors"
+              >
+                {DISPLAY_NAME}'s ticket
+                <Image
+                  src={getTicketIcon()}
+                  alt=""
+                  width={24}
+                  height={24}
+                  aria-hidden
+                  className="w-auto h-4 shadow"
+                  priority
+                />
+              </Link>
+            )}
           </div>
         </SectionContainer>
       </nav>
