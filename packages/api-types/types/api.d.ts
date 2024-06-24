@@ -2173,6 +2173,7 @@ export interface components {
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY: number
+      RATE_LIMIT_OTP: number
       RATE_LIMIT_TOKEN_REFRESH: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
@@ -2327,6 +2328,7 @@ export interface components {
       SESSIONS_SINGLE_PER_USER?: boolean
       SESSIONS_TAGS?: string
       RATE_LIMIT_ANONYMOUS_USERS?: number
+      RATE_LIMIT_OTP?: number
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -5338,6 +5340,7 @@ export interface components {
       rate_limit_sms_sent: number | null
       rate_limit_token_refresh: number | null
       rate_limit_verify: number | null
+      rate_limit_otp: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_enabled: boolean | null
       security_captcha_enabled: boolean | null
@@ -5425,6 +5428,7 @@ export interface components {
       rate_limit_sms_sent?: number
       rate_limit_verify?: number
       rate_limit_token_refresh?: number
+      rate_limit_otp?: number
       mailer_secure_email_change_enabled?: boolean
       refresh_token_rotation_enabled?: boolean
       password_hibp_enabled?: boolean
