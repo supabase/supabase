@@ -53,7 +53,7 @@ const TopNavBar: FC = () => {
                     text-foreground-lighter
                   "
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 text-foreground-muted">
                     <IconSearch size={18} strokeWidth={2} />
                     <p className="flex text-sm pr-2">
                       Search<span className="hidden xl:inline ml-1"> docs...</span>
@@ -127,7 +127,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase Logo"
       />
       <ThemeImage
-        containerClassName="!w-[96px] block lg:hidden xl:block"
+        containerClassName="!w-[96px] block lg:hidden xl:block !m-0"
         src={{ dark: '/docs/supabase-dark.svg', light: '/docs/supabase-light.svg' }}
         priority
         width={96}

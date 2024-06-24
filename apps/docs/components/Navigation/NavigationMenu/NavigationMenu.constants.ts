@@ -247,6 +247,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/self-hosting',
             level: 'self_hosting',
           },
+          {
+            label: 'Integrations',
+            icon: 'integrations',
+            hasLightIcon: true,
+            href: 'https://supabase.com/partners/integrations',
+            level: 'integrations',
+          },
         ],
       ],
     },
@@ -316,13 +323,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'reference_javascript',
           },
         ],
-      ],
-    },
-  ],
-  [
-    {
-      label: 'Resources',
-      menuItems: [
         [
           // { label: 'Data API' },
           {
@@ -338,19 +338,19 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'graphql',
           },
         ],
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Resources',
+      menuItems: [
         [
           {
             label: 'Guides and Examples',
             icon: 'resources',
             href: '/guides/resources',
             level: 'resources',
-          },
-          {
-            label: 'Integrations',
-            icon: 'integrations',
-            hasLightIcon: true,
-            href: 'https://supabase.com/partners/integrations',
-            level: 'integrations',
           },
           {
             label: 'Changelog',

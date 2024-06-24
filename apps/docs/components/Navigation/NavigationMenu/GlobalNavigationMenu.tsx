@@ -89,28 +89,30 @@ const GlobalNavigationMenu: FC = () => {
                       section[0].label
                     )}
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] border-y w-screen md:w-64 overflow-hidden rounded-none md:rounded-md md:border border-overlay bg-overlay p-3 md:p-1 text-foreground-light shadow-md !duration-0">
-                    {section[0].menuItems?.map((menuItem, menuItemIndex) => (
-                      <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-                        {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
-                        {menuItem.map((item) =>
-                          !item.href ? (
-                            <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
-                              {item.label}
-                            </div>
-                          ) : (
-                            <NavigationMenuLink asChild>
-                              <MenuItem
-                                href={item.href}
-                                title={item.label}
-                                community={item.community}
-                                icon={item.icon}
-                              />
-                            </NavigationMenuLink>
-                          )
-                        )}
-                      </Fragment>
-                    ))}
+                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] max-h-[calc(100vh-80px)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md !duration-0">
+                    <div className="p-3 md:p-1">
+                      {section[0].menuItems?.map((menuItem, menuItemIndex) => (
+                        <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
+                          {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
+                          {menuItem.map((item) =>
+                            !item.href ? (
+                              <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                                {item.label}
+                              </div>
+                            ) : (
+                              <NavigationMenuLink asChild>
+                                <MenuItem
+                                  href={item.href}
+                                  title={item.label}
+                                  community={item.community}
+                                  icon={item.icon}
+                                />
+                              </NavigationMenuLink>
+                            )
+                          )}
+                        </Fragment>
+                      ))}
+                    </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               ) : (
@@ -174,7 +176,7 @@ export const MenuItem = React.forwardRef<
       ref={ref}
       className={cn(
         'group/menu-item flex items-center gap-2',
-        'w-full flex items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 py-2.5 lg:py-2 leading-none no-underline !outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 py-2.5 lg:py-2 leading-none no-underline !outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
       {...props}
