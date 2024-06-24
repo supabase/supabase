@@ -1,3 +1,4 @@
+import SettingsMenuPanel from './settings/settings-menu-panel'
 import SideNav from './side-nav'
 import TopHeader from './top-header'
 
@@ -9,9 +10,10 @@ export default function OrgLayout({
   return (
     <div className="w-screen h-screen flex">
       <SideNav />
+      <SettingsMenuPanel />
       <div className="flex flex-col grow">
         <TopHeader />
-        <div>{children}</div>
+        {children}
       </div>
     </div>
   )

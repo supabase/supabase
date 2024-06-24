@@ -6,9 +6,9 @@ export default function TableEditorLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
+    <div className="flex h-full w-full">
       <TableEditorItemsPanel />
-      <div>{children}</div>
-    </>
+      {children}
+    </div>
   )
 }
