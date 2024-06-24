@@ -58,9 +58,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     }
   )
 
-  const finalDaysRemainingBeforeRestoreDisabled = pauseStatus?.remaining_days_till_restore_disabled
-    ? pauseStatus?.remaining_days_till_restore_disabled
-    : pauseStatus?.max_days_till_restore_disabled
+  const finalDaysRemainingBeforeRestoreDisabled =
+    pauseStatus?.remaining_days_till_restore_disabled ??
+    pauseStatus?.max_days_till_restore_disabled ??
+    0
 
   const isFreePlan = subscription?.plan?.id === 'free'
   const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
@@ -218,7 +219,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                               <AlertTitle_Shadcn_>
                                 Project can be restored through the dashboard within the next{' '}
                                 {finalDaysRemainingBeforeRestoreDisabled} day
-                                {(finalDaysRemainingBeforeRestoreDisabled ?? 0) > 1 ? 's' : ''}
+                                {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
                               </AlertTitle_Shadcn_>
                               <AlertDescription_Shadcn_>
                                 Free projects cannot be restored through the dashboard if they are
