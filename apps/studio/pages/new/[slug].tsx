@@ -42,8 +42,6 @@ import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
   Admonition,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
   CollapsibleContent_Shadcn_,
@@ -71,7 +69,6 @@ import {
   cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
