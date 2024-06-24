@@ -107,30 +107,6 @@ export function BranchMenu() {
             ))}
           </CommandGroup_Shadcn_>
         </Command_Shadcn_>
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search framework..." />
-          <CommandEmpty_Shadcn_>No framework found.</CommandEmpty_Shadcn_>
-          <CommandGroup_Shadcn_>
-            {frameworks.map((framework) => (
-              <CommandItem_Shadcn_
-                key={framework.value}
-                value={framework.value}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? '' : currentValue)
-                  setOpen(false)
-                }}
-              >
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    value === framework.value ? 'opacity-100' : 'opacity-0'
-                  )}
-                />
-                {framework.label}
-              </CommandItem_Shadcn_>
-            ))}
-          </CommandGroup_Shadcn_>
-        </Command_Shadcn_>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

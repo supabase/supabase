@@ -15,7 +15,7 @@ import { cn } from 'ui'
 const STROKE_WIDTH = 1
 const ICON_SIZE = 21
 const iconsClasses = cn(
-  'text-foreground-muted',
+  'text-foreground-lighter',
   'group-aria-[current=page]/nav-item-anchor:text-foreground',
   'group-aria-[current=page]/nav-item-anchor:stroke-[1.5]',
   'group-hover/nav-item-anchor:text-foreground-light',

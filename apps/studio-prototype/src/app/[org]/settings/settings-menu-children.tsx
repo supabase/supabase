@@ -57,7 +57,7 @@ const SettingsMenuChildren: React.FC = () => {
 
   const renderGroup = (group: string) => {
     return (
-      <h2 className="text-sm font-mono text-foreground-muted uppercase tracking-wide px-5">
+      <h2 className="text-sm font-mono text-foreground-lighter/75 uppercase tracking-wide px-5">
         {group}
       </h2>
     )

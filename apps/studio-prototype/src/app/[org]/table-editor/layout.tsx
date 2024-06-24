@@ -9,7 +9,7 @@ export default function TableEditorLayout({
   return (
     <div className="flex h-full w-full">
       <TableEditorItemsPanel />
-      <div className="grow">
+      <div className="flex flex-col grow h-full w-full">
         <TabHeader />
         {children}
       </div>

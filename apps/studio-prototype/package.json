@@ -15,6 +15,7 @@
     "next": "14.2.4",
     "next-themes": "^0.3.0",
     "react": "^18",
+    "react-data-grid": "^7.0.0-beta.44",
     "react-dom": "^18",
     "react-hotkeys-hook": "^4.5.0",
     "ui": "*"

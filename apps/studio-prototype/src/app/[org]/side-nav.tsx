@@ -2,6 +2,7 @@ import { cn } from 'ui'
 import SideNavMenuIcon from './side-nav-menu-icon'
 import UserMenu from './user-menu'
 import { SideNav as SideNavData } from '@/src/config/nav'
+import SideMenuOrgMenu from './side-menu-org-menu'
 
 export default function SideNav() {
   return (
@@ -13,14 +14,7 @@ export default function SideNav() {
         'transition-all'
       )}
     >
-      <div
-        className={cn(
-          'w-[26px] h-[26px] border bg-foreground rounded-md',
-          'flex items-center justify-center text-background text-xs font-semibold'
-        )}
-      >
-        SM
-      </div>
+      <SideMenuOrgMenu />
       <div className="grow w-full flex flex-col gap-5 my-6">
         {SideNavData.map((product) => (
           <SideNavMenuIcon key={product.name} product={product} />

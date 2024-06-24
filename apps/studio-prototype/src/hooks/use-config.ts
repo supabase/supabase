@@ -7,15 +7,29 @@ type Config = {
   project?: string
   tableEditor: {
     sidePanelOpen: boolean
+    activeTabId: number
+    itemsOpen: boolean
+    queriesOpen: boolean
+  }
+  env: {
+    type: 'prod' | 'preview' | 'long-running'
+    name: string
   }
 }
 
 const configAtom = atomWithStorage<Config>('config', {
   radius: 0.5,
-  organization: 'Summers-Muir',
+  organization: 'summersmuir',
   project: 'Sonsing',
   tableEditor: {
     sidePanelOpen: true,
+    activeTabId: 1,
+    itemsOpen: true,
+    queriesOpen: true,
+  },
+  env: {
+    type: 'prod',
+    name: 'name',
   },
 })
 

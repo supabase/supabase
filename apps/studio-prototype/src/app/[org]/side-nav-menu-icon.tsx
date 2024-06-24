@@ -12,6 +12,8 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
   const pathname = usePathname()
   const isActive = pathname.startsWith(`/${org}${product.href}`)
 
+  // console.log('config.tableEditor.activeTabId', config.tableEditor.activeTabId)
+
   /**
    * Override href for settings product
    * Grabs project and organization from config to build friendly URL
@@ -19,6 +21,9 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
   let overrideHref = null
   if (product.name === 'settings') {
     overrideHref = `/${organization}/settings/${project}/general`
+  }
+  if (product.name === 'table-editor' && config.tableEditor.activeTabId) {
+    overrideHref = `/${organization}/table-editor/${config.tableEditor.activeTabId}`
   }
 
   return (
