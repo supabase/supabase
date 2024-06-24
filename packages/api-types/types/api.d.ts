@@ -157,8 +157,6 @@ export interface paths {
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
     put: operations['updateCustomerV2']
-    /** Updates the Stripe customer */
-    patch: operations['CustomerController_updateCustomer']
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
@@ -267,7 +265,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
-    get: operations['PaymentsController_getPaymentMethods']
+    get: operations['getPaymentMethodsV2']
     /** Detach payment method with the given card ID */
     delete: operations['PaymentsController_detachPaymentMethod']
   }
@@ -2582,50 +2580,10 @@ export interface components {
       email: string
       address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
-      invoice_settings: Record<string, never>
       billing_via_partner: boolean
     }
     BillingCustomerUpdateBody: {
       address?: components['schemas']['CustomerBillingAddress']
-    }
-    CustomerUpdateResponse: {
-      id: string
-      object: string
-      address: Record<string, never>
-      balance: number
-      cash_balance?: Record<string, never>
-      created: number
-      currency: string
-      default_currency?: string
-      default_source: string
-      delinquent: boolean
-      description: string
-      discount: Record<string, never>
-      email: string
-      invoice_credit_balance?: Record<string, never>
-      invoice_prefix: string
-      invoice_settings: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      name: string
-      next_invoice_sequence?: number
-      phone: string
-      preferred_locales: string[]
-      shipping: Record<string, never>
-      sources?: Record<string, never>
-      subscriptions?: Record<string, never>
-      tax?: Record<string, never>
-      tax_exempt?: string
-      tax_ids?: Record<string, never>
-      test_clock?: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     OrganizationRole: {
       id: number
@@ -2819,70 +2777,16 @@ export interface components {
       exp_year: number
       last4: string
     }
-    PaymentV2: {
+    Payment: {
       id: string
       card?: components['schemas']['PaymentMethodCard']
       created: number
       type: string
       is_default: boolean
     }
-    PaymentsResponseV2: {
-      defaultPaymentMethodId: string | null
-      data: components['schemas']['PaymentV2'][]
-    }
-    Payment: {
-      id: string
-      object: string
-      acss_debit?: Record<string, never>
-      affirm?: Record<string, never>
-      afterpay_clearpay?: Record<string, never>
-      alipay?: Record<string, never>
-      au_becs_debit?: Record<string, never>
-      bacs_debit?: Record<string, never>
-      bancontact?: Record<string, never>
-      billing_details: Record<string, never>
-      blik?: Record<string, never>
-      boleto?: Record<string, never>
-      card?: Record<string, never>
-      card_present?: Record<string, never>
-      created: number
-      customer: Record<string, never>
-      customer_balance?: Record<string, never>
-      eps?: Record<string, never>
-      fpx?: Record<string, never>
-      giropay?: Record<string, never>
-      grabpay?: Record<string, never>
-      ideal?: Record<string, never>
-      interac_present?: Record<string, never>
-      klarna?: Record<string, never>
-      konbini?: Record<string, never>
-      link?: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      oxxo?: Record<string, never>
-      p24?: Record<string, never>
-      paynow?: Record<string, never>
-      promptpay?: Record<string, never>
-      radar_options?: Record<string, never>
-      sepa_debit?: Record<string, never>
-      sofort?: Record<string, never>
-      type: string
-      us_bank_account?: Record<string, never>
-      wechat_pay?: Record<string, never>
-    }
     PaymentsResponse: {
-      object: string
+      defaultPaymentMethodId: string | null
       data: components['schemas']['Payment'][]
-      has_more: boolean
-      url: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     DetachPaymentMethodBody: {
       card_id: string
@@ -2894,37 +2798,8 @@ export interface components {
       hcaptchaToken: string
     }
     SetupIntentResponse: {
-      id: string
-      object: string
-      application: Record<string, never>
-      attach_to_self?: boolean
-      cancellation_reason: string
       client_secret: string
-      created: number
-      customer: Record<string, never>
-      description: string
-      flow_directions: Record<string, never>
-      last_setup_error: Record<string, never>
-      latest_attempt: Record<string, never>
-      livemode: boolean
-      mandate: Record<string, never>
-      metadata: Record<string, never>
-      next_action: Record<string, never>
-      on_behalf_of: Record<string, never>
       payment_method: Record<string, never>
-      payment_method_options: Record<string, never>
-      payment_method_types: string[]
-      single_use_mandate: Record<string, never>
-      status: string
-      usage: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
     }
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
@@ -2978,12 +2853,6 @@ export interface components {
       name: string
       ref: string
     }
-    PaymentMethodCardDetails: {
-      last_4_digits: string
-      brand: string
-      expiry_month: number
-      expiry_year: number
-    }
     ScheduledPlanChange: {
       target_plan: components['schemas']['BillingPlanId']
       /** Format: date-time */
@@ -3000,8 +2869,6 @@ export interface components {
       addons: components['schemas']['BillingSubscriptionAddon'][]
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       payment_method_type: string
-      payment_method_id?: string
-      payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
       billing_via_partner: boolean
       /** @enum {string} */
       billing_partner: 'fly' | 'aws'
@@ -3947,9 +3814,10 @@ export interface components {
     }
     Buffer: Record<string, never>
     PauseStatusResponse: {
-      max_days_till_restore_disabled: number | null
+      max_days_till_restore_disabled: number
       remaining_days_till_restore_disabled: number | null
-      can_restore: boolean | null
+      can_restore: boolean
+      latest_downloadable_backup_id: number | null
     }
     ResizeBody: {
       volume_size_gb: number
@@ -4015,16 +3883,20 @@ export interface components {
       region: string
       /** @enum {string} */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
       subscription_id: string
       connectionString: string
       kpsVersion?: string
@@ -5676,6 +5548,7 @@ export interface components {
       default?: Record<string, never> | number | string | boolean
       name?: string
       names?: string[]
+      array?: boolean
     }
     AttributeMapping: {
       keys: {
@@ -6904,36 +6777,13 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       403: {
         content: never
       }
       /** @description Failed to update the billing customer */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates the Stripe customer */
-  CustomerController_updateCustomer: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['CustomerUpdateResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update the Stripe customer */
       500: {
         content: never
       }
@@ -7573,7 +7423,7 @@ export interface operations {
     }
   }
   /** Gets Stripe payment methods for the given organization */
-  PaymentsController_getPaymentMethods: {
+  getPaymentMethodsV2: {
     parameters: {
       path: {
         /** @description Organization slug */
