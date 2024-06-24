@@ -9,6 +9,7 @@ import { Button, buttonVariants, cn, IconCommand, IconMenu, IconSearch } from 'u
 import GlobalMobileMenu from './GlobalMobileMenu'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import TopNavDropdown from './TopNavDropdown'
+import Image from 'next/image'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -118,18 +119,29 @@ const HeaderLogo = memo(() => {
         'flex h-auto items-center !bg-transparent !border-none !shadow-none'
       )}
     >
-      <ThemeImage
-        containerClassName="!w-[18px] hidden lg:block xl:hidden"
+      <Image
+        className="!w-[18px] hidden lg:block xl:hidden"
         src="/docs/supabase-logo-icon.svg"
-        priority
+        priority={true}
+        loading="eager"
         width={18}
         height={18}
         alt="Supabase Logo"
       />
-      <ThemeImage
-        containerClassName="!w-[96px] block lg:hidden xl:block !m-0"
-        src={{ dark: '/docs/supabase-dark.svg', light: '/docs/supabase-light.svg' }}
-        priority
+      <Image
+        className="!w-[96px] hidden dark:block lg:dark:hidden xl:dark:block !ml-0 lg:!ml-2.5"
+        src="/docs/supabase-dark.svg"
+        priority={true}
+        loading="eager"
+        width={96}
+        height={24}
+        alt="Supabase wordmark"
+      />
+      <Image
+        className="!w-[96px] block dark:hidden lg:hidden xl:block xl:dark:hidden !ml-0 lg:!ml-2.5"
+        src="/docs/supabase-light.svg"
+        priority={true}
+        loading="eager"
         width={96}
         height={24}
         alt="Supabase wordmark"
