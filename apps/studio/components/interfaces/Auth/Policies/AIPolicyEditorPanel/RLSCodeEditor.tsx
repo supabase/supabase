@@ -119,6 +119,12 @@ const RLSCodeEditor = ({
     onChange()
   }
 
+  // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.
+  // Happens when the value wordwraps and is updated via a template.
+  useEffect(() => {
+    onChange()
+  }, [value])
+
   async function formatPgsql(value: any) {
     try {
       const formatted = await formatQuery({
