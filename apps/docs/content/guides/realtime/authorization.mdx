@@ -23,7 +23,7 @@ Use realtime.js version `2.10.0` or greater.
 
 ## How it works
 
-We use tables in the `realtime` schema to allow you to write RLS policies which will determine the access your users have to a Channel topic and features within a Channel topic.
+Realtime uses tables in the `realtime` schema to allow you to write RLS policies which will determine the access your users have to a Channel topic and features within a Channel topic.
 
 The validation itself is done on connect per user. For each WebSocket connection we generate the policy for your user based on:
 
