@@ -33,7 +33,7 @@ import {
 } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -41,8 +41,14 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
+  Admonition,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -62,8 +68,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
@@ -689,44 +697,71 @@ const Wizard: NextPageWithLayout = () => {
                     </Panel.Content>
 
                     <Panel.Content>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="dataApi"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="What connections do you plan to use?"
-                            layout="horizontal"
-                          >
-                            <FormControl_Shadcn_>
-                              <RadioGroupStacked
-                                // Due to radio group not supporting boolean values
-                                // value is converted to boolean
-                                onValueChange={(value) => field.onChange(value === 'true')}
-                                defaultValue={field.value.toString()}
-                              >
-                                <FormItem_Shadcn_ asChild>
+                      <Collapsible_Shadcn_>
+                        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+                          Advanced options
+                          <ChevronRight
+                            size={16}
+                            strokeWidth={1}
+                            className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+                          />
+                        </CollapsibleTrigger_Shadcn_>
+                        <CollapsibleContent_Shadcn_ className="pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="dataApi"
+                            render={({ field }) => (
+                              <>
+                                <FormItemLayout
+                                  label="What connections do you plan to use?"
+                                  layout="horizontal"
+                                >
                                   <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem
-                                      value={'true'}
-                                      label="Data API + Connection String"
-                                      description="For connecting from the browser, mobile and server."
-                                    />
+                                    <RadioGroupStacked
+                                      // Due to radio group not supporting boolean values
+                                      // value is converted to boolean
+                                      onValueChange={(value) => field.onChange(value === 'true')}
+                                      defaultValue={field.value.toString()}
+                                    >
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            value={'true'}
+                                            label="Data API + Connection String"
+                                            description="For connecting from the browser, mobile and server."
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            label="Only Connection String"
+                                            value="false"
+                                            description="For connecting via server."
+                                            className={cn(
+                                              !form.getValues('dataApi') && '!rounded-b-none'
+                                            )}
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                    </RadioGroupStacked>
                                   </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
-                                <FormItem_Shadcn_ asChild>
-                                  <FormControl_Shadcn_>
-                                    <RadioGroupStackedItem
-                                      label="Only Connection String"
-                                      value="false"
-                                      description="For connecting via server."
-                                    />
-                                  </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
-                              </RadioGroupStacked>
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
+                                  {!form.getValues('dataApi') && (
+                                    <Admonition
+                                      className="rounded-t-none"
+                                      type={'warning'}
+                                      title="Data API will effectively be disabled"
+                                    >
+                                      PostgREST which powers the Data API will have no schemas
+                                      available to it.
+                                    </Admonition>
+                                  )}
+                                </FormItemLayout>
+                              </>
+                            )}
+                          />
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
                     </Panel.Content>
                     {orgSubscription && orgSubscription.plan.id !== 'free' && (
                       <Panel.Content>
