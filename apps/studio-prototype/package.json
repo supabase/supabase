@@ -16,6 +16,7 @@
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hotkeys-hook": "^4.5.0",
     "ui": "*"
   },
   "devDependencies": {
