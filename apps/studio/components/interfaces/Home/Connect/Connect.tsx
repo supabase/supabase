@@ -164,7 +164,7 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="primary" icon={<Plug size={14} className="rotate-90" />}>
+          <Button type="primary" icon={<Plug className="rotate-90" />}>
             <span>Connect</span>
           </Button>
         </DialogTrigger>
