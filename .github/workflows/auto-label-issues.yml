@@ -22,10 +22,10 @@ jobs:
         NUMBER: ${{ github.event.issue.number }}
       run: |
         if [ ${{ steps.is-org-member.outputs.result }} != "true" ]; then
-          echo "User is outside of organization, labelling external"
+          echo "User is outside of organization, labeling external"
           gh issue edit "$NUMBER" --add-label "external-issue"
         else
-          echo "User is within the organization, labelling internal"
+          echo "User is within the organization, labeling internal"
           gh issue edit "$NUMBER" --add-label "internal-issue"
         fi
   triage-new:
