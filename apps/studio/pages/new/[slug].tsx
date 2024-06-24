@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import {
@@ -19,6 +20,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import generator from 'generate-password-browser'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
@@ -26,6 +28,7 @@ import {
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
+  PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
@@ -59,10 +62,8 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { z } from 'zod'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -173,7 +174,8 @@ const Wizard: NextPageWithLayout = () => {
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
     allProjects?.filter(
-      (project) => project.organization_id === currentOrg?.id && project.status !== 'paused'
+      (project) =>
+        project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({
