@@ -1,17 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { Download, ExternalLink, PauseCircle } from 'lucide-react'
+import { Download, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
 import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -24,12 +26,11 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useProjectContext } from './ProjectContext'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import dayjs from 'dayjs'
-import AlertError from 'components/ui/AlertError'
+import { RestorePaidPlanProjectNotice } from './RestorePaidPlanProjectNotice'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -40,7 +41,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
-  const enableDisablingOfProjectRestores90DayLimit = useFlag('enforceNinetyDayUnpauseExpiry')
+  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
@@ -53,14 +54,12 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   } = useProjectPauseStatusQuery(
     { ref },
     {
-      enabled:
-        project?.status === PROJECT_STATUS.INACTIVE && enableDisablingOfProjectRestores90DayLimit,
+      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
     }
   )
 
   const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled =
-    enableDisablingOfProjectRestores90DayLimit && isSuccess && !pauseStatus.can_restore
+  const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
@@ -158,107 +157,97 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {isLoading && <GenericSkeletonLoader />}
-                {isError && (
-                  <AlertError error={pauseStatusError} subject="Failed to retrieve pause status" />
-                )}
-                {isSuccess && (
+                {enforceNinetyDayUnpauseExpiry && (
                   <>
-                    {isRestoreDisabled ? (
-                      <Alert_Shadcn_ variant="warning">
-                        <WarningIcon />
-                        <AlertTitle_Shadcn_>
-                          Project cannot be restored through the dashboard
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          This project has been paused for over{' '}
-                          <span className="text-foreground">
-                            {pauseStatus?.max_days_till_restore_disabled ?? 90} days
-                          </span>{' '}
-                          and cannot be restored through the dashboard. However, your data remains
-                          intact and can be downloaded as a backup.
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
-                          <Tooltip_Shadcn_>
-                            <TooltipTrigger_Shadcn_ asChild>
-                              <Button
-                                type="default"
-                                icon={<Download />}
-                                loading={isDownloading}
-                                disabled={!latestBackup}
-                                className="pointer-events-auto"
-                                onClick={() => onSelectDownloadBackup()}
-                              >
-                                Download backup
-                              </Button>
-                            </TooltipTrigger_Shadcn_>
-                            {!latestBackup && (
-                              <TooltipContent_Shadcn_ side="bottom">
-                                No backups available, please reach out via support for assistance
-                              </TooltipContent_Shadcn_>
-                            )}
-                          </Tooltip_Shadcn_>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    ) : isFreePlan ? (
+                    {isLoading && <GenericSkeletonLoader />}
+                    {isError && (
+                      <AlertError
+                        error={pauseStatusError}
+                        subject="Failed to retrieve pause status"
+                      />
+                    )}
+                    {isSuccess && (
                       <>
-                        <p className="text-sm text-foreground-light text-center">
-                          To prevent future pauses, consider upgrading to Pro.
-                        </p>
-                        <Alert_Shadcn_>
-                          <AlertTitle_Shadcn_>
-                            Project can be restored through the dashboard within the next{' '}
-                            {pauseStatus?.remaining_days_till_restore_disabled} day
-                            {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1
-                              ? 's'
-                              : ''}
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            Free projects cannot be restored through the dashboard if they are
-                            paused for more than{' '}
-                            <span className="text-foreground">
-                              {pauseStatus?.max_days_till_restore_disabled} days
-                            </span>
-                            . The latest that your project can be restored is by{' '}
-                            <span className="text-foreground">
-                              {dayjs()
-                                .utc()
-                                .add(pauseStatus.max_days_till_restore_disabled ?? 0, 'day')
-                                .format('DD MMM YYYY')}
-                            </span>
-                            . However, your database backup will still be available for download
-                            thereafter.
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
+                        {isRestoreDisabled ? (
+                          <Alert_Shadcn_ variant="warning">
+                            <WarningIcon />
+                            <AlertTitle_Shadcn_>
+                              Project cannot be restored through the dashboard
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              This project has been paused for over{' '}
+                              <span className="text-foreground">
+                                {pauseStatus?.max_days_till_restore_disabled ?? 90} days
+                              </span>{' '}
+                              and cannot be restored through the dashboard. However, your data
+                              remains intact and can be downloaded as a backup.
+                            </AlertDescription_Shadcn_>
+                            <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_ asChild>
+                                  <Button
+                                    type="default"
+                                    icon={<Download />}
+                                    loading={isDownloading}
+                                    disabled={!latestBackup}
+                                    className="pointer-events-auto"
+                                    onClick={() => onSelectDownloadBackup()}
+                                  >
+                                    Download backup
+                                  </Button>
+                                </TooltipTrigger_Shadcn_>
+                                {!latestBackup && (
+                                  <TooltipContent_Shadcn_ side="bottom">
+                                    No backups available, please reach out via support for
+                                    assistance
+                                  </TooltipContent_Shadcn_>
+                                )}
+                              </Tooltip_Shadcn_>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        ) : isFreePlan ? (
+                          <>
+                            <p className="text-sm text-foreground-light text-center">
+                              To prevent future pauses, consider upgrading to Pro.
+                            </p>
+                            <Alert_Shadcn_>
+                              <AlertTitle_Shadcn_>
+                                Project can be restored through the dashboard within the next{' '}
+                                {pauseStatus?.remaining_days_till_restore_disabled} day
+                                {(pauseStatus?.remaining_days_till_restore_disabled ?? 0) > 1
+                                  ? 's'
+                                  : ''}
+                              </AlertTitle_Shadcn_>
+                              <AlertDescription_Shadcn_>
+                                Free projects cannot be restored through the dashboard if they are
+                                paused for more than{' '}
+                                <span className="text-foreground">
+                                  {pauseStatus?.max_days_till_restore_disabled} days
+                                </span>
+                                . The latest that your project can be restored is by{' '}
+                                <span className="text-foreground">
+                                  {dayjs()
+                                    .utc()
+                                    .add(pauseStatus.max_days_till_restore_disabled ?? 0, 'day')
+                                    .format('DD MMM YYYY')}
+                                </span>
+                                . However, your database backup will still be available for download
+                                thereafter.
+                              </AlertDescription_Shadcn_>
+                            </Alert_Shadcn_>
+                          </>
+                        ) : (
+                          <RestorePaidPlanProjectNotice />
+                        )}
                       </>
-                    ) : (
-                      <Alert_Shadcn_>
-                        <WarningIcon />
-                        <AlertTitle_Shadcn_>
-                          Project will count towards compute usage once restored
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          For every hour your instance is active, we will bill you based on the
-                          instance size of your project.
-                        </AlertDescription_Shadcn_>
-                        <AlertDescription_Shadcn_ className="mt-3">
-                          <Button asChild type="default" icon={<ExternalLink />}>
-                            <a
-                              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              More information
-                            </a>
-                          </Button>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
                     )}
                   </>
                 )}
+
+                {!enforceNinetyDayUnpauseExpiry && !isFreePlan && <RestorePaidPlanProjectNotice />}
               </div>
 
-              {isSuccess && !isRestoreDisabled && (
+              {(!enforceNinetyDayUnpauseExpiry || (isSuccess && !isRestoreDisabled)) && (
                 <div className="flex items-center justify-center gap-4">
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_ asChild>
