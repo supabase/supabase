@@ -347,7 +347,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Guides and Examples',
+            label: 'Migration guides',
             icon: 'resources',
             href: '/guides/resources',
             level: 'resources',
