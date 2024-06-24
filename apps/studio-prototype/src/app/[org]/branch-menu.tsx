@@ -88,7 +88,10 @@ export function BranchMenu() {
             )}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
-            {env?.name}
+            <div className="flex gap-2 items-center">
+              <IconHandler icon={env?.type} />
+              {env?.name}
+            </div>
           </Button>
         </PopoverTrigger_Shadcn_>
         <BranchMenuPopoverContent
@@ -101,6 +104,19 @@ export function BranchMenu() {
       </Popover_Shadcn_>
     </>
   )
+}
+
+const IconHandler = (props: { icon: string }) => {
+  switch (props.icon) {
+    case 'prod':
+      return <Shield className="text-warning" size={14} />
+    case 'preview':
+      return <GitBranch className="text-foreground-muted" size={14} />
+    case 'long-running':
+      return <GitBranch className="text-foreground-muted" size={14} />
+    default:
+      return null
+  }
 }
 
 const BranchMenuPopoverContent = (props: {
@@ -262,9 +278,9 @@ const BranchMenuPopoverContent = (props: {
                 >
                   <div className="flex gap-2 items-center">
                     {branch.type === 'prod' ? (
-                      <Shield className="text-warning" size={14} />
+                      <IconHandler icon="prod" />
                     ) : (
-                      <GitBranch className="text-foreground-muted" size={14} />
+                      <IconHandler icon="preview" />
                     )}
                     {branch.name}
                     <span className="font-mono text-foreground-muted">{branch.type}</span>
