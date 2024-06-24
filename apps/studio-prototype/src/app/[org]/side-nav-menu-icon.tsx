@@ -1,18 +1,30 @@
 'use client'
 
+import { useConfig } from '@/src/hooks/use-config'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
 
 export default function SideNavMenuIcon({ product }: { product: any }) {
   const { org } = useParams()
+  const [config] = useConfig()
+  const { organization, project } = config
   const pathname = usePathname()
   const isActive = pathname.startsWith(`/${org}${product.href}`)
+
+  /**
+   * Override href for settings product
+   * Grabs project and organization from config to build friendly URL
+   */
+  let overrideHref = null
+  if (product.name === 'settings') {
+    overrideHref = `/${organization}/settings/${project}/general`
+  }
 
   return (
     <Link
       key={product.name}
-      href={`/${org}${product.href}`}
+      href={overrideHref || `/${org}${product.href}`}
       className={cn(
         'relative',
         'w-full',

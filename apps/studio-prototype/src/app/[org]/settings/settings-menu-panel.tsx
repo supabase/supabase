@@ -12,8 +12,9 @@ export default function SettingsMenuPanel() {
   return (
     <div
       className={cn(
+        'bg-dash-sidebar',
         'h-full',
-        isActive ? 'w-[300px]' : 'w-[0px]',
+        isActive ? 'w-[270px]' : 'w-[0px]',
         isActive && 'border-r',
         'duration-200',
         'ease-out',

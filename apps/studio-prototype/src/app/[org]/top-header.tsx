@@ -7,7 +7,7 @@ export default function TopHeader() {
   const showSlashes = false
 
   return (
-    <div className="border-b h-[48px] w-full px-3">
+    <div className="border-b h-[48px] w-full px-3 bg-dash-sidebar">
       <div className="flex items-center h-full -space-x-px">
         <BranchMenu />{' '}
         <Button
