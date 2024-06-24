@@ -49,22 +49,20 @@ export const RealtimePolicies = () => {
             realtime schema directly for greater control
           </p>
 
-          {isSuccess && (
-            <Policies
-              schema={'realtime'}
-              tables={filteredTables}
-              hasTables={tables.length > 0}
-              isLocked={false}
-              onSelectCreatePolicy={() => {
-                setSelectedPolicyToEdit(undefined)
-                showPolicyEditor(true)
-              }}
-              onSelectEditPolicy={(policy) => {
-                setSelectedPolicyToEdit(policy)
-                showPolicyEditor(true)
-              }}
-            />
-          )}
+          <Policies
+            schema="realtime"
+            tables={filteredTables}
+            hasTables
+            isLocked={false}
+            onSelectCreatePolicy={() => {
+              setSelectedPolicyToEdit(undefined)
+              showPolicyEditor(true)
+            }}
+            onSelectEditPolicy={(policy) => {
+              setSelectedPolicyToEdit(policy)
+              showPolicyEditor(true)
+            }}
+          />
         </div>
       )}
 

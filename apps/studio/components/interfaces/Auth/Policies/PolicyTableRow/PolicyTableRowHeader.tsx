@@ -40,7 +40,7 @@ const PolicyTableRowHeader = ({
           <h4 className="m-0">{table.name}</h4>
         </Link>
         <div className="flex items-center gap-x-2">
-          {isTableLocked && !isRealtimeMessagesTable && (
+          {isTableLocked && (
             <Badge>
               <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
                 <Lock size={12} /> Locked
