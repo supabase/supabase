@@ -72,7 +72,7 @@ export default function TableEditorItemsPanel() {
           />
           Items
         </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
+        <CollapsibleContent_Shadcn_ className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
           <div className="px-3 py-3 flex flex-col gap-2">
             <Button type="default" className="justify-start">
               <span className="text-foreground-lighter">Schema</span> <span>public</span>
@@ -106,7 +106,7 @@ export default function TableEditorItemsPanel() {
           />
           Project Queries
         </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
+        <CollapsibleContent_Shadcn_ className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
           <div className="px-3 py-3 flex flex-col gap-2">
             <Button type="default" className="justify-start" icon={<Plus />}>
               <span>New query</span>
@@ -140,7 +140,7 @@ export default function TableEditorItemsPanel() {
           />
           Your Queries
         </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
+        <CollapsibleContent_Shadcn_ className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
           <div className="px-3 py-3 flex flex-col gap-2">
             <Button type="default" className="justify-start" icon={<Plus />}>
               <span>New query</span>

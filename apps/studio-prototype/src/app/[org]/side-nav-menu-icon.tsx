@@ -20,7 +20,7 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
    */
   let overrideHref = null
   if (product.name === 'settings') {
-    overrideHref = `/${organization}/settings/project/  ${project}/general`
+    overrideHref = `/${organization}/settings/project/${project}/general`
   }
   if (product.name === 'table-editor' && config.tableEditor.activeTabId) {
     overrideHref = `/${organization}/table-editor/${config.tableEditor.activeTabId}`

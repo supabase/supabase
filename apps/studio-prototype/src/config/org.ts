@@ -10,16 +10,14 @@ export const orgs = [
           {
             name: 'main',
             key: 'main',
+            type: 'prod',
           },
           {
             name: 'dev',
             key: 'dev',
+            type: 'long-running',
           },
         ],
-      },
-      {
-        name: 'Docmrk',
-        key: 'docmrk',
       },
     ],
   },

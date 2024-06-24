@@ -4,6 +4,7 @@ import { orgs } from '@/src/config/org'
 import { useConfig } from '@/src/hooks/use-config'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { CommandSeparator_Shadcn_, ScrollArea, ScrollBar, cn } from 'ui'
 
 import {
@@ -18,12 +19,13 @@ import {
 } from 'ui'
 
 export default function SideMenuOrgMenu() {
+  const [open, setOpenState] = useState(false)
   const [config, setConfig] = useConfig()
   const { organization } = config
 
   return (
     <>
-      <Popover_Shadcn_>
+      <Popover_Shadcn_ open={open} onOpenChange={setOpenState}>
         <PopoverTrigger_Shadcn_>
           <div
             className={cn(
@@ -34,9 +36,9 @@ export default function SideMenuOrgMenu() {
             {config?.organization?.slice(0, 2).toUpperCase()}
           </div>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[200px] p-0" side="right" align="start" sideOffset={8}>
+        <PopoverContent_Shadcn_ className="w-[320px] p-0" side="right" align="start" sideOffset={8}>
           <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search framework..." />
+            <CommandInput_Shadcn_ placeholder="Search organizations..." />
             <CommandEmpty_Shadcn_>No framework found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className="max-h-[128px] overflow-y-auto">
@@ -48,7 +50,13 @@ export default function SideMenuOrgMenu() {
                       setConfig({
                         ...config,
                         organization: currentValue,
+                        project: orgs.find((o) => o.key === currentValue)?.projects[0].key,
+                        env: {
+                          name: 'main',
+                          type: 'prod',
+                        },
                       })
+                      setOpenState(false)
                     }}
                     className="flex items-center justify-between"
                   >

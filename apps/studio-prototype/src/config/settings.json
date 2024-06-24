@@ -6,9 +6,10 @@
     "items": [
       { "label": "General", "key": "general", "href": "/general" },
       { "label": "Infrastructure", "key": "infrastructure", "href": "/infrastructure" },
+      { "label": "API", "key": "api", "href": "/api" },
       { "label": "Integrations", "key": "integrations", "href": "/integrations" },
       { "label": "Add ons", "key": "add_ons", "href": "/add-ons" },
-      { "label": "Vault", "key": "vault", "href": "/vault" },
+      { "label": "Branching", "key": "branching", "href": "/branching" },
       { "label": "Database", "key": "database", "href": "/database" },
       {
         "label": "Authentication",
@@ -34,7 +35,7 @@
       { "label": "Storage", "key": "storage", "href": "/storage" },
       { "label": "Edge Functions", "key": "edge_functions", "href": "/edge-functions" },
       { "label": "Realtime", "key": "realtime", "href": "/realtime" },
-      { "label": "Branching", "key": "branching", "href": "/branching" }
+      { "label": "Vault", "key": "vault", "href": "/vault" }
     ]
   },
   "ORGANIZATION_SETTINGS": {
