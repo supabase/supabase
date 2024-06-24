@@ -127,7 +127,12 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
             </div>
           ) : (
-            <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
+            <BlockKeys
+              value={value}
+              onEscape={cancelChanges}
+              onEnter={saveChanges}
+              ignoreOutsideClicks={isConfirmNextModalOpen}
+            >
               <MonacoEditor
                 width={`${gridColumn?.width || column.width}px`}
                 value={value ?? ''}
