@@ -119,7 +119,7 @@ const HeaderLogo = memo(() => {
         'flex h-auto items-center !bg-transparent !border-none !shadow-none mr-4'
       )}
     >
-      <Image
+      {/* <Image
         className="!w-[18px] hidden lg:block xl:hidden"
         src="/docs/supabase-logo-icon.svg"
         priority={true}
@@ -127,9 +127,9 @@ const HeaderLogo = memo(() => {
         width={18}
         height={18}
         alt="Supabase Logo"
-      />
+      /> */}
       <Image
-        className="!w-[96px] hidden dark:block lg:dark:hidden xl:dark:block !ml-0 lg:!ml-2.5"
+        className="!w-[96px] hidden dark:block !ml-0 lg:!ml-2.5"
         src="/docs/supabase-dark.svg"
         priority={true}
         loading="eager"
@@ -138,7 +138,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className="!w-[96px] block dark:hidden lg:hidden xl:block xl:dark:hidden !ml-0 lg:!ml-2.5"
+        className="!w-[96px] block dark:hidden !ml-0 lg:!ml-2.5"
         src="/docs/supabase-light.svg"
         priority={true}
         loading="eager"

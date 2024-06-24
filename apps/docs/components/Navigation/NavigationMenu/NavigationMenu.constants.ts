@@ -173,7 +173,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
-      label: 'Getting Started',
+      label: 'Start',
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
@@ -260,7 +260,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   ],
   [
     {
-      label: 'API Reference',
+      label: 'Reference',
       menuItems: [
         [
           {
