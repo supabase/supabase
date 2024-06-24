@@ -10,6 +10,7 @@ type Config = {
     activeTabId: number
     itemsOpen: boolean
     queriesOpen: boolean
+    privateQueriesOpen?: boolean
   }
   env: {
     type: 'prod' | 'preview' | 'long-running'
@@ -26,6 +27,7 @@ const configAtom = atomWithStorage<Config>('config', {
     activeTabId: 1,
     itemsOpen: true,
     queriesOpen: true,
+    privateQueriesOpen: true,
   },
   env: {
     type: 'prod',

@@ -12,7 +12,7 @@ import {
   cn,
 } from 'ui'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { ChevronRight, Search } from 'lucide-react'
+import { ChevronRight, Plus, Search } from 'lucide-react'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 export default function TableEditorItemsPanel() {
@@ -48,11 +48,12 @@ export default function TableEditorItemsPanel() {
         'duration-200',
         'ease-out',
         'transition-all',
-        'py-3'
+        'py-3',
+        'flex flex-col gap-0'
       )}
     >
       <Collapsible_Shadcn_
-        className="group pb-3"
+        className="group pb-3 data-[state=open]:grow"
         open={config.tableEditor.itemsOpen}
         onOpenChange={() =>
           setConfig({
@@ -64,7 +65,7 @@ export default function TableEditorItemsPanel() {
           })
         }
       >
-        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-muted font-mono flex gap-3 items-center">
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
           <ChevronRight
             size={14}
             className="group-data-[state=open]:rotate-90 transform transition-all"
@@ -86,7 +87,7 @@ export default function TableEditorItemsPanel() {
       </Collapsible_Shadcn_>
       <Separator />
       <Collapsible_Shadcn_
-        className="group py-3"
+        className="group py-3 data-[state=open]:grow"
         open={config.tableEditor.queriesOpen}
         onOpenChange={() =>
           setConfig({
@@ -98,21 +99,55 @@ export default function TableEditorItemsPanel() {
           })
         }
       >
-        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-muted font-mono flex gap-3 items-center">
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
           <ChevronRight
             size={14}
             className="group-data-[state=open]:rotate-90 transform transition-all"
           />
-          Queries
+          Project Queries
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_>
           <div className="px-3 py-3 flex flex-col gap-2">
-            <Button type="default" className="justify-start">
-              <span className="text-foreground-lighter">Schema</span> <span>public</span>
+            <Button type="default" className="justify-start" icon={<Plus />}>
+              <span>New query</span>
             </Button>
             <Input
               icon={<Search size={13} className="text-foreground-muted" />}
-              placeholder="Search tables..."
+              placeholder="Search queries..."
+              size="tiny"
+            />
+          </div>
+        </CollapsibleContent_Shadcn_>
+      </Collapsible_Shadcn_>
+      <Separator />
+      <Collapsible_Shadcn_
+        className="group py-3 data-[state=open]:grow"
+        open={config.tableEditor.privateQueriesOpen}
+        onOpenChange={() =>
+          setConfig({
+            ...config,
+            tableEditor: {
+              ...config.tableEditor,
+              privateQueriesOpen: !config.tableEditor.privateQueriesOpen,
+            },
+          })
+        }
+      >
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
+          <ChevronRight
+            size={14}
+            className="group-data-[state=open]:rotate-90 transform transition-all"
+          />
+          Your Queries
+        </CollapsibleTrigger_Shadcn_>
+        <CollapsibleContent_Shadcn_>
+          <div className="px-3 py-3 flex flex-col gap-2">
+            <Button type="default" className="justify-start" icon={<Plus />}>
+              <span>New query</span>
+            </Button>
+            <Input
+              icon={<Search size={13} className="text-foreground-muted" />}
+              placeholder="Search queries..."
               size="tiny"
             />
           </div>

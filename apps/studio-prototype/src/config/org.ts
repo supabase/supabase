@@ -6,6 +6,16 @@ export const orgs = [
       {
         name: 'Sonsing',
         key: 'sonsing',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+          },
+        ],
       },
       {
         name: 'Docmrk',
@@ -14,58 +24,146 @@ export const orgs = [
     ],
   },
   {
-    name: 'Docmrk',
-    key: 'docmrk',
+    name: 'Tech Innovators',
+    key: 'tech-innovators',
     projects: [
       {
-        name: 'Sonsing',
-        key: 'sonsing',
+        name: 'Alpha Platform',
+        key: 'alpha-platform',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+            type: 'long-running',
+          },
+          {
+            name: 'feature-1',
+            key: 'feature-1',
+            type: 'preview',
+          },
+          {
+            name: 'hotfix-1',
+            key: 'hotfix-1',
+            type: 'preview',
+          },
+        ],
       },
       {
-        name: 'Docmrk',
-        key: 'docmrk',
+        name: 'Beta Application',
+        key: 'beta-application',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'staging',
+            key: 'staging',
+            type: 'preview',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+            type: 'long-running',
+          },
+        ],
       },
     ],
   },
   {
-    name: 'Sonsing 2',
-    key: 'sonsing-2',
+    name: 'Digital Solutions',
+    key: 'digital-solutions',
     projects: [
       {
-        name: 'Sonsing 2',
-        key: 'sonsing',
+        name: 'Gamma Service',
+        key: 'gamma-service',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+            type: 'long-running',
+          },
+          {
+            name: 'experiment-1',
+            key: 'experiment-1',
+            type: 'preview',
+          },
+        ],
       },
       {
-        name: 'Docmrk',
-        key: 'docmrk',
+        name: 'Delta Project',
+        key: 'delta-project',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'testing',
+            key: 'testing',
+            type: 'preview',
+          },
+        ],
       },
     ],
   },
   {
-    name: 'Sonsing 3',
-    key: 'sonsing-3',
+    name: 'NextGen Enterprises',
+    key: 'nextgen-enterprises',
     projects: [
       {
-        name: 'Sonsing 2',
-        key: 'sonsing',
+        name: 'Omega Platform',
+        key: 'omega-platform',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+            type: 'long-running',
+          },
+          {
+            name: 'feature-xyz',
+            key: 'feature-xyz',
+            type: 'preview',
+          },
+        ],
       },
       {
-        name: 'Docmrk',
-        key: 'docmrk',
-      },
-    ],
-  },
-  {
-    name: 'Sonsing 4',
-    key: 'sonsing-4',
-    projects: [
-      {
-        name: 'Sonsing 2',
-        key: 'sonsing',
-      },
-      {
-        name: 'Docmrk',
-        key: 'docmrk',
+        name: 'Zeta System',
+        key: 'zeta-system',
+        branches: [
+          {
+            name: 'main',
+            key: 'main',
+            type: 'prod',
+          },
+          {
+            name: 'dev',
+            key: 'dev',
+            type: 'long-running',
+          },
+          {
+            name: 'hotfix-2',
+            key: 'hotfix-2',
+            type: 'preview',
+          },
+        ],
       },
     ],
   },
