@@ -116,7 +116,7 @@ const HeaderLogo = memo(() => {
       href="/"
       className={cn(
         buttonVariants({ type: 'default' }),
-        'flex h-auto items-center !bg-transparent !border-none !shadow-none'
+        'flex h-auto items-center !bg-transparent !border-none !shadow-none mr-4'
       )}
     >
       <Image
