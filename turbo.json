@@ -1,48 +1,71 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "ui": "stream",
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "www#build": {
+    "database-design#build": {
       "dependsOn": ["^build"],
-      "env": [
-        "SUPABASE_SERVICE_ROLE_SECRET",
-        "EMAIL_TO_ID_SECRET",
-        "SUPABASE_URL",
-        "GITHUB_OAUTH_CLIENT_SECRET"
-      ],
+      "env": ["NEXT_PUBLIC_*", "OPENAI_API_KEY", "VERCEL_URL"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.local"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "design-system#build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_*"],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["OPENAI_API_KEY"],
+      "env": [
+        "ANALYZE",
+        "NEXT_PUBLIC_*",
+        "NODE_ENV",
+        "OPENAI_API_KEY",
+        "SKIP_BUILD_STATIC_GENERATION"
+      ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
       "dependsOn": ["^build"],
       "env": [
-        "SITE_URL",
-        "AUTH0_AUDIENCE",
-        "AUTH0_CLIENT_ID",
-        "AUTH0_CLIENT_SECRET",
-        "AUTH0_DOMAIN",
-        "COOKIE_DOMAIN",
-        "INTERCOM_API_KEY",
+        "ANALYZE",
+        "AUTH_JWT_SECRET",
+        "DEFAULT_ORGANIZATION_NAME",
+        "DEFAULT_PROJECT_NAME",
+        "LOGFLARE_API_KEY",
+        "LOGFLARE_URL",
+        "NEXT_PUBLIC_*",
+        "OPENAI_API_KEY",
+        "PLATFORM_PG_META_URL",
         "READ_ONLY_API_KEY",
         "READ_ONLY_URL",
-        "SENTRY_AUTH_TOKEN",
-        "SENTRY_ORG",
-        "SENTRY_PROJECT",
-        "SENTRY_URL",
-        "SESSION_COOKIE_SECRET",
-        "SUPABASE_ENCRYPTION_KEY",
-        "PLATFORM_PG_META_URL",
-        "NEXT_PUBLIC_VERCEL_ENV",
-        "NEXT_PUBLIC_SITE_URL"
+        "STUDIO_PG_META_URL",
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_PUBLIC_URL",
+        "SUPABASE_SERVICE_KEY",
+        "SUPABASE_URL",
+        "VERCEL_GIT_COMMIT_SHA",
+        "VERCEL_ENV",
+        "VERCEL_URL"
       ],
+      "passThroughEnv": ["SENTRY_ORG", "SENTRY_PROJECT", "SENTRY_AUTH_TOKEN"],
       "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "www#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "ANALYZE",
+        "GITHUB_CHANGELOG_APP_*",
+        "MISC_USE_SERVICE_ROLE_KEY",
+        "NEXT_PUBLIC_*",
+        "NODE_ENV",
+        "OPENAI_API_KEY",
+        "npm_lifecycle_event"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
