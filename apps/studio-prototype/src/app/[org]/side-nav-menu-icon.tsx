@@ -7,9 +7,7 @@ import { cn } from 'ui'
 export default function SideNavMenuIcon({ product }: { product: any }) {
   const { org } = useParams()
   const pathname = usePathname()
-  const isActive = pathname === `/${org}${product.href}`
-
-  console.log('pathname', pathname)
+  const isActive = pathname.startsWith(`/${org}${product.href}`)
 
   return (
     <Link

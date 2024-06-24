@@ -1,0 +1,62 @@
+{
+  "PROJECT_SETTINGS": {
+    "metadata": {
+      "base_path": "/project"
+    },
+    "items": [
+      { "label": "General", "key": "general", "href": "/general" },
+      { "label": "Infrastructure", "key": "infrastructure", "href": "/infrastructure" },
+      { "label": "Integrations", "key": "integrations", "href": "/integrations" },
+      { "label": "Add ons", "key": "add_ons", "href": "/add-ons" },
+      { "label": "Vault", "key": "vault", "href": "/vault" },
+      { "label": "Database", "key": "database", "href": "/database" },
+      {
+        "label": "Authentication",
+        "key": "authentication",
+        "href": "/authentication",
+        "items": [
+          { "label": "General", "key": "auth_general", "href": "/authentication/general" },
+          { "label": "Providers", "key": "providers", "href": "/authentication/providers" },
+          { "label": "Rate Limits", "key": "rate_limits", "href": "/authentication/rate-limits" },
+          {
+            "label": "Email templates",
+            "key": "email_templates",
+            "href": "/authentication/email-templates"
+          },
+          {
+            "label": "URL configuration",
+            "key": "url_configuration",
+            "href": "/authentication/url-configuration"
+          },
+          { "label": "Hooks", "key": "hooks", "href": "/authentication/hooks" }
+        ]
+      },
+      { "label": "Storage", "key": "storage", "href": "/storage" },
+      { "label": "Edge Functions", "key": "edge_functions", "href": "/edge-functions" },
+      { "label": "Realtime", "key": "realtime", "href": "/realtime" },
+      { "label": "Branching", "key": "branching", "href": "/branching" }
+    ]
+  },
+  "ORGANIZATION_SETTINGS": {
+    "items": [
+      { "label": "General", "key": "general", "href": "/general" },
+      { "label": "Subscription plan", "key": "subscription_plan", "href": "/subscription-plan" },
+      { "label": "Team", "key": "team", "href": "/team" },
+      { "label": "Integrations", "key": "integrations", "href": "/integrations" },
+      { "label": "Billing", "key": "billing", "href": "/billing" },
+      { "label": "Usage", "key": "usage", "href": "/usage" },
+      { "label": "Invoices", "key": "invoices", "href": "/invoices" },
+      { "label": "OAuth apps", "key": "oauth_apps", "href": "/oauth-apps" },
+      { "label": "Audit logs", "key": "audit_logs", "href": "/audit-logs" },
+      { "label": "Legal documents", "key": "legal_documents", "href": "/legal-documents" }
+    ]
+  },
+  "ACCOUNT_SETTINGS": {
+    "items": [
+      { "label": "General", "key": "general", "href": "/general" },
+      { "label": "Access tokens", "key": "access_tokens", "href": "/access-tokens" },
+      { "label": "Security", "key": "security", "href": "/security" },
+      { "label": "Audit logs", "key": "audit_logs", "href": "/audit-logs" }
+    ]
+  }
+}

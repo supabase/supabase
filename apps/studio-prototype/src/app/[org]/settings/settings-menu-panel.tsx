@@ -2,28 +2,25 @@
 
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
+import SettingsMenuChildren from './settings-menu-children'
 
 export default function SettingsMenuPanel() {
   const { org } = useParams()
   const pathname = usePathname()
-  const isActive = pathname === `/${org}/settings`
+  const isActive = pathname.startsWith(`/${org}/settings`)
 
   return (
     <div
       className={cn(
         'h-full',
-        //
         isActive ? 'w-[300px]' : 'w-[0px]',
-        isActive &&
-          `
-        border-r 
-        `,
+        isActive && 'border-r',
         'duration-200',
-        'ease-in-out',
+        'ease-out',
         'transition-all'
       )}
     >
-      <span className="text-foreground">items panel</span>
+      <SettingsMenuChildren />
     </div>
   )
 }
