@@ -2,7 +2,7 @@
 
 import { orgs } from '@/src/config/org'
 import { useConfig } from '@/src/hooks/use-config'
-import { resolveHideBranchesDropdown } from '@/src/utils/url-resolver'
+import { resolveHideBranchesDropdown, resolveHideProjectsDropdown } from '@/src/utils/url-resolver'
 import { Check, ChevronsUpDown, GitBranch, Shield } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
@@ -36,6 +36,7 @@ export function BranchMenu() {
   const branches = projects.find((proj) => proj.key === projectFocus || project)?.branches || []
 
   const hideBranchesDropdown = resolveHideBranchesDropdown(pathName, organization, project)
+  const hideProjectsDropdown = resolveHideProjectsDropdown(pathName, organization, project)
 
   const branchBasedSettings =
     !hideBranchesDropdown && pathName.startsWith(`/${organization}/settings/project`)
@@ -51,7 +52,11 @@ export function BranchMenu() {
             aria-expanded={openProject}
             className={cn(
               'z-10 w-[180px] justify-between',
-              !hideBranchesDropdown && 'rounded-r-none'
+              !hideBranchesDropdown && 'rounded-r-none',
+              'left-0',
+              'opacity-100',
+              hideProjectsDropdown && '-left-[8px] opacity-0',
+              'transition-all duration-200 ease-out'
             )}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
@@ -78,7 +83,7 @@ export function BranchMenu() {
               'rounded-l-none',
               'left-0',
               'opacity-100',
-              hideBranchesDropdown && '-left-[180px] opacity-0',
+              hideBranchesDropdown ? '-left-[180px] opacity-0' : 'delay-500',
               'transition-all duration-200 ease-out'
             )}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}

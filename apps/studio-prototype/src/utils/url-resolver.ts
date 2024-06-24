@@ -14,3 +14,15 @@ export function resolveHideBranchesDropdown(
     pathName.startsWith(`/${organization}/settings/project/${project}/branching`)
   )
 }
+
+export function resolveHideProjectsDropdown(
+  pathName: string,
+  organization: string | undefined,
+  project: string | undefined
+) {
+  return (
+    pathName.startsWith(`/${organization}/settings`) &&
+    !pathName.startsWith(`/${organization}/settings/project/${project}`) &&
+    !pathName.startsWith(`/${organization}/settings/account`)
+  )
+}
