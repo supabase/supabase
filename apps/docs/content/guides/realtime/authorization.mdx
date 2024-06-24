@@ -7,17 +7,17 @@ sidebar_label: 'Authorization'
 
 <Admonition type="note">
 
-Realtime Channels Authorization is in preview. Please [contact us]() to enable this feature for your project.
+Realtime Channels Authorization is in public alpha.
 
 </Admonition>
 
 <Admonition type="note">
 
-The [Typescript client library](https://www.npmjs.com/package/@supabase/realtime-js/v/2.10.0-next.6) is still under heavy development and as such is under the `next` version to ensure a better developer experience.
+Make sure to use the latest version of realtime.js.
 
 </Admonition>
 
-Realtime provides a system to set authorization per Channel and per Channel feature (Broadcast and Presence).
+Realtime provides a system to set authorization per Channel and per Channel feature.
 
 In this section we detail how to set up Channel authorization using RLS policies.
 
@@ -37,116 +37,21 @@ Increased RLS complexity can impact database performance and user connection tim
 
 We've included a helper function to facilitate building policies, making it easier to access user connection context.
 
-### realtime.channel_name
+### realtime.topic
 
-Returns name of the channel to which the user is connecting against.
+Returns the Channel topic to which the user is connecting against.
 
 ```sql
 CREATE POLICY "authenticated users can view all profiles"
-ON "realtime"."channels"
+ON "realtime"."messages"
 AS PERMISSIVE FOR SELECT
 TO authenticated
 USING (
-  realtime.channel_name = 'room_1'
+  realtime.topic = 'room_1'
 );
 ```
 
-## Creating Channels
-
-<Admonition type="note">
-
-If you don't create a channel, we assume you don't want RLS enabled on it.
-
-</Admonition>
-
-As previously stated, tables in the Realtime schema now represent your Channels.
-
-These are not automatically created upon connection; you must perform this action yourself.
-
-Once a Channel is created, it will be subject to RLS policy checks.
-
-<Admonition type="note">
-
-Whenever you use this feature we advice you to setup your RLS policies first otherwise you won't be able to test your code properly.
-
-</Admonition>
-
-### Admin created Channels
-
-Using your `service_role` token you can call either our REST endpoint or use a client library to create a Channel.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-  <TabPanel id="js" label="JavaScript">
-
-    ```js
-    // If you used service_role to initialize client library
-    await supabase.realtime.createChannel(name)
-    ```
-
-  </TabPanel>
-  <TabPanel id="bash" label="Bash">
-
-    ```bash
-    curl -v -X POST 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
-    --header 'apikey: <service_role>'\
-    --header 'Authorization: Bearer <access_token>' \
-    --data-raw '{ "name": "<channel name>" }'
-    ```
-
-  </TabPanel>
-</Tabs>
-
-### User created Channels
-
-Users can create Channels by creating an RLS policy for `INSERT` on the `realtime.channels` table.
-
-Utilize your `anon_token` and set the `Authorization` header with the bearer token to verify if a user can create a Channel.
-
-If permitted, the Channel will be created.
-
-```sql
-CREATE POLICY "authenticated can create channel"
-ON "realtime"."channels"
-AS PERMISSIVE FOR INSERT
-TO authenticated
-WITH CHECK (TRUE);
-```
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-  <TabPanel id="js" label="JavaScript">
-
-    ```js
-    supabase.realtime.setAuth(token)
-    await supabase.realtime.createChannel(name)
-    ```
-
-  </TabPanel>
-  <TabPanel id="bash" label="Bash">
-
-    ```bash
-    curl -X POST 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
-     --header 'apikey: <anon_token>'\
-     --header 'Authorization: Bearer <access_token>' \
-     --header 'Content-Type: application/json'\
-     --data-raw '{ "name": "<channel name>" }'
-    ```
-
-  </TabPanel>
-</Tabs>
-
-## Authorizing Channels
+## Authorize Channels
 
 Channels serve as our WebSocket representation, and here, we restrict joining capabilities by preventing WebSocket connections and terminating such connections.
 
@@ -160,7 +65,7 @@ CREATE TABLE public.profiles (
   user_id uuid REFERENCES auth.users (id)
 );
 CREATE TABLE public.rooms_users (
-  name text REFERENCES realtime.channels (name),
+  topic text REFERENCES realtime.messages (topic),
   user_id uuid REFERENCES auth.users (id),
   created_at timestamptz DEFAULT CURRENT_TIMESTAMP
 );
@@ -180,16 +85,18 @@ EXECUTE FUNCTION insert_user ();
 GRANT EXECUTE ON FUNCTION insert_user () TO supabase_auth_admin;
 ```
 
-### Allow Channel join
+### Authorize Channel joins
 
-To allow access we'll write an RLS policy for `SELECT` and determine which users are able to connect.
+To allow access clients must have at least one read or write permission on the Channel topic.
 
-You can implement the following policy to grant access to the Channel exclusively to users listed in the relationship table `public.rooms_users`.
+We'll write an RLS policy for `SELECT` and determine which users are able to connect.
+
+You can implement the following policy to grant access to the Channel topic exclusively to users listed in the relationship table `public.rooms_users`.
 
 ```sql
-CREATE POLICY "authenticated users can view all profiles"
-ON "realtime"."channels"
-AS PERMISSIVE FOR SELECT
+CREATE POLICY "authenticated users can join topic"
+ON "realtime"."messages"
+FOR SELECT
 TO authenticated
 USING (
 EXISTS (
@@ -199,23 +106,52 @@ EXISTS (
       rooms_users ru
     WHERE
       ru.user_id = auth.uid()
-      AND ru.name = realtime.channel_name()
+      AND ru.topic = realtime.topic()
+      AND realtime.messages.extension in ['broadcast']
   )
 );
+```
+
+## Joining Channels
+
+To connect to a Channel and join a topic with RLS enabled, instantiate the Channel with the `private` option set to `true`.
+
+```typescript
+import { createClient } from 'npm:@supabase/supabase-js@2.38.5'
+const url = 'https://<project_ref>.supabase.com'
+const apikey = '<api_key>'
+
+const client = createClient(url, apikey)
+
+const channel = client.channel('room_1', {
+  config: { private: true },
+})
+
+channel
+  .on('broadcast', { event: 'test' }, (payload) => console.log(payload))
+  .subscribe((status: string, err: any) => {
+    if (status === 'SUBSCRIBED') {
+      console.log('Connected!')
+    } else {
+      console.error(err)
+    }
+  })
 ```
 
 ## Authorize Broadcast read and write
 
-Broadcast is represented by a new table called `broadcasts` under the `realtime` schema that will be associated with a Channel via id and which will be automatically created for you.
+Broadcast is represented by the `extension` field on the `realtime.messages` table.
 
-### Allow Broadcast read
+If a message is a Broadcast message the value of `realtime.messages.extension` will be `broadcast`.
 
-To grant users permission to read Broadcast messages on a Channel, you must create a policy for `SELECT` operations on `realtime.broadcasts`.
+### Broadcast read
+
+To grant users permission to read Broadcast messages on a Channel topic, you must create a policy for `SELECT` operations on `realtime.messages` where `extension` is `broadcast`.
 
 ```sql
 CREATE POLICY "authenticated user can receive in room"
-ON "realtime"."broadcasts"
-AS PERMISSIVE FOR SELECT
+ON "realtime"."messages"
+FOR SELECT
 TO authenticated
 USING (
   EXISTS (
@@ -225,21 +161,22 @@ USING (
       rooms_users ru
     WHERE
       ru.user_id = auth.uid()
-      AND ru.name = realtime.channel_name()
+      AND ru.topic = realtime.topic()
+      AND realtime.messages.extension in ['broadcast']
   )
 );
 ```
 
-### Allow Broadcast write
+### Broadcast write
 
-Similarly to allow sending Broadcast messages you'll need to set a policy for `UPDATE` in `realtime.broadcasts`.
+To authorize sending Broadcast messages you'll need to set a policy for `INSERT` where the value of `realtime.messages.extention` is `broadcast`.
 
 ```sql
 CREATE POLICY "authenticated user can broadcast in room"
-ON "realtime"."broadcasts"
-AS PERMISSIVE FOR UPDATE
+ON "realtime"."messages"
+FOR INSERT
 TO authenticated
-USING (
+WITH CHECK (
   EXISTS (
     SELECT
       ru.user_id
@@ -247,23 +184,26 @@ USING (
       rooms_users ru
     WHERE
       ru.user_id = auth.uid()
-      AND ru.name = realtime.channel_name()
+      AND ru.topic = realtime.topic()
+      AND realtime.messages.extension in ['broadcast']
   )
 );
 ```
 
 ## Authorize Presence read and write
 
-Similar to setting up a Broadcast, you can establish the same for Presence. This allows you to specify whether users can read Presence changes or write Presece updates.
+Presnece is also represented by the `extension` field on the `realtime.messages` table.
 
-### Allow Presence read
+If a message is a Presence message the value of `realtime.messages.extension` will be `presence`.
 
-Again, here we use a policy for `SELECT` for `realtime.presences`.
+### Presence read
+
+Again, here we use a policy for `SELECT` on `realtime.messages` where `realtime.messages.extension` is `presence`.
 
 ```sql
-CREATE POLICY "authenticated user can listen to changes in room"
-ON "realtime"."presences"
-AS PERMISSIVE FOR SELECT
+CREATE POLICY "authenticated user can listen to Presence changes in room"
+ON "realtime"."messages"
+FOR SELECT
 TO authenticated
 USING (
   EXISTS (
@@ -273,19 +213,47 @@ USING (
       rooms_users ru
     WHERE
       ru.user_id = auth.uid()
-      AND ru.name = realtime.channel_name()
+      AND ru.topic = realtime.channel_name()
+      AND realtime.messages.extension in ['presence']
   )
 );
 ```
 
-### Allow Presence write
+### Presence write
 
-To update the Presence status for a user we need to create a policy for `UPDATE` on `realtime.presences`.
+To update the Presence status for a user we need to create a policy for `INSERT` on `realtime.messages` where the value of `realtime.messages.extension` is `presence`.
 
 ```sql
 CREATE POLICY "authenticated user can register presence in room"
-ON "realtime"."presences"
-AS PERMISSIVE FOR UPDATE
+ON "realtime"."messages"
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT
+      ru.user_id
+    FROM
+      rooms_users ru
+    WHERE
+      ru.user_id = auth.uid()
+      AND ru.name = realtime.channel_name()
+      AND realtime.messages.extension in ['presence']
+  )
+);
+```
+
+## Authorize Presence and Broadcast
+
+We can authorize Presence and Broadcast in two RLS policies by simply including both extensions in our where filter.
+
+### Broadcast and Presence read
+
+Authorize Presence and Broadcast read in one RLS policy.
+
+```sql
+CREATE POLICY "authenticated user can listen to Broadcast and Presence messages in room"
+ON "realtime"."messages"
+FOR SELECT
 TO authenticated
 USING (
   EXISTS (
@@ -295,146 +263,42 @@ USING (
       rooms_users ru
     WHERE
       ru.user_id = auth.uid()
-      AND ru.name = realtime.channel_name()
+      AND ru.topic = realtime.channel_name()
+      AND realtime.messages.extension in ['broadcast', 'presence']
   )
 );
 ```
 
-## Managing Channels
+### Broadcast Presence write
 
-Now that you can create Channels, you can also manage them.
-
-Utilizing your `service_role` token enables you to perform all operations, bypassing RLS.
-
-Alternatively, you can create RLS policies to authorize your users to manage only certain Channels.
-
-### List Channels
-
-List Channels a user has access to.
-
-Results are filtered with the `SELECT` policy on the `realtime.channels` tables.
+Authorize Presence and Broadcast write in one RLS policy.
 
 ```sql
--- Authenticated user would access and be able to list all channels
-CREATE POLICY "authenticated users can view all profiles"
-ON "realtime"."channels"
-AS PERMISSIVE FOR SELECT
+CREATE POLICY "authenticated user can send Broadcast and Presence messages in a room"
+ON "realtime"."messages"
+FOR INSERT
 TO authenticated
-USING ( true )
+WITH CHECK (
+  EXISTS (
+    SELECT
+      ru.user_id
+    FROM
+      rooms_users ru
+    WHERE
+      ru.user_id = auth.uid()
+      AND ru.name = realtime.channel_name()
+      AND realtime.messages.extension in ['broadcast', 'presence']
+  )
+);
 ```
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-  <TabPanel id="js" label="JavaScript">
-
-    ```js
-    supabase.realtime.listChannels()
-    ```
-
-  </TabPanel>
-  <TabPanel id="bash" label="Bash">
-
-    ```bash
-    curl 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
-     --header 'apikey: <anon_token>'\
-     --header 'Authorization: Bearer <access_token>' \
-     --header 'Content-Type: application/json'\
-    ```
-
-  </TabPanel>
-</Tabs>
-
-### Delete Channel
-
-Users can also delete Channels based on the `DELETE` policy on the `realtime.channels` table.
-
-```sql
--- Authenticated user can delete all channels
-CREATE POLICY authenticated_all_channels_delete
-ON realtime.channels FOR DELETE
-TO authenticated
-USING ( true );
-```
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-  <TabPanel id="js" label="JavaScript">
-
-    ```js
-    supabase.realtime.deleteChannel(name)
-    ```
-
-  </TabPanel>
-  <TabPanel id="bash" label="Bash">
-
-    ```bash
-    curl -X DELETE 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
-     --header 'apikey: <anon_token>'\
-     --header 'Authorization: Bearer <access_token>' \
-     --header 'Content-Type: application/json'\
-    ```
-
-  </TabPanel>
-</Tabs>
-
-### Update Channel
-
-Users can update Channel names. Channel names are unique so users will receive unique index errors if a Channel already exists.
-
-```sql
--- authenticated users can update channel name
-CREATE POLICY authenticated_all_channels_update
-ON realtime.channels FOR UPDATE
-TO authenticated
-USING ( true )
-```
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-  <TabPanel id="js" label="JavaScript">
-
-    ```js
-    supabase.realtime.updateChannel(old_name, new_name)
-    ```
-
-  </TabPanel>
-  <TabPanel id="bash" label="Bash">
-
-    ```bash
-    curl -X PATCH 'https://<project_ref>.supabase.co/realtime/v1/api/channels/<old_name>'\
-     --header 'apikey: <anon_token>'\
-     --header 'Authorization: Bearer <access_token>' \
-     --header 'Content-Type: application/json'\
-     --data-raw '{ "name": "<new name>" }'
-    ```
-
-  </TabPanel>
-</Tabs>
 
 ## Avoid usage with Postgres Changes
 
-If the Channel is created the policies on `realtime.channels` will influence the Channels you use to receive updates for Postgres Changes.
+Realtime Postgres Changes are separate from Channel authorization.
 
-We recommend not creating a Channel before subscribing when useing Postgres Changes.
+Postgres Changes with RLS Realtime Channl authorization is backwards compatible with your production application.
 
-In this way, Realtime Channl authorization is backwards compatible with your production application.
-
-## Changing RLS policies
+## Updating RLS policies
 
 When you change an RLS policy these changes are picked up when a user connects to a Channel.
 
