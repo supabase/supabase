@@ -3,6 +3,7 @@
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import SettingsMenuChildren from './settings-menu-children'
+import { ClickCounter } from './click-counter'
 
 export default function SettingsMenuPanel() {
   const { org } = useParams()
@@ -21,6 +22,7 @@ export default function SettingsMenuPanel() {
         'transition-all'
       )}
     >
+      {/* <ClickCounter /> */}
       <SettingsMenuChildren />
     </div>
   )

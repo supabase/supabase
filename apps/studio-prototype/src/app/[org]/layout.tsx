@@ -1,4 +1,4 @@
-import SettingsMenuPanel from './settings/settings-menu-panel'
+import SettingsMenuPanel from './settings-menu-panel'
 import SideNav from './side-nav'
 import TopHeader from './top-header'
 

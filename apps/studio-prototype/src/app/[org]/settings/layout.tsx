@@ -1,4 +1,4 @@
-import SettingsMenuPanel from './settings-menu-panel'
+import SettingsMenuPanel from '../settings-menu-panel'
 
 export default function TableEditorLayout({
   children,
