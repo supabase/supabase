@@ -91,7 +91,7 @@ export const generateProductRoutes = (
             key: 'realtime',
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/policies`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
           },
         ]
       : []),

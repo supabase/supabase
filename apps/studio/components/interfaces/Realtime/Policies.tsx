@@ -34,8 +34,7 @@ export const RealtimePolicies = () => {
     <div className="flex min-h-full w-full flex-col p-4">
       <h3 className="text-xl">Realtime policies</h3>
       <p className="mt-2 text-sm text-foreground-light">
-        Safeguard your channels with policies that define the operations allowed for your users at
-        the channel level.
+        You can use RLS policies to control access to Realtime Channels.
       </p>
 
       {isLoading && <GenericSkeletonLoader />}
@@ -44,11 +43,6 @@ export const RealtimePolicies = () => {
 
       {isSuccess && (
         <div className="mt-4 space-y-4">
-          <p className="text-sm text-foreground-light">
-            You may also write general policies for the <code>channels</code> table under the
-            realtime schema directly for greater control
-          </p>
-
           <Policies
             schema="realtime"
             tables={filteredTables}

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProject, withAuth } from 'hooks'
+import { useFlag, useSelectedProject, withAuth } from 'hooks'
 import { ProjectLayout } from '../'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
@@ -15,6 +15,8 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+
+  const authzEnabled = useFlag('authzRealtime')
 
   return (
     <ProjectLayout
