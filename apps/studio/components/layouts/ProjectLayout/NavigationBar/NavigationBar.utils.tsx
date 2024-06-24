@@ -1,5 +1,6 @@
 import type { Route } from 'components/ui/ui.types'
 import type { Project } from 'data/projects/project-detail-query'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
   Auth,
   Database,
@@ -10,9 +11,8 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { FileText, Lightbulb, List, Settings } from 'lucide-react'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
+import { Settings, FileText, List, Lightbulb } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
