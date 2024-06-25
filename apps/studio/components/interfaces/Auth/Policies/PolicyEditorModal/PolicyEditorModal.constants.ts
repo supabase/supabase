@@ -238,7 +238,7 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
 with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Enable pushing broadcasts to specific channel',
       definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name''`,
+      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       command: 'UPDATE',
       roles: [],
     },

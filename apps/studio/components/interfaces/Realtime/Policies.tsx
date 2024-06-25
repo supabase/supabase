@@ -11,10 +11,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
 
-  const [policyEditorShown, showPolicyEditor] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | undefined>(
-    undefined
-  )
+  const [showPolicyEditor, setShowPolicyEditor] = useState(false)
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
 
   const {
     data: tables,
@@ -50,22 +48,22 @@ export const RealtimePolicies = () => {
             isLocked={false}
             onSelectCreatePolicy={() => {
               setSelectedPolicyToEdit(undefined)
-              showPolicyEditor(true)
+              setShowPolicyEditor(true)
             }}
             onSelectEditPolicy={(policy) => {
               setSelectedPolicyToEdit(policy)
-              showPolicyEditor(true)
+              setShowPolicyEditor(true)
             }}
           />
         </div>
       )}
 
       <AIPolicyEditorPanel
-        visible={policyEditorShown}
+        visible={showPolicyEditor}
         searchString="messages"
         schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
-        onSelectCancel={() => showPolicyEditor(false)}
+        onSelectCancel={() => setShowPolicyEditor(false)}
       />
     </div>
   )

@@ -12,7 +12,6 @@ import {
   getGeneralPolicyTemplates,
   getRealtimePolicyTemplates,
 } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
   schema: string
@@ -31,12 +30,10 @@ export const PolicyTemplates = ({
 }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
 
-  let templates: PolicyTemplate[] = []
-  if (schema === 'realtime') {
-    templates = getRealtimePolicyTemplates()
-  } else {
-    templates = getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
-  }
+  const templates =
+    schema === 'realtime'
+      ? getRealtimePolicyTemplates()
+      : getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
 
   const baseTemplates =
     selectedPolicy !== undefined

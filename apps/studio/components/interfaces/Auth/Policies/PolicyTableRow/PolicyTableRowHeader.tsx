@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCheckPermissions } from 'hooks'
-import { Badge, Button } from 'ui'
+import { Badge, Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -56,8 +56,8 @@ const PolicyTableRowHeader = ({
         <div className="flex-1">
           <div className="flex flex-row justify-end gap-x-2">
             {!isRealtimeMessagesTable ? (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
+              <Tooltip_Shadcn_ delayDuration={0}>
+                <TooltipTrigger_Shadcn_ asChild>
                   <Button
                     type="default"
                     disabled={!canToggleRLS}
@@ -65,25 +65,23 @@ const PolicyTableRowHeader = ({
                   >
                     {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
                   </Button>
-                </Tooltip.Trigger>
+                </TooltipTrigger_Shadcn_>
                 {!canToggleRLS && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to toggle RLS
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
+                  <TooltipContent_Shadcn_ side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        You need additional permissions to toggle RLS
+                      </span>
+                    </div>
+                  </TooltipContent_Shadcn_>
                 )}
-              </Tooltip.Root>
+              </Tooltip_Shadcn_>
             ) : null}
             {!isAiAssistantEnabled && (
               <Button

@@ -8,6 +8,17 @@ export const generateRealtimeMenu = (
   const ref = project?.ref ?? 'default'
 
   return [
+    {
+      title: 'Tools',
+      items: [
+        {
+          name: 'Inspector',
+          key: 'inspector',
+          url: `/project/${ref}/realtime/inspector`,
+          items: [],
+        },
+      ],
+    },
     ...(authzEnabled
       ? [
           {
@@ -23,16 +34,5 @@ export const generateRealtimeMenu = (
           },
         ]
       : []),
-    {
-      title: 'Tools',
-      items: [
-        {
-          name: 'Inspector',
-          key: 'inspector',
-          url: `/project/${ref}/realtime/inspector`,
-          items: [],
-        },
-      ],
-    },
   ]
 }
