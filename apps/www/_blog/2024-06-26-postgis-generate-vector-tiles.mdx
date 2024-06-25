@@ -16,7 +16,7 @@ toc_depth: 3
 
 <Admonition>
 
-[Do you prefer audio-visual learning? Watch the video guide!]()
+[Do you prefer audio-visual learning? Watch the video guide!](https://supabase.link/supa-gis-yt-docs)
 
 [Or jump straight into the code](https://github.com/bdon/supabase-vector-tile)
 
@@ -27,6 +27,14 @@ toc_depth: 3
 Overture Maps allows us to download open map data, like places of interest, as [GeoJSON](https://geojson.org/) which we can transform into SQL and ingest into our Postgres database on Supabase.
 
 Using PostGIS we can then programmatically generate vector tiles and serve them to our MapLibre GL client using supabase-js.
+
+<Admonition>
+
+Vector tiles are packets of geographic data, packaged into pre-defined roughly-square shaped "tiles" for transfer over the web. Map data is requested by a client as a set of "tiles" corresponding to square areas of land of a pre-defined size and location.
+
+Especially for large datasets, this has the benefit that the data transfer is greatly reduced because because only data within the current viewport, and at the current zoom level needs to be transferred.
+
+</Admonition>
 
 In this tutorial, you will learn to
 
@@ -61,7 +69,7 @@ PG_USE_COPY=true ogr2ogr -f pgdump places.sql places.geojson
 
 ## Import location data into Supabase
 
-Enable the PostGIS extension on your Supabase Database on a dedicated separate `gis` schema. To do so you can navigate to the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) and run the following SQL, or you can enable the extension from the [Database Extensions Settings](https://supabase.com/dashboard/project/_/database/extensions).
+Enable the PostGIS extension on your Supabase Database on a dedicated separate `gis` schema. To do so you can navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following SQL, or you can enable the extension from the [Database Extensions Settings](/dashboard/project/_/database/extensions).
 
 As PostGIS can be quite compute heavy, we recommend enabling it on a decidacted separate schema, for example names `gis`!
 
@@ -76,13 +84,13 @@ Import the open map data into a `places` table in Supabase:
 psql -h aws-0-us-west-1.pooler.supabase.com -p 5432 -d postgres -U postgres.project-ref < places.sql
 ```
 
-You can find the credentials in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) of your Supabase Dashboard.
+You can find the credentials in the [Database settings](/dashboard/project/_/settings/database) of your Supabase Dashboard.
 
 ### Enable RLS and create a public read policy
 
 We want the places data to be available publicly, so we can create a row level security policy that enables public read access.
 
-In your Supabase Dashboard, navigate to the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) and run the following:
+In your Supabase Dashboard, navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following:
 
 ```sql
 ALTER TABLE "public"."places" ENABLE ROW LEVEL SECURITY;
@@ -92,7 +100,7 @@ CREATE POLICY "Enable read access for all users" ON "public"."places" FOR SELECT
 
 ## Generate vector tiles with PostGIS
 
-To programmatically generate vector tiles on client-side request, we need to create a Postgres function that we can invoke via remote procedure call. In your SQL Editor, run:
+To programmatically generate vector tiles on client-side request, we need to create a Postgres function that we can invoke via a [remote procedure call](/docs/reference/javascript/rpc). In your SQL Editor, run:
 
 ```sql
 CREATE OR REPLACE FUNCTION mvt(z integer, x integer, y integer)
@@ -141,7 +149,7 @@ END;
 $$;
 ```
 
-To limit the amount of data send over the wire, we limit the amount of metadata to include in the vector tile. For example we add a condition for the zoom leverl, and only return the place name when the user has zoomed in beyond level 13.
+To limit the amount of data send over the wire, we limit the amount of metadata to include in the vector tile. For example we add a condition for the zoom level, and only return the place name when the user has zoomed in beyond level 13.
 
 ## Use supabase-js to fetch vector tiles from MapLibre GL client
 
@@ -194,7 +202,7 @@ const map = new maplibregl.Map({
       },
       protomaps: {
         type: 'vector',
-        url: 'https://api.protomaps.com/tiles/v3.json?key=1003762824b9687f',
+        url: 'https://api.protomaps.com/tiles/v3.json?key=your-protomaps-api-key',
         attribution: 'Basemap © <a href="https://openstreetmap.org">OpenStreetMap</a>',
       },
     },
@@ -277,12 +285,12 @@ map.on('click', 'overture-pois-text', async (e) => {
 
 PostGIS is incredibly powerful, allowing you to programmatically generate vector tiles from table rows stored in Postgres. Paired with Supabase's auto generated REST API and supabase-js client library you're able to build interactive geospatial applications with ease!
 
-Make sure to follow our [Twitter]() and [YouTube]() channels to stay up to date with more Postgres and PostGIS learnings!
+Want to learn more about Maps and PostGIS? Make sure to follow our [Twitter](https://x.com/supabase) and [YouTube](https://www.youtube.com/@Supabase) channels to not miss out! See you then!
 
 ## More Supabase
 
-- [Watch the video guide]()
+- [Watch the video guide](https://supabase.link/supa-gis-yt-docs)
 - [Find the code](https://github.com/bdon/supabase-vector-tile)
-- [Self-host Maps on Supabase Storage with Protomaps]()
-- [Getting started with PostGIS](https://youtu.be/MWfB0t5u3V0)
+- [Self-host Maps on Supabase Storage with Protomaps](https://supabase.link/protomaps-storage-yt)
+- [Getting started with PostGIS](https://supabase.link/postgis-quickstart-yt)
 - [PostGIS docs guide](/docs/guides/database/extensions/postgis)
