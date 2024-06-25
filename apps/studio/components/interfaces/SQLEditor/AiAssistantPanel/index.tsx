@@ -14,6 +14,7 @@ import {
   FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  TextArea_Shadcn_,
   cn,
 } from 'ui'
 import { AiIcon } from 'ui-patterns/Cmdk'
@@ -171,12 +172,12 @@ export const AiAssistantPanel = ({
                 <FormControl_Shadcn_>
                   <div className="relative">
                     <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <Input_Shadcn_
+                    <TextArea_Shadcn_
                       {...field}
                       autoComplete="off"
                       disabled={loading}
                       autoFocus
-                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
+                      className={`bg-surface-300 dark:bg-black rounded-full pl-12 h-16 rounded-lg ${
                         loading ? 'pr-10' : ''
                       }`}
                       placeholder="Ask a question about your SQL query"
