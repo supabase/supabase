@@ -31,7 +31,7 @@ let supabase = SupabaseClient(
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="ToDoModel.swift">
+      <ConnectTabContent value="Todo.swift">
         <SimpleCodeBlock className="swift" parentClassName="min-h-72">
           {`
 import Foundation
