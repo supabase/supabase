@@ -12,7 +12,7 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization, useSelectedProject, useUrlState } from 'hooks'
 import { Button, IconExternalLink, IconGitHub } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
@@ -24,6 +24,8 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+
+type Tab = 'overview' | 'prs' | 'branches'
 
 const BranchManagement = () => {
   const router = useRouter()
@@ -37,7 +39,10 @@ const BranchManagement = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const [view, setView] = useState<'overview' | 'prs' | 'branches'>('overview')
+  const [urlParams, setParams] = useUrlState<{ tab: Tab }>()
+  const tab = urlParams.tab ?? 'overview'
+  const setTab = (tab: Tab) => setParams({ tab })
+
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
@@ -146,27 +151,27 @@ const BranchManagement = () => {
                   <Button
                     type="default"
                     className={`rounded-r-none transition hover:opacity-90 ${
-                      view === 'overview' ? 'opacity-100' : 'opacity-60'
+                      tab === 'overview' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('overview')}
+                    onClick={() => setTab('overview')}
                   >
                     Overview
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-none transition hover:opacity-90 ${
-                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                      tab === 'prs' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('prs')}
+                    onClick={() => setTab('prs')}
                   >
                     Pull requests
                   </Button>
                   <Button
                     type="default"
                     className={`rounded-l-none transition hover:opacity-90 ${
-                      view === 'branches' ? 'opacity-100' : 'opacity-60'
+                      tab === 'branches' ? 'opacity-100' : 'opacity-60'
                     }`}
-                    onClick={() => setView('branches')}
+                    onClick={() => setTab('branches')}
                   >
                     All branches
                   </Button>
@@ -209,27 +214,32 @@ const BranchManagement = () => {
                     <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
                       <IconGitHub size={18} strokeWidth={2} />
                     </div>
-                    <p className="text-sm">GitHub branch workflow</p>
+                    <p className="text-sm">
+                      {repo ? 'GitHub branch workflow' : 'No GitHub integration connected'}
+                    </p>
                     <Button asChild type="default" iconRight={<IconExternalLink />}>
                       <Link passHref href={`/project/${ref}/settings/integrations`}>
                         Settings
                       </Link>
                     </Button>
-                    <Button
-                      type="text"
-                      size="small"
-                      className="text-light hover:text py-1 px-1.5"
-                      iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-                    >
-                      <Link
-                        passHref
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`https://github.com/${repo}`}
+                    {repo && (
+                      <Button
+                        type="text"
+                        size="small"
+                        className="text-light hover:text py-1 px-1.5"
+                        iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+                        asChild
                       >
-                        {repo}
-                      </Link>
-                    </Button>
+                        <Link
+                          passHref
+                          target="_blank"
+                          rel="noreferrer"
+                          href={`https://github.com/${repo}`}
+                        >
+                          {repo}
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                   <Button type="default" onClick={() => setShowDisableBranching(true)}>
                     Disable branching
@@ -237,26 +247,26 @@ const BranchManagement = () => {
                 </div>
               )}
 
-              {isErrorBranches && view === 'overview' && (
+              {isErrorBranches && tab === 'overview' && (
                 <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
               )}
 
               {!isError && (
                 <>
-                  {view === 'overview' && (
+                  {tab === 'overview' && (
                     <Overview
                       isLoading={isLoading}
                       isSuccess={isSuccess}
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      onViewAllBranches={() => setView('branches')}
+                      onViewAllBranches={() => setTab('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
                       generateCreatePullRequestURL={generateCreatePullRequestURL}
                     />
                   )}
-                  {view === 'prs' && (
+                  {tab === 'prs' && (
                     <BranchManagementSection
                       header={`${branchesWithPRs.length} branches with pull requests found`}
                     >
@@ -280,7 +290,7 @@ const BranchManagement = () => {
                       )}
                     </BranchManagementSection>
                   )}
-                  {view === 'branches' && (
+                  {tab === 'branches' && (
                     <BranchManagementSection header={`${previewBranches.length} branches found`}>
                       {isLoadingBranches && <BranchLoader />}
                       {isErrorBranches && (

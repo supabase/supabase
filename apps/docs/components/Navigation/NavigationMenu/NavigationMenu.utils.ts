@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { ICommonItem } from '~/components/reference/Reference.types'
 import { Json } from '~/types'

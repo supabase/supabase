@@ -213,7 +213,7 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1">
+                <div className="flex flex-1" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
                     ItemComponent={EntityListItem}

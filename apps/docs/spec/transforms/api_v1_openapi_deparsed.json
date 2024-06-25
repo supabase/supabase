@@ -60,10 +60,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     },
@@ -327,7 +330,7 @@
     },
     "/v1/projects": {
       "get": {
-        "operationId": "v1-get-all-projects",
+        "operationId": "v1-list-all-projects",
         "summary": "List all projects",
         "description": "Returns a list of all projects you've previously created.",
         "parameters": [],
@@ -389,10 +392,13 @@
                           "INACTIVE",
                           "INIT_FAILED",
                           "REMOVED",
-                          "RESTORING",
+                          "RESTARTING",
                           "UNKNOWN",
                           "UPGRADING",
-                          "PAUSING"
+                          "PAUSING",
+                          "RESTORING",
+                          "RESTORE_FAILED",
+                          "PAUSE_FAILED"
                         ],
                         "type": "string"
                       }
@@ -567,10 +573,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     }
@@ -936,13 +945,13 @@
                             ]
                           },
                           "visibility": {
+                            "type": "string",
                             "enum": [
                               "user",
                               "project",
                               "org",
                               "public"
-                            ],
-                            "type": "string"
+                            ]
                           },
                           "name": {
                             "type": "string"
@@ -2973,7 +2982,7 @@
         ]
       },
       "delete": {
-        "operationId": "v1-deactive-vanity-subdomain-config",
+        "operationId": "v1-deactivate-vanity-subdomain-config",
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
         "parameters": [
           {
@@ -3365,6 +3374,7 @@
                               "type": "number"
                             },
                             "error": {
+                              "type": "string",
                               "enum": [
                                 "1_upgraded_instance_launch_failed",
                                 "2_volume_detachchment_from_upgraded_instance_failed",
@@ -3374,10 +3384,10 @@
                                 "6_volume_detachchment_from_original_instance_failed",
                                 "7_volume_attachment_to_upgraded_instance_failed",
                                 "8_upgrade_completion_failed"
-                              ],
-                              "type": "string"
+                              ]
                             },
                             "progress": {
+                              "type": "string",
                               "enum": [
                                 "0_requested",
                                 "1_started",
@@ -3389,16 +3399,15 @@
                                 "7_detached_volume_from_original_instance",
                                 "8_attached_volume_to_upgraded_instance",
                                 "9_completed_upgrade"
-                              ],
-                              "type": "string"
+                              ]
                             },
                             "status": {
+                              "type": "number",
                               "enum": [
                                 0,
                                 1,
                                 2
-                              ],
-                              "type": "number"
+                              ]
                             }
                           },
                           "required": [
@@ -3802,7 +3811,7 @@
     },
     "/v1/projects/{ref}/config/database/postgres": {
       "get": {
-        "operationId": "get-postgres-config",
+        "operationId": "v1-get-postgres-config",
         "summary": "Gets project's Postgres config",
         "parameters": [
           {
@@ -3903,7 +3912,7 @@
         ]
       },
       "put": {
-        "operationId": "update-postgres-config",
+        "operationId": "v1-update-postgres-config",
         "summary": "Updates project's Postgres config",
         "parameters": [
           {
@@ -4131,6 +4140,196 @@
         },
         "tags": [
           "database"
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pooler": {
+      "get": {
+        "operationId": "v1-get-supavisor-config",
+        "summary": "Gets project's supavisor config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "identifier": {
+                        "type": "string"
+                      },
+                      "database_type": {
+                        "enum": [
+                          "PRIMARY",
+                          "READ_REPLICA"
+                        ],
+                        "type": "string"
+                      },
+                      "is_using_scram_auth": {
+                        "type": "boolean"
+                      },
+                      "db_user": {
+                        "type": "string"
+                      },
+                      "db_host": {
+                        "type": "string"
+                      },
+                      "db_port": {
+                        "type": "number"
+                      },
+                      "db_name": {
+                        "type": "string"
+                      },
+                      "connectionString": {
+                        "type": "string"
+                      },
+                      "default_pool_size": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "max_client_conn": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "pool_mode": {
+                        "enum": [
+                          "transaction",
+                          "session"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "identifier",
+                      "database_type",
+                      "is_using_scram_auth",
+                      "db_user",
+                      "db_host",
+                      "db_port",
+                      "db_name",
+                      "connectionString",
+                      "default_pool_size",
+                      "max_client_conn",
+                      "pool_mode"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project's supavisor config"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-supavisor-config",
+        "summary": "Updates project's supavisor config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "default_pool_size": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "pool_mode": {
+                    "enum": [
+                      "transaction",
+                      "session"
+                    ],
+                    "type": "string",
+                    "deprecated": true,
+                    "description": "This field is deprecated and is ignored in this request"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "default_pool_size": {
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "pool_mode": {
+                      "enum": [
+                        "transaction",
+                        "session"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "default_pool_size",
+                    "pool_mode"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's supavisor config"
+          }
+        },
+        "tags": [
+          "database"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -7231,6 +7430,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -7306,6 +7508,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7453,6 +7658,9 @@
                                           "items": {
                                             "type": "string"
                                           }
+                                        },
+                                        "array": {
+                                          "type": "boolean"
                                         }
                                       }
                                     }
@@ -7611,6 +7819,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7754,6 +7965,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -7826,6 +8040,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7976,6 +8193,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8355,10 +8575,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           },
@@ -8554,10 +8777,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           }
@@ -8802,13 +9028,13 @@
             ]
           },
           "visibility": {
+            "type": "string",
             "enum": [
               "user",
               "project",
               "org",
               "public"
-            ],
-            "type": "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -8898,13 +9124,13 @@
                   ]
                 },
                 "visibility": {
+                  "type": "string",
                   "enum": [
                     "user",
                     "project",
                     "org",
                     "public"
-                  ],
-                  "type": "string"
+                  ]
                 },
                 "name": {
                   "type": "string"
@@ -9654,6 +9880,7 @@
             "type": "number"
           },
           "error": {
+            "type": "string",
             "enum": [
               "1_upgraded_instance_launch_failed",
               "2_volume_detachchment_from_upgraded_instance_failed",
@@ -9663,10 +9890,10 @@
               "6_volume_detachchment_from_original_instance_failed",
               "7_volume_attachment_to_upgraded_instance_failed",
               "8_upgrade_completion_failed"
-            ],
-            "type": "string"
+            ]
           },
           "progress": {
+            "type": "string",
             "enum": [
               "0_requested",
               "1_started",
@@ -9678,16 +9905,15 @@
               "7_detached_volume_from_original_instance",
               "8_attached_volume_to_upgraded_instance",
               "9_completed_upgrade"
-            ],
-            "type": "string"
+            ]
           },
           "status": {
+            "type": "number",
             "enum": [
               0,
               1,
               2
-            ],
-            "type": "number"
+            ]
           }
         },
         "required": [
@@ -9712,6 +9938,7 @@
                     "type": "number"
                   },
                   "error": {
+                    "type": "string",
                     "enum": [
                       "1_upgraded_instance_launch_failed",
                       "2_volume_detachchment_from_upgraded_instance_failed",
@@ -9721,10 +9948,10 @@
                       "6_volume_detachchment_from_original_instance_failed",
                       "7_volume_attachment_to_upgraded_instance_failed",
                       "8_upgrade_completion_failed"
-                    ],
-                    "type": "string"
+                    ]
                   },
                   "progress": {
+                    "type": "string",
                     "enum": [
                       "0_requested",
                       "1_started",
@@ -9736,16 +9963,15 @@
                       "7_detached_volume_from_original_instance",
                       "8_attached_volume_to_upgraded_instance",
                       "9_completed_upgrade"
-                    ],
-                    "type": "string"
+                    ]
                   },
                   "status": {
+                    "type": "number",
                     "enum": [
                       0,
                       1,
                       2
-                    ],
-                    "type": "number"
+                    ]
                   }
                 },
                 "required": [
@@ -10088,6 +10314,107 @@
             "type": "string"
           }
         }
+      },
+      "SupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "database_type": {
+            "enum": [
+              "PRIMARY",
+              "READ_REPLICA"
+            ],
+            "type": "string"
+          },
+          "is_using_scram_auth": {
+            "type": "boolean"
+          },
+          "db_user": {
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_port": {
+            "type": "number"
+          },
+          "db_name": {
+            "type": "string"
+          },
+          "connectionString": {
+            "type": "string"
+          },
+          "default_pool_size": {
+            "type": "number",
+            "nullable": true
+          },
+          "max_client_conn": {
+            "type": "number",
+            "nullable": true
+          },
+          "pool_mode": {
+            "enum": [
+              "transaction",
+              "session"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "database_type",
+          "is_using_scram_auth",
+          "db_user",
+          "db_host",
+          "db_port",
+          "db_name",
+          "connectionString",
+          "default_pool_size",
+          "max_client_conn",
+          "pool_mode"
+        ]
+      },
+      "UpdateSupavisorConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "pool_mode": {
+            "enum": [
+              "transaction",
+              "session"
+            ],
+            "type": "string",
+            "deprecated": true,
+            "description": "This field is deprecated and is ignored in this request"
+          }
+        }
+      },
+      "UpdateSupavisorConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "number",
+            "nullable": true
+          },
+          "pool_mode": {
+            "enum": [
+              "transaction",
+              "session"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_pool_size",
+          "pool_mode"
+        ]
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -11590,6 +11917,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "array": {
+            "type": "boolean"
           }
         }
       },
@@ -11625,6 +11955,9 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "array": {
+                  "type": "boolean"
                 }
               }
             }
@@ -11688,6 +12021,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -11749,6 +12085,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -11837,6 +12176,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -11939,6 +12281,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12046,6 +12391,9 @@
                                 "items": {
                                   "type": "string"
                                 }
+                              },
+                              "array": {
+                                "type": "boolean"
                               }
                             }
                           }
@@ -12154,6 +12502,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12250,6 +12601,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12314,6 +12668,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12416,6 +12773,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }

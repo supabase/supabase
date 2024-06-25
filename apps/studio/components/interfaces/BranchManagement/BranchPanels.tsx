@@ -210,23 +210,32 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-8">
         {isMain ? (
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" iconRight={<IconExternalLink />}>
-              <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
-                View Repository
-              </Link>
-            </Button>
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-                  <DropdownMenuItem asChild className="gap-x-2">
-                    <a>Change production branch</a>
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {repo && (
+              <>
+                <Button asChild type="default" iconRight={<IconExternalLink />}>
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    passHref
+                    href={`https://github.com/${repo}`}
+                  >
+                    View Repository
+                  </Link>
+                </Button>
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                    <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+                      <DropdownMenuItem asChild className="gap-x-2">
+                        <a>Change production branch</a>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-x-2">

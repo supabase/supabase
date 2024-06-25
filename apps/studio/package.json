@@ -151,7 +151,7 @@
     "autoprefixer": "^10.4.14",
     "common": "*",
     "config": "*",
-    "eslint-config-next": "^14.2.3",
+    "eslint-config-supabase": "*",
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",

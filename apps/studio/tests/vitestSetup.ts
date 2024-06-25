@@ -6,7 +6,6 @@ export const mswServer = setupServer(...APIMock)
 
 beforeAll(() => {
   mswServer.listen()
-
   vi.mock('next/router', () => require('next-router-mock'))
 })
 

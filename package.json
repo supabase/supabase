@@ -27,7 +27,7 @@
     "docker:remove": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
-	"test:ui-patterns": "turbo run test --filter=ui-patterns",
+    "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "test:playwright": "npm --prefix playwright-tests run test",
@@ -37,23 +37,20 @@
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "eslint-config-custom": "*",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
-    "turbo": "^1.13.3"
+    "turbo": "2.0.4"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "npm": ">=9.0.0",
-    "node": ">=20.0.0"
+    "npm": "^10.0.0",
+    "node": "^20.0.0"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "volta": {
-    "node": "20.11.1"
-  }
+  "packageManager": "npm@10.7.0"
 }
