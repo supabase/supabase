@@ -38,6 +38,7 @@
     "@stripe/stripe-js": "^3.0.5",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/pg-meta": "*",
+    "@supabase/realtime-js-next": "npm:@supabase/realtime-js@2.10.0-next.8",
     "@supabase/shared-types": "0.1.65",
     "@supabase/supabase-js": "^2.41.1",
     "@tanstack/react-query": "4.35.7",
