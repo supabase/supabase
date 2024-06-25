@@ -13,7 +13,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value="Supabase.swift" />
-        <ConnectTabTrigger value="ToDoModel.swift" />
+        <ConnectTabTrigger value="Todo.swift" />
         <ConnectTabTrigger value="ContentView.swift" />
       </ConnectTabTriggers>
 
