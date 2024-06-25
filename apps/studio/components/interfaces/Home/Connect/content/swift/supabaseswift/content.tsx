@@ -50,34 +50,20 @@ struct Todo: Identifiable, Decodable {
 import Supabase
 import SwiftUI
 
-class TodoViewModel: ObservableObject {
-  @Published var todos: [Todo] = []
-
-  func getToDos() async throws {
-    let response = try await supabase.from("todos").select().execute()
-
-    self.todos = try JSONDecoder().decode([Todo].self, from: response.data)
-  }
-
-}
-
 struct ContentView: View {
-  @StateObject private var viewModel = TodoViewModel()
+  @State var todos: [Todo] = []
 
   var body: some View {
-    NavigationView {
-      List(viewModel.todos) { todo in
-        HStack {
-          Text(todo.title)
-          Spacer()
-        }
+    NavigationStack {
+      List(todos) { todo in
+        Text(todo.title)
       }
       .navigationTitle("Todos")
-      .onAppear {
-        Task {
-          do {
-            try await viewModel.getToDos()
-          }
+      .task {
+        do {
+          todos = try await supabase.from("todos").select().execute().value
+        } catch {
+          debugPrint(error)
         }
       }
     }
