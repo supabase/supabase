@@ -32,8 +32,8 @@ export function BranchMenu() {
   const [value, setValue] = React.useState('')
 
   const projects = orgs.find((org) => org.key === organization)?.projects || []
-
   const branches = projects.find((proj) => proj.key === projectFocus || project)?.branches || []
+  const projectMeta = projects.find((proj) => proj.key === project)
 
   const hideBranchesDropdown = resolveHideBranchesDropdown(pathName, organization, project)
   const hideProjectsDropdown = resolveHideProjectsDropdown(pathName, organization, project)
@@ -78,7 +78,7 @@ export function BranchMenu() {
       <Popover_Shadcn_ open={openBranch} onOpenChange={setOpenBranchState}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
-            type="default"
+            type={projectMeta?.branching ? 'default' : 'outline'}
             role="combobox"
             size={'tiny'}
             aria-expanded={openBranch}
@@ -91,11 +91,24 @@ export function BranchMenu() {
               hideBranchesDropdown ? '-left-[180px] opacity-0' : 'delay-500',
               'transition-all duration-200 ease-out'
             )}
-            iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+            iconRight={
+              projectMeta?.branching && (
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              )
+            }
           >
             <div className="flex gap-2 items-center">
-              <IconHandler icon={env?.type} />
-              {env?.name}
+              {projectMeta?.branching ? (
+                <>
+                  <IconHandler icon={env?.type} />
+                  {env?.name}
+                </>
+              ) : (
+                <>
+                  <IconHandler icon={'preview'} />
+                  <span className="text-foreground-lighter">Branching not enabled</span>
+                </>
+              )}
             </div>
           </Button>
         </PopoverTrigger_Shadcn_>
@@ -222,17 +235,21 @@ const BranchMenuPopoverContent = (props: {
 }) => {
   const [config, setConfig] = useConfig()
   const { organization, project } = config
-  const [projectFocus, setProjectFocusState] = React.useState<string | null>(null)
-  const [isFrameworkInputFocused, setIsFrameworkInputFocused] = React.useState(false)
-  const [isBranchInputFocused, setIsBranchInputFocused] = React.useState(false)
 
   // data
   const projects = orgs.find((org) => org.key === organization)?.projects || []
   const branches = projects.find((proj) => proj.key === project)?.branches || []
 
+  const [projectFocus, setProjectFocusState] = React.useState<string | undefined>(undefined)
+  const [isFrameworkInputFocused, setIsFrameworkInputFocused] = React.useState(false)
+  const [isBranchInputFocused, setIsBranchInputFocused] = React.useState(false)
+
   // refs
   const projectInputRef = React.useRef<HTMLInputElement>(null)
   const branchInputRef = React.useRef<HTMLInputElement>(null)
+
+  const _projectFocus = projectFocus || project // dumb variable needed
+  const projectMeta = projects.find((proj) => proj.key === _projectFocus)
 
   // pick up stray unfocussed state with left and right keys
   useHotkeys(
@@ -331,11 +348,20 @@ const BranchMenuPopoverContent = (props: {
         )}
       >
         {props.hideBranchesDropdown ? (
-          <div className="flex flex-col items-center justify-center mt-10 opacity-50 px-5">
+          <div className="flex flex-col items-center justify-center mt-10 opacity-50 px-5 text-center">
             <p className="text-xs text-foreground">Branch settings not available</p>
-            <p className="text-xs text-foreground-light text-center">
+            <p className="text-xs text-foreground-light">
               No branch specific settings available on this page.
             </p>
+          </div>
+        ) : !projectMeta?.branching ? (
+          <div className="flex flex-col items-center justify-center mt-10 px-5 text-center">
+            <p className="text-xs text-foreground">Branching not yet enabled</p>
+            <p className="text-xs text-foreground-light">Use for safe database migrations</p>
+
+            <Button type="default" className="mt-3">
+              Enable Branching
+            </Button>
           </div>
         ) : (
           <>

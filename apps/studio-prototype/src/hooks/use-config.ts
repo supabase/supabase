@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+import { orgs } from '../config/org'
 
 type Config = {
   radius: number
@@ -16,6 +17,9 @@ type Config = {
     type: 'prod' | 'preview' | 'long-running'
     name: string
   }
+  selectedProject?: (typeof orgs)[0]['projects'][0]
+  selectedOrg?: (typeof orgs)[0]
+  db: any
 }
 
 const configAtom = atomWithStorage<Config>('config', {
@@ -32,6 +36,11 @@ const configAtom = atomWithStorage<Config>('config', {
   env: {
     type: 'prod',
     name: 'name',
+  },
+  selectedProject: undefined,
+  selectedOrg: undefined,
+  db: {
+    orgs: { ...orgs },
   },
 })
 

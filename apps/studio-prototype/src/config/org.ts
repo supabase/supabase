@@ -6,6 +6,9 @@ export const orgs = [
       {
         name: 'Sonsing',
         key: 'sonsing',
+        github: 'summersmuir/sonsing-repo',
+        vercel: 'sonsing-vercel',
+        branching: true,
         branches: [
           {
             name: 'main',
@@ -28,6 +31,9 @@ export const orgs = [
       {
         name: 'Alpha Platform',
         key: 'alpha-platform',
+        github: 'tech-innovators/alpha-platform-repo',
+        vercel: 'alpha-platform-vercel',
+        branching: true,
         branches: [
           {
             name: 'main',
@@ -54,6 +60,9 @@ export const orgs = [
       {
         name: 'Beta Application',
         key: 'beta-application',
+        github: undefined,
+        vercel: undefined,
+        branching: false,
         branches: [
           {
             name: 'main',
@@ -81,6 +90,9 @@ export const orgs = [
       {
         name: 'Gamma Service',
         key: 'gamma-service',
+        github: 'digital-solutions/gamma-service-repo',
+        vercel: 'gamma-service-vercel',
+        branching: true,
         branches: [
           {
             name: 'main',
@@ -102,6 +114,9 @@ export const orgs = [
       {
         name: 'Delta Project',
         key: 'delta-project',
+        github: undefined,
+        vercel: undefined,
+        branching: false,
         branches: [
           {
             name: 'main',
@@ -124,6 +139,9 @@ export const orgs = [
       {
         name: 'Omega Platform',
         key: 'omega-platform',
+        github: 'nextgen-enterprises/omega-platform-repo',
+        vercel: 'omega-platform-vercel',
+        branching: true,
         branches: [
           {
             name: 'main',
@@ -145,6 +163,9 @@ export const orgs = [
       {
         name: 'Zeta System',
         key: 'zeta-system',
+        github: undefined,
+        vercel: 'zeta-system-vercel',
+        branching: false,
         branches: [
           {
             name: 'main',
