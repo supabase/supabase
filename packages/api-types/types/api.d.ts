@@ -3063,6 +3063,7 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
+      usage_based_billing_project_addons: boolean
       usage_billing_enabled: boolean
     }
     GetUserContentByIdResponse: {
