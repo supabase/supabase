@@ -1,3 +1,4 @@
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import {
   AlertCircle,
@@ -70,7 +71,12 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) => {
-  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
+  const supabaseClient = useSupabaseClient()
+  const {
+    handleDocsSearchDebounced,
+    searchState,
+    searchState: state,
+  } = useDocsSearch(supabaseClient)
   const [subject, setSubject] = useState('')
   const [docsResults, setDocsResults] = useState<Page[]>([])
 
