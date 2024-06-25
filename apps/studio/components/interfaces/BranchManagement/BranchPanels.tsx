@@ -301,7 +301,7 @@ export const BranchRow = ({
                     </DropdownMenuItem>
                   </TooltipTrigger_Shadcn_>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="top">
+                    <TooltipContent_Shadcn_ side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before resetting
                     </TooltipContent_Shadcn_>
@@ -328,7 +328,7 @@ export const BranchRow = ({
                     </DropdownMenuItem>
                   </TooltipTrigger_Shadcn_>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="top">
+                    <TooltipContent_Shadcn_ side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
                     </TooltipContent_Shadcn_>
@@ -348,7 +348,7 @@ export const BranchRow = ({
                     </DropdownMenuItem>
                   </TooltipTrigger_Shadcn_>
                   {!canDeleteBranches && (
-                    <TooltipContent_Shadcn_ side="bottom">
+                    <TooltipContent_Shadcn_ side="left">
                       You need additional permissions to delete branches
                     </TooltipContent_Shadcn_>
                   )}
