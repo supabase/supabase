@@ -123,18 +123,20 @@ export const generateUpdateColumnPayload = (
   const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
 
   // Only append the properties which are getting updated
+  const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = (field.comment?.length ?? '') === 0 ? null : field.comment
+  const comment = ((field.comment?.length ?? '') === 0 ? null : field.comment)?.trim()
+  const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}
-  if (!isEqual(originalColumn.name, field.name)) {
-    payload.name = field.name
+  if (!isEqual(originalColumn.name, name)) {
+    payload.name = name
   }
   if (!isEqual(originalColumn.comment, comment)) {
     payload.comment = comment as string | undefined
   }
-  if (!isEqual(originalColumn.check?.trim(), field.check?.trim())) {
-    payload.check = field.check?.trim()
+  if (!isEqual(originalColumn.check?.trim(), check)) {
+    payload.check = check
   }
 
   if (!isEqual(originalColumn.format, type)) {
