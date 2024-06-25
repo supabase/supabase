@@ -177,7 +177,7 @@ export const AiAssistantPanel = ({
                       autoComplete="off"
                       disabled={loading}
                       autoFocus
-                      className={`bg-surface-300 dark:bg-black rounded-full pl-12 h-16 rounded-lg ${
+                      className={`bg-surface-300 dark:bg-black pl-12 h-16 rounded-lg ${
                         loading ? 'pr-10' : ''
                       }`}
                       placeholder="Ask a question about your SQL query"
