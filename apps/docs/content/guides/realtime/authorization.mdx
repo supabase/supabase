@@ -83,7 +83,7 @@ after insert on auth.users for each row
 execute function insert_user ();
 
 revoke execute on function insert_user () from public, anon, authenticated;
-grant execute on function insert_user () TO supabase_auth_admin;
+grant execute on function insert_user () to supabase_auth_admin;
 grant insert on table public.profiles to supabase_auth_admin;
 ```
 
