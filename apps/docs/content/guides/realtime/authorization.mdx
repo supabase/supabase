@@ -111,7 +111,7 @@ exists (
     where
       ru.user_id = (select auth.uid())
       and ru.topic = (select realtime.topic())
-      and realtime.messages.extension in ['broadcast']
+      and realtime.messages.extension in ('broadcast')
   )
 );
 ```
@@ -160,7 +160,7 @@ with check (
     where
       ru.user_id = (select auth.uid())
       and ru.topic = (select realtime.topic())
-      and realtime.messages.extension in ['broadcast']
+      and realtime.messages.extension in ('broadcast')
   )
 );
 ```
@@ -186,7 +186,7 @@ using (
       rooms_users ru
     where
       ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.channel_name())
+      and ru.topic = (select realtime.topic())
       and realtime.messages.extension in ['presence']
   )
 );
@@ -209,7 +209,7 @@ with check (
       rooms_users ru
     where
       ru.user_id = (select auth.uid())
-      and ru.name = (select realtime.channel_name())
+      and ru.name = (select realtime.topic())
       and realtime.messages.extension in ['presence']
   )
 );
@@ -236,8 +236,8 @@ using (
       rooms_users ru
     where
       ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.channel_name())
-      and realtime.messages.extension in ['broadcast', 'presence']
+      and ru.topic = (select realtime.topic())
+      and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
 ```
@@ -259,8 +259,8 @@ with check (
       rooms_users ru
     where
       ru.user_id = (select auth.uid())
-      and ru.name = (select realtime.channel_name())
-      and realtime.messages.extension in ['broadcast', 'presence']
+      and ru.name = (select realtime.topic())
+      and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
 ```
