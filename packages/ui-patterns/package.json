@@ -32,13 +32,18 @@
     "valtio": "*"
   },
   "devDependencies": {
-    "@testing-library/react": "^15.0.1",
+    "@supabase/auth-helpers-react": "^0.4.2",
+    "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^15.0.1",
-    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^13.5.0",
     "@types/common-tags": "^1.8.4",
+    "@types/lodash": "^4.17.5",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "api-types": "*",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.1.2"
   },
   "peerDependencies": {

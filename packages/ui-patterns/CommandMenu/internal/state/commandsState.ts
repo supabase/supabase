@@ -1,14 +1,14 @@
 import { proxy } from 'valtio'
 
 import { type ICommand } from '../Command'
-import { type ICommandSectionName, type ICommandSection, section$new } from '../CommandSection'
+import { type ICommandSection, section$new } from '../CommandSection'
 
 type OrderSectionInstruction = (sections: ICommandSection[], idx: number) => ICommandSection[]
 type OrderCommandsInstruction = (
   commands: ICommand[],
   commandsToInsert: ICommand[]
 ) => Array<ICommand>
-type UseCommandOptions = {
+type CommandOptions = {
   deps?: any[]
   enabled?: boolean
   forceMountSection?: boolean
@@ -19,9 +19,9 @@ type UseCommandOptions = {
 type ICommandsState = {
   commandSections: ICommandSection[]
   registerSection: (
-    sectionName: ICommandSectionName,
+    sectionName: string,
     commands: ICommand[],
-    options?: UseCommandOptions
+    options?: CommandOptions
   ) => () => void
 }
 
@@ -88,4 +88,4 @@ const orderSectionFirst = (sections: ICommandSection[], idx: number) => {
 }
 
 export { initCommandsState, orderSectionFirst }
-export type { ICommandsState, UseCommandOptions }
+export type { ICommandsState, CommandOptions }

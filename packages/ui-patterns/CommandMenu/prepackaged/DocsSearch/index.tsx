@@ -2,7 +2,7 @@ import { Book } from 'lucide-react'
 
 import { useRegisterCommands } from '../../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../../api/hooks/pagesHooks'
-import type { ICommand, UseCommandOptions } from '../../api/types'
+import type { ICommand, CommandOptions } from '../../api/types'
 import { PageType } from '../../api/utils'
 import { DocsSearchPage } from './DocsSearchPage'
 
@@ -16,7 +16,7 @@ const identity = <T,>(x: T) => x
 const useDocsSearchCommands = ({
   modify = identity,
   options,
-}: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
+}: { modify?: (command: ICommand) => ICommand; options?: CommandOptions } = {}) => {
   const setCommandPage = useSetPage()
   useRegisterPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, {
     type: PageType.Component,

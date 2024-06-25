@@ -1,3 +1,4 @@
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
@@ -64,12 +65,13 @@ const IconContainer = (
 )
 
 const DocsSearchPage = () => {
+  const supabaseClient = useSupabaseClient()
   const {
     searchState: state,
     handleDocsSearch: handleSearch,
     handleDocsSearchDebounced: debouncedSearch,
     resetSearch,
-  } = useDocsSearch()
+  } = useDocsSearch(supabaseClient)
   const setIsOpen = useSetCommandMenuOpen()
   const setQuery = useSetQuery()
   const query = useQuery()

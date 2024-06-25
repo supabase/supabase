@@ -5,8 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { components } from 'api-types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethodsResponse = components['schemas']['PaymentsResponseV2']
-export type OrganizationPaymentMethod = components['schemas']['PaymentV2']
+export type OrganizationPaymentMethod = components['schemas']['Payment']
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -25,11 +24,9 @@ export async function getOrganizationPaymentMethods(
     },
     signal,
   })
-  if (error) handleError(error)
 
-  // Due to API versioning, this is not correctly recognized until the old endpoint is removed
-  // @ts-ignore
-  return data as OrganizationPaymentMethodsResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type OrganizationPaymentMethodsData = Awaited<

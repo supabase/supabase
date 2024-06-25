@@ -2,7 +2,7 @@ import { isEqual } from 'lodash'
 import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
-import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
+import type { ICommand, CommandOptions } from '../types'
 import { useCommandContext } from '../../internal/Context'
 import { useCurrentPage } from './pagesHooks'
 import { PageDefinition, isCommandsPage } from '../../internal/state/pagesState'
@@ -19,9 +19,9 @@ const useCommands = () => {
 }
 
 const useRegisterCommands = (
-  sectionName: ICommandSectionName,
+  sectionName: string,
   commands: ICommand[],
-  options: UseCommandOptions = {}
+  options: CommandOptions = {}
 ) => {
   const { commandsState } = useCommandContext()
   const { registerSection } = useSnapshot(commandsState)

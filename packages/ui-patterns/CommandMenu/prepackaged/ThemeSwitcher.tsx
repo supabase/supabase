@@ -2,14 +2,14 @@ import { useTheme } from 'next-themes'
 import { useRegisterCommands } from '../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../api/hooks/pagesHooks'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-import type { UseCommandOptions } from '../api/types'
+import type { CommandOptions } from '../api/types'
 import { PageType } from '../api/utils'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 
 const THEME_SWITCHER_PAGE_NAME = 'Switch theme'
 
-const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } = {}) => {
+const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}) => {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 

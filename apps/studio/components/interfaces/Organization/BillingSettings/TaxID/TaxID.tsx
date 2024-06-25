@@ -59,9 +59,9 @@ const TaxID = () => {
         type: taxId.type,
         value: taxId.value,
         name:
-          taxId.type === 'eu_vat'
-            ? `${taxId.country} VAT`
-            : TAX_IDS.find((option) => option.type === taxId.type)?.name ?? '',
+          TAX_IDS.find(
+            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
+          )?.name ?? '',
       }
     : { type: '', value: '', name: '' }
 
@@ -94,7 +94,7 @@ const TaxID = () => {
         type?.length && value?.length
           ? {
               type: type,
-              value: sanitizeTaxIdValue({ type, value }),
+              value: sanitizeTaxIdValue({ value, name: form.getValues().name }),
             }
           : null,
     })
