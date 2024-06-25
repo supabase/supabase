@@ -238,6 +238,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/quickstarts/kotlin',
