@@ -133,26 +133,11 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
+        getAll() {
+          return cookieStore.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // The `delete` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
       },
     }
@@ -225,14 +210,12 @@ export const config = {
 ```
 
 ```ts utils/supabase/middleware.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+  let supabaseResponse = NextResponse.next({
+    request,
   })
 
   const supabase = createServerClient(
@@ -240,50 +223,47 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
+        getAll() {
+          return request.cookies.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
           })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
         },
       },
     }
   )
 
-  await supabase.auth.getUser()
+  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
+  // issues with users being randomly logged out.
 
-  return response
+  const { data: user, error } = await supabase.auth.getUser()
+
+  if (!user) {
+    // no user, potentially respond by redirecting the user to the login page
+    return NextResponse.redirect('/login')
+  }
+
+  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
+  // creating a new response object with NextResponse.next() make sure to:
+  // 1. Pass the request in it, like so:
+  //    const myNewResponse = NextResponse.next({ request })
+  // 2. Copy over the cookies, like so:
+  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
+  // 3. Change the myNewResponse object to fit your needs, but avoid changing
+  //    the cookies!
+  // 4. Finally:
+  //    return myNewResponse
+  // If this is not done, you may be causing the browser and server to go out
+  // of sync and terminate the user's session prematurely!
+
+  return supabaseResponse
 }
 ```
 
@@ -626,23 +606,25 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 <CH.Code>
 
 ```ts utils/supabase/server-props.ts
-import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
 import { type GetServerSidePropsContext } from 'next'
+import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 
-export function createClient(context: GetServerSidePropsContext) {
+export function createClient({ req, res }: GetServerSidePropsContext) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return context.req.cookies[name]
+        getAll() {
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
         },
-        set(name: string, value: string, options: CookieOptions) {
-          context.res.appendHeader('Set-Cookie', serialize(name, value, options))
-        },
-        remove(name: string, options: CookieOptions) {
-          context.res.appendHeader('Set-Cookie', serialize(name, '', options))
+        setAll(cookiesToSet) {
+          res.setHeader(
+            'Set-Cookie',
+            cookiesToSet.map(({ name, value, options }) =>
+              serializeCookieHeader(name, value, options)
+            )
+          )
         },
       },
     }
@@ -688,14 +670,14 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return req.cookies[name]
+        getAll() {
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
         },
-        set(name: string, value: string, options: CookieOptions) {
-          res.appendHeader('Set-Cookie', serialize(name, value, options))
-        },
-        remove(name: string, options: CookieOptions) {
-          res.appendHeader('Set-Cookie', serialize(name, '', options))
+        setAll(cookiesToSet) {
+          res.setHeader(
+            'Set-Cookie',
+            cookiesToSet.map(({ name, value, options }) => serialize(name, value, options))
+          )
         },
       },
     }
