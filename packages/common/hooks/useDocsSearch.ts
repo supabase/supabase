@@ -1,3 +1,5 @@
+'use client'
+
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'

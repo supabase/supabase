@@ -1,3 +1,5 @@
+'use client'
+
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   type DocsSearchResult as Page,
@@ -6,7 +8,7 @@ import {
   useDocsSearch,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'

@@ -1,13 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { IconChevronLeft } from 'ui'
+
+import { BASE_PATH } from '~/lib/constants'
+import clientLibsCommon from '~/spec/common-cli.yml' assert { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
 
-import clientLibsCommon from '~/spec/common-cli.yml' assert { type: 'yml' }
-
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
-  const router = useRouter()
-
   const menu = NavItems[id]
 
   const FunctionLink = ({
@@ -26,7 +24,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           href={`#${id}`}
           className="cursor-pointer transition text-foreground-lighter text-sm hover:text-brand flex gap-3"
         >
-          {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
+          {icon && <img className="w-3" src={`${BASE_PATH}${icon}`} />}
           {title}
         </Link>
       </li>
@@ -113,7 +111,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         </Link>
         <div className="flex items-center gap-3 my-3">
           <img
-            src={`${router.basePath}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            src={`${BASE_PATH}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
             className="w-5 rounded"
           />
 
