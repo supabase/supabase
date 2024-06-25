@@ -11,12 +11,14 @@ export default function TopHeader() {
   const pathName = usePathname()
   const [config] = useConfig()
   const {
-    organization,
-    project,
-    env: { name, type },
+    selectedOrg,
+    selectedProject,
+    selectedEnv: { type },
   } = config
 
-  const isPreview = type !== 'prod' && !resolveHideBranchesDropdown(pathName, organization, project)
+  const isPreview =
+    type !== 'prod' &&
+    !resolveHideBranchesDropdown(pathName, selectedOrg?.key, selectedProject?.key)
 
   return (
     <div

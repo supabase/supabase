@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
-import { orgs } from '../config/org'
+import { Branch, Org, Project, orgs } from '../config/org'
 
 type Config = {
   radius: number
@@ -13,13 +13,12 @@ type Config = {
     queriesOpen: boolean
     privateQueriesOpen?: boolean
   }
-  env: {
-    type: 'prod' | 'preview' | 'long-running'
-    name: string
+  selectedEnv: Branch
+  selectedProject?: Project
+  selectedOrg?: Org
+  db: {
+    orgs: Org[]
   }
-  selectedProject?: (typeof orgs)[0]['projects'][0]
-  selectedOrg?: (typeof orgs)[0]
-  db: any
 }
 
 const configAtom = atomWithStorage<Config>('config', {
@@ -33,14 +32,15 @@ const configAtom = atomWithStorage<Config>('config', {
     queriesOpen: true,
     privateQueriesOpen: true,
   },
-  env: {
+  selectedEnv: {
+    name: 'main',
     type: 'prod',
-    name: 'name',
+    key: 'main',
   },
-  selectedProject: undefined,
-  selectedOrg: undefined,
+  selectedProject: orgs[0].projects[0],
+  selectedOrg: orgs[0],
   db: {
-    orgs: { ...orgs },
+    orgs: [...orgs],
   },
 })
 

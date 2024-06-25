@@ -1,4 +1,25 @@
-export const orgs = [
+export type Branch = {
+  name: string
+  key: string
+  type: 'prod' | 'preview' | 'long-running'
+}
+
+export type Project = {
+  name: string
+  key: string
+  github: undefined | string
+  vercel: undefined | string
+  branching: boolean
+  branches: Branch[]
+}
+
+export type Org = {
+  name: string
+  key: string
+  projects: Project[]
+}
+
+export const orgs: Org[] = [
   {
     name: 'SummersMuir',
     key: 'summersmuir',

@@ -1,28 +1,28 @@
 export function resolveHideBranchesDropdown(
   pathName: string,
-  organization: string | undefined,
-  project: string | undefined
+  organizationKey: string | undefined,
+  projectKey: string | undefined
 ) {
   return (
-    (pathName.startsWith(`/${organization}/settings`) &&
-      !pathName.startsWith(`/${organization}/settings/project`)) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/general`) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/infrastructure`) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/api`) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/integrations`) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/add-ons`) ||
-    pathName.startsWith(`/${organization}/settings/project/${project}/branching`)
+    (pathName.startsWith(`/${organizationKey}/settings`) &&
+      !pathName.startsWith(`/${organizationKey}/settings/project`)) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/general`) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/infrastructure`) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/api`) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/integrations`) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/add-ons`) ||
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/branching`)
   )
 }
 
 export function resolveHideProjectsDropdown(
   pathName: string,
-  organization: string | undefined,
-  project: string | undefined
+  organizationKey: string | undefined,
+  projectKey: string | undefined
 ) {
   return (
-    pathName.startsWith(`/${organization}/settings`) &&
-    !pathName.startsWith(`/${organization}/settings/project/${project}`) &&
-    !pathName.startsWith(`/${organization}/settings/account`)
+    pathName.startsWith(`/${organizationKey}/settings`) &&
+    !pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}`) &&
+    !pathName.startsWith(`/${organizationKey}/settings/account`)
   )
 }

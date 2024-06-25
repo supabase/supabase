@@ -1,6 +1,6 @@
 'use client'
 
-import { orgs } from '@/src/config/org'
+import { Org, orgs } from '@/src/config/org'
 import { useConfig } from '@/src/hooks/use-config'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
@@ -21,7 +21,7 @@ import {
 export default function SideMenuOrgMenu() {
   const [open, setOpenState] = useState(false)
   const [config, setConfig] = useConfig()
-  const { organization } = config
+  const { organization, db } = config
 
   return (
     <>
@@ -49,11 +49,14 @@ export default function SideMenuOrgMenu() {
                     onSelect={(currentValue) => {
                       setConfig({
                         ...config,
-                        organization: currentValue,
-                        project: orgs.find((o) => o.key === currentValue)?.projects[0].key,
-                        env: {
+                        selectedOrg: db.orgs.find((o: Org) => o.key === currentValue),
+                        selectedProject: db.orgs.find((o: Org) => o.key === currentValue)
+                          .projects[0],
+                        selectedEnv: db.orgs.find((o: Org) => o.key === currentValue).projects[0]
+                          .branches[0] ?? {
                           name: 'main',
                           type: 'prod',
+                          key: 'main',
                         },
                       })
                       setOpenState(false)

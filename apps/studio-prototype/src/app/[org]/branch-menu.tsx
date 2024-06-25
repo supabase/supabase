@@ -24,22 +24,30 @@ import {
 export function BranchMenu() {
   const [config] = useConfig()
   const pathName = usePathname()
-  const { organization, project, env } = config
+  const { selectedOrg, selectedProject, selectedEnv } = config
   const [projectFocus, setProjectFocusState] = React.useState<string | null>(null)
 
   const [openProject, setOpenProjectState] = React.useState(false)
   const [openBranch, setOpenBranchState] = React.useState(false)
   const [value, setValue] = React.useState('')
 
-  const projects = orgs.find((org) => org.key === organization)?.projects || []
-  const branches = projects.find((proj) => proj.key === projectFocus || project)?.branches || []
-  const projectMeta = projects.find((proj) => proj.key === project)
+  const projects = selectedOrg?.projects || []
+  const branches = selectedProject?.branches || []
+  const projectMeta = selectedProject
 
-  const hideBranchesDropdown = resolveHideBranchesDropdown(pathName, organization, project)
-  const hideProjectsDropdown = resolveHideProjectsDropdown(pathName, organization, project)
+  const hideBranchesDropdown = resolveHideBranchesDropdown(
+    pathName,
+    selectedOrg?.key,
+    selectedProject?.key
+  )
+  const hideProjectsDropdown = resolveHideProjectsDropdown(
+    pathName,
+    selectedOrg?.key,
+    selectedProject?.key
+  )
 
   const branchBasedSettings =
-    !hideBranchesDropdown && pathName.startsWith(`/${organization}/settings/project`)
+    !hideBranchesDropdown && pathName.startsWith(`/${selectedOrg?.key}/settings/project`)
 
   return (
     <>
@@ -63,7 +71,7 @@ export function BranchMenu() {
           >
             <div className="flex gap-2 items-center">
               <IconHandler icon="project" />
-              {project}
+              {selectedProject?.name}
             </div>
           </Button>
         </PopoverTrigger_Shadcn_>
@@ -100,8 +108,8 @@ export function BranchMenu() {
             <div className="flex gap-2 items-center">
               {projectMeta?.branching ? (
                 <>
-                  <IconHandler icon={env?.type} />
-                  {env?.name}
+                  <IconHandler icon={selectedEnv?.type} />
+                  {selectedEnv?.name}
                 </>
               ) : (
                 <>
@@ -234,11 +242,11 @@ const BranchMenuPopoverContent = (props: {
   branchBasedSettings?: boolean
 }) => {
   const [config, setConfig] = useConfig()
-  const { organization, project } = config
+  const { selectedOrg, selectedProject } = config
 
   // data
-  const projects = orgs.find((org) => org.key === organization)?.projects || []
-  const branches = projects.find((proj) => proj.key === project)?.branches || []
+  const projects = selectedOrg?.projects || []
+  const branches = selectedProject?.branches || []
 
   const [projectFocus, setProjectFocusState] = React.useState<string | undefined>(undefined)
   const [isFrameworkInputFocused, setIsFrameworkInputFocused] = React.useState(false)
@@ -248,7 +256,7 @@ const BranchMenuPopoverContent = (props: {
   const projectInputRef = React.useRef<HTMLInputElement>(null)
   const branchInputRef = React.useRef<HTMLInputElement>(null)
 
-  const _projectFocus = projectFocus || project // dumb variable needed
+  const _projectFocus = projectFocus || selectedProject?.key // dumb variable needed
   const projectMeta = projects.find((proj) => proj.key === _projectFocus)
 
   // pick up stray unfocussed state with left and right keys
@@ -307,8 +315,10 @@ const BranchMenuPopoverContent = (props: {
               onSelect={(currentValue) => {
                 setConfig({
                   ...config,
-                  project: currentValue,
-                  env: {
+                  selectedProject: selectedOrg?.projects.find((p) => p.key === currentValue),
+                  selectedEnv: selectedOrg?.projects?.find((p) => p.key === currentValue)
+                    ?.branches[0] ?? {
+                    key: 'main',
                     name: 'main',
                     type: 'prod',
                   },
@@ -385,12 +395,12 @@ const BranchMenuPopoverContent = (props: {
                   key={branch.key}
                   value={branch.key}
                   onSelect={(currentValue) => {
-                    // setValue(currentValue === value ? '' : currentValue)
-                    // setOpen(false)
                     setConfig({
                       ...config,
-                      env: {
+                      selectedEnv: {
+                        key: branches.find((b) => b.key === currentValue)?.key || 'main',
                         name: currentValue,
+                        // @ts-expect-error
                         type: branches.find((b) => b.key === currentValue)?.type || 'prod',
                       },
                     })
