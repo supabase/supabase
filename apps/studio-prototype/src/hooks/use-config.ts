@@ -14,6 +14,7 @@ type Config = {
     privateQueriesOpen?: boolean
   }
   selectedEnv: Branch
+  settingsAllPreviews?: boolean
   selectedProject?: Project
   selectedOrg?: Org
   db: {
@@ -37,6 +38,7 @@ const configAtom = atomWithStorage<Config>('config', {
     type: 'prod',
     key: 'main',
   },
+  settingsAllPreviews: false,
   selectedProject: orgs[0].projects[0],
   selectedOrg: orgs[0],
   db: {

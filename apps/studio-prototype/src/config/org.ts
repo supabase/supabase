@@ -2,6 +2,7 @@ export type Branch = {
   name: string
   key: string
   type: 'prod' | 'preview' | 'long-running'
+  settings?: boolean
 }
 
 export type Project = {
@@ -10,7 +11,7 @@ export type Project = {
   github: undefined | string
   vercel: undefined | string
   branching: boolean
-  branches: Branch[]
+  branches?: Branch[]
 }
 
 export type Org = {
@@ -70,6 +71,7 @@ export const orgs: Org[] = [
             name: 'feature-1',
             key: 'feature-1',
             type: 'preview',
+            settings: true,
           },
           {
             name: 'hotfix-1',
@@ -84,23 +86,6 @@ export const orgs: Org[] = [
         github: undefined,
         vercel: undefined,
         branching: false,
-        branches: [
-          {
-            name: 'main',
-            key: 'main',
-            type: 'prod',
-          },
-          {
-            name: 'staging',
-            key: 'staging',
-            type: 'preview',
-          },
-          {
-            name: 'dev',
-            key: 'dev',
-            type: 'long-running',
-          },
-        ],
       },
     ],
   },
