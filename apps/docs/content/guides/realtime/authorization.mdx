@@ -187,7 +187,7 @@ using (
     where
       ru.user_id = (select auth.uid())
       and ru.topic = (select realtime.topic())
-      and realtime.messages.extension in ['presence']
+      and realtime.messages.extension in ('presence')
   )
 );
 ```
@@ -210,7 +210,7 @@ with check (
     where
       ru.user_id = (select auth.uid())
       and ru.name = (select realtime.topic())
-      and realtime.messages.extension in ['presence']
+      and realtime.messages.extension in ('presence')
   )
 );
 ```
