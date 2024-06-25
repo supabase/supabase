@@ -1,3 +1,5 @@
+'use client'
+
 import 'react-medium-image-zoom/dist/styles.css'
 
 import { useEffect, useState } from 'react'
