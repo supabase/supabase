@@ -4,19 +4,11 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { ThemeProvider } from 'common'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { type Metadata, type Viewport } from 'next'
-import { PortalToast } from 'ui'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
-import { AuthContainer } from '~/features/auth/auth.client'
-import { QueryClientProvider } from '~/features/data/queryClient.client'
-import { ShortcutPreviewBuild } from '~/features/envs/staging.client'
-import { PageTelemetry } from '~/features/telemetry/telemetry.client'
-import { favicons } from '~/features/ui/faviconData'
-import { ThemeSandbox } from '~/features/ui/theme.client'
-import { ScrollRestoration } from '~/features/ui/helpers.scroll.client'
-import SiteLayout from '~/layouts/SiteLayout'
+
 import { BASE_PATH } from '~/lib/constants'
+import { GlobalProviders } from '~/features/app.providers'
 
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',
@@ -24,9 +16,7 @@ const metadata: Metadata = {
   description:
     'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
-  icons: {
-    other: favicons,
-  },
+  icons: genFaviconData(BASE_PATH),
   robots: {
     index: true,
     follow: true,
@@ -53,29 +43,11 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ShortcutPreviewBuild>
-      <QueryClientProvider>
-        <AuthContainer>
-          <PageTelemetry />
-          <ScrollRestoration />
-          <html lang="en">
-            <body>
-              <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                <CommandMenuProvider site="docs">
-                  <div className="h-screen flex flex-col">
-                    <SiteLayout>
-                      <PortalToast />
-                      {children}
-                    </SiteLayout>
-                  </div>
-                </CommandMenuProvider>
-                <ThemeSandbox />
-              </ThemeProvider>
-            </body>
-          </html>
-        </AuthContainer>
-      </QueryClientProvider>
-    </ShortcutPreviewBuild>
+    <html lang="en">
+      <body>
+        <GlobalProviders>{children}</GlobalProviders>
+      </body>
+    </html>
   )
 }
 

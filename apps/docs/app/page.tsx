@@ -1,9 +1,11 @@
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
 import { IconBackground, TextLink } from 'ui'
-import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
+import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
+import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
 import { BASE_PATH } from '~/lib/constants'
 
@@ -11,7 +13,6 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
   const parentAlternates = (await parent).alternates
 
   return {
-    // @ts-ignore
     alternates: {
       ...parentAlternates,
       canonical: `${BASE_PATH}`,
@@ -209,15 +210,9 @@ const HomePage = () => (
           return (
             <li key={product.title} className="col-span-12 md:col-span-4">
               <Link href={product.href} passHref>
-                <GlassPanel
-                  {...product}
-                  icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
-                  background={true}
-                  showIconBg={true}
-                  showLink={false}
-                >
+                <GlassPanelWithIconPicker {...product}>
                   {product.description}
-                </GlassPanel>
+                </GlassPanelWithIconPicker>
               </Link>
             </li>
           )
@@ -244,12 +239,7 @@ const HomePage = () => (
                 passHref
                 className="col-span-6 md:col-span-4"
               >
-                <IconPanel
-                  {...library}
-                  icon={<HomeMenuIconPicker icon={library.icon} width={18} height={18} />}
-                  background={true}
-                  showLink={false}
-                />
+                <IconPanelWithIconPicker {...library} />
               </Link>
             )
           })}
@@ -274,8 +264,8 @@ const HomePage = () => (
         <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
           {migrationGuides.map((guide) => {
             return (
-              <li className="col-span-6 md:col-span-4">
-                <Link href={guide.href} key={guide.title} passHref>
+              <li key={guide.title} className="col-span-6 md:col-span-4">
+                <Link href={guide.href} passHref>
                   <IconPanel {...guide} background={true} showLink={false} />
                 </Link>
               </li>
@@ -294,20 +284,15 @@ const HomePage = () => (
         <ul className="grid grid-cols-12 gap-6 not-prose">
           {additionalResources.map((resource) => {
             return (
-              <li className="col-span-12 md:col-span-6 lg:col-span-3">
+              <li key={resource.title} className="col-span-12 md:col-span-6 lg:col-span-3">
                 <Link
                   href={resource.href}
-                  key={resource.title}
                   className="col-span-12 md:col-span-6 lg:col-span-3"
                   passHref
                 >
-                  <GlassPanel
-                    {...resource}
-                    icon={<HomeMenuIconPicker icon={resource.icon} width={18} height={18} />}
-                    background={false}
-                  >
+                  <GlassPanelWithIconPicker {...resource} background={false}>
                     {resource.description}
-                  </GlassPanel>
+                  </GlassPanelWithIconPicker>
                 </Link>
               </li>
             )
@@ -339,14 +324,9 @@ const HomePage = () => (
           <ul className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
             {selfHostingOptions.map((option) => {
               return (
-                <li className="col-span-6">
-                  <Link href={option.href} key={option.title} passHref>
-                    <IconPanel
-                      {...option}
-                      icon={<HomeMenuIconPicker icon={option.icon} width={18} height={18} />}
-                      background={true}
-                      showLink={false}
-                    />
+                <li key={option.title} className="col-span-6">
+                  <Link href={option.href} passHref>
+                    <IconPanelWithIconPicker {...option} background={true} showLink={false} />
                   </Link>
                 </li>
               )
