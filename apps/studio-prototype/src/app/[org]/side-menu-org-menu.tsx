@@ -88,7 +88,9 @@ export default function SideMenuOrgMenu() {
             <CommandSeparator_Shadcn_ />
             <CommandGroup_Shadcn_>
               <Link href={`/${organization}/settings/general`}>
-                <CommandItem_Shadcn_ value="Settings">Organization Settings</CommandItem_Shadcn_>
+                <CommandItem_Shadcn_ onSelect={() => setOpenState(false)} value="Settings">
+                  Organization Settings
+                </CommandItem_Shadcn_>
               </Link>
               <CommandItem_Shadcn_ value="Members">Members</CommandItem_Shadcn_>
               <CommandItem_Shadcn_ value="Billing">Billing</CommandItem_Shadcn_>
