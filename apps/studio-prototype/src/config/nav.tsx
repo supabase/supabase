@@ -11,19 +11,27 @@ import {
   Settings,
 } from 'icons'
 import { cn } from 'ui'
+import { IconHandler } from '../app/[org]/icon-handler'
+import { Boxes } from 'lucide-react'
 
 const STROKE_WIDTH = 1
 const ICON_SIZE = 21
 const iconsClasses = cn(
   'text-foreground-lighter',
   'group-aria-[current=page]/nav-item-anchor:text-foreground',
-  'group-aria-[current=page]/nav-item-anchor:stroke-[1.5]',
+  'group-aria-[current=page]/nav-item-anchor:stroke-[1.6]',
   'group-hover/nav-item-anchor:text-foreground-light',
   'group-hover/nav-item-anchor:stroke-[1.3]',
   'transition-all'
 )
 
 const SideNav = [
+  {
+    name: 'projects',
+    label: 'Projects',
+    icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+    href: '/projects',
+  },
   {
     name: 'table-editor',
     label: 'Table Editor',

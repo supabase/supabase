@@ -18,6 +18,7 @@
     "react-data-grid": "^7.0.0-beta.44",
     "react-dom": "^18",
     "react-hotkeys-hook": "^4.5.0",
+    "recharts": "^2.12.7",
     "ui": "*"
   },
   "devDependencies": {

@@ -27,5 +27,14 @@ export default function RedirectCatcher() {
     }
   }, [selectedOrg?.key, selectedProject?.key, org, project, asPath, router])
 
+  // useEffect(() => {
+  //   if (selectedOrg?.key) {
+  //     // Construct the new URL with the updated parameters
+
+  //     // Navigate to the new URL
+  //     router.push(`/${selectedOrg.key}/projects`)
+  //   }
+  // }, [selectedOrg?.key])
+
   return <></>
 }

@@ -8,7 +8,7 @@ export default function SideNav() {
   return (
     <div
       className={cn(
-        'w-12 bg-dash-sidebar border-r flex flex-col py-[10px]',
+        'w-16 bg-dash-sidebar border-r flex flex-col py-[10px]',
         // 'hover:w-32 px-5',
         'items-center',
         'transition-all'

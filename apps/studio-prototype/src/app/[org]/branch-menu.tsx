@@ -2,7 +2,7 @@
 
 import { useConfig } from '@/src/hooks/use-config'
 import { resolveHideBranchesDropdown, resolveHideProjectsDropdown } from '@/src/utils/url-resolver'
-import { ChevronsUpDown } from 'lucide-react'
+import { ChevronsUpDown, Plug, Plug2 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
 import * as React from 'react'
@@ -87,7 +87,7 @@ export function BranchMenu() {
               'rounded-l-none',
               'left-0',
               'opacity-100',
-              hideBranchesDropdown ? '-left-[180px] opacity-0' : 'delay-500',
+              hideBranchesDropdown ? '-left-[8px] opacity-0 w-0 px-0' : 'delay-500',
               'transition-all duration-200 ease-out'
             )}
             iconRight={
@@ -105,7 +105,7 @@ export function BranchMenu() {
               ) : (
                 <>
                   <IconHandler icon={'preview'} />
-                  <span className="text-foreground-lighter">Branching not enabled</span>
+                  <span className="text-foreground-lighter pr-1">Branching not enabled</span>
                 </>
               )}
             </div>
@@ -119,6 +119,19 @@ export function BranchMenu() {
           branchBasedSettings={branchBasedSettings}
         />
       </Popover_Shadcn_>
+
+      <div>
+        <Button
+          type="outline"
+          className={cn(
+            'ml-3 rounded-full bg-opacity-50 text-foreground-lighter',
+            hideProjectsDropdown && '-left-[8px] opacity-0'
+          )}
+          icon={<Plug className="rotate-90" />}
+        >
+          Connect
+        </Button>
+      </div>
     </>
   )
 }

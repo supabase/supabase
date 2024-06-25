@@ -21,6 +21,7 @@ import {
 export default function SideMenuOrgMenu() {
   const [open, setOpenState] = useState(false)
   const [config, setConfig] = useConfig()
+
   const { selectedOrg, db } = config
 
   return (
@@ -47,6 +48,7 @@ export default function SideMenuOrgMenu() {
                     key={org.key}
                     value={org.key}
                     onSelect={(currentValue) => {
+                      console.log('about to push')
                       setConfig({
                         ...config,
                         selectedOrg: db.orgs.find((o: Org) => o.key === currentValue),

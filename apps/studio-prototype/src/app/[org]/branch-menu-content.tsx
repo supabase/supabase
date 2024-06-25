@@ -118,14 +118,17 @@ export const BranchMenuPopoverContent = (props: {
               onSelectCapture={() => {
                 console.log('select capture')
               }}
-              className="text-sm justify-between flex cursor-pointer"
+              className={cn('text-sm justify-between flex cursor-pointer')}
               onFocus={() => {
                 console.log('focus')
                 setProjectFocusState(project.key)
               }}
             >
               <div className="flex gap-2 items-center">
-                <IconHandler icon="project" />
+                <IconHandler
+                  icon="project"
+                  className={cn(selectedProject?.key === project.key && 'text-foreground')}
+                />
                 {project.name}
               </div>
               <div

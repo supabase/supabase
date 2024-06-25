@@ -3,8 +3,6 @@ export function resolveHideBranchesDropdown(
   organizationKey: string | undefined,
   projectKey: string | undefined
 ) {
-  console.log(pathName, organizationKey, projectKey)
-
   return (
     (pathName.startsWith(`/${organizationKey}/settings`) &&
       !pathName.startsWith(`/${organizationKey}/settings/project`)) ||
@@ -13,7 +11,8 @@ export function resolveHideBranchesDropdown(
     pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/api`) ||
     pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/integrations`) ||
     pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/add-ons`) ||
-    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/branching`)
+    pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/branching`) ||
+    pathName === `/${organizationKey}/projects`
   )
 }
 
@@ -23,8 +22,9 @@ export function resolveHideProjectsDropdown(
   projectKey: string | undefined
 ) {
   return (
-    pathName.startsWith(`/${organizationKey}/settings`) &&
-    !pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}`) &&
-    !pathName.startsWith(`/${organizationKey}/settings/account`)
+    (pathName.startsWith(`/${organizationKey}/settings`) &&
+      !pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}`) &&
+      !pathName.startsWith(`/${organizationKey}/settings/account`)) ||
+    pathName === `/${organizationKey}/projects`
   )
 }
