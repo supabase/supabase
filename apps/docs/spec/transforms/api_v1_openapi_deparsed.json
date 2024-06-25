@@ -60,10 +60,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     },
@@ -389,10 +392,13 @@
                           "INACTIVE",
                           "INIT_FAILED",
                           "REMOVED",
-                          "RESTORING",
+                          "RESTARTING",
                           "UNKNOWN",
                           "UPGRADING",
-                          "PAUSING"
+                          "PAUSING",
+                          "RESTORING",
+                          "RESTORE_FAILED",
+                          "PAUSE_FAILED"
                         ],
                         "type": "string"
                       }
@@ -567,10 +573,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     }
@@ -7421,6 +7430,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -7496,6 +7508,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7643,6 +7658,9 @@
                                           "items": {
                                             "type": "string"
                                           }
+                                        },
+                                        "array": {
+                                          "type": "boolean"
                                         }
                                       }
                                     }
@@ -7801,6 +7819,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7944,6 +7965,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -8016,6 +8040,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8166,6 +8193,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8545,10 +8575,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           },
@@ -8744,10 +8777,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           }
@@ -11881,6 +11917,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "array": {
+            "type": "boolean"
           }
         }
       },
@@ -11916,6 +11955,9 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "array": {
+                  "type": "boolean"
                 }
               }
             }
@@ -11979,6 +12021,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12040,6 +12085,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12128,6 +12176,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12230,6 +12281,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12337,6 +12391,9 @@
                                 "items": {
                                   "type": "string"
                                 }
+                              },
+                              "array": {
+                                "type": "boolean"
                               }
                             }
                           }
@@ -12445,6 +12502,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12541,6 +12601,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12605,6 +12668,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12707,6 +12773,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }

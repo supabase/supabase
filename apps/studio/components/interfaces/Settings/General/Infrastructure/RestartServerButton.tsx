@@ -10,7 +10,7 @@ import {
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useFlag } from 'hooks'
 import { ChevronDown } from 'lucide-react'
 import {
@@ -78,7 +78,7 @@ const RestartServerButton = () => {
   }
 
   const onRestartSuccess = () => {
-    setProjectPostgrestStatus(queryClient, projectRef, 'OFFLINE')
+    setProjectStatus(queryClient, projectRef, 'RESTARTING')
     toast.success('Restarting server...')
     router.push(`/project/${projectRef}`)
     setServiceToRestart(undefined)

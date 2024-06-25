@@ -13,8 +13,6 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type {
@@ -60,22 +58,16 @@ const GitHubSection = () => {
   )
 
   const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
-  const { data: branches } = useBranchesQuery({ projectRef })
 
-  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+  const { mutateAsync: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted Github connection')
     },
   })
 
-  const { mutate: disableBranching } = useBranchesDisableMutation()
-
   const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
-  const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
   const isBranch = project?.parent_project_ref !== undefined
-  const isBranchingEnabled =
-    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   const connections =
     allConnections?.filter((connection) =>
@@ -90,27 +82,13 @@ const GitHubSection = () => {
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      if (isBranchingEnabled) {
-        if (!projectRef) {
-          toast.error('Project ref not found')
-          return
-        }
-        disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
-      }
       if (!org?.id) {
         toast.error('Organization not found')
         return
       }
-      deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
+      await deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
     },
-    [
-      deleteGitHubConnection,
-      disableBranching,
-      isBranchingEnabled,
-      org?.id,
-      previewBranches,
-      projectRef,
-    ]
+    [deleteGitHubConnection, org?.id]
   )
 
   return (

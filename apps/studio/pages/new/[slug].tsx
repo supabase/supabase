@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import {
@@ -19,6 +20,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import generator from 'generate-password-browser'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
@@ -26,11 +28,12 @@ import {
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
+  PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -38,12 +41,19 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
+  Admonition,
   Badge,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -56,13 +66,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { z } from 'zod'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -173,7 +182,8 @@ const Wizard: NextPageWithLayout = () => {
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
     allProjects?.filter(
-      (project) => project.organization_id === currentOrg?.id && project.status !== 'paused'
+      (project) =>
+        project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({
@@ -253,6 +263,7 @@ const Wizard: NextPageWithLayout = () => {
         })
         .min(1, 'Password is required.'),
       instanceSize: z.string(),
+      dataApi: z.boolean(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -276,6 +287,7 @@ const Wizard: NextPageWithLayout = () => {
       dbPassStrength: 0,
       dbRegion: defaultRegion || undefined,
       instanceSize: sizes[0],
+      dataApi: true,
     },
   })
 
@@ -306,10 +318,11 @@ const Wizard: NextPageWithLayout = () => {
     delayedCheckPasswordStrength(password)
   }
 
-  const onClickNext = async (values: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize } = values
+    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize, dataApi } =
+      values
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -322,6 +335,7 @@ const Wizard: NextPageWithLayout = () => {
       // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+      dataApiExposedSchemas: !dataApi ? [] : undefined,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -378,7 +392,7 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onClickNext)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <Panel
           loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
           title={
@@ -677,6 +691,75 @@ const Wizard: NextPageWithLayout = () => {
                           />
                         )}
                       />
+                    </Panel.Content>
+
+                    <Panel.Content>
+                      <Collapsible_Shadcn_>
+                        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+                          Advanced options
+                          <ChevronRight
+                            size={16}
+                            strokeWidth={1}
+                            className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+                          />
+                        </CollapsibleTrigger_Shadcn_>
+                        <CollapsibleContent_Shadcn_ className="pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="dataApi"
+                            render={({ field }) => (
+                              <>
+                                <FormItemLayout
+                                  label="What connections do you plan to use?"
+                                  description="This setting can be changed after the project is created"
+                                  layout="horizontal"
+                                >
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStacked
+                                      // Due to radio group not supporting boolean values
+                                      // value is converted to boolean
+                                      onValueChange={(value) => field.onChange(value === 'true')}
+                                      defaultValue={field.value.toString()}
+                                    >
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            value={'true'}
+                                            label="Data API + Connection String"
+                                            description="For connecting from the browser, mobile and server."
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            label="Only Connection String"
+                                            value="false"
+                                            description="For connecting via server."
+                                            className={cn(
+                                              !form.getValues('dataApi') && '!rounded-b-none'
+                                            )}
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                    </RadioGroupStacked>
+                                  </FormControl_Shadcn_>
+                                  {!form.getValues('dataApi') && (
+                                    <Admonition
+                                      className="rounded-t-none"
+                                      type={'warning'}
+                                      title="Data API will effectively be disabled"
+                                    >
+                                      PostgREST which powers the Data API will have no schemas
+                                      available to it.
+                                    </Admonition>
+                                  )}
+                                </FormItemLayout>
+                              </>
+                            )}
+                          />
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
                     </Panel.Content>
                     {orgSubscription && orgSubscription.plan.id !== 'free' && (
                       <Panel.Content>
