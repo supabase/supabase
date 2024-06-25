@@ -42,7 +42,7 @@ const RadioGroupStackedItem = React.forwardRef<
         'w-full',
         'bg-overlay/50',
         'border',
-        'first-of-type:rounded-t-md last-of-type:rounded-b-md',
+        'first-of-type:rounded-t-lg last-of-type:rounded-b-lg',
         'shadow-sm',
         'hover:bg-surface-300',
         'hover:border-foreground-muted',
@@ -56,7 +56,7 @@ const RadioGroupStackedItem = React.forwardRef<
         props.className
       )}
     >
-      <div className="flex gap-3 w-full px-[21px] py-[16px]">
+      <div className="flex gap-3 w-full px-[21px] py-3">
         {showIndicator && (
           <div
             className="
@@ -77,12 +77,12 @@ const RadioGroupStackedItem = React.forwardRef<
             </RadioGroupPrimitive.Indicator>
           </div>
         )}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.25 items-start">
           <Label_Shadcn_
             htmlFor={props.value}
             className={cn(
               'block',
-              '-mt-[0.05rem]',
+              '-mt-[0.15rem]',
               'text-sm transition-colors text-left',
               'text-light',
               'group-hover:text-foreground group-data-[state=checked]:text-foreground',
@@ -92,7 +92,7 @@ const RadioGroupStackedItem = React.forwardRef<
             {label}
           </Label_Shadcn_>
           {props.description && (
-            <p className="text-xs text-foreground-lighter">{props.description}</p>
+            <p className="text-sm text-foreground-lighter">{props.description}</p>
           )}
           {props.children}
         </div>
