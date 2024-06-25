@@ -29,6 +29,11 @@ The validation is done when the user connects. When their WebSocket connection i
 - The request headers
 - The Channel topic the user is trying to connect to
 
+Using Realtime authorization involves two steps:
+
+- In your database, create an RLS policy on `realtime.messages`
+- In your client, instantiate the Realtime Channel with the `config` option `private: true`
+
 <Admonition type="caution">
 
 Increased RLS complexity can impact database performance and connection time, leading to higher connection latency and decreased join rates.
