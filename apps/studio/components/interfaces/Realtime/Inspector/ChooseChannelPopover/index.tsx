@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTelemetryProps } from 'common'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -23,6 +22,7 @@ import * as z from 'zod'
 
 import { useFlag } from 'hooks'
 import Telemetry from 'lib/telemetry'
+import { ExternalLink } from 'lucide-react'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
@@ -103,38 +103,40 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     name="channel"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
-                        <label className="text-foreground text-xs mb-2">Name of channel</label>
-                        <div className="flex flex-row">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              {...field}
-                              autoComplete="off"
-                              className="rounded-r-none text-xs px-2.5 py-1 h-auto"
-                              placeholder="Enter a channel name"
-                            />
-                          </FormControl_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                        <div className="flex flex-col gap-y-1">
+                          <label className="text-foreground text-xs">Name of channel</label>
+                          <div className="flex flex-row">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                autoComplete="off"
+                                className="rounded-r-none text-xs px-2.5 py-1 h-auto"
+                                placeholder="Enter a channel name"
+                              />
+                            </FormControl_Shadcn_>
 
-                          <Button
-                            type="primary"
-                            className="rounded-l-none"
-                            disabled={form.getValues().channel.length === 0}
-                            onClick={() => onSubmit()}
-                          >
-                            Listen to channel
-                          </Button>
+                            <Button
+                              type="primary"
+                              className="rounded-l-none"
+                              disabled={form.getValues().channel.length === 0}
+                              onClick={() => onSubmit()}
+                            >
+                              Listen to channel
+                            </Button>
+                          </div>
                         </div>
-                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                           The channel you initialize with the Supabase Realtime client. Learn more
                           in{' '}
-                          <Link
-                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                          <a
                             target="_blank"
                             rel="noreferrer"
                             className="underline hover:text-foreground transition"
+                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
                           >
                             our docs
-                          </Link>
+                          </a>
                         </FormDescription_Shadcn_>
                       </FormItem_Shadcn_>
                     )}
@@ -167,6 +169,16 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                       )}
                     />
                   ) : null}
+
+                  <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/22484"
+                    >
+                      Documentation
+                    </a>
+                  </Button>
                 </form>
               </Form_Shadcn_>
             </>
