@@ -1,15 +1,15 @@
 'use client'
 
-import React from 'react'
-import { usePathname } from 'next/navigation'
 import settingsData from '@/src/config/settings.json'
-import { ScrollArea, ScrollBar, cn } from 'ui'
 import { useConfig } from '@/src/hooks/use-config'
+import { usePathname } from 'next/navigation'
+import { ScrollArea, ScrollBar } from 'ui'
 import { ClickCounter } from './click-counter'
-import Link from 'next/link'
+import { SettingsGroup } from './settings-menu-group'
 
 // Define types for the settings data items
-interface SettingsItemProps {
+
+export interface SettingsItemProps {
   item: {
     key: string
     label: string
@@ -18,111 +18,62 @@ interface SettingsItemProps {
   }
   basePath: string
 }
-
-interface SettingsGroupProps {
-  group: string
+export interface SettingsGroupProps {
+  group: 'Project settings' | 'Environment settings' | 'Organization settings' | 'Account settings'
   items: SettingsItemProps['item'][]
   basePath: string
+  hasBranchingEnabled?: boolean
 }
 
 const SettingsMenuChildren = () => {
   const [config] = useConfig()
   const pathname = usePathname()
-  const { organization, project } = config
+  const { selectedOrg, selectedProject } = config
 
   const getBasePath = (section: string): string => {
     switch (section) {
       case 'PROJECT_SETTINGS':
-        return `/${organization}/settings/project/${project}`
+        return `/${selectedOrg?.key}/settings/project/${selectedProject?.key}`
+      case 'ENV_SETTINGS':
+        return `/${selectedOrg?.key}/settings/project/${selectedProject?.key}`
       case 'ORGANIZATION_SETTINGS':
-        return `/${organization}/settings`
+        return `/${selectedOrg?.key}/settings`
       case 'ACCOUNT_SETTINGS':
-        return `/${organization}/settings/account`
+        return `/${selectedOrg?.key}/settings/account`
       default:
         return ''
     }
   }
 
-  const SettingsItem = React.memo(
-    ({ item, basePath }: SettingsItemProps) => {
-      const fullPath = `${basePath}${item.href}`
-      const isActive = pathname.startsWith(fullPath)
-
-      return (
-        <li key={item.key}>
-          {/* <ClickCounter /> */}
-          <Link
-            href={fullPath}
-            className={`pl-5 group/nav-item-anchor relative hover:text-foreground text-sm ${isActive ? 'text-foreground' : 'text-foreground-lighter'}`}
-          >
-            {item.label}
-            <div
-              className={cn(
-                'absolute top-1/2 transform -translate-y-1/2 h-2 w-[3px] rounded-r-full duration-500',
-                'group-hover/nav-item-anchor:bg-foreground-muted group-hover/nav-item-anchor:left-0',
-                isActive ? '!bg-foreground left-0 w-[5px] duration-100' : '-left-1',
-                'transition-all'
-              )}
-            ></div>
-          </Link>
-          {item.items && (
-            <ul role="menu" className="pl-5">
-              {item.items.map((childItem) => (
-                <SettingsItem key={childItem.key} item={childItem} basePath={basePath} />
-              ))}
-            </ul>
-          )}
-        </li>
-      )
-    },
-    (prevProps, nextProps) => {
-      return prevProps.item === nextProps.item && prevProps.basePath === nextProps.basePath
-    }
-  )
-
-  SettingsItem.displayName = 'SettingsItem'
-
-  const SettingsGroup = React.memo(
-    ({ group, items, basePath }: SettingsGroupProps) => (
-      <div className="mb-8">
-        {/* <ClickCounter /> */}
-        <h2 className="text-sm font-mono text-foreground-lighter/75 uppercase tracking-wide px-5">
-          {group}
-        </h2>
-        <ul role="menu" className="mt-2">
-          {items.map((item) => (
-            <SettingsItem key={item.key} item={item} basePath={basePath} />
-          ))}
-        </ul>
-      </div>
-    ),
-    (prevProps, nextProps) => {
-      return (
-        prevProps.group === nextProps.group &&
-        prevProps.items === nextProps.items &&
-        prevProps.basePath === nextProps.basePath
-      )
-    }
-  )
-
-  SettingsGroup.displayName = 'SettingsGroup'
+  const hasBranchingEnabled = selectedProject?.branching
 
   return (
     <ScrollArea className="h-full w-full overflow-hidden">
       {/* <ClickCounter /> */}
       <nav aria-label="Settings Navigation" className="text-foreground-light h-full py-3">
         <SettingsGroup
-          group="Project Settings"
+          key={'project-settings'}
+          group="Project settings"
           items={settingsData.PROJECT_SETTINGS.items}
           basePath={getBasePath('PROJECT_SETTINGS')}
+          hasBranchingEnabled={hasBranchingEnabled}
         />
         <SettingsGroup
-          group="Organization Settings"
+          key={'environment-settings'}
+          group="Environment settings"
+          items={settingsData.ENV_SETTINGS.items}
+          basePath={getBasePath('PROJECT_SETTINGS')}
+          hasBranchingEnabled={hasBranchingEnabled}
+        />
+        <SettingsGroup
+          key={'organization-settings'}
+          group="Organization settings"
           items={settingsData.ORGANIZATION_SETTINGS.items}
           basePath={getBasePath('ORGANIZATION_SETTINGS')}
         />
         <SettingsGroup
-          group="Account Settings"
+          key={'account-settings'}
+          group="Account settings"
           items={settingsData.ACCOUNT_SETTINGS.items}
           basePath={getBasePath('ACCOUNT_SETTINGS')}
         />

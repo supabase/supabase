@@ -1,3 +1,4 @@
+import RedirectCatcher from './redirect-catcher'
 import SettingsMenuPanel from './settings-menu-panel'
 import SideNav from './side-nav'
 import TopHeader from './top-header'
@@ -15,6 +16,7 @@ export default function OrgLayout({
         <TopHeader />
         {children}
       </div>
+      <RedirectCatcher />
     </div>
   )
 }

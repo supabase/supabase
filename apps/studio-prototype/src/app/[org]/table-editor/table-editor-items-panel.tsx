@@ -40,7 +40,7 @@ export default function TableEditorItemsPanel() {
         'h-full',
         'bg-dash-sidebar',
         //
-        isActive ? 'w-[300px]' : 'w-[0px]',
+        isActive ? 'w-[340px]' : 'w-[0px]',
         isActive &&
           `
         border-r 
@@ -65,7 +65,7 @@ export default function TableEditorItemsPanel() {
           })
         }
       >
-        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-xs uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full h-[23px]">
           <ChevronRight
             size={14}
             className="group-data-[state=open]:rotate-90 transform transition-all"
@@ -99,7 +99,7 @@ export default function TableEditorItemsPanel() {
           })
         }
       >
-        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-xs uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full h-[23px]">
           <ChevronRight
             size={14}
             className="group-data-[state=open]:rotate-90 transform transition-all"
@@ -133,7 +133,7 @@ export default function TableEditorItemsPanel() {
           })
         }
       >
-        <CollapsibleTrigger_Shadcn_ className="px-3 text-sm uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full">
+        <CollapsibleTrigger_Shadcn_ className="px-3 text-xs uppercase text-foreground-lighter/75 hover:text-foreground-light font-mono flex gap-3 items-center w-full h-[23px]">
           <ChevronRight
             size={14}
             className="group-data-[state=open]:rotate-90 transform transition-all"

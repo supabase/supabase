@@ -8,7 +8,7 @@ import { cn } from 'ui'
 export default function SideNavMenuIcon({ product }: { product: any }) {
   const { org } = useParams()
   const [config] = useConfig()
-  const { organization, project } = config
+  const { selectedOrg, selectedProject } = config
   const pathname = usePathname()
   const isActive = pathname.startsWith(`/${org}${product.href}`)
 
@@ -20,10 +20,10 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
    */
   let overrideHref = null
   if (product.name === 'settings') {
-    overrideHref = `/${organization}/settings/project/${project}/general`
+    overrideHref = `/${selectedOrg?.key}/settings/project/${selectedProject?.key}/general`
   }
   if (product.name === 'table-editor' && config.tableEditor.activeTabId) {
-    overrideHref = `/${organization}/table-editor/${config.tableEditor.activeTabId}`
+    overrideHref = `/${selectedOrg?.key}/table-editor/${config.tableEditor.activeTabId}`
   }
 
   return (

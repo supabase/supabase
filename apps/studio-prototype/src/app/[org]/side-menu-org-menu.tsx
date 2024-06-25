@@ -21,7 +21,7 @@ import {
 export default function SideMenuOrgMenu() {
   const [open, setOpenState] = useState(false)
   const [config, setConfig] = useConfig()
-  const { organization, db } = config
+  const { selectedOrg, db } = config
 
   return (
     <>
@@ -33,7 +33,7 @@ export default function SideMenuOrgMenu() {
               'flex items-center justify-center text-background text-xs font-semibold'
             )}
           >
-            {config?.organization?.slice(0, 2).toUpperCase()}
+            {config?.selectedOrg?.name?.slice(0, 2).toUpperCase()}
           </div>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="w-[320px] p-0" side="right" align="start" sideOffset={8}>
@@ -50,9 +50,9 @@ export default function SideMenuOrgMenu() {
                       setConfig({
                         ...config,
                         selectedOrg: db.orgs.find((o: Org) => o.key === currentValue),
-                        selectedProject: db.orgs.find((o: Org) => o.key === currentValue)
-                          .projects[0],
-                        selectedEnv: db.orgs.find((o: Org) => o.key === currentValue).projects[0]
+                        selectedProject: db?.orgs?.find((o: Org) => o.key === currentValue)
+                          ?.projects[0],
+                        selectedEnv: db?.orgs?.find((o: Org) => o.key === currentValue)?.projects[0]
                           .branches[0] ?? {
                           name: 'main',
                           type: 'prod',
@@ -78,7 +78,7 @@ export default function SideMenuOrgMenu() {
                       className={cn(
                         'w-4 h-4 bg-foreground rounded-full',
                         'flex items-center justify-center',
-                        organization === org.key ? 'opacity-100' : 'opacity-0'
+                        selectedOrg?.key === org.key ? 'opacity-100' : 'opacity-0'
                       )}
                     >
                       <Check className={cn('h-2 w-2 text-background')} strokeWidth={5} />
@@ -90,7 +90,7 @@ export default function SideMenuOrgMenu() {
             </CommandGroup_Shadcn_>
             <CommandSeparator_Shadcn_ />
             <CommandGroup_Shadcn_>
-              <Link href={`/${organization}/settings/general`}>
+              <Link href={`/${selectedOrg?.key}/settings/general`}>
                 <CommandItem_Shadcn_ onSelect={() => setOpenState(false)} value="Settings">
                   Organization Settings
                 </CommandItem_Shadcn_>

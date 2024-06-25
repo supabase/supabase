@@ -3,6 +3,8 @@ export function resolveHideBranchesDropdown(
   organizationKey: string | undefined,
   projectKey: string | undefined
 ) {
+  console.log(pathName, organizationKey, projectKey)
+
   return (
     (pathName.startsWith(`/${organizationKey}/settings`) &&
       !pathName.startsWith(`/${organizationKey}/settings/project`)) ||

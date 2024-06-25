@@ -12,6 +12,7 @@ export default function PageRender() {
       <span className="text-lg text-foreground">
         {org} {config} {pathname}
       </span>
+      <h1 className="text-xl text-foreground">{config}</h1>
       <hr />
     </div>
   )
