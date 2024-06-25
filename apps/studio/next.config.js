@@ -46,6 +46,7 @@ const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
 const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
+const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
@@ -54,7 +55,7 @@ const PUSHER_URL_WS = 'wss://*.pusher.com'
 const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
 const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL}`
+const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL}`
 const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
@@ -75,7 +76,7 @@ const csp = [
         `default-src 'self' ${DEFAULT_SRC_URLS};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS};`,
         `frame-src 'self' ${FRAME_SRC_URLS};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS};`,
+        `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
         `font-src 'self' ${FONT_SRC_URLS};`,
         `worker-src 'self' blob: data:;`,
