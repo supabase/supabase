@@ -1,0 +1,158 @@
+---
+title: 'Use Supabase with iOS and SwiftUI'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+
+    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create an iOS SwiftUI app with Xcode">
+
+    Open Xcode > New Project > iOS > App. You can skip this step if you already have a working app.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+      Install Supabase package dependency using Xcode by following Apple's [tutorial](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+
+      Make sure to add `Supabase` product package as dependency to the application.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Initialize the Supabase client">
+
+      Create a new `Supabase.swift` file add a new supabase instance using your project URL and public API (anon) key:
+
+      <ProjectConfigVariables variable="url" />
+      <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```swift Supabase.swift
+      import Supabase
+
+      let supabase = SupabaseClient(
+        supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
+        supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+      )
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+
+    <StepHikeCompact.Details title="Create a data model for countries">
+
+    Create a decodable struct to deserialize the data from the database.
+
+    Add the following code to a new file named `Country.swift`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```swift Supabase.swift
+      struct Country: Decodable, Identifiable {
+        let id: Int
+        let name: String
+      }
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+
+    <StepHikeCompact.Details title="Query data from the app">
+
+      Use a `task` to fetch the data from the database and display it using a `List`.
+
+      Replace the default `ContentView` with the following code.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```swift ContentView.swift
+      struct ContentView: View {
+
+        @State var countries: [Country] = []
+
+        var body: some View {
+          List(countries) { country in
+            Text(country.name)
+          }
+          .overlay {
+            if countries.isEmpty {
+              ProgressView()
+            }
+          }
+          .task {
+            do {
+              countries = try await supabase.from("countries").select().execute().value
+            } catch {
+              dump(error)
+            }
+          }
+        }
+      }
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
