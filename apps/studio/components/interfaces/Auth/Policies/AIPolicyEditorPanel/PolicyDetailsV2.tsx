@@ -1,10 +1,10 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -124,10 +124,11 @@ export const PolicyDetailsV2 = ({
             name="table"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Table</p>
-                  <code className="text-xs">on</code>
-                  <p className="text-foreground-light text-sm">clause</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">on</code> clause
+                  </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -198,10 +199,11 @@ export const PolicyDetailsV2 = ({
             name="behavior"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Policy Behavior</p>
-                  <code className="text-xs">as</code>
-                  <p className="text-foreground-light text-sm">clause</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">as</code> clause
+                  </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
@@ -240,10 +242,11 @@ export const PolicyDetailsV2 = ({
             name="command"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Policy Command</p>
-                  <code className="text-xs">for</code>
-                  <p className="text-foreground-light text-sm">clause</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">for</code> clause
+                  </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <RadioGroup_Shadcn_
@@ -277,10 +280,11 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_ className="flex items-center gap-x-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
                   <p className="text-foreground-light text-sm">Target Roles</p>
-                  <code className="text-xs">to</code>
-                  <p className="text-foreground-light text-sm">clause</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">to</code> clause
+                  </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <MultiSelectV2
