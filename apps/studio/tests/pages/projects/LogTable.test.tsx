@@ -25,8 +25,6 @@ test('can display log data', async () => {
 
   const table = await screen.findByTestId('logs-table')
 
-  console.log(prettyDOM(table))
-
   await screen.findByText('timestamp')
   const row = await screen.findByText('1621323232312')
 

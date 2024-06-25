@@ -51,7 +51,6 @@ test('Shows focused log on row click', async () => {
 })
 
 test('Can copy Raw log', async () => {
-  console.log('🔵 copy raw log: ', mockRouter.query.ref)
   render(<LogsExplorerPage dehydratedState={{}} />)
 
   const logsTable = await screen.findByTestId('logs-table')
