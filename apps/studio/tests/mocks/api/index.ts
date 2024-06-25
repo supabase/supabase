@@ -20,7 +20,6 @@ export const APIMock = [
         ],
       })
     } else {
-      console.log('🔵 Return 2')
       return HttpResponse.json({
         result: [
           {
