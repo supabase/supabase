@@ -307,13 +307,11 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Assign organization member with new role */
-    patch: operations['MembersController_assignMemberRoleV2']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Update organization member role */
-    put: operations['MembersController_UpdateMemberRole']
-    /** Removes organization member role */
+    /** Removes organization member */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/platform/organizations/{slug}/members/invitations': {
@@ -1231,13 +1229,11 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Assign organization member with new role */
-    patch: operations['MembersController_assignMemberRoleV2']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
   }
   '/v0/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Update organization member role */
-    put: operations['MembersController_UpdateMemberRole']
-    /** Removes organization member role */
+    /** Removes organization member */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/v0/organizations/{slug}/members/invite': {
@@ -1815,6 +1811,18 @@ export interface paths {
     /** Removes a SSO provider by its UUID */
     delete: operations['v1-delete-a-sso-provider']
   }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** [Alpha] Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** [Alpha] Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** [Alpha] Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** [Alpha] Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
+  }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
     get: operations['v1-get-project-pgbouncer-config']
@@ -2081,10 +2089,6 @@ export interface components {
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
     }
-    AssignMemberRoleBodyV2: {
-      role_id: number
-      role_scoped_projects?: string[]
-    }
     AttributeMapping: {
       keys: {
         [key: string]: components['schemas']['AttributeValue']
@@ -2154,9 +2158,6 @@ export interface components {
       external_phone_enabled: boolean | null
       external_slack_client_id: string | null
       external_slack_enabled: boolean | null
-      external_slack_oidc_client_id: string | null
-      external_slack_oidc_enabled: boolean | null
-      external_slack_oidc_secret: string | null
       external_slack_secret: string | null
       external_spotify_client_id: string | null
       external_spotify_enabled: boolean | null
@@ -2670,6 +2671,11 @@ export interface components {
       id: string
       type: string
       value: string
+    }
+    CreateThirdPartyAuthBody: {
+      custom_jwks?: Record<string, never>
+      jwks_url?: string
+      oidc_issuer_url?: string
     }
     CreateTriggerBody: {
       /** @enum {string} */
@@ -3210,9 +3216,6 @@ export interface components {
       EXTERNAL_PHONE_ENABLED: boolean
       EXTERNAL_SLACK_CLIENT_ID: string
       EXTERNAL_SLACK_ENABLED: boolean
-      EXTERNAL_SLACK_OIDC_CLIENT_ID: string
-      EXTERNAL_SLACK_OIDC_ENABLED: boolean
-      EXTERNAL_SLACK_OIDC_SECRET: string
       EXTERNAL_SLACK_SECRET: string
       EXTERNAL_SPOTIFY_CLIENT_ID: string
       EXTERNAL_SPOTIFY_ENABLED: boolean
@@ -5032,6 +5035,17 @@ export interface components {
       referrer: string
       title: string
     }
+    ThirdPartyAuth: {
+      custom_jwks?: unknown
+      id: string
+      inserted_at: string
+      jwks_url?: string | null
+      oidc_issuer_url?: string | null
+      resolved_at?: string | null
+      resolved_jwks?: unknown
+      type: string
+      updated_at: string
+    }
     TransferOrganizationBody: {
       member_gotrue_id: string
       member_id: number
@@ -5109,9 +5123,6 @@ export interface components {
       external_phone_enabled?: boolean
       external_slack_client_id?: string
       external_slack_enabled?: boolean
-      external_slack_oidc_client_id?: string
-      external_slack_oidc_enabled?: boolean
-      external_slack_oidc_secret?: string
       external_slack_secret?: string
       external_spotify_client_id?: string
       external_spotify_enabled?: boolean
@@ -5343,9 +5354,6 @@ export interface components {
       EXTERNAL_PHONE_ENABLED?: boolean
       EXTERNAL_SLACK_CLIENT_ID?: string
       EXTERNAL_SLACK_ENABLED?: boolean
-      EXTERNAL_SLACK_OIDC_CLIENT_ID?: string
-      EXTERNAL_SLACK_OIDC_ENABLED?: boolean
-      EXTERNAL_SLACK_OIDC_SECRET?: string
       EXTERNAL_SLACK_SECRET?: string
       EXTERNAL_SPOTIFY_CLIENT_ID?: string
       EXTERNAL_SPOTIFY_ENABLED?: boolean
@@ -5458,10 +5466,9 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
-    UpdateMemberRoleBody: {
-      description?: string
-      name: string
-      role_scoped_projects: string[]
+    UpdateMemberRoleBodyV2: {
+      role_id: number
+      role_scoped_projects?: string[]
     }
     UpdateNotificationBodyV2: {
       id: string
@@ -7657,8 +7664,8 @@ export interface operations {
       }
     }
   }
-  /** Assign organization member with new role */
-  MembersController_assignMemberRoleV2: {
+  /** Updates organization member role */
+  MembersController_updateMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7668,32 +7675,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['AssignMemberRoleBodyV2']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to assign organization member with new role */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Update organization member role */
-  MembersController_UpdateMemberRole: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-        gotrue_id: string
-        role_id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateMemberRoleBody']
+        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
       }
     }
     responses: {
@@ -7706,7 +7688,7 @@ export interface operations {
       }
     }
   }
-  /** Removes organization member role */
+  /** Removes organization member */
   MembersController_deleteMemberRole: {
     parameters: {
       path: {
@@ -7720,7 +7702,7 @@ export interface operations {
       200: {
         content: never
       }
-      /** @description Failed to remove organization member role */
+      /** @description Failed to remove organization member */
       500: {
         content: never
       }
@@ -13680,6 +13662,89 @@ export interface operations {
       }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
       404: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
         content: never
       }
     }
