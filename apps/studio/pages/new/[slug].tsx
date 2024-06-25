@@ -711,6 +711,7 @@ const Wizard: NextPageWithLayout = () => {
                               <>
                                 <FormItemLayout
                                   label="What connections do you plan to use?"
+                                  description="This setting can be changed after the project is created"
                                   layout="horizontal"
                                 >
                                   <FormControl_Shadcn_>
