@@ -39,7 +39,7 @@ const ReadAndWritesChart = () => {
           </div>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={140}>
         <AreaChart
           data={data}
           className="[&_.recharts-area-dots>circle]:hidden [&_.recharts-area-dots>circle:last-of-type]:block"

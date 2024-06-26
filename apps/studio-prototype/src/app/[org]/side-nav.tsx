@@ -1,4 +1,3 @@
-import { cn } from 'ui'
 import SideNavMenuIcon from './side-nav-menu-icon'
 import UserMenu from './user-menu'
 import { SideNav as SideNavData } from '@/src/config/nav'

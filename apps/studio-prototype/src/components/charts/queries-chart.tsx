@@ -40,8 +40,8 @@ const QueriesChart = () => {
     return () => clearInterval(interval)
   }, [])
 
-  console.log('render')
-  console.log(data)
+  // console.log('render')
+  // console.log(data)
 
   return (
     <div className="flex flex-col gap-2 grow">
@@ -52,10 +52,8 @@ const QueriesChart = () => {
           <span className="text-xs font-mono text-foreground-lighter">Total queries</span>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={140}>
         <BarChart
-          width={200}
-          height={200}
           data={data}
           barGap={4}
           className="[&_.recharts-bar-rectangle>path]:fill-foreground/50 [&_.recharts-bar-rectangle:last-of-type>path]:fill-foreground"
