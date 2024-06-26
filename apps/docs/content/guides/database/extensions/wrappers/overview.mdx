@@ -113,7 +113,7 @@ This process can be taxing on your database if you are moving large amounts of d
 
 Foreign Data Wrappers do not provide Row Level Security. We do not advise exposing them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
-If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign tables through API.
+If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
 
 As an example, let's go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) first and then follow below steps,
 
@@ -137,10 +137,10 @@ As an example, let's go to [SQL Editor](https://supabase.com/dashboard/project/_
      );
    ```
 
-2. Create a security definer function that queries the foreign table:
+2. Create a security definer function that queries the foreign table and filters on the name prefix parameter:
 
    ```sql
-   create function public.get_stripe_products()
+   create function public.get_stripe_products(name_prefix text)
    returns table (
      id text,
      name text,
@@ -160,7 +160,10 @@ As an example, let's go to [SQL Editor](https://supabase.com/dashboard/project/_
        t.default_price,
        t.description
      from
-       stripe.stripe_products t;
+       stripe.stripe_products t
+     where
+       t.name like $1 || '%'
+     ;
    end;
    $$;
    ```
@@ -178,14 +181,16 @@ As an example, let's go to [SQL Editor](https://supabase.com/dashboard/project/_
    revoke execute on function public.get_stripe_products from public;
    revoke execute on function public.get_stripe_products from anon;
 
-   -- grant execute permission to specific role only
+   -- grant execute permission to the specific role only
    grant execute on function public.get_stripe_products to authenticated;
    ```
 
 Once the above steps are finished, we can invoke the function to query foreign table from Supabase client:
 
 ```js
-let { data, error } = await supabase.rpc('get_stripe_products').select('*')
+const { data, error } = await supabase
+  .rpc('get_stripe_products', { name_prefix: 'Test' })
+  .select('*')
 if (error) console.error(error)
 else console.log(data)
 ```
