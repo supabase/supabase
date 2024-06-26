@@ -24,7 +24,7 @@ Realtime uses the `messages` table in your database's `realtime` schema to gener
 
 By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic,
 
-The validation is done when the user connects. When their WebSocket connection is established, their permissions are calculated based on:
+The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
 - The RLS policies on tables in your `realtime` schema
 - The user information sent as part of their [Auth JWT](/docs/guides/auth/jwts)
