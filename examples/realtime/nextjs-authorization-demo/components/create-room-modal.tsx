@@ -12,11 +12,11 @@ export default function CreateRoomModal() {
     const token = (await supabase.auth.getSession()).data.session!.access_token
     supabase.realtime.setAuth(token)
     console.log()
-    const rooms_response = await supabase.from('rooms').insert({ topic }).select('id')
+    const rooms_response = await supabase.from('rooms').insert({ topic }).select('topic')
     console.log(rooms_response.data)
     await supabase
       .from('rooms_users')
-      .insert({ user_id: user.data.user!.id, room_id: rooms_response.data![0].id })
+      .insert({ user_id: user.data.user!.id, room_topic: rooms_response.data![0].topic })
     return redirect(`/protected`)
   }
 

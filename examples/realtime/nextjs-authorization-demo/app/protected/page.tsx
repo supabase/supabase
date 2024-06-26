@@ -21,15 +21,15 @@ export default function Chat() {
   }
 
   const addUserToChannel = async (email: string) => {
-    const user = await supabase.from('profiles').select('user_id').eq('email', email)
+    const user = await supabase.from('profiles').select('id').eq('email', email)
     if (!user.data?.length) {
       addMessage(true, true, `User ${email} not found`)
     } else {
-      const room = await supabase.from('rooms').select('id').eq('topic', selectedRoom)
+      const room = await supabase.from('rooms').select('topic').eq('topic', selectedRoom)
 
       await supabase
         .from('rooms_users')
-        .upsert({ user_id: user.data?.[0].user_id, room_id: room.data?.[0].id })
+        .upsert({ user_id: user.data?.[0].id, room_topic: room.data?.[0].topic })
       addMessage(true, true, `Added ${email} to channel ${selectedRoom}`)
     }
   }
