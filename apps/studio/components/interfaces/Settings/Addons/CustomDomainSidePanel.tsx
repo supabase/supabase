@@ -258,7 +258,7 @@ const CustomDomainSidePanel = () => {
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0)
                 ? subscription?.billing_via_partner === false &&
                   // Old addon billing with upfront payment
-                  subscription.usage_based_billing_project_addons === true && (
+                  subscription.usage_based_billing_project_addons === false && (
                     <p className="text-sm text-foreground-light">
                       <span>
                         Upon clicking confirm, the add-on is removed immediately and any unused time

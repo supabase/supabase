@@ -385,7 +385,7 @@ const PITRSidePanel = () => {
               (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0)
                 ? subscription?.billing_via_partner === false &&
                   // Old addon billing with upfront payment
-                  subscription.usage_based_billing_project_addons === true && (
+                  subscription.usage_based_billing_project_addons === false && (
                     <p className="text-sm text-foreground-light">
                       Upon clicking confirm, the add-on is removed immediately and any unused time
                       in the current billing cycle is added as prorated credits to your organization
