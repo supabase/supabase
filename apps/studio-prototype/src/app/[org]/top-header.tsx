@@ -14,11 +14,13 @@ export default function TopHeader() {
     selectedOrg,
     selectedProject,
     selectedEnv: { type },
+    settingsAllPreviews,
   } = config
 
   const isPreview =
-    type !== 'prod' &&
-    !resolveHideBranchesDropdown(pathName, selectedOrg?.key, selectedProject?.key)
+    (settingsAllPreviews && pathName.includes(`${selectedOrg?.key}/settings`)) ||
+    (type !== 'prod' &&
+      !resolveHideBranchesDropdown(pathName, selectedOrg?.key, selectedProject?.key))
 
   const pickersHidden =
     resolveHideBranchesDropdown(pathName, selectedOrg?.key, selectedProject?.key) &&

@@ -29,6 +29,7 @@ export default function ProjectsPage() {
         <div className="flex gap-10">
           <QueriesChart />
           <ReadAndWritesChart />
+          <QueriesChart />
         </div>
         {/* <IOPSChart /> */}
         {/* <StorageChart /> */}
