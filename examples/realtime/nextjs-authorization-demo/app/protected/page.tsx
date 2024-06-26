@@ -1,13 +1,13 @@
 'use client'
 import CreateRoomModal from '@/components/create-room-modal'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useState, useEffect, use } from 'react'
 
 export default function Chat() {
-  const [userId, setUserId] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [rooms, setRooms] = useState<any>([])
-  const [users, setUsers] = useState<any>([])
+  const [users, setUsers] = useState<Set<string>>(new Set())
   const [selectedRoom, setSelectedRoom] = useState<string | undefined>()
   const [channel, setChannel] = useState<any>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -22,18 +22,15 @@ export default function Chat() {
 
   const addUserToChannel = async (email: string) => {
     const user = await supabase.from('profiles').select('user_id').eq('email', email)
-    console.log()
     if (!user.data?.length) {
       addMessage(true, true, `User ${email} not found`)
     } else {
-      console.log(user.count)
       const room = await supabase.from('rooms').select('id').eq('topic', selectedRoom)
 
       await supabase
         .from('rooms_users')
         .upsert({ user_id: user.data?.[0].user_id, room_id: room.data?.[0].id })
       addMessage(true, true, `Added ${email} to channel ${selectedRoom}`)
-      setUsers([...users, email])
     }
   }
 
@@ -61,7 +58,7 @@ export default function Chat() {
   useEffect(() => {
     supabase.auth
       .getUser()
-      .then((user) => setUserId(user.data.user?.id || null))
+      .then((user) => setUser(user.data.user))
       .then(async () => {
         await supabase.auth.getUser()
         const token = (await supabase.auth.getSession()).data.session?.access_token!
@@ -80,43 +77,40 @@ export default function Chat() {
 
     if (selectedRoom) {
       channel?.unsubscribe()
+      setUsers(new Set())
 
       let newChannel = supabase.realtime.channel(selectedRoom, {
         config: {
           broadcast: { self: true },
-          presence: { key: userId! },
           private: true, // This line will tell the server that you want to use a private channel for this connection
         },
       })
 
       newChannel
         .on('broadcast', { event: 'message' }, ({ payload: payload }) =>
-          addMessage(payload.user_id == userId, false, payload.message)
+          addMessage(payload.user_id == user?.id, false, payload.message)
         )
-        .on('presence', { event: 'sync' }, () => {
-          console.log(['sync', newChannel.presenceState()])
-        })
         .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-          console.log(['join', key, newPresences])
+          newPresences.map(({ email }) => users.add(email))
+          setUsers(new Set(users))
         })
         .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-          console.log(['leave', key, leftPresences])
+          leftPresences.map(({ email }) => users.delete(email))
+          setUsers(new Set(users))
         })
         .subscribe((status, err) => {
+          setLoading(false)
+
           if (status == 'SUBSCRIBED') {
-            console.log(err)
             setChannel(newChannel)
-            setLoading(false)
+            newChannel.track({ email: user?.email })
             setError(null)
           }
           if (status == 'CLOSED') {
-            console.log(err)
             setChannel(null)
           }
           if (status == 'CHANNEL_ERROR') {
-            console.log(err)
             setError(err?.message || null)
-            setLoading(false)
           }
         })
     }
@@ -156,7 +150,7 @@ export default function Chat() {
           </div>
           <div className="bg-white h-full rounded-sm text-slate-900">
             <div className="flex flex-col gap-2 p-2">
-              {users?.map((email: string) => {
+              {Array.from(users)?.map((email: string) => {
                 return <div key={email}>{email}</div>
               })}
             </div>
@@ -195,7 +189,7 @@ export default function Chat() {
                 channel?.send({
                   type: 'broadcast',
                   event: 'message',
-                  payload: { message, user_id: userId },
+                  payload: { message, user_id: user?.id },
                 })
               }
 
