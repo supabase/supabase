@@ -134,7 +134,7 @@ export const generateUpdateColumnPayload = (
   if (!isEqual(originalColumn.name.trim(), name)) {
     payload.name = name
   }
-  if (!isEqual(originalColumn.comment, comment)) {
+  if (!isEqual(originalColumn.comment?.trim(), comment)) {
     payload.comment = comment as string | undefined
   }
   if (!isEqual(originalColumn.check?.trim(), check)) {
