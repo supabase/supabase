@@ -20,7 +20,9 @@ Realtime Authorization is in Public Alpha. To use Authorization for your Realtim
 
 ## How it works
 
-Realtime uses tables in your database's `realtime` schema to track users and Channel topics. By writing RLS policies against these tables, you can control the access users have to a Channel topic and features within a Channel topic.
+Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
+
+By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic,
 
 The validation is done when the user connects. When their WebSocket connection is established, their permissions are calculated based on:
 
