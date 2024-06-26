@@ -1,3 +1,5 @@
+'use client'
+
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
 import { TextArea } from 'ui/src/components/shadcn/ui/text-area'

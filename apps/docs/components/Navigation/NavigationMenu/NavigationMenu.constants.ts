@@ -238,6 +238,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/quickstarts/kotlin',
@@ -1142,12 +1143,12 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging-tools',
         },
         {
-          name: 'Logging and Troubleshooting',
-          url: '/guides/functions/debugging',
+          name: 'Logging',
+          url: '/guides/functions/logging',
         },
         {
-          name: 'Logging and Using Headers',
-          url: '/guides/functions/functions-headers',
+          name: 'Troubleshooting Common Issues',
+          url: '/guides/functions/troubleshooting',
         },
         {
           name: 'Testing your Edge Functions',

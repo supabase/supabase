@@ -1,7 +1,9 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { type CSSProperties, type PropsWithChildren, memo, useEffect } from 'react'
+import { type PropsWithChildren, memo, useEffect } from 'react'
 import { cn } from 'ui'
 import Footer from '~/components/Navigation/Footer'
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
@@ -277,16 +279,19 @@ const Container = memo(function Container({
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
-        // 'overflow-x-auto',
+        /**
+         * This controls scroll restoration on page navigation, so the overflow
+         * must be on the element with DOCS_CONTENT_CONTAINER_ID
+         */
+        'overflow-auto',
         'w-full transition-all ease-out',
-        // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
         className
       )}
     >
-      <div className="flex flex-col relative">{children}</div>
+      {children}
     </div>
   )
 })
@@ -300,7 +305,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
       className={[
         // 'hidden',
         'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
+        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0 z-20' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',
@@ -376,10 +381,8 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
             <MobileHeader menuId={menuId} />
           </div>
         </div>
-        <div className="grow">
-          {children}
-          <Footer />
-        </div>
+        {children}
+        <Footer />
         <MobileMenuBackdrop />
       </Container>
     </div>

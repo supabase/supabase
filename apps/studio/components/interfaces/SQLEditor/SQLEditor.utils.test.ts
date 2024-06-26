@@ -25,6 +25,24 @@ describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
     const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test('Should return false if query uses `FETCH FIRST` instead of limit ', () => {
+    const sql = 'select * from countries FETCH FIRST 5 rows only'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query uses `fetch first` instead of limit ', () => {
+    const sql = 'select * from countries fetch first 5 rows only'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query uses `fetch   first` (with random spaces) instead of limit ', () => {
+    const sql = 'select * from countries FETCH FIRST 5 rows only'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
   test('Should return false if query is not a select statement', () => {
     const sql = 'create table test (id int8 primary key, name varchar);'
     const limit = 100
