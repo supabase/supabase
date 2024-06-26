@@ -7,6 +7,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { FormHeader } from 'components/ui/Forms'
 
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
@@ -29,18 +30,19 @@ export const RealtimePolicies = () => {
   const filteredTables = (tables ?? []).filter((table) => table.name === 'messages')
 
   return (
-    <div className="flex min-h-full w-full flex-col p-4">
-      <h3 className="text-xl">Realtime policies</h3>
-      <p className="mt-2 text-sm text-foreground-light">
-        You can use RLS policies to control access to Realtime Channels.
-      </p>
+    <div className="flex min-h-full w-full flex-col p-4 gap-y-4">
+      <FormHeader
+        className="!mb-0"
+        title="Realtime policies"
+        description="You can use RLS policies to control access to Realtime Channels"
+      />
 
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <div className="mt-4 space-y-4">
+        <div className="space-y-4">
           <Policies
             schema="realtime"
             tables={filteredTables}
