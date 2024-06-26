@@ -1,9 +1,8 @@
-import { memo, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { menuState } from '~/hooks/useMenuState'
+import { memo } from 'react'
 import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
   Home = 'home',
@@ -271,13 +270,10 @@ function getMenuElement(menu: Menu) {
 }
 
 const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
-  const router = useRouter()
   const level = menuId
   const menu = getMenuById(level)
 
-  useEffect(() => {
-    menuState.setMenuMobileOpen(false)
-  }, [router])
+  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu)
 }

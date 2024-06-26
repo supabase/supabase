@@ -324,7 +324,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
         ],
         [
-          // { label: 'Data API' },
+          { label: 'Data API' },
           {
             label: 'REST',
             icon: 'rest',
@@ -417,7 +417,7 @@ export const REFERENCES: References = {
 
 export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
-  title: 'Getting Started',
+  title: 'Start with Supabase',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
