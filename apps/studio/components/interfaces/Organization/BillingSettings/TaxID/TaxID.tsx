@@ -95,6 +95,7 @@ const TaxID = () => {
           ? {
               type: type,
               value: sanitizeTaxIdValue({ value, name: form.getValues().name }),
+              country: selectedTaxId?.countryIso2,
             }
           : null,
     })
