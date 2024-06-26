@@ -238,7 +238,7 @@ const TableEditorMenu = () => {
                           onClick={() => setVisibleTypes([value])}
                           className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                         >
-                          Only
+                          Select only
                         </Button>
                       </div>
                     ))}
