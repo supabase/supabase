@@ -22,9 +22,9 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
     case 'firebase':
       return 'Allow users to use Supabase with Firebase project'
     case 'auth0':
-      return 'Auth0'
+      return 'Allow users to use Supabase with Auth0 project'
     case 'awsCognito':
-      return 'AWS Cognito'
+      return 'Allow users to use Supabase with AWS Cognito project'
     case 'custom':
     default:
       return 'Custom'

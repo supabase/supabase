@@ -152,7 +152,7 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
                 control={form.control}
                 name="awsRegion"
                 render={({ field }) => (
-                  <FormItemLayout label="Return type">
+                  <FormItemLayout label="AWS Region">
                     <AwsRegionSelector value={field.value} onChange={field.onChange} />
                   </FormItemLayout>
                 )}
