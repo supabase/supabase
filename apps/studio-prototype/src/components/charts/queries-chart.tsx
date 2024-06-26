@@ -46,8 +46,11 @@ const QueriesChart = () => {
   return (
     <div className="flex flex-col gap-2 grow">
       <div className="flex items-baseline gap-2">
-        <h2 className="text-2xl font-mono font-extralight text-foreground">3,402</h2>
-        <span className="text-xs font-mono text-foreground-lighter">Total Queries</span>
+        <div className="h-2 w-4 rounded-full bg-foreground"></div>
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-2xl font-mono font-extralight text-foreground">3,402</h2>
+          <span className="text-xs font-mono text-foreground-lighter">Total queries</span>
+        </div>
       </div>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart

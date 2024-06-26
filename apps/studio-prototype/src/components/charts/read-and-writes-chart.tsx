@@ -4,11 +4,11 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } f
 
 const generateLineChartData = () => {
   let reads = 12400
-  let writes = 1000
+  let writes = 3000
 
   return Array.from({ length: 20 }, (_, i) => {
     reads = reads + (Math.random() - 0.5) * 5000 // Add variation to reads
-    writes = writes + (Math.random() - 0.5) * 100 // Add variation to writes
+    writes = writes + (Math.random() - 0.5) * 1000 // Add variation to writes
 
     return {
       time: `${14 + Math.floor(i / 4)}:${(i % 4) * 15}`,

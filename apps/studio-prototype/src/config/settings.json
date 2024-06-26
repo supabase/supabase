@@ -6,7 +6,6 @@
     "items": [
       { "label": "General", "key": "general", "href": "/general" },
       { "label": "Infrastructure", "key": "infrastructure", "href": "/infrastructure" },
-      { "label": "API", "key": "api", "href": "/api" },
       { "label": "Integrations", "key": "integrations", "href": "/integrations" },
       { "label": "Add ons", "key": "add_ons", "href": "/add-ons" },
       { "label": "Branching", "key": "branching", "href": "/branching" }
@@ -17,6 +16,7 @@
       "base_path": "/project"
     },
     "items": [
+      { "label": "API", "key": "api", "href": "/api" },
       { "label": "Database", "key": "database", "href": "/database" },
       {
         "label": "Authentication",

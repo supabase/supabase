@@ -125,7 +125,10 @@ export function BranchMenu() {
           type="outline"
           className={cn(
             'ml-3 rounded-full bg-opacity-50 text-foreground-lighter',
-            hideProjectsDropdown && '-left-[8px] opacity-0'
+            hideProjectsDropdown
+              ? '-left-[8px] opacity-0'
+              : // animate in slow
+                'delay-1000'
           )}
           icon={<Plug className="rotate-90" />}
         >
