@@ -137,6 +137,7 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
+    !cleanedSql.match(/limit [0-9]* offset [0-9]*[;]?$/i) &&
     !cleanedSql.match(/limit [0-9]*[;]?$/i)
   return { cleanedSql, appendAutoLimit }
 }
