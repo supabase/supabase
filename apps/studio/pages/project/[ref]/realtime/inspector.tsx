@@ -16,6 +16,8 @@ export const InspectorPage: NextPageWithLayout = () => {
   return <RealtimeInspector />
 }
 
-InspectorPage.getLayout = (page) => <RealtimeLayout title="Realtime">{page}</RealtimeLayout>
+InspectorPage.getLayout = (page) => (
+  <RealtimeLayout title="Realtime Inspector">{page}</RealtimeLayout>
+)
 
 export default InspectorPage
