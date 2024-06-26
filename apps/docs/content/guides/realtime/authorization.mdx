@@ -31,6 +31,8 @@ The validation is done when the user connects. When their WebSocket connection i
 - The request headers
 - The Channel topic the user is trying to connect to
 
+When Realtime generates a policy for a client it does a test query on the `realtime.messages` table and then rolls it back. Realtime does not store any messages in your `realtime.messages` table.
+
 Using Realtime authorization involves two steps:
 
 - In your database, create an RLS policy on `realtime.messages`
