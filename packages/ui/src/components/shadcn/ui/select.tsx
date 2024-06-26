@@ -34,6 +34,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       'flex w-full items-center justify-between rounded-md border border-button bg-button text-xs ring-offset-background-control placeholder:text-foreground-muted focus:outline-none ring-border-control focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+      'text-foreground-light',
       SelectTriggerVariants({ size }),
       className
     )}

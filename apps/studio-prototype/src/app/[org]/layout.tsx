@@ -1,4 +1,4 @@
-import RedirectCatcher from './redirect-catcher'
+import RedirectCatcher from '@/src/components/redirect-catcher'
 import SettingsMenuPanel from './settings-menu-panel'
 import SideNav from './side-nav'
 import TopHeader from './top-header'

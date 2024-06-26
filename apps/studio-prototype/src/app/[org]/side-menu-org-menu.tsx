@@ -4,6 +4,7 @@ import { Org, orgs } from '@/src/config/org'
 import { useConfig } from '@/src/hooks/use-config'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { CommandSeparator_Shadcn_, ScrollArea, ScrollBar, cn } from 'ui'
 
@@ -21,6 +22,8 @@ import {
 export default function SideMenuOrgMenu() {
   const [open, setOpenState] = useState(false)
   const [config, setConfig] = useConfig()
+
+  const router = useRouter()
 
   const { selectedOrg, db } = config
 
@@ -89,6 +92,12 @@ export default function SideMenuOrgMenu() {
                 ))}
                 <ScrollBar />
               </ScrollArea>
+            </CommandGroup_Shadcn_>
+            <CommandSeparator_Shadcn_ />
+            <CommandGroup_Shadcn_>
+              <CommandItem_Shadcn_ onSelect={() => router.push('/new')}>
+                New organization
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
             <CommandSeparator_Shadcn_ />
             <CommandGroup_Shadcn_>
