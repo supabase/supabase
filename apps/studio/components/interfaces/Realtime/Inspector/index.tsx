@@ -25,6 +25,7 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
+    isChannelPrivate: false,
     filter: undefined,
     bearer: null,
     enablePresence: true,

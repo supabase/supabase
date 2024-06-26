@@ -1,14 +1,15 @@
+'use client'
+
 import * as Accordion from '@radix-ui/react-accordion'
-import { useRouter } from 'next/router'
 
 import * as NavItems from './NavigationMenu.constants'
 import { getPathWithoutHash } from './NavigationMenu.utils'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
+import { usePathname } from 'next/navigation'
 
 const NavigationMenuGuideList = ({ id }: { id: string }) => {
-  const path = useRouter().asPath
-  const url = getPathWithoutHash(path)
-  const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
+  const pathname = usePathname()
+  const firstLevelRoute = pathname?.split('/')?.slice(0, 4)?.join('/')
 
   const menu = NavItems[id]
 
