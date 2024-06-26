@@ -2097,6 +2097,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/partners/integrations/powersync</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/partners/integrations/prisma</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
