@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { Plus } from 'lucide-react'
+import { Filter, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
@@ -15,7 +15,17 @@ import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-que
 import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox_Shadcn_,
+  Label_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -26,6 +36,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -34,6 +45,7 @@ const TableEditorMenu = () => {
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
     'alphabetical'
@@ -57,6 +69,7 @@ const TableEditorMenu = () => {
       schema: snap.selectedSchemaName,
       search: searchText || undefined,
       sort,
+      filterTypes: visibleTypes,
     },
     {
       keepPreviousData: Boolean(searchText),
@@ -188,6 +201,39 @@ const TableEditorMenu = () => {
                 </InnerSideBarFilterSortDropdownItem>
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                  className="px-1"
+                  icon={<Filter />}
+                />
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="center">
+                <div className="px-3 py-3 flex flex-col gap-y-2">
+                  <p className="text-xs">Show entity types</p>
+                  <div className="flex flex-col gap-y-2">
+                    {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                      <div key={key} className="flex items-center gap-x-2">
+                        <Checkbox_Shadcn_
+                          checked={visibleTypes.includes(value)}
+                          onCheckedChange={() => {
+                            if (visibleTypes.includes(value)) {
+                              setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                            } else {
+                              setVisibleTypes(visibleTypes.concat([value]))
+                            }
+                          }}
+                        />
+                        <Label_Shadcn_ className="capitalize text-xs">
+                          {key.toLowerCase().replace('_', ' ')}
+                        </Label_Shadcn_>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </InnerSideBarFilters>
 
           {isLoading && <InnerSideBarShimmeringLoaders />}
