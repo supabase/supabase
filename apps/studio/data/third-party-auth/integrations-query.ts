@@ -1,4 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { keys } from './keys'
@@ -6,6 +7,8 @@ import { keys } from './keys'
 export type GetThirdPartyAuthIntegrationsVariables = {
   projectRef?: string
 }
+
+export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth']
 
 export async function getThirdPartyAuthIntegrations(
   { projectRef }: GetThirdPartyAuthIntegrationsVariables,

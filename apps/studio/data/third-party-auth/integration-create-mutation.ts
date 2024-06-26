@@ -37,7 +37,7 @@ export async function createThirdPartyIntegration({
 
 type ThirdPartyIntegrationCreateData = Awaited<ReturnType<typeof createThirdPartyIntegration>>
 
-export const useThirdPartyAuthIntegrationCreateMutation = ({
+export const useCreateThirdPartyAuthIntegrationMutation = ({
   onSuccess,
   onError,
   ...options
