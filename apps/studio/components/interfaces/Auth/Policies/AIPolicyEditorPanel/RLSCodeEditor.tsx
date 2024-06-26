@@ -4,9 +4,9 @@ import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { noop } from 'lodash'
-import { formatQuery } from 'data/sql/format-sql-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { formatQuery } from 'data/sql/format-sql-query'
+import { noop } from 'lodash'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure
@@ -118,6 +118,12 @@ const RLSCodeEditor = ({
 
     onChange()
   }
+
+  // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.
+  // Happens when the value wordwraps and is updated via a template.
+  useEffect(() => {
+    onChange()
+  }, [value])
 
   async function formatPgsql(value: any) {
     try {

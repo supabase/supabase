@@ -73,8 +73,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas, (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  const [protectedSchemas] = partition(
+    schemas,
+    (schema) => schema?.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
