@@ -28,7 +28,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
   if (response.error) {
     return res.status(400).json(response.error)
   } else {
-  return res.status(200).json(response)
+    return res.status(200).json(response)
   }
 }
 
