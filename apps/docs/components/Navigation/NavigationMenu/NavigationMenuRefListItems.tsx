@@ -1,20 +1,19 @@
+'use client'
+
 import * as Accordion from '@radix-ui/react-accordion'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft, IconChevronUp, cn } from 'ui'
-import * as NavItems from './NavigationMenu.constants'
-
+import { ChevronUp } from 'lucide-react'
 import Image from 'next/legacy/image'
-
+import { Fragment, memo } from 'react'
+import { cn } from 'ui'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
-
-import React, { Fragment } from 'react'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
+import { BASE_PATH } from '~/lib/constants'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
+import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
 
-const HeaderLink = React.memo(function HeaderLink(props: any) {
+const HeaderLink = memo(function HeaderLink(props: any) {
   return (
     <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
@@ -34,7 +33,7 @@ interface FunctionLinkProps {
   onClick?: () => void
 }
 
-const FunctionLink = React.memo(function FunctionLink({
+const FunctionLink = memo(function FunctionLink({
   title,
   id,
   icon,
@@ -44,10 +43,9 @@ const FunctionLink = React.memo(function FunctionLink({
   isSubItem = false,
   onClick = () => {},
 }: FunctionLinkProps) {
-  const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
 
-  const url = `${router.basePath}${basePath}/${slug}`
+  const url = `${BASE_PATH}${basePath}/${slug}`
   const active = activeAccordionItem === id
 
   return (
@@ -70,7 +68,7 @@ const FunctionLink = React.memo(function FunctionLink({
           active ? 'text-brand' : 'text-foreground-lighter'
         )}
       >
-        {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
+        {icon && <Image width={16} height={16} alt={icon} src={`${BASE_PATH}${icon}`} />}
         {title}
         {active && !isSubItem && (
           <div
@@ -79,7 +77,7 @@ const FunctionLink = React.memo(function FunctionLink({
           ></div>
         )}
         {isParent && (
-          <IconChevronUp
+          <ChevronUp
             width={16}
             className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
           />
@@ -94,7 +92,7 @@ export interface RenderLinkProps {
   basePath: string
 }
 
-const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderLinkProps) {
+const RenderLink = memo(function RenderLink({ section, basePath }: RenderLinkProps) {
   const activeAccordionItem = useMenuActiveRefId()
 
   if (!('items' in section)) {
@@ -209,4 +207,4 @@ const NavigationMenuRefListItems = ({
   )
 }
 
-export default React.memo(NavigationMenuRefListItems)
+export default memo(NavigationMenuRefListItems)

@@ -1,3 +1,5 @@
+'use client'
+
 import { type PropsWithChildren, memo, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import Footer from '~/components/Navigation/Footer'

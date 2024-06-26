@@ -303,7 +303,7 @@ To get started, create a `supabase-image-loader.js` file in your Next.js project
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/object/public/${src}?width=${width}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 
