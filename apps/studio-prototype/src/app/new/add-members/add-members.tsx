@@ -1,26 +1,14 @@
 'use client'
 
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { useRouter } from 'next/navigation'
+import { Button, TextArea_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-import {
-  Button,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  TextArea_Shadcn_,
-} from 'ui'
 import { NewHeader, NewHeaderDescription, NewHeaderTitle } from '../new-header'
-import { TextArea } from '@ui/components/shadcn/ui/text-area'
 
 export default function NewOrganization() {
+  const router = useRouter()
   return (
-    <div className="flex flex-col w-[380px] gap-10">
+    <div key="add-members" className="flex flex-col w-[380px] gap-10 mx-auto py-20">
       <NewHeader>
         <NewHeaderTitle>Invite your co-workers</NewHeaderTitle>
         <NewHeaderDescription>
@@ -45,7 +33,7 @@ export default function NewOrganization() {
         <Button type="text" size="small" className="text-foreground-lighter">
           Skip adding members
         </Button>
-        <Button size="small" className="">
+        <Button size="small" className="" onClick={() => router.push('/new/project')}>
           Continue
         </Button>
       </div>

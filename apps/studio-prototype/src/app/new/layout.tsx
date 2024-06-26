@@ -1,3 +1,5 @@
+'use client'
+
 import RedirectCatcher from '@/src/components/redirect-catcher'
 
 export default function OrgLayout({
@@ -16,7 +18,7 @@ export default function OrgLayout({
           <span>Log out</span>
         </div>
       </div>
-      {children}
+      <div className="grow bg-dash-canvas overflow-auto">{children}</div>
       <RedirectCatcher />
     </div>
   )

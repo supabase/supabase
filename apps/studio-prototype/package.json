@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "framer-motion": "^11.2.12",
     "icons": "*",
     "jotai": "^2.8.0",
     "lucide-react": "^0.338.0",

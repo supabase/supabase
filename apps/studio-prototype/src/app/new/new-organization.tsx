@@ -1,8 +1,6 @@
 'use client'
 
-import { Input } from 'ui-patterns/DataInputs/Input'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
+import { useRouter } from 'next/navigation'
 import {
   Button,
   Select_Shadcn_,
@@ -13,15 +11,15 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { NewHeader, NewHeaderDescription, NewHeaderTitle } from './new-header'
-import { useRouter } from 'next/navigation'
 
 export default function NewOrganization() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col w-[380px] gap-10">
+    <div key="new-organization" className="flex flex-col w-[380px] gap-10 mx-auto py-20">
       <NewHeader>
         <NewHeaderTitle>Create your first organization</NewHeaderTitle>
         <NewHeaderDescription>

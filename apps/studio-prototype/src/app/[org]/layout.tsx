@@ -1,7 +1,8 @@
 import RedirectCatcher from '@/src/components/redirect-catcher'
 import SettingsMenuPanel from './settings-menu-panel'
-import SideNav from './side-nav'
 import TopHeader from './top-header'
+import { motion } from 'framer-motion'
+import EntranceTransition from './entrance-transition'
 
 export default function OrgLayout({
   children,
@@ -10,12 +11,13 @@ export default function OrgLayout({
 }>) {
   return (
     <div className="w-screen h-screen flex">
-      <SideNav />
-      <SettingsMenuPanel />
-      <div className="flex flex-col grow">
-        <TopHeader />
-        {children}
-      </div>
+      <EntranceTransition>
+        <SettingsMenuPanel />
+        <div className="flex flex-col grow">
+          <TopHeader />
+          {children}
+        </div>
+      </EntranceTransition>
       <RedirectCatcher />
     </div>
   )

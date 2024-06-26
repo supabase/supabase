@@ -17,7 +17,7 @@ export default function SettingsMenuPanel() {
         'h-full',
         isActive ? 'w-[270px]' : 'w-[0px]',
         isActive && 'border-r',
-        'duration-200',
+        'duration-150',
         'ease-out',
         'transition-all'
       )}

@@ -3,17 +3,12 @@ import SideNavMenuIcon from './side-nav-menu-icon'
 import UserMenu from './user-menu'
 import { SideNav as SideNavData } from '@/src/config/nav'
 import SideMenuOrgMenu from './side-menu-org-menu'
+import SideNavMotion from './side-nav-motion'
+import React, { memo } from 'react'
 
-export default function SideNav() {
+function SideNav() {
   return (
-    <div
-      className={cn(
-        'w-16 bg-dash-sidebar border-r flex flex-col py-[10px]',
-        // 'hover:w-32 px-5',
-        'items-center',
-        'transition-all'
-      )}
-    >
+    <SideNavMotion>
       <SideMenuOrgMenu />
       <div className="grow w-full flex flex-col gap-5 my-6">
         {SideNavData.map((product) => (
@@ -21,6 +16,8 @@ export default function SideNav() {
         ))}
       </div>
       <UserMenu />
-    </div>
+    </SideNavMotion>
   )
 }
+
+export default memo(SideNav)
