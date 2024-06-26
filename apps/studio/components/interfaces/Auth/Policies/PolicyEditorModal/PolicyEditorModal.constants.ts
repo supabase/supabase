@@ -175,20 +175,18 @@ for select using (
 ]
 
 export const getRealtimePolicyTemplates = (): PolicyTemplate[] => {
-  const templateData = { channelName: 'channel_name' }
-
   const results = [
     {
       id: 'policy-broadcast-1',
       preview: false,
-      templateName: 'Enable listening to broadcasts for authenticated users only',
-      description: 'This policy enables listening to broadcasts for authenticated users only.',
+      templateName: 'Allow listening for broadcasts for authenticated users only',
+      description: 'This policy allows listening for broadcasts for authenticated users only.',
       statement: `
-create policy  "Enable listening to broadcasts for authenticated users only"
+create policy  "Allow listening for broadcasts for authenticated users only"
 on realtime.messages for select
 to authenticated
 using ( realtime.messages.extension = 'broadcast' );`.trim(),
-      name: 'Enable listening to broadcasts for authenticated users only',
+      name: 'Allow listening for broadcasts for authenticated users only',
       definition: "realtime.messages.extension = 'broadcast'",
       check: '',
       command: 'SELECT',
@@ -197,15 +195,15 @@ using ( realtime.messages.extension = 'broadcast' );`.trim(),
     {
       id: 'policy-broadcast-2',
       preview: false,
-      templateName: 'Enable pushing broadcasts for authenticated users only',
-      description: 'This policy enables pushing broadcasts for authenticated users only.',
+      templateName: 'Allow pushing broadcasts for authenticated users only',
+      description: 'This policy allows pushing broadcasts for authenticated users only.',
       statement: `
-create policy "Enable pushing broadcasts for authenticated users only"
+create policy "Allow pushing broadcasts for authenticated users only"
 ON realtime.messages for update
 TO authenticated
 using ( realtime.messages.extension = 'broadcast' )
 with check ( realtime.messages.extension = 'broadcast' );`.trim(),
-      name: 'Enable pushing broadcasts for authenticated users only',
+      name: 'Allow pushing broadcasts for authenticated users only',
       definition: "realtime.messages.extension = 'broadcast'",
       check: "realtime.messages.extension = 'broadcast'",
       command: 'UPDATE',
@@ -214,13 +212,13 @@ with check ( realtime.messages.extension = 'broadcast' );`.trim(),
     {
       id: 'policy-broadcast-3',
       preview: false,
-      templateName: 'Enable listening to broadcasts from a specific channel',
-      description: 'This policy enables listening to broadcasts from a specific channel.',
+      templateName: 'Allow listening for broadcasts from a specific channel',
+      description: 'This policy allows listening for broadcasts from a specific channel.',
       statement: `
-create policy "Enable listening to broadcasts from a specific channel"
+create policy "Allow listening for broadcasts from a specific channel"
 on realtime.messages for select
 using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
-      name: 'Enable listening to broadcasts from a specific channel',
+      name: 'Allow listening for broadcasts from a specific channel',
       definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       check: '',
       command: 'SELECT',
@@ -229,14 +227,14 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
     {
       id: 'policy-broadcast-4',
       preview: false,
-      templateName: 'Enable pushing broadcasts to specific channel',
-      description: 'This policy enables pushing broadcasts to specific channel.',
+      templateName: 'Allow pushing broadcasts to specific channel',
+      description: 'This policy allow pushing broadcasts to specific channel.',
       statement: `
-create policy "Enable pushing broadcasts to specific channel"
+create policy "Allow pushing broadcasts to specific channel"
 ON realtime.messages for update
 using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' )
 with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
-      name: 'Enable pushing broadcasts to specific channel',
+      name: 'Allow pushing broadcasts to specific channel',
       definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       command: 'UPDATE',
@@ -245,15 +243,15 @@ with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'c
     {
       id: 'policy-presences-1',
       preview: false,
-      templateName: 'Enable listening to presences on all channels for authenticated users only',
+      templateName: 'Allow listening for presences on all channels for authenticated users only',
       description:
-        'This policy enables listening to presences on all channels for all authenticated users only.',
+        'This policy enables listening for presences on all channels for all authenticated users only.',
       statement: `
-create policy "Enable listening to presences on all channels for authenticated users only"
+create policy "Allow listening for presences on all channels for authenticated users only"
 on realtime.messages for select
 to authenticated
 using ( realtime.messages.extension = 'presence' );`.trim(),
-      name: 'Enable listening to presences on all channels for authenticated users only',
+      name: 'Allow listening for presences on all channels for authenticated users only',
       definition: "realtime.messages.extension = 'presence'",
       check: '',
       command: 'SELECT',
@@ -262,17 +260,17 @@ using ( realtime.messages.extension = 'presence' );`.trim(),
     {
       id: 'policy-presences-2',
       preview: false,
-      templateName: 'Enable broadcasting presences on all channels for authenticated users only',
+      templateName: 'Allow broadcasting presences on all channels for authenticated users only',
       description:
         'This policy enables broadcasting presences on all channels for all authenticated users only.',
       statement: `
-create policy "Enable broadcasting presences on all channels for authenticated users only"
+create policy "Allow broadcasting presences on all channels for authenticated users only"
 ON realtime.messages for update
 TO authenticated
 using ( realtime.messages.extension = 'presence' )
 with check ( realtime.messages.extension = 'presence' );
   ;`.trim(),
-      name: 'Enable broadcasting presences on all channels for authenticated users only',
+      name: 'Allow broadcasting presences on all channels for authenticated users only',
       definition: "realtime.messages.extension = 'presence'",
       check: "realtime.messages.extension = 'presence'",
       command: 'UPDATE',
@@ -281,13 +279,13 @@ with check ( realtime.messages.extension = 'presence' );
     {
       id: 'policy-presences-3',
       preview: false,
-      templateName: 'Enable listening to presences from a specific channel',
-      description: 'This policy enables listening to presences from a specific channel.',
+      templateName: 'Allow listening for presences from a specific channel',
+      description: 'This policy enables listening for presences from a specific channel.',
       statement: `
-create policy "Enable listening to presences from a specific channel"
+create policy "Allow listening for presences from a specific channel"
 on realtime.messages for select
 using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );`.trim(),
-      name: 'Enable listening to presences from a specific channel',
+      name: 'Allow listening for presences from a specific channel',
       definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       check: '',
       command: 'SELECT',
@@ -296,15 +294,15 @@ using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel
     {
       id: 'policy-presences-4',
       preview: false,
-      templateName: 'Enable publishing presence to a specific channel',
-      description: 'This policy enables publishing presence to a specific channel.',
+      templateName: 'Publish presence to a specific channel',
+      description: 'This policy allows publishing presence to a specific channel.',
       statement: `
-create policy "Enable publishing presence to a specific channel"
+create policy "Publish presence to a specific channel"
 ON realtime.messages for update
 using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' )
 with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
   ;`.trim(),
-      name: 'Enable publishing presence to a specific channel',
+      name: 'Publish presence to a specific channel',
       definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       command: 'UPDATE',
