@@ -1,14 +1,14 @@
 # SupaSecureSlack
 
-Example application on how you can use Realtime Authorization feature to limit access to Realtime [Channels](https://supabase.com/docs/guides/realtime/concepts#channels) and limit access to the [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) feature.
+Example application on how you can use Realtime Authorization to limit access to Realtime [Channels](https://supabase.com/docs/guides/realtime/concepts#channels) and [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) and [Presence](https://supabase.com/docs/guides/realtime/presence) extensions.
 
 You can provide feedback on our [Github Discussion](https://github.com/orgs/supabase/discussions/22484).
 
 ## Objective
 
-Build a chat system using Realtime Broadcast with Authorized Channels where users can create rooms and invite existing users to a room.
+Build a chat system using Realtime Broadcast and Presence with Authorized Channels where users can create rooms and invite existing users to a room.
 
-Each room restricts the number of users authorized by applying RLS policies applied to `public` schema tables you'll be creating and the auto-generated `realtime` schema tables.
+Each room restricts users authorized by applying RLS policies applied to the `public` schema tables you'll be creating and the auto-generated `realtime.messages` tables.
 
 ## Run It
 
@@ -31,7 +31,7 @@ And here one of the user does not have access because their RLS rules made the u
 We'll be using:
 
 - `public.profiles` - table that will be automatically updated using a trigger when new users are created
-- `public.rooms` - a list of all rooms created
+- `public.rooms` - a list of all unique rooms created
 - `public.rooms_users` - the table responsible for the association between rooms and users
 
 ## Database Setup
@@ -63,9 +63,7 @@ ALTER TABLE public.rooms_users ENABLE ROW LEVEL SECURITY;
 
 ### Create RLS Policies
 
-We do have a lot of RLS policies to set up so we will group them by `schema.table` below.
-
-The most noteworthy ones are the policies created for `realtime.broadcasts` table as they will limit access to rooms by checking if an entry for a given room name and user id exists in the `public.rooms_users` table.
+We have to set up RLS policies for the `public` schema tables we created in the previous step as well as for the `realtime.messages` table. The policies created on this Realtime table will authorize user access to rooms and Broadcast/Presence by checking if an entry for a given room name and user id exists in the `public.rooms_users` table.
 
 > ⚠️ All the RLS policies here are meant for this demo. You may refer to them but make sure that your policies are tailored to your use case and secure your application.
 
