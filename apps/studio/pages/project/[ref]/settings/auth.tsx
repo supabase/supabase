@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import {
-  SmtpForm,
-  BasicAuthSettingsForm,
   AdvancedAuthSettingsForm,
+  BasicAuthSettingsForm,
+  SmtpForm,
+  ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
 import { SettingsLayout } from 'components/layouts'
 import {
@@ -12,7 +13,6 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
@@ -39,6 +39,7 @@ const AuthSettings: NextPageWithLayout = () => {
           <>
             <BasicAuthSettingsForm />
             <SmtpForm />
+            <ThirdPartyAuthForm />
             <AdvancedAuthSettingsForm />
           </>
         )}
