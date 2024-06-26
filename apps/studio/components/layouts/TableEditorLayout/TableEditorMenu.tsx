@@ -205,29 +205,41 @@ const TableEditorMenu = () => {
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="px-1"
+                  className="h-[28px] px-1.5"
                   icon={<Filter />}
                 />
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="center">
-                <div className="px-3 py-3 flex flex-col gap-y-2">
+              <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+                <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                   <p className="text-xs">Show entity types</p>
-                  <div className="flex flex-col gap-y-2">
+                  <div className="flex flex-col">
                     {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                      <div key={key} className="flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
-                          checked={visibleTypes.includes(value)}
-                          onCheckedChange={() => {
-                            if (visibleTypes.includes(value)) {
-                              setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                            } else {
-                              setVisibleTypes(visibleTypes.concat([value]))
-                            }
-                          }}
-                        />
-                        <Label_Shadcn_ className="capitalize text-xs">
-                          {key.toLowerCase().replace('_', ' ')}
-                        </Label_Shadcn_>
+                      <div key={key} className="group flex items-center justify-between py-0.5">
+                        <div className="flex items-center gap-x-2">
+                          <Checkbox_Shadcn_
+                            id={key}
+                            name={key}
+                            checked={visibleTypes.includes(value)}
+                            onCheckedChange={() => {
+                              if (visibleTypes.includes(value)) {
+                                setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                              } else {
+                                setVisibleTypes(visibleTypes.concat([value]))
+                              }
+                            }}
+                          />
+                          <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                            {key.toLowerCase().replace('_', ' ')}
+                          </Label_Shadcn_>
+                        </div>
+                        <Button
+                          size="tiny"
+                          type="default"
+                          onClick={() => setVisibleTypes([value])}
+                          className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                        >
+                          Only
+                        </Button>
                       </div>
                     ))}
                   </div>
