@@ -3,6 +3,7 @@ import SettingsMenuPanel from './settings-menu-panel'
 import TopHeader from './top-header'
 import { motion } from 'framer-motion'
 import EntranceTransition from './entrance-transition'
+import ProjectContentTransition from './project-content-transition'
 
 export default function OrgLayout({
   children,
@@ -15,7 +16,7 @@ export default function OrgLayout({
         <SettingsMenuPanel />
         <div className="flex flex-col grow">
           <TopHeader />
-          {children}
+          <ProjectContentTransition>{children}</ProjectContentTransition>
         </div>
       </EntranceTransition>
       <RedirectCatcher />
