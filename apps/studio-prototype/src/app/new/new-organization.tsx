@@ -14,15 +14,21 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 
+import { NewHeader, NewHeaderDescription, NewHeaderTitle } from './new-header'
+import { useRouter } from 'next/navigation'
+
 export default function NewOrganization() {
+  const router = useRouter()
+
   return (
     <div className="flex flex-col w-[380px] gap-10">
-      <div className="text-left flex flex-col gap-3">
-        <h1 className="text-foreground text-lg">Create your first organization</h1>
-        <p className="text-foreground-light text-sm">
-          Organizations are shared environments where teams can work on projects.
-        </p>
-      </div>
+      <NewHeader>
+        <NewHeaderTitle>Create your first organization</NewHeaderTitle>
+        <NewHeaderDescription>
+          <p>Organizations are shared environments where teams can work on projects.</p>
+          <p>Invite some co-workers to test Supabase with.</p>
+        </NewHeaderDescription>
+      </NewHeader>
       <div className="bg-200">
         <div className="px-8 py-10 bg-studio w-full border rounded-t-md">
           <FormItemLayout label="Organization name" isReactForm={false}>
@@ -75,7 +81,7 @@ export default function NewOrganization() {
         </div>
       </div>
       <div className="w-full flex justify-end">
-        <Button size="small" className="">
+        <Button size="small" className="" onClick={() => router.push('/new/add-members')}>
           Continue
         </Button>
       </div>
