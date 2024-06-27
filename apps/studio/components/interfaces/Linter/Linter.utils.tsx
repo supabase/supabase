@@ -161,7 +161,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'materialized_view_in_api',
     title: 'Materialized View in API',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
       `https://supabase.com/docs/guides/database/database-advisors?lint=0016_materialized_view_in_api`,
     linkText: 'View docs',
@@ -171,7 +171,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'foreign_table_in_api',
     title: 'Foreign Table in API',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
       `https://supabase.com/docs/guides/database/database-linter?lint=0017_foreign_table_in_api`,
     linkText: 'View docs',
