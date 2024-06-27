@@ -131,8 +131,8 @@ const UpgradingState = () => {
                     <div>
                       <p className="text-center">Performing a full backup</p>
                       <p className="text-sm text-center text-foreground-light">
-                        Upgrade is now complete, and your project is online. A full backup is
-                        now being performed to ensure that there is a proper base backup available
+                        Upgrade is now complete, and your project is online. A full backup is now
+                        being performed to ensure that there is a proper base backup available
                         post-upgrade. This can take from a few minutes up to several hours depending
                         on the size of your database.
                       </p>
