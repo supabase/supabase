@@ -128,6 +128,7 @@ export default function Chat() {
         <div className="grow-0 flex flex-col gap-2 w-[20rem] overflow-hidden">
           <div className="bg-white h-full rounded-sm text-slate-900">
             <div className="flex flex-col">
+              <div className="p-2 font-semibold bg-stone-100 w-full text-center">Rooms</div>
               {rooms?.map((room: string) => {
                 return (
                   <button
@@ -149,6 +150,7 @@ export default function Chat() {
             </div>
           </div>
           <div className="bg-white h-full rounded-sm text-slate-900">
+            <div className="p-2 font-semibold bg-stone-100 w-full text-center">Users in Room</div>
             <div className="flex flex-col gap-2 p-2">
               {Array.from(users)?.map((email: string) => {
                 return <div key={email}>{email}</div>
