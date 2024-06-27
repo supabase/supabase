@@ -14,6 +14,7 @@ import {
 import { useHotkeys } from 'react-hotkeys-hook'
 import { ChevronRight, Plus, Search } from 'lucide-react'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TreeViewExample } from './tree-view-example'
 
 export default function TableEditorItemsPanel() {
   const { org } = useParams()
@@ -151,6 +152,7 @@ export default function TableEditorItemsPanel() {
               size="tiny"
             />
           </div>
+          <TreeViewExample />
         </CollapsibleContent_Shadcn_>
       </Collapsible_Shadcn_>
     </div>
