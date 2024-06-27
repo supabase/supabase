@@ -39,6 +39,7 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { timestampLocalFormatter } from './LogsFormatters'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -121,6 +122,8 @@ const LogTable = ({
           return JSON.stringify(value)
         } else if (value === null) {
           return 'NULL'
+        } else if (String(v).includes('timestamp')) {
+          return timestampLocalFormatter(String(value))
         } else {
           return String(value)
         }
@@ -375,7 +378,6 @@ const LogTable = ({
               rowHeight={40}
               headerRowHeight={queryType ? 0 : 28}
               onSelectedCellChange={(row) => {
-                console.log('row', row)
                 setFocusedLog(row.row as LogData)
               }}
               selectedRows={new Set([])}
