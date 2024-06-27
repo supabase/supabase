@@ -1,6 +1,6 @@
-import { ExternalLink, Loader, CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
@@ -21,16 +21,21 @@ const SecurityStatus = () => {
 
   const noIssuesFound = securityLints.length === 0
 
-  return noIssuesFound ? null : (
+  return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type="default"
           icon={
             isLoading ? (
-              <Loader className="animate-spin" />
+              <Loader2 className="animate-spin" />
             ) : (
-              <div className="w-2 h-2 rounded-full bg-destructive-600" />
+              <div
+                className={cn(
+                  `w-2 h-2 rounded-full`,
+                  noIssuesFound ? 'bg-brand' : 'bg-destructive-600'
+                )}
+              />
             )
           }
         >
@@ -46,10 +51,18 @@ const SecurityStatus = () => {
           )}
 
           <div className="flex flex-col gap-y-3 -mt-1">
-            <p>
-              This project has {securityLints.length} security issues requiring urgent attention.
-            </p>
-            <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+            {noIssuesFound ? (
+              <p>
+                No security issues found. <br />
+                Keep monitoring Security Advisor for updates as your project grows.
+              </p>
+            ) : (
+              <p>
+                This project has ${securityLints.length} security issues requiring urgent attention.
+              </p>
+            )}
+
+            <Button asChild type="default" className="w-min">
               <Link href={`/project/${project?.ref}/database/security-advisor`}>
                 Security Advisor
               </Link>
