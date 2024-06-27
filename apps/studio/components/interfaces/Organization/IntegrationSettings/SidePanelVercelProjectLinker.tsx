@@ -52,8 +52,7 @@ const SidePanelVercelProjectLinker = () => {
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
 

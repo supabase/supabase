@@ -5,7 +5,7 @@ import ProductIcon from '../ProductIcon'
 type subheader = string
 interface Types {
   h1: string | React.ReactNode
-  subheader: string[]
+  subheader: (string | React.ReactNode)[]
   icon?: string
   title?: string
   image?: React.ReactNode

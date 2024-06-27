@@ -94,7 +94,7 @@ const DowngradeModal = ({
                 {projects
                   .filter((it) => it.infra_compute_size === 'micro')
                   .map((project) => (
-                    <li className="list-disc ml-6" key={project.id}>
+                    <li className="list-disc ml-6" key={project.ref}>
                       {project.name}: Compute will be downgraded. Project will also{' '}
                       <span className="font-bold">need to be restarted</span>.
                     </li>
