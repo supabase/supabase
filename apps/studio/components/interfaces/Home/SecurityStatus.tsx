@@ -12,7 +12,6 @@ const SecurityStatus = () => {
   const [open, setOpen] = useState(false)
   const { data, isLoading } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const securityLints = (data ?? []).filter(
@@ -22,7 +21,7 @@ const SecurityStatus = () => {
 
   const noIssuesFound = securityLints.length === 0
 
-  return (
+  return noIssuesFound ? null : (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
@@ -31,9 +30,7 @@ const SecurityStatus = () => {
             isLoading ? (
               <Loader className="animate-spin" />
             ) : (
-              <div
-                className={`w-2 h-2 rounded-full ${noIssuesFound ? 'bg-brand' : 'bg-amber-900'}`}
-              />
+              <div className="w-2 h-2 rounded-full bg-destructive-600" />
             )
           }
         >
@@ -49,21 +46,14 @@ const SecurityStatus = () => {
           )}
 
           <div className="flex flex-col gap-y-3 -mt-1">
-            {noIssuesFound ? (
-              <p>No security issues requiring your attention at this time</p>
-            ) : (
-              <>
-                <p>
-                  This project has {securityLints.length} security issues requiring urgent
-                  attention.
-                </p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
-                  <Link href={`/project/${project?.ref}/database/security-advisor`}>
-                    Security Advisor
-                  </Link>
-                </Button>
-              </>
-            )}
+            <p>
+              This project has {securityLints.length} security issues requiring urgent attention.
+            </p>
+            <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+              <Link href={`/project/${project?.ref}/database/security-advisor`}>
+                Security Advisor
+              </Link>
+            </Button>
           </div>
         </div>
       </PopoverContent_Shadcn_>

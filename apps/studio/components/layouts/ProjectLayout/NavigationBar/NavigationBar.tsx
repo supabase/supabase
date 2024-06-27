@@ -168,7 +168,9 @@ const NavigationBar = () => {
             } else if (route.key === 'advisors') {
               return (
                 <div className="relative">
-                  <span className="absolute right-0 bottom-2 z-10">dot</span>
+                  <div
+                    className={`w-2 h-2 rounded-full bg-destructive-600 absolute z-10 left-6 bottom-1.5 shadow-lg	`}
+                  />
                   <NavigationIconLink
                     key={route.key}
                     route={route}
