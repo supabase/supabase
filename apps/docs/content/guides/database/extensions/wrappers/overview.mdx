@@ -162,7 +162,7 @@ As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/n
      from
        stripe.stripe_products t
      where
-       t.name like $1 || '%'
+       t.name like name_prefix || '%'
      ;
    end;
    $$;
