@@ -16,9 +16,10 @@ You can read about the initial announcement [here](https://github.com/orgs/supab
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination | Transport Method | Configuration         |
-| ----------- | ---------------- | --------------------- |
-| Datadog     | HTTP             | API Key <br /> Region |
+| Destination        | Transport Method | Configuration                    |
+| ------------------ | ---------------- | -------------------------------- |
+| Datadog            | HTTP             | API Key <br /> Region            |
+| Elastic - Filebeat | HTTP             | URL <br /> Username and Password |
 
 ### Destinations And Behavior
 
@@ -29,3 +30,9 @@ HTTP requests will be batched with a max of 250 items with at most 1 second inte
 Logs sent to Datadog will have the name of the log source set on the `service` field of the event.
 
 The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.
+
+#### Elastic - Filebeat
+
+Logs will be sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
+
+The Filebeat server only handles HTTP1 requests. Basic Auth can be provided for users.
