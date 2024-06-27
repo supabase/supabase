@@ -30,7 +30,7 @@ import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useSelectedProject } from '../../../hooks'
-import { getTableDefinitionQuery } from '../../../data/database/table-definition-query'
+import { getTableDefinitionQuery, useTableDefinitionQuery } from '../../../data/database/table-definition-query'
 
 export interface EntityListItemProps {
   id: number
@@ -88,11 +88,12 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const copyDefinition = async () => {
     try {
       const definition = getTableDefinitionQuery({schema: entity.schema, name: entity.name})
-      console.log(`Definition: ${await definition}`)
-      toast.success("Definition successfully copied to clipboard")
+      console.log(`${await definition.trim()}`)
+      await navigator.clipboard.writeText(definition.trim())
+      toast.success("Definition successfully copied to clipboard.")
     }
     catch (error: any) {
-      toast.error("Failed to console.log() the table")
+      toast.error("Failed to copy definition.")
     }
   }
 
