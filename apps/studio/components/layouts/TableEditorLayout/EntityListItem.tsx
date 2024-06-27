@@ -29,6 +29,8 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { useSelectedProject } from '../../../hooks'
+import { getTableDefinitionQuery } from '../../../data/database/table-definition-query'
 
 export interface EntityListItemProps {
   id: number
@@ -81,6 +83,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       ?.toLowerCase()
       ?.split('_')
       ?.join(' ')
+  }
+
+  const copyDefinition = async () => {
+    try {
+      const definition = getTableDefinitionQuery({schema: entity.schema, name: entity.name})
+      console.log(`Definition: ${await definition}`)
+      toast.success("Definition successfully copied to clipboard")
+    }
+    catch (error: any) {
+      toast.error("Failed to console.log() the table")
+    }
   }
 
   const exportTableAsCSV = async () => {
@@ -313,6 +326,18 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             >
               <IconDownload size="tiny" />
               <span>Export as CSV</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              key="copy-definition"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                // TODO add functionality to copy the definition to clipboard
+                copyDefinition()
+              }}
+            >
+              <IconCopy size="tiny" />
+              <span>Copy Definition</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
