@@ -13,7 +13,7 @@ import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_  } from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -72,30 +72,30 @@ const Home: NextPageWithLayout = () => {
               <h4 className="text-lg">Example projects</h4>
             </div>
             <div className="flex justify-center mx-6">
-              <Tabs defaultValue="app">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="app">App Frameworks</TabsTrigger>
-                  <TabsTrigger value="mobile">Mobile Framework</TabsTrigger>
-                </TabsList>
-                <TabsContent value="app">
-                  <div className="grid gap-8 mx-6 md:grid-cols-2 lg:grid-cols-3">
+              <Tabs_Shadcn_ defaultValue="app">
+                <TabsList_Shadcn_ className="grid w-1/2 grid-cols-2 mx-auto">
+                  <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_ value="app">
+                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
                       .sort((a, b) => a.title.localeCompare(b.title))
                       .map((project) => (
                         <ExampleProject key={project.url} {...project} />
                       ))}
                   </div>
-                </TabsContent>
-                <TabsContent value="mobile">
-                  <div className="grid gap-8 mx-6 md:grid-cols-2 lg:grid-cols-3">
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="mobile">
+                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
                       .sort((a, b) => a.title.localeCompare(b.title))
                       .map((project) => (
                         <ExampleProject key={project.url} {...project} />
                       ))}
                   </div>
-                </TabsContent>
-              </Tabs>
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
             </div>
           </div>
         </>
