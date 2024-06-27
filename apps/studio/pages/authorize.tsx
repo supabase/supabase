@@ -180,7 +180,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.id}
+                key={organization.slug}
                 label={organization.name}
                 value={organization.slug}
               >
