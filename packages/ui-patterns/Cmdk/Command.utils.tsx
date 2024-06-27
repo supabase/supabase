@@ -85,7 +85,10 @@ export const CommandDialog = ({
         }}
         hideClose
         size={'xlarge'}
-        className={cn('place-self-start mx-auto top-24')}
+        className={cn(
+          'place-self-end my-0 mx-auto rounded-t-lg h-[calc(100vh-9rem)]',
+          'data-[state=closed]:!animate-slide-out-to-bottom-outside data-[state=open]:!animate-slide-in-from-bottom-outside'
+        )}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command
@@ -125,7 +128,7 @@ export const CommandInput = React.forwardRef<
         onValueChange={onValueChange}
         ref={ref}
         className={cn(
-          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
+          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
           'focus:shadow-none focus:ring-transparent',
           'text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className

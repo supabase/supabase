@@ -466,7 +466,7 @@ const AiCommand = () => {
       <div className="absolute bottom-0 w-full bg-background py-3">
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
+          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
           autoFocus
           placeholder={

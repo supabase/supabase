@@ -212,6 +212,14 @@ const uiConfig = {
           '0%': { height: 'inherit', opacity: 1 },
           '100%': { height: 0, opacity: 0 },
         },
+        slideInFromBottomOutside: {
+          '0%': { transform: 'translate3d(0,100%,0)' },
+          '100%': { transform: 'translate3d(0,0,0)' },
+        },
+        slideOutToBottomOutside: {
+          '0%': { transform: 'translate3d(0,0,0)' },
+          '100%': { transform: 'translate3d(0,100%,0)' },
+        },
 
         panelSlideLeftOut: {
           '0%': { transform: 'translateX(-100%)', opacity: 0 },
@@ -274,6 +282,10 @@ const uiConfig = {
 
         'slide-down-normal': 'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up-normal': 'slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+
+        'slide-in-from-bottom-outside':
+          'slideInFromBottomOutside 300ms cubic-bezier(.57,.02,.52,1) !important',
+        'slide-out-to-bottom-outside': 'slideOutToBottomOutside 300ms cubic-bezier(.57,.02,.52,1)',
 
         'panel-slide-left-out': 'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-left-in': 'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
