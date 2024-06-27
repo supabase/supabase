@@ -5,7 +5,7 @@ import { API_URL } from 'lib/constants'
 import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
-  id?: string,
+  id?: string
   slug?: string
 }
 

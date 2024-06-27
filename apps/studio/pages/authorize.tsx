@@ -25,7 +25,12 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const [selectedOrg, setSelectedOrg] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id, slug: selectedOrg })
+  const {
+    data: requester,
+    isLoading,
+    isError,
+    error,
+  } = useApiAuthorizationQuery({ id: auth_id, slug: selectedOrg })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
@@ -67,7 +72,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to decline request: No organization selected')
     }
 
-    declineRequest({ id: auth_id, slug: selectedOrg  })
+    declineRequest({ id: auth_id, slug: selectedOrg })
   }
 
   if (isLoading) {

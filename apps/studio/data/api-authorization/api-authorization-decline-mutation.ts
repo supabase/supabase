@@ -6,7 +6,7 @@ import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type ApiAuthorizationDeclineVariables = {
-  id: string,
+  id: string
   slug: string
 }
 
