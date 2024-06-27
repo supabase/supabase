@@ -10,7 +10,6 @@ const ProjectHomeLints = () => {
 
   const { data } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const securityLints = (data ?? []).filter(
