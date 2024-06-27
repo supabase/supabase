@@ -826,15 +826,11 @@ const getProjectLints = async (
   { projectRef, connectionString, authConfig }: ProjectLintsVariables,
   signal?: AbortSignal
 ) => {
-  console.log('success 2')
   let lints: Lint[] = []
 
-  console.log('what linty', authConfig)
   // [Alaister]: checking this client side for speed, but should be moved into the query if possible
   if (authConfig?.EXTERNAL_EMAIL_ENABLED) {
-    console.log('first true')
     if (authConfig.MAILER_OTP_EXP > 3600) {
-      console.log('second true')
       lints.push({
         name: 'auth_otp_long_expiry',
         level: 'WARN',
@@ -879,7 +875,7 @@ const getProjectLints = async (
     },
     signal
   )
-  console.log('pre lints linty', lints)
+
   lints = lints.concat(result)
 
   return lints
@@ -893,9 +889,6 @@ export const useProjectLintsQuery = <TData = ProjectLintsData>(
   { enabled = true, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
 ) => {
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
-
-  console.log('success 1', { isSuccess })
-  console.log('the authconfig', authConfig)
 
   return useQuery<ProjectLintsData, ProjectLintsError, TData>(
     lintKeys.lint(projectRef),
