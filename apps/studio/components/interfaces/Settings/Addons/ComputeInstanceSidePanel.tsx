@@ -140,7 +140,15 @@ const ComputeInstanceSidePanel = () => {
       })
     }
 
-    return computeOptions
+    return computeOptions.filter((option) => {
+      if (!selectedProject?.cloud_provider) {
+        return true
+      }
+
+      const meta = option.meta as ProjectAddonVariantMeta
+
+      return !meta.supported_cloud_providers || meta.supported_cloud_providers.includes(selectedProject.cloud_provider)
+    })
   }, [availableAddons, hasMicroOptionFromApi])
 
   const defaultInstanceSize = useMemo(() => {
