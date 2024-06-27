@@ -1,32 +1,30 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type ApiAuthorizationApproveVariables = {
   id: string
-  organization_id: string
+  slug: string
 }
 
 export type ApiAuthorizationApproveResponse = {
   url: string
 }
 
-export async function approveApiAuthorization({
-  id,
-  organization_id,
-}: ApiAuthorizationApproveVariables) {
+export async function approveApiAuthorization({ id, slug }: ApiAuthorizationApproveVariables) {
   if (!id) throw new Error('Authorization ID is required')
-  if (!organization_id) throw new Error('Organization slug is required')
+  if (!slug) throw new Error('Organization slug is required')
 
-  const response = await post(
-    `${API_URL}/organizations/${organization_id}/oauth/authorizations/${id}?skip_browser_redirect=true`,
-    { organization_id }
-  )
-  if (response.error) throw response.error
-  return response as ApiAuthorizationApproveResponse
+  // @ts-ignore [Joshen] API codegen is wrong, will need to be fixed
+  const { data, error } = await post('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    params: { path: { slug, id }, query: { skip_browser_redirect: true } },
+    body: { organization_id: slug },
+  })
+
+  if (error) handleError(error)
+  return data as unknown as ApiAuthorizationApproveResponse
 }
 
 type ApiAuthorizationApproveData = Awaited<ReturnType<typeof approveApiAuthorization>>

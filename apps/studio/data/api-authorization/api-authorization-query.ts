@@ -1,6 +1,7 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+
+import { get, handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { resourceKeys } from './keys'
 
@@ -26,9 +27,14 @@ export async function getApiAuthorizationDetails(
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const response = await get(`${API_URL}/organizations/${slug}/authorizations/${id}`, { signal })
-  if (response.error) throw response.error
-  return response as ApiAuthorizationResponse
+  // @ts-ignore [Joshen] API codegen is wrong here, needs to be fixed
+  const { data, error } = await get('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    params: { path: { slug, id } },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data as ApiAuthorizationResponse
 }
 
 export type ResourceData = Awaited<ReturnType<typeof getApiAuthorizationDetails>>

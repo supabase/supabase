@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type ApiAuthorizationDeclineVariables = {
@@ -17,9 +16,14 @@ export type ApiAuthorizationDeclineResponse = {
 export async function declineApiAuthorization({ id, slug }: ApiAuthorizationDeclineVariables) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const response = await delete_(`${API_URL}/organizations/${slug}/oauth/authorizations/${id}`, {})
-  if (response.error) throw response.error
-  return response as ApiAuthorizationDeclineResponse
+  // @ts-ignore [Joshen] API Codegen is wrong, needs to be fixed
+  const { data, error } = await del('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    params: { path: { slug, id } },
+    body: {},
+  })
+
+  if (error) handleError(error)
+  return data as ApiAuthorizationDeclineResponse
 }
 
 type ApiAuthorizationDeclineData = Awaited<ReturnType<typeof declineApiAuthorization>>
