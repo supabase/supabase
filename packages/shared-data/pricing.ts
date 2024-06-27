@@ -509,12 +509,12 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Log drains',
+        title: 'Log drain',
         plans: {
           free: false,
           pro: false,
-          team: '$50 per destination per project per month',
-          enterprise: '1, additional $50/destination/project/month',
+          team: 'Coming soon',
+          enterprise: 'Coming soon',
         },
         usage_based: false,
       },
