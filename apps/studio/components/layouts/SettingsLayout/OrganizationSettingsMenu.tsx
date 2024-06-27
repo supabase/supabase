@@ -18,9 +18,6 @@ const OrganizationSettingsMenu = () => {
     { label: 'Legal Documents', pathname: `/org/[slug]/documents` },
   ]
 
-  // const { data: allProjects } = useProjectsQuery()
-  // const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
-
   return (
     <div className="space-y-10">
       <div className="space-y-2">
@@ -36,25 +33,6 @@ const OrganizationSettingsMenu = () => {
           />
         ))}
       </div>
-
-      {/* [Joshen] Hiding below until we figure out a better UX for consolidating settings on projects */}
-      {/* <div className="space-y-2">
-        <p className="text-sm font-medium">Projects</p>
-        <Accordion_Shadcn_ type="single" collapsible className="w-full">
-          {projects?.map((project) => (
-            <ProjectSettingsMenuItem key={project.ref} project={project} />
-          ))}
-        </Accordion_Shadcn_>
-      </div>
-      <div>
-        <Link href={`/new/${organization?.slug}`}>
-          <a>
-            <Button type="default" size="small">
-              Create new project
-            </Button>
-          </a>
-        </Link>
-      </div> */}
     </div>
   )
 }
