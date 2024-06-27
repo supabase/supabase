@@ -14,7 +14,6 @@ import InfiniteLoader from 'react-window-infinite-loader'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { propsAreEqual } from 'lib/helpers'
-import { useParams } from 'common'
 
 /**
  * Note that the loading more logic of this component works best with a cursor-based
