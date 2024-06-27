@@ -145,7 +145,7 @@ const Policies = ({
             <section key={table.id}>
               <PolicyTableRow
                 table={table}
-                isLocked={isLocked}
+                isLocked={schema === 'realtime' ? true : isLocked}
                 onSelectToggleRLS={onSelectToggleRLS}
                 onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
                 onSelectEditPolicy={onSelectEditPolicy}

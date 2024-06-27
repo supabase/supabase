@@ -125,28 +125,15 @@ export const getTableRowsSqlQuery = ({
 
   if (!table) return ``
 
-  // [Joshen] Only truncate text/json based columns as their length could go really big
-  // Note: Risk of payload being too large if the user has many many text/json based columns
-  // although possibly negligible risk.
-  const truncatedColumns = table.columns
-    .filter((column) => {
-      return (
-        ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') ||
-        TEXT_TYPES.includes(column.format) ||
-        JSON_TYPES.includes(column.format)
-      )
-    })
-    .map((column) => {
-      if ((column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array') {
-        return `"${column.name}"::text[]`
-      } else {
-        return `case when length("${column.name}"::text) > ${MAX_CHARACTERS} then concat(left("${column.name}"::text, ${MAX_CHARACTERS}), '...') else "${column.name}"::text end "${column.name}"`
-      }
-    })
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
-    .select(truncatedColumns.length > 0 ? `*,${truncatedColumns.join(',')}` : '*')
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
 
   filters
     .filter((x) => x.value && x.value != '')
@@ -157,10 +144,10 @@ export const getTableRowsSqlQuery = ({
 
   // If sorts is empty, use the primary key as the default sort
   if (sorts.length === 0) {
-    const primaryKey = getDefaultOrderByColumn(table)
+    const defaultOrderByColumn = getDefaultOrderByColumn(table)
 
-    if (primaryKey) {
-      queryChains = queryChains.order(table.name, primaryKey, true, true)
+    if (defaultOrderByColumn) {
+      queryChains = queryChains.order(table.name, defaultOrderByColumn, true, true)
     }
   } else {
     sorts.forEach((x) => {
@@ -170,9 +157,22 @@ export const getTableRowsSqlQuery = ({
 
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
-  const sql = queryChains.range(from, to).toSql()
+  const baseSql = queryChains.range(from, to).toSql()
 
-  return sql
+  // [Joshen] Only truncate text/json based columns as their length could go really big
+  // Note: Risk of payload being too large if the user has many many text/json based columns
+  // although possibly negligible risk.
+  const truncatedColumns = table.columns
+    .filter((column) => TEXT_TYPES.includes(column.format) || JSON_TYPES.includes(column.format))
+    .map((column) => {
+      return `case when length("${column.name}"::text) > ${MAX_CHARACTERS} then concat(left("${column.name}"::text, ${MAX_CHARACTERS}), '...') else "${column.name}"::text end "${column.name}"`
+    })
+  const outputSql =
+    truncatedColumns.length > 0
+      ? `with _temp as (${baseSql.slice(0, -1)}) select *, ${truncatedColumns.join(',')} from _temp`
+      : baseSql
+
+  return outputSql
 }
 
 export type TableRows = {
