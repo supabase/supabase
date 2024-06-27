@@ -22,20 +22,20 @@ Realtime Authorization is in Public Alpha. To use Authorization for your Realtim
 
 Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
 
-By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic,
+By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
 
 The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
-- The RLS policies on tables in your `realtime` schema
+- The RLS policies on the `realtime.messages` table
 - The user information sent as part of their [Auth JWT](/docs/guides/auth/jwts)
 - The request headers
 - The Channel topic the user is trying to connect to
 
-When Realtime generates a policy for a client it does a test query on the `realtime.messages` table and then rolls it back. Realtime does not store any messages in your `realtime.messages` table.
+When Realtime generates a policy for a client it performs a query on the `realtime.messages` table and then rolls it back. Realtime does not store any messages in your `realtime.messages` table.
 
-Using Realtime authorization involves two steps:
+Using Realtime Authorization involves two steps:
 
-- In your database, create an RLS policy on `realtime.messages`
+- In your database, create RLS policies on the `realtime.messages`
 - In your client, instantiate the Realtime Channel with the `config` option `private: true`
 
 <Admonition type="caution">
@@ -53,12 +53,12 @@ You can use the following helper functions when writing RLS policies:
 Returns the Channel topic the user is attempting to connect to.
 
 ```sql
-create policy "authenticated users can read all messages in room_1"
+create policy "authenticated users can read all messages in room-1"
 on "realtime"."messages"
 for select
 to authenticated
 using (
-  (select realtime.topic()) = 'room_1'
+  (select realtime.topic()) = 'room-1'
 );
 ```
 
@@ -134,7 +134,7 @@ const apikey = '<api_key>'
 
 const client = createClient(url, apikey)
 
-const channel = client.channel('room_1', {
+const channel = client.channel('room-1', {
   config: { private: true },
 })
 
