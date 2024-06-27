@@ -14,7 +14,17 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel, cn } from 'ui'
+import {
+  Alert,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  Button,
+  cn,
+  IconAlertTriangle,
+  IconExternalLink,
+  Radio,
+  SidePanel,
+} from 'ui'
 
 const IPv4SidePanel = () => {
   const router = useRouter()
@@ -224,10 +234,15 @@ const IPv4SidePanel = () => {
             <>
               {selectedOption === 'ipv4_none' ||
               (selectedIPv4?.price ?? 0) < (subscriptionIpV4Option?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the add-on is removed immediately and won't be billed in
-                  the future.
-                </p>
+                subscription?.billing_via_partner === false &&
+                // Old addon billing with upfront payment
+                subscription.usage_based_billing_project_addons === false && (
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the add-on is removed immediately and any unused time in
+                    the current billing cycle is added as prorated credits to your organization and
+                    used in subsequent billing cycles.
+                  </p>
+                )
               ) : (
                 <>
                   <Alert withIcon variant="info" title="Potential downtime">
@@ -245,9 +260,43 @@ const IPv4SidePanel = () => {
                       Read replicas
                     </Link>{' '}
                     are used, each replica also gets its own IPv4 address, with a corresponding{' '}
-                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
                     charge.
                   </p>
+                  {!subscription?.billing_via_partner && (
+                    <p className="text-sm text-foreground-light">
+                      {subscription?.usage_based_billing_project_addons === false ? (
+                        <span>
+                          Upon clicking confirm, the respective amount will be added to your monthly
+                          invoice. The addon is prepaid per month and in case of a downgrade, you
+                          get credits for the remaining time. For the current billing cycle you're
+                          immediately charged a prorated amount for the remaining days.
+                        </span>
+                      ) : (
+                        <span>
+                          There are no immediate charges. The addon is billed at the end of your
+                          billing cycle based on your usage and prorated to the hour.
+                        </span>
+                      )}
+                    </p>
+                  )}
+
+                  {
+                    // Billed via partner
+                    subscription?.billing_via_partner &&
+                      // Project addons are still billed the old way (upfront payment)
+                      subscription?.usage_based_billing_project_addons === false &&
+                      // Scheduled billing plan change
+                      subscription.scheduled_plan_change?.target_plan !== undefined && (
+                        <Alert_Shadcn_ variant={'warning'} className="mb-2">
+                          <IconAlertTriangle className="h-4 w-4" />
+                          <AlertDescription_Shadcn_>
+                            You have a scheduled subscription change that will be canceled if you
+                            change your PITR add on.
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )
+                  }
                 </>
               )}
             </>

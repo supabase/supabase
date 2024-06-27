@@ -1,3 +1,5 @@
+'use client'
+
 import { X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
@@ -42,7 +44,7 @@ const PortalToast = () => (
                         ? 'max-w-[380px]'
                         : isConsentToast
                           ? 'max-w-none sm:max-w-[800px]'
-                          : 'max-w-[260px]'
+                          : 'max-w-[280px]'
                     }`}
                   >
                     {message}

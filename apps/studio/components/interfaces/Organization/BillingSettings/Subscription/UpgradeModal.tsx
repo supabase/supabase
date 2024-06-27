@@ -71,20 +71,19 @@ const UpgradeSurveyModal = ({
         cancelText="Skip"
         header="We're excited for your upgrade"
       >
-        <Modal.Content>
-          <div className="py-6 space-y-4">
-            <p className="text-sm text-foreground-light">
-              What reasons motivated your decision to upgrade? Your feedback helps us improve
-              Supabase as much as we can.
-            </p>
-            <div className="space-y-8 mt-6">
-              <div className="flex flex-wrap gap-2" data-toggle="buttons">
-                {upgradeReasons.map((option) => {
-                  const active = selectedReasons.find((x) => x === option)
-                  return (
-                    <label
-                      key={option}
-                      className={`
+        <Modal.Content className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            What reasons motivated your decision to upgrade? Your feedback helps us improve Supabase
+            as much as we can.
+          </p>
+          <div className="space-y-8 mt-6">
+            <div className="flex flex-wrap gap-2" data-toggle="buttons">
+              {upgradeReasons.map((option) => {
+                const active = selectedReasons.find((x) => x === option)
+                return (
+                  <label
+                    key={option}
+                    className={`
                       flex cursor-pointer items-center space-x-2 rounded-md py-1 
                       pl-2 pr-3 text-center text-sm
                       shadow-sm transition-all duration-100
@@ -94,28 +93,27 @@ const UpgradeSurveyModal = ({
                           : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                       }
                   `}
-                    >
-                      <input
-                        type="checkbox"
-                        name="options"
-                        value={option}
-                        className="hidden"
-                        onClick={dispatchSelectedReasons}
-                      />
-                      <div>{option}</div>
-                    </label>
-                  )
-                })}
-              </div>
-              <div className="text-area-text-sm">
-                <Input.TextArea
-                  id="message"
-                  name="message"
-                  value={message}
-                  onChange={(event: any) => setMessage(event.target.value)}
-                  label="Anything else that we can improve on?"
-                />
-              </div>
+                  >
+                    <input
+                      type="checkbox"
+                      name="options"
+                      value={option}
+                      className="hidden"
+                      onClick={dispatchSelectedReasons}
+                    />
+                    <div>{option}</div>
+                  </label>
+                )
+              })}
+            </div>
+            <div className="text-area-text-sm">
+              <Input.TextArea
+                id="message"
+                name="message"
+                value={message}
+                onChange={(event: any) => setMessage(event.target.value)}
+                label="Anything else that we can improve on?"
+              />
             </div>
           </div>
         </Modal.Content>

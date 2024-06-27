@@ -20,7 +20,8 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useCheckPermissions } from 'hooks'
-import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { Button, Form, IconArrowLeft, IconEdit, IconTrash, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
@@ -167,14 +168,14 @@ const CreateWrapper = () => {
           >
             <Link href={`/project/${ref}/database/wrappers`}>
               <div className="flex items-center space-x-2">
-                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>
               </div>
             </Link>
           </div>
           <h3 className="mb-2 text-xl text-foreground">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link href={wrapperMeta.docsUrl} target="_blank" rel="noreferrer">
                 Documentation
               </Link>
@@ -268,7 +269,7 @@ const CreateWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-foreground-light">
-                                {wrapperMeta.tables[table.index].label}:{' '}
+                                Columns:{' '}
                                 {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>

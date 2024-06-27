@@ -54,7 +54,10 @@ const BlogListItem = ({ post }: Props) => {
             {post.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <p className="border border-muted py-1 px-2 rounded text-center w-auto capitalize">
+                  <p
+                    key={category}
+                    className="border border-muted py-1 px-2 rounded text-center w-auto capitalize"
+                  >
                     {category}
                   </p>
                 )

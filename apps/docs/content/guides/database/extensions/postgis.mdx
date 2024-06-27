@@ -29,13 +29,17 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "postgis" and enable the extension.
+4. In the confirmation prompt select "Create a new schema" and name it `gis` for example.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
 ```sql
+-- Create a dedicated separate schema
+create schema if not exists "gis";
+
 -- Example: enable the "postgis" extension
-create extension postgis with schema extensions;
+create extension postgis with schema "gis";
 
 -- Example: disable the "postgis" extension
 drop extension if exists postgis;

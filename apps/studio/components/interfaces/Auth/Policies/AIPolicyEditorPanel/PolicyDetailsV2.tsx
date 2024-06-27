@@ -1,9 +1,10 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -30,14 +31,20 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
   schema: string
   searchString?: string
   selectedTable?: string
   isEditing: boolean
-  form: any
+  form: UseFormReturn<{
+    name: string
+    table: string
+    behavior: string
+    command: string
+    roles: string
+  }>
   onUpdateCommand: (command: string) => void
 }
 

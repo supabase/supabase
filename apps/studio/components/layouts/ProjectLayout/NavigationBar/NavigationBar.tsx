@@ -80,6 +80,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -148,6 +149,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -162,6 +164,30 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative">
+                  <span className="absolute right-0 bottom-2 z-10">dot</span>
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
+              )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
               )
             } else {
               return (

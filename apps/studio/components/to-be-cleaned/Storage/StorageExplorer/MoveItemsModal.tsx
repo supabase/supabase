@@ -1,11 +1,12 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
+import { StorageItemWithColumn } from '../Storage.types'
 
 interface MoveItemsModalProps {
   bucketName: string
   visible: boolean
-  selectedItemsToMove: any[]
+  selectedItemsToMove: StorageItemWithColumn[]
   onSelectCancel: () => void
   onSelectMove: (path: string) => void
 }
@@ -65,7 +66,7 @@ const MoveItemsModal = ({
       }
     >
       <Modal.Content>
-        <form className="my-4">
+        <form>
           <div className="relative flex items-center">
             <Input
               autoFocus

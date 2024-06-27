@@ -221,17 +221,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow">
-              <LogTable
-                onRun={handleRun}
-                onSave={handleOnSave}
-                hasEditorValue={Boolean(editorValue)}
-                params={params}
-                data={logData}
-                error={error}
-                projectRef={projectRef as string}
-              />
-            </div>
+            <LogTable
+              showHistogramToggle={false}
+              onRun={handleRun}
+              onSave={handleOnSave}
+              hasEditorValue={Boolean(editorValue)}
+              params={params}
+              data={logData}
+              error={error}
+              projectRef={projectRef as string}
+            />
           </LoadingOpacity>
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
@@ -273,43 +272,32 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         >
           {() => (
             <>
-              <div className="py-4">
-                <Modal.Content>
-                  <div className="space-y-6">
-                    <Input layout="horizontal" label="Name" id="name" />
-                    <div className="text-area-text-sm">
-                      <Input.TextArea
-                        layout="horizontal"
-                        labelOptional="Optional"
-                        label="Description"
-                        id="description"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                </Modal.Content>
-              </div>
-              <div className="py-3 border-t bg-surface-100">
-                <Modal.Content>
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setSaveModalOpen(!saveModalOpen)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="tiny"
-                      loading={isSubmitting}
-                      disabled={isSubmitting}
-                      htmlType="submit"
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </div>
+              <Modal.Content className="space-y-6">
+                <Input layout="horizontal" label="Name" id="name" />
+                <div className="text-area-text-sm">
+                  <Input.TextArea
+                    layout="horizontal"
+                    labelOptional="Optional"
+                    label="Description"
+                    id="description"
+                    rows={2}
+                  />
+                </div>
+              </Modal.Content>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center justify-end gap-2">
+                <Button size="tiny" type="default" onClick={() => setSaveModalOpen(!saveModalOpen)}>
+                  Cancel
+                </Button>
+                <Button
+                  size="tiny"
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+                  htmlType="submit"
+                >
+                  Save
+                </Button>
+              </Modal.Content>
             </>
           )}
         </Form>
