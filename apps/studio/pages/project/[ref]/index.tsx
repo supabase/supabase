@@ -15,7 +15,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 
 import SecurityStatus from 'components/interfaces/Home/SecurityStatus'
-import ProjectHomeLints from 'components/interfaces/Home/ProjectHomeLints'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -53,10 +52,6 @@ const Home: NextPageWithLayout = () => {
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
       <div className="mx-6">
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
-      </div>
-
-      <div className="mx-auto max-w-4xl">
-        <ProjectHomeLints />
       </div>
 
       {project?.status !== PROJECT_STATUS.INACTIVE && (
