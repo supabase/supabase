@@ -812,7 +812,7 @@ const Wizard: NextPageWithLayout = () => {
                                   </TableHeader>
                                   <TableBody className="[&_td]:py-2">
                                     {organizationProjects.map((project) => (
-                                      <TableRow key={project.id} className="text-foreground-light">
+                                      <TableRow key={project.ref} className="text-foreground-light">
                                         <TableCell className="w-[170px]">{project.name}</TableCell>
                                         <TableCell className="text-center">
                                           {instanceLabel(project.infra_compute_size)}
