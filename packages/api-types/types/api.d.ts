@@ -365,6 +365,22 @@ export interface paths {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
   }
+  '/platform/organizations/{slug}/oauth/apps': {
+    /** List published or authorized oauth apps */
+    get: operations['OAuthAppsController_listOAuthApps']
+    /** Create an oauth app */
+    post: operations['OAuthAppsController_createOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}': {
+    /** Update an oauth app */
+    put: operations['OAuthAppsController_updateOAuthApp']
+    /** Remove a published oauth app */
+    delete: operations['OAuthAppsController_removeOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}/revoke': {
+    /** Revoke an authorized oauth app */
+    post: operations['OAuthAppsController_revokeAuthorizedOAuthApp']
+  }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
     get: operations['getPaymentMethodsV2']
@@ -2527,6 +2543,39 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
+    CreateOAuthAppBody: {
+      icon?: string
+      name: string
+      redirect_uris: string[]
+      scopes?: (
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
+    }
+    CreateOAuthAppResponse: {
+      client_id: string
+      client_secret: string
+      id: string
+    }
     CreateOrganizationBody: {
       kind?: string
       name: string
@@ -2831,6 +2880,16 @@ export interface components {
       | '8xlarge'
       | '12xlarge'
       | '16xlarge'
+    DeleteOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     DeleteObjectsBody: {
       paths: string[]
     }
@@ -3063,6 +3122,7 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
+      usage_based_billing_project_addons: boolean
       usage_billing_enabled: boolean
     }
     GetUserContentByIdResponse: {
@@ -3593,6 +3653,39 @@ export interface components {
       has_critical: boolean
       has_warning: boolean
       unread_count: number
+    }
+    OAuthAppResponse: {
+      authorized_at?: string
+      client_id?: string
+      client_secret_alias?: string
+      created_at?: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris?: string[]
+      scopes?: (
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
     }
     OAuthTokenBody: {
       client_id: string
@@ -4348,6 +4441,16 @@ export interface components {
     PublicUrlResponse: {
       publicUrl: string
     }
+    PutOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     ReadOnlyStatusResponse: {
       enabled: boolean
       override_active_until: string
@@ -4563,6 +4666,13 @@ export interface components {
         | 'exceed_storage_size_quota'
         | 'overdue_payment'
       )[]
+    }
+    RevokeAuthorizedOAuthAppResponse: {
+      authorized_at?: string
+      icon?: string
+      id: string
+      name: string
+      website: string
     }
     RevokeColumnPrivilegesBody: {
       column_id: string
@@ -7244,6 +7354,9 @@ export interface operations {
           'application/json': components['schemas']['AuditLogsResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to get an organization's audit logs */
       500: {
         content: never
@@ -7975,6 +8088,114 @@ export interface operations {
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
+        content: never
+      }
+    }
+  }
+  /** List published or authorized oauth apps */
+  OAuthAppsController_listOAuthApps: {
+    parameters: {
+      query: {
+        type: 'published' | 'authorized'
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OAuthAppResponse'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Create an oauth app */
+  OAuthAppsController_createOAuthApp: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Update an oauth app */
+  OAuthAppsController_updateOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PutOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Remove a published oauth app */
+  OAuthAppsController_removeOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DeleteOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Revoke an authorized oauth app */
+  OAuthAppsController_revokeAuthorizedOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['RevokeAuthorizedOAuthAppResponse']
+        }
+      }
+      403: {
         content: never
       }
     }
