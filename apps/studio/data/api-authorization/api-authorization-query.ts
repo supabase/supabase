@@ -1,11 +1,12 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
-  id?: string
+  id?: string,
+  slug?: string
 }
 
 export type ApiAuthorizationResponse = {
@@ -20,12 +21,12 @@ export type ApiAuthorizationResponse = {
 }
 
 export async function getApiAuthorizationDetails(
-  { id }: ApiAuthorizationVariables,
+  { id, slug }: ApiAuthorizationVariables,
   signal?: AbortSignal
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const response = await get(`${API_ADMIN_URL}/oauth/authorizations/${id}`, { signal })
+  const response = await get(`${API_URL}/organizations/${slug}/authorizations/${id}`, { signal })
   if (response.error) throw response.error
   return response as ApiAuthorizationResponse
 }
@@ -34,12 +35,12 @@ export type ResourceData = Awaited<ReturnType<typeof getApiAuthorizationDetails>
 export type ResourceError = { errorEventId: string; message: string }
 
 export const useApiAuthorizationQuery = <TData = ResourceData>(
-  { id }: ApiAuthorizationVariables,
+  { id, slug }: ApiAuthorizationVariables,
   { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
   useQuery<ResourceData, ResourceError, TData>(
     resourceKeys.resource(id),
-    ({ signal }) => getApiAuthorizationDetails({ id }, signal),
+    ({ signal }) => getApiAuthorizationDetails({ id, slug }, signal),
     {
       enabled: enabled && typeof id !== 'undefined',
       ...options,

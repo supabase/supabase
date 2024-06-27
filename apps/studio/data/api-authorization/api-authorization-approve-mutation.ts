@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type ApiAuthorizationApproveVariables = {
@@ -22,7 +22,7 @@ export async function approveApiAuthorization({
   if (!organization_id) throw new Error('Organization slug is required')
 
   const response = await post(
-    `${API_ADMIN_URL}/oauth/authorizations/${id}?skip_browser_redirect=true`,
+    `${API_URL}/organizations/${organization_id}/oauth/authorizations/${id}?skip_browser_redirect=true`,
     { organization_id }
   )
   if (response.error) throw response.error
