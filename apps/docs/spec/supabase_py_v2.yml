@@ -365,15 +365,16 @@ functions:
               "action_link": null,
               "email": "",
               "phone": "",
-              "created_at": "2024-06-23T22:35:47.518626Z",
+              "created_at": "2024-06-25T19:57:25.870777Z",
               "confirmed_at": null,
               "email_confirmed_at": null,
               "phone_confirmed_at": null,
-              "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+              "last_sign_in_at": "2024-06-25T19:57:25.878874Z",
               "role": "authenticated",
-              "updated_at": "2024-06-23T22:35:47.522241Z",
+              "updated_at": "2024-06-25T19:57:25.880971Z",
               "identities": [],
-              "factors": null
+              "factors": null,
+              "is_anonymous": true
             },
             "session": {
               "provider_token": null,
@@ -381,7 +382,7 @@ functions:
               "access_token": "<ACCESS_TOKEN>",
               "refresh_token": "<REFRESH_TOKEN>",
               "expires_in": 3600,
-              "expires_at": 1719185747,
+              "expires_at": 1719349045,
               "token_type": "bearer",
               "user": {
                 "id": "11111111-1111-1111-1111-111111111111",
@@ -396,15 +397,16 @@ functions:
                 "action_link": null,
                 "email": "",
                 "phone": "",
-                "created_at": "2024-06-23T22:35:47.518626Z",
+                "created_at": "2024-06-25T19:57:25.870777Z",
                 "confirmed_at": null,
                 "email_confirmed_at": null,
                 "phone_confirmed_at": null,
-                "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+                "last_sign_in_at": "2024-06-25T19:57:25.878874Z",
                 "role": "authenticated",
-                "updated_at": "2024-06-23T22:35:47.522241Z",
+                "updated_at": "2024-06-25T19:57:25.880971Z",
                 "identities": [],
-                "factors": null
+                "factors": null,
+                "is_anonymous": true
               }
             }
           }
@@ -420,30 +422,166 @@ functions:
           ```
   - id: sign-in-with-password
     title: 'sign_in_with_password'
+    params:
+      - name: credentials
+        type: SignInWithPasswordCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: password
+            type: string
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: captcha_token
+                isOptional: true
+                type: string
     notes: |
+      Log in an existing user with an email and password or phone and password.
       - Requires either an email and password or a phone number and password.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
         isSpotlight: true
         code: |
+          ```python
+          response = supabase.auth.sign_in_with_password(
+              credentials={"email": "email@example.com", "password": "example-password"}
+          )
           ```
-          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-25T19:50:31.744823Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-25T19:50:31.757491Z",
+              "identities": [],
+              "factors": null,
+              "is_anonymous": false
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 3600,
+              "expires_at": 1719348631,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
+                },
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "email@example.com",
+                "phone": "",
+                "created_at": "2023-02-19T00:01:51.142802Z",
+                "confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-25T19:50:31.744823Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-25T19:50:31.757491Z",
+                "identities": [],
+                "factors": null,
+                "is_anonymous": false
+              }
+            }
+          }
           ```
       - id: sign-in-with-phone-and-password
         name: Sign in with phone and password
         isSpotlight: false
         code: |
-          ```
-          data = supabase.auth.sign_in_with_password({"phone": "+1234566", password": "testsupabasenow"})
-          # After receiving a SMS with a OTP.
-          data = supabase.auth.verify_otp({
-            "phone": '+13334445555',
-            "token": '123456',
-          })
+          ```python
+          response = supabase.auth.sign_in_with_password(
+              credentials={"phone": "+13334445555", "password": "some-password"}
+          )
           ```
   - id: sign-in-with-otp
     title: 'sign_in_with_otp'
+    params:
+      - name: credentials
+        type: SignInWithPasswordCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: email_redirect_to
+                isOptional: true
+                type: string
+                description: >
+                  Only for email signups.
+                  The redirect URL embedded in the email link.
+                  Must be a configured redirect URL for your Supabase instance.
+              - name: should_create_user
+                isOptional: true
+                type: boolean
+                description: >
+                  Whether to create the user if they don't already exist.
+                  Defaults to true.
+              - name: data
+                isOptional: true
+                type: object
+                description: >
+                  A custom data object to store additional user metadata.
+              - name: captcha_token
+                isOptional: true
+                type: string
+              - name: channel
+                isOptional: true
+                type: sms | whatsapp
+                description: >
+                  The channel to use for sending messages.
+                  Only for phone signups.
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -459,21 +597,21 @@ functions:
         isSpotlight: true
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
-          ```
-          data = supabase.auth.sign_in_with_otp({
-            "email": 'example@email.com',
-            "options": {
-              "email_redirect_to": 'https://example.com/welcome'
-            }
-          })
+          ```python
+          supabase.auth.sign_in_with_otp(
+              {
+                  "email": "email@example.com",
+                  "options": {"email_redirect_to": "https://example.com/welcome"},
+              }
+          )
           ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
-          ```
-          data = supabase.auth.sign_in_with_otp({
+          ```python
+          supabase.auth.sign_in_with_otp({
             "phone": '+13334445555',
           })
           ```
