@@ -9,10 +9,19 @@ import {
   Storage,
   TableEditor,
   Settings,
+  Postgres,
 } from 'icons'
 import { cn } from 'ui'
 import { IconHandler } from '../app/[org]/icon-handler'
-import { Boxes } from 'lucide-react'
+import {
+  BarChart2,
+  BarChartBig,
+  Boxes,
+  ClipboardMinus,
+  Compass,
+  ListTree,
+  Users2,
+} from 'lucide-react'
 
 const STROKE_WIDTH = 1
 const ICON_SIZE = 21
@@ -26,78 +35,86 @@ const iconsClasses = cn(
 )
 
 const SideNav = [
-  {
-    name: 'projects',
-    label: 'Projects',
-    icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/projects',
-  },
-  {
-    name: 'table-editor',
-    label: 'Table Editor',
-    icon: <TableEditor strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/table-editor',
-  },
-  {
-    name: 'sql-editor',
-    label: 'SQL Editor',
-    icon: <SqlEditor strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/sql-editor',
-  },
-  {
-    name: 'authentication',
-    label: 'Authentication',
-    icon: <Auth strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/authentication',
-  },
-  {
-    name: 'database',
-    label: 'Database',
-    icon: <Database strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/database',
-  },
-  {
-    name: 'storage',
-    label: 'Storage',
-    icon: <Storage strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/storage',
-  },
-  {
-    name: 'functions',
-    label: 'Edge Functions',
-    icon: <EdgeFunctions strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/edge-functions',
-  },
-  {
-    name: 'realtime',
-    label: 'Realtime',
-    icon: <Realtime strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/realtime',
-  },
-  {
-    name: 'usage',
-    label: 'Usage',
-    icon: <Settings strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/usage',
-  },
-  {
-    name: 'reports',
-    label: 'Reports',
-    icon: <Reports strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/reports',
-  },
-  {
-    name: 'logs',
-    label: 'Logs',
-    icon: <Logs strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/logs',
-  },
-  {
-    name: 'settings',
-    label: 'Settings',
-    icon: <Settings strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    href: '/settings',
-  },
+  [
+    {
+      name: 'projects',
+      label: 'Projects',
+      icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/projects',
+    },
+    {
+      name: 'table-editor',
+      label: 'Table Editor',
+      icon: <Compass strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/table-editor',
+    },
+    // {
+    //   name: 'sql-editor',
+    //   label: 'SQL Editor',
+    //   icon: <SqlEditor strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+    //   href: '/sql-editor',
+    // },
+  ],
+  [
+    {
+      name: 'database',
+      label: 'Database',
+      icon: <Database strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/database',
+    },
+    {
+      name: 'authentication',
+      label: 'Authentication',
+      icon: <Users2 strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/authentication',
+    },
+    {
+      name: 'storage',
+      label: 'Storage',
+      icon: <Storage strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/storage',
+    },
+    {
+      name: 'functions',
+      label: 'Edge Functions',
+      icon: <EdgeFunctions strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/edge-functions',
+    },
+    {
+      name: 'realtime',
+      label: 'Realtime',
+      icon: <Realtime strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/realtime',
+    },
+  ],
+  [
+    {
+      name: 'logs',
+      label: 'Logs',
+      icon: <ListTree strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/logs',
+    },
+    {
+      name: 'reports',
+      label: 'Reports',
+      icon: <ClipboardMinus strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/reports',
+    },
+    {
+      name: 'usage',
+      label: 'Usage',
+      icon: <BarChartBig strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/usage',
+    },
+  ],
+  [
+    {
+      name: 'settings',
+      label: 'Settings',
+      icon: <Settings strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/settings',
+    },
+  ],
 ]
 
 export { SideNav }
