@@ -3,26 +3,38 @@ import { createClient } from '@/utils/supabase/client'
 import { redirect } from 'next/navigation'
 import { SubmitButton } from './submit-button'
 import { useEffect, useState } from 'react'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
-export default function CreateRoomModal() {
+export default function CreateRoomModal({ channel }: { channel: RealtimeChannel | null }) {
   const supabase = createClient()
   const createRoom = async (formData: FormData) => {
     const topic = formData.get('topic') as string
     const user = await supabase.auth.getUser()
     const token = (await supabase.auth.getSession()).data.session!.access_token
+
     supabase.realtime.setAuth(token)
-    console.log()
+
     const rooms_response = await supabase.from('rooms').insert({ topic }).select('id')
-    console.log(rooms_response.data)
-    await supabase
-      .from('rooms_users')
-      .insert({ user_id: user.data.user!.id, room_id: rooms_response.data![0].id })
-    return redirect(`/protected`)
+
+    if (rooms_response.data) {
+      await supabase
+        .from('rooms_users')
+        .insert({ user_id: user.data.user!.id, room_id: rooms_response.data![0].id })
+
+      await channel?.send({
+        type: 'broadcast',
+        event: 'new_room',
+        payload: {},
+      })
+
+      return redirect(`/protected`)
+    }
   }
 
   const close = async () => {
     return redirect(`/protected`)
   }
+
   return (
     <div className="fixed top-0 left-0 right-0 flex flex-col h-full w-full justify-center items-center align-middle gap-2 z-10 bg-[#000000EE]">
       <form className="flex flex-col sm:max-w-md gap-2 text-foreground bg-background rounded-md p-4">

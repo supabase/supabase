@@ -1,15 +1,17 @@
 'use client'
 import CreateRoomModal from '@/components/create-room-modal'
 import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { RealtimeChannel } from '@supabase/supabase-js'
 import { useState, useEffect, use } from 'react'
 
 export default function Chat() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [rooms, setRooms] = useState<any>([])
+  const [rooms, setRooms] = useState<string[]>([])
   const [users, setUsers] = useState<Set<string>>(new Set())
   const [selectedRoom, setSelectedRoom] = useState<string | undefined>()
-  const [channel, setChannel] = useState<any>(null)
+  const [mainChannel, setMainChannel] = useState<RealtimeChannel | null>(null)
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -63,6 +65,11 @@ export default function Chat() {
         await supabase.auth.getUser()
         const token = (await supabase.auth.getSession()).data.session?.access_token!
         supabase.realtime.setAuth(token)
+        let main = supabase.realtime
+          .channel('supaslack')
+          .on('broadcast', { event: 'new_room' }, () => getChannels())
+          .subscribe()
+        setMainChannel(main)
         getChannels()
       })
       .then(() => {
@@ -90,11 +97,11 @@ export default function Chat() {
         .on('broadcast', { event: 'message' }, ({ payload: payload }) =>
           addMessage(payload.user_id == user?.id, false, payload.message)
         )
-        .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+        .on('presence', { event: 'join' }, ({ newPresences }) => {
           newPresences.map(({ email }) => users.add(email))
           setUsers(new Set(users))
         })
-        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        .on('presence', { event: 'leave' }, ({ leftPresences }) => {
           leftPresences.map(({ email }) => users.delete(email))
           setUsers(new Set(users))
         })
@@ -123,7 +130,7 @@ export default function Chat() {
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-foreground"></div>
         </div>
       )}
-      {showModal ? <CreateRoomModal /> : ''}
+      {showModal ? <CreateRoomModal channel={mainChannel} /> : ''}
       <div className="flex w-full h-full gap-4">
         <div className="grow-0 flex flex-col gap-2 w-[20rem] overflow-hidden">
           <div className="bg-white h-full rounded-sm text-slate-900">
