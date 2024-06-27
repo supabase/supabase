@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
@@ -13,6 +14,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   AuditLog,
@@ -22,6 +24,7 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useCheckPermissions } from 'hooks'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 // [Joshen considerations]
@@ -44,6 +47,8 @@ const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
+  const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
+
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -56,6 +61,7 @@ const AuditLogs = () => {
         iso_timestamp_end: dateRange.to,
       },
       {
+        enabled: canReadAuditLogs,
         retry(_failureCount, error) {
           if (error.message.endsWith('upgrade to team or enterprise plan to access audit logs.')) {
             return false
@@ -110,6 +116,14 @@ const AuditLogs = () => {
     })
 
   const currentOrganization = organizations?.find((o) => o.slug === slug)
+
+  if (!canReadAuditLogs) {
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view organization audit logs" />
+      </ScaffoldContainerLegacy>
+    )
+  }
 
   return (
     <>
