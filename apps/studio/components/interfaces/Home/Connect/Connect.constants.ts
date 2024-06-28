@@ -217,8 +217,9 @@ export const MOBILES: ConnectionType[] = [
         label: 'supabase-swift',
         children: [],
         icon: 'supabase',
-      }
+      },
     ],
+  },
   {
     key: 'androidkotlin',
     label: 'Android Kotlin',
