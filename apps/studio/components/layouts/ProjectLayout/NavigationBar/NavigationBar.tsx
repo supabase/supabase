@@ -40,6 +40,7 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -71,6 +72,15 @@ const NavigationBar = () => {
     'project_storage:all',
     'realtime:all',
   ])
+
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter(
+    (lint) =>
+      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
+  )
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -168,10 +178,10 @@ const NavigationBar = () => {
             } else if (route.key === 'advisors') {
               return (
                 <div className="relative">
-                  <div className="relative flex h-2 w-2 left-6 top-4 z-10">
-                    <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive-600 opacity-75" />
-                    <div className="relative inline-flex rounded-full h-2 w-2 bg-destructive-600 shadow" />
-                  </div>
+                  {securityLints.length > 0 && (
+                    <div className="absolute flex h-2 w-2 left-6 top-2 z-10 bg-destructive-600 rounded-full" />
+                  )}
+
                   <NavigationIconLink
                     key={route.key}
                     route={route}
