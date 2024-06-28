@@ -29,13 +29,8 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import {
-  getTableDefinitionQuery,
-  useTableDefinitionQuery,
-} from '../../../data/database/table-definition-query'
-import { format } from 'sql-formatter'
-import { useMemo } from 'react'
-import { useViewDefinitionQuery } from '../../../data/database/view-definition-query'
+import useTableDefinition from '../../../hooks/misc/useTableDefinition'
+import useEntityType from '../../../hooks/misc/useEntityType'
 
 export interface EntityListItemProps {
   id: number
@@ -90,58 +85,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       ?.join(' ')
   }
 
-  const viewResult = useViewDefinitionQuery(
-    {
-      schema: entity.schema,
-      name: entity.name,
-      projectRef,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW,
-    }
-  )
-
-  const tableResult = useTableDefinitionQuery(
-    {
-      schema: entity.schema,
-      name: entity.name,
-      projectRef,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: entity.type === ENTITY_TYPE.TABLE,
-    }
-  )
-
-  const { data: definition, isLoading } =
-    entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
-      ? viewResult
-      : tableResult
-
-  const prepend =
-    entity.type === ENTITY_TYPE.VIEW
-      ? `create view ${entity.schema}.${entity.name} as\n`
-      : entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
-        ? `create materialized view ${entity.schema}.${entity.name} as\n`
-        : ''
-
-  const formatDefinition = (value: string) => {
-    try {
-      return format(value, {
-        language: 'postgresql',
-        keywordCase: 'lower',
-      })
-    } catch (err) {
-      return value
-    }
-  }
-
-  const formattedDefinition = useMemo(
-    () => (definition ? formatDefinition(prepend + definition) : undefined),
-    [definition]
-  )
-
+  const formattedDefinition = useTableDefinition(useEntityType(id), project).formattedDefinition
   const copyDefinition = async () => {
     try {
       await navigator.clipboard.writeText(formattedDefinition!)
