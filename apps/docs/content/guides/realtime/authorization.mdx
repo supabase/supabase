@@ -53,7 +53,7 @@ You can use the following helper functions when writing RLS policies:
 Returns the Channel topic the user is attempting to connect to.
 
 ```sql
-create policy "authenticated users can read all messages in room-1"
+create policy "authenticated can read all messages on topic"
 on "realtime"."messages"
 for select
 to authenticated
@@ -103,7 +103,7 @@ To join a Broadcast Channel, a user must have at least one read or write permiss
 Here, we allow reads (`select`s) for users who are linked to the requested topic within the relationship table `public.room_users`:
 
 ```sql
-create policy "authenticated users can join topic"
+create policy "authenticated can receive broadcast"
 on "realtime"."messages"
 for select
 to authenticated
@@ -152,7 +152,7 @@ To authorize sending Broadcast messages, create a policy for `insert` where the 
 Here, we allow writes (sends) for users who are linked to the requested topic within the relationship table `public.room_users`:
 
 ```sql
-create policy "authenticated users can send broadcast messages in a room"
+create policy "authenticated can send broadcast on topic"
 on "realtime"."messages"
 for insert
 to authenticated
@@ -179,7 +179,7 @@ The `extension` field on the `realtime.messages` table records the message type.
 Create a policy for `select` on `realtime.messages` where `realtime.messages.extension` is `presence`.
 
 ```sql
-create policy "authenticated users can listen to presence changes in a room"
+create policy "authenticated can listen to presence in topic"
 on "realtime"."messages"
 for select
 to authenticated
@@ -202,7 +202,7 @@ using (
 To update the Presence status for a user create a policy for `insert` on `realtime.messages` where the value of `realtime.messages.extension` is `presence`.
 
 ```sql
-create policy "authenticated users can register and update their presence in a room"
+create policy "authenticated can track presence on topic"
 on "realtime"."messages"
 for insert
 to authenticated
@@ -229,7 +229,7 @@ Authorize both Presence and Broadcast by including both extensions in the `where
 Authorize Presence and Broadcast read in one RLS policy.
 
 ```sql
-create policy "authenticated user can listen to Broadcast and Presence messages in room"
+create policy "authenticated can listen to broadcast and presence on topic"
 on "realtime"."messages"
 for select
 to authenticated
@@ -252,7 +252,7 @@ using (
 Authorize Presence and Broadcast write in one RLS policy.
 
 ```sql
-create policy "authenticated user can send Broadcast and Presence messages in a room"
+create policy "authenticated can send broadcast and presence on topic"
 on "realtime"."messages"
 for insert
 to authenticated
