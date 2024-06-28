@@ -8,7 +8,10 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
+import {
+  getGeneralPolicyTemplates,
+  getRealtimePolicyTemplates,
+} from '../PolicyEditorModal/PolicyEditorModal.constants'
 
 interface PolicyTemplatesProps {
   schema: string
@@ -26,7 +29,11 @@ export const PolicyTemplates = ({
   onSelectTemplate,
 }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
-  const templates = getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
+
+  const templates =
+    schema === 'realtime'
+      ? getRealtimePolicyTemplates()
+      : getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
 
   const baseTemplates =
     selectedPolicy !== undefined
@@ -68,7 +75,7 @@ export const PolicyTemplates = ({
                   title={template.name}
                   titleClass="text-sm"
                   className={cn(
-                    'transition',
+                    'transition w-full',
                     template.id === selectedTemplate
                       ? '!border-stronger bg-surface-200 hover:!border-stronger'
                       : ''
