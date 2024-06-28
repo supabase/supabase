@@ -207,6 +207,20 @@ export const MOBILES: ConnectionType[] = [
     ],
   },
   {
+    key: 'swift',
+    label: 'Swift',
+    icon: 'swift',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-swift',
+    children: [
+      {
+        key: 'supabaseswift',
+        label: 'supabase-swift',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
     key: 'androidkotlin',
     label: 'Android Kotlin',
     icon: 'kotlin',
