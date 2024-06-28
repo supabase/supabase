@@ -17,6 +17,10 @@ export default function TopHeader() {
     settingsAllPreviews,
   } = config
 
+  const isHome = pathName.includes(`/${selectedOrg?.key}/projects`)
+  console.log(isHome)
+  console.log(pathName)
+
   const isPreview =
     (settingsAllPreviews && pathName.includes(`${selectedOrg?.key}/settings`)) ||
     (type !== 'prod' &&
@@ -30,7 +34,8 @@ export default function TopHeader() {
     <div
       className={cn(
         'relative',
-        'w-full px-3 bg-dash-sidebar py-2.5',
+        'w-full px-3 py-2.5',
+        !isHome && 'bg-dash-sidebar',
         isPreview
           ? 'bg-[#05A5FF]/5 items-start flex flex-col gap-3 h-[80px] delay-500'
           : 'h-[48px]',

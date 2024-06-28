@@ -29,6 +29,8 @@ const TreeViewItem = forwardRef<
     isEditing?: boolean
     /** Callback for when the item is edited */
     onEditSubmit?: (value: string) => void
+    /** Icon for the item */
+    icon?: React.ReactNode
   }
 >(
   (
@@ -42,6 +44,7 @@ const TreeViewItem = forwardRef<
       name = '',
       isEditing = false,
       onEditSubmit,
+      icon,
       ...props
     },
     ref
@@ -82,6 +85,7 @@ const TreeViewItem = forwardRef<
         aria-expanded={isExpanded}
         {...props}
         className={cn(
+          'group/tree-view-item',
           'relative',
           'transition-colors',
           'flex items-center gap-3',
@@ -145,19 +149,22 @@ const TreeViewItem = forwardRef<
             />
           </>
         ) : (
-          <SQL_ICON
-            className={cn(
-              'transition-colors',
-              'fill-foreground-muted',
-              'group-aria-selected:fill-foreground',
-              'w-5 h-5',
-              '-ml-0.5'
-            )}
-            size={16}
-            strokeWidth={1.5}
-          />
+          icon ?? (
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
+          )
         )}
         <span className={cn(isEditing && 'hidden')}>{name}</span>
+        {props.children}
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             ref={inputRef}
@@ -218,4 +225,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem }
+export { TreeView, TreeViewFolderIcon, TreeViewItem, SQL_ICON }

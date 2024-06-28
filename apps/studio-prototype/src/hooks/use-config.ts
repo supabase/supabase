@@ -18,6 +18,7 @@ type Config = {
   settingsAllPreviews?: boolean
   selectedProject?: Project
   selectedOrg?: Org
+  activeTab?: number
   db: {
     orgs: Org[]
   }
@@ -31,7 +32,7 @@ const configAtom = atomWithStorage<Config>('config', {
     sidePanelOpen: true,
     activeTabId: 1,
     itemsOpen: true,
-    queriesOpen: true,
+    queriesOpen: false,
     privateQueriesOpen: true,
   },
   isChangingProject: false,

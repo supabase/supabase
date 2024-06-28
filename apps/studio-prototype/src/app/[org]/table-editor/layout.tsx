@@ -1,5 +1,5 @@
-import TabHeader from './tab-header'
 import TableEditorItemsPanel from './table-editor-items-panel'
+import TabsHeader from './tabs-header'
 
 export default function TableEditorLayout({
   children,
@@ -10,7 +10,7 @@ export default function TableEditorLayout({
     <div className="flex h-full w-full">
       <TableEditorItemsPanel />
       <div className="flex flex-col grow h-full w-full">
-        <TabHeader />
+        <TabsHeader />
         {children}
       </div>
     </div>

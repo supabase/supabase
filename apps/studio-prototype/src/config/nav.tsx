@@ -19,6 +19,7 @@ import {
   Boxes,
   ClipboardMinus,
   Compass,
+  Lightbulb,
   ListTree,
   Users2,
 } from 'lucide-react'
@@ -88,6 +89,12 @@ const SideNav = [
     },
   ],
   [
+    {
+      name: 'advisor',
+      label: 'Advisor',
+      icon: <Lightbulb strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+      href: '/advisor',
+    },
     {
       name: 'logs',
       label: 'Logs',

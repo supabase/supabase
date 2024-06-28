@@ -1,4 +1,4 @@
-import TabHeader from './tab-header'
+import TabHeader from './filter-header'
 
 export default function TableEditorPage() {
   return (
