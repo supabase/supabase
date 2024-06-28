@@ -26,11 +26,8 @@ export async function getIndexAdvisorResult({
 }: GetIndexAdvisorResultVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
+  // swap single quotes for double to prevent syntax errors
   const escapedQuery = query.replace(/'/g, "''")
-
-  const traceparent = "/* traceparent='00-xxx-01' */"
-  const queryWithTraceparent = `${escapedQuery} ${traceparent}`
-
 
   const { result } = await executeSql({
     projectRef,
