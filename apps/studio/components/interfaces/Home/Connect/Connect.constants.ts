@@ -206,6 +206,20 @@ export const MOBILES: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'androidkotlin',
+    label: 'Android Kotlin',
+    icon: 'kotlin',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin',
+    children: [
+      {
+        key: 'supabasekt',
+        label: 'supabase-kt',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const ORMS: ConnectionType[] = [
