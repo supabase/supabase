@@ -747,10 +747,6 @@ export const database: NavMenuConstant = {
           name: 'Superuser Access and Unsupported Operations',
           url: '/guides/database/postgres/roles-superuser',
         },
-        {
-          name: 'Column level privileges',
-          url: '/guides/database/postgres/column-level-security',
-        },
       ],
     },
     {
