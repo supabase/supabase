@@ -277,16 +277,13 @@ When using Postgres Changes with RLS, database records are sent only to clients 
 
 ## Updating RLS policies
 
-When you change an RLS policy these changes are picked up when a user connects to a Channel.
+Client access polices are cached for the duration of the connection. Your database is not queried for every Channel message.
 
-When a user connects, Realtime queries your database and generates a representation of the permissions for a user for a Channel.
+Realtime updates the access policy cache for a client based on your RLS polices when:
 
-Permissions are cached for the duration of the connection so we don't have to query your database for each Channel message.
+- A client connects to Realtime and subscribes to a Channel
+- A new JWT is sent to Realtime from a client via the [`access_token` message](docs/guides/realtime/protocol#access-token)
 
-RLS policies are re-checked when access tokens are updated on the Channel. Our client libraries default to updating the access token every 30 seconds.
+If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 
-If a user Channel permissions have been updated these changes will be picked up when the access token is sent over the Channel from the client.
-
-If a new access token is never received on the Channel users will be disconnected when the JWT expires.
-
-Make sure to expire your JWTs frequently.
+Make sure to keep the JWT expiration window short.
