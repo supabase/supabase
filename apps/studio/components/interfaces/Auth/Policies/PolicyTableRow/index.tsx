@@ -56,8 +56,7 @@ const PolicyTableRow = ({
                 Row Level Security is enabled for this table, but no policies are set
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Select queries will return an{' '}
-                <span className="text-foreground underline">empty array</span> of results.
+                Select queries may return 0 results.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
