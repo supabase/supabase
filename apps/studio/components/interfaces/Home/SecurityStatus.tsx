@@ -39,10 +39,14 @@ const SecurityStatus = () => {
             )
           }
         >
-          Security issues
+          Security Issues
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="py-1.5 px-0 w-72" side="bottom" align="start">
+      <PopoverContent_Shadcn_
+        className={`py-1.5 px-0 ${noIssuesFound ? 'w-64' : 'w-84'}`}
+        side="bottom"
+        align="center"
+      >
         <div className="px-4 py-2 text-sm flex gap-3">
           {noIssuesFound ? (
             <CheckCircle2 className="text-brand shrink-0" size={18} strokeWidth={1.5} />
@@ -52,19 +56,26 @@ const SecurityStatus = () => {
 
           <div className="flex flex-col gap-y-3 -mt-1">
             {noIssuesFound ? (
-              <p>
-                No security issues found. <br />
-                Keep monitoring Security Advisor for updates as your project grows.
-              </p>
+              <div className="flex flex-col gap-y-1">
+                <p className="text-xs">No security issues found</p>
+                <p className="text-xs text-foreground-light">
+                  Keep monitoring Security Advisor for updates as your project grows.
+                </p>
+              </div>
             ) : (
-              <p>
-                This project has ${securityLints.length} security issues requiring urgent attention.
-              </p>
+              <div className="flex flex-col gap-y-1">
+                <p className="text-xs">
+                  {securityLints.length} security issues requiring urgent attention
+                </p>
+                <p className="text-xs text-foreground-light">
+                  Check the Security Advisor to address them
+                </p>
+              </div>
             )}
 
             <Button asChild type="default" className="w-min">
               <Link href={`/project/${project?.ref}/database/security-advisor`}>
-                Security Advisor
+                Head to Security Advisor
               </Link>
             </Button>
           </div>
