@@ -31,7 +31,6 @@ export async function getIndexAdvisorResult({
   const traceparent = "/* traceparent='00-xxx-01' */"
   const queryWithTraceparent = `${escapedQuery} ${traceparent}`
 
-  console.log('Original query with traceparent:', `${query} ${traceparent}`)
   console.log('Escaped query:', escapedQuery)
 
   const { result } = await executeSql({
