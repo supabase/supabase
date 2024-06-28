@@ -212,15 +212,15 @@ const uiConfig = {
           '0%': { height: 'inherit', opacity: 1 },
           '100%': { height: 0, opacity: 0 },
         },
-        slideInFromBottomOutside: {
-          '0%': { transform: 'translate3d(0,100%,0)' },
-          '100%': { transform: 'translate3d(0,0,0)' },
+        slideInFromOutsideBottom: {
+          '0%': { transform: 'translateY(0dvh)', opacity: 0, visibility: 'hidden' },
+          '1%': { transform: 'translateY(100dvh)', opacity: 0, visibility: 'hidden' },
+          '100%': { transform: 'translateY(0dvh)', opacity: 1, visibility: 'visible' },
         },
-        slideOutToBottomOutside: {
-          '0%': { transform: 'translate3d(0,0,0)' },
-          '100%': { transform: 'translate3d(0,100%,0)' },
+        slideOutToOutsideBottom: {
+          '0%': { transform: 'translateY(0dvh)' },
+          '100%': { transform: 'translateY(100dvh)' },
         },
-
         panelSlideLeftOut: {
           '0%': { transform: 'translateX(-100%)', opacity: 0 },
           '100%': {
@@ -283,9 +283,10 @@ const uiConfig = {
         'slide-down-normal': 'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up-normal': 'slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
 
-        'slide-in-from-bottom-outside':
-          'slideInFromBottomOutside 300ms cubic-bezier(.57,.02,.52,1) !important',
-        'slide-out-to-bottom-outside': 'slideOutToBottomOutside 300ms cubic-bezier(.57,.02,.52,1)',
+        'slide-in-from-outside-bottom':
+          'slideInFromOutsideBottom 0.2ms cubic-bezier(0.87, 0, 0.13, 1) both',
+        'slide-out-to-outside-bottom':
+          'slideOutToOutsideBottom 0.1s cubic-bezier(0.87, 0, 0.13, 1) both',
 
         'panel-slide-left-out': 'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-left-in': 'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',

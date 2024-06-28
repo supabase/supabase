@@ -118,7 +118,6 @@ const CommandMenu = () => {
                 ? commandListMaxHeight
                 : 'auto',
           }}
-          className="my-2"
         >
           {!currentPage && (
             <>

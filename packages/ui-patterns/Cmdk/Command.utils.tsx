@@ -66,15 +66,19 @@ export const CommandDialog = ({
   setIsOpen,
   ...props
 }: CommandDialogProps) => {
-  const [animateBounce, setAnimateBounce] = React.useState(false)
+  const isOpen = props.visible || props.open
+  const [isVisible, setIsVisible] = React.useState(false)
 
   React.useEffect(() => {
-    setAnimateBounce(true)
-    setTimeout(() => setAnimateBounce(false), 126)
-  }, [page])
+    if (isOpen) {
+      setTimeout(() => setIsVisible(true), 200)
+    } else {
+      setIsVisible(false)
+    }
+  }, [isOpen])
 
   return (
-    <Dialog {...props} open={props.visible || props.open}>
+    <Dialog {...props} open={isOpen}>
       <DialogContent
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
@@ -85,9 +89,20 @@ export const CommandDialog = ({
         }}
         hideClose
         size={'xlarge'}
+        dialogOverlayProps={{
+          className: cn('overflow-hidden flex'),
+        }}
         className={cn(
-          'place-self-end my-0 mx-auto rounded-t-lg h-[calc(100vh-9rem)]',
-          'data-[state=closed]:!animate-slide-out-to-bottom-outside data-[state=open]:!animate-slide-in-from-bottom-outside'
+          'relative my-0 mx-auto rounded-t-lg top-[20dvh] md:top-auto md:bottom-auto h-[300px] md:max-h-[450px]',
+          'transform transition-transform duration-500',
+          'opacity-0 invisible',
+          isVisible ? 'animate-slide-in-from-outside-bottom' : 'animate-slide-out-to-bottom-outside'
+          // 'ease-in-out duration-1000 delay-300 transform transition-transform'
+          // 'data-[state=closed]:!animate-slide-out-to-outside-bottom data-[state=open]:!animate-slide-in-from-outside-bottom'
+          // 'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
+          // 'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
+          // 'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
+          // 'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
         )}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
