@@ -7,7 +7,7 @@ import { useSelectedProject } from 'hooks'
 import Link from 'next/link'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
-const SecurityStatus = () => {
+export const SecurityStatus = () => {
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
   const { data, isLoading } = useProjectLintsQuery({
@@ -84,5 +84,3 @@ const SecurityStatus = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default SecurityStatus

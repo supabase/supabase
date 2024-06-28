@@ -5,6 +5,7 @@ import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import Connect from 'components/interfaces/Home/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
+import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
@@ -13,8 +14,6 @@ import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-
-import SecurityStatus from 'components/interfaces/Home/SecurityStatus'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
