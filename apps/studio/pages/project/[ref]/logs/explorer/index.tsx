@@ -16,6 +16,7 @@ import {
 import {
   DatePickerToFrom,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  LOGS_TABLES,
   LogTable,
   LogTemplate,
   LogsQueryPanel,
@@ -38,31 +39,78 @@ import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useWarehouseCollectionsQuery, useWarehouseQueryQuery } from 'data/analytics'
+import { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 
+const createWarehouseQuery = (collection: string) => {
+  const query = `
+        # Fetch the last 50 logs from the last 7 days
+        select id, timestamp, event_message from \`${collection}\`
+        where timestamp > timestamp_sub(current_timestamp(), interval 7 day)
+        order by timestamp desc limit 50`
+  return query
+}
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const router = useRouter()
-  const { ref: projectRef, q, ite, its } = useParams()
+  const { ref, q, ite, its } = useParams()
+  const projectRef = ref as string
   const organization = useSelectedOrganization()
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
-    projectRef as string,
+  const {
+    params,
+    logData,
+    error,
+    isLoading: logsLoading,
+    changeQuery,
+    runQuery,
+    setParams,
+  } = useLogsQuery(projectRef, {
+    iso_timestamp_start: its ? (its as string) : undefined,
+    iso_timestamp_end: ite ? (ite as string) : undefined,
+  })
+
+  const {
+    refetch: runWarehouseQuery,
+    data: warehouseResults,
+    isFetching: warehouseFetching,
+    error: warehouseError,
+  } = useWarehouseQueryQuery(
+    { ref: projectRef, sql: editorValue },
     {
-      iso_timestamp_start: its ? (its as string) : undefined,
-      iso_timestamp_end: ite ? (ite as string) : undefined,
+      enabled: false,
     }
   )
+
+  useEffect(() => {
+    if (warehouseError) {
+    }
+  }, [warehouseError])
+
+  const isLoading = logsLoading || warehouseFetching
+
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const { data: warehouseCollections } = useWarehouseCollectionsQuery(
+    { projectRef },
+    {
+      enabled: !!projectRef,
+    }
+  )
+
+  const [sourceType, setSourceType] = useState<SourceType>('logs')
+
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
@@ -125,9 +173,47 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
+
     if (value && typeof value === 'string') {
       setEditorValue(value)
     }
+
+    if (sourceType === 'warehouse') {
+      if (!warehouseCollections?.length) {
+        toast.error("You don't have any collections in your warehouse yet.")
+        return
+      }
+
+      // Check that a collection name is included in the query
+      const collectionNames = warehouseCollections?.map((collection) => collection.name)
+      const collectionExists = collectionNames?.find((collectionName) =>
+        query.includes(collectionName)
+      )
+
+      if (!collectionExists) {
+        toast.error('Please specify a collection name in the query')
+        return
+      }
+
+      // Check that the user is not trying to query logs tables and warehouse collections at the same time
+      const logsSources = Object.values(LOGS_TABLES)
+      const logsSourceExists = logsSources.find((source) => query.includes(source))
+
+      if (logsSourceExists) {
+        toast.error(
+          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
+        )
+        return
+      }
+
+      runWarehouseQuery()
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, q: query },
+      })
+      return
+    }
+
     changeQuery(query)
     runQuery()
     router.push({
@@ -143,7 +229,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     changeQuery('')
   }
 
-  const handleInsertSource = (source: LogsTableName) => {
+  const handleInsertSource = (source: string) => {
     setEditorValue((prev) => {
       const index = prev.indexOf('from')
       if (index === -1) return `${prev}${source}`
@@ -207,6 +293,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSave={handleOnSave}
             isLoading={isLoading}
             warnings={warnings}
+            warehouseCollections={warehouseCollections || []}
+            sourceType={sourceType}
+            onSourceTypeChange={setSourceType}
           />
 
           <ShimmerLine active={isLoading} />
@@ -227,7 +316,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
               params={params}
-              data={logData}
+              data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
               error={error}
               projectRef={projectRef as string}
             />

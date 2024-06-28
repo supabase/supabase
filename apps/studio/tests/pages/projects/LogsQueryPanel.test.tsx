@@ -18,6 +18,7 @@ test('run and clear', async () => {
       warnings={[]}
       onClear={mockClear}
       hasEditorValue
+      warehouseCollections={[]}
     />
   )
   await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()

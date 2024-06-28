@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Alert,
   Badge,
@@ -8,9 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconBookOpen,
   IconCheck,
-  IconChevronDown,
   IconClipboard,
   IconExternalLink,
   IconX,
@@ -19,8 +16,7 @@ import {
   Tabs,
 } from 'ui'
 
-import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { useProfile } from 'lib/profile'
+import { useIsFeatureEnabled } from 'hooks'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import {
@@ -29,16 +25,19 @@ import {
   LogsWarning,
   LOGS_SOURCE_DESCRIPTION,
   LogTemplate,
+  WarehouseCollection,
 } from '.'
 import DatePickers from './Logs.DatePickers'
 import Table from 'components/to-be-cleaned/Table'
 import { logConstants } from 'shared-data'
 import { copyToClipboard } from 'lib/helpers'
+import { BookOpen, ChevronDown } from 'lucide-react'
 
+export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
-  onSelectSource: (source: LogsTableName) => void
+  onSelectSource: (source: string) => void
   onClear: () => void
   onSave?: () => void
   hasEditorValue: boolean
@@ -47,6 +46,18 @@ export interface LogsQueryPanelProps {
   defaultTo: string
   defaultFrom: string
   warnings: LogsWarning[]
+  warehouseCollections: WarehouseCollection[]
+  sourceType: SourceType
+  onSourceTypeChange: (sourceType: SourceType) => void
+}
+
+function DropdownMenuItemContent({ name, desc }: { name: string; desc?: string }) {
+  return (
+    <div className="grid gap-1">
+      <div className="font-mono font-bold">{name}</div>
+      {desc && <div className="text-foreground-light">{desc}</div>}
+    </div>
+  )
 }
 
 const LogsQueryPanel = ({
@@ -57,8 +68,11 @@ const LogsQueryPanel = ({
   defaultTo,
   onDateChange,
   warnings,
+  warehouseCollections,
+  sourceType,
+  onSourceTypeChange,
 }: LogsQueryPanelProps) => {
-  const [showReference, setShowReference] = React.useState(false)
+  const [showReference, setShowReference] = useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -71,56 +85,97 @@ const LogsQueryPanel = ({
       if (key === 'AUTH') return authEnabled
       if (key === 'STORAGE') return storageEnabled
       if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      if (key === 'WAREHOUSE') return false
       return true
     })
     .map(([, value]) => value)
 
   return (
-    <div className="rounded rounded-bl-none rounded-br-none border border-overlay bg-surface-100">
+    <div className="border-b bg-surface-100">
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconChevronDown />}>
-                  Insert source
+                <Button type="default" iconRight={<ChevronDown />}>
+                  Query type <span className="ml-2 font-mono opacity-50">{sourceType}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
-                {logsTableNames
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((source) => (
-                    <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono font-bold">{source}</span>
-                        <span className="text-foreground-light">
-                          {LOGS_SOURCE_DESCRIPTION[source]}
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
+                <DropdownMenuItem onClick={() => onSourceTypeChange('logs')}>
+                  <DropdownMenuItemContent name="Logs" desc="Logs for all Supabase products" />
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onClick={() => onSourceTypeChange('warehouse')}>
+                  <DropdownMenuItemContent
+                    name="Warehouse"
+                    desc="Query your data warehouse collections"
+                  />
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconChevronDown />}>
-                  Templates
+                <Button type="default" iconRight={<ChevronDown />}>
+                  Insert source
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                {templates
-                  .sort((a, b) => a.label!.localeCompare(b.label!))
-                  .map((template) => (
-                    <DropdownMenuItem
-                      key={template.label}
-                      onClick={() => onSelectTemplate(template)}
-                    >
-                      <p>{template.label}</p>
+              <DropdownMenuContent
+                side="bottom"
+                align="start"
+                className="max-h-[70vh] overflow-auto"
+              >
+                {sourceType === 'logs' &&
+                  logsTableNames
+                    .sort((a, b) => a.localeCompare(b))
+                    .map((source) => (
+                      <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
+                        <DropdownMenuItemContent
+                          name={source}
+                          desc={LOGS_SOURCE_DESCRIPTION[source]}
+                        />
+                      </DropdownMenuItem>
+                    ))}
+                {sourceType === 'warehouse' &&
+                  warehouseCollections.map((col) => (
+                    <DropdownMenuItem onClick={() => onSelectSource(col.name)}>
+                      <DropdownMenuItemContent name={col.name} />
                     </DropdownMenuItem>
                   ))}
+                {sourceType === 'warehouse' && warehouseCollections.length === 0 && (
+                  <DropdownMenuItem className="hover:bg-transparent cursor-default">
+                    <DropdownMenuItemContent
+                      name="No collections found"
+                      desc="You can create collections in the left sidebar."
+                    />
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {sourceType === 'logs' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Templates
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
+                  {templates
+                    .sort((a, b) => a.label!.localeCompare(b.label!))
+                    .map((template) => (
+                      <DropdownMenuItem
+                        key={template.label}
+                        onClick={() => onSelectTemplate(template)}
+                      >
+                        <p>{template.label}</p>
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <DatePickers
               to={defaultTo}
               from={defaultFrom}
@@ -181,7 +236,8 @@ const LogsQueryPanel = ({
                       asChild // ?: we don't want a button inside a button
                       type="default"
                       onClick={() => setShowReference(true)}
-                      icon={<IconBookOpen strokeWidth={1.5} />}
+                      icon={<BookOpen />}
+                      className="px-2"
                     >
                       <span>Field Reference</span>
                     </Button>

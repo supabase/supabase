@@ -47,7 +47,6 @@ interface Props {
   isLoading?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
-  // TODO: move all common params to a context to avoid prop drilling
   queryType?: QueryType
   projectRef: string
   params: LogSelectionProps['params']
@@ -57,6 +56,7 @@ interface Props {
   maxHeight?: string
   className?: string
   collectionName?: string // Used for warehouse queries
+  warehouseError?: string
   emptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
@@ -375,7 +375,6 @@ const LogTable = ({
               rowHeight={40}
               headerRowHeight={queryType ? 0 : 28}
               onSelectedCellChange={(row) => {
-                console.log('row', row)
                 setFocusedLog(row.row as LogData)
               }}
               selectedRows={new Set([])}
