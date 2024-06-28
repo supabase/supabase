@@ -68,7 +68,7 @@
     "swiper": "^11.0.7",
     "three": "^0.136.0",
     "typed.js": "^2.0.16",
-    "typescript": "^5.4.3",
+    "typescript": "^5.5.0",
     "ui": "*",
     "ui-patterns": "*",
     "use-debounce": "^7.0.1",
