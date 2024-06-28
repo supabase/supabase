@@ -25,9 +25,11 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import generator from 'generate-password-browser'
 import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
+  AWS_REGIONS_DEFAULT,
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
+  FLY_REGIONS_DEFAULT,
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
@@ -530,7 +532,13 @@ const Wizard: NextPageWithLayout = () => {
                           render={({ field }) => (
                             <FormItemLayout label="Cloud provider" layout="horizontal">
                               <Select_Shadcn_
-                                onValueChange={field.onChange}
+                                onValueChange={(value) => {
+                                  field.onChange(value)
+                                  form.setValue(
+                                    'dbRegion',
+                                    value === 'FLY' ? FLY_REGIONS_DEFAULT : AWS_REGIONS_DEFAULT
+                                  )
+                                }}
                                 defaultValue={field.value}
                               >
                                 <FormControl_Shadcn_>
