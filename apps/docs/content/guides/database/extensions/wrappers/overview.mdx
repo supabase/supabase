@@ -149,7 +149,7 @@ As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/n
      description text
    )
    language plpgsql
-   security definer set search_path = public, extensions, pg_temp
+   security definer set search_path = ''
    as $$
    begin
      return query
