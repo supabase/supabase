@@ -30,7 +30,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
     <GridFooter>
       {selectedView === 'data' && <Pagination />}
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-x-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
         )}
