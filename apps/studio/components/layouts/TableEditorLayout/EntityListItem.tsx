@@ -29,8 +29,13 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { useSelectedProject } from '../../../hooks'
-import { getTableDefinitionQuery, useTableDefinitionQuery } from '../../../data/database/table-definition-query'
+import {
+  getTableDefinitionQuery,
+  useTableDefinitionQuery,
+} from '../../../data/database/table-definition-query'
+import { format } from 'sql-formatter'
+import { useMemo } from 'react'
+import { useViewDefinitionQuery } from '../../../data/database/view-definition-query'
 
 export interface EntityListItemProps {
   id: number
@@ -85,15 +90,64 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       ?.join(' ')
   }
 
+  const viewResult = useViewDefinitionQuery(
+    {
+      schema: entity.schema,
+      name: entity.name,
+      projectRef,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW,
+    }
+  )
+
+  const tableResult = useTableDefinitionQuery(
+    {
+      schema: entity.schema,
+      name: entity.name,
+      projectRef,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: entity.type === ENTITY_TYPE.TABLE,
+    }
+  )
+
+  const { data: definition, isLoading } =
+    entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
+      ? viewResult
+      : tableResult
+
+  const prepend =
+    entity.type === ENTITY_TYPE.VIEW
+      ? `create view ${entity.schema}.${entity.name} as\n`
+      : entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
+        ? `create materialized view ${entity.schema}.${entity.name} as\n`
+        : ''
+
+  const formatDefinition = (value: string) => {
+    try {
+      return format(value, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+    } catch (err) {
+      return value
+    }
+  }
+
+  const formattedDefinition = useMemo(
+    () => (definition ? formatDefinition(prepend + definition) : undefined),
+    [definition]
+  )
+
   const copyDefinition = async () => {
     try {
-      const definition = getTableDefinitionQuery({schema: entity.schema, name: entity.name})
-      console.log(`${await definition.trim()}`)
-      await navigator.clipboard.writeText(definition.trim())
-      toast.success("Definition successfully copied to clipboard.")
-    }
-    catch (error: any) {
-      toast.error("Failed to copy definition.")
+      await navigator.clipboard.writeText(formattedDefinition!)
+      toast.success('Definition successfully copied to clipboard.')
+    } catch (error: any) {
+      toast.error('Failed to copy definition.')
     }
   }
 
@@ -333,7 +387,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               className="space-x-2"
               onClick={(e) => {
                 e.stopPropagation()
-                // TODO add functionality to copy the definition to clipboard
                 copyDefinition()
               }}
             >
