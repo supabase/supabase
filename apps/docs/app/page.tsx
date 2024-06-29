@@ -122,22 +122,22 @@ const selfHostingOptions = [
   {
     title: 'Auth',
     icon: 'auth',
-    href: 'reference/self-hosting-auth/introduction',
+    href: '/reference/self-hosting-auth/introduction',
   },
   {
     title: 'Realtime',
     icon: 'realtime',
-    href: 'reference/self-hosting-realtime/introduction',
+    href: '/reference/self-hosting-realtime/introduction',
   },
   {
     title: 'Storage',
     icon: 'storage',
-    href: 'reference/self-hosting-storage/introduction',
+    href: '/reference/self-hosting-storage/introduction',
   },
   {
     title: 'Analytics',
     icon: 'analytics',
-    href: 'reference/self-hosting-analytics/introduction',
+    href: '/reference/self-hosting-analytics/introduction',
   },
 ]
 
@@ -145,32 +145,32 @@ const clientLibraries = [
   {
     title: 'Javascript',
     icon: 'reference-javascript',
-    href: 'reference/javascript/introduction',
+    href: '/reference/javascript/introduction',
   },
   {
     title: 'Flutter',
     icon: 'reference-dart',
-    href: 'reference/dart/introduction',
+    href: '/reference/dart/introduction',
   },
   {
     title: 'Python',
     icon: 'reference-python',
-    href: 'reference/python/introduction',
+    href: '/reference/python/introduction',
   },
   {
     title: 'C#',
     icon: 'reference-csharp',
-    href: 'reference/csharp/introduction',
+    href: '/reference/csharp/introduction',
   },
   {
     title: 'Swift',
     icon: 'reference-swift',
-    href: 'reference/swift/introduction',
+    href: '/reference/swift/introduction',
   },
   {
     title: 'Kotlin',
     icon: 'reference-kotlin',
-    href: 'reference/kotlin/introduction',
+    href: '/reference/kotlin/introduction',
   },
 ]
 
@@ -179,25 +179,25 @@ const additionalResources = [
     title: 'Management API',
     description: 'Manage your Supabase projects and organizations.',
     icon: 'reference-api',
-    href: 'reference/api/introduction',
+    href: '/reference/api/introduction',
   },
   {
     title: 'Supabase CLI',
     description: 'Use the CLI to develop, manage and deploy your projects.',
     icon: 'reference-cli',
-    href: 'reference/cli/introduction',
+    href: '/reference/cli/introduction',
   },
   {
     title: 'Platform Guides',
     description: 'Learn more about the tools and services powering Supabase.',
     icon: 'platform',
-    href: 'guides/platform',
+    href: '/guides/platform',
   },
   {
     title: 'Integrations',
     description: 'Explore a variety of integrations from Supabase partners.',
     icon: 'integrations',
-    href: 'guides/integrations',
+    href: '/guides/integrations',
   },
 ]
 
