@@ -12,7 +12,7 @@ Accessing the [Storage Logs](/dashboard/project/__/logs/explorer?q=select+id%2C+
 #### Filter by status 5XX error
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
+select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage, e.raw as rawError
   from storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.res) as r
@@ -25,7 +25,7 @@ select id, storage_logs.timestamp, event_message, r.statusCode, e.message as err
 #### Filter by status 4XX error
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
+select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage, e.raw as rawError
   from storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.res) as r
