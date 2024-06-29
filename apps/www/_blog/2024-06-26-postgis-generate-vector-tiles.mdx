@@ -103,7 +103,7 @@ CREATE POLICY "Enable read access for all users" ON "public"."places" FOR SELECT
 To programmatically generate vector tiles on client-side request, we need to create a Postgres function that we can invoke via a [remote procedure call](/docs/reference/javascript/rpc). In your SQL Editor, run:
 
 ```sql
-CREATE OR REPLACE FUNCTION mvt(z integer, x integer, y integer)
+CREATE OR REPLACE FUNCTION mvt(relation text, z integer, x integer, y integer)
 RETURNS text
 LANGUAGE plpgsql
 AS $$
@@ -141,7 +141,7 @@ BEGIN
             ST_Intersects(ST_Transform(wkb_geometry, 3857), bounds.geom)
     )
     -- Generate the MVT from the clipped geometries
-    SELECT INTO mvt_output encode(ST_AsMVT(mvtgeom, 'places', 4096, 'geom'),'base64')
+    SELECT INTO mvt_output encode(ST_AsMVT(mvtgeom, relation, 4096, 'geom'),'base64')
     FROM mvtgeom;
 
     RETURN mvt_output;
@@ -171,6 +171,7 @@ maplibregl.addProtocol('supabase', async (params, abortController) => {
   const re = new RegExp(/supabase:\/\/(.+)\/(\d+)\/(\d+)\/(\d+)/)
   const result = params.url.match(re)
   const { data, error } = await client.rpc('mvt', {
+    relation: result[1],
     z: result[2],
     x: result[3],
     y: result[4],
@@ -193,11 +194,11 @@ const map = new maplibregl.Map({
   container: 'map',
   style: {
     version: 8,
-    glyphs: 'https://cdn.protomaps.com/fonts/pbf/{fontstack}/{range}.pbf',
+    glyphs: 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
     sources: {
       supabase: {
         type: 'vector',
-        tiles: ['supabase://boston/{z}/{x}/{y}'],
+        tiles: ['supabase://places/{z}/{x}/{y}'],
         attribution: '© <a href="https://overturemaps.org">Overture Maps Foundation</a>',
       },
       protomaps: {
