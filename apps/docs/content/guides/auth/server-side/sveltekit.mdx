@@ -88,7 +88,7 @@ const supabase: Handle = async ({ event, resolve }) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
         })
-      }
+      },
     },
   })
 
@@ -174,7 +174,7 @@ declare global {
       user: User | null
     }
     interface PageData {
-      session: Session | null;
+      session: Session | null
     }
     // interface PageState {}
     // interface Platform {}
@@ -216,16 +216,16 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
     ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
         global: {
           fetch,
-        }
+        },
       })
     : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
         global: {
           fetch,
         },
         cookies: {
-          getAll() { 
+          getAll() {
             return data.cookies
-          }
+          },
         },
       })
 
@@ -252,7 +252,7 @@ import type { LayoutServerLoad } from './$types'
 export const load: LayoutServerLoad = async ({ locals: { session }, cookies }) => {
   return {
     session,
-    cookies: cookies.getAll()
+    cookies: cookies.getAll(),
   }
 }
 ```
