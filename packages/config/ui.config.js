@@ -212,12 +212,11 @@ const uiConfig = {
           '0%': { height: 'inherit', opacity: 1 },
           '100%': { height: 0, opacity: 0 },
         },
-        slideInFromOutsideBottom: {
-          '0%': { transform: 'translateY(0dvh)', opacity: 0, visibility: 'hidden' },
-          '1%': { transform: 'translateY(100dvh)', opacity: 0, visibility: 'hidden' },
+        slideInFromBottom: {
+          '0%': { transform: 'translateY(100dvh)', opacity: 0, visibility: 'hidden' },
           '100%': { transform: 'translateY(0dvh)', opacity: 1, visibility: 'visible' },
         },
-        slideOutToOutsideBottom: {
+        slideOutToBottom: {
           '0%': { transform: 'translateY(0dvh)' },
           '100%': { transform: 'translateY(100dvh)' },
         },
@@ -283,10 +282,8 @@ const uiConfig = {
         'slide-down-normal': 'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up-normal': 'slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
 
-        'slide-in-from-outside-bottom':
-          'slideInFromOutsideBottom 0.2ms cubic-bezier(0.87, 0, 0.13, 1) both',
-        'slide-out-to-outside-bottom':
-          'slideOutToOutsideBottom 0.1s cubic-bezier(0.87, 0, 0.13, 1) both',
+        'slide-in-from-bottom': 'slideInFromBottom 0.15ms cubic-bezier(0.87, 0, 0.13, 1) both',
+        'slide-out-to-bottom': 'slideOutToBottom 0.1s cubic-bezier(0.87, 0, 0.13, 1) both',
 
         'panel-slide-left-out': 'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-left-in': 'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
