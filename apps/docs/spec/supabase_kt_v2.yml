@@ -4522,15 +4522,15 @@ functions:
           data class Message(val content: String, val sender: String)
 
           val channel = supabase.channel("channelId") {
-              //optional config
+              // optional config
           }
 
           val broadcastFlow = channel.broadcastFlow<Message>(event = "message")
 
-          //Collect the flow
-          broadcastFlow.collect { //it: Message
+          // Collect the flow
+          broadcastFlow.onEach { // it: Message
               println(it)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
 
@@ -4551,11 +4551,11 @@ functions:
           val presenceFlow = channel.presenceDataFlow<PresenceState>() 
 
           //Collect the flow
-          presenceFlow.collect {
+          presenceFlow.onEach {
               for (presence in it) {
                   println(presence.username)
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
           //send your own state
@@ -4574,14 +4574,14 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
                   is PostgresAction.Insert -> println("Inserted: ${it.record}")
                   is PostgresAction.Select -> println("Selected: ${it.record}")
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4603,14 +4603,14 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
                   is PostgresAction.Insert -> println("Inserted: ${it.record}")
                   is PostgresAction.Select -> println("Selected: ${it.record}")
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4630,9 +4630,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.record)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4656,10 +4656,10 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.record)
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4683,9 +4683,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
@@ -4710,9 +4710,9 @@ functions:
           }
 
           //Collect the flow
-          changeFlow.collect {
+          changeFlow.onEach {
               println(it.oldRecord)
-          }
+          }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe()
           ```
