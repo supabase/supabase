@@ -282,8 +282,8 @@ const uiConfig = {
         'slide-down-normal': 'slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         'slide-up-normal': 'slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1)',
 
-        'slide-in-from-bottom': 'slideInFromBottom 0.15ms cubic-bezier(0.87, 0, 0.13, 1) both',
-        'slide-out-to-bottom': 'slideOutToBottom 0.1s cubic-bezier(0.87, 0, 0.13, 1) both',
+        'slide-in-from-bottom': 'slideInFromBottom 0.3ms cubic-bezier(0.87, 0, 0.13, 1) both',
+        'slide-out-to-bottom': 'slideOutToBottom 0.15s cubic-bezier(0.87, 0, 0.13, 1) both',
 
         'panel-slide-left-out': 'panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-left-in': 'panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
