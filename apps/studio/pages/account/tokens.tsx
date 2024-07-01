@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { FormHeader } from 'components/ui/Forms'
-import { AccountLayout } from 'components/layouts'
 import {
   AccessTokenList,
-  NewTokenBanner,
   NewAccessTokenButton,
+  NewTokenBanner,
 } from 'components/interfaces/Account'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { FormHeader } from 'components/ui/Forms'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { useState } from 'react'
+import type { NextPageWithLayout } from 'types'
 
 import Link from 'next/link'
 import { Alert, Button, IconExternalLink } from 'ui'

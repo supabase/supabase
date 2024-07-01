@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import RedirectUrls from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
 import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
-import { AuthLayout } from 'components/layouts'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'

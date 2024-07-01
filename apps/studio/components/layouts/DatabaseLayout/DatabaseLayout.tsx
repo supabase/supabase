@@ -8,7 +8,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedProject, withAuth } from 'hooks'
 import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {

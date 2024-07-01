@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 
 import { EnumeratedTypes } from 'components/interfaces/Database'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,

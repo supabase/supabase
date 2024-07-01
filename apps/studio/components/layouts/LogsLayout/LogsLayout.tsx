@@ -11,7 +11,7 @@ import {
   useSelectedProject,
   withAuth,
 } from 'hooks'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
 import { Badge, Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'

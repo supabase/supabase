@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import RateLimits from 'components/interfaces/Auth/RateLimits/RateLimits'
-import { AuthLayout } from 'components/layouts'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'

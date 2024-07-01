@@ -3,13 +3,13 @@ import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import Link from 'next/link'
 import { NavMenu, NavMenuItem } from 'ui'
-import { AccountLayout } from './'
+import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
+import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()

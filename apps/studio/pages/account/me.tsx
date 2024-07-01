@@ -6,7 +6,7 @@ import {
 } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import { AccountLayout } from 'components/layouts'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'

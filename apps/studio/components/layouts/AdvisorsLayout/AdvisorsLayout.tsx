@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProject, withAuth } from 'hooks'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
 
 export interface AdvisorsLayoutProps {

@@ -8,7 +8,7 @@ import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks'
 import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
 export interface AuthLayoutProps {
