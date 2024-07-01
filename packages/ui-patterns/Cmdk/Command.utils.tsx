@@ -86,7 +86,7 @@ export const CommandDialog = ({
         }}
         className={cn(
           'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
-          'h-[50dvh] max-h-[90dvh] min-h-[300px] md:max-h-[450px] md:top-auto md:bottom-auto',
+          'h-[80dvh] md:max-h-[450px] md:top-auto md:bottom-auto',
           'place-self-end md:place-self-auto',
           isOpen && '!animate-in !slide-in-from-bottom fill-mode-both w-full !duration-300',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
