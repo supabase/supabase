@@ -8,6 +8,7 @@ import {
   IntegrationConnection,
   IntegrationConnectionProps,
 } from 'components/interfaces/Integrations/IntegrationPanels'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -75,9 +76,19 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           showNode={false}
           actions={
             disabled ? (
-              <Button asChild disabled iconRight={<ChevronDown size={14} />} type="default">
-                <span>Manage</span>
-              </Button>
+              <ButtonTooltip
+                disabled
+                iconRight={<ChevronDown size={14} />}
+                type="default"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to manage this connection',
+                  },
+                }}
+              >
+                Manage
+              </ButtonTooltip>
             ) : (
               <DropdownMenu
                 open={dropdownVisible}
