@@ -1330,6 +1330,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   },
 }
 
+// TODO: Check htis
 const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1340,6 +1341,11 @@ const PROVIDER_SAML = {
       description:
         'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
+    },
+    SAML_EXTERNAL_URL: {
+      // TODO: Update this
+      title: 'Allows the advertised SAML metadata to be different than the one defined with the API external URL.',
+      type: 'string',
     },
   },
   validationSchema: object().shape({
