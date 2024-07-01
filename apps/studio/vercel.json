@@ -1,5 +1,11 @@
 {
-  "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }],
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "buildCommand": "npm run build-remix",
   "outputDirectory": "build/client"
 }
