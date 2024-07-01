@@ -1,5 +1,4 @@
 import { memo } from 'react'
-import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
@@ -251,8 +250,6 @@ function getMenuById(id: MenuId) {
 function getMenuElement(menu: Menu) {
   const menuType = menu.type
   switch (menuType) {
-    case 'home':
-      return <NavigationMenuHome />
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
     case 'reference':

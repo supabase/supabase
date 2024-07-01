@@ -168,7 +168,10 @@ const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
   ...props
 }) => {
   return (
-    <article key={props.id + 'education'} className={'prose max-w-none py-16 first:pt-8 last:pb-8'}>
+    <article
+      key={props.id + 'education'}
+      className={'prose max-w-none py-16 first:pb-8 first:pt-0 last:pb-8'}
+    >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}
     </article>
