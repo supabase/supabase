@@ -150,7 +150,11 @@ The GitHub app will watch for changes in your repository such as file changes, b
             </p>
           )}
           {GitHubContentSectionBottom && (
-            <Markdown content={GitHubContentSectionBottom} className="text-foreground-lighter" />
+            <Markdown
+              extLinks
+              content={GitHubContentSectionBottom}
+              className="text-foreground-lighter"
+            />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
