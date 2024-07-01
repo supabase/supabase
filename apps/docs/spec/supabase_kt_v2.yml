@@ -4413,6 +4413,8 @@ functions:
             }
           )
           ```
+        description: |
+          The return type of the invoking methods is an `HttpResponse`. You can access the response body via `response.body<T>()`, where `T` can be any serializable type.
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true
