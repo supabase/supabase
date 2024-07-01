@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
 import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -64,19 +63,5 @@ const ProjectsPage: NextPageWithLayout = () => {
     </>
   )
 }
-
-ProjectsPage.getLayout = (page) => (
-  <AccountLayout
-    title="Dashboard"
-    breadcrumbs={[
-      {
-        key: `supabase-projects`,
-        label: 'Projects',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
-)
 
 export default ProjectsPage

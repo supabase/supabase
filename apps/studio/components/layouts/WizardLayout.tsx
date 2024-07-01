@@ -1,26 +1,24 @@
+import { useParams } from '@remix-run/react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import type { Organization, Project } from 'types'
+import { Organization } from 'types'
 import { IconChevronRight } from 'ui'
 import { FeedbackDropdown } from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
 
-interface WizardLayoutProps {
-  organization: Organization | null | undefined
-  project: Project | null
-}
+const WizardLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { slug } = useParams()
 
-const WizardLayout = ({
-  organization,
-  project,
-  children,
-}: PropsWithChildren<WizardLayoutProps>) => {
+  const { data: organizations } = useOrganizationsQuery()
+  const organization = organizations?.find((o) => o.slug === slug)
+
   return (
     <div className="flex w-full flex-col">
-      <Header organization={organization} project={project} />
+      <Header organization={organization} />
       <div className="overflow-auto">
         <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
           {children}
@@ -34,8 +32,12 @@ export default withAuth(WizardLayout)
 
 export const WizardLayoutWithoutAuth = WizardLayout
 
-const Header = ({ organization, project }: WizardLayoutProps) => {
-  let stepNumber = organization ? 1 : project ? 2 : 0
+interface HeaderProps {
+  organization?: Organization
+}
+
+const Header = ({ organization }: HeaderProps) => {
+  let stepNumber = organization ? 1 : 0
   return (
     <div className="border-b p-3 border-default">
       <div className="PageHeader">
@@ -56,11 +58,11 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
               </p>
               <IconChevronRight size="small" className="text-foreground-light" />
               <p className={`text-sm ${stepNumber < 1 ? 'text-foreground-light' : ''}`}>
-                {project ? project.name : 'Create a new project'}
+                Create a new project
               </p>
               <IconChevronRight size="small" className="text-foreground-light" />
               <p className={`text-sm ${stepNumber < 2 ? 'text-foreground-light' : ''}`}>
-                {project ? project.name : 'Extend your database'}
+                Extend your database
               </p>
             </div>
           </div>

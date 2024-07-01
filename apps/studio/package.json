@@ -2,6 +2,7 @@
   "name": "studio",
   "version": "0.0.9",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 8082",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/studio",
@@ -18,7 +19,10 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "dev-remix": "remix vite:dev",
+    "build-remix": "remix vite:build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "^3.0.0",
@@ -32,6 +36,8 @@
     "@next/bundle-analyzer": "^14.2.3",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@remix-run/node": "^2.10.0",
+    "@remix-run/react": "^2.10.0",
     "@scaleleap/pg-format": "^1.0.0",
     "@sentry/nextjs": "^7.108.0",
     "@stripe/react-stripe-js": "^2.5.0",
@@ -44,7 +50,6 @@
     "@tanstack/react-query": "4.35.7",
     "@tanstack/react-query-devtools": "4.35.7",
     "@uidotdev/usehooks": "^2.4.1",
-    "@vitejs/plugin-react": "^4.2.1",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "^2.2.31",
     "ai-commands": "*",
@@ -101,6 +106,7 @@
     "react-window-infinite-loader": "^1.0.7",
     "reactflow": "^11.10.1",
     "recharts": "^2.8.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "semver": "^6.3.1",
     "shared-data": "*",
     "sql-formatter": "^13.1.0",
@@ -117,6 +123,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@remix-run/dev": "^2.10.0",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
     "@storybook/addon-links": "^7.5.3",
@@ -147,6 +154,7 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "@vitest/ui": "^1.6.0",
     "api-types": "*",
     "autoprefixer": "^10.4.14",
@@ -157,8 +165,11 @@
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
+    "sass": "^1.77.6",
     "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "vite": "^5.3.2",
+    "vite-plugin-cjs-interop": "^2.1.1"
   }
 }
