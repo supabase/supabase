@@ -22,18 +22,18 @@ const NotFound = ({
         Sorry, we couldn&apos;t find that page. It might be missing, or we had a temporary error
         generating it.
       </p>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 pt-4">
         {!omitSearch && (
-          <Button type="secondary" className="p-4" onClick={() => setCommandMenuOpen(true)}>
+          <Button type="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
             Search for page
           </Button>
         )}
-        <Button type="secondary" className="p-4" asChild>
+        <Button type="default" size="small" className="p-4" asChild>
           <Link href="/" className="no-underline">
             Return to homepage
           </Link>
         </Button>
-        <Button type="secondary" className="p-4" asChild>
+        <Button type="text" size="small" asChild>
           <Link
             href="https://github.com/supabase/supabase/issues/new?assignees=&labels=documentation&projects=&template=2.Improve_docs.md"
             target="_blank"
