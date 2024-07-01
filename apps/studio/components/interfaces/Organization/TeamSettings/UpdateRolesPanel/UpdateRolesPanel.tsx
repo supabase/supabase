@@ -47,6 +47,7 @@ import {
   ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -62,10 +63,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
+  const isEnterprise = subscription?.plan.id === 'enterprise'
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
     organization?.id,
@@ -192,7 +195,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
-              {projectLevelPermissionsEnabled && (
+              {projectLevelPermissionsEnabled && isEnterprise && (
                 <div className="flex items-center gap-x-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
