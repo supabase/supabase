@@ -1,4 +1,4 @@
-import Page from 'pages/project/[ref]/index'
+import Page from 'pages/project/[ref]/logs/edge-logs'
 
 export const handle = {
   getLayout: Page.getLayout,

@@ -1,4 +1,4 @@
-import Page from 'pages/project/[ref]/index'
+import Page from 'pages/project/[ref]/logs/auth-logs'
 
 export const handle = {
   getLayout: Page.getLayout,

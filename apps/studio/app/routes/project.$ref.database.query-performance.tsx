@@ -1,4 +1,4 @@
-import Page from 'pages/project/[ref]/index'
+import Page from 'pages/project/[ref]/database/query-performance'
 
 export const handle = {
   getLayout: Page.getLayout,
