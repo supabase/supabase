@@ -159,6 +159,6 @@
     "prettier": "^4.0.0-alpha.8",
     "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   }
 }

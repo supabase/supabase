@@ -116,7 +116,7 @@
     "ts-jest": "^29.1.1",
     "tsconfig": "*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   },
   "peerDependencies": {
     "next": "*",

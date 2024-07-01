@@ -40,6 +40,6 @@
     "autoprefixer": "^10.4.14",
     "nextjs-node-loader": "^1.1.5",
     "postcss": "^8.4.31",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   }
 }
