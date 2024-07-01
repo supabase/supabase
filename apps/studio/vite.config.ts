@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
         dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],
       }),
       remix({
-        basename: process.env.NEXT_PUBLIC_BASE_PATH ?? '/',
+        basename: process.env.NEXT_PUBLIC_BASE_PATH,
         ssr: false,
         future: {
           v3_fetcherPersist: true,
