@@ -87,8 +87,8 @@ export const Restriction = () => {
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . After that, requests that go over your quota will no longer be served. Reduce your
-              usage below your plan's quota or upgrade your plan.
+              . After that, the Fair Use Policy will apply. If you plan to maintain this level of
+              usage, upgrade your plan to avoid any restrictions.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
@@ -96,7 +96,7 @@ export const Restriction = () => {
               </Button>
               <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
-                  About Fair Usage Policy
+                  About Fair Use Policy
                 </a>
               </Button>
             </div>
@@ -113,8 +113,8 @@ export const Restriction = () => {
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Requests that go over your quota will no longer be served. Stay below your plan’s
-              quota or upgrade your plan if you expect to exceed it.
+              . Fair Use Policy applies now. Stay below your plan’s quota or upgrade your plan if
+              you expect to exceed it.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
@@ -122,7 +122,7 @@ export const Restriction = () => {
               </Button>
               <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
-                  About Fair Usage Policy
+                  About Fair Use Policy
                 </a>
               </Button>
             </div>
@@ -148,7 +148,7 @@ export const Restriction = () => {
               </Button>
               <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
-                  About service restrictions
+                  About Fair Use Policy
                 </a>
               </Button>
             </div>
