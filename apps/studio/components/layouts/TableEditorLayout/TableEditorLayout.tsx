@@ -13,7 +13,6 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
 
   if (isPermissionsLoaded && !canReadTables) {
-    debugger
     return (
       <ProjectLayoutWithAuth isBlocking={false}>
         <NoPermission isFullPage resourceText="view tables from this project" />
