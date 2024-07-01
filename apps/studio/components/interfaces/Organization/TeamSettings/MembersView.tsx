@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, HelpCircle } from 'lucide-react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
@@ -6,10 +6,15 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { Loading } from 'ui'
-import { MemberRow } from './MemberRow'
-import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { useProfile } from 'lib/profile'
+import {
+  Button,
+  Loading,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
+import { MemberRow } from './MemberRow'
 
 export interface MembersViewProps {
   searchString: string
@@ -74,9 +79,24 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-mfa" className="text-center w-32">
                   Enabled MFA
                 </Table.th>,
-                <Table.th key="header-role" className="flex items-center space-x-2">
+                <Table.th key="header-role" className="flex items-center space-x-1">
                   <span>Role</span>
-                  <RolesHelperModal />
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
+                      <Button asChild type="text" className="px-1">
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://supabase.com/docs/guides/platform/access-control"
+                        >
+                          <HelpCircle size={14} className="text-foreground-light" />
+                        </a>
+                      </Button>
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ side="bottom">
+                      How to configure access control?
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
                 </Table.th>,
                 <Table.th key="header-action" />,
               ]}

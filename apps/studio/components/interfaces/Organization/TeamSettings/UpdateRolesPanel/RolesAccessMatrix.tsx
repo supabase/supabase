@@ -8,6 +8,7 @@ interface RolesAccessMatrixProps {
   visible: boolean
 }
 
+// [Joshen] TODO We'll need to update this for project level permissions too
 export const RolesAccessMatrix = ({ visible }: RolesAccessMatrixProps) => {
   return (
     <div
@@ -96,12 +97,12 @@ export const RolesAccessMatrix = ({ visible }: RolesAccessMatrixProps) => {
         <div className="flex flex-col gap-y-2">
           <p className="text-sm">Footnotes</p>
           <ol className="list-decimal pl-6 text-xs flex flex-col gap-y-2">
-            <li id="roles-helper-1">
+            <li id="roles-helper-1">Available on the Teams and Enterprise Plans.</li>
+            <li id="roles-helper-2">
               Invites sent from a SSO account can only be accepted by another SSO account coming
               from the same identity provider. This is a security measure that prevents accidental
               invites to accounts not managed by your company's enterprise systems
             </li>
-            <li id="roles-helper-2">Available on the Teams and Enterprise Plans.</li>
             <li id="roles-helper-3">
               <Markdown
                 className="text-xs text-foreground"

@@ -47,6 +47,7 @@ import {
   ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -173,26 +174,17 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             <SheetHeader
               className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
             >
-              <p className="truncate" title={`Manage access for team member ${member.username}`}>
-                Manage access for team member {member.username}
+              <p className="truncate" title={`Manage access for ${member.username}`}>
+                Manage access for {member.username}
               </p>
               <Tooltip_Shadcn_ delayDuration={100}>
                 <TooltipTrigger_Shadcn_ asChild>
-                  <button
-                    aria-expanded={showRolesAccessMatrix}
-                    aria-controls="show-roles-matrix"
-                    className={cn(
-                      !showRolesAccessMatrix ? 'text-foreground-lighter' : 'text-light',
-                      'mt-1 hover:text-foreground transition'
-                    )}
+                  <Button
+                    type="outline"
+                    className="[&>div]:text-foreground-light px-1.5"
+                    icon={!showRolesAccessMatrix ? <PanelLeftClose /> : <PanelRightClose />}
                     onClick={() => setShowRolesAccessMatrix(!showRolesAccessMatrix)}
-                  >
-                    {!showRolesAccessMatrix ? (
-                      <PanelLeftClose size={19} strokeWidth={1} />
-                    ) : (
-                      <PanelRightClose size={19} strokeWidth={1} />
-                    )}
-                  </button>
+                  />
                 </TooltipTrigger_Shadcn_>
                 <TooltipContent_Shadcn_ side="left">
                   {showRolesAccessMatrix ? 'Hide' : 'Show'} role permissions
