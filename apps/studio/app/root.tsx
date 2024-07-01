@@ -18,7 +18,15 @@ import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  UIMatch,
+  useMatches,
+} from '@remix-run/react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -51,8 +59,10 @@ import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
+import { identity } from 'lib/void'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
+import { NextPageWithLayout } from 'types'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 
@@ -173,6 +183,10 @@ export default function App() {
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
+  const matches = useMatches() as UIMatch<unknown, { getLayout: NextPageWithLayout['getLayout'] }>[]
+  const lastMatch = matches[matches.length - 1]
+  const getLayout = lastMatch?.handle?.['getLayout'] ?? identity
+
   return (
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
@@ -192,7 +206,7 @@ export default function App() {
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
                             <FeaturePreviewContextProvider>
-                              <Outlet />
+                              {getLayout(<Outlet />)}
 
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>
