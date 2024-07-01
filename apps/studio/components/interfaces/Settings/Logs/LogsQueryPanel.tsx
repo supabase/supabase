@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Alert,
   Badge,
@@ -19,21 +18,20 @@ import {
   Tabs,
 } from 'ui'
 
-import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { useProfile } from 'lib/profile'
+import Table from 'components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
 import Link from 'next/link'
 import React, { useState } from 'react'
+import { logConstants } from 'shared-data'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  LogsTableName,
-  LogsWarning,
   LOGS_SOURCE_DESCRIPTION,
   LogTemplate,
+  LogsTableName,
+  LogsWarning,
 } from '.'
 import DatePickers from './Logs.DatePickers'
-import Table from 'components/to-be-cleaned/Table'
-import { logConstants } from 'shared-data'
-import { copyToClipboard } from 'lib/helpers'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
