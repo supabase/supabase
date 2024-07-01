@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
+import { SignInLayout } from 'components/layouts'
 import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
@@ -61,5 +62,15 @@ const SignInPage: NextPageWithLayout = () => {
     </>
   )
 }
+
+SignInPage.getLayout = (page) => (
+  <SignInLayout
+    heading="Welcome back"
+    subheading="Sign in to your account"
+    logoLinkToMarketingSite={true}
+  >
+    {page}
+  </SignInLayout>
+)
 
 export default SignInPage

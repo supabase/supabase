@@ -1,8 +1,7 @@
-import { MetaFunction } from '@remix-run/react'
-import SignInPage from 'pages/sign-in'
+import Page from 'pages/sign-in'
 
-export const meta: MetaFunction = () => {
-  return [{ title: 'Sign In | Supabase' }]
+export const handle = {
+  getLayout: Page.getLayout,
 }
 
-export default SignInPage
+export default Page

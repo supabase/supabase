@@ -1,8 +1,7 @@
-import { MetaFunction } from '@remix-run/react'
-import ProjectsPage from 'pages/projects'
+import Page from 'pages/projects'
 
-export const meta: MetaFunction = () => {
-  return [{ title: 'Projects | Supabase' }]
+export const handle = {
+  getLayout: Page.getLayout,
 }
 
-export default ProjectsPage
+export default Page

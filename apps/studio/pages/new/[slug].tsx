@@ -8,6 +8,7 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -950,5 +951,7 @@ const monthlyInstancePrice = (instance: string | undefined): number => {
 const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
 }
+
+Wizard.getLayout = (page) => <WizardLayoutWithoutAuth>{page}</WizardLayoutWithoutAuth>
 
 export default Wizard

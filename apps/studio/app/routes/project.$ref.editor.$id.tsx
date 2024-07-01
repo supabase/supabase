@@ -1,4 +1,4 @@
-import Page from 'pages/sign-in-mfa'
+import Page from 'pages/project/[ref]/editor/[id]'
 
 export const handle = {
   getLayout: Page.getLayout,

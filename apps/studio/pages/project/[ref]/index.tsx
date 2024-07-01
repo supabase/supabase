@@ -6,6 +6,7 @@ import Connect from 'components/interfaces/Home/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedProject } from 'hooks'
@@ -80,5 +81,13 @@ const Home: NextPageWithLayout = () => {
     </div>
   )
 }
+
+Home.getLayout = (page) => (
+  <ProjectLayoutWithAuth>
+    <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+      {page}
+    </main>
+  </ProjectLayoutWithAuth>
+)
 
 export default Home
