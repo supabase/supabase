@@ -38,7 +38,6 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@remix-run/node": "^2.10.0",
     "@remix-run/react": "^2.10.0",
-    "@scaleleap/pg-format": "^1.0.0",
     "@sentry/nextjs": "^7.108.0",
     "@stripe/react-stripe-js": "^2.5.0",
     "@stripe/stripe-js": "^3.0.5",
