@@ -365,7 +365,7 @@ const AiCommand = () => {
             switch (message.role) {
               case MessageRole.User:
                 return (
-                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                  <div key={index} className="flex gap-3 mx-4 [overflow-anchor:none] mb-6">
                     <div
                       className="
                   w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
@@ -382,7 +382,7 @@ const AiCommand = () => {
               case MessageRole.Assistant:
                 return (
                   <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
-                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <div className="flex gap-4 [overflow-anchor:none] mb-6">
                       <AiIconChat
                         loading={
                           message.status === MessageStatus.Pending ||
@@ -464,7 +464,7 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-background py-3">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
+        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3 px-4" />}
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}

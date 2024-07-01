@@ -88,7 +88,7 @@ export const CommandDialog = ({
           'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
           'h-[50dvh] min-h-[350px] md:max-h-[450px] md:top-auto md:bottom-auto',
           'place-self-end md:place-self-auto',
-          isOpen && '!animate-in !slide-in-from-bottom fill-mode-both w-full !duration-300',
+          isOpen && '!animate-in !slide-in-from-bottom !duration-300',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
           'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
           'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
