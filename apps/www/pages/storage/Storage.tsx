@@ -26,7 +26,7 @@ function StoragePage() {
 
   const meta_title = 'Storage | Store any digital content'
   const meta_description =
-    'An open source Object store with unlimited scalability, for any file type.'
+    'An open source S3 Compatible Object Store with unlimited scalability, for any file type.'
 
   return (
     <>
@@ -56,7 +56,10 @@ function StoragePage() {
             </span>,
           ]}
           subheader={[
-            'An open source Object store with unlimited scalability, for any file type.',
+            <>
+              An open source <b>S3 Compatible</b> Object Store, with unlimited scalability, for any
+              file type.
+            </>,
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
@@ -86,7 +89,6 @@ function StoragePage() {
               </div>
 
               <h4 className="h4">Interoperable</h4>
-
               <p className="p">
                 Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
               </p>
@@ -112,8 +114,11 @@ function StoragePage() {
                   }
                 />
               </div>
-              <h4 className="h4">Dependable</h4>
-              <p className="p">Enterprise-level scalability and durability.</p>
+              <h4 className="h4">Multiple Protocol Support</h4>
+
+              <p className="p">
+                S3, Resumable Uploads and Standard Uploads. Enterprise-level scalability.
+              </p>
             </div>
           </div>
         </SectionContainer>

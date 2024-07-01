@@ -71,7 +71,7 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
       {organizations?.map((organization) => {
         return (
           <OrganizationProjects
-            key={organization.id}
+            key={organization.slug}
             organization={organization}
             projects={projectsByOrg[organization.id]}
             overdueInvoices={(allOverdueInvoices ?? []).filter(
@@ -163,7 +163,7 @@ const OrganizationProjects = ({
   if (search.length > 0 && filteredProjects.length === 0) return null
 
   return (
-    <div className="space-y-3" key={organization.id}>
+    <div className="space-y-3" key={organization.slug}>
       <div className="flex space-x-4 items-center">
         <h4 className="text-lg flex items-center">{organization.name}</h4>
 

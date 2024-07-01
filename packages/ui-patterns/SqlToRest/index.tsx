@@ -1,3 +1,5 @@
+'use client'
+
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
