@@ -164,14 +164,12 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="primary">
-            <span className="flex items-center gap-2 px-3">
-              <Plug size={14} className="rotate-90" /> <span>Connect</span>
-            </span>
+          <Button type="primary" icon={<Plug className="rotate-90" />}>
+            <span>Connect</span>
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')}>
-          <DialogHeader className="pb-0">
+          <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
               Get the connection strings and environment variables for your app

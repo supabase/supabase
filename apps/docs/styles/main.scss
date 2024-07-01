@@ -271,3 +271,9 @@ article p code {
 .dg.ac {
   z-index: 9999 !important;
 }
+
+/* tables */
+
+th code {
+  @apply text-nowrap;
+}

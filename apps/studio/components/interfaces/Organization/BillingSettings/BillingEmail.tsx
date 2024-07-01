@@ -25,8 +25,11 @@ const BillingEmail = () => {
   const initialValues = { billing_email: billing_email ?? '' }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
-  const { mutateAsync: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const canReadBillingEmail = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -35,18 +38,23 @@ const BillingEmail = () => {
     if (!slug) return console.error('Slug is required')
     if (!name) return console.error('Organization name is required')
 
-    try {
-      const { billing_email } = await updateOrganization({
+    updateOrganization(
+      {
         slug,
         name,
         billing_email: values.billing_email,
-      })
-      resetForm({ values: { billing_email }, initialValues: { billing_email } })
-      invalidateOrganizationsQuery(queryClient)
-      toast.success('Successfully saved settings')
-    } finally {
-    }
+      },
+      {
+        onSuccess: ({ billing_email }) => {
+          resetForm({ values: { billing_email }, initialValues: { billing_email } })
+          invalidateOrganizationsQuery(queryClient)
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
+
+  if (!canReadBillingEmail) return null
 
   return (
     <ScaffoldSection>
@@ -96,7 +104,7 @@ const BillingEmail = () => {
                       id="billing_email"
                       size="small"
                       label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
+                      type="text"
                       disabled={!canUpdateOrganization}
                     />
                   </FormSectionContent>

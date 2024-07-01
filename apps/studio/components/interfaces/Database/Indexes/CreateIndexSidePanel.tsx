@@ -32,8 +32,8 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { MultiSelectOption } from 'ui-patterns/MultiSelect'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
 
@@ -99,9 +99,9 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
 
   const generatedSQL = `
-CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns.join(
-    ', '
-  )});
+CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+    .map((column) => `"${column}"`)
+    .join(', ')});
 `.trim()
 
   const onSaveIndex = () => {

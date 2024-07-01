@@ -3,6 +3,7 @@ id: 'function-ai-models'
 title: 'Running AI Models'
 description: 'How to run AI models in Edge Functions.'
 subtitle: 'How to run AI models in Edge Functions.'
+tocVideo: 'w4Rr_1whU-U'
 ---
 
 [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) has a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI related tasks in your Edge Functions.
@@ -19,7 +20,11 @@ const model = new Supabase.ai.Session('model-name')
 
 <Admonition type="tip">
 
-To get type hints and checks for the API we recommend adding this triple-slash directive to the start of the Edge Function code: `/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />`
+To get type hints and checks for the API you can import types from `functions-js` at the top of your file:
+
+```ts
+import 'https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts'
+```
 
 </Admonition>
 
@@ -95,7 +100,7 @@ Inference via larger models is supported via [Ollama](https://ollama.com/). In t
    ```
 
    ```ts
-   /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+   import 'https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts'
    const session = new Supabase.ai.Session('mistral')
 
    Deno.serve(async (req: Request) => {

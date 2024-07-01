@@ -2,7 +2,7 @@ import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstac
 import { useCallback, useRef } from 'react'
 
 import type { components } from 'data/api'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
@@ -11,13 +11,15 @@ export type ProjectsVariables = {
   ref?: string
 }
 
-export type ProjectInfo = components['schemas']['ProjectInfo']
+export type ProjectInfo = components['schemas']['ProjectInfo'] & {
+  status: components['schemas']['ResourceWithServicesStatusResponse']['status']
+}
 
 export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })
 
-  if (error) throw error
-  return data
+  if (error) handleError(error)
+  return data as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>

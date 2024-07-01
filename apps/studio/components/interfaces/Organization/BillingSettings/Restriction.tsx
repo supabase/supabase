@@ -82,22 +82,23 @@ export const Restriction = () => {
           <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p className="leading-tight">
-              Your organization is over its quota. You can continue with projects until your grace
-              period ends on{' '}
+              Your organization is over its quota. You can continue with your projects until your
+              grace period ends on{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . After that, requests that go over your quota will no longer be served. Reduce your
-              usage below your plan's quota or upgrade your plan.
+              . After that, the Fair Use Policy will apply. If you plan to maintain this level of
+              usage, upgrade your plan to avoid any restrictions.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              {/* [Joshen] TODO update once docs are live */}
-              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button> */}
+              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                  About Fair Use Policy
+                </a>
+              </Button>
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
@@ -108,22 +109,22 @@ export const Restriction = () => {
           <AlertTitle_Shadcn_>Your grace period is over.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p>
-              You have exceeded your plan’s quota in the past and your grace period ended on{' '}
+              Your grace period ended on{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Service restrictions will apply if your usage is above your quota. If service
-              restrictions are active, your projects will no longer be able to serve requests.
-              Reduce your usage below your plan’s quota or upgrade your plan.
+              . Fair Use Policy applies now. Stay below your plan’s quota or upgrade your plan if
+              you expect to exceed it.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              {/* [Joshen] TODO update once docs are live */}
-              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button> */}
+              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                  About Fair Use Policy
+                </a>
+              </Button>
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
@@ -134,8 +135,8 @@ export const Restriction = () => {
           <AlertTitle_Shadcn_>All services are restricted.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p>
-              Your projects are currently under service restrictions and are not able to serve
-              requests. You have exceeded your plan’s quota and your grace period ended on{' '}
+              Fair Use Policy applies and your service is restricted. Your projects are not able to
+              serve requests. You have exceeded your plan’s quota and your grace period ended on{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
@@ -145,10 +146,11 @@ export const Restriction = () => {
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              {/* [Joshen] TODO update once docs are live */}
-              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
-                <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button> */}
+              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
+                  About Fair Use Policy
+                </a>
+              </Button>
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>

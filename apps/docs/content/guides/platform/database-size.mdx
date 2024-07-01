@@ -57,7 +57,7 @@ vacuum full <table name>;
 
 <Admonition type="note">
 
-Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed.
+Vacuum operations can temporarily increase resource utilization, which may adversely impact the observed performance of your project until the maintenance is completed. The [vacuum full](https://www.postgresql.org/docs/current/sql-vacuum.html) command will lock the table until the operation concludes.
 
 </Admonition>
 
@@ -126,7 +126,7 @@ First, change the [transaction access mode](https://www.postgresql.org/docs/curr
 set session characteristics as transaction read write;
 ```
 
-This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible. After deleting data, consider running a vacuum to reclaim as much space as possible:
+This allows you to delete data from within the session. After deleting data, consider running a vacuum to reclaim as much space as possible:
 
 ```sql
 vacuum;
