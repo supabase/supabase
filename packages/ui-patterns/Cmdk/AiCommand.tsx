@@ -476,7 +476,13 @@ const AiCommand = () => {
           actions={
             <>
               {!isLoading && !isResponding ? (
-                <div
+                <Button
+                  onClick={() => {
+                    if (!search || isLoading || isResponding || isImeComposing) {
+                      return
+                    }
+                    return handleSubmit(search)
+                  }}
                   className={`flex items-center gap-3 mr-3 transition-opacity duration-700 ${
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
@@ -485,7 +491,7 @@ const AiCommand = () => {
                   <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
-                </div>
+                </Button>
               ) : null}
             </>
           }
