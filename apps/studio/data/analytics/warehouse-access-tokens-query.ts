@@ -15,7 +15,7 @@ export async function getWarehouseAccessTokens(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
+  const response = await get(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: { path: { ref: projectRef } },
     signal,
   })

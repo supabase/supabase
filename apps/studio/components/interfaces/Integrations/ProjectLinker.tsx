@@ -1,4 +1,4 @@
-import { PlusIcon } from 'lucide-react'
+import { ChevronDown, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -205,7 +205,7 @@ const ProjectLinker = ({
                     block
                     disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                     loading={loadingSupabaseProjects}
-                    className="justify-start"
+                    className="justify-start h-[34px]"
                     icon={
                       <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
                         <img
@@ -218,7 +218,7 @@ const ProjectLinker = ({
                     iconRight={
                       defaultSupabaseProjectRef === undefined ? (
                         <span className="grow flex justify-end">
-                          <IconChevronDown className={''} />
+                          <ChevronDown />
                         </span>
                       ) : null
                     }
@@ -302,7 +302,7 @@ const ProjectLinker = ({
                     block
                     disabled={loadingForeignProjects}
                     loading={loadingForeignProjects}
-                    className="justify-start"
+                    className="justify-start h-[34px]"
                     icon={
                       <div>
                         {selectedForeignProject
@@ -312,7 +312,7 @@ const ProjectLinker = ({
                     }
                     iconRight={
                       <span className="grow flex justify-end">
-                        <IconChevronDown className={''} />
+                        <ChevronDown />
                       </span>
                     }
                   >
