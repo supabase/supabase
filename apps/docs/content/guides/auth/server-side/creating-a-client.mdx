@@ -527,8 +527,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
           fetch,
         },
         cookies: {
-          get() {
-            return JSON.stringify(data.session)
+          getAll() {
+            return data.cookies
           },
         },
       })
@@ -553,12 +553,13 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 ```ts +layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
   const { session, user } = await safeGetSession()
 
   return {
     session,
     user,
+    cookies: cookies.getAll(),
   }
 }
 ```
