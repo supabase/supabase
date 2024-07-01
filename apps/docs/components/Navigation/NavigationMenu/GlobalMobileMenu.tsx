@@ -38,7 +38,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   useKey('Escape', () => setOpen(false))
 
   const itemClassName =
-    'block py-2 pl-1 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
+    'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
 
   const AccordionMenuItem = ({ section }: any) => (
     <m.div
@@ -112,7 +112,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
             exit="exit"
             className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform"
           >
-            <div className="absolute px-5 h-[50px] flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
+            <div className="absolute px-5 h-[var(--header-height)] flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
               <Link href="/" className="flex items-center gap-2">
                 <Image
                   className="cursor-pointer hidden dark:block"

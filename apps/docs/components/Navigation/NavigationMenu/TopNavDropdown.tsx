@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import { Menu } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMenu,
   Theme,
   buttonVariants,
   cn,
@@ -65,7 +65,7 @@ const TopNavDropdown = () => {
             'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
           )}
         >
-          <IconMenu />
+          <Menu size={18} strokeWidth={1} />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-64">

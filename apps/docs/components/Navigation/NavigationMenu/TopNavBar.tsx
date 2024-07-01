@@ -3,8 +3,8 @@ import Link from 'next/link'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { SearchButton } from 'ui-patterns/Cmdk'
-import { ThemeImage } from 'ui-patterns'
-import { Button, buttonVariants, cn, IconCommand, IconMenu, IconSearch } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
+import { Command, Search, Menu } from 'lucide-react'
 
 import GlobalMobileMenu from './GlobalMobileMenu'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -22,8 +22,8 @@ const TopNavBar: FC = () => {
         aria-label="top bar"
         className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
       >
-        <div className="w-full px-5 flex justify-between h-[var(--header-height,50px)] gap-3 lg:h-[var(--header-height,60px)]">
-          <div className="hidden pl-5 lg:flex h-full items-center justify-center gap-2">
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+          <div className="hidden lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
             <GlobalNavigationMenu />
           </div>
@@ -50,12 +50,12 @@ const TopNavBar: FC = () => {
                     hover:border-strong
                     border
                     transition
-                    pl-1.5 md:pl-3 pr-1 w-full h-full rounded-md
+                    pl-1.5 md:pl-2 pr-1 w-full h-full rounded-md
                     text-foreground-lighter
                   "
                 >
                   <div className="flex items-center space-x-2 text-foreground-muted">
-                    <IconSearch size={18} strokeWidth={2} />
+                    <Search size={18} strokeWidth={2} />
                     <p className="flex text-sm pr-2">
                       Search<span className="hidden xl:inline ml-1"> docs...</span>
                     </p>
@@ -63,9 +63,9 @@ const TopNavBar: FC = () => {
                   <div className="hidden md:flex items-center space-x-1">
                     <div
                       aria-hidden="true"
-                      className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1"
+                      className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
                     >
-                      <IconCommand size={12} strokeWidth={1.5} />
+                      <Command size={12} strokeWidth={1.5} />
                       <span className="text-[12px]">K</span>
                     </div>
                   </div>
@@ -79,7 +79,7 @@ const TopNavBar: FC = () => {
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                <IconMenu />
+                <Menu size={18} strokeWidth={1} />
               </button>
             </div>
           </div>
@@ -116,34 +116,25 @@ const HeaderLogo = memo(() => {
       href="/"
       className={cn(
         buttonVariants({ type: 'default' }),
-        'flex h-auto items-center !bg-transparent !border-none !shadow-none mr-4'
+        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
       )}
     >
-      {/* <Image
-        className="!w-[18px] hidden lg:block xl:hidden"
-        src="/docs/supabase-logo-icon.svg"
-        priority={true}
-        loading="eager"
-        width={18}
-        height={18}
-        alt="Supabase Logo"
-      /> */}
       <Image
-        className="!w-[96px] hidden dark:block !ml-0 lg:!ml-2.5"
+        className="hidden dark:block !m-0"
         src="/docs/supabase-dark.svg"
         priority={true}
         loading="eager"
         width={96}
-        height={24}
+        height={18}
         alt="Supabase wordmark"
       />
       <Image
-        className="!w-[96px] block dark:hidden !ml-0 lg:!ml-2.5"
+        className="block dark:hidden !m-0"
         src="/docs/supabase-light.svg"
         priority={true}
         loading="eager"
         width={96}
-        height={24}
+        height={18}
         alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>

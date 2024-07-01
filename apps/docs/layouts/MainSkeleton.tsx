@@ -279,8 +279,8 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
         'fixed lg:relative z-50 lg:z-40',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
-        'lg:top-[60px] lg:sticky',
-        'h-screen lg:h-[calc(100vh-60px)]',
+        'lg:top-[var(--header-height)] lg:sticky',
+        'h-screen lg:h-[calc(100vh-var(--header-height))]',
         // desktop override any left styles
         'lg:left-0',
         'transition-all',
@@ -292,7 +292,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
     >
       <div
         className={cn(
-          'top-0 lg:top-[98px]',
+          'top-0 lg:top-[var(--header-height)]',
           'h-full',
           'relative lg:sticky',
           'w-full lg:w-auto',

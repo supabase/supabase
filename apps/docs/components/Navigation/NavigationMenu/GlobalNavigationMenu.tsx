@@ -56,7 +56,7 @@ const GlobalNavigationMenu: FC = () => {
   const isLowerThanMd = useBreakpoint('md')
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
   const triggerClassName =
-    'h-[60px] bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground py-2 px-0 h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
+    'h-[var(--header-height)] p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-lighter hover:text-foreground data-[state=open]:!text-foreground data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground h-full focus-visible:rounded !shadow-none outline-none transition-all outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600'
 
   return (
     <div className="hidden lg:flex relative gap-2 justify-start items-end w-full h-full">
@@ -69,7 +69,7 @@ const GlobalNavigationMenu: FC = () => {
         orientation="horizontal"
       >
         <ResponsiveScrollArea isLowerThanMd={isLowerThanMd}>
-          <NavigationMenuList className="px-5 lg:px-6 space-x-5 lg:space-x-6 h-[60px]">
+          <NavigationMenuList className="px-5 lg:px-6 space-x-2 h-[var(--header-height)]">
             {GLOBAL_MENU_ITEMS.map((section) =>
               section[0].menuItems ? (
                 <NavigationMenuItem
@@ -89,7 +89,7 @@ const GlobalNavigationMenu: FC = () => {
                       section[0].label
                     )}
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] max-h-[calc(100vh-80px)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md !duration-0">
+                  <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] max-h-[calc(100vh-5rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md !duration-0">
                     <div className="p-3 md:p-1">
                       {section[0].menuItems?.map((menuItem, menuItemIndex) => (
                         <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>

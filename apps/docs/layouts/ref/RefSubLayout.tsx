@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 import Image from 'next/legacy/image'
+import { cn } from 'ui'
 
 interface ISectionContainer {
   id: string
@@ -120,11 +121,11 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           ref={ref}
           id={props.slug}
           data-ref-id={props.id}
-          className={[
-            'text-2xl font-medium text-foreground scroll-mt-[calc(33px+2rem)] lg:scroll-mt-[calc(60px+4rem)]',
+          className={cn(
+            'text-2xl font-medium text-foreground scroll-mt-[calc(33px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
             !icon && 'mb-8',
-            props.monoFont && 'font-mono',
-          ].join(' ')}
+            props.monoFont && 'font-mono'
+          )}
         >
           {props.title && <span className="max-w-xl">{props.title}</span>}
         </h2>

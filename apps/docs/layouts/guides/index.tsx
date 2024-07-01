@@ -143,8 +143,9 @@ const Layout: FC<Props> = (props) => {
                 className={cn(
                   'col-span-3 self-start',
                   'hidden md:block md:col-span-3',
-                  'sticky top-[calc(98px+4rem)]',
-                  'max-h-[calc(100vh-60px-5rem)]'
+                  // 1px accounts for the header border-b
+                  'sticky top-[calc(var(--header-height)+1px+4rem)]',
+                  'max-h-[calc(100vh-var(--header-height)-5rem)]'
                 )}
               />
             )}
