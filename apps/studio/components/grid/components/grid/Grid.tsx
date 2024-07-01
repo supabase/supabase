@@ -102,7 +102,8 @@ export const Grid = memo(
       const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
 
       function copyCellValue() {
-        const selectedCellValue = selectedCellRef.current?.row[selectedCellRef.current?.column?.key]
+        const selectedCellValue =
+          selectedCellRef.current?.row?.[selectedCellRef.current?.column?.key]
         const text = formatClipboardValue(selectedCellValue)
         if (!text) return
         copyToClipboard(text)
