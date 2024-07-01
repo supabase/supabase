@@ -13,6 +13,8 @@ export type OrganizationMemberInviteCreateVariables = {
   roleId: number
 }
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function createOrganizationMemberInvite({
   slug,
   invitedEmail,

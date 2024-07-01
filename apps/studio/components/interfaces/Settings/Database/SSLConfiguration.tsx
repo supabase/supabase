@@ -1,11 +1,12 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Download, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   FormHeader,
   FormPanel,
@@ -17,7 +18,14 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
+import {
+  Alert,
+  Button,
+  Switch,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
@@ -77,7 +85,7 @@ const SSLConfiguration = () => {
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
               Documentation
             </Link>
@@ -122,12 +130,13 @@ const SSLConfiguration = () => {
           <FormSectionContent loading={false} className="lg:!col-span-5">
             <div className="flex items-center justify-end mt-2.5 space-x-2">
               {(isLoading || isSubmitting) && (
-                <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
+                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isSuccess && (
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Toggle
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Switch
+                      size="large"
                       checked={isEnforced}
                       disabled={
                         isLoading ||
@@ -135,31 +144,19 @@ const SSLConfiguration = () => {
                         !canUpdateSSLEnforcement ||
                         !hasAccessToSSLEnforcement
                       }
-                      onChange={toggleSSLEnforcement}
+                      onCheckedChange={toggleSSLEnforcement}
                     />
-                  </Tooltip.Trigger>
+                  </TooltipTrigger_Shadcn_>
                   {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content align="center" side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background w-[250px]',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground text-center flex items-center justify-center">
-                            {!canUpdateSSLEnforcement
-                              ? 'You need additional permissions to update SSL enforcement for your project'
-                              : !hasAccessToSSLEnforcement
-                                ? 'Your project does not have access to SSL enforcement'
-                                : ''}
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
+                    <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">
+                      {!canUpdateSSLEnforcement
+                        ? 'You need additional permissions to update SSL enforcement for your project'
+                        : !hasAccessToSSLEnforcement
+                          ? 'Your project does not have access to SSL enforcement'
+                          : ''}
+                    </TooltipContent_Shadcn_>
                   )}
-                </Tooltip.Root>
+                </Tooltip_Shadcn_>
               )}
             </div>
           </FormSectionContent>
@@ -176,35 +173,29 @@ const SSLConfiguration = () => {
             </div>
           </div>
           <div className="flex items-end justify-end">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button type="default" disabled={!hasSSLCertificate} icon={<IconDownload />}>
-                  <a
-                    href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
-                  >
-                    Download Certificate
-                  </a>
-                </Button>
-              </Tooltip.Trigger>
-              {!hasSSLCertificate && (
-                <Tooltip.Portal>
-                  <Tooltip.Content align="center" side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background w-[250px]',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
-                        installed
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+            {!hasSSLCertificate ? (
+              <ButtonTooltip
+                disabled
+                type="default"
+                icon={<Download />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates installed',
+                  },
+                }}
+              >
+                Download certificate
+              </ButtonTooltip>
+            ) : (
+              <Button type="default" icon={<Download />}>
+                <a
+                  href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
+                >
+                  Download certificate
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </FormPanel>
