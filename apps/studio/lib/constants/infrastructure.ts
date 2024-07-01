@@ -69,7 +69,7 @@ export const PROVIDERS = {
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
@@ -79,12 +79,12 @@ export const PROJECT_STATUS: {
   GOING_DOWN: 'GOING_DOWN',
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
+  RESTARTING: 'RESTARTING',
   RESTORING: 'RESTORING',
+  RESTORE_FAILED: 'RESTORE_FAILED',
   UPGRADING: 'UPGRADING',
-  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
-  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
+  PAUSE_FAILED: 'PAUSE_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

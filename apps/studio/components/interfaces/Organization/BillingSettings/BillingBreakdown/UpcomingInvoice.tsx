@@ -265,7 +265,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
+                  <InvoiceTooltip text="Projected costs at the end of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
                   {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}

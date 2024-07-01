@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
@@ -23,9 +23,11 @@ import useEntityType from 'hooks/misc/useEntityType'
 import type { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
+import { ExternalLink } from 'lucide-react'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary, SchemaView } from 'types'
+import { Button, toast as UiToast } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import { SidePanelEditor } from './SidePanelEditor'
@@ -230,7 +232,35 @@ const TableGridEditor = ({
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
-      toast.error(ERROR_PRIMARY_KEY_NOTFOUND)
+      return UiToast({
+        variant: 'default',
+        style: { flexDirection: 'column' },
+        title: (
+          <Markdown
+            className="text-foreground [&>p]:m-0"
+            content="Unable to update row as table has no primary keys"
+          />
+        ) as any,
+        description: (
+          <Markdown
+            className="[&>p]:m-0"
+            content="Add a primary key column to your table first to serve as a unique identifier for each row before updating or deleting the row."
+          />
+        ),
+        action: (
+          <div className="w-full flex gap-x-2 !mx-0 mt-3">
+            <Button asChild type="outline" icon={<ExternalLink />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/database/tables#primary-keys"
+              >
+                Documentation
+              </a>
+            </Button>
+          </div>
+        ),
+      })
     }
 
     mutateUpdateTableRow({
