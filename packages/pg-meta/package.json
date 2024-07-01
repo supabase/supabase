@@ -6,7 +6,6 @@
   "main": "./src/index.ts",
   "repository": "supabase/supabase",
   "dependencies": {
-    "@scaleleap/pg-format": "^1.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

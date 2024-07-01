@@ -1,4 +1,4 @@
-import { literal } from '@scaleleap/pg-format'
+import { literal } from './pg-format'
 
 export function filterByList(include?: string[], exclude?: string[], defaultExclude?: string[]) {
   if (defaultExclude) {
