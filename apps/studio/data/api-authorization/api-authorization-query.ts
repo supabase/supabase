@@ -27,8 +27,9 @@ export async function getApiAuthorizationDetails(
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  // @ts-ignore [Joshen] API codegen is wrong here, needs to be fixed
   const { data, error } = await get('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    // @ts-ignore [Joshen] Endpoint doesnt need slug in the path params, but the endpoint path requires slug
+    // it's a little weird, will need API to decide if they wanna shift this route outside of the {slug} endpoint
     params: { path: { slug, id } },
     signal,
   })

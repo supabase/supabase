@@ -17,8 +17,9 @@ export async function approveApiAuthorization({ id, slug }: ApiAuthorizationAppr
   if (!id) throw new Error('Authorization ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
-  // @ts-ignore [Joshen] API codegen is wrong, will need to be fixed
   const { data, error } = await post('/platform/organizations/{slug}/oauth/authorizations/{id}', {
+    // @ts-ignore [Joshen] Endpoint doesnt need slug in the path params, but the endpoint path requires slug
+    // it's a little weird, will need API to decide if they wanna shift this route outside of the {slug} endpoint
     params: { path: { slug, id }, query: { skip_browser_redirect: true } },
     body: { organization_id: slug },
   })
