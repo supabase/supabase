@@ -1,19 +1,15 @@
-import { type PropsWithChildren, useEffect, useMemo } from 'react'
+'use client'
 
 import { useConstant } from 'common'
+import { type PropsWithChildren, useEffect, useMemo, useCallback } from 'react'
 
-import {
-  useIsCommandNavigating,
-  useSetCommandMenuOpen,
-  useSetIsCommandNavigating,
-  useToggleCommandMenu,
-} from './hooks/viewHooks'
+import { useCrossCompatRouter } from './hooks/useCrossCompatRouter'
+import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
 import { initPagesState } from '../internal/state/pagesState'
 import { initViewState } from '../internal/state/viewState'
 import { initQueryState } from '../internal/state/queryState'
-import { useRouter } from 'next/router'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const commandsState = useConstant(initCommandsState)
@@ -34,21 +30,9 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   return <CommandContext.Provider value={combinedState}>{children}</CommandContext.Provider>
 }
 
-const CommandShortcut = () => {
+// This is a component not a hook so it can be used within the right context.
+function CommandShortcut() {
   const toggleOpen = useToggleCommandMenu()
-  const setIsOpen = useSetCommandMenuOpen()
-  const setIsNavigating = useSetIsCommandNavigating()
-  const isNavigating = useIsCommandNavigating()
-  const router = useRouter()
-
-  useEffect(() => {
-    router.events.on('routeChangeComplete', () => {
-      if (isNavigating) {
-        setIsNavigating(false)
-        setIsOpen(false)
-      }
-    })
-  }, [router])
 
   useEffect(() => {
     const handleKeydown = (evt: KeyboardEvent) => {
@@ -66,11 +50,31 @@ const CommandShortcut = () => {
   return null
 }
 
-const CommandProvider = ({ children }: PropsWithChildren) => (
-  <CommandProviderInternal>
-    <CommandShortcut />
-    {children}
-  </CommandProviderInternal>
-)
+// This is a component not a hook so it can be used within the right context.
+function CloseOnNavigation() {
+  const setIsOpen = useSetCommandMenuOpen()
+  const router = useCrossCompatRouter()
+
+  const completeNavigation = useCallback(() => {
+    setIsOpen(false)
+  }, [setIsOpen])
+
+  useEffect(() => {
+    router.events.onRouteChangeComplete(completeNavigation)
+    return () => router.events.offRouteChangeComplete(completeNavigation)
+  }, [router])
+
+  return null
+}
+
+const CommandProvider = ({ children }: PropsWithChildren) => {
+  return (
+    <CommandProviderInternal>
+      <CommandShortcut />
+      <CloseOnNavigation />
+      {children}
+    </CommandProviderInternal>
+  )
+}
 
 export { CommandProvider }

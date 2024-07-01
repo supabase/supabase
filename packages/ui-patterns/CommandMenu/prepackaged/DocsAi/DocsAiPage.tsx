@@ -1,3 +1,5 @@
+'use client'
+
 import { CornerDownLeft, User } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'

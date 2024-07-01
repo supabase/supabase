@@ -1,8 +1,8 @@
-import { useRouter } from 'next/navigation'
 import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
-import { useSetCommandMenuOpen, useSetIsCommandNavigating } from '../api/hooks/viewHooks'
+import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -80,8 +80,7 @@ const CommandItem = forwardRef<
   React.ElementRef<typeof CommandItem_Shadcn_>,
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
-  const router = useRouter()
-  const setIsNavigating = useSetIsCommandNavigating()
+  const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
@@ -96,8 +95,8 @@ const CommandItem = forwardRef<
           : isRouteCommand(command)
             ? () => {
                 command.route.startsWith('http')
-                  ? (window.open(command.route, '_blank', 'noreferrer,noopener'), setIsOpen(false))
-                  : (router.push(command.route), setIsNavigating(true))
+                  ? (setIsOpen(false), window.open(command.route, '_blank', 'noreferrer,noopener'))
+                  : router.push(command.route)
               }
             : () => {}
       }

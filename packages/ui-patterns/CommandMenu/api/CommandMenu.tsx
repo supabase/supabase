@@ -1,3 +1,5 @@
+'use client'
+
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
 import { type PropsWithChildren, forwardRef, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'

@@ -1,3 +1,4 @@
+import { CommandProvider } from '@ui-patterns/CommandMenu'
 import PromoToast from '@ui-patterns/PromoToast'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
@@ -10,7 +11,6 @@ import { ShortcutPreviewBuild } from './envs/staging.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
-import { CommandProvider } from '@ui-patterns/CommandMenu'
 import { DocsCommandMenu } from '~/components/CommandMenu'
 
 /**
