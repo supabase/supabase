@@ -20,7 +20,7 @@ const BillingSettings = () => {
 
   const { slug: orgSlug } = useParams()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const isNotOrgWithPartnerBilling = !(subscription?.billing_via_partner ?? true)
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling

@@ -47,7 +47,7 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
   const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
 
   const ContentFile = dynamic<ConnectContentTabProps>(
-    () => import(`./content/${filePath}/content`),
+    () => import(`./content/${filePath}/content.tsx`),
     {
       loading: () => (
         <div className="p-4 min-h-[331px]">

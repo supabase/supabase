@@ -19,7 +19,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const isNotOrgWithPartnerBilling = !(subscription?.billing_via_partner ?? true)
   const invoicesEnabled = invoicesEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   const navLayoutV2 = useFlag('navigationLayoutV2')

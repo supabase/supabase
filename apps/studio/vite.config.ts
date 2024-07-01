@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
         'next/compat/router': path.resolve(__dirname, 'lib', 'next-compat', 'router.ts'),
         'next/navigation': path.resolve(__dirname, 'lib', 'next-compat', 'navigation.ts'),
         'next/head': path.resolve(__dirname, 'lib', 'next-compat', 'head.ts'),
+        'next/dynamic': path.resolve(__dirname, 'lib', 'next-compat', 'dynamic.ts'),
         'next/legacy/image': path.resolve(__dirname, 'lib', 'next-compat', 'image.ts'),
         '@sentry/nextjs': path.resolve(__dirname, 'lib', 'next-compat', 'sentry.ts'),
       },
