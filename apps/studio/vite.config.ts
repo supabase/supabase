@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => {
     envPrefix: ENV_PREFIX,
     server: { port: 8082 },
     preview: { port: 8082 },
+    base: process.env.NEXT_PUBLIC_BASE_PATH ? `${process.env.NEXT_PUBLIC_BASE_PATH}/` : '/',
     plugins: [
       cjsInterop({
         dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],

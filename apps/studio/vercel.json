@@ -1,11 +1,74 @@
 {
   "framework": "vite",
+  "trailingSlash": false,
+  "buildCommand": "npm run build-remix",
+  "outputDirectory": "build/client",
   "rewrites": [
+    {
+      "source": "/dashboard/assets/:match*",
+      "destination": "/assets/:match*"
+    },
+    {
+      "source": "/dashboard/css/:match*",
+      "destination": "/css/:match*"
+    },
+    {
+      "source": "/dashboard/favicon/:match*",
+      "destination": "/favicon/:match*"
+    },
+    {
+      "source": "/dashboard/fonts/:match*",
+      "destination": "/fonts/:match*"
+    },
+    {
+      "source": "/dashboard/img/:match*",
+      "destination": "/img/:match*"
+    },
+    {
+      "source": "/dashboard/monaco-editor/:match*",
+      "destination": "/monaco-editor/:match*"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "npm run build-remix",
-  "outputDirectory": "build/client"
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31556952, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "/css/fonts.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
+      "source": "/favicon/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ]
 }
