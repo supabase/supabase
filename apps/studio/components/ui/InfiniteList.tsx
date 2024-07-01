@@ -1,5 +1,13 @@
 import memoize from 'memoize-one'
-import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
+import {
+  CSSProperties,
+  ComponentType,
+  MutableRefObject,
+  ReactNode,
+  memo,
+  useEffect,
+  useRef,
+} from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { VariableSizeList, areEqual } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
@@ -78,7 +86,6 @@ function InfiniteList<T, P>({
   LoaderComponent,
 }: InfiniteListProps<T, P>) {
   const listRef = useRef<VariableSizeList<any> | null>()
-
   // Only load 1 page of items at a time
   // Pass an empty callback to InfiniteLoader in case it asks to load more than once
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
@@ -90,6 +97,17 @@ function InfiniteList<T, P>({
 
   const itemCount = hasNextPage ? items.length + 1 : items.length
   const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
+
+  useEffect(() => {
+    if (itemProps && itemData && listRef.current !== undefined) {
+      const index = itemData.items.findIndex((item: any) => item.id === Number(itemProps.id))
+      if (index !== -1 && listRef.current) {
+        console.log('success', { index })
+        listRef.current.scrollToItem(index, 'start')
+      }
+    }
+    // literally can't think of what else to put in this array :^)
+  }, [itemData, items, itemProps, listRef, isItemLoaded])
 
   return (
     <div className="relative flex flex-col flex-grow">
