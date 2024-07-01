@@ -138,6 +138,32 @@ functions:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: password
+        type: String
+      - name: data
+        isOptional: true
+        type: JSONObject
+        description: >
+          A custom data object to store additional user metadata.
+      - name: redirectTo
+        isOptional: true
+        type: URL
+        description: >
+          Only for email signups.
+          The redirect URL embedded in the email link.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: captchaToken
+        isOptional: true
+        type: String
     examples:
       - id: sign-up
         name: Sign up with email and password
@@ -232,7 +258,6 @@ functions:
         - `PASSWORD_RECOVERY`
           - Emitted instead of the `SIGNED_IN` event when the user lands on a page that includes a password recovery link in the URL.
           - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
-
     examples:
       - id: listen-to-auth-changes
         name: Listen to auth changes
@@ -292,6 +317,20 @@ functions:
     title: "signInWithPassword()"
     notes: |
       - Requires either an email and password or a phone number and password.
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: password
+        type: String
+      - name: captchaToken
+        isOptional: true
+        type: String
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -322,6 +361,42 @@ functions:
           ```
   - id: sign-in-with-otp
     title: "signInWithOTP()"
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `email` or `phone` must be provided.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: >
+          Only for email signups.
+          The redirect URL embedded in the email link.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: channel
+        isOptional: true
+        type: MessagingChannel
+        description: >
+          The channel to use for sending messages.
+          Only for phone signups.
+      - name: shouldCreateUser
+        isOptional: true
+        type: Bool
+        description: >
+          Whether to create the user if they don't already exist.
+          Defaults to true.
+      - name: data
+        isOptional: true
+        type: JSONObject
+        description: >
+          A custom data object to store additional user metadata.
+      - name: captchaToken
+        isOptional: true
+        type: String
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -365,6 +440,31 @@ functions:
           ```
   - id: sign-in-with-oauth
     title: "signInWithOAuth()"
+    overwriteParams:
+      - name: provider
+        type: Provider
+        description: >
+          The third-party provider.
+      - name: redirectTo
+        type: URL
+        isOptional: true
+        description: >
+          A URL to send the user to after they are confirmed.
+      - name: scopes
+        type: String
+        isOptional: true
+        description: >
+          A space-separated list of scopes granted to the OAuth application.
+      - name: queryParams
+        type: "[(name: String, value: String?)]"
+        isOptional: true
+        description: >
+          Additional query params.
+      - name: configure
+        type: Callback
+        isOptional: true
+        description: >
+          A custom configuration callback for opening the OAuth flow externally.
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
@@ -454,7 +554,27 @@ functions:
           )
           ```
   - id: sign-in-with-sso
-    title: 'signInWithSSO()'
+    title: "signInWithSSO()"
+    overwriteParams:
+      - name: providerId
+        isOptional: true
+        type: String
+        description: >
+          UUID of the SSO provider.
+          One of `providerId` or `domain` is required.
+      - name: domain
+        isOptional: true
+        type: String
+        description: >
+          Domain name of the organization to use SSO with.
+          One of `providerId` or `domain` is required.
+      - name: redirectTo
+        type: String
+        description: >
+          The URL to redirect the user to after they have signed in.
+          Must be a configured redirect URL for your Supabase instance.
+      - name: captchaToken
+        type: String
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
@@ -506,6 +626,37 @@ functions:
           ```
   - id: verify-otp
     title: "verifyOTP()"
+    overwriteParams:
+      - name: email
+        isOptional: true
+        type: String
+        description: One of `phone`, `email`, or `token_hash` must be provided.
+      - name: phone
+        isOptional: true
+        type: String
+        description: One of `phone`, `email`, or `token_hash` must be provided.
+      - name: token_hash
+        isOptional: true
+        type: String
+        description: >
+          The token hash from the user's email link.
+          One of `phone`, `email`, or `token_hash` must be provided.
+      - name: type
+        type: EmailOTPType | MobileOTPType
+      - name: token
+        isOptional: true
+        type: String
+        description: The OTP sent to the user. Required if using `phone` or `email`.
+      - name: redirectTo
+        isOptional: true
+        type: URL
+        description: >
+          A URL to redirect the user to after they are confirmed.
+          Must be in your configured redirect URLs.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: Deprecated.
     notes: |
       - The `verifyOTP` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, or `email`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOTP` to sign up / sign-in a user.
@@ -629,7 +780,7 @@ functions:
           let identities = try await supabase.auth.userIdentities()
           ```
   - id: link-identity
-    title: 'linkIdentity()'
+    title: "linkIdentity()"
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `linkIdentity()`.
@@ -657,7 +808,7 @@ functions:
           }
           ```
   - id: unlink-identity
-    title: 'unlinkIdentity()'
+    title: "unlinkIdentity()"
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `unlinkIdentity()`.
@@ -928,7 +1079,7 @@ functions:
           let factors = try await supabase.auth.mfa.listFactors()
           ```
   - id: admin-api
-    title: 'Overview'
+    title: "Overview"
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
@@ -949,7 +1100,7 @@ functions:
           let adminAuthClient = supabase.auth.admin
           ```
   - id: delete-user
-    title: 'deleteUser()'
+    title: "deleteUser()"
     notes: |
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
