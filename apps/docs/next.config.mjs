@@ -72,7 +72,7 @@ const nextConfig = {
     'api-types',
     'icons',
   ],
-	/**
+  /**
    * The SQL to REST API translator relies on libpg-query, which packages a
    * native Node.js module that wraps the Postgres query parser.
    *
