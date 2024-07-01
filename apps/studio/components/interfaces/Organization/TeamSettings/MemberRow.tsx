@@ -6,7 +6,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -19,10 +19,11 @@ interface MemberRowProps {
 
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
+  const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
+  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
 
-  const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
@@ -129,30 +130,36 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
-                <span>•</span>
-                {projectsApplied.length === 1 ? (
-                  <span className="text-foreground truncate" title={projectsApplied[0]}>
-                    {projectsApplied[0]}
-                  </span>
-                ) : (
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <span className="text-foreground">
-                        {role?.project_ids === null
-                          ? 'Organization'
-                          : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
+                {projectLevelPermissionsEnabled && (
+                  <>
+                    <span>•</span>
+                    {projectsApplied.length === 1 ? (
+                      <span className="text-foreground truncate" title={projectsApplied[0]}>
+                        {projectsApplied[0]}
                       </span>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                      {projectsApplied?.slice(0, 2).map((name) => <span key={name}>{name}</span>)}
-                      {projectsApplied.length > 2 && (
-                        <span>
-                          And {projectsApplied.length - 2} other project
-                          {projectsApplied.length > 4 ? 's' : ''}
-                        </span>
-                      )}
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    ) : (
+                      <Tooltip_Shadcn_>
+                        <TooltipTrigger_Shadcn_ asChild>
+                          <span className="text-foreground">
+                            {role?.project_ids === null
+                              ? 'Organization'
+                              : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
+                          </span>
+                        </TooltipTrigger_Shadcn_>
+                        <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                          {projectsApplied
+                            ?.slice(0, 2)
+                            .map((name) => <span key={name}>{name}</span>)}
+                          {projectsApplied.length > 2 && (
+                            <span>
+                              And {projectsApplied.length - 2} other project
+                              {projectsApplied.length > 4 ? 's' : ''}
+                            </span>
+                          )}
+                        </TooltipContent_Shadcn_>
+                      </Tooltip_Shadcn_>
+                    )}
+                  </>
                 )}
               </div>
             )
