@@ -13,7 +13,6 @@ const SignInWithGitHub = () => {
   async function handleGithubSignIn() {
     setLoading(true)
 
-    console.log('process.env.NEXT_PUBLIC_VERCEL_ENV:', process.env.NEXT_PUBLIC_VERCEL_ENV)
     try {
       // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
       const redirectTo = buildPathWithParams(
