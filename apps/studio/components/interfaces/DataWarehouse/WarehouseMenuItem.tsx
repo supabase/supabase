@@ -49,7 +49,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [showDeleteDialog, setDeleteDialog] = useState(false)
 
-  const canUpdateWareCollection = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const canUpdateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const updateCollection = useUpdateCollection({
     onSuccess: () => {
@@ -122,17 +122,17 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  disabled={!canUpdateWareCollection}
+                  disabled={!canUpdateCollection}
                   className="!pointer-events-auto"
                   onClick={() => {
-                    if (canUpdateWareCollection) setShowUpdateDialog(true)
+                    if (canUpdateCollection) setShowUpdateDialog(true)
                   }}
                 >
                   <EditIcon size={14} />
                   <div>Rename collection</div>
                 </DropdownMenuItem>
               </TooltipTrigger_Shadcn_>
-              {!canUpdateWareCollection && (
+              {!canUpdateCollection && (
                 <TooltipContent_Shadcn_ side="right">
                   You need additional permissions to rename collections
                 </TooltipContent_Shadcn_>
@@ -142,17 +142,17 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  disabled={!canUpdateWareCollection}
+                  disabled={!canUpdateCollection}
                   className="!pointer-events-auto"
                   onClick={async () => {
-                    if (canUpdateWareCollection) setDeleteDialog(true)
+                    if (canUpdateCollection) setDeleteDialog(true)
                   }}
                 >
                   <TrashIcon size={14} />
                   <div>Delete collection</div>
                 </DropdownMenuItem>
               </TooltipTrigger_Shadcn_>
-              {!canUpdateWareCollection && (
+              {!canUpdateCollection && (
                 <TooltipContent_Shadcn_ side="right">
                   You need additional permissions to delete collections
                 </TooltipContent_Shadcn_>

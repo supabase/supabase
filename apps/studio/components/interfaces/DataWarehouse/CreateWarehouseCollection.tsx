@@ -20,7 +20,7 @@ export const CreateWarehouseCollectionModal = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {

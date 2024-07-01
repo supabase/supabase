@@ -51,7 +51,7 @@ const AccessTokenItem = ({
   onDeleteClick: (id: number) => void
 }) => {
   const formattedInsertedAt = new Date(inserted_at).toLocaleString()
-  const canDeleteAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const canDeleteAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   return (
     <Table.tr className="group">
@@ -110,7 +110,7 @@ const WarehouseAccessTokens = () => {
   const projectRef = params.ref as string
   const [open, setOpen] = useState(false)
 
-  const canReadAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const canReadAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
   const accessTokensQuery = useWarehouseAccessTokensQuery(
     { projectRef },
     { enabled: canReadAccessTokens }

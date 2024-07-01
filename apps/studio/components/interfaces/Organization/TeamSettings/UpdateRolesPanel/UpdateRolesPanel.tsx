@@ -47,7 +47,6 @@ import {
   ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface UpdateRolesPanelProps {
   visible: boolean
