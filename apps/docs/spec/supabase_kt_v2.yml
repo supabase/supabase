@@ -4396,7 +4396,7 @@ functions:
           val response = supabase.functions.invoke("function_name")
 
           // Decode the response body to a serializable class
-          val data = res.body<FunctionResponse>()
+          val data = response.body<FunctionResponse>()
           ```
       - id: basic-invocation-with-body
         name: Basic invocation with body
