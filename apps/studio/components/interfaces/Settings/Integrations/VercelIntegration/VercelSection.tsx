@@ -240,6 +240,7 @@ You can change the scope of the access for Supabase by configuring
               )}
               {VercelContentSectionBottom && (
                 <Markdown
+                  extLinks
                   content={VercelContentSectionBottom}
                   className="text-foreground-lighter"
                 />

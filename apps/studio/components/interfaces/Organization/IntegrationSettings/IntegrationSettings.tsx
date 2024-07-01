@@ -172,6 +172,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
               )}
               {GitHubContentSectionBottom && (
                 <Markdown
+                  extLinks
                   content={GitHubContentSectionBottom}
                   className="text-foreground-lighter"
                 />
