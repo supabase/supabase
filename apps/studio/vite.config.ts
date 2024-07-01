@@ -5,12 +5,24 @@ import { defineConfig, loadEnv } from 'vite'
 import circleDependency from 'vite-plugin-circular-dependency'
 import { cjsInterop } from 'vite-plugin-cjs-interop'
 
-const ENV_PREFIX = 'NEXT_PUBLIC_'
+const NEXT_ENV_PREFIX = 'NEXT_PUBLIC_'
+const VITE_ENV_PREFIX = 'VITE_'
 
 export default defineConfig(({ mode }) => {
+  const envs = Object.fromEntries(
+    Object.entries(loadEnv(mode, process.cwd(), [NEXT_ENV_PREFIX, VITE_ENV_PREFIX])).map(
+      ([key, value]) => {
+        if (key.startsWith(VITE_ENV_PREFIX)) {
+          return [key.replace(VITE_ENV_PREFIX, NEXT_ENV_PREFIX), value]
+        }
+        return [key, value]
+      }
+    )
+  )
+
   return {
     define: {
-      'process.env': loadEnv(mode, process.cwd(), ENV_PREFIX),
+      'process.env': envs,
     },
     resolve: {
       alias: {
@@ -39,7 +51,7 @@ export default defineConfig(({ mode }) => {
         '@sentry/nextjs': path.resolve(__dirname, 'lib', 'next-compat', 'sentry.ts'),
       },
     },
-    envPrefix: ENV_PREFIX,
+    envPrefix: NEXT_ENV_PREFIX,
     server: { port: 8082 },
     preview: { port: 8082 },
     base:
@@ -52,7 +64,7 @@ export default defineConfig(({ mode }) => {
         dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],
       }),
       remix({
-        basename: process.env.NEXT_PUBLIC_BASE_PATH,
+        basename: process.env.NEXT_PUBLIC_BASE_PATH ?? '/',
         ssr: false,
         future: {
           v3_fetcherPersist: true,
