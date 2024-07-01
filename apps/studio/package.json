@@ -106,7 +106,6 @@
     "react-window-infinite-loader": "^1.0.7",
     "reactflow": "^11.10.1",
     "recharts": "^2.8.0",
-    "rollup-plugin-node-polyfills": "^0.2.1",
     "semver": "^6.3.1",
     "shared-data": "*",
     "sql-formatter": "^13.1.0",
@@ -123,6 +122,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@remix-run/dev": "^2.10.0",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
@@ -165,6 +165,7 @@
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "sass": "^1.77.6",
     "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",

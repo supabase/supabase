@@ -8,7 +8,6 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
-import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -23,7 +22,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import generator from 'generate-password-browser'
-import { useCheckPermissions, useFlag, withAuth } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
 import {
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
@@ -31,12 +30,12 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import passwordStrength from 'lib/password-strength'
 import { debounce } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
@@ -206,7 +205,7 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
-      router.push(`/project/${res.ref}/building`)
+      router.push(`/project/${res.ref}`)
     },
   })
 
@@ -951,20 +950,5 @@ const monthlyInstancePrice = (instance: string | undefined): number => {
 const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
 }
-
-const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
-})
-
-Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 
 export default Wizard

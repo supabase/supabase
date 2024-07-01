@@ -16,7 +16,7 @@ import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import passwordStrength from 'lib/password-strength'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()

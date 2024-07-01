@@ -1,5 +1,5 @@
 declare module 'next/router' {
-  import type { ParsedUrlQuery } from 'querystring'
+  import type { ParsedUrlQuery, ParsedUrlQueryInput } from 'querystring'
 
   interface UrlObject {
     auth?: string | null | undefined
@@ -57,8 +57,19 @@ declare module 'next/router' {
      */
     push(url: Url, as?: Url, options?: TransitionOptions): Promise<boolean>
 
+    /**
+     * Performs a `replaceState` with arguments
+     * @param url of the route
+     * @param as masks `url` for the browser
+     * @param options object you can define `shallow` and other options
+     */
+    replace(url: Url, as?: Url, options?: TransitionOptions): Promise<boolean>
+
     events: MittEmitter<RouterEvent>
   }
 
+  /**
+   * @deprecated use functions from `@remix-run/react` instead
+   */
   export function useRouter(): NextRouter
 }

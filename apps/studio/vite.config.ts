@@ -1,3 +1,4 @@
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import { vitePlugin as remix } from '@remix-run/dev'
 import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
@@ -41,7 +42,7 @@ export default defineConfig(({ mode }) => {
     preview: { port: 8082 },
     plugins: [
       cjsInterop({
-        dependencies: ['react-use', 'lodash'],
+        dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],
       }),
       remix({
         ssr: false,
@@ -52,5 +53,18 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    optimizeDeps: {
+      esbuildOptions: {
+        define: {
+          global: 'globalThis',
+        },
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            process: false,
+            buffer: true,
+          }) as any,
+        ],
+      },
+    },
   }
 })
