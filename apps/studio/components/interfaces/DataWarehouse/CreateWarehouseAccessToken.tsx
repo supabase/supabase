@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions } from 'hooks'
 import {
-  Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -8,9 +13,6 @@ import {
   Input_Shadcn_,
   Modal,
 } from 'ui'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 
 type CreateWarehouseProps = {
   onSubmit: (values: { description: string }) => void
@@ -33,11 +35,23 @@ const CreateWarehouseAccessToken = ({ onSubmit, loading, open, setOpen }: Create
     },
   })
 
+  const canCreateAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+
   return (
     <>
-      <Button type="outline" onClick={() => setOpen(true)}>
+      <ButtonTooltip
+        disabled={!canCreateAccessTokens}
+        type="outline"
+        onClick={() => setOpen(true)}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'You need additional permissions to create access tokens',
+          },
+        }}
+      >
         Create access token
-      </Button>
+      </ButtonTooltip>
       <Modal
         size="medium"
         onCancel={() => {
