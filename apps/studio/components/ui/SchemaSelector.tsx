@@ -20,6 +20,8 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { useCheckPermissions } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface SchemaSelectorProps {
   className?: string
@@ -45,6 +47,7 @@ const SchemaSelector = ({
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
+  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
 
   const { project } = useProjectContext()
   const {
@@ -152,7 +155,7 @@ const SchemaSelector = ({
                     ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
-                {onSelectCreateSchema !== undefined && (
+                {onSelectCreateSchema !== undefined && canCreateSchemas && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_>
