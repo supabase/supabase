@@ -32,7 +32,10 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   })
 
   const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
-    onSuccess: () => toast.success('Successfully saved profile'),
+    onSuccess: (data) => {
+      toast.success('Successfully saved profile')
+      form.reset({ first_name: data.first_name, last_name: data.last_name })
+    },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
 

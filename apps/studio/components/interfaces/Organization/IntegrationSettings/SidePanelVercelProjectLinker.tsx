@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { SidePanel } from 'ui'
 
+import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -23,6 +24,7 @@ const VERCEL_ICON = (
 )
 
 const SidePanelVercelProjectLinker = () => {
+  const { ref } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
@@ -119,13 +121,13 @@ const SidePanelVercelProjectLinker = () => {
 
   return (
     <SidePanel
-      header={'Add new Vercel Project Connection'}
-      size="large"
-      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       hideFooter
+      size="large"
+      header="Add new Vercel project connection"
+      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       onCancel={() => sidePanelStateSnapshot.setVercelConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-studio h-full">
+      <div className="py-6 flex flex-col gap-6 bg-studio h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -137,6 +139,7 @@ Check the details below before proceeding
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
+            defaultSupabaseProjectRef={ref}
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={vercelProjects}
             supabaseProjects={supabaseProjects}
