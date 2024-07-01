@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,10 +8,12 @@ import toast from 'react-hot-toast'
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
+import { useProfile } from 'lib/profile'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,9 +31,19 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const ReportsMenu = () => {
   const router = useRouter()
+  const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
+
+  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
+  const canUpdateCustomReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
+    resource: { type: 'report', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   const { data: content, isLoading } = useContentQuery(ref)
   const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
@@ -124,17 +137,25 @@ const ReportsMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col px-2 gap-y-6">
-          <div className="flex px-2">
-            <Button
+          <div className="px-2">
+            <ButtonTooltip
+              block
               type="default"
+              icon={<Plus />}
+              disabled={!canCreateCustomReport}
               className="justify-start flex-grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
-              icon={<Plus size={12} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create custom reports',
+                },
+              }}
             >
               New custom report
-            </Button>
+            </ButtonTooltip>
           </div>
 
           {reportMenuItems.length > 0 ? (
@@ -154,37 +175,39 @@ const ReportsMenu = () => {
                 >
                   <div>{item.name}</div>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button
-                        type="text"
-                        className="px-1 opacity-50 hover:opacity-100"
-                        icon={<ChevronDown size={12} strokeWidth={2} />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-52 *:space-x-2">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (!item.id) return
-                          setSelectedReportToUpdate(item.report)
-                        }}
-                      >
-                        <Edit2 size={12} />
-                        <div>Rename</div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={async () => {
-                          if (!item.id) return
-                          setSelectedReportToDelete(item.report)
-                          setDeleteModalOpen(true)
-                        }}
-                      >
-                        <Trash size={12} />
-                        <div>Delete</div>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {canUpdateCustomReport && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button
+                          type="text"
+                          className="px-1 opacity-50 hover:opacity-100"
+                          icon={<ChevronDown size={12} strokeWidth={2} />}
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-52 *:space-x-2">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (!item.id) return
+                            setSelectedReportToUpdate(item.report)
+                          }}
+                        >
+                          <Edit2 size={12} />
+                          <div>Rename</div>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            if (!item.id) return
+                            setSelectedReportToDelete(item.report)
+                            setDeleteModalOpen(true)
+                          }}
+                        >
+                          <Trash size={12} />
+                          <div>Delete</div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </Link>
               ))}
             </div>
