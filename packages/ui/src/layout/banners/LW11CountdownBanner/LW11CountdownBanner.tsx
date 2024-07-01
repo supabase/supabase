@@ -1,9 +1,10 @@
 'use client'
 
-import { useRouter } from 'next/router'
-import { Button, cn } from 'ui'
-import announcement from '../data/Announcement.json'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Button } from '../../../components/Button/Button'
+import { cn } from '../../../lib/utils/cn'
+import announcement from '../data/Announcement.json'
 
 export function LW11CountdownBanner() {
   const router = useRouter()

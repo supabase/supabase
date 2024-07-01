@@ -3,7 +3,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
-import { Button } from '../../../index'
+import { Button } from '../../components/Button/Button'
 import styleHandler from '../../lib/theme/styleHandler'
 
 export type SidePanelProps = RadixProps & CustomProps

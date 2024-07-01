@@ -2,6 +2,7 @@ import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfil
 import { vitePlugin as remix } from '@remix-run/dev'
 import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
+import circleDependency from 'vite-plugin-circular-dependency'
 import { cjsInterop } from 'vite-plugin-cjs-interop'
 
 const ENV_PREFIX = 'NEXT_PUBLIC_'
@@ -45,6 +46,7 @@ export default defineConfig(({ mode }) => {
         ? `${process.env.NEXT_PUBLIC_BASE_PATH}/`
         : '/',
     plugins: [
+      circleDependency(),
       cjsInterop({
         dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],
       }),
