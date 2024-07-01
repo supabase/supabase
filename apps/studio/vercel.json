@@ -1,0 +1,5 @@
+{
+  "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }],
+  "buildCommand": "npm run build-remix",
+  "outputDirectory": "build/client"
+}
