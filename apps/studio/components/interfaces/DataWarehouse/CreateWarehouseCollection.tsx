@@ -4,12 +4,13 @@ import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Modal } from 'ui'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Input } from '@ui/components/shadcn/ui/input'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -83,7 +84,7 @@ export const CreateWarehouseCollectionModal = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Collection name" layout="horizontal">
                     <FormControl_Shadcn_>
-                      <Input {...field} placeholder="Events" />
+                      <Input placeholder="Events" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
