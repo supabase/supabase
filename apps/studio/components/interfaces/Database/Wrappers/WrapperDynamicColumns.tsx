@@ -130,7 +130,6 @@ const WrapperDynamicColumns = ({
                   value={column.type}
                   enumTypes={[]}
                   onOptionSelect={(value) => onUpdateValue(column.id, 'type', value)}
-                  layout="vertical"
                   className="[&_label]:!p-0"
                 />
               </div>
