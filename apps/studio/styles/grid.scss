@@ -400,26 +400,6 @@
 }
 
 /*
-  Pagination
-*/
-
-.sb-grid-pagination {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-pagination-input-container {
-  @apply w-12;
-}
-.sb-grid-pagination-input {
-  @apply block w-12;
-}
-
-.sb-grid-pagination-input .sbui-inputnumber {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-/*
   Footer
 */
 

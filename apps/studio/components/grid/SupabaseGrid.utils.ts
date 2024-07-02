@@ -115,6 +115,7 @@ export function parseSupaTable(
   })
 
   return {
+    id: table.id,
     name: table.name,
     comment: table.comment,
     schema: table.schema,
