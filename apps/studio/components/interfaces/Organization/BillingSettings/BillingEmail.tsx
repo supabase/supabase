@@ -25,7 +25,10 @@ const BillingEmail = () => {
   const initialValues = { billing_email: billing_email ?? '' }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: any, { resetForm }: any) => {
@@ -50,6 +53,8 @@ const BillingEmail = () => {
       }
     )
   }
+
+  if (!canReadBillingEmail) return null
 
   return (
     <ScaffoldSection>
@@ -99,7 +104,7 @@ const BillingEmail = () => {
                       id="billing_email"
                       size="small"
                       label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
+                      type="text"
                       disabled={!canUpdateOrganization}
                     />
                   </FormSectionContent>
