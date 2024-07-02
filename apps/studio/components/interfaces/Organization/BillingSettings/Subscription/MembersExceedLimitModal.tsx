@@ -2,8 +2,6 @@ import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-l
 import { useSelectedOrganization } from 'hooks'
 import { Button, Modal } from 'ui'
 
-// [Joshen TODO] Check if we still need this?
-
 export interface MembersExceedLimitModalProps {
   visible: boolean
   onClose: () => void
