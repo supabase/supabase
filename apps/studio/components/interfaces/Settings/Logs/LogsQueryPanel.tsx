@@ -32,11 +32,14 @@ import Table from 'components/to-be-cleaned/Table'
 import { logConstants } from 'shared-data'
 import { copyToClipboard } from 'lib/helpers'
 import { BookOpen, ChevronDown } from 'lucide-react'
+import { WarehouseQueryTemplate } from './Warehouse.utils'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
+  warehouseTemplates?: WarehouseQueryTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
+  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
   onSelectSource: (source: string) => void
   onClear: () => void
   onSave?: () => void
@@ -62,7 +65,9 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 
 const LogsQueryPanel = ({
   templates = [],
+  warehouseTemplates = [],
   onSelectTemplate,
+  onSelectWarehouseTemplate,
   onSelectSource,
   defaultFrom,
   defaultTo,
@@ -123,44 +128,60 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
-                  Insert {dataSource === 'logs' ? 'source' : 'collection'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="bottom"
-                align="start"
-                className="max-h-[70vh] overflow-auto"
-              >
-                {dataSource === 'logs' &&
-                  logsTableNames
-                    .sort((a, b) => a.localeCompare(b))
-                    .map((source) => (
-                      <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
-                        <DropdownMenuItemContent
-                          name={source}
-                          desc={LOGS_SOURCE_DESCRIPTION[source]}
-                        />
-                      </DropdownMenuItem>
-                    ))}
-                {dataSource === 'warehouse' &&
-                  warehouseCollections.map((col) => (
-                    <DropdownMenuItem onClick={() => onSelectSource(col.name)}>
-                      <DropdownMenuItemContent name={col.name} />
+            {dataSource === 'warehouse' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Templates
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {warehouseTemplates.map((template) => (
+                    <DropdownMenuItem
+                      key={template.name}
+                      onClick={() => onSelectWarehouseTemplate(template)}
+                    >
+                      <DropdownMenuItemContent name={template.name} desc={template.description} />
                     </DropdownMenuItem>
                   ))}
-                {dataSource === 'warehouse' && warehouseCollections.length === 0 && (
-                  <DropdownMenuItem className="hover:bg-transparent cursor-default">
-                    <DropdownMenuItemContent
-                      name="No collections found"
-                      desc="You can create collections in the left sidebar."
-                    />
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  {warehouseCollections.length === 0 && (
+                    <DropdownMenuItem className="hover:bg-transparent cursor-default">
+                      <DropdownMenuItemContent
+                        name="No collections found"
+                        desc="You can create collections in the left sidebar."
+                      />
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {dataSource === 'logs' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Insert source
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="start"
+                  className="max-h-[70vh] overflow-auto"
+                >
+                  {dataSource === 'logs' &&
+                    logsTableNames
+                      .sort((a, b) => a.localeCompare(b))
+                      .map((source) => (
+                        <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
+                          <DropdownMenuItemContent
+                            name={source}
+                            desc={LOGS_SOURCE_DESCRIPTION[source]}
+                          />
+                        </DropdownMenuItem>
+                      ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {dataSource === 'logs' && (
               <DropdownMenu>

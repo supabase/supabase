@@ -42,6 +42,7 @@ import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { useWarehouseCollectionsQuery, useWarehouseQueryQuery } from 'data/analytics'
 import { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
+import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
@@ -306,11 +307,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onClear={handleClear}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            warehouseCollections={warehouseCollections || []}
             onSelectTemplate={onSelectTemplate}
+            warehouseTemplates={createWarehouseQueryTemplates(warehouseCollections || [])}
+            onSelectWarehouseTemplate={(template) => {
+              setWarehouseEditorValue(template.query)
+              setWarehouseEditorId(uuidv4())
+            }}
             onSave={handleOnSave}
             isLoading={isLoading}
             warnings={warnings}
-            warehouseCollections={warehouseCollections || []}
             dataSource={sourceType}
             onDataSourceChange={(srcType) => {
               setSourceType(srcType)
