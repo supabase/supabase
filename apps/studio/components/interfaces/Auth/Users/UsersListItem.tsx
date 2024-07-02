@@ -9,16 +9,20 @@ import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
   user: User
-  canRemoveUser: boolean
-  canRemoveMFAFactors: boolean
+  permissions: {
+    canRemoveUser: boolean
+    canRemoveMFAFactors: boolean
+    canSendMagicLink: boolean
+    canSendRecovery: boolean
+    canSendOtp: boolean
+  }
   setSelectedUser: (user: User) => void
   setUserSidePanelOpen: (open: boolean) => void
 }
 
 const UserListItem = ({
   user,
-  canRemoveUser,
-  canRemoveMFAFactors,
+  permissions,
   setSelectedUser,
   setUserSidePanelOpen,
 }: UserListItemProps) => {
@@ -65,8 +69,7 @@ const UserListItem = ({
       <Table.td className="table-cell">
         <UserDropdown
           user={user}
-          canRemoveUser={canRemoveUser}
-          canRemoveMFAFactors={canRemoveMFAFactors}
+          permissions={permissions}
           setSelectedUser={setSelectedUser}
           setUserSidePanelOpen={setUserSidePanelOpen}
         />

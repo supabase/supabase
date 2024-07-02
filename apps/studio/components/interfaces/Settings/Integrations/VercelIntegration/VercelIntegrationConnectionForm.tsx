@@ -20,9 +20,11 @@ import {
 } from 'ui'
 
 const VercelIntegrationConnectionForm = ({
+  disabled,
   connection,
   integration,
 }: {
+  disabled?: boolean
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
@@ -82,6 +84,7 @@ const VercelIntegrationConnectionForm = ({
                 <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      disabled={disabled}
                       className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
@@ -106,6 +109,7 @@ const VercelIntegrationConnectionForm = ({
                 <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      disabled={disabled}
                       className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
@@ -130,6 +134,7 @@ const VercelIntegrationConnectionForm = ({
                 <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                   <FormControl_Shadcn_>
                     <Switch
+                      disabled={disabled}
                       className="mt-1"
                       checked={field.value}
                       onCheckedChange={(e) => {
