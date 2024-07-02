@@ -34,7 +34,7 @@ import {
   Radio,
   SidePanel,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -115,7 +115,20 @@ const ComputeInstanceSidePanel = () => {
 
   const availableOptions = useMemo(() => {
     const computeOptions =
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+      availableAddons
+        .find((addon) => addon.type === 'compute_instance')
+        ?.variants.filter((option) => {
+          if (!selectedProject?.cloud_provider) {
+            return true
+          }
+
+          const meta = option.meta as ProjectAddonVariantMeta
+
+          return (
+            !meta.supported_cloud_providers ||
+            meta.supported_cloud_providers.includes(selectedProject.cloud_provider)
+          )
+        }) ?? []
 
     // Backwards comp until API is deployed
     if (!hasMicroOptionFromApi) {
@@ -449,7 +462,7 @@ const ComputeInstanceSidePanel = () => {
               subscription?.billing_via_partner &&
               subscription.scheduled_plan_change?.target_plan !== undefined && (
                 <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                  <IconAlertTriangle className="h-4 w-4" />
+                  <CriticalIcon />
                   <AlertDescription_Shadcn_>
                     You have a scheduled subscription change that will be canceled if you change
                     your compute size.

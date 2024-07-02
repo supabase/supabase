@@ -203,11 +203,19 @@ export async function middleware(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const { data: user, error } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith('/login') &&
+    !request.nextUrl.pathname.startsWith('/auth')
+  ) {
     // no user, potentially respond by redirecting the user to the login page
-    return NextResponse.redirect('/login')
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
@@ -519,8 +527,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
           fetch,
         },
         cookies: {
-          get() {
-            return JSON.stringify(data.session)
+          getAll() {
+            return data.cookies
           },
         },
       })
@@ -545,12 +553,13 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 ```ts +layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
   const { session, user } = await safeGetSession()
 
   return {
     session,
     user,
+    cookies: cookies.getAll(),
   }
 }
 ```

@@ -1,11 +1,17 @@
-import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
-import { useParams } from 'common'
-import { useDeleteCollectionMutation, useUpdateCollection } from 'data/analytics'
-import { EditIcon, TrashIcon } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { EditIcon, MoreHorizontal, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { z } from 'zod'
+
+import { FormMessage } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
+import { useDeleteCollectionMutation, useUpdateCollection } from 'data/analytics'
+import { useCheckPermissions } from 'hooks'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -20,12 +26,11 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 type Props = {
@@ -43,6 +48,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
 
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const [showDeleteDialog, setDeleteDialog] = useState(false)
+
+  const canUpdateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const updateCollection = useUpdateCollection({
     onSuccess: () => {
@@ -102,33 +109,55 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               loading={isLoading}
               type="text"
               className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
-              icon={<EllipsisHorizontalIcon />}
+              icon={<MoreHorizontal />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             onClick={(e) => {
               e.stopPropagation()
             }}
-            align="start"
-            className="w-52 *:space-x-2"
+            align="end"
+            className="w-44 *:space-x-2"
           >
-            <DropdownMenuItem
-              onClick={() => {
-                setShowUpdateDialog(true)
-              }}
-            >
-              <EditIcon size="14" />
-              <div>Rename</div>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  className="!pointer-events-auto"
+                  onClick={() => {
+                    if (canUpdateCollection) setShowUpdateDialog(true)
+                  }}
+                >
+                  <EditIcon size={14} />
+                  <div>Rename collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to rename collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={async () => {
-                setDeleteDialog(true)
-              }}
-            >
-              <TrashIcon size="14" />
-              <div>Delete</div>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canUpdateCollection}
+                  className="!pointer-events-auto"
+                  onClick={async () => {
+                    if (canUpdateCollection) setDeleteDialog(true)
+                  }}
+                >
+                  <TrashIcon size={14} />
+                  <div>Delete collection</div>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateCollection && (
+                <TooltipContent_Shadcn_ side="right">
+                  You need additional permissions to delete collections
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </Link>

@@ -1,33 +1,34 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
+import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import DatePicker from 'react-datepicker'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconChevronLeft,
-  IconChevronRight,
-  IconHelpCircle,
-  Modal,
-} from 'ui'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useCheckPermissions } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import Link from 'next/link'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Modal,
+} from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import BackupsEmpty from '../BackupsEmpty'
+import BackupsStorageAlert from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'
 import {
   constrainDateToRange,
@@ -38,7 +39,6 @@ import {
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
-import BackupsStorageAlert from '../BackupsStorageAlert'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -50,6 +50,11 @@ const PITRSelection = () => {
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
+
+  const canTriggerPhysicalBackups = useCheckPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.restore.prepare'
+  )
 
   const hasReadReplicas = (databases ?? []).length > 1
 
@@ -146,7 +151,7 @@ const PITRSelection = () => {
         <>
           {hasReadReplicas && (
             <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
+              <WarningIcon />
               <AlertTitle_Shadcn_>
                 Unable to restore from PITR as project has read replicas enabled
               </AlertTitle_Shadcn_>
@@ -181,34 +186,24 @@ const PITRSelection = () => {
                   <Button type="default" onClick={onCancel}>
                     Cancel
                   </Button>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="warning"
-                        disabled={isSelectedOutOfRange || !selectedDate}
-                        onClick={() => setShowConfirmation(true)}
-                      >
-                        Review restore details
-                      </Button>
-                    </Tooltip.Trigger>
-                    {isSelectedOutOfRange && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'bg-alternative rounded py-1 px-2 leading-none shadow',
-                              'border-background border w-48 text-center',
-                            ].join(' ')}
-                          >
-                            <span className="text-foreground text-xs">
-                              Selected date is out of range where backups are available
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
+
+                  <ButtonTooltip
+                    type="warning"
+                    disabled={isSelectedOutOfRange || !selectedDate || !canTriggerPhysicalBackups}
+                    onClick={() => setShowConfirmation(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isSelectedOutOfRange
+                          ? 'Selected date is out of range where backups are available'
+                          : !canTriggerPhysicalBackups
+                            ? 'You need additional permissions to trigger a restore'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Review restore details
+                  </ButtonTooltip>
                 </div>
               }
             >
@@ -240,7 +235,7 @@ const PITRSelection = () => {
                             text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
-                            <IconChevronLeft size={16} strokeWidth={2} />
+                            <ChevronLeft size={16} strokeWidth={2} />
                           </button>
                           <span className="text-foreground-light text-sm">
                             {format(date, 'MMMM yyyy')}
@@ -254,7 +249,7 @@ const PITRSelection = () => {
                             text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
-                            <IconChevronRight size={16} strokeWidth={2} />
+                            <ChevronRight size={16} strokeWidth={2} />
                           </button>
                         </div>
                       </div>
@@ -273,7 +268,7 @@ const PITRSelection = () => {
                         <InformationBox
                           defaultVisibility
                           hideCollapse
-                          icon={<IconHelpCircle strokeWidth={2} />}
+                          icon={<HelpCircle size={14} strokeWidth={2} />}
                           title="Select a date which you'd like to restore your database to"
                         />
                       </div>
@@ -354,8 +349,8 @@ const PITRSelection = () => {
           )}
         </>
       )}
+
       <Modal
-        closable
         size="medium"
         visible={showConfirmation}
         onCancel={() => setShowConfirmation(false)}

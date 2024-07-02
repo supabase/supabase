@@ -1,17 +1,21 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { MoreVertical, TrashIcon } from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms'
+import NoPermission from 'components/ui/NoPermission'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
 import {
   useCreateWarehouseAccessToken,
   useDeleteWarehouseAccessToken,
   useWarehouseAccessTokensQuery,
 } from 'data/analytics'
-import { MoreVertical, TrashIcon } from 'lucide-react'
-import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { useCheckPermissions } from 'hooks'
 import {
   Button,
   Dialog,
@@ -25,10 +29,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
+import { TooltipContent } from '@radix-ui/react-tooltip'
 
 const AccessTokenItem = ({
   token,
@@ -44,6 +51,7 @@ const AccessTokenItem = ({
   onDeleteClick: (id: number) => void
 }) => {
   const formattedInsertedAt = new Date(inserted_at).toLocaleString()
+  const canDeleteAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   return (
     <Table.tr className="group">
@@ -66,17 +74,29 @@ const AccessTokenItem = ({
           <DropdownMenuTrigger className="h-8 w-8 p-2 focus-visible:outline-none">
             <MoreVertical size="14" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-w-40">
-            <DropdownMenuItem
-              className="flex gap-1.5 "
-              onClick={(e) => {
-                e.preventDefault()
-                onDeleteClick(id)
-              }}
-            >
-              <TrashIcon size="14" />
-              Revoke token
-            </DropdownMenuItem>
+          <DropdownMenuContent className="max-w-40" align="end">
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canDeleteAccessTokens}
+                  className="flex gap-1.5 !pointer-events-auto"
+                  onClick={(e) => {
+                    if (canDeleteAccessTokens) {
+                      e.preventDefault()
+                      onDeleteClick(id)
+                    }
+                  }}
+                >
+                  <TrashIcon size="14" />
+                  Revoke token
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canDeleteAccessTokens && (
+                <TooltipContent side="left">
+                  You need additional permissions to delete access tokens
+                </TooltipContent>
+              )}
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </Table.td>
@@ -90,8 +110,13 @@ const WarehouseAccessTokens = () => {
   const projectRef = params.ref as string
   const [open, setOpen] = useState(false)
 
-  const accessTokensQuery = useWarehouseAccessTokensQuery({ projectRef })
+  const canReadAccessTokens = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+  const accessTokensQuery = useWarehouseAccessTokensQuery(
+    { projectRef },
+    { enabled: canReadAccessTokens }
+  )
   const hasAccessTokens = accessTokensQuery.isSuccess && accessTokensQuery.data.data.length > 0
+
   const [tokenToDelete, setTokenToDelete] = useState<string | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -118,6 +143,7 @@ const WarehouseAccessTokens = () => {
   return (
     <section className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
       <FormHeader
+        className="!mb-0"
         title="Warehouse access tokens"
         description="Manage your warehouse access tokens for this project."
         actions={
@@ -134,59 +160,65 @@ const WarehouseAccessTokens = () => {
           />
         }
       />
-      <div className={cn(['bg-surface-100', 'overflow-hidden', 'rounded-md shadow'])}>
-        {!isProjectActive ? (
-          <ProjectPausedAlert
-            projectRef={projectRef}
-            description="Restore your project to manage your warehouse access tokens"
-          />
-        ) : (
-          <>
-            {accessTokensQuery.isLoading ? (
-              <div className="p-4">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table
-                  head={[
-                    <Table.th key="description">Description</Table.th>,
-                    <Table.th key="token">Created at</Table.th>,
-                    <Table.th key="token">Token</Table.th>,
-                    <Table.th key="actions" />,
-                  ]}
-                  body={
-                    hasAccessTokens ? (
-                      accessTokensQuery.data.data.map((accessToken) => (
-                        <AccessTokenItem
-                          key={accessToken.id + '-wh-access-token'}
-                          token={accessToken.token}
-                          id={accessToken.id}
-                          inserted_at={accessToken.inserted_at}
-                          description={accessToken.description || 'No description'}
-                          onDeleteClick={() => {
-                            setShowDeleteDialog(true)
-                            setTokenToDelete(accessToken.token)
-                          }}
-                        />
-                      ))
-                    ) : (
-                      <Table.tr>
-                        <Table.td colSpan={4}>
-                          <p className="text-sm text-foreground">No access tokens created</p>
-                          <p className="text-sm text-foreground-light">
-                            There are no access tokens associated with your project yet
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+
+      {!canReadAccessTokens ? (
+        <NoPermission resourceText="view warehouse access tokens" />
+      ) : (
+        <div className={cn(['bg-surface-100', 'overflow-hidden', 'rounded-md shadow'])}>
+          {!isProjectActive ? (
+            <ProjectPausedAlert
+              projectRef={projectRef}
+              description="Restore your project to manage your warehouse access tokens"
+            />
+          ) : (
+            <>
+              {accessTokensQuery.isLoading ? (
+                <div className="p-4">
+                  <GenericSkeletonLoader />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table
+                    head={[
+                      <Table.th key="description">Description</Table.th>,
+                      <Table.th key="token">Created at</Table.th>,
+                      <Table.th key="token">Token</Table.th>,
+                      <Table.th key="actions" />,
+                    ]}
+                    body={
+                      hasAccessTokens ? (
+                        accessTokensQuery.data.data.map((accessToken) => (
+                          <AccessTokenItem
+                            key={accessToken.id + '-wh-access-token'}
+                            token={accessToken.token}
+                            id={accessToken.id}
+                            inserted_at={accessToken.inserted_at}
+                            description={accessToken.description || 'No description'}
+                            onDeleteClick={() => {
+                              setShowDeleteDialog(true)
+                              setTokenToDelete(accessToken.token)
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Table.tr>
+                          <Table.td colSpan={4}>
+                            <p className="text-sm text-foreground">No access tokens created</p>
+                            <p className="text-sm text-foreground-light">
+                              There are no access tokens associated with your project yet
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    }
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
