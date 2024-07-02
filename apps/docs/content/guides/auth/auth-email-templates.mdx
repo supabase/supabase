@@ -24,6 +24,7 @@ The templating system provides the following variables for use:
 | `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
 | `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
 | `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
+| `{{ .MailType }}`        | Contains the email type being sent. This will be one of: `magiclink`, `recovery`, `invite`, `signup` or `email_change`.                                                                                                                                                               |
 
 ## Editing email templates
 

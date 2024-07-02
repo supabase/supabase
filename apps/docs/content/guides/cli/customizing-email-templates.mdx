@@ -77,7 +77,7 @@ Contains a hashed version of the `Token`. This is useful for constructing your o
 ```html
 <p>Follow this link to confirm your user:</p>
 <p>
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type={{ .MailType }}"
     >Confirm your email</a
   >
 </p>
@@ -111,6 +111,23 @@ Contains the new user's email address. This is only available in the `email_chan
 
 ```html
 <p>You are requesting to update your email address to {{ .NewEmail }}.</p>
+```
+
+
+### MailType
+
+Contains the MailType being sent.
+
+The value will be one of: `magiclink`, `recovery`, `invite`, `signup` or `email_change`.
+
+**Usage**
+
+```html
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type={{ .MailType }}"
+    >Click the Link</a
+  >
+</p>
 ```
 
 ## Deploying email templates
