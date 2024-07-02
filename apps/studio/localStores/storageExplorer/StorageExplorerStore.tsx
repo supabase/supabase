@@ -585,10 +585,20 @@ class StorageExplorerStore {
        * Storage maintains a list of allowed characters, which excludes
        * characters such as the narrow no-break space used in Mac screenshots.
        * To preempt errors, replace all non-word characters with underscores.
+       * [Joshen] Except backslashes as this will indicate a folder path
        */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(/[^\w.-]/g, '_')
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(
+        /[^\w.-\/]/g,
+        '_'
+      )
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
+      console.log({
+        pathToFile,
+        formattedPathToFile,
+        formattedFileName,
+        unsanitizedFormattedFileName,
+      })
 
       if (isWithinFolder) {
         const topLevelFolder = file.path?.split('/')[0] || ''
