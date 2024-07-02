@@ -44,10 +44,6 @@ interface BaseMenu {
   type: string
 }
 
-interface HomeMenu extends BaseMenu {
-  type: 'home'
-}
-
 interface GuideMenu extends BaseMenu {
   type: 'guide'
 }
@@ -59,13 +55,9 @@ interface ReferenceMenu extends BaseMenu {
   specFile?: string
 }
 
-type Menu = HomeMenu | GuideMenu | ReferenceMenu
+type Menu = GuideMenu | ReferenceMenu
 
 const menus: Menu[] = [
-  {
-    id: MenuId.Home,
-    type: 'home',
-  },
   {
     id: MenuId.GettingStarted,
     type: 'guide',
