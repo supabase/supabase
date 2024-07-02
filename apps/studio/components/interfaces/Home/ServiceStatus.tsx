@@ -132,7 +132,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <div
             key={service.name}

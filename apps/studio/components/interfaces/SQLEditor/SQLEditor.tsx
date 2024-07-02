@@ -57,6 +57,8 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { lintKeys } from 'data/lint/keys'
+import { useQueryClient } from '@tanstack/react-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -82,6 +84,7 @@ const SQLEditor = () => {
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const queryClient = useQueryClient()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -176,6 +179,9 @@ const SQLEditor = () => {
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
+
+      // revalidate lint query
+      queryClient.invalidateQueries(lintKeys.lint(ref))
     },
     onError(error: any, vars) {
       if (id) {
