@@ -12,27 +12,41 @@ Accessing the [Storage Logs](/dashboard/project/__/logs/explorer?q=select+id%2C+
 #### Filter by status 5XX error
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
-  from storage_logs
+select
+  id,
+  storage_logs.timestamp,
+  event_message,
+  r.statusCode,
+  e.message as errorMessage,
+  e.raw as rawError
+from
+  storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.res) as r
   cross join unnest(m.error) as e
-  where r.statusCode >= 500
-  order by timestamp desc
-  limit 100
+where r.statusCode >= 500
+order by timestamp desc
+limit 100;
 ```
 
 #### Filter by status 4XX error
 
 ```sql
-select id, storage_logs.timestamp, event_message, r.statusCode, e.message as errorMessage e.raw as rawError
-  from storage_logs
+select
+  id,
+  storage_logs.timestamp,
+  event_message,
+  r.statusCode,
+  e.message as errorMessage,
+  e.raw as rawError
+from
+  storage_logs
   cross join unnest(metadata) as m
   cross join unnest(m.res) as r
   cross join unnest(m.error) as e
-  where r.statusCode >= 400 and r.statusCode < 500
-  order by timestamp desc
-  limit 100
+where r.statusCode >= 400 and r.statusCode < 500
+order by timestamp desc
+limit 100;
 ```
 
 #### Filter by method
