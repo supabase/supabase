@@ -101,6 +101,7 @@ const PostgrestConfig = () => {
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
+
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
@@ -207,6 +208,7 @@ const PostgrestConfig = () => {
                         <FormControl_Shadcn_>
                           <Switch
                             size="large"
+                            disabled={!canUpdatePostgrestConfig}
                             checked={field.value}
                             onCheckedChange={(value) => {
                               field.onChange(value)

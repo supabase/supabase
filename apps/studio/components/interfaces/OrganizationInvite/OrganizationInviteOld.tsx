@@ -1,10 +1,10 @@
-import { useParams } from 'common'
+import { CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconCheckSquare, Loading } from 'ui'
 
+import { useParams } from 'common'
 import { useOrganizationJoinDeclineMutation } from 'data/organizations/organization-join-decline-mutation'
 import { useOrganizationJoinMutation } from 'data/organizations/organization-join-mutation'
 import {
@@ -13,17 +13,19 @@ import {
 } from 'data/organizations/organization-join-token-validation-query'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
+import { Button, Loading } from 'ui'
 
-const JoinOrganizationPage = () => {
+export const OrganizationInviteOld = () => {
   const router = useRouter()
-  const { slug, token, name } = useParams()
-  const { profile } = useProfile()
   const signOut = useSignOut()
+  const { profile } = useProfile()
+  const { slug, token, name } = useParams()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<any>()
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
+
   const {
     token_does_not_exist,
     sso_mismatch,
@@ -56,46 +58,6 @@ const JoinOrganizationPage = () => {
       setIsSubmitting(false)
     },
   })
-
-  useEffect(() => {
-    const fetchTokenInfo = async () => {
-      if (!slug) return console.error('Slug is required')
-      if (!token) return console.error('Token is required')
-
-      try {
-        const response = await validateTokenInformation({ slug, token })
-        setTokenInfoLoaded(true)
-        setTokenValidationInfo(response)
-      } catch (error) {
-        setError(error)
-        setTokenInfoLoaded(true)
-      }
-    }
-
-    if (!tokenInfoLoaded && token) {
-      fetchTokenInfo()
-    }
-
-    /**
-     * if params are empty then redirect
-     * user to the homepage of app
-     */
-    // if (!slug && !token) router.push('/')
-  }, [token, router.asPath])
-
-  async function handleJoinOrganization() {
-    if (!slug) return console.error('Slug is required')
-    if (!token) return console.error('Token is required')
-    setIsSubmitting(true)
-    joinOrganization({ slug, token })
-  }
-
-  async function handleDeclineJoinOrganization() {
-    if (!slug) return console.error('Slug is required')
-    if (!invite_id) return console.error('Invite ID is required')
-    setIsSubmitting(true)
-    declineOrganization({ slug, invited_id: invite_id })
-  }
 
   const isError =
     error ||
@@ -210,7 +172,7 @@ const JoinOrganizationPage = () => {
                 htmlType="submit"
                 loading={isSubmitting}
                 type="primary"
-                icon={<IconCheckSquare />}
+                icon={<CheckSquare />}
               >
                 Join organization
               </Button>
@@ -238,6 +200,46 @@ const JoinOrganizationPage = () => {
       </div>
     </>
   )
+
+  async function handleJoinOrganization() {
+    if (!slug) return console.error('Slug is required')
+    if (!token) return console.error('Token is required')
+    setIsSubmitting(true)
+    joinOrganization({ slug, token })
+  }
+
+  async function handleDeclineJoinOrganization() {
+    if (!slug) return console.error('Slug is required')
+    if (!invite_id) return console.error('Invite ID is required')
+    setIsSubmitting(true)
+    declineOrganization({ slug, invited_id: invite_id })
+  }
+
+  useEffect(() => {
+    const fetchTokenInfo = async () => {
+      if (!slug) return console.error('Slug is required')
+      if (!token) return console.error('Token is required')
+
+      try {
+        const response = await validateTokenInformation({ slug, token })
+        setTokenInfoLoaded(true)
+        setTokenValidationInfo(response)
+      } catch (error) {
+        setError(error)
+        setTokenInfoLoaded(true)
+      }
+    }
+
+    if (!tokenInfoLoaded && token) {
+      fetchTokenInfo()
+    }
+
+    /**
+     * if params are empty then redirect
+     * user to the homepage of app
+     */
+    // if (!slug && !token) router.push('/')
+  }, [token, router.asPath])
 
   return (
     <div
@@ -268,5 +270,3 @@ const JoinOrganizationPage = () => {
     </div>
   )
 }
-
-export default JoinOrganizationPage

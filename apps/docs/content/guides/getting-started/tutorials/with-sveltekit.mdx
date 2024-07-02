@@ -68,18 +68,16 @@ import type { Handle } from '@sveltejs/kit'
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
-      get: (key) => event.cookies.get(key),
+      getAll: () => event.cookies.getAll(),
       /**
-       * Note: You have to add the `path` variable to the
-       * set and remove method due to sveltekit's cookie API
-       * requiring this to be set, setting the path to `/`
-       * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
+       * SvelteKit's cookies API requires `path` to be explicitly set in
+       * the cookie options. Setting `path` to `/` replicates previous/
+       * standard behavior.
        */
-      set: (key, value, options) => {
-        event.cookies.set(key, value, { ...options, path: '/' })
-      },
-      remove: (key, options) => {
-        event.cookies.delete(key, { ...options, path: '/' })
+      setAll: (cookiesToSet) => {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          event.cookies.set(name, value, { ...options, path: '/' })
+        })
       },
     },
   })
@@ -148,14 +146,15 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 // src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load = (async ({ locals: { safeGetSession } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
   const { session, user } = await safeGetSession()
 
   return {
     session,
     user,
+    cookies: cookies.getAll(),
   }
-}) satisfies LayoutServerLoad
+}
 ```
 
 <Admonition type="tip">
@@ -168,28 +167,29 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
+import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import type { LayoutLoad } from './$types'
-import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
-export const load = (async ({ fetch, data, depends }) => {
+export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-    global: {
-      fetch,
-    },
-    cookies: {
-      get(key) {
-        if (!isBrowser()) {
-          return JSON.stringify(data.session)
-        }
-
-        const cookie = parse(document.cookie)
-        return cookie[key]
-      },
-    },
-  })
+  const supabase = isBrowser()
+    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+        global: {
+          fetch,
+        },
+      })
+    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+        global: {
+          fetch,
+        },
+        cookies: {
+          getAll() {
+            return data.cookies
+          },
+        },
+      })
 
   /**
    * It's fine to use `getSession` here, because on the client, `getSession` is
@@ -201,7 +201,7 @@ export const load = (async ({ fetch, data, depends }) => {
   } = await supabase.auth.getSession()
 
   return { supabase, session }
-}) satisfies LayoutLoad
+}
 ```
 
 Update your `src/routes/+layout.svelte`:
@@ -219,8 +219,8 @@ Update your `src/routes/+layout.svelte`:
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
+		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 			}
 		})
@@ -270,7 +270,6 @@ Add the `Auth` component to your home page
 		<Auth
 			supabaseClient={data.supabase}
 			view="magic_link"
-			redirectTo={`${data.url}/auth/callback`}
 			showLinks={false}
 			appearance={{ theme: ThemeSupa, style: { input: 'color: #fff' } }}
 		/>
@@ -297,60 +296,64 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 }
 ```
 
-### Proof Key for Code Exchange (PKCE)
+### Email template
 
-As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a server endpoint responsible for exchanging the code for a session.
+Change the email template to support a server-side authentication flow.
+
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+
+### Confirmation endpoint
+
+As we are working in a server-side rendering (SSR) environment, it is necessary to create a server endpoint responsible for exchanging the `token_hash` for a session.
 
 In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
-- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
-- Finally, we redirect the user to the `account` page.
+- Retrieve the `token_hash` sent back from the Supabase Auth server using the `token_hash` query parameter.
+- Exchange this `token_hash` for a session, which we store in storage (in this case, cookies).
+- Finally, the user is redirected to the `account` page or the `error` page.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-```js title=src/routes/auth/callback/+server.js
-// src/routes/auth/callback/+server.js
+```ts title=src/routes/api/auth/confirm/+server.ts
+// src/routes/api/auth/confirm/+server.js
+import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
-  const code = url.searchParams.get('code')
-
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
-  }
-
-  redirect(303, '/account')
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```ts title=src/routes/auth/callback/+server.ts
-// src/routes/auth/callback/+server.ts
-import { redirect, type RequestHandler } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
-  const code = url.searchParams.get('code')
+  const token_hash = url.searchParams.get('token_hash')
+  const type = url.searchParams.get('type') as EmailOtpType | null
+  const next = url.searchParams.get('next') ?? '/account'
 
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
+  /**
+   * Clean up the redirect URL by deleting the Auth flow parameters.
+   *
+   * `next` is preserved for now, because it's needed in the error case.
+   */
+  const redirectTo = new URL(url)
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
+
+  if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash })
+    if (!error) {
+      redirectTo.searchParams.delete('next')
+      return redirect(303, redirectTo)
+    }
   }
 
-  redirect(303, '/account')
+  redirectTo.pathname = '/auth/error'
+  return redirect(303, redirectTo)
 }
 ```
 
-</TabPanel>
-</Tabs>
+### Authentication error page
+
+If there is an error with confirming the token you will be redirect to this error page.
+
+```svelte src/routes/auth/error/+page.svelte
+<p>Login error</p>
+```
 
 ### Account page
 
