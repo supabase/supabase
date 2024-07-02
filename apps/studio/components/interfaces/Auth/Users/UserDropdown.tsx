@@ -45,6 +45,7 @@ const UserDropdown = ({
   const { ref } = useParams()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
+  const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
 
   const { canRemoveUser, canRemoveMFAFactors, canSendMagicLink, canSendRecovery, canSendOtp } =
     permissions
@@ -56,7 +57,7 @@ const UserDropdown = ({
   })
   const { mutate: sendMagicLink, isLoading: isSendingLink } = useUserSendMagicLinkMutation({
     onSuccess: () => {
-      toast.success(`Sent magic link to ${user.email}`)
+      toast.success(`${isUserConfirmed ? "Sent magic link to": "Sent confirm sign up link to"} ${user.email}`)
     },
   })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
@@ -157,7 +158,7 @@ const UserDropdown = ({
                       }}
                     >
                       <Mail size={14} />
-                      <p>Send magic link</p>
+                      <p>{isUserConfirmed ? "Send magic link": "Send confirm sign up link"}</p>
                     </DropdownMenuItem>
                   </TooltipTrigger_Shadcn_>
                   {!canSendMagicLink && (
