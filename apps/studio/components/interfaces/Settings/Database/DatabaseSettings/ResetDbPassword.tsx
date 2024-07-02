@@ -1,11 +1,17 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Input, Modal } from 'ui'
+import {
+  Button,
+  Input,
+  Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 import {
   useIsProjectActive,
@@ -17,6 +23,7 @@ import { useDatabasePasswordResetMutation } from 'data/database/database-passwor
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -105,38 +112,23 @@ const ResetDbPassword = ({ disabled = false }) => {
               </p>
             </div>
             <div className="flex items-end justify-end">
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="default"
-                    disabled={!canResetDbPassword || !isProjectActive || disabled}
-                    onClick={() => setShowResetDbPass(true)}
-                  >
-                    Reset database password
-                  </Button>
-                </Tooltip.Trigger>
-                {(!canResetDbPassword || !isProjectActive) && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                          'border border-background', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          {!canResetDbPassword
-                            ? 'You need additional permissions to reset the database password'
-                            : !isProjectActive
-                              ? 'Unable to reset database password as project is not active'
-                              : ''}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <ButtonTooltip
+                type="default"
+                disabled={!canResetDbPassword || !isProjectActive || disabled}
+                onClick={() => setShowResetDbPass(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canResetDbPassword
+                      ? 'You need additional permissions to reset the database password'
+                      : !isProjectActive
+                        ? 'Unable to reset database password as project is not active'
+                        : undefined,
+                  },
+                }}
+              >
+                Reset database password
+              </ButtonTooltip>
             </div>
           </div>
         </Panel.Content>

@@ -1,20 +1,15 @@
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 
 const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -67,7 +62,7 @@ const AuthProvidersForm = () => {
           ))}
         {isError && (
           <Alert_Shadcn_ variant="destructive">
-            <IconAlertCircle strokeWidth={2} />
+            <WarningIcon />
             <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
           </Alert_Shadcn_>

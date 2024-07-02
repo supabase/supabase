@@ -1,6 +1,6 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -11,18 +11,18 @@ import {
   Button,
   DialogSectionSeparator,
   Form,
-  IconAlertCircle,
-  IconExternalLink,
   Input,
   Modal,
 } from 'ui'
 import { object, string } from 'yup'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'
@@ -110,7 +110,7 @@ const RedirectUrls = () => {
           description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
         />
         <div className="flex items-center gap-2 mb-6 ml-12">
-          <Button asChild type="default" icon={<IconExternalLink />}>
+          <Button asChild type="default" icon={<ExternalLink />}>
             <Link
               href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
               target="_blank"
@@ -119,30 +119,18 @@ const RedirectUrls = () => {
               Documentation
             </Link>
           </Button>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-                Add URL
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateConfig && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to update redirect URLs
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          <ButtonTooltip
+            disabled={!canUpdateConfig}
+            onClick={() => setOpen(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to update redirect URLs',
+              },
+            }}
+          >
+            Add URL
+          </ButtonTooltip>
         </div>
       </div>
       {isLoading && (
@@ -157,7 +145,7 @@ const RedirectUrls = () => {
       )}
       {isError && (
         <Alert_Shadcn_ variant="destructive">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
         </Alert_Shadcn_>
@@ -212,7 +200,7 @@ const RedirectUrls = () => {
         hideFooter
         size="small"
         visible={selectedUrlToDelete !== undefined}
-        header={<h3 className="text-sm">Remove URL</h3>}
+        header="Remove URL"
         onCancel={() => setSelectedUrlToDelete(undefined)}
       >
         <Modal.Content>
@@ -225,7 +213,7 @@ const RedirectUrls = () => {
           </p>
         </Modal.Content>
         <Modal.Separator />
-        <Modal.Content>
+        <Modal.Content className="flex items-center gap-x-2">
           <Button
             block
             type="default"

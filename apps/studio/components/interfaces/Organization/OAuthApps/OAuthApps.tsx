@@ -1,13 +1,17 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
+import { useCheckPermissions } from 'hooks'
 import { Alert, Button, IconX, Input } from 'ui'
 import AuthorizedAppRow from './AuthorizedAppRow'
 import DeleteAppModal from './DeleteAppModal'
@@ -28,13 +32,16 @@ const OAuthApps = () => {
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
+  const canReadOAuthApps = useCheckPermissions(PermissionAction.READ, 'approved_oauth_apps')
+  const canCreateOAuthApps = useCheckPermissions(PermissionAction.CREATE, 'approved_oauth_apps')
+
   const {
     data: publishedApps,
     error: publishedAppsError,
     isLoading: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
-  } = useOAuthAppsQuery({ slug })
+  } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
     return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
@@ -51,6 +58,14 @@ const OAuthApps = () => {
     return Number(new Date(a.authorized_at)) - Number(new Date(b.authorized_at))
   })
 
+  if (!canReadOAuthApps) {
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view invoices" />
+      </ScaffoldContainerLegacy>
+    )
+  }
+
   return (
     <>
       <ScaffoldContainerLegacy>
@@ -62,9 +77,19 @@ const OAuthApps = () => {
                 Build integrations that extend Supabase's functionality
               </p>
             </div>
-            <Button type="primary" onClick={() => setShowPublishModal(true)}>
+            <ButtonTooltip
+              disabled={!canCreateOAuthApps}
+              type="primary"
+              onClick={() => setShowPublishModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create apps',
+                },
+              }}
+            >
               Add application
-            </Button>
+            </ButtonTooltip>
           </div>
 
           {isLoadingPublishedApps && (
