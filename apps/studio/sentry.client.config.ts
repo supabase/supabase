@@ -67,6 +67,8 @@ Sentry.init({
     /504 Gateway Time-out/,
     // [Joshen] This is the one caused by Google translate in the browser + 3rd party extensions
     'Node.insertBefore: Child to insert before is not a child of this node',
+    // [Joshen] This one sprung up recently and I've no idea where this is coming from
+    'r.default.setDefaultLevel is not a function',
   ],
 })
 
