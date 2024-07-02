@@ -153,14 +153,12 @@ const ResponsiveScrollArea: FC<PropsWithChildren<{ isLowerThanMd: boolean }>> = 
   !isLowerThanMd ? (
     <>{children}</>
   ) : (
-    <>
       <ScrollArea className="relative">
         <div className="absolute h-full right-0 w-7 z-50 bg-gradient-to-r from-transparent to-background" />
         {children}
         <ScrollBar orientation="horizontal" className="hidden" />
         <NavigationMenuViewport containerProps={{ className: 'overflow-hidden' }} />
       </ScrollArea>
-    </>
   )
 
 export const MenuItem = React.forwardRef<
