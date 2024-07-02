@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
+  Badge,
   Button,
   Form,
   Input,
@@ -45,14 +46,8 @@ import { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 
-const createWarehouseQuery = (collection: string) => {
-  const query = `
-        # Fetch the last 50 logs from the last 7 days
-        select id, timestamp, event_message from \`${collection}\`
-        where timestamp > timestamp_sub(current_timestamp(), interval 7 day)
-        order by timestamp desc limit 50`
-  return query
-}
+const PLACEHOLDER_WAREHOUSE_QUERY =
+  '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
@@ -61,9 +56,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const projectRef = ref as string
   const organization = useSelectedOrganization()
   const [editorId, setEditorId] = useState<string>(uuidv4())
+  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
+  const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
+    PLACEHOLDER_WAREHOUSE_QUERY
+  )
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+
+  const routerSource = router.query.source as SourceType
+  const [sourceType, setSourceType] = useState<SourceType>(routerSource || 'logs')
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const {
     params,
@@ -73,10 +76,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     changeQuery,
     runQuery,
     setParams,
-  } = useLogsQuery(projectRef, {
-    iso_timestamp_start: its ? (its as string) : undefined,
-    iso_timestamp_end: ite ? (ite as string) : undefined,
-  })
+  } = useLogsQuery(
+    projectRef,
+    {
+      iso_timestamp_start: its ? (its as string) : undefined,
+      iso_timestamp_end: ite ? (ite as string) : undefined,
+    },
+    sourceType === 'logs'
+  )
 
   const {
     refetch: runWarehouseQuery,
@@ -84,7 +91,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     isFetching: warehouseFetching,
     error: warehouseError,
   } = useWarehouseQueryQuery(
-    { ref: projectRef, sql: editorValue },
+    { ref: projectRef, sql: warehouseEditorValue },
     {
       enabled: false,
     }
@@ -92,6 +99,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (warehouseError) {
+      toast.error(warehouseError.message)
     }
   }, [warehouseError])
 
@@ -108,8 +116,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       enabled: !!projectRef,
     }
   )
-
-  const [sourceType, setSourceType] = useState<SourceType>('logs')
 
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
@@ -179,6 +185,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
 
     if (sourceType === 'warehouse') {
+      const whQuery = warehouseEditorValue
+
       if (!warehouseCollections?.length) {
         toast.error("You don't have any collections in your warehouse yet.")
         return
@@ -187,7 +195,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       // Check that a collection name is included in the query
       const collectionNames = warehouseCollections?.map((collection) => collection.name)
       const collectionExists = collectionNames?.find((collectionName) =>
-        query.includes(collectionName)
+        whQuery.includes(collectionName)
       )
 
       if (!collectionExists) {
@@ -197,7 +205,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
       // Check that the user is not trying to query logs tables and warehouse collections at the same time
       const logsSources = Object.values(LOGS_TABLES)
-      const logsSourceExists = logsSources.find((source) => query.includes(source))
+      const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
 
       if (logsSourceExists) {
         toast.error(
@@ -226,10 +234,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleClear = () => {
     setEditorValue('')
     setEditorId(uuidv4())
+    setWarehouseEditorId(uuidv4())
     changeQuery('')
   }
 
   const handleInsertSource = (source: string) => {
+    if (sourceType === 'warehouse') {
+      //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
+
+      setWarehouseEditorId(uuidv4())
+
+      return
+    }
+
     setEditorValue((prev) => {
       const index = prev.indexOf('from')
       if (index === -1) return `${prev}${source}`
@@ -294,18 +311,34 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isLoading={isLoading}
             warnings={warnings}
             warehouseCollections={warehouseCollections || []}
-            sourceType={sourceType}
-            onSourceTypeChange={setSourceType}
+            dataSource={sourceType}
+            onDataSourceChange={(srcType) => {
+              setSourceType(srcType)
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, source: srcType },
+              })
+            }}
           />
 
           <ShimmerLine active={isLoading} />
-          <CodeEditor
-            id={editorId}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            onInputRun={handleRun}
-          />
+          {sourceType === 'warehouse' ? (
+            <CodeEditor
+              id={warehouseEditorId}
+              language="pgsql" // its bq sql but monaco doesn't have a language for it
+              defaultValue={warehouseEditorValue}
+              onInputChange={(v) => setWarehouseEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          ) : (
+            <CodeEditor
+              id={editorId}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
