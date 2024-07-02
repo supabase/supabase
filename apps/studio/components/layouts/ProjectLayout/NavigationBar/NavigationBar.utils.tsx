@@ -103,16 +103,12 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
   const buildingUrl = `/project/${ref}/building`
 
   return [
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'advisors',
-            label: 'Advisors',
-            icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
-          },
-        ]
-      : []),
+    {
+      key: 'advisors',
+      label: 'Advisors',
+      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+    },
     ...(IS_PLATFORM
       ? [
           {

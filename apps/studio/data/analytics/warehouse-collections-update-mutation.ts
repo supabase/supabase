@@ -20,7 +20,7 @@ export async function updateCollection(
   payload: UpdateCollectionPayload
 ) {
   const { data, error } = await patch(
-    '/platform/projects/{ref}/analytics/warehouse/collections/{token}',
+    '/v1/projects/{ref}/analytics/warehouse/collections/{token}',
     {
       params: { path: { ref: projectRef, token: collectionToken } },
       body: payload,
