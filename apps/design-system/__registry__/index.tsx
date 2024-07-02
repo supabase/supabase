@@ -489,7 +489,7 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-	"commandmenu-demo": {
+    "commandmenu-demo": {
       name: "commandmenu-demo",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -499,8 +499,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-badge": {
+    },
+    "commandmenu-badge": {
       name: "commandmenu-badge",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -510,8 +510,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-icon": {
+    },
+    "commandmenu-icon": {
       name: "commandmenu-icon",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -521,8 +521,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-hidden": {
+    },
+    "commandmenu-hidden": {
       name: "commandmenu-hidden",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -532,8 +532,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-force": {
+    },
+    "commandmenu-force": {
       name: "commandmenu-force",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -543,8 +543,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-subpage": {
+    },
+    "commandmenu-subpage": {
       name: "commandmenu-subpage",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -554,8 +554,8 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
-	"commandmenu-subpage-custom": {
+    },
+    "commandmenu-subpage-custom": {
       name: "commandmenu-subpage-custom",
       type: "components:example",
       registryDependencies: ["commandmenu"],
@@ -565,7 +565,7 @@ export const Index: Record<string, any> = {
       category: "undefined",
       subcategory: "undefined",
       chunks: []
-	},
+    },
     "context-menu-demo": {
       name: "context-menu-demo",
       type: "components:example",

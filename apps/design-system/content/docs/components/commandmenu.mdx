@@ -37,16 +37,16 @@ function Commands() {
       route: 'https://supabase.com',
     },
   ])
- 
+
   return null
 }
- 
+
 function CommandMenuTrigger() {
   const setOpen = useSetCommandMenuOpen()
- 
+
   return <Button onClick={() => setOpen(true)}>Open command menu</Button>
 }
- 
+
 export function CommandMenuDemo() {
   return (
     <CommandProvider openKey="j">
@@ -100,4 +100,3 @@ You can define a subpage of commands:
 You can define an arbitrary subpage that loads a custom component:
 
 <ComponentPreview name="commandmenu-subpage-custom" />
-
