@@ -38,7 +38,7 @@ export const getTableRowsCountSqlQuery = ({
     const query = new Query()
     let queryChains = query.from(table.name, table.schema ?? undefined).count()
     filters
-      .filter((x) => x.value && x.value != '')
+      .filter((x) => x.value && x.value !== '')
       .forEach((x) => {
         const value = formatFilterValue(table, x)
         queryChains = queryChains.filter(x.column, x.operator, value)
@@ -65,7 +65,7 @@ export const getTableRowsCountSqlQuery = ({
       })
     const countBaseSql = countQueryChains.toSql().slice(0, -1)
 
-    const sql = `
+    return `
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
@@ -75,15 +75,13 @@ with approximation as (
 )
 select 
   case 
-    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql}'))
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql}')` : 'estimate'}
+    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replace("'", "''")}'))
+    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replace("'", "''")}')` : 'estimate'}
     else (${countBaseSql})
   end as count,
   estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
 from approximation;
 `.trim()
-
-    return sql
   }
 }
 

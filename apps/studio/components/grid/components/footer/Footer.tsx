@@ -7,11 +7,10 @@ import RefreshButton from '../header/RefreshButton'
 import { GridFooter } from 'components/ui/GridFooter'
 
 export interface FooterProps {
-  isLoading?: boolean
   isRefetching?: boolean
 }
 
-const Footer = ({ isLoading, isRefetching }: FooterProps) => {
+const Footer = ({ isRefetching }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: selectedTable } = useTable(id)

@@ -17,6 +17,9 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDispatch, useTrackedState } from '../../../store'
 import { DropdownControl } from '../../common'
+import useTable from 'hooks/misc/useTable'
+import { useParams } from 'common'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -25,10 +28,17 @@ const rowsPerPageOptions = [
 ]
 
 const Pagination = () => {
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
+
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+
+  const { data: selectedTable } = useTable(id)
+  // [Joshen] Only applicable to table entities
+  const rowsCountEstimate = (selectedTable as PostgresTable)?.live_rows_estimate ?? null
 
   const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
   const filters = formatFilterURLParams(filter as string[])
@@ -36,7 +46,9 @@ const Pagination = () => {
   const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const [enforceExactCount, setEnforceExactCount] = useState(false)
+  const [enforceExactCount, setEnforceExactCount] = useState(
+    rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT
+  )
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
@@ -127,9 +139,6 @@ const Pagination = () => {
       snap.setPage(totalPages)
     }
   }, [page, totalPages])
-
-  // [Joshen] Oddly without this, state.selectedRows will be stale
-  useEffect(() => {}, [state.selectedRows])
 
   return (
     <div className="flex items-center gap-x-4">
