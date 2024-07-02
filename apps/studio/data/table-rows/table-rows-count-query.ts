@@ -75,8 +75,8 @@ with approximation as (
 )
 select 
   case 
-    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replace("'", "''")}'))
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replace("'", "''")}')` : 'estimate'}
+    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}'))
+    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
     else (${countBaseSql})
   end as count,
   estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
