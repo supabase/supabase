@@ -115,7 +115,20 @@ const ComputeInstanceSidePanel = () => {
 
   const availableOptions = useMemo(() => {
     const computeOptions =
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+      availableAddons
+        .find((addon) => addon.type === 'compute_instance')
+        ?.variants.filter((option) => {
+          if (!selectedProject?.cloud_provider) {
+            return true
+          }
+
+          const meta = option.meta as ProjectAddonVariantMeta
+
+          return (
+            !meta.supported_cloud_providers ||
+            meta.supported_cloud_providers.includes(selectedProject.cloud_provider)
+          )
+        }) ?? []
 
     // Backwards comp until API is deployed
     if (!hasMicroOptionFromApi) {

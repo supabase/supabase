@@ -231,6 +231,7 @@ article p code {
 }
 
 .short-inline-codeblock {
+  word-wrap: break-word;
   @media screen and (min-width: 769px) {
     white-space: pre !important;
   }
