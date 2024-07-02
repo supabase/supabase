@@ -1,12 +1,18 @@
 'use client'
 
 import { type PropsWithChildren, memo, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { cn } from 'ui'
-import Footer from '~/components/Navigation/Footer'
-import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
+
+import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+
+const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+const NavigationMenu = dynamic(
+  () => import('~/components/Navigation/NavigationMenu/NavigationMenu')
+)
+const TopNavBar = dynamic(() => import('~/components/Navigation/NavigationMenu/TopNavBar'))
 
 const levelsData = {
   home: {
@@ -189,15 +195,6 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
           />
         </div>
       </button>
-      {/* <div>
-        <HomeMenuIconPicker
-          icon={menuLevel ? levelsData[menuLevel]?.icon : 'home'}
-          className={cn(
-            'transition-all duration-200',
-            mobileMenuOpen ? 'invisible w-0 h-0' : 'w-4 h-4'
-          )}
-        />
-      </div> */}
       <span
         className={cn(
           'transition-all duration-200',
@@ -251,8 +248,6 @@ const Container = memo(function Container({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) {
-  const mobileMenuOpen = useMenuMobileOpen()
-
   return (
     <main
       // used by layout to scroll to top

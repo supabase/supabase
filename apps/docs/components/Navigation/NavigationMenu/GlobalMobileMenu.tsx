@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Accordion, Button, IconX, cn } from 'ui'
+import { Accordion, Button, cn, IconX } from 'ui'
 import { ThemeToggle } from 'ui-patterns'
 
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
@@ -151,29 +151,17 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               {!isUserLoading && (
                 <>
                   {isLoggedIn ? (
-                    <Link href="/dashboard/projects" passHref legacyBehavior>
-                      <Button block asChild>
-                        <a type={undefined} className="h-10 py-4">
-                          Dashboard
-                        </a>
-                      </Button>
-                    </Link>
+                    <Button block size="medium" asChild>
+                      <Link href="/dashboard/projects">Dashboard</Link>
+                    </Button>
                   ) : (
                     <>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
-                        <Button block type="default" asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Sign in
-                          </a>
-                        </Button>
-                      </Link>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
-                        <Button block asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Start your project
-                          </a>
-                        </Button>
-                      </Link>
+                      <Button block size="medium" type="default" asChild>
+                        <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
+                      </Button>
+                      <Button block size="medium" asChild>
+                        <Link href="https://supabase.com/dashboard/new">Start your project</Link>
+                      </Button>
                     </>
                   )}
                 </>

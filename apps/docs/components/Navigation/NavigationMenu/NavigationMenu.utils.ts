@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { ICommonItem } from '~/components/reference/Reference.types'
 import { Json } from '~/types'
 import { menuState } from '../../../hooks/useMenuState'
@@ -99,9 +99,9 @@ export function useSpec(specFile?: string) {
 }
 
 export const useCloseMenuOnRouteChange = () => {
-  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     menuState.setMenuMobileOpen(false)
-  }, [router])
+  }, [pathname])
 }

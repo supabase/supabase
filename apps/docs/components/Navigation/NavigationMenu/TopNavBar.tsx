@@ -1,15 +1,17 @@
 import { FC, memo, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { SearchButton } from 'ui-patterns/Cmdk'
 import { Button, buttonVariants, cn } from 'ui'
 import { Command, Search, Menu } from 'lucide-react'
 
-import GlobalMobileMenu from './GlobalMobileMenu'
-import GlobalNavigationMenu from './GlobalNavigationMenu'
-import TopNavDropdown from './TopNavDropdown'
 import Image from 'next/image'
+
+const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
+const GlobalNavigationMenu = dynamic(() => import('./GlobalNavigationMenu'))
+const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()

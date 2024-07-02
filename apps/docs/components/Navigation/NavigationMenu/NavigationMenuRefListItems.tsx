@@ -59,7 +59,10 @@ const FunctionLink = memo(function FunctionLink({
         onClick={(e) => {
           e.preventDefault()
           history.pushState({}, '', url)
-          document.getElementById(slug)?.scrollIntoView({ behavior: 'smooth' })
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          document.getElementById(slug)?.scrollIntoView({
+            behavior: reduceMotion ? 'auto' : 'smooth',
+          })
           onClick()
         }}
         className={cn(

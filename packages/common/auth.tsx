@@ -123,18 +123,6 @@ export function clearLocalStorage() {
   }
 }
 
-export function useSignOut() {
-  // const queryClient = useQueryClient()
-
-  return useCallback(async () => {
-    const result = await gotrueClient.signOut()
-    clearLocalStorage()
-    // await gotrueClient.clear()
-
-    return result
-  }, [gotrueClient])
-}
-
 export const useIsLoggedIn = () => {
   const user = useUser()
 
