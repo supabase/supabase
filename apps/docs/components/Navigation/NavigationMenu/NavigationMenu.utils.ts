@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { ICommonItem } from '~/components/reference/Reference.types'
 import { Json } from '~/types'
+import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
   return new URL(relativePath, 'http://placeholder').pathname
@@ -94,4 +96,12 @@ export function useSpec(specFile?: string) {
   }, [specFile])
 
   return spec
+}
+
+export const useCloseMenuOnRouteChange = () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    menuState.setMenuMobileOpen(false)
+  }, [pathname])
 }

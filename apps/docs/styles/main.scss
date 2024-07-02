@@ -29,6 +29,7 @@
 
 :root {
   --sidebar-width: 300px;
+  --header-height: 50px;
 }
 
 body {
@@ -265,6 +266,10 @@ article p code {
   width: 100% !important;
   position: relative !important;
   height: unset !important;
+}
+
+#docs-content-container #introduction {
+  @apply scroll-mt-60;
 }
 
 /* dat.GUI */

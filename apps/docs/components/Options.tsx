@@ -50,7 +50,7 @@ const Option: FC<IOption> = (props) => {
         flex flex-col gap-3
       "
     >
-      <div className="flex gap-3 items-center">
+      <div className="flex flex-wrap gap-3 items-center">
         <span className="text-sm text-foreground font-mono font-medium">
           {props.name ?? 'no-name'}
         </span>
