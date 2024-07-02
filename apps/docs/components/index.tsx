@@ -8,7 +8,7 @@ import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } f
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { TabPanel, Tabs } from '~/components/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'

@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   Badge,
   DropdownMenu,
@@ -11,8 +11,9 @@ import {
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 
 const RevVersionDropdown = () => {
-  const { asPath, push } = useRouter()
-  const pathSegments = asPath.split('/')
+  const pathname = usePathname()
+  const { push } = useRouter()
+  const pathSegments = pathname.split('/')
 
   const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
   const libraryMeta = REFERENCES?.[library] ?? undefined

@@ -37,13 +37,7 @@ export async function constructHeaders(
 }
 
 export const get: typeof _get = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers)
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+  const headers = await constructHeaders(init?.headers)
 
   return await _get(url, {
     ...init,
@@ -52,13 +46,7 @@ export const get: typeof _get = async (url, init) => {
 }
 
 export const post: typeof _post = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers)
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+  const headers = await constructHeaders(init?.headers)
 
   return await _post(url, {
     ...init,
@@ -67,13 +55,7 @@ export const post: typeof _post = async (url, init) => {
 }
 
 export const unauthedAllowedPost: typeof _post = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+  const headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
 
   return await _post(url, {
     ...init,

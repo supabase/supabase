@@ -1,11 +1,9 @@
-import { lazy, Suspense } from 'react'
+'use client'
 
-const Generator = lazy(() => import('./AppleSecretGenerator'))
+import dynamic from 'next/dynamic'
+
+const Generator = dynamic(() => import('./AppleSecretGenerator'), { ssr: false })
 
 export function AppleSecretGenerator() {
-  return (
-    <Suspense>
-      <Generator />
-    </Suspense>
-  )
+  return <Generator />
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { lazy, Suspense } from 'react'
 
 const Estimator = lazy(() => import('./RealtimeLimitsEstimator'))

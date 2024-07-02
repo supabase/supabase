@@ -34,6 +34,7 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
+
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],

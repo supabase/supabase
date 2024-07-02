@@ -1,5 +1,5 @@
+import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
