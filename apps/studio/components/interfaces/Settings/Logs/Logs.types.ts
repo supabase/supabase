@@ -138,3 +138,9 @@ export interface DatetimeHelper {
   default?: boolean
   disabled?: boolean
 }
+
+export interface WarehouseCollection {
+  name: string
+  id: number
+  token: string
+}
