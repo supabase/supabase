@@ -1053,6 +1053,44 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   },
 }
 
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'API Key',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'API Secret Key',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_SECRET: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('API Secret Key is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
 const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1365,6 +1403,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_GOOGLE,
   EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
