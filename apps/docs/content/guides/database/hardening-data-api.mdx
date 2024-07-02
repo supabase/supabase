@@ -18,7 +18,7 @@ You can disable the Data API entirely if you never intend to use the Supabase cl
 
 ## Exposing a custom schema instead of `public`
 
-If you want to use the Data API but with increased security, you can expose a custom schema instead of `public`. By not using `public`, which is often used as a default space, you get more conscious control over the data that gets exposed via the API.
+If you want to use the Data API but with increased security, you can expose a custom schema instead of `public`. By not using `public`, which is often used as a default space and has laxer default permissions, you get more conscious control over your exposed data.
 
 Any data, views, or functions that should be exposed need to be deliberately put within your custom schema (which we will call `api`), rather than ending up there by default.
 
@@ -39,19 +39,19 @@ Any data, views, or functions that should be exposed need to be deliberately put
     create schema if not exists api;
     ```
 
-1.  Grant the `anon` and `authenticated` roles usage on this schema. Also grant any other permissions they will need, such as ability to read and edit tables:
+1.  Grant the `anon` and `authenticated` roles usage on this schema.
 
     ```sql
     grant usage on schema api to anon, authenticated;
-    grant select, insert, update, delete on all tables in schema api to anon, authenticated;
     ```
 
 1.  Go to [API Settings](/dashboard/project/_/settings/api) in the Supabase Dashboard.
 
 1.  Under **Data API Settings**, add `api` to **Exposed schemas**. Make sure it is the first schema in the list, so that it will be searched first by default.
 
-<Admonition type="danger" label="Enable RLS on tables in all exposed schemas">
+1.  Under these new settings, `anon` and `authenticated` can execute functions defined in the `api` schema, but they have no automatic permissions on any tables. On a table-by-table basis, you can grant them permissions. For example:
 
-Your `api` schema is now exposed over the public Data API. Remember to protect your tables by enabling [Row Level Security](/docs/guides/database/postgres/row-level-security).
-
-</Admonition>
+    ```sql
+    grant select on table api.<your_table> to anon;
+    grant select, insert, update, delete on table api.<your_table> to authenticated;
+    ```
