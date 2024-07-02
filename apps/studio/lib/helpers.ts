@@ -1,3 +1,5 @@
+import toast from 'react-hot-toast'
+
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
 
@@ -140,20 +142,23 @@ export const snakeToCamel = (str: string) =>
  * text content async before coping, please use Promise<string> for the 1st arg.
  */
 export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
-  const focused = window.document.hasFocus()
-  if (focused) {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+  try {
+    const focused = window.document.hasFocus()
+    if (focused) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        const text = await Promise.resolve(str)
+        Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+        return
+      }
 
-      return
+      Promise.resolve(str)
+        .then((text) => window.navigator?.clipboard?.writeText(text))
+        .then(callback)
+    } else {
+      console.warn('Unable to copy to clipboard')
     }
-
-    Promise.resolve(str)
-      .then((text) => window.navigator?.clipboard?.writeText(text))
-      .then(callback)
-  } else {
-    console.warn('Unable to copy to clipboard')
+  } catch (error: any) {
+    toast.error(`Unable to copy to clipboard: ${error.message}`)
   }
 }
 
