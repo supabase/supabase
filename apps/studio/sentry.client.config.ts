@@ -63,6 +63,7 @@ Sentry.init({
     // Error thrown by `sql-formatter` lexer when given invalid input
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
+    /504 Gateway Time-out/,
   ],
 })
 
