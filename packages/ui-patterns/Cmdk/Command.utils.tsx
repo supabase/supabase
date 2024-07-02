@@ -85,13 +85,7 @@ export const CommandDialog = ({
         }}
         hideClose
         size={'xlarge'}
-        className={cn(
-          '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
-          '!border-overlay/90',
-          'transition ease-out',
-          'place-self-start mx-auto top-20',
-          animateBounce ? 'scale-[101.5%]' : 'scale-100'
-        )}
+        className={cn('place-self-start mx-auto top-20')}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command
