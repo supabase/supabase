@@ -34,7 +34,7 @@ Any data, views, or functions that should be exposed need to be deliberately put
 1.  Connect to your database. You can use `psql`, the [Supabase SQL Editor](/dashboard/project/_/sql), or the Postgres client of your choice.
 
 1.  Create a new schema named `api`:
-    
+
     ```sql
     create schema if not exists api;
     ```
@@ -55,4 +55,3 @@ Any data, views, or functions that should be exposed need to be deliberately put
 Your `api` schema is now exposed over the public Data API. Remember to protect your tables by enabling [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 </Admonition>
-
