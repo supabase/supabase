@@ -1,10 +1,10 @@
 ---
 id: 'auth-hooks'
 title: 'Auth Hooks'
-description: 'Use Supabase Postgres Functions to customize your authentication flow'
+description: 'Use HTTP or Postgres Functions to customize your authentication flow'
 ---
 
-Supabase allows you to use Postgres functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
+Supabase allows you to use HTTP or Postgres Functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
 
@@ -13,11 +13,13 @@ Hooks help you:
 - Support legacy systems by integrating with identity credentials from external authentication systems
 - Add additional custom claims to your JWT
 
-You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. The following hooks are available:
+You can use hooks at specific points along an Auth flow to perform custom behavior via a function. The following hooks are available:
 
 | Hook                          | Available on Plan    |
 | ----------------------------- | -------------------- |
 | Custom Access Token           | Free, Pro            |
+| Send SMS                      | Free, Pro            |
+| Send email                    | Free, Pro            |
 | MFA Verification Attempt      | Teams and Enterprise |
 | Password Verification Attempt | Teams and Enterprise |
 
@@ -27,41 +29,44 @@ You can connect a hook to Supabase Auth to signal to Supabase Auth that it shoul
 
 ### What is a hook
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) with a single argument -- the `event` of type [JSONB]() -- and which returns a JSONB object.
+A Hook is a primitive invoked by Supabase Auth, with an event object, at a point in the flow. The Hook returns an object which provides instructions on how Supabase Auth should continue processing. While the Hook interface is protocol agnostic, platform support is limited to Postgres (SQL) and HTTP Hooks. Pick the Hook corresponding to the medium (PL/pgSQL or JavaScript) that you are most familiar with.
 
-This function is invoked by Supabase Auth at its point in the flow by providing an event object. The object returned by the function gives instructions on how Supabase Auth should continue processing.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-what-is-a-hook" label="SQL">
 
-To access properties of the `event` argument, you can use the [JSON operators and functions](https://www.postgresql.org/docs/current/functions-json.html).
+A Postgres Hook is a Postgres Function which takes a single argument -- the event of type JSONB -- and returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance. You can read more about Postgres Functions in [the Postgres guide](/docs/guides/database/functions)
 
-There are no restrictions as to what language can be used to write Auth Hooks. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+</TabPanel>
+<TabPanel id="https-what-is-a-hook" label="HTTP">
+A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. HTTP Hooks in Supabase follow the Standard Webhooks Specification, which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee authenticity of the payload:
 
-<Admonition type="caution">
-  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string
-  exist as a top-level key within the JSON value?*) operator. Use a direct connection to the
-  database if you need to use it when defining a function.
-</Admonition>
+- `webhook-id`: the unique webhook identifier described in the preceding sections.
+- `webhook-timestamp`: integer UNIX timestamp (seconds since epoch).
+- `webhook-signature`: the signatures of this webhook. This is generated from body of the hook.
 
-Here is an example hook signature:
+You can use any HTTP endpoint as a Hook, including an endpoint on your application. For convenience, a Supabase Edge Function is used for demonstration.
 
-```sql
-create or replace function public.custom_access_token_hook(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-declare
-  -- Insert variables here
-begin
-  -- Insert logic here
-  return event;
-end;
-$$;
-```
+</TabPanel>
+</Tabs>
 
-You can visit `SQL Editor > Templates` for hook templates.
+### Hook Security Model
 
-### Hook grants and roles
+Sign the payload and grant permissions selectively in order to guard the integrity of the payload.
 
-You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-hook-security-model" label="SQL">
+
+You will need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
 
 The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
 
@@ -85,13 +90,51 @@ revoke execute
   from authenticated, anon, public;
 ```
 
-For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+For security, avoid using the `security definer` tag where possible. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
 
 We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
 Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-### Hook errors
+</TabPanel>
+<TabPanel id="https-hook-security-model" label="HTTP">
+
+Validate the payload to ensure it has not been tampered with.
+
+Each Hook has a dedicated `HOOK_SECRET` used to sign the payload. Create an entry in your `.env.local` file for each Hook that you have and register the corresponding secret. Here is an example for the `SEND_SMS` Hook secret:
+
+```bash
+SEND_SMS_HOOK_SECRET="v1,whsec_<standard-base-64-secret>"
+```
+
+Let's break down the secret content:
+
+- `v1` denotes the version of the hook
+- `whsec_` signifies that the secret is symmetric
+- `<base-64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
+
+Use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
+
+```jsx
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
+
+Deno.serve(async (req) => {
+	  const payload = await req.text()
+	  const sendSMSHookSecret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+	  // Extract headers and security specific fields
+	  const headers = Object.fromEntries(req.headers)
+	  const wh = new Webhook(sendSMSHookSecret);
+	  const { user, sms } = wh.verify(payload, headers);
+	  ...
+
+```
+
+Permission to execute the hook is granted based on the validity of the signature. You can use the access token as an additional layer of security for hooks which run post authentication such as the MFA Verification Hook.
+
+</TabPanel>
+</Tabs>
+
+## Hook errors
 
 You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 
@@ -100,6 +143,14 @@ Runtime errors could happen when:
 - The user does not have appropriate permissions
 - The event payload received does not have required claims.
 - The user has performed an action which violates a business rule.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-hook-errors" label="SQL">
 
 The error is a JSON object and has the following properties:
 
@@ -118,15 +169,180 @@ Here's an example:
 }
 ```
 
-When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+Errors returned from a Postgres Hook are not retry-able. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
-### Timeouts
+</TabPanel>
 
-Ensure that your hooks complete within **2 seconds** to avoid any errors.
+<TabPanel id="https-hook-errors" label="HTTP">
+Hooks return status codes based on the nature of the response. These status codes help determine the next steps in the processing flow:
 
-### Connect a hook
+| HTTP Status Code | Description                                                   | Example Usage                                  |
+| ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
+| 429, 503         | Retry-able errors with Retry-after header supported           | Temporary server overload or maintenance       |
+| 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+Errors are responses which contain status codes 400 and above. On a retry-able error, such as an error with a `429` or `503` status code, HTTP Hooks will attempt up to three retries with a back-off of two seconds.
+
+Here’s a sample HTTP retry schedule:
+
+| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
+| --------------------------- | ----------------------- | ------------------------------------------------- |
+| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
+| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
+| 00:00:07                    | Retry Start #1          | After 2 sec delay, first retry begins.            |
+| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
+| 00:00:14                    | Retry Start #2          | After 2 sec delay, second retry begins.           |
+| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
+
+Return a retry-able error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
+
+```jsx
+return new Response(
+  JSON.stringify({
+    error: `Failed to process the request: ${error}`,
+  }),
+  { status: 429, headers: { 'Content-Type': 'application/json', 'retry-after': 'true' } }
+)
+```
+
+Note that all responses, including error responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in the function returning an error response. Supabase Auth will in turn return an Internal Server Error.
+
+</TabPanel>
+</Tabs>
+
+Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have <SharedData data="config">auth.hook_timeouts.postgres_hooks</SharedData> seconds to complete processing while HTTP Hooks should complete in <SharedData data="config">auth.hook_timeouts.http_hooks</SharedData> seconds. Both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
+
+## Developing A Hook
+
+Let us develop a Hook locally and then deploy it to the cloud. As a recap, here’s a list of available Hooks
+
+| Hook                          | Suggested Function Name         | When it is called                                  | What it Does                                                                                              |
+| ----------------------------- | ------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Send SMS                      | `send_sms`                      | Each time an SMS is sent                           | Allows you to customize message content and SMS Provider                                                  |
+| Send Email                    | `send_email`                    | Each time an Email is sent                         | Allows you to customize message content and Email Provider                                                |
+| Custom Access Token           | `custom_access_token`           | Each time a new JWT is created                     | Returns the claims you wish to be present in the JWT.                                                     |
+| MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
+| Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
+
+Edit config.toml to set up the Auth Hook locally.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-connect-hook-locally" label="SQL">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+
+```
+[auth.hook.<hook_name>]
+enabled = true
+uri = "pg-functions://...."
+
+```
+
+You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
+
+The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook:
+
+```sql
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+```
+
+You also need to grant usage to `supabase_auth_admin`:
+
+```sql
+grant usage on schema public to supabase_auth_admin;
+
+```
+
+Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+
+```sql
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon;
+
+```
+
+For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+
+We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
+
+Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+
+There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+
+Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](/docs/reference/cli/supabase-migration-new) to create a migration.
+
+<Admonition type="caution">
+
+If you're using the Supabase SQL Editor, there's an issue when using the `?` (_Does the string exist as a top-level key within the JSON value?_) operator. Use a direct connection to the database if you need to use it when defining a function.
+
+</Admonition>
+
+Here is an example hook signature:
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+  -- Insert variables here
+begin
+  -- Insert logic here
+  return event;
+end;
+$$;
+
+```
+
+You can visit `SQL Editor > Templates` for hook templates.
+
+</TabPanel>
+<TabPanel id="https-connect-hook-locally" label="HTTP">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
+```
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
+secret = "env(SEND_SMS_HOOK_SECRET)"
+```
+
+`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
+
+Fill in the Hook Secret in `supabase/functions/.env`
+
+```jsx
+SEND_SMS_HOOK_SECRET = '<base64_standard_secret>'
+```
+
+Start the function locally:
+
+```bash
+supabase functions serve send-sms --no-verify-jwt
+```
+
+Disable JWT verification via the `--no-verify-jwt` to accommodate hooks which are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
+
+Note that payloads are sent uncompressed (Encoding: `identity`) in order to accurately track Content Length. In addition, there is a 20KB payload limit to guard against payload stuffing attacks.
+
+</TabPanel>
+</Tabs>
+
+## Deploying a Hook
+
+In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
+
+## Available Hooks
+
+Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
 
 ## Hook: MFA verification attempt
 
@@ -146,6 +362,14 @@ Supabase Auth will supply the following fields to your hook:
 
 Example payload:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="mfa-verification-attempt-json" label="JSON">
+
 ```json
 {
   "factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
@@ -153,6 +377,30 @@ Example payload:
   "valid": true
 }
 ```
+
+</TabPanel>
+<TabPanel id="mfa-verification-attempt-json-schema" label="JSON Schema">
+```json
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "valid": {
+      "type": "boolean",
+      "x-faker": "random.boolean"
+    }
+  },
+  "required": [
+    "user_id",
+    "valid"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
@@ -170,16 +418,16 @@ Example output:
 }
 ```
 
-**Examples**
+**SQL Examples**
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="limit-failed-mfa-verification-attempts"
+  defaultActiveId="sql-limit-failed-mfa-verification-attempts"
   queryGroup="language"
 >
-<TabPanel id="limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
+<TabPanel id="sql-limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
 
 Your company requires that a user can input an incorrect MFA Verification code no more than once every 2 seconds.
 
@@ -281,12 +529,44 @@ Check if a password is valid prior to taking any additional action to ensure the
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `valid` Whether the password verification attempt was valid.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="password-verification-attempt-json" label="JSON">
+
 ```json
 {
   "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
   "valid": true
 }
 ```
+
+</TabPanel>
+<TabPanel id="password-verification-attempt-json-schema" label="JSON Schema">
+```json
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "valid": {
+      "type": "boolean",
+      "x-faker": "random.boolean"
+    }
+  },
+  "required": [
+    "user_id",
+    "valid"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
@@ -306,16 +586,16 @@ Example output:
 }
 ```
 
-**Examples**
+**SQL Examples**
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="limit-failed-password-verification-attempts"
+  defaultActiveId="sql-limit-failed-password-verification-attempts"
   queryGroup="language"
 >
-<TabPanel id="limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
+<TabPanel id="sql-limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
 
 As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You want to write a hook to enforce this.
 
@@ -397,7 +677,7 @@ revoke all
 ```
 
 </TabPanel>
-<TabPanel id="send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
+<TabPanel id="sql-send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 
 You can notify a user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use [`pg_net`](/docs/guides/database/extensions/pg_net) to send a HTTP request to our email provider to send the email. Ensure that you have configured a sender signature for the email account which you are sending emails from.
 
@@ -530,7 +810,183 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
-  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="custom-access-token-json" label="JSON">
+```json
+{
+  "user_id": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+  "claims": {
+    "aud": "authenticated",
+    "exp": 1715690221,
+    "iat": 1715686621,
+    "sub": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+    "email": "",
+    "phone": "",
+    "app_metadata": {},
+    "user_metadata": {},
+    "role": "authenticated",
+    "aal": "aal1",
+    "amr": [ { method: "anonymous", timestamp: 1715686621 } ],
+    "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
+    "is_anonymous": true
+  },
+  "authentication_method": "anonymous"
+}
+```
+</TabPanel>
+<TabPanel id="custom-access-token-json-schema" label="JSON Schema">
+```json
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "claims": {
+      "type": "object",
+      "properties": {
+        "aud": {
+          "type": "string",
+          "x-faker": "random.word"
+        },
+        "exp": {
+          "type": "integer",
+          "x-faker": "date.future"
+        },
+        "iat": {
+          "type": "integer",
+          "x-faker": "date.past"
+        },
+        "sub": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "app_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "user_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "anon",
+            "authenticated"
+          ]
+        },
+        "aal": {
+          "type": "string",
+          "enum": [
+            "aal1",
+            "aal2",
+            "aal3"
+          ]
+        },
+        "amr": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "oauth",
+                  "password",
+                  "otp",
+                  "totp",
+                  "recovery",
+                  "invite",
+                  "sso/saml",
+                  "magiclink",
+                  "email/signup",
+                  "email_change",
+                  "token_refresh",
+                  "anonymous"
+                ]
+              },
+              "timestamp": {
+                "type": "integer",
+                "x-faker": "date.past"
+              }
+            },
+            "required": [
+              "method",
+              "timestamp"
+            ]
+          }
+        },
+        "session_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "aud",
+        "exp",
+        "iat",
+        "sub",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "role",
+        "aal",
+        "amr",
+        "session_id",
+        "is_anonymous"
+      ]
+    },
+    "authentication_method": {
+      "type": "string",
+      "enum": [
+        "oauth",
+        "password",
+        "otp",
+        "totp",
+        "recovery",
+        "invite",
+        "sso/saml",
+        "magiclink",
+        "email/signup",
+        "email_change",
+        "token_refresh",
+        "anonymous"
+      ]
+    }
+  },
+  "required": [
+    "user_id",
+    "claims",
+    "authentication_method"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
@@ -538,7 +994,7 @@ Return these only if your hook processed the input without errors.
 
 - `claims` A json containing the updated claims after the hook has been run.
 
-**Examples**
+**SQL Examples**
 
 <Tabs
   scrollable
@@ -712,24 +1168,1537 @@ revoke execute
 </TabPanel>
 </Tabs>
 
-## Local Development
+**HTTP Examples**
 
-Unlike the hosted platform, the local development dashboard does not have a user interface for linking a Hook. Instead, edit `config.toml` to link an Auth Hook and run it with your local setup. Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-add-metadata-claim"
+  queryGroup="language"
+>
+<TabPanel id="http-add-metadata-claim" label="Add claim">
 
-For instance, the `config.toml` for a Custom Access Token Hook which uses the function `public.custom_access_token_hook`:
+Your company wishes to add assign permissions via the role claim on the `app_metadata` field. Add the role claim to the token via a Hook.
 
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(base64_secret)
+  try {
+    const { user_id, claims, authentication_method } = wh.verify(payload, headers)
+    if (claims.app_metadata && claims.app_metadata.role) {
+      claims['role'] = claims.app_metadata.role
+    }
+    return new Response(
+      JSON.stringify({
+        claims,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+})
 ```
-...
 
-[auth.hook.custom_access_token]
-enabled = true
-uri = "pg-functions://postgres/public/custom_access_token_hook"
+</TabPanel>
+<TabPanel id="http-restrict-access-to-sso-users" label="Restrict access to SSO users">
+You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+```javascript
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0"
+import {
+    readAll
+} from "https://deno.land/std/io/read_all.ts";
+import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
-...
+Deno.serve(async (req) => {
+const payload = await req.text()
+const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+const headers = Object.fromEntries(req.headers)
+const wh = new Webhook(base64_secret);
+try {
+const {
+user_id,
+claims,
+authentication_method
+} = wh.verify(payload, headers);
+
+        // Check the condition
+        const allowedEmails = ['myemail@company.com', 'example@company.com'];
+        if (authentication_method === 'sso/saml' || allowedEmails.includes(claims.email)) {
+            return new Response(JSON.stringify({
+                claims
+            }), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        } else {
+            return new Response(JSON.stringify({
+                error: 'Unauthorized'
+            }), {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        }
+    } catch (error) {
+        return new Response(JSON.stringify({
+            error: `Failed to process the request: ${error}`
+        }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
+})
+
+````
+
+</TabPanel>
+</Tabs>
+
+## Hook: Send SMS
+
+Runs before a message is sent. Use the hook to:
+- Use a regional SMS Provider
+- Use alternate messaging channels such as WhatsApp
+- Adjust the message body to include platform specific fields such as the [AppHash](https://developers.google.com/identity/sms-retriever/overview)
+
+**Inputs**
+
+- `user` User attempting to sign in. Correlate this to the `auth.users` table.
+- `sms` Metadata specific to the SMS sending process. Includes the OTP.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="send-sms-json" label="JSON">
+```json
+{
+  "user": {
+    "id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "",
+    "phone": "+1333363128",
+    "phone_confirmed_at": "2024-05-13T11:52:48.157306Z",
+    "confirmation_sent_at": "2024-05-14T12:31:52.824573Z",
+    "confirmed_at": "2024-05-13T11:52:48.157306Z",
+    "phone_change_sent_at": "2024-05-13T11:47:02.183064Z",
+    "last_sign_in_at": "2024-05-13T11:52:48.162518Z",
+    "app_metadata": {
+      "provider": "phone",
+      "providers": ["phone"]
+    },
+    "user_metadata": {},
+    "identities": [
+      {
+        "identity_id": "3be5e552-65aa-41d9-9db9-2a502f845459",
+        "id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+        "user_id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+        "identity_data": {
+          "email_verified": false,
+          "phone": "+1612341244428",
+          "phone_verified": true,
+          "sub": "6481a5c1-3d37-4a56-9f6a-bee08c554965"
+        },
+        "provider": "phone",
+        "last_sign_in_at": "2024-05-13T11:52:48.155562Z",
+        "created_at": "2024-05-13T11:52:48.155599Z",
+        "updated_at": "2024-05-13T11:52:48.159391Z"
+      }
+    ],
+    "created_at": "2024-05-13T11:45:33.7738Z",
+    "updated_at": "2024-05-14T12:31:52.82475Z",
+    "is_anonymous": false
+  },
+  "sms": {
+    "otp": "561166"
+  }
+}
+````
+
+</TabPanel>
+<TabPanel id="send-sms-json-schema" label="JSON Schema">
+```json
+{
+  "type": "object",
+  "properties": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "aud": {
+          "type": "string",
+          "enum": [
+            "authenticated"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "anon",
+            "authenticated"
+          ]
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "phone_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "confirmation_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "phone_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "last_sign_in_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "app_metadata": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": [
+                "phone"
+              ]
+            },
+            "providers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "phone"
+                ]
+              }
+            }
+          }
+        },
+        "user_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identity_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "identity_data": {
+                "type": "object",
+                "properties": {
+                  "email_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "x-faker": {
+                      "fake": "{{phone.phoneNumber('+1##########')}}"
+                    }
+                  },
+                  "phone_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "sub": {
+                    "type": "string",
+                    "x-faker": "random.uuid"
+                  }
+                }
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "phone",
+                  "email",
+                  "google"
+                ]
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              }
+            },
+            "required": [
+              "identity_id",
+              "id",
+              "user_id",
+              "identity_data",
+              "provider",
+              "last_sign_in_at",
+              "created_at",
+              "updated_at"
+            ]
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "phone_confirmed_at",
+        "confirmation_sent_at",
+        "confirmed_at",
+        "phone_change_sent_at",
+        "last_sign_in_at",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
+      ]
+    },
+    "sms": {
+      "type": "object",
+      "properties": {
+        "otp": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$",
+          "x-faker": {
+            "fake": "{{helpers.replaceSymbols(######)}}"
+          }
+        }
+      },
+      "required": [
+        "otp"
+      ]
+    }
+  },
+  "required": [
+    "user",
+    "sms"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
+
+**Outputs**
+
+- No outputs are required. An empty response with a status code of 200 is taken as a successful response.
+
+**SQL Examples**
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql-send-message-via-job-queue"
+  queryGroup="language"
+>
+<TabPanel id="sql-send-message-via-job-queue" label="Queue SMS Messages">
+
+Your company uses a worker to manage all messaging related jobs. For performance reasons, the messaging system sends messages in intervals via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
+
+Create a table to store jobs
+
+```sql
+create table job_queue (
+    job_id uuid primary key default gen_random_uuid(),
+    job_data jsonb not null,
+    created_at timestamp default now(),
+    status text default 'pending',
+    priority int default 0,
+    retry_count int default 0,
+    max_retries int default 2,
+    scheduled_at timestamp default now()
+);
 ```
 
-Save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
+Create the hook:
 
-### Debugging Your Hook
+```sql
+create or replace function send_sms(event jsonb) returns void as $$
+declare
+    job_data jsonb;
+    scheduled_time timestamp;
+    priority int;
+begin
+    -- extract phone and otp from the event json
+    job_data := jsonb_build_object(
+        'phone', event->'user'->>'phone',
+        'otp', event->'sms'->>'otp'
+    );
 
-Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
+    -- calculate the nearest 5-minute window for scheduled_time
+    scheduled_time := date_trunc('minute', now()) + interval '5 minute' * floor(extract('epoch' from (now() - date_trunc('minute', now())) / 60) / 5);
+
+    -- assign priority dynamically (example logic: higher priority for earlier scheduled time)
+    priority := extract('epoch' from (scheduled_time - now()))::int;
+
+    -- insert the job into the job_queue table
+    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    values (job_data, priority, scheduled_time, 2);
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.send_sms
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.send_sms
+  from authenticated, anon;
+
+grant all
+  on table public.job_queue
+  to supabase_auth_admin;
+
+revoke all
+  on table public.job_queue
+  from authenticated, anon;
+```
+
+Create a function to periodically run and dequeue all jobs
+
+```sql
+create or replace function dequeue_and_run_jobs() returns void as $$
+declare
+    job record;
+begin
+    for job in
+        select * from job_queue
+        where status = 'pending'
+          and scheduled_at <= now()
+        order by priority desc, created_at
+        for update skip locked
+    loop
+        begin
+            -- add job processing logic here.
+            -- for demonstration, we'll just update the job status to 'completed'.
+            update job_queue
+            set status = 'completed'
+            where job_id = job.job_id;
+
+        exception when others then
+            -- handle job failure and retry logic
+            if job.retry_count < job.max_retries then
+                update job_queue
+                set retry_count = retry_count + 1,
+                    scheduled_at = now() + interval '1 minute'  -- delay retry by 1 minute
+                where job_id = job.job_id;
+            else
+                update job_queue
+                set status = 'failed'
+                where job_id = job.job_id;
+            end if;
+        end;
+    end loop;
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.dequeue_and_run_jobs
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.dequeue_and_run_jobs
+  from authenticated, anon;
+```
+
+Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
+
+```sql
+select cron.schedule(
+    '* * * * *',  -- this cron expression means every minute.
+    'select dequeue_and_run_jobs();'
+);
+```
+
+</TabPanel>
+
+</Tabs>
+
+**HTTP Examples**
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-alternate-message-provider"
+  queryGroup="language"
+>
+<TabPanel id="http-alternate-message-provider" label="Alternate message provider">
+Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). The example uses Twilio as it is widely available and does not require a regional number.
+
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import { Twilio } from 'https://cdn.skypack.dev/twilio'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+
+const accountSid: string | undefined = Deno.env.get('TWILIO_ACCOUNT_SID')
+const authToken: string | undefined = Deno.env.get('TWILIO_AUTH_TOKEN')
+const fromNumber: string = Deno.env.get('TWILIO_PHONE_NUMBER')
+
+const sendTextMessage = async (
+  messageBody: string,
+  accountSid: string | undefined,
+  authToken: string | undefined,
+  fromNumber: string,
+  toNumber: string
+): Promise<any> => {
+  if (!accountSid || !authToken) {
+    console.log('Your Twilio account credentials are missing. Please add them.')
+    return
+  }
+  const url: string = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
+
+  const encodedCredentials: string = base64.fromUint8Array(
+    new TextEncoder().encode(`${accountSid}:${authToken}`)
+  )
+
+  const body: URLSearchParams = new URLSearchParams({
+    To: `+${toNumber}`,
+    From: fromNumber,
+    // Uncomment when testing with a fixed number
+    Body: messageBody,
+  })
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${encodedCredentials}`,
+    },
+    body,
+  })
+
+  return response.json()
+}
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(base64_secret)
+  try {
+    const { user, sms } = wh.verify(payload, headers)
+    const messageBody = `Your OTP is: ${sms.otp}`
+    const response = await sendTextMessage(
+      messageBody,
+      accountSid,
+      authToken,
+      fromNumber,
+      user.phone
+    )
+    if (response.status !== 'queued') {
+      return new Response(
+        JSON.stringify({
+          error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`,
+        }),
+        {
+          status: response.status,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+    return new Response(
+      JSON.stringify({
+        message: 'SMS sent successfully.',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+
+  return Response.json(data)
+})
+```
+
+</TabPanel>
+<TabPanel id="http-whatsapp-and-sms-messages" label="Use WhatsApp with SMS">
+
+Your company is expanding into Latin America and would like to use WhatsApp for higher deliverability. Write a hook to send WhatsApp messages to requests from the continent and SMS messages to all other numbers.
+
+```javascript
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0";
+import {
+    readAll
+} from "https://deno.land/std/io/read_all.ts";
+import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
+
+const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
+const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
+const fromNumber: string = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
+const smsFromNumber: string = Deno.env.get("TWILIO_SMS_NUMBER");
+
+const latinAmericanCountryCodes = ['54', '55', '56', '57', '58', '501', '502', '503', '504', '505', '506', '507', '508', '509', '51', '52', '53', '591', '592', '593', '594', '595', '596', '597', '598', '599'];
+
+const sendMessage = async (
+    messageBody: string,
+    accountSid: string | undefined,
+    authToken: string | undefined,
+    fromNumber: string,
+    toNumber: string,
+    useWhatsApp: boolean,
+): Promise < any > => {
+    if (!accountSid || !authToken) {
+        console.log("Your Twilio account credentials are missing. Please add them.");
+        return;
+    }
+    const url: string = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+    const encodedCredentials: string = base64.fromUint8Array(
+        new TextEncoder().encode(`${accountSid}:${authToken}`),
+    );
+
+    const body: URLSearchParams = new URLSearchParams({
+        To: useWhatsApp ? `whatsapp:${toNumber}` : toNumber,
+        From: useWhatsApp ? `whatsapp:${fromNumber}` : smsFromNumber,
+        Body: messageBody,
+    });
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Basic ${encodedCredentials}`,
+        },
+        body,
+    });
+
+    return response.json();
+};
+
+Deno.serve(async (req) => {
+    const payload = await req.text();
+    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET");
+    const headers = Object.fromEntries(req.headers);
+    const wh = new Webhook(base64_secret);
+    try {
+        const {
+            user,
+            sms
+        } = wh.verify(payload, headers);
+        const messageBody = `Your OTP is: ${sms.otp}`;
+        const userPhoneNumber = user.phone;
+        const countryCode = userPhoneNumber.substring(1, userPhoneNumber.indexOf(userPhoneNumber.match(/\d/)!));
+
+        const useWhatsApp = latinAmericanCountryCodes.includes(countryCode);
+
+        const response = await sendMessage(
+            messageBody,
+            accountSid,
+            authToken,
+            fromNumber,
+            userPhoneNumber,
+            useWhatsApp,
+        );
+
+        if (response.status !== "queued") {
+            return new Response(
+                JSON.stringify({
+                    error: `Failed to send message, Error Code: ${response.code} ${response.message} ${response.more_info}`,
+                }), {
+                    status: response.status,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+        }
+        return new Response(
+            JSON.stringify({
+                message: "Message sent successfully."
+            }), {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+    } catch (error) {
+        return new Response(
+            JSON.stringify({
+                error: `Failed to process the request: ${error}`
+            }), {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+    }
+});
+```
+
+</TabPanel>
+</Tabs>
+
+## Hook: Send Email
+
+The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
+
+**Inputs**
+
+- `user` User attempting to sign in. Correlate this to the `auth.users` table.
+- `email` Metadata specific to the email sending process. Includes the OTP and `token_hash`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="send-email-json" label="JSON">
+```json
+{
+  "user": {
+    "id": "8484b834-f29e-4af2-bf42-80644d154f76",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "john@soupbase.io",
+    "phone": "",
+    "app_metadata": {
+      "provider": "email",
+      "providers": ["email"]
+    },
+    "user_metadata": {
+      "email": "john@soupbase.io",
+      "email_verified": false,
+      "phone_verified": false,
+      "sub": "8484b834-f29e-4af2-bf42-80644d154f76"
+    },
+    "identities": [
+      {
+        "identity_id": "bc26d70b-517d-4826-bce4-413a5ff257e7",
+        "id": "8484b834-f29e-4af2-bf42-80644d154f76",
+        "user_id": "8484b834-f29e-4af2-bf42-80644d154f76",
+        "identity_data": {
+          "email": "john@soupbase.io",
+          "email_verified": false,
+          "phone_verified": false,
+          "sub": "8484b834-f29e-4af2-bf42-80644d154f76"
+        },
+        "provider": "email",
+        "last_sign_in_at": "2024-05-14T12:56:33.824231484Z",
+        "created_at": "2024-05-14T12:56:33.824261Z",
+        "updated_at": "2024-05-14T12:56:33.824261Z",
+        "email": "john@soupbase.io"
+      }
+    ],
+    "created_at": "2024-05-14T12:56:33.821567Z",
+    "updated_at": "2024-05-14T12:56:33.825595Z",
+    "is_anonymous": false
+  },
+  "email_data": {
+    "token": "305805",
+    "token_hash": "7d5b7b1964cf5d388340a7f04f1dbb5eeb6c7b52ef8270e1737a58d0",
+    "redirect_to": "http://localhost:3000/",
+    "email_action_type": "signup",
+    "site_url": "http://localhost:9999",
+    "token_new": "",
+    "token_hash_new": ""
+  }
+}
+```
+</TabPanel>
+<TabPanel id="send-email-json-schema" label="JSON Schema">
+```json
+{
+  "type": "object",
+  "properties": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "aud": {
+          "type": "string",
+          "enum": [
+            "authenticated"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "anon",
+            "authenticated"
+          ]
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "app_metadata": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": [
+                "email"
+              ]
+            },
+            "providers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "email"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 1
+            }
+          }
+        },
+        "user_metadata": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "x-faker": "internet.email"
+            },
+            "email_verified": {
+              "type": "boolean",
+              "x-faker": "random.boolean"
+            },
+            "phone_verified": {
+              "type": "boolean",
+              "x-faker": "random.boolean"
+            },
+            "sub": {
+              "type": "string",
+              "x-faker": "random.uuid"
+            }
+          }
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identity_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "identity_data": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "x-faker": "internet.email"
+                  },
+                  "email_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "phone_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "sub": {
+                    "type": "string",
+                    "x-faker": "random.uuid"
+                  }
+                }
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "email"
+                ]
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "email": {
+                "type": "string",
+                "x-faker": "internet.email"
+              }
+            },
+            "required": [
+              "identity_id",
+              "id",
+              "user_id",
+              "identity_data",
+              "provider",
+              "last_sign_in_at",
+              "created_at",
+              "updated_at",
+              "email"
+            ]
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
+      ]
+    },
+    "email_data": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$",
+          "x-faker": {
+            "fake": "{{helpers.replaceSymbols('######')}}"
+          }
+        },
+        "token_hash": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 30,
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        },
+        "redirect_to": {
+          "type": "string",
+          "x-faker": "internet.url"
+        },
+        "email_action_type": {
+          "type": "string",
+          "enum": [
+            "signup",
+            "login",
+            "reset_password"
+          ]
+        },
+        "site_url": {
+          "type": "string",
+          "x-faker": "internet.url"
+        },
+        "token_new": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 30,
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        },
+        "token_hash_new": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 30,
+          "x-faker": {
+            "fake": "{{random.alphaNumeric(30)}}"
+          }
+        }
+      },
+      "required": [
+        "token",
+        "token_hash",
+        "redirect_to",
+        "email_action_type",
+        "site_url",
+        "token_new",
+        "token_hash_new"
+      ]
+    }
+  },
+  "required": [
+    "user",
+    "email_data"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
+
+**Outputs**
+
+- No outputs are required. An empty response with a status code of 200 is taken as a successful response.
+
+**SQL Examples**
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql-queue-email-messages"
+  queryGroup="language"
+>
+<TabPanel id="sql-queue-email-messages" label="Queue Email Messages">
+Your company uses a worker to manage all emails related jobs. For performance reasons, the messaging system sends emails in batches via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
+
+Create a table to store jobs
+
+```sql
+create table job_queue (
+    job_id uuid primary key default gen_random_uuid(),
+    job_data jsonb not null,
+    created_at timestamp default now(),
+    status text default 'pending',
+    priority int default 0,
+    retry_count int default 0,
+    max_retries int default 2,
+    scheduled_at timestamp default now()
+);
+```
+
+Create the hook
+
+```sql
+create or replace function send_email(event jsonb) returns void as $$
+declare
+    job_data jsonb;
+    scheduled_time timestamp;
+    priority int;
+begin
+    -- Extract email details from the event JSON
+    job_data := jsonb_build_object(
+        'email_action_type', event->'email_data'->>'email_action_type',
+        'token_hash', event->'email_data'->>'token_hash',
+        'token', event->'email_data'->>'token',
+        'email', event->'user'->>'email'
+    );
+
+    -- Calculate the nearest 5-minute window for scheduled_time
+    scheduled_time := date_trunc('minute', now()) + interval '5 minute' * floor(extract('epoch' from (now() - date_trunc('minute', now())) / 60) / 5);
+
+    -- Assign priority dynamically (example logic: higher priority for earlier scheduled time)
+    priority := extract('epoch' from (scheduled_time - now()))::int;
+
+    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    values (job_data, priority, scheduled_time, 2);
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.send_email
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.send_email
+  from authenticated, anon;
+
+grant all
+  on table public.job_queue
+  to supabase_auth_admin;
+
+revoke all
+  on table public.job_queue
+  from authenticated, anon;
+```
+
+Create a function to periodically run and dequeue all jobs
+
+```sql
+create or replace function dequeue_and_run_jobs() returns void as $$
+declare
+    job record;
+begin
+    for job in
+        select * from job_queue
+        where status = 'pending'
+          and scheduled_at <= now()
+        order by priority desc, created_at
+        for update skip locked
+    loop
+        begin
+            -- add job processing logic here.
+            -- for demonstration, we'll just update the job status to 'completed'.
+            update job_queue
+            set status = 'completed'
+            where job_id = job.job_id;
+
+        exception when others then
+            -- handle job failure and retry logic
+            if job.retry_count < job.max_retries then
+                update job_queue
+                set retry_count = retry_count + 1,
+                    scheduled_at = now() + interval '1 minute'  -- delay retry by 1 minute
+                where job_id = job.job_id;
+            else
+                update job_queue
+                set status = 'failed'
+                where job_id = job.job_id;
+            end if;
+        end;
+    end loop;
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.dequeue_and_run_jobs
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.dequeue_and_run_jobs
+  from authenticated, anon;
+```
+
+Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
+
+```sql
+select cron.schedule(
+    '* * * * *',  -- this cron expression means every minute.
+    'select dequeue_and_run_jobs();'
+);
+```
+
+</TabPanel>
+
+</Tabs>
+
+**HTTP Examples**
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-internationalization-for-emails"
+  queryGroup="language"
+>
+<TabPanel id="http-internationalization-for-emails" label="Add Internationalization for Email Templates">
+Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `AUTH_SEND_EMAIL_HOOK_SECRET` in your `.env` file.
+
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+
+const postmarkEndpoint = 'https://api.postmarkapp.com/email'
+// Replace this with your email
+const FROM_EMAIL = 'myemail@gmail.com'
+
+// Email Subjects
+const subjects = {
+  en: {
+    signup: 'Confirm Your Email',
+    recovery: 'Reset Your Password',
+    invite: 'You have been invited',
+    magic_link: 'Your Magic Link',
+    email_change: 'Confirm Email Change',
+    email_change_new: 'Confirm New Email Address',
+    reauthentication: 'Confirm Reauthentication',
+  },
+  es: {
+    signup: 'Confirma tu correo electrónico',
+    recovery: 'Restablece tu contraseña',
+    invite: 'Has sido invitado',
+    magic_link: 'Tu enlace mágico',
+    email_change: 'Confirma el cambio de correo electrónico',
+    email_change_new: 'Confirma la Nueva Dirección de Correo',
+    reauthentication: 'Confirma la reautenticación',
+  },
+  fr: {
+    signup: 'Confirmez votre adresse e-mail',
+    recovery: 'Réinitialisez votre mot de passe',
+    invite: 'Vous avez été invité',
+    magic_link: 'Votre Lien Magique',
+    email_change: 'Confirmez le changement d’adresse e-mail',
+    email_change_new: 'Confirmez la nouvelle adresse e-mail',
+    reauthentication: 'Confirmez la réauthentification',
+  },
+}
+
+// HTML Body
+const templates = {
+  en: {
+    signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
+    email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
+    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`,
+  },
+  es: {
+    signup: `<h2>Confirma tu correo electrónico</h2><p>Sigue este enlace para confirmar tu correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma tu correo electrónico</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+    recovery: `<h2>Restablece tu contraseña</h2><p>Sigue este enlace para restablecer la contraseña de tu usuario:</p><p><a href="{{confirmation_url}}">Restablece tu contraseña</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+    invite: `<h2>Has sido invitado</h2><p>Has sido invitado para crear un usuario en {{site_url}}. Sigue este enlace para aceptar la invitación:</p><p><a href="{{confirmation_url}}">Aceptar la invitación</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+    magic_link: `<h2>Tu enlace mágico</h2><p>Sigue este enlace para iniciar sesión:</p><p><a href="{{confirmation_url}}">Iniciar sesión</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+    email_change: `<h2>Confirma el cambio de correo electrónico</h2><p>Sigue este enlace para confirmar la actualización de tu correo electrónico de {{old_email}} a {{new_email}}:</p><p><a href="{{confirmation_url}}">Cambiar correo electrónico</a></p><p>Alternativamente, ingresa los códigos: {{token}} y {{new_token}}</p>`,
+    email_change_new: `<h2>Confirma la Nueva Dirección de Correo</h2><p>Sigue este enlace para confirmar tu nueva dirección de correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma la nueva dirección de correo</a></p><p>Alternativamente, ingresa el código: {{new_token}}</p>`,
+    reauthentication: `<h2>Confirma la reautenticación</h2><p>Ingresa el código: {{token}}</p>`,
+  },
+  fr: {
+    signup: `<h2>Confirmez votre adresse e-mail</h2><p>Suivez ce lien pour confirmer votre adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez votre adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+    recovery: `<h2>Réinitialisez votre mot de passe</h2><p>Suivez ce lien pour réinitialiser votre mot de passe :</p><p><a href="{{confirmation_url}}">Réinitialisez votre mot de passe</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+    invite: `<h2>Vous avez été invité</h2><p>Vous avez été invité à créer un utilisateur sur {{site_url}}. Suivez ce lien pour accepter l'invitation :</p><p><a href="{{confirmation_url}}">Acceptez l'invitation</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+    magic_link: `<h2>Votre Lien Magique</h2><p>Suivez ce lien pour vous connecter :</p><p><a href="{{confirmation_url}}">Connectez-vous</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+    email_change: `<h2>Confirmez le changement d’adresse e-mail</h2><p>Suivez ce lien pour confirmer la mise à jour de votre adresse e-mail de {{old_email}} à {{new_email}} :</p><p><a href="{{confirmation_url}}">Changez d’adresse e-mail</a></p><p>Vous pouvez aussi saisir les codes : {{token}} et {{new_token}}</p>`,
+    email_change_new: `<h2>Confirmez la nouvelle adresse e-mail</h2><p>Suivez ce lien pour confirmer votre nouvelle adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez la nouvelle adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{new_token}}</p>`,
+    reauthentication: `<h2>Confirmez la réauthentification</h2><p>Saisissez le code : {{token}}</p>`,
+  },
+}
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
+  const headers = Object.fromEntries(req.headers)
+  const base64_secret = Deno.env.get('AUTH_SEND_EMAIL_HOOK_SECRET')
+  const wh = new Webhook(base64_secret)
+  const { user, email_data } = wh.verify(payload, headers)
+
+  const language = (user.user_metadata && user.user_metadata.i18n) || 'en'
+  const subject = subjects[language][email_data.email_action_type] || 'Notification'
+
+  let template = templates[language][email_data.email_action_type]
+  let htmlBody = template
+    .replace('{{confirmation_url}}', email_data.confirmation_url)
+    .replace('{{token}}', email_data.token || '')
+    .replace('{{new_token}}', email_data.new_token || '')
+    .replace('{{site_url}}', email_data.site_url || '')
+    .replace('{{old_email}}', email_data.email || '')
+    .replace('{{new_email}}', email_data.new_email || '')
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-Postmark-Server-Token': serverToken,
+    },
+    body: JSON.stringify({
+      From: FROM_EMAIL,
+      To: user.email,
+      Subject: subject,
+      HtmlBody: htmlBody,
+    }),
+  }
+
+  try {
+    const response = await fetch(postmarkEndpoint, requestOptions)
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(`Failed to send email: ${errorData.Message}`)
+    }
+    return new Response(
+      JSON.stringify({
+        message: 'Email sent successfully.',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error.message}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+})
+```
+
+</TabPanel>
+<TabPanel id="http-backup-email-provider" label="Add Backup Email Provider">
+Your company is rapidly growing and depends heavily on email signups. You'd like to configure a backup email provider in case the email provider runs out of credits during your new product launch. Postmark and Sengrid are used as examples but in practice you can use any email provider.
+Ensure that you have configured `POSTMARK_SERVER_TOKEN`, `SENDGRID_API_KEY` and `AUTH_SEND_EMAIL_HOOK_SECRET` in your `.env` file.
+
+```javascript
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0";
+import {
+    readAll
+} from "https://deno.land/std/io/read_all.ts";
+
+const postmarkEndpoint = 'https://api.postmarkapp.com/email';
+const sendGridEndpoint = 'https://api.sendgrid.com/v3/mail/send';
+const FROM_EMAIL = 'myemail@gmail.com'
+
+// Email Subjects
+const subjects = {
+    signup: 'Confirm Your Email',
+    recovery: 'Reset Your Password',
+    invite: 'You have been invited',
+    magic_link: 'Your Magic Link',
+    email_change: 'Confirm Email Change',
+    email_change_new: 'Confirm New Email Address',
+    reauthentication: 'Confirm Reauthentication'
+};
+
+// HTML Body
+const templates = {
+    signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
+    email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
+    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
+};
+
+async function sendEmailWithPostmark(user: any, email_data: any, serverToken: string): Promise<Response> {
+    const subject = subjects[email_data.email_action_type] || 'Notification';
+    let template = templates[email_data.email_action_type];
+    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+        .replace('{{token}}', email_data.token || '')
+        .replace('{{new_token}}', email_data.new_token || '')
+        .replace('{{site_url}}', email_data.site_url || '')
+        .replace('{{old_email}}', email_data.email || '')
+        .replace('{{new_email}}', email_data.new_email || '');
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Postmark-Server-Token': serverToken
+        },
+        body: JSON.stringify({
+            From: FROM_EMAIL,
+            To: user.email,
+            Subject: subject,
+            HtmlBody: htmlBody
+        })
+    };
+
+    return await fetch(postmarkEndpoint, requestOptions);
+}
+
+async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string): Promise<Response> {
+    const subject = subjects[email_data.email_action_type] || 'Notification';
+    let template = templates[email_data.email_action_type];
+    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+        .replace('{{token}}', email_data.token || '')
+        .replace('{{new_token}}', email_data.new_token || '')
+        .replace('{{site_url}}', email_data.site_url || '')
+        .replace('{{old_email}}', email_data.email || '')
+        .replace('{{new_email}}', email_data.new_email || '');
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            personalizations: [{
+                to: [{
+                    email: user.email
+                }],
+                subject: subject
+            }],
+            from: {
+                email: FROM_EMAIL
+            },
+            content: [{
+                type: "text/html",
+                value: htmlBody
+            }]
+        })
+    };
+
+    return await fetch(sendGridEndpoint, requestOptions);
+}
+
+Deno.serve(async (req) => {
+    const payload = await req.text();
+    const postmarkServerToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
+    const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
+    const headers = Object.fromEntries(req.headers);
+    const base64_secret = Deno.env.get('AUTH_SEND_EMAIL_HOOK_SECRET');
+    const wh = new Webhook(base64_secret);
+    const {
+        user,
+        email_data
+    } = wh.verify(payload, headers);
+
+    try {
+        // Try sending email using Postmark
+        let response = await sendEmailWithPostmark(user, email_data, postmarkServerToken!);
+
+        if (!response.ok) {
+            // If Postmark fails, try SendGrid
+            console.error(`Primary email send failed: ${await response.text()}`);
+            response = await sendEmailWithSendGrid(user, email_data, sendGridApiKey!);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to send email via backup: ${errorData.errors[0].message}`);
+            }
+        }
+
+        return new Response(JSON.stringify({
+            message: "Email sent successfully."
+        }), {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    } catch (error) {
+        return new Response(JSON.stringify({
+            error: `Failed to process the request: ${error.message}`
+        }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+});
+```
+
+</TabPanel>
+
+</Tabs>
