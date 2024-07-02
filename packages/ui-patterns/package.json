@@ -24,6 +24,7 @@
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "*",
+    "react-use": "^17.5.0",
     "reactflow": "*",
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.1",
@@ -43,6 +44,7 @@
     "api-types": "*",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "next-router-mock": "^0.9.13",
     "ts-jest": "^29.1.2"
   },
   "peerDependencies": {

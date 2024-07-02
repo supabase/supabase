@@ -1,12 +1,15 @@
-import { useConstant } from 'common'
-import { useEffect, type PropsWithChildren } from 'react'
+'use client'
 
-import { useToggleCommandMenu } from './hooks/viewHooks'
+import { useConstant } from 'common'
+import { type PropsWithChildren, useEffect, useMemo, useCallback } from 'react'
+
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
 import { initPagesState } from '../internal/state/pagesState'
 import { initQueryState } from '../internal/state/queryState'
 import { initViewState } from '../internal/state/viewState'
+import { useCrossCompatRouter } from './hooks/useCrossCompatRouter'
+import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const combinedState = useConstant(() => ({
@@ -19,6 +22,7 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   return <CommandContext.Provider value={combinedState}>{children}</CommandContext.Provider>
 }
 
+// This is a component not a hook so it can access the wrapping context.
 const CommandShortcut = () => {
   const toggleOpen = useToggleCommandMenu()
 
@@ -38,9 +42,27 @@ const CommandShortcut = () => {
   return null
 }
 
+// This is a component not a hook so it can access the wrapping context.
+function CloseOnNavigation() {
+  const setIsOpen = useSetCommandMenuOpen()
+  const router = useCrossCompatRouter()
+
+  const completeNavigation = useCallback(() => {
+    setIsOpen(false)
+  }, [setIsOpen])
+
+  useEffect(() => {
+    router.events.onRouteChangeComplete(completeNavigation)
+    return () => router.events.offRouteChangeComplete(completeNavigation)
+  }, [router])
+
+  return null
+}
+
 const CommandProvider = ({ children }: PropsWithChildren) => (
   <CommandProviderInternal>
     <CommandShortcut />
+    <CloseOnNavigation />
     {children}
   </CommandProviderInternal>
 )

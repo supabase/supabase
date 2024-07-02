@@ -1,3 +1,5 @@
+'use client'
+
 import { useLayoutEffect, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
@@ -10,7 +12,7 @@ const useCommandMenuInitiated = () => {
   return initiated
 }
 
-const useCommandMenuVisible = () => {
+const useCommandMenuOpen = () => {
   const { viewState } = useCommandContext()
   const { open } = useSnapshot(viewState)
   return open
@@ -26,18 +28,6 @@ const useToggleCommandMenu = () => {
   const { viewState } = useCommandContext()
   const { toggleOpen } = useSnapshot(viewState)
   return toggleOpen
-}
-
-const useIsCommandNavigating = () => {
-  const { viewState } = useCommandContext()
-  const { isNavigating } = useSnapshot(viewState)
-  return isNavigating
-}
-
-const useSetIsCommandNavigating = () => {
-  const { viewState } = useCommandContext()
-  const { setIsNavigating } = useSnapshot(viewState)
-  return setIsNavigating
 }
 
 const useCommandMenuSize = () => {
@@ -60,11 +50,9 @@ const useSetCommandMenuSize = (newSize: DialogSize) => {
 
 export {
   useCommandMenuInitiated,
-  useCommandMenuVisible,
+  useCommandMenuOpen,
   useSetCommandMenuOpen,
   useToggleCommandMenu,
-  useIsCommandNavigating,
-  useSetIsCommandNavigating,
   useCommandMenuSize,
   useSetCommandMenuSize,
 }
