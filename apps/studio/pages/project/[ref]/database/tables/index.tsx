@@ -9,8 +9,10 @@ import { FormHeader } from 'components/ui/Forms'
 import type { Table } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
+import { useQueryClient } from '@tanstack/react-query'
 
 const DatabaseTables: NextPageWithLayout = () => {
+  const queryClient = useQueryClient()
   const snap = useTableEditorStateSnapshot()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
 
