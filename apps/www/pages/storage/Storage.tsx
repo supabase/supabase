@@ -1,4 +1,4 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Image } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -16,7 +16,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 import ProductsNav from '~/components/Products/ProductsNav'
 import { PRODUCT_NAMES } from 'shared-data/products'
 
@@ -63,7 +62,7 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <ThemeImage
+            <Image
               src={{
                 light: `${basePath}/images/product/storage/header--light.png`,
                 dark: `${basePath}/images/product/storage/header--dark.png`,

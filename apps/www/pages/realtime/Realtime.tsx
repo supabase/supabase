@@ -1,4 +1,4 @@
-import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
+import { Button, IconGrid, IconLayers, IconMenu, Image } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
@@ -14,7 +14,6 @@ import RealtimeStyles from './Realtime.module.css'
 import ProductsNav from '~/components/Products/ProductsNav'
 
 import 'swiper/css'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { PRODUCT_NAMES } from 'shared-data/products'
 
 const Cursor = ({ className = '', color = 'none' }) => {
@@ -194,7 +193,7 @@ function RealtimePage() {
               return (
                 <>
                   <div className="flex flex-col gap-3">
-                    <ThemeImage
+                    <Image
                       alt={example.title}
                       src={{
                         light: `/images/realtime/example-apps/light/${example.img}?type=1`,

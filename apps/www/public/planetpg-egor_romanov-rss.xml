@@ -5,21 +5,21 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Egor Romanov at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 02 Aug 2023 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 02 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-egor_romanov-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
   <title>pgvector: Fewer dimensions are better</title>
   <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
   <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
-  <pubDate>Wed, 02 Aug 2023 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pgvector-performance</guid>
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
   <description>There&apos;s been a lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
-  <pubDate>Wed, 12 Jul 2023 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
 </item>
 
     </channel>

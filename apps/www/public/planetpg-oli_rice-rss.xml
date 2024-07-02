@@ -5,63 +5,63 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Oliver Rice at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 12 Dec 2023 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 12 Dec 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-oli_rice-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/postgrest-12</guid>
   <title>PostgREST 12</title>
   <link>https://supabase.com/blog/postgrest-12</link>
   <description>PostgREST 12 is out and we take a look at some of the major new features like JWT Caching and Aggregate Functions</description>
-  <pubDate>Tue, 12 Dec 2023 16:00:00 GMT</pubDate>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pg-graphql-postgres-functions</guid>
   <title>pg_graphql: Postgres functions now supported</title>
   <link>https://supabase.com/blog/pg-graphql-postgres-functions</link>
   <description>pg_graphql now supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs)</description>
-  <pubDate>Mon, 11 Dec 2023 16:00:00 GMT</pubDate>
+  <pubDate>Mon, 11 Dec 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
   <title>pgvector: Fewer dimensions are better</title>
   <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
   <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
-  <pubDate>Wed, 02 Aug 2023 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</guid>
   <title>What&apos;s New in pg_graphql v1.2</title>
   <link>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</link>
   <description>New Features in the v1.2 release of pg_graphql</description>
-  <pubDate>Thu, 20 Apr 2023 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 20 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</guid>
   <title>Type Constraints in 65 lines of SQL</title>
   <link>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</link>
   <description>Creating validated data types in Postgres</description>
-  <pubDate>Thu, 16 Feb 2023 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 16 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pg-graphql-v1</guid>
   <title>pg_graphql v1.0</title>
   <link>https://supabase.com/blog/pg-graphql-v1</link>
   <description>Announcing the v1.0 release of pg_graphql</description>
-  <pubDate>Thu, 15 Dec 2022 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 15 Dec 2022 23:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</guid>
   <title>pg_jsonschema: JSON Schema support for Postgres</title>
   <link>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</link>
   <description>Today we&apos;re releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
-  <pubDate>Thu, 18 Aug 2022 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-audit</guid>
   <title>Postgres Auditing in 150 lines of SQL</title>
   <link>https://supabase.com/blog/postgres-audit</link>
   <description>PostgreSQL has a robust set of features which we can leverage to create a generic auditing solution in 150 lines of SQL.</description>
-  <pubDate>Mon, 07 Mar 2022 16:00:00 GMT</pubDate>
+  <pubDate>Mon, 07 Mar 2022 23:00:00 GMT</pubDate>
 </item>
 
     </channel>
