@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -14,6 +14,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -26,9 +27,6 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
-  IconEye,
-  IconEyeOff,
   Input,
   InputNumber,
   Toggle,
@@ -91,6 +89,7 @@ const BasicAuthSettingsForm = () => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [hidden, setHidden] = useState(true)
+  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
@@ -146,11 +145,15 @@ const BasicAuthSettingsForm = () => {
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
+  }
+
+  if (!canReadConfig) {
+    return <NoPermission resourceText="view auth configuration settings" />
   }
 
   return (
@@ -434,7 +437,7 @@ const BasicAuthSettingsForm = () => {
                         disabled={!canUpdateConfig}
                         actions={
                           <Button
-                            icon={hidden ? <IconEye /> : <IconEyeOff />}
+                            icon={hidden ? <Eye /> : <EyeOff />}
                             type="default"
                             onClick={() => setHidden(!hidden)}
                           />
