@@ -137,9 +137,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
         ],
         [
-          // {
-          //   label: 'Tools',
-          // },
           {
             label: 'CLI Commands',
             icon: 'reference-cli',
