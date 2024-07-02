@@ -207,7 +207,7 @@ export const PolicyDetailsV2 = ({
                     }}
                     className={`grid grid-cols-10 gap-3 ${isEditing ? 'opacity-50' : ''}`}
                   >
-                    {['select', 'insert', 'update', 'delete', 'all'].map((x) => (
+                    {['select', 'insert'].map((x) => (
                       <RadioGroupLargeItem_Shadcn_
                         key={x}
                         value={x}

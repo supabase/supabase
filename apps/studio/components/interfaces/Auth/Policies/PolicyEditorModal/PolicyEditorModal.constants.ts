@@ -192,7 +192,23 @@ using ( realtime.messages.extension = 'broadcast' );`.trim(),
       command: 'SELECT',
       roles: ['authenticated'],
     },
-
+    {
+      id: 'policy-broadcast-2',
+      preview: false,
+      templateName: 'Allow pushing broadcasts for authenticated users only',
+      description: 'This policy allows pushing broadcasts for authenticated users only.',
+      statement: `
+create policy "Allow pushing broadcasts for authenticated users only"
+ON realtime.messages for insert
+TO authenticated
+using ( realtime.messages.extension = 'broadcast' )
+with check ( realtime.messages.extension = 'broadcast' );`.trim(),
+      name: 'Allow pushing broadcasts for authenticated users only',
+      definition: "realtime.messages.extension = 'broadcast'",
+      check: "realtime.messages.extension = 'broadcast'",
+      command: 'INSERT',
+      roles: ['authenticated'],
+    },
     {
       id: 'policy-broadcast-3',
       preview: false,
@@ -208,7 +224,22 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
       command: 'SELECT',
       roles: [],
     },
-
+    {
+      id: 'policy-broadcast-4',
+      preview: false,
+      templateName: 'Allow pushing broadcasts to specific channel',
+      description: 'This policy allow pushing broadcasts to specific channel.',
+      statement: `
+create policy "Allow pushing broadcasts to specific channel"
+ON realtime.messages for insert
+using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' )
+with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
+      name: 'Allow pushing broadcasts to specific channel',
+      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      command: 'INSERT',
+      roles: [],
+    },
     {
       id: 'policy-presences-1',
       preview: false,
@@ -226,7 +257,25 @@ using ( realtime.messages.extension = 'presence' );`.trim(),
       command: 'SELECT',
       roles: ['authenticated'],
     },
-
+    {
+      id: 'policy-presences-2',
+      preview: false,
+      templateName: 'Allow broadcasting presences on all channels for authenticated users only',
+      description:
+        'This policy enables broadcasting presences on all channels for all authenticated users only.',
+      statement: `
+create policy "Allow broadcasting presences on all channels for authenticated users only"
+ON realtime.messages for insert
+TO authenticated
+using ( realtime.messages.extension = 'presence' )
+with check ( realtime.messages.extension = 'presence' );
+  ;`.trim(),
+      name: 'Allow broadcasting presences on all channels for authenticated users only',
+      definition: "realtime.messages.extension = 'presence'",
+      check: "realtime.messages.extension = 'presence'",
+      command: 'INSERT',
+      roles: ['authenticated'],
+    },
     {
       id: 'policy-presences-3',
       preview: false,
@@ -240,6 +289,23 @@ using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel
       definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       check: '',
       command: 'SELECT',
+      roles: [],
+    },
+    {
+      id: 'policy-presences-4',
+      preview: false,
+      templateName: 'Publish presence to a specific channel',
+      description: 'This policy allows publishing presence to a specific channel.',
+      statement: `
+create policy "Publish presence to a specific channel"
+ON realtime.messages for insert
+using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' )
+with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
+  ;`.trim(),
+      name: 'Publish presence to a specific channel',
+      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      command: 'INSERT',
       roles: [],
     },
   ] as PolicyTemplate[]
