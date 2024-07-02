@@ -209,6 +209,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     ```dart
     import 'package:sign_in_with_apple/sign_in_with_apple.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
+    import 'package:crypto/crypto.dart';
 
     /// Performs Apple sign in on iOS or macOS
     Future<AuthResponse> signInWithApple() async {
