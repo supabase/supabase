@@ -1,0 +1,12 @@
+.reveal-mask {
+  pointer-events: none;
+  will-change: all;
+  --size: 200px;
+  --mask: radial-gradient(
+    circle var(--size) at var(--x, -300px) var(--y, -300px),
+    black 40%,
+    transparent
+  );
+  mask-image: var(--mask);
+  -webkit-mask-image: var(--mask);
+}
