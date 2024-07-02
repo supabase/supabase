@@ -320,10 +320,10 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId?: MenuId }>) {
   const ref = useRef(null)
   const mobileMenuOpen = useMenuMobileOpen()
-  const isHomePage = menuId === 'home'
+  const hideSideNav = !menuId
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -331,12 +331,12 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
         <TopNavBar />
       </div>
       <div className="flex flex-row h-full relative">
-        {!isHomePage && <NavContainer menuId={menuId} />}
+        {!hideSideNav && <NavContainer menuId={menuId} />}
         <Container>
           <div
             className={cn(
               'flex lg:hidden w-full top-0 left-0 right-0 z-50',
-              isHomePage && 'sticky',
+              hideSideNav && 'sticky',
               mobileMenuOpen && 'z-10'
             )}
           >
@@ -349,7 +349,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
               'backdrop-blur backdrop-filter bg-background'
             )}
           >
-            {!isHomePage && <MobileHeader menuId={menuId} />}
+            {!hideSideNav && <MobileHeader menuId={menuId} />}
           </div>
           <div className="grow">
             {children}

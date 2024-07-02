@@ -67,10 +67,10 @@ const GlobalNavigationMenu: FC = () => {
         viewportClassName="mt-0 max-w-screen overflow-hidden border-0 rounded-none mt-1.5 rounded-md !border-x"
       >
         <NavigationMenuList className="px-6 space-x-2 h-[var(--header-height)]">
-          {GLOBAL_MENU_ITEMS.map((section) =>
+          {GLOBAL_MENU_ITEMS.map((section, sectionIdx) =>
             section[0].menuItems ? (
               <NavigationMenuItem
-                key={`desktop-docs-menu-section-${section[0].label}`}
+                key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
                 className="text-sm relative h-full"
               >
                 <NavigationMenuTrigger
@@ -89,15 +89,21 @@ const GlobalNavigationMenu: FC = () => {
                 <NavigationMenuContent className="!top-[calc(100%+4px)] min-w-[14rem] max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md !duration-0">
                   <div className="p-3 md:p-1">
                     {section[0].menuItems?.map((menuItem, menuItemIndex) => (
-                      <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
+                      <Fragment key={`desktop-docs-menu-section-${menuItemIndex}-${menuItemIndex}`}>
                         {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
-                        {menuItem.map((item) =>
+                        {menuItem.map((item, itemIdx) =>
                           !item.href ? (
-                            <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                            <div
+                              key={`desktop-docs-menu-section-label-${item.label}-${itemIdx}`}
+                              className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
+                            >
                               {item.label}
                             </div>
                           ) : (
-                            <NavigationMenuLink asChild>
+                            <NavigationMenuLink
+                              key={`desktop-docs-menu-section-label-${item.label}-${itemIdx}`}
+                              asChild
+                            >
                               <MenuItem
                                 href={item.href}
                                 title={item.label}
@@ -114,7 +120,7 @@ const GlobalNavigationMenu: FC = () => {
               </NavigationMenuItem>
             ) : (
               <NavigationMenuItem
-                key={`desktop-docs-menu-section-${section[0].label}`}
+                key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
                 className="text-sm relative h-full"
               >
                 <NavigationMenuLink asChild>

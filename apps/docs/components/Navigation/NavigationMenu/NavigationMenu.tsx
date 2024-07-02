@@ -4,7 +4,6 @@ import NavigationMenuRefList from './NavigationMenuRefList'
 import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
-  Home = 'home',
   GettingStarted = 'gettingstarted',
   Database = 'database',
   Api = 'api',
@@ -236,7 +235,7 @@ const menus: Menu[] = [
 ]
 
 function getMenuById(id: MenuId) {
-  return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
+  return menus.find((menu) => menu.id === id)
 }
 
 function getMenuElement(menu: Menu) {
@@ -254,7 +253,7 @@ function getMenuElement(menu: Menu) {
         />
       )
     default:
-      throw new Error(`Unknown menu type '${menuType}'`)
+      return null
   }
 }
 

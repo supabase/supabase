@@ -73,9 +73,13 @@ const TopNavDropdown = () => {
       <DropdownMenuContent side="bottom" align="end" className="w-64">
         {menu.map((menuSection, sectionIdx) => (
           <>
-            {sectionIdx !== 0 && <DropdownMenuSeparator />}
-            {menuSection.map((sectionItem) => (
-              <Link key={sectionItem.href} href={sectionItem.href} {...sectionItem.otherProps}>
+            {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
+            {menuSection.map((sectionItem, itemIdx) => (
+              <Link
+                key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
+                href={sectionItem.href}
+                {...sectionItem.otherProps}
+              >
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                   {sectionItem.icon && (
                     <HomeMenuIconPicker
@@ -101,7 +105,7 @@ const TopNavDropdown = () => {
             {themes
               .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
               .map((theme: Theme) => (
-                <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
                   {theme.name}
                 </DropdownMenuRadioItem>
               ))}
