@@ -107,20 +107,20 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
+           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="mx-2 flex items-center h-[40px]"
+              className="mx-4 flex items-center h-[40px]"
               onClick={onCloseNavigationIconLink}
             >
               <img
                 alt="Supabase"
                 src={`${router.basePath}/img/supabase-logo.svg`}
-                className="absolute h-[40px] w-6 cursor-pointer rounded"
+                className="z-10 absolute h-[48px] w-6 cursor-pointer rounded"
               />
             </Link>
           )}
+        <ul className="flex flex-col gap-y-1 justify-start px-2 h-[calc(100vh-100px)] overflow-y-auto hide-scrollbar">
           <NavigationIconLink
             isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
             route={{
@@ -131,6 +131,7 @@ const NavigationBar = () => {
             }}
             onClick={onCloseNavigationIconLink}
           />
+          
           <Separator className="my-1 bg-border-muted" />
           {toolRoutes.map((route) => (
             <NavigationIconLink
@@ -149,7 +150,9 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+      
           <Separator className="my-1 bg-border-muted" />
+          
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
               return (
