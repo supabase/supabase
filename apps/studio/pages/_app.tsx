@@ -30,18 +30,15 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
+import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
@@ -55,6 +52,7 @@ import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -110,7 +108,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+  const errorBoundaryHandler = (error: Error) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
       Sentry.captureException(error)
@@ -168,14 +166,15 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <RouteValidationWrapper>
                       <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
                         <AppBannerContextProvider>
-                          <CommandMenuWrapper>
+                          <CommandProvider>
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
+                                <StudioCommandMenu />
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
-                          </CommandMenuWrapper>
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

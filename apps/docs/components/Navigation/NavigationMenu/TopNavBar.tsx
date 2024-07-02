@@ -2,15 +2,20 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { FC } from 'react'
-import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
-import { SearchButton } from 'ui-patterns/Cmdk'
+
 import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
+
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 const TopNavBar: FC = () => {
+  const { resolvedTheme } = useTheme()
+
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const { resolvedTheme } = useTheme()
+
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <nav
@@ -36,7 +41,10 @@ const TopNavBar: FC = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          <SearchButton className="md:w-full lg:w-96 order-2 lg:order-1">
+          <button
+            onClick={() => setCommandMenuOpen(true)}
+            className="md:w-full lg:w-96 order-2 lg:order-1"
+          >
             <div
               className="
               flex
@@ -67,7 +75,7 @@ const TopNavBar: FC = () => {
                 </div>
               </div>
             </div>
-          </SearchButton>
+          </button>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button type="text" asChild>

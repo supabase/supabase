@@ -3,6 +3,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
+import { GenerateSql } from 'components/interfaces/SqlGenerator/GenerateSql'
+import { useGenerateSqlCommand } from 'components/interfaces/SqlGenerator/GenerateSql.commands'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
@@ -85,6 +87,8 @@ const ProjectLayout = ({
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
+  useGenerateSqlCommand()
+
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
@@ -155,6 +159,7 @@ const ProjectLayout = ({
 
         <EnableBranchingModal />
         <AISettingsModal />
+        <GenerateSql />
         <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
@@ -239,7 +244,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
-  }, [ref])
+  }, [state, ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />

@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'

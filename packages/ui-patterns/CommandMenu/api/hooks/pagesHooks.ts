@@ -1,9 +1,11 @@
-import { isEqual } from 'lodash'
+'use client'
+
 import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
 import { type PageDefinition, isComponentPage } from '../../internal/state/pagesState'
+import { isEqual } from 'lodash'
 import { useSetQuery } from './queryHooks'
 
 const useCurrentPage = () => {
@@ -64,14 +66,13 @@ const useRegisterPage = (
   const unsubscribe = useRef<() => void>()
 
   /**
-   * useEffect handles the registration on first render, since React runs the
-   * first render twice in development. (Otherwise the first render would leave
-   * a dangling subscription.)
+   * The double useMemo / useEffect subscription is to handle a pair of
+   * intersecting side effects:
    *
-   * It also handles final cleanup, since useMemo can't do this.
-   *
-   * useMemo handles the registration on subsequent renders, to ensure it
-   * happens synchronously.
+   * 1. useMemo ensures that the updates to state happen synchronously
+   * 2. useEffect ensures that the first render (which sometimes happens as a
+   *    pair of renders, with the second ignoring the refs set by the first)
+   *    doesn't leave dangling subscriptions.
    */
   useMemo(() => {
     if (!isEqual(prevDeps.current, deps) || prevEnabled.current !== enabled) {

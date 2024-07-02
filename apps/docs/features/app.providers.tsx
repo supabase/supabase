@@ -1,4 +1,4 @@
-import { CommandMenuProvider } from '@ui-patterns/Cmdk'
+import { CommandProvider } from '@ui-patterns/CommandMenu'
 import PromoToast from '@ui-patterns/PromoToast'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
@@ -11,6 +11,7 @@ import { ShortcutPreviewBuild } from './envs/staging.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
+import { DocsCommandMenu } from '~/components/CommandMenu'
 
 /**
  * Global providers that wrap the entire app
@@ -23,16 +24,17 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <PageTelemetry />
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-            <CommandMenuProvider site="docs">
+            <CommandProvider>
               <div className="h-screen flex flex-col">
                 <SiteLayout>
                   <PortalToast />
                   <PromoToast />
                   {children}
+                  <DocsCommandMenu />
                 </SiteLayout>
                 <ThemeSandbox />
               </div>
-            </CommandMenuProvider>
+            </CommandProvider>
           </ThemeProvider>
         </AuthContainer>
       </QueryClientProvider>
