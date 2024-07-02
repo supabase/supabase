@@ -69,7 +69,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   return (
     <ProjectLayout
       title={title}
-      product="Logs"
+      product="Logs & Analytics"
       productMenu={
         <>
           <ProductMenu
@@ -88,7 +88,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                   <Menu.Group
                     title={
                       <div>
-                        Events
+                        Warehouse Events
                         <Badge variant="warning" size="small" className="ml-2">
                           New
                         </Badge>
