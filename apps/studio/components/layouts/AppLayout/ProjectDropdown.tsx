@@ -41,9 +41,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
     // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
     // for storage bucket route since its longer
     const isStorageBucketRoute = 'bucketId' in routerQueries
+    const isSecurityAdvisorRoute = 'preset' in routerQueries
+
     return route
       .split('/')
-      .slice(0, isStorageBucketRoute ? 5 : 4)
+      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
       .join('/')
   } else {
     return route

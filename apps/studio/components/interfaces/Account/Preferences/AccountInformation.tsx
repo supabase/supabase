@@ -106,7 +106,7 @@ const AccountInformation = ({ profile }: { profile?: Profile }) => {
                 <p className="text-foreground-light break-all">Password</p>
               </div>
               <div className="col-span-8">
-                <Button asChild type="default" size="medium">
+                <Button asChild type="default">
                   <Link href="/reset-password">Reset password</Link>
                 </Button>
               </div>

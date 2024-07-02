@@ -16,6 +16,7 @@ import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
+import dayjs from 'dayjs'
 
 const PAGE_LIMIT = 10
 
@@ -52,7 +53,11 @@ const InvoicesSettings = () => {
   }
 
   if (!canReadInvoices) {
-    return <NoPermission resourceText="view invoices" />
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view invoices" />
+      </ScaffoldContainerLegacy>
+    )
   }
 
   return (
@@ -66,7 +71,7 @@ const InvoicesSettings = () => {
           head={[
             <Table.th key="header-icon"></Table.th>,
             <Table.th key="header-date">Date</Table.th>,
-            <Table.th key="header-amount">Amount due</Table.th>,
+            <Table.th key="header-amount">Amount</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
             <Table.th key="header-status" className="flex items-center">
               Status
@@ -91,7 +96,7 @@ const InvoicesSettings = () => {
                         <IconFileText size="xxl" />
                       </Table.td>
                       <Table.td>
-                        <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
+                        <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
                       </Table.td>
                       <Table.td>
                         <p>{formatCurrency(x.subtotal / 100)}</p>

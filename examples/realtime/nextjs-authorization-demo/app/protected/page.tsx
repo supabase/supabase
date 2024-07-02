@@ -23,15 +23,15 @@ export default function Chat() {
   }
 
   const addUserToChannel = async (email: string) => {
-    const user = await supabase.from('profiles').select('user_id').eq('email', email)
+    const user = await supabase.from('profiles').select('id').eq('email', email)
     if (!user.data?.length) {
       addMessage(true, true, `User ${email} not found`)
     } else {
-      const room = await supabase.from('rooms').select('id').eq('topic', selectedRoom)
+      const room = await supabase.from('rooms').select('topic').eq('topic', selectedRoom)
 
       await supabase
         .from('rooms_users')
-        .upsert({ user_id: user.data?.[0].user_id, room_id: room.data?.[0].id })
+        .upsert({ user_id: user.data?.[0].id, room_topic: room.data?.[0].topic })
       addMessage(true, true, `Added ${email} to channel ${selectedRoom}`)
     }
   }
@@ -65,7 +65,7 @@ export default function Chat() {
         await supabase.auth.getUser()
         const token = (await supabase.auth.getSession()).data.session?.access_token!
         supabase.realtime.setAuth(token)
-        let main = supabase.realtime
+        let main = supabase
           .channel('supaslack')
           .on('broadcast', { event: 'new_room' }, () => getChannels())
           .subscribe()
@@ -86,7 +86,7 @@ export default function Chat() {
       channel?.unsubscribe()
       setUsers(new Set())
 
-      let newChannel = supabase.realtime.channel(selectedRoom, {
+      let newChannel = supabase.channel(selectedRoom, {
         config: {
           broadcast: { self: true },
           private: true, // This line will tell the server that you want to use a private channel for this connection
