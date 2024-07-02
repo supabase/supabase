@@ -55,6 +55,8 @@ import {
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { useForeignTableQuery } from 'data/foreign-tables/foreign-table-query'
+import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 
 interface TableListProps {
   onAddTable: () => void
@@ -134,11 +136,45 @@ const TableList = ({
     isError: isErrorMaterializedViews,
     isLoading: isLoadingMaterializedViews,
     isSuccess: isSuccessMaterializedViews,
-  } = useMaterializedViewsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
-  })
+  } = useMaterializedViewsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: snap.selectedSchemaName,
+    },
+    {
+      select(materializedViews) {
+        return filterString.length === 0
+          ? materializedViews
+          : materializedViews.filter((view) =>
+              view.name.toLowerCase().includes(filterString.toLowerCase())
+            )
+      },
+    }
+  )
+
+  const {
+    data: foreignTables,
+    error: foreignTablesError,
+    isError: isErrorForeignTables,
+    isLoading: isLoadingForeignTables,
+    isSuccess: isSuccessForeignTables,
+  } = useForeignTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: snap.selectedSchemaName,
+    },
+    {
+      select(foreignTables) {
+        return filterString.length === 0
+          ? foreignTables
+          : foreignTables.filter((table) =>
+              table.name.toLowerCase().includes(filterString.toLowerCase())
+            )
+      },
+    }
+  )
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -149,15 +185,17 @@ const TableList = ({
   )
 
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const entities = formatAllEntities({ tables, views, materializedViews }).filter((x) =>
-    visibleTypes.includes(x.type)
+  const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
+    (x) => visibleTypes.includes(x.type)
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const error = tablesError || viewsError || materializedViewsError
-  const isError = isErrorTables || isErrorViews || isErrorMaterializedViews
-  const isLoading = isLoadingTables || isLoadingViews || isLoadingMaterializedViews
-  const isSuccess = (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews
+  const error = tablesError || viewsError || materializedViewsError || foreignTablesError
+  const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
+  const isLoading =
+    isLoadingTables || isLoadingViews || isLoadingMaterializedViews || isLoadingForeignTables
+  const isSuccess =
+    (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews || isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
