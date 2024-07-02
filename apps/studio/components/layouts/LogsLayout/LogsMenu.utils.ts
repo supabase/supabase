@@ -17,7 +17,7 @@ export const generateLogsMenu = (
 
   return [
     {
-      title: 'Logs Explorer',
+      title: 'Explorer',
       items: (
         [
           { key: 'explorer', name: 'Query', root: true },
@@ -33,7 +33,7 @@ export const generateLogsMenu = (
       })),
     },
     {
-      title: 'Infrastructure',
+      title: 'Infrastructure Logs',
       items: [
         {
           name: 'API Gateway',
