@@ -1,20 +1,26 @@
-import { useParams } from 'common'
-import { useCreateCollection } from 'data/analytics'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import toast from 'react-hot-toast'
 import { z } from 'zod'
+
 import { FormMessage } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
+import { useCreateCollection } from 'data/analytics'
+import { useCheckPermissions } from 'hooks'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const { ref } = useParams()
+
+  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
 
   const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
@@ -53,14 +59,21 @@ export const CreateWarehouseCollectionModal = () => {
 
   return (
     <>
-      <Button
+      <ButtonTooltip
         type="default"
+        disabled={!canCreateCollection}
         className="justify-start flex-grow w-full"
         icon={<PlusIcon size="14" />}
         onClick={() => setIsOpen(!isOpen)}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'You need additional permissions to create collections',
+          },
+        }}
       >
         New collection
-      </Button>
+      </ButtonTooltip>
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
