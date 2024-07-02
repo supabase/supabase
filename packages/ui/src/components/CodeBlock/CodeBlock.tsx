@@ -3,7 +3,7 @@
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
-import * as CopyToClipboard from 'react-copy-to-clipboard'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import { Button, cn } from 'ui'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -161,10 +161,10 @@ export const CodeBlock = ({
                 `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}
             >
-              {/* //
-              @ts-ignore */}
-              <CopyToClipboard text={value || children}>
+              <CopyToClipboard text={value || children || ''}>
                 <Button
+                  data-testid="codeblock-copy-btn"
+                  title="Copy"
                   type="default"
                   className="px-1.5"
                   icon={copied ? <Check /> : <Copy />}
