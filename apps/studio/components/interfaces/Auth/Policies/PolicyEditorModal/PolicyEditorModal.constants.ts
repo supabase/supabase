@@ -39,7 +39,7 @@ for select using (true);`.trim(),
     statement: `
 create policy "Enable insert for authenticated users only"
 on "${schema}"."${table}"
-for insert to authenticated 
+for insert to authenticated
 with check (true);`.trim(),
     name: 'Enable insert for authenticated users only',
     definition: '',
@@ -110,7 +110,7 @@ for insert with check (
     templateName: 'Policy with table joins',
     description: `
 Query across tables to build more advanced RLS rules
-    
+
 Assuming 2 tables called \`teams\` and \`members\`, you can query both tables in the policy to control access to the members table.`,
     statement: `
 create policy "Members can update team details if they belong to the team"
@@ -130,8 +130,8 @@ on teams for update using (
     preview: true,
     templateName: 'Policy with security definer functions',
     description: `
-Useful in a many-to-many relationship where you want to restrict access to the linking table. 
-    
+Useful in a many-to-many relationship where you want to restrict access to the linking table.
+
 Assuming 2 tables called \`teams\` and \`members\`, you can use a security definer function in combination with a policy to control access to the members table.`.trim(),
     statement: `
 create or replace function get_teams_for_user(user_id uuid)
@@ -158,7 +158,7 @@ for all using (
     templateName: 'Policy to implement Time To Live (TTL)',
     description: `
 Implement a TTL-like feature that you see in Instagram stories or Snapchat where messages expire after a day.
-    
+
 Rows under the table are available only if they have been created within the last 24 hours.`,
     statement: `
 create policy "Stories are live for a day"
@@ -192,23 +192,7 @@ using ( realtime.messages.extension = 'broadcast' );`.trim(),
       command: 'SELECT',
       roles: ['authenticated'],
     },
-    {
-      id: 'policy-broadcast-2',
-      preview: false,
-      templateName: 'Allow pushing broadcasts for authenticated users only',
-      description: 'This policy allows pushing broadcasts for authenticated users only.',
-      statement: `
-create policy "Allow pushing broadcasts for authenticated users only"
-ON realtime.messages for update
-TO authenticated
-using ( realtime.messages.extension = 'broadcast' )
-with check ( realtime.messages.extension = 'broadcast' );`.trim(),
-      name: 'Allow pushing broadcasts for authenticated users only',
-      definition: "realtime.messages.extension = 'broadcast'",
-      check: "realtime.messages.extension = 'broadcast'",
-      command: 'UPDATE',
-      roles: ['authenticated'],
-    },
+
     {
       id: 'policy-broadcast-3',
       preview: false,
@@ -224,22 +208,7 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
       command: 'SELECT',
       roles: [],
     },
-    {
-      id: 'policy-broadcast-4',
-      preview: false,
-      templateName: 'Allow pushing broadcasts to specific channel',
-      description: 'This policy allow pushing broadcasts to specific channel.',
-      statement: `
-create policy "Allow pushing broadcasts to specific channel"
-ON realtime.messages for update
-using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' )
-with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
-      name: 'Allow pushing broadcasts to specific channel',
-      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      command: 'UPDATE',
-      roles: [],
-    },
+
     {
       id: 'policy-presences-1',
       preview: false,
@@ -257,25 +226,7 @@ using ( realtime.messages.extension = 'presence' );`.trim(),
       command: 'SELECT',
       roles: ['authenticated'],
     },
-    {
-      id: 'policy-presences-2',
-      preview: false,
-      templateName: 'Allow broadcasting presences on all channels for authenticated users only',
-      description:
-        'This policy enables broadcasting presences on all channels for all authenticated users only.',
-      statement: `
-create policy "Allow broadcasting presences on all channels for authenticated users only"
-ON realtime.messages for update
-TO authenticated
-using ( realtime.messages.extension = 'presence' )
-with check ( realtime.messages.extension = 'presence' );
-  ;`.trim(),
-      name: 'Allow broadcasting presences on all channels for authenticated users only',
-      definition: "realtime.messages.extension = 'presence'",
-      check: "realtime.messages.extension = 'presence'",
-      command: 'UPDATE',
-      roles: ['authenticated'],
-    },
+
     {
       id: 'policy-presences-3',
       preview: false,
@@ -289,23 +240,6 @@ using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel
       definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       check: '',
       command: 'SELECT',
-      roles: [],
-    },
-    {
-      id: 'policy-presences-4',
-      preview: false,
-      templateName: 'Publish presence to a specific channel',
-      description: 'This policy allows publishing presence to a specific channel.',
-      statement: `
-create policy "Publish presence to a specific channel"
-ON realtime.messages for update
-using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' )
-with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
-  ;`.trim(),
-      name: 'Publish presence to a specific channel',
-      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
-      check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
-      command: 'UPDATE',
       roles: [],
     },
   ] as PolicyTemplate[]
