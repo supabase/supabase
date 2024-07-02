@@ -343,9 +343,9 @@ create table shifts (
 );
 ```
 
-In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous as they are both referencing the `scans` table.
 
-To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+To fetch all the `shifts` with `scan_id_start` and `scan_id_end` related to a specific `scan`, use the following syntax:
 
 <Tabs
   scrollable
@@ -364,6 +364,11 @@ const { data, error } = await supabase.from('shifts').select(
       id,
       user_id,
       badge_scan_time
+    ),
+   scans:scan_id_end (
+     id, 
+     user_id,
+     badge_scan_time
     )
   `
 )
@@ -376,6 +381,11 @@ const { data, error } = await supabase.from('shifts').select(
 final data = await supabase.from('shifts').select('''
   *,
   scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+scans:scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -422,11 +432,65 @@ let shifts: [Shift] = try await supabase
         id,
         user_id,
         badge_scan_time
-      )
+      ),
+     scans: scan_id_end (
+        id,
+        user_id,
+        badge_scan_time
+     )
     """
   )
   .execute()
   .value
+```
+
+</TabPanel>
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("shifts").select(Columns.raw('''
+  *,
+  scans:scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+scans:scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+'''));
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+```javascript
+const Query = `
+  query {
+    shiftsCollection {
+      edges {
+        node {
+          id
+          user_id
+          attendance_status
+          scan_id_start {
+            id
+            user_id
+            badge_scan_time
+          }
+          scan_id_end {
+            id
+            user_id
+            badge_scan_time
+          }
+        }
+      }
+    }
+  }
+`
 ```
 
 </TabPanel>
