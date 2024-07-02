@@ -7,7 +7,6 @@ export interface Organization {
   name: string
   billing_email: string
   is_owner?: boolean
-  stripe_customer_id?: string
   opt_in_tags: string[]
   subscription_id?: string | null
   restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
@@ -81,6 +80,8 @@ export interface Permission {
   condition: jsonLogic.RulesLogic
   organization_id: number
   resources: string[]
+  restrictive?: boolean
+  project_ids?: number[]
 }
 
 export interface ResponseFailure {

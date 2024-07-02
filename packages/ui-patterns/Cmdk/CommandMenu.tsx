@@ -1,5 +1,7 @@
+'use client'
+
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
 import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'

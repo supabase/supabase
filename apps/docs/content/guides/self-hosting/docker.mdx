@@ -17,6 +17,14 @@ You need the following installed in your system: [Git](https://git-scm.com/downl
 
 Follow these steps to start Supabase locally:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="general"
+>
+<TabPanel id="general" label="General">
+
 ```sh
 # Get the code
 git clone --depth 1 https://github.com/supabase/supabase
@@ -33,6 +41,33 @@ docker compose pull
 # Start the services (in detached mode)
 docker compose up -d
 ```
+
+</TabPanel>
+<TabPanel id="advanced" label="Advanced">
+
+```sh
+# Get the code using git sparse checkout
+git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
+cd supabase
+git sparse-checkout set --cone docker && git checkout master
+
+# Go to the docker folder
+cd docker
+
+# Copy the fake env vars
+cp .env.example .env
+
+# Pull the latest images
+docker compose pull
+
+# Start the services (in detached mode)
+docker compose up -d
+```
+
+</TabPanel>
+</Tabs>
+
+If you are using rootless docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
 
 After all the services have started you can see them running in the background:
 
@@ -206,7 +241,7 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 
-For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres-roles) and the `pgjwt` Postgres extension. 
+For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres/roles) and the `pgjwt` Postgres extension. 
 
 You can find all the default extensions inside the [schema migration scripts repo](https://github.com/supabase/postgres/tree/develop/migrations). These scripts are mounted at `/docker-entrypoint-initdb.d` to run automatically when starting the database container.
 

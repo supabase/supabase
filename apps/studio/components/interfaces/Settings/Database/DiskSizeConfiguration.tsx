@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Info } from 'lucide-react'
@@ -10,6 +9,7 @@ import { number, object } from 'yup'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
@@ -109,34 +109,21 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                   </p>
                 </div>
                 <div className="flex items-end justify-end">
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="default"
-                        disabled={!canUpdateDiskSizeConfig || disabled}
-                        onClick={() => setShowResetDbPass(true)}
-                      >
-                        Increase disk size
-                      </Button>
-                    </Tooltip.Trigger>
-                    {!canUpdateDiskSizeConfig && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              You need additional permissions to increase the disk size
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canUpdateDiskSizeConfig || disabled}
+                    onClick={() => setShowResetDbPass(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateDiskSizeConfig
+                          ? 'You need additional permissions to increase the disk size'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Increase disk size
+                  </ButtonTooltip>
                 </div>
               </div>
             </Panel.Content>
@@ -196,7 +183,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
       )}
 
       <Modal
-        header={<h5 className="text-sm text-foreground">Increase Disk Storage Size</h5>}
+        header="Increase Disk Storage Size"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}
@@ -230,47 +217,43 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
               </Alert_Shadcn_>
             ) : (
               <>
-                <Modal.Content>
-                  <div className="w-full space-y-4 py-6">
-                    <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
-                      <Info size={16} />
-                      <AlertTitle_Shadcn_>
-                        This operation is only possible every 6 hours
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        {isAbleToResizeDatabase
-                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}`
-                          : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                    <InputNumber
-                      required
-                      id="new-disk-size"
-                      label="New disk size"
-                      labelOptional="GB"
-                      disabled={!isAbleToResizeDatabase}
-                    />
-                  </div>
+                <Modal.Content className="w-full space-y-4">
+                  <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                    <Info size={16} />
+                    <AlertTitle_Shadcn_>
+                      This operation is only possible every 6 hours
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {isAbleToResizeDatabase
+                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}`
+                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                  <InputNumber
+                    required
+                    id="new-disk-size"
+                    label="New disk size"
+                    labelOptional="GB"
+                    disabled={!isAbleToResizeDatabase}
+                  />
                 </Modal.Content>
                 <Modal.Separator />
-                <Modal.Content>
-                  <div className="flex space-x-2 justify-end pt-1 pb-3">
-                    <Button type="default" onClick={() => setShowResetDbPass(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      htmlType="submit"
-                      type="primary"
-                      disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
-                      loading={isUpdatingDiskSize}
-                    >
-                      Update disk size
-                    </Button>
-                  </div>
+                <Modal.Content className="flex space-x-2 justify-end">
+                  <Button type="default" onClick={() => setShowResetDbPass(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    htmlType="submit"
+                    type="primary"
+                    disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
+                    loading={isUpdatingDiskSize}
+                  >
+                    Update disk size
+                  </Button>
                 </Modal.Content>
               </>
             )

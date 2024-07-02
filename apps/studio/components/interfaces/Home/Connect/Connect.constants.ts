@@ -175,6 +175,9 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+]
+
+export const MOBILES: ConnectionType[] = [
   {
     key: 'exporeactnative',
     label: 'Expo React Native',
@@ -203,6 +206,48 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'ionicreact',
+    label: 'Ionic React',
+    icon: 'react',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-react',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'swift',
+    label: 'Swift',
+    icon: 'swift',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-swift',
+    children: [
+      {
+        key: 'supabaseswift',
+        label: 'supabase-swift',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'androidkotlin',
+    label: 'Android Kotlin',
+    icon: 'kotlin',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin',
+    children: [
+      {
+        key: 'supabasekt',
+        label: 'supabase-kt',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const ORMS: ConnectionType[] = [
@@ -225,5 +270,6 @@ export const ORMS: ConnectionType[] = [
 
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
+  { key: 'mobiles', label: 'Mobile Frameworks', obj: MOBILES },
   { key: 'orms', label: 'ORMs', obj: ORMS },
 ]

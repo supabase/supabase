@@ -158,7 +158,10 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         onCancel={() => setIsActivateConfirmModalVisible(false)}
         onConfirm={onActivateCustomDomain}
       >
-        <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
+        <p className="text-sm">
+          This will activate the custom domain <code>{customDomain.hostname}</code>. Your project's
+          Supabase domain will also remain active.
+        </p>
       </ConfirmationModal>
     </>
   )

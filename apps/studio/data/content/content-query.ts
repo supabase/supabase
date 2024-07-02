@@ -72,15 +72,3 @@ export const useContentQuery = <TData = ContentData>(
     ({ signal }) => getContent(projectRef, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useContentPrefetch = (projectRef: string | undefined) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(contentKeys.list(projectRef), ({ signal }) =>
-        getContent(projectRef, signal)
-      )
-    }
-  }, [projectRef])
-}

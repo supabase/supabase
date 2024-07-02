@@ -26,7 +26,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, ORMS } from './Connect.constants'
+import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
@@ -98,6 +98,11 @@ const Connect = () => {
       handleConnectionTypeChange(FRAMEWORKS)
     }
 
+    if (type === 'mobiles') {
+      setConnectionObject(MOBILES)
+      handleConnectionTypeChange(MOBILES)
+    }
+
     if (type === 'orms') {
       setConnectionObject(ORMS)
       handleConnectionTypeChange(ORMS)
@@ -159,14 +164,12 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="primary">
-            <span className="flex items-center gap-2 px-3">
-              <Plug size={14} className="rotate-90" /> <span>Connect</span>
-            </span>
+          <Button type="primary" icon={<Plug className="rotate-90" />}>
+            <span>Connect</span>
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')}>
-          <DialogHeader className="pb-0">
+          <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
               Get the connection strings and environment variables for your app
@@ -208,7 +211,11 @@ const Connect = () => {
                       <ConnectDropdown
                         state={selectedParent}
                         updateState={handleParentChange}
-                        label={connectionObject === FRAMEWORKS ? 'Framework' : 'Tool'}
+                        label={
+                          connectionObject === FRAMEWORKS || connectionObject === MOBILES
+                            ? 'Framework'
+                            : 'Tool'
+                        }
                         items={connectionObject}
                       />
                       {selectedParent && hasChildOptions && (

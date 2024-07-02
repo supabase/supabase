@@ -10,15 +10,18 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",
+    "last-changed": "tsx scripts/last-changed.ts",
+    "last-changed:reset": "npm run last-changed -- --reset",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@har-sdk/openapi-sampler": "^2.2.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
@@ -35,6 +38,7 @@
     "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",
+    "eslint-config-supabase": "*",
     "framer-motion": "^11.0.3",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
@@ -88,16 +92,17 @@
     "@types/react": "^18.2.24",
     "@types/unist": "^2.0.6",
     "acorn": "^8.11.3",
+    "api-types": "*",
     "config": "*",
     "dotenv": "^16.0.3",
-    "ejs": "^3.1.8",
+    "ejs": "^3.1.10",
     "globby": "^13.2.2",
     "jest-environment-jsdom": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.1.3",
+    "simple-git": "^3.24.0",
     "tsconfig": "*",
     "tsx": "^4.6.2",
-    "typescript": "^5.4.3",
-    "api-types": "*"
+    "typescript": "^5.5.0"
   }
 }
