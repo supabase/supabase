@@ -16,9 +16,9 @@ import {
   Tabs,
 } from 'ui'
 
-import { useIsFeatureEnabled } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
@@ -47,11 +47,11 @@ export interface LogsQueryPanelProps {
   defaultFrom: string
   warnings: LogsWarning[]
   warehouseCollections: WarehouseCollection[]
-  sourceType: SourceType
-  onSourceTypeChange: (sourceType: SourceType) => void
+  dataSource: SourceType
+  onDataSourceChange: (sourceType: SourceType) => void
 }
 
-function DropdownMenuItemContent({ name, desc }: { name: string; desc?: string }) {
+function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
   return (
     <div className="grid gap-1">
       <div className="font-mono font-bold">{name}</div>
@@ -69,8 +69,8 @@ const LogsQueryPanel = ({
   onDateChange,
   warnings,
   warehouseCollections,
-  sourceType,
-  onSourceTypeChange,
+  dataSource,
+  onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
 
@@ -79,6 +79,8 @@ const LogsQueryPanel = ({
     projectStorageAll: storageEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
   } = useIsFeatureEnabled(['project_auth:all', 'project_storage:all', 'project_edge_function:all'])
+
+  const warehouseEnabled = useFlag('warehouse')
 
   const logsTableNames = Object.entries(LogsTableName)
     .filter(([key]) => {
@@ -95,30 +97,36 @@ const LogsQueryPanel = ({
       <div className="flex w-full items-center justify-between px-5 py-2">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
+            {warehouseEnabled && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Data source <span className="ml-2 font-mono opacity-50">{dataSource}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
+                  <DropdownMenuItem onClick={() => onDataSourceChange('logs')}>
+                    <DropdownMenuItemContent name="Logs" desc="Logs for all Supabase products" />
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => onDataSourceChange('warehouse')}>
+                    <DropdownMenuItemContent
+                      name={
+                        <span>
+                          Warehouse <Badge variant="warning">NEW</Badge>
+                        </span>
+                      }
+                      desc="Query your data warehouse collections"
+                    />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" iconRight={<ChevronDown />}>
-                  Query type <span className="ml-2 font-mono opacity-50">{sourceType}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                <DropdownMenuItem onClick={() => onSourceTypeChange('logs')}>
-                  <DropdownMenuItemContent name="Logs" desc="Logs for all Supabase products" />
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => onSourceTypeChange('warehouse')}>
-                  <DropdownMenuItemContent
-                    name="Warehouse"
-                    desc="Query your data warehouse collections"
-                  />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
-                  Insert source
+                  Insert {dataSource === 'logs' ? 'source' : 'collection'}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -126,7 +134,7 @@ const LogsQueryPanel = ({
                 align="start"
                 className="max-h-[70vh] overflow-auto"
               >
-                {sourceType === 'logs' &&
+                {dataSource === 'logs' &&
                   logsTableNames
                     .sort((a, b) => a.localeCompare(b))
                     .map((source) => (
@@ -137,13 +145,13 @@ const LogsQueryPanel = ({
                         />
                       </DropdownMenuItem>
                     ))}
-                {sourceType === 'warehouse' &&
+                {dataSource === 'warehouse' &&
                   warehouseCollections.map((col) => (
                     <DropdownMenuItem onClick={() => onSelectSource(col.name)}>
                       <DropdownMenuItemContent name={col.name} />
                     </DropdownMenuItem>
                   ))}
-                {sourceType === 'warehouse' && warehouseCollections.length === 0 && (
+                {dataSource === 'warehouse' && warehouseCollections.length === 0 && (
                   <DropdownMenuItem className="hover:bg-transparent cursor-default">
                     <DropdownMenuItemContent
                       name="No collections found"
@@ -154,7 +162,7 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {sourceType === 'logs' && (
+            {dataSource === 'logs' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
@@ -176,12 +184,15 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            <DatePickers
-              to={defaultTo}
-              from={defaultFrom}
-              onChange={onDateChange}
-              helpers={EXPLORER_DATEPICKER_HELPERS}
-            />
+            {dataSource === 'logs' && (
+              <DatePickers
+                to={defaultTo}
+                from={defaultFrom}
+                onChange={onDateChange}
+                helpers={EXPLORER_DATEPICKER_HELPERS}
+              />
+            )}
+
             <div className="overflow-hidden">
               <div
                 className={` transition-all duration-300 ${
