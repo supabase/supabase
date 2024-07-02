@@ -24,12 +24,12 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   return (
     <div
       className={cn(
-        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-gray-200'
+        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-200'
       )}
     >
       <div
         className={cn(
-          'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-scale-200 text-center opacity-0 transition-all',
+          'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-200 text-center opacity-0 transition-all',
           log ? 'z-0 opacity-0' : 'z-10 opacity-100'
         )}
       >

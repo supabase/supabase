@@ -187,7 +187,7 @@ const MessagesTable = ({
                   'font-mono tracking-tight',
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
-                    : ' bg-scale-200 hover:bg-scale-300 cursor-pointer',
+                    : ' bg-200 hover:bg-scale-300 cursor-pointer',
                   isErrorLog(row) && '!bg-warning-300',
                 ])
               }}

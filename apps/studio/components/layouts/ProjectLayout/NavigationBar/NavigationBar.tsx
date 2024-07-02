@@ -98,7 +98,7 @@ const NavigationBar = () => {
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
@@ -207,7 +207,7 @@ const NavigationBar = () => {
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
               rightText={
                 <div
                   className={cn(
