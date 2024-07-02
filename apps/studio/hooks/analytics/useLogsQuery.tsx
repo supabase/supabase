@@ -23,11 +23,13 @@ export interface LogsQueryHook {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
+  enabled?: boolean
 }
 
 const useLogsQuery = (
   projectRef: string,
-  initialParams: Partial<LogsEndpointParams> = {}
+  initialParams: Partial<LogsEndpointParams> = {},
+  enabled = true
 ): LogsQueryHook => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
@@ -41,7 +43,7 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
-  const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
+  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const queryParams = genQueryParams(params as any)
 
@@ -58,7 +60,7 @@ const useLogsQuery = (
         signal,
       }),
     {
-      enabled,
+      enabled: _enabled,
       refetchOnWindowFocus: false,
     }
   )
@@ -74,7 +76,7 @@ const useLogsQuery = (
 
   return {
     params,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (_enabled && isLoading) || isRefetching,
     logData: isResponseOk(data) && data.result ? data.result : [],
     error,
     changeQuery,
