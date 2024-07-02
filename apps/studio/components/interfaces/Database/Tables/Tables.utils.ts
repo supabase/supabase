@@ -1,4 +1,4 @@
-import { PostgresTable, PostgresView } from '@supabase/postgres-meta'
+import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase/postgres-meta'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 // [Joshen] We just need name, description, rows, size, and the number of columns
@@ -6,9 +6,11 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 export const formatAllEntities = ({
   tables = [],
   views = [],
+  materializedViews = [],
 }: {
   tables?: PostgresTable[]
   views?: PostgresView[]
+  materializedViews?: PostgresMaterializedView[]
 }) => {
   const formattedTables = tables.map((x) => {
     return {
@@ -34,5 +36,19 @@ export const formatAllEntities = ({
     }
   })
 
-  return [...formattedTables, ...formattedViews].sort((a, b) => a.name.localeCompare(b.name))
+  const formattedMaterializedViews = materializedViews.map((x) => {
+    return {
+      type: ENTITY_TYPE.MATERIALIZED_VIEW,
+      id: x.id,
+      name: x.name,
+      comment: x.comment,
+      rows: undefined,
+      size: undefined,
+      numColumns: x.columns?.length ?? 0,
+    }
+  })
+
+  return [...formattedTables, ...formattedViews, ...formattedMaterializedViews].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )
 }

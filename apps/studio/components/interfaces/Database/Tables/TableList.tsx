@@ -29,6 +29,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks'
@@ -54,7 +55,6 @@ import {
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
-import { useMaterializedViewQuery } from 'data/materialized-views/materialized-view-query'
 
 interface TableListProps {
   onAddTable: () => void
@@ -128,6 +128,18 @@ const TableList = ({
     }
   )
 
+  const {
+    data: materializedViews,
+    error: materializedViewsError,
+    isError: isErrorMaterializedViews,
+    isLoading: isLoadingMaterializedViews,
+    isSuccess: isSuccessMaterializedViews,
+  } = useMaterializedViewsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: snap.selectedSchemaName,
+  })
+
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -137,13 +149,15 @@ const TableList = ({
   )
 
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const entities = formatAllEntities({ tables, views }).filter((x) => visibleTypes.includes(x.type))
+  const entities = formatAllEntities({ tables, views, materializedViews }).filter((x) =>
+    visibleTypes.includes(x.type)
+  )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const error = tablesError || viewsError
-  const isError = isErrorTables || isErrorViews
-  const isLoading = isLoadingTables || isLoadingViews
-  const isSuccess = isSuccessTables && isSuccessViews
+  const error = tablesError || viewsError || materializedViewsError
+  const isError = isErrorTables || isErrorViews || isErrorMaterializedViews
+  const isLoading = isLoadingTables || isLoadingViews || isLoadingMaterializedViews
+  const isSuccess = (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)

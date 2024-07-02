@@ -26,6 +26,7 @@ export async function getMaterializedViews(
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',
+        include_columns: true,
       } as any,
     },
     headers,
