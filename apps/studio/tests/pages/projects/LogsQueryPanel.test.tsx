@@ -19,6 +19,11 @@ test('run and clear', async () => {
       onClear={mockClear}
       hasEditorValue
       warehouseCollections={[]}
+      dataSource="logs"
+      onDataSourceChange={() => {}}
+      templates={[]}
+      warehouseTemplates={[]}
+      onSelectWarehouseTemplate={() => {}}
     />
   )
   await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()
