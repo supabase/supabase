@@ -486,63 +486,60 @@ const TableList = ({
                                   <p>View in Table Editor</p>
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator />
-
                                 {x.type === ENTITY_TYPE.TABLE && (
-                                  <Tooltip_Shadcn_>
-                                    <TooltipTrigger_Shadcn_ asChild>
-                                      <DropdownMenuItem
-                                        className="!pointer-events-auto gap-x-2"
-                                        disabled={!canUpdateTables}
-                                        onClick={() => {
-                                          if (canUpdateTables) onEditTable(x)
-                                        }}
-                                      >
-                                        <Edit size={12} />
-                                        <p>Edit table</p>
-                                      </DropdownMenuItem>
-                                    </TooltipTrigger_Shadcn_>
-                                    {!canUpdateTables && (
-                                      <TooltipContent_Shadcn_ side="left">
-                                        You need additional permissions to edit this table
-                                      </TooltipContent_Shadcn_>
-                                    )}
-                                  </Tooltip_Shadcn_>
-                                )}
-
-                                {x.type === ENTITY_TYPE.TABLE && (
-                                  <DropdownMenuItem
-                                    key="duplicate-table"
-                                    className="space-x-2"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      snap.onDuplicateTable()
-                                    }}
-                                  >
-                                    <Copy size={12} />
-                                    <span>Duplicate Table</span>
-                                  </DropdownMenuItem>
-                                )}
-
-                                <Tooltip_Shadcn_>
-                                  <TooltipTrigger_Shadcn_ asChild>
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <Tooltip_Shadcn_>
+                                      <TooltipTrigger_Shadcn_ asChild>
+                                        <DropdownMenuItem
+                                          className="!pointer-events-auto gap-x-2"
+                                          disabled={!canUpdateTables}
+                                          onClick={() => {
+                                            if (canUpdateTables) onEditTable(x)
+                                          }}
+                                        >
+                                          <Edit size={12} />
+                                          <p>Edit table</p>
+                                        </DropdownMenuItem>
+                                      </TooltipTrigger_Shadcn_>
+                                      {!canUpdateTables && (
+                                        <TooltipContent_Shadcn_ side="left">
+                                          You need additional permissions to edit this table
+                                        </TooltipContent_Shadcn_>
+                                      )}
+                                    </Tooltip_Shadcn_>
                                     <DropdownMenuItem
-                                      disabled={!canUpdateTables || isLocked}
-                                      className="!pointer-events-auto gap-x-2"
-                                      onClick={() => {
-                                        if (canUpdateTables && !isLocked) onDeleteTable(x)
+                                      key="duplicate-table"
+                                      className="space-x-2"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        snap.onDuplicateTable()
                                       }}
                                     >
-                                      <Trash stroke="red" size={12} />
-                                      <p>Delete table</p>
+                                      <Copy size={12} />
+                                      <span>Duplicate Table</span>
                                     </DropdownMenuItem>
-                                  </TooltipTrigger_Shadcn_>
-                                  {!canUpdateTables && (
-                                    <TooltipContent_Shadcn_ side="left">
-                                      You need additional permissions to delete tables
-                                    </TooltipContent_Shadcn_>
-                                  )}
-                                </Tooltip_Shadcn_>
+                                    <Tooltip_Shadcn_>
+                                      <TooltipTrigger_Shadcn_ asChild>
+                                        <DropdownMenuItem
+                                          disabled={!canUpdateTables || isLocked}
+                                          className="!pointer-events-auto gap-x-2"
+                                          onClick={() => {
+                                            if (canUpdateTables && !isLocked) onDeleteTable(x)
+                                          }}
+                                        >
+                                          <Trash stroke="red" size={12} />
+                                          <p>Delete table</p>
+                                        </DropdownMenuItem>
+                                      </TooltipTrigger_Shadcn_>
+                                      {!canUpdateTables && (
+                                        <TooltipContent_Shadcn_ side="left">
+                                          You need additional permissions to delete tables
+                                        </TooltipContent_Shadcn_>
+                                      )}
+                                    </Tooltip_Shadcn_>
+                                  </>
+                                )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           )}
