@@ -100,7 +100,7 @@ export const PolicyDetailsV2 = ({
   return (
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-        <div className="flex items-start justify-between gap-4 grid grid-cols-12">
+        <div className="items-start justify-between gap-4 grid grid-cols-12">
           <FormField_Shadcn_
             control={form.control}
             name="name"
@@ -131,63 +131,11 @@ export const PolicyDetailsV2 = ({
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
-                  <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                    <PopoverTrigger_Shadcn_ asChild>
-                      <Button
-                        type="default"
-                        className="w-full [&>span]:w-full h-[38px] text-sm"
-                        iconRight={
-                          <ChevronsUpDown
-                            className="text-foreground-muted"
-                            strokeWidth={2}
-                            size={14}
-                          />
-                        }
-                      >
-                        <div className="w-full flex gap-1">
-                          <span className="text-foreground">
-                            {schema}.{field.value}
-                          </span>
-                        </div>
-                      </Button>
-                    </PopoverTrigger_Shadcn_>
-                    <PopoverContent_Shadcn_
-                      className="p-0"
-                      side="bottom"
-                      align="start"
-                      sameWidthAsTrigger
-                    >
-                      <Command_Shadcn_>
-                        <CommandInput_Shadcn_ placeholder="Find a table..." />
-                        <CommandList_Shadcn_>
-                          <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
-                          <CommandGroup_Shadcn_>
-                            <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
-                              {(tables ?? []).map((table) => (
-                                <CommandItem_Shadcn_
-                                  key={table.id}
-                                  className="cursor-pointer flex items-center justify-between space-x-2 w-full"
-                                  onSelect={() => {
-                                    form.setValue('table', table.name)
-                                    setOpen(false)
-                                  }}
-                                  onClick={() => {
-                                    form.setValue('table', table.name)
-                                    setOpen(false)
-                                  }}
-                                >
-                                  <span className="flex items-center gap-1.5">
-                                    {field.value === table.name ? <Check size={13} /> : ''}
-                                    {table.name}
-                                  </span>
-                                </CommandItem_Shadcn_>
-                              ))}
-                            </ScrollArea>
-                          </CommandGroup_Shadcn_>
-                        </CommandList_Shadcn_>
-                      </Command_Shadcn_>
-                    </PopoverContent_Shadcn_>
-                  </Popover_Shadcn_>
+                  <Input_Shadcn_
+                    disabled
+                    value="messages.realtime"
+                    className="bg-control border-control"
+                  />
                 </FormControl_Shadcn_>
                 <FormMessage_Shadcn_ />
               </FormItem_Shadcn_>
