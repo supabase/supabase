@@ -15,14 +15,14 @@ import {
   Listbox,
 } from 'ui'
 
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { ListPlus } from 'lucide-react'
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
-import { ListPlus } from 'lucide-react'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
@@ -51,9 +51,27 @@ const ColumnType = ({
   showRecommendation = false,
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
-  // @ts-ignore
-  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
-  const isAvailableType = value ? availableTypes.includes(value) : true
+  const availableTypes = POSTGRES_DATA_TYPES
+  const isAvailableInPgTypes = value ? availableTypes.includes(value) : true
+
+  let isAvailableInEnums = false
+  if (!isAvailableInPgTypes) {
+    // this logic is to map the enums. The API for table columns sends only the enums name, without the schema. Since the
+    // create/update API call for tables expect the enums to be sent with their schemas prefixed. We also want to show
+    // the prefixed enums in the dropdown so we're changing the value of dropdowns from "enumName" to "schema.enumName"
+    // on first render
+    const foundByName = enumTypes.find((type) => type.name === value)
+    if (foundByName) {
+      onOptionSelect(`${foundByName.schema}.${foundByName.name}`)
+    }
+    const foundByFormat = enumTypes.find((type) => `${type.schema}.${type.name}` === value)
+    if (foundByFormat) {
+      isAvailableInEnums = true
+    }
+  }
+
+  const isAvailableType = isAvailableInPgTypes || isAvailableInEnums
+
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
   const inferIcon = (type: string) => {
@@ -188,17 +206,17 @@ const ColumnType = ({
 
         {enumTypes.length > 0 ? (
           // @ts-ignore
-          enumTypes.map((enumType: PostgresType) => (
+          enumTypes.map((enumType) => (
             <Listbox.Option
-              key={enumType.name}
-              value={enumType.name}
-              label={enumType.name}
+              key={`${enumType.schema}.${enumType.name}`}
+              value={`${enumType.schema}.${enumType.name}`}
+              label={`${enumType.schema}.${enumType.name}`}
               addOnBefore={() => {
                 return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
               }}
             >
               <div className="flex items-center space-x-4">
-                <p className="text-foreground">{enumType.name}</p>
+                <p className="text-foreground">{`${enumType.schema}.${enumType.name}`}</p>
                 {enumType.comment !== undefined && (
                   <p className="text-foreground-lighter">{enumType.comment}</p>
                 )}

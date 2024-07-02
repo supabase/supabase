@@ -20,15 +20,17 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { uuidv4 } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
+import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import type { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
-import type { ColumnField } from '../SidePanelEditor.types'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -62,6 +64,14 @@ export const ForeignKeySelector = ({
 }: ForeignKeySelectorProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+
+  const { data: types } = useEnumeratedTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+  )
 
   const [fk, setFk] = useState(EMPTY_STATE)
   const [errors, setErrors] = useState<{ columns?: string; types?: any[]; typeNotice?: any[] }>({})
@@ -119,7 +129,14 @@ export const ForeignKeySelector = ({
     const updatedRelations = fk.columns.map((x, i) => {
       if (i === idx) {
         if (key === 'target') {
-          const targetType = selectedTable?.columns?.find((col) => col.name === value)?.format
+          // handle the case where the enums should be shown prefixed with their schema
+          const foundColumn = selectedTable?.columns?.find((col) => col.name === value)
+          let targetType = foundColumn?.format
+          if (foundColumn?.enums && foundColumn.enums.length > 0) {
+            const enumType = enumTypes.find((type) => type.name === foundColumn?.format)
+            targetType = `${enumType?.schema}.${enumType?.name}`
+          }
+
           return { ...x, [key]: value, targetType }
         } else {
           const sourceType = table.columns.find((col) => col.name === value)?.format as string
