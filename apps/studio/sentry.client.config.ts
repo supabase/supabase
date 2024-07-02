@@ -69,6 +69,8 @@ Sentry.init({
     'Node.insertBefore: Child to insert before is not a child of this node',
     // [Joshen] This one sprung up recently and I've no idea where this is coming from
     'r.default.setDefaultLevel is not a function',
+    // [Joshen] Safe to ignore, it an error from the copyToClipboard
+    'The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.',
   ],
 })
 
