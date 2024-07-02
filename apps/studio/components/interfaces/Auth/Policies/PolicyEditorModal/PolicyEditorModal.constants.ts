@@ -201,7 +201,6 @@ using ( realtime.messages.extension = 'broadcast' );`.trim(),
 create policy "Allow pushing broadcasts for authenticated users only"
 ON realtime.messages for insert
 TO authenticated
-using ( realtime.messages.extension = 'broadcast' )
 with check ( realtime.messages.extension = 'broadcast' );`.trim(),
       name: 'Allow pushing broadcasts for authenticated users only',
       definition: "realtime.messages.extension = 'broadcast'",
@@ -232,7 +231,6 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
       statement: `
 create policy "Allow pushing broadcasts to specific channel"
 ON realtime.messages for insert
-using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' )
 with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Allow pushing broadcasts to specific channel',
       definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
@@ -267,7 +265,6 @@ using ( realtime.messages.extension = 'presence' );`.trim(),
 create policy "Allow broadcasting presences on all channels for authenticated users only"
 ON realtime.messages for insert
 TO authenticated
-using ( realtime.messages.extension = 'presence' )
 with check ( realtime.messages.extension = 'presence' );
   ;`.trim(),
       name: 'Allow broadcasting presences on all channels for authenticated users only',
@@ -299,7 +296,6 @@ using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel
       statement: `
 create policy "Publish presence to a specific channel"
 ON realtime.messages for insert
-using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' )
 with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
   ;`.trim(),
       name: 'Publish presence to a specific channel',
