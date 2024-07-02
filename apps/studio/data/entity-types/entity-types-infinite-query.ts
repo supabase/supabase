@@ -10,6 +10,7 @@ export type EntityTypesVariables = {
   limit?: number
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
+  filterTypes?: string[]
 } & Pick<ExecuteSqlVariables, 'connectionString'>
 
 export type EntityTypesResponse = {
@@ -28,6 +29,7 @@ export async function getEntityTypes(
     limit = 100,
     page = 0,
     sort = 'alphabetical',
+    filterTypes,
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -55,7 +57,7 @@ export async function getEntityTypes(
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in ('r', 'v', 'm', 'f', 'p')
+        c.relkind in (${filterTypes === undefined ? `'r', 'v', 'm', 'f', 'p'` : filterTypes.map((x) => `'${x}'`).join(', ')})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -113,6 +115,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     search,
     limit = 100,
     sort,
+    filterTypes,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -120,10 +123,10 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit }),
+    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort },
+        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
         signal
       ),
     {

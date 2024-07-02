@@ -29,7 +29,6 @@ import {
 } from 'ui'
 
 export interface Project {
-  id: string
   name: string
   ref: string
 }
