@@ -4,6 +4,7 @@ import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { useQuery } from '../api/hooks/queryHooks'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
@@ -21,7 +22,7 @@ interface IBaseCommand {
    */
   defaultHidden?: boolean
   /**
-   * Curerntly unused
+   * Currently unused
    */
   keywords?: string[]
   /**
@@ -84,13 +85,13 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
+  const query = useQuery()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
   return (
     <CommandItem_Shadcn_
       ref={ref}
-      forceMount={command.forceMount}
       onSelect={
         isActionCommand(command)
           ? command.action
@@ -102,7 +103,7 @@ const CommandItem = forwardRef<
               }
             : () => {}
       }
-      value={command.value}
+      value={command.forceMount ? `${query} ${command.value}` : command.value}
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),
         className,

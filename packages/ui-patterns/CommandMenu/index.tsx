@@ -1,7 +1,7 @@
 export * from './api/Badges'
 export { CommandInput } from './api/CommandInput'
 export { CommandList } from './api/CommandList'
-export { CommandMenu, CommandWrapper } from './api/CommandMenu'
+export { Breadcrumb, CommandMenu, CommandWrapper } from './api/CommandMenu'
 export { CommandProvider } from './api/CommandProvider'
 export { TextHighlighter, TextHighlighterBase } from './api/TextHighlighter'
 export * from './api/hooks/commandsHooks'

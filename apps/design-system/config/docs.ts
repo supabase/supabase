@@ -194,6 +194,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Command Menu (cmdk)',
+          href: '/docs/components/commandmenu',
+          items: [],
+        },
+        {
           title: 'Context Menu',
           href: '/docs/components/context-menu',
           items: [],

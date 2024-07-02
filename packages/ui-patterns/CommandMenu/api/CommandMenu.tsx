@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
-import { type PropsWithChildren, forwardRef, useEffect, useState } from 'react'
+import { type PropsWithChildren, forwardRef } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
@@ -11,14 +11,16 @@ import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuSize, useCommandMenuOpen, useSetCommandMenuOpen } from './hooks/viewHooks'
 import { PageType } from './utils'
 
-function Breadcrumb() {
+function Breadcrumb({ className }: { className?: string }) {
   const currPage = useCurrentPage()
   const popPage = usePopPage()
 
   if (!currPage) return
 
   return (
-    <div className="flex items-center gap-2 mt-2 ml-2 text-xs text-foreground-muted">
+    <div
+      className={cn('flex items-center gap-2 mt-2 ml-2 text-xs text-foreground-muted', className)}
+    >
       <button onClick={popPage}>
         <ArrowLeft width={12} height={12} />
       </button>
@@ -112,4 +114,4 @@ function CommandMenu({ children }: PropsWithChildren) {
   )
 }
 
-export { CommandMenu, CommandWrapper }
+export { Breadcrumb, CommandMenu, CommandWrapper }

@@ -23,12 +23,14 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
 }
 
 // This is a component not a hook so it can access the wrapping context.
-const CommandShortcut = () => {
+const CommandShortcut = ({ openKey }: { openKey: string }) => {
   const toggleOpen = useToggleCommandMenu()
 
   useEffect(() => {
     const handleKeydown = (evt: KeyboardEvent) => {
-      if (evt.key === 'k' && evt.metaKey) {
+      if (openKey === '') return
+
+      if (evt.key === openKey && evt.metaKey) {
         evt.preventDefault()
         toggleOpen()
       }
@@ -59,9 +61,19 @@ function CloseOnNavigation() {
   return null
 }
 
-const CommandProvider = ({ children }: PropsWithChildren) => (
+interface CommandProviderProps extends PropsWithChildren {
+  /**
+   * The keyboard shortcut that opens the command menu when used in
+   * combination with the meta key.
+   *
+   * Defaults to `k`. Pass an empty string to disable the keyboard shortcut.
+   */
+  openKey?: string
+}
+
+const CommandProvider = ({ children, openKey }: CommandProviderProps) => (
   <CommandProviderInternal>
-    <CommandShortcut />
+    <CommandShortcut openKey={openKey ?? 'k'} />
     <CloseOnNavigation />
     {children}
   </CommandProviderInternal>
