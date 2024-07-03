@@ -3,7 +3,7 @@ import { Button, IconPlus } from 'ui'
 
 import { ADD_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
-import { DefaultFormatter } from '../formatter'
+import { DefaultFormatter } from '../formatter/DefaultFormatter'
 
 export const AddColumn: CalculatedColumn<any, any> = {
   key: ADD_COLUMN_KEY,
