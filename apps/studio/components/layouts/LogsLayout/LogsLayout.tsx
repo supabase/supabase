@@ -38,7 +38,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const showWarehouse = useFlag('warehouse')
   const project = useSelectedProject()
   const { ref } = useParams()
-  const projectRef = ref || 'default'
+  const projectRef = ref as string
 
   const { data: tenant } = useWarehouseTenantQuery(
     { projectRef },
@@ -48,7 +48,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   )
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     {
-      projectRef: !tenant ? 'undefined' : projectRef,
+      projectRef,
     },
     { enabled: !!tenant }
   )

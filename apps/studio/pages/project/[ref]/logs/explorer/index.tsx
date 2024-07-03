@@ -111,12 +111,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  const { data: warehouseCollections } = useWarehouseCollectionsQuery(
-    { projectRef },
-    {
-      enabled: !!projectRef,
-    }
-  )
+  const { data: warehouseCollections } = useWarehouseCollectionsQuery({ projectRef })
 
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
@@ -357,7 +352,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               params={params}
               data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
               error={error}
-              projectRef={projectRef as string}
+              projectRef={projectRef}
             />
           </LoadingOpacity>
           <div className="flex flex-row justify-end mt-2">
