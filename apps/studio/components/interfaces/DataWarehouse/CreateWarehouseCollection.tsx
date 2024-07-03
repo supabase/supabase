@@ -76,7 +76,7 @@ export const CreateWarehouseCollectionModal = () => {
       >
         New collection
       </ButtonTooltip>
-      <Button onClick={() => setIsOpen(!isOpen)}>Create collection</Button>
+      {/* <Button onClick={() => setIsOpen(!isOpen)}>Create collection</Button> */}
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}

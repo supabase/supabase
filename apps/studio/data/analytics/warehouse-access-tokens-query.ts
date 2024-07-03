@@ -16,13 +16,10 @@ export async function getWarehouseAccessTokens(
   }
 
   // TODO: Remove typecast when codegen types are fixed
-  const response = await get(
-    `/platform/projects/{ref}/analytics/warehouse/access-tokens` as '/v1/projects/{ref}/analytics/warehouse/access-tokens',
-    {
-      params: { path: { ref: projectRef } },
-      signal,
-    }
-  )
+  const response = await get(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
 
   if (response.error) {
     handleError(response)

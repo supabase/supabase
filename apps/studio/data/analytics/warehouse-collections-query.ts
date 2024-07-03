@@ -15,13 +15,10 @@ export async function getWarehouseCollections(
   }
 
   // TODO: Remove type cast when codegen types are fixed
-  const { data, error } = await get(
-    `/platform/projects/{ref}/analytics/warehouse/collections` as '/v1/projects/{ref}/analytics/warehouse/collections',
-    {
-      params: { path: { ref: projectRef } },
-      signal,
-    }
-  )
+  const { data, error } = await get(`/v1/projects/{ref}/analytics/warehouse/collections`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
 
   if (error) handleError(error)
 

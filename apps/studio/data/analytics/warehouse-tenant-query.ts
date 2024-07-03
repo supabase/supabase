@@ -16,13 +16,10 @@ export async function getWarehouseTenant(
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
-  const { data, error } = await get(
-    `/platform/projects/{ref}/analytics/warehouse/tenant` as `/v1/projects/{ref}/analytics/warehouse/tenant`,
-    {
-      params: { path: { ref: projectRef } },
-      signal,
-    }
-  )
+  const { data, error } = await get(`/v1/projects/{ref}/analytics/warehouse/tenant`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
   if (error) {
     handleError(error)
   }
