@@ -11,8 +11,6 @@ const JoinOrganizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const isProjectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
 
-  console.log({ isProjectLevelPermissionsEnabled })
-
   // [Joshen] Can remove this once API changes are deployed to production
   if (!isProjectLevelPermissionsEnabled) {
     return <OrganizationInviteOld />
