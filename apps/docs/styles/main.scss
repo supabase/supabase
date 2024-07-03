@@ -278,3 +278,22 @@ article p code {
 th code {
   @apply text-nowrap;
 }
+
+/* Zoomable image */
+
+[data-rmiz-modal]:focus,
+[data-rmiz-modal-overlay]:focus {
+  outline: none !important;
+}
+
+[data-rmiz-modal-overlay],
+[data-rmiz-modal-img] {
+  transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
+}
+[data-rmiz-modal-overlay='visible'] {
+  background-color: hsl(var(--background-default)) !important;
+  opacity: 0.8;
+}
+[data-rmiz-modal-img] {
+  image-rendering: high-quality;
+}
