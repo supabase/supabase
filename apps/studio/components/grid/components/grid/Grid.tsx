@@ -7,7 +7,7 @@ import 'react-data-grid/lib/styles.css'
 import { memo } from 'react-tracked'
 import { Button } from 'ui'
 
-import { formatClipboardValue } from 'components/grid/utils'
+import { formatClipboardValue } from 'components/grid/utils/common'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
