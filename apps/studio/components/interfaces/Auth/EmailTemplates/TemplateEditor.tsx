@@ -3,6 +3,13 @@ import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
+
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import InformationBox from 'components/ui/InformationBox'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks'
+import type { FormSchema } from 'types'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -13,13 +20,6 @@ import {
   Input,
   Tabs,
 } from 'ui'
-
-import { CodeEditor } from 'components/ui/CodeEditor'
-import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import InformationBox from 'components/ui/InformationBox'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
-import type { FormSchema } from 'types'
 
 interface TemplateEditorProps {
   template: FormSchema

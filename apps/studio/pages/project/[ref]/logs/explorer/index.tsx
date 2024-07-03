@@ -22,7 +22,7 @@ import {
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'

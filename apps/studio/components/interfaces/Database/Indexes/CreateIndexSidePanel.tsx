@@ -1,16 +1,16 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button,
   CommandEmpty_Shadcn_,

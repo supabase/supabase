@@ -5,7 +5,7 @@ import { PropsWithChildren, useMemo } from 'react'
 import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { RestrictrionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
-import { getTheme } from 'components/ui/CodeEditor'
+import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
 import { useFlag } from 'hooks'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
