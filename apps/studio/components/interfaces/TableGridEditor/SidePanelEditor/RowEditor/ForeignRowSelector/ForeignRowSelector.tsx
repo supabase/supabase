@@ -10,7 +10,7 @@ import {
   parseSupaTable,
 } from 'components/grid/SupabaseGrid.utils'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import { FilterPopover } from 'components/grid/components/header/filter'
+import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'

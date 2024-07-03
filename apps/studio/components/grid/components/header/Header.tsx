@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import { FilterPopover } from './filter'
+import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
