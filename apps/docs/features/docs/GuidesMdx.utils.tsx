@@ -47,7 +47,12 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
     redirect(notFoundLink(slug.join('/')))
   }
 
-  const mdx = await readFile(fullPath, 'utf-8')
+  let mdx: string
+  try {
+    mdx = await readFile(fullPath, 'utf-8')
+  } catch {
+    redirect(notFoundLink(slug.join('/')))
+  }
 
   const editLink = newEditLink(
     `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`

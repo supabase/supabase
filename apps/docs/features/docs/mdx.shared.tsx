@@ -3,9 +3,7 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { Button } from 'ui'
-import { Admonition } from 'ui'
+import { Admonition, Button, Image } from 'ui'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
@@ -57,7 +55,7 @@ const components = {
   IconArrowDown: ArrowDown,
   IconCheck: Check,
   IconPanel,
-  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
+  Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
   Link,
