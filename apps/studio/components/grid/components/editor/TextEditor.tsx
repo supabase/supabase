@@ -16,12 +16,12 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
-import { TruncatedWarningOverlay } from '.'
 import { useTrackedState } from '../../store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
+import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,

@@ -1,18 +1,6 @@
 import { CalculatedColumn } from 'react-data-grid'
 
 import {
-  BooleanEditor,
-  DateEditor,
-  DateTimeEditor,
-  DateTimeWithTimezoneEditor,
-  JsonEditor,
-  NumberEditor,
-  SelectEditor,
-  TextEditor,
-  TimeEditor,
-  TimeWithTimezoneEditor,
-} from 'components/grid/components/editor'
-import {
   BooleanFormatter,
   DefaultFormatter,
   ForeignKeyFormatter,
@@ -20,6 +8,14 @@ import {
 } from 'components/grid/components/formatter'
 import { AddColumn, ColumnHeader, SelectColumn } from 'components/grid/components/grid'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { BooleanEditor } from '../components/editor/BooleanEditor'
+import { DateEditor } from '../components/editor/DateEditor'
+import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import { JsonEditor } from '../components/editor/JsonEditor'
+import { NumberEditor } from '../components/editor/NumberEditor'
+import { SelectEditor } from '../components/editor/SelectEditor'
+import { TextEditor } from '../components/editor/TextEditor'
+import { TimeEditor, TimeWithTimezoneEditor } from '../components/editor/TimeEditor'
 import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,

@@ -13,10 +13,10 @@ import { useSelectedProject } from 'hooks'
 import useTable from 'hooks/misc/useTable'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
-import { TruncatedWarningOverlay } from '.'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
+import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
 
 const verifyJSON = (value: string) => {
   try {
