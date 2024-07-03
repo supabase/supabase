@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Accordion, Admonition, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
-import { TabPanel, Tabs } from '~/components/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'

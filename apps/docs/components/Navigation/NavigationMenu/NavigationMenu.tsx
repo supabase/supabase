@@ -238,7 +238,9 @@ function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id)
 }
 
-function getMenuElement(menu: Menu) {
+function getMenuElement(menu: Menu | undefined) {
+  if (!menu) throw Error('No menu found for this menuId')
+
   const menuType = menu.type
   switch (menuType) {
     case 'guide':
