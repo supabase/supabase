@@ -12,7 +12,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

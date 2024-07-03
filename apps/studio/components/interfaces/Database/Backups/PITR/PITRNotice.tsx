@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, IconCalendar } from 'ui'
 import { getPITRRetentionDuration } from './PITR.utils'
 

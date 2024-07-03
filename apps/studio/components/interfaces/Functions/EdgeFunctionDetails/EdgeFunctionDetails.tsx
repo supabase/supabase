@@ -18,7 +18,7 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

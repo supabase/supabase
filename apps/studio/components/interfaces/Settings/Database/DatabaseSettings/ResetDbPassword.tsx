@@ -14,7 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 

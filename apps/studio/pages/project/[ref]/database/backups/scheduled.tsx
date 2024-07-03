@@ -12,7 +12,7 @@ import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {

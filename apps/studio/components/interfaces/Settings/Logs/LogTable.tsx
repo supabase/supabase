@@ -8,7 +8,7 @@ import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import toast from 'react-hot-toast'
 
 import CSVButton from 'components/ui/CSVButton'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {

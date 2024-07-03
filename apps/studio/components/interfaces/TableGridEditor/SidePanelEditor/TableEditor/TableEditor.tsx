@@ -17,7 +17,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'

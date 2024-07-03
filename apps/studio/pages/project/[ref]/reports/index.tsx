@@ -8,7 +8,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { Loading } from 'components/ui/Loading'
 import { useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 

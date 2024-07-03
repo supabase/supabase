@@ -16,7 +16,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,

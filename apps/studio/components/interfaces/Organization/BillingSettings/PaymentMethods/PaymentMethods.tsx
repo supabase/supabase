@@ -19,7 +19,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import {

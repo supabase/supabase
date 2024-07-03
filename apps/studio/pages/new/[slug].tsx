@@ -1,4 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import generator from 'generate-password-browser'
+import { debounce } from 'lodash'
+import { ChevronRight, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
+
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
@@ -22,8 +32,9 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import generator from 'generate-password-browser'
-import { useCheckPermissions, useFlag, withAuth } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
@@ -35,13 +46,6 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
-import { debounce } from 'lodash'
-import { ChevronRight, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
 import {
   Admonition,
@@ -74,7 +78,6 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { z } from 'zod'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 

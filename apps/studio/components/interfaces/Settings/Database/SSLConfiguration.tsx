@@ -13,7 +13,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Alert,
   Button,

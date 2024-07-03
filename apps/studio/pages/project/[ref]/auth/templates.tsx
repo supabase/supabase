@@ -4,7 +4,7 @@ import { EmailTemplates } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {

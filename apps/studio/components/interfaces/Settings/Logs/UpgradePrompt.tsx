@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
 import { TIER_QUERY_LIMITS } from './Logs.constants'
 

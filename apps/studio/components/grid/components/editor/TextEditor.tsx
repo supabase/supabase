@@ -1,14 +1,14 @@
 import { PostgresTable } from '@supabase/postgres-meta'
+import { Maximize } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import useTable from 'hooks/misc/useTable'
-import { Maximize } from 'lucide-react'
-import { useCallback, useState } from 'react'
 import {
   Button,
   Popover,

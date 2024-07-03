@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'
@@ -12,11 +11,12 @@ import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-muta
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
-import { useUrlState } from 'hooks'
 import type { TableLike } from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {

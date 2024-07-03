@@ -14,7 +14,7 @@ import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
 import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
 import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,

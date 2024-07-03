@@ -6,7 +6,7 @@ import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { RestrictrionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
 import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()

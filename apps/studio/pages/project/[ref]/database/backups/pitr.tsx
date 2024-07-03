@@ -12,7 +12,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, usePermissionsLoaded, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {

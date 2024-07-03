@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React, { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { copyToClipboard } from 'lib/helpers'
 import { logConstants } from 'shared-data'
 import {

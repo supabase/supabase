@@ -19,7 +19,7 @@ import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   FormControl_Shadcn_,

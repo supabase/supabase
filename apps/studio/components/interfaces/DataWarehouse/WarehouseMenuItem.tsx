@@ -12,7 +12,7 @@ import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useDeleteCollectionMutation } from 'data/analytics/warehouse-collections-delete-mutation'
 import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Checkbox_Shadcn_,

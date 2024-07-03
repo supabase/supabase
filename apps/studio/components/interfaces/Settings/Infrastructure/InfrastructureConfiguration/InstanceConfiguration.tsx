@@ -6,15 +6,6 @@ import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  cn,
-} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -25,10 +16,19 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  cn,
+} from 'ui'
 import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'

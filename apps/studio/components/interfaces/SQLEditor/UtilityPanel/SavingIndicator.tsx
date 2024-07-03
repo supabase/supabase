@@ -1,10 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useUser } from 'common'
-import { usePrevious } from 'hooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
+import { useUser } from 'common'
+import { usePrevious } from 'hooks/deprecated'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconCheck, IconRefreshCcw } from 'ui'
+import { Button } from 'ui'
 import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type SavingIndicatorProps = { id: string }

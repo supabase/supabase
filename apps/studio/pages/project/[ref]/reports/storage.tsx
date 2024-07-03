@@ -14,7 +14,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {

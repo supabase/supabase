@@ -12,7 +12,8 @@ import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useUrlState } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,

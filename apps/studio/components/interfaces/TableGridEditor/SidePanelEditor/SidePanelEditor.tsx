@@ -17,7 +17,7 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'

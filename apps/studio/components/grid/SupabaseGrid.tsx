@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {

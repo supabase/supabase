@@ -20,7 +20,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Admonition,
   AlertDescription_Shadcn_,

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-import type { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -16,7 +15,7 @@ import {
 import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { Loading } from 'components/ui/Loading'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import {
@@ -24,6 +23,7 @@ import {
   VERCEL_DEFAULT_EXTERNAL_ID,
   VERCEL_INTEGRATION_CONFIGS,
 } from 'lib/vercelConfigs'
+import type { Dictionary } from 'types'
 import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select, Separator } from 'ui'
 
 interface IVercelIntegrationStore {

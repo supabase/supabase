@@ -14,7 +14,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const HooksPage: NextPageWithLayout = () => {

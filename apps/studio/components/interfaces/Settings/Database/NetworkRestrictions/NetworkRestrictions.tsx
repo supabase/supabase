@@ -10,7 +10,7 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,

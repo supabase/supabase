@@ -10,7 +10,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 
 const schema = yup.object({

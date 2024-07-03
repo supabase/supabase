@@ -5,7 +5,7 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseExtensions: NextPageWithLayout = () => {

@@ -14,7 +14,8 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

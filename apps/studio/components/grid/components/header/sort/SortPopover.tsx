@@ -1,4 +1,3 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
@@ -7,6 +6,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,

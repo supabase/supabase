@@ -12,7 +12,7 @@ import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import { Alert, Button, Listbox } from 'ui'
 
@@ -204,4 +204,5 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 }
 
 APIAuthorizationPage.getLayout = (page) => <APIAuthorizationLayout>{page}</APIAuthorizationLayout>
+
 export default withAuth(APIAuthorizationPage)

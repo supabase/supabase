@@ -10,7 +10,10 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

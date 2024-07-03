@@ -2,7 +2,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useFlag, useSelectedProject, withAuth } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 

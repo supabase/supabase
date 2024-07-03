@@ -4,7 +4,7 @@ import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const Hooks: NextPageWithLayout = () => {

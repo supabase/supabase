@@ -16,7 +16,7 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Form, Input, Listbox } from 'ui'
 import { COUNTRIES } from './BillingAddress.constants'
 

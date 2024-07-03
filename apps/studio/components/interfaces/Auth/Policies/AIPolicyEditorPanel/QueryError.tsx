@@ -1,6 +1,15 @@
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
+
+import { useTelemetryProps } from 'common'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { QueryResponseError } from 'data/sql/execute-sql-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -10,15 +19,6 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
-
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { QueryResponseError } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const QueryError = ({
   error,

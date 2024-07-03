@@ -29,10 +29,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -55,8 +56,6 @@ import {
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
-import { useForeignTableQuery } from 'data/foreign-tables/foreign-table-query'
-import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 
 interface TableListProps {
   onAddTable: () => void
