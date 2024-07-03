@@ -3,6 +3,7 @@ import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { TooltipContent } from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
@@ -10,11 +11,9 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import {
-  useCreateWarehouseAccessToken,
-  useDeleteWarehouseAccessToken,
-  useWarehouseAccessTokensQuery,
-} from 'data/analytics'
+import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
+import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
 import { useCheckPermissions } from 'hooks'
 import {
   Button,
@@ -35,7 +34,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
-import { TooltipContent } from '@radix-ui/react-tooltip'
 
 const AccessTokenItem = ({
   token,

@@ -7,11 +7,9 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  useWarehouseAccessTokensQuery,
-  useWarehouseCollectionsQuery,
-  useWarehouseQueryQuery,
-} from 'data/analytics'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useFlag } from 'hooks'
 import { Button } from 'ui'
 import LogTable from '../Settings/Logs/LogTable'
