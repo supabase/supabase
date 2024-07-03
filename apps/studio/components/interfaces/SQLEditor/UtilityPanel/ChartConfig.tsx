@@ -101,11 +101,16 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               XAxisProps={{
                 angle: 0,
                 interval: 0,
-                tick: config.showLabels ? {} : false,
                 hide: !config.showLabels,
+                tickFormatter: (idx: string) => {
+                  const value = resultToRender[+idx][config.xKey]
+                  if (xKeyDateFormat === 'date') {
+                    return dayjs(value).format('MMM D YYYY')
+                  }
+                  return value
+                },
               }}
               YAxisProps={{
-                dataKey: config.yKey,
                 tickFormatter: (value: number) => value.toLocaleString(),
                 label: <></>,
                 hide: !config.showLabels,

@@ -142,13 +142,13 @@ const BarChart = ({
           }}
         >
           {showLegend && <Legend />}
+          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
           <YAxis
             {..._YAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
             key={yAxisKey}
           />
-          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
           <XAxis
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
