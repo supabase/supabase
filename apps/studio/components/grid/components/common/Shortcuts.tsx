@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { DataGridHandle } from 'react-data-grid'
-import { useTrackedState } from '../../store'
+import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
 

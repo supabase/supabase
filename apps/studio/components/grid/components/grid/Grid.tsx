@@ -15,7 +15,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useKeyboardShortcuts, useUrlState } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { useDispatch, useTrackedState } from '../../store'
+import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import RowRenderer from './RowRenderer'
 

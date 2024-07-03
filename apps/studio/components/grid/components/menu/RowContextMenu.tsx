@@ -5,7 +5,7 @@ import type { SupaRow } from 'components/grid/types'
 import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ROW_CONTEXT_MENU_ID } from '.'
-import { useTrackedState } from '../../store'
+import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {

@@ -2,7 +2,7 @@ import type { CalculatedColumn } from 'react-data-grid'
 import { Button, IconPlus } from 'ui'
 
 import { ADD_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store'
+import { useTrackedState } from '../../store/Store'
 import { DefaultFormatter } from '../formatter/DefaultFormatter'
 
 export const AddColumn: CalculatedColumn<any, any> = {

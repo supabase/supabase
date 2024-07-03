@@ -16,7 +16,7 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
-import { useTrackedState } from '../../store'
+import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'

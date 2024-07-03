@@ -6,7 +6,7 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store'
+import { useTrackedState } from 'components/grid/store/Store'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks'
