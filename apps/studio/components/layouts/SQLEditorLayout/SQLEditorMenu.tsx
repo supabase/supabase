@@ -242,7 +242,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
                   <InnerSideBarFilterSearchInput
                     name="search-queries"
                     placeholder="Search queries..."
-                    onChange={(e) => setSearchText(e.target.value.trim())}
+                    onChange={(e) => setSearchText(e.target.value)}
                     value={searchText}
                     aria-labelledby="Search queries"
                   />

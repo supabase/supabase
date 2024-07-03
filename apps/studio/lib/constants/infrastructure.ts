@@ -34,7 +34,7 @@ export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
-const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',

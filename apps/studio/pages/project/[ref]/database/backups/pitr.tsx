@@ -58,8 +58,8 @@ const PITR = () => {
   const plan = subscription?.plan?.id
   const isEnabled = backups?.pitr_enabled
 
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
   const isPermissionsLoaded = usePermissionsLoaded()
+  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />

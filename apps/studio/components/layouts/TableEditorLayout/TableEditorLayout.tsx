@@ -7,8 +7,8 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
   const isPermissionsLoaded = usePermissionsLoaded()
+  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
 

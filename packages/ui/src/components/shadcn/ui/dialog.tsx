@@ -188,7 +188,11 @@ const DialogSection = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
 >(({ className, children, padding, ...props }, ref) => (
-  <div ref={ref} {...props} className={cn(DialogPaddingVariants({ padding }), className)}>
+  <div
+    ref={ref}
+    {...props}
+    className={cn(DialogPaddingVariants({ padding }), 'overflow-hidden', className)}
+  >
     {children}
   </div>
 ))
