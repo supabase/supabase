@@ -337,7 +337,7 @@ Most web apps and websites can utilize Google's [personalized sign-in buttons](h
      const hashedNonce = hashArray
        .map((b) => b.toString(16).padStart(2, "0"))
        .join("");
-   }
+   });
 
    // Use 'hashedNonce' when making the authentication request to Google
    // Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
