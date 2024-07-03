@@ -10,7 +10,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, InputNumber } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDispatch, useTrackedState } from '../../../store'
-import { DropdownControl } from '../../common'
+import { DropdownControl } from '../../common/DropdownControl'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },

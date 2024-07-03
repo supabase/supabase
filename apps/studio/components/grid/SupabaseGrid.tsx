@@ -17,7 +17,7 @@ import {
   getStorageKey,
   saveStorageDebounced,
 } from './SupabaseGrid.utils'
-import { Shortcuts } from './components/common'
+import { Shortcuts } from './components/common/Shortcuts'
 import Footer from './components/footer/Footer'
 import { Grid } from './components/grid'
 import Header from './components/header/Header'

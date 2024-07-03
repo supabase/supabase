@@ -18,7 +18,10 @@ import {
 } from 'ui'
 import { TruncatedWarningOverlay } from '.'
 import { useTrackedState } from '../../store'
-import { BlockKeys, EmptyValue, MonacoEditor, NullValue } from '../common'
+import { BlockKeys } from '../common/BlockKeys'
+import { EmptyValue } from '../common/EmptyValue'
+import { MonacoEditor } from '../common/MonacoEditor'
+import { NullValue } from '../common/NullValue'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,

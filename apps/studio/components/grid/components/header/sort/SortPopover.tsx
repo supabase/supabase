@@ -5,7 +5,7 @@ import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { DropdownControl } from 'components/grid/components/common'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
 import {
   Button,

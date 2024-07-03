@@ -6,7 +6,6 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 import { useTrackedState } from 'components/grid/store'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
@@ -15,6 +14,9 @@ import useTable from 'hooks/misc/useTable'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { TruncatedWarningOverlay } from '.'
+import { BlockKeys } from '../common/BlockKeys'
+import { MonacoEditor } from '../common/MonacoEditor'
+import { NullValue } from '../common/NullValue'
 
 const verifyJSON = (value: string) => {
   try {
