@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import IconX from '../../components/Icon/icons/IconX/IconX'
 import { cn } from '../../lib/utils/cn'
@@ -32,8 +32,8 @@ const Announcement = ({
 }: PropsWithChildren<AnnouncementComponentProps>) => {
   const [hidden, setHidden] = useState(false)
 
-  const router = useRouter()
-  const isLaunchWeekSection = router.pathname.includes('launch-week')
+  const pathname = usePathname()
+  const isLaunchWeekSection = pathname.includes('launch-week')
 
   // override to hide announcement
   if (!show || !announcement.show) return null

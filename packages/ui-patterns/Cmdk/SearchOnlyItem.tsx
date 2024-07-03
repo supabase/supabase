@@ -1,5 +1,5 @@
+import { useRouter } from 'next/navigation'
 import { CommandItem } from './Command.utils'
-import { useRouter } from 'next/router'
 import { useCommandMenu } from './CommandMenuContext'
 
 interface SearchOnlyItemProps {

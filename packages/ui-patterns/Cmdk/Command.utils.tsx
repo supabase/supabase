@@ -85,7 +85,7 @@ export const CommandDialog = ({
         }}
         hideClose
         size={'xlarge'}
-        className={cn('place-self-start mx-auto top-24')}
+        className={cn('place-self-start mx-auto top-20')}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command

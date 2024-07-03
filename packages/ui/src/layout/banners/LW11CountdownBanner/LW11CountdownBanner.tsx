@@ -1,17 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { Button } from '../../../components/Button/Button'
 import { cn } from '../../../lib/utils/cn'
 import announcement from '../data/Announcement.json'
 
 export function LW11CountdownBanner() {
-  const router = useRouter()
-  const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname === '/ga-week'
-  const isLaunchWeekSection =
-    router.pathname.includes('/launch-week') || router.pathname.includes('/ga-week')
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
+  const isLaunchWeekPage = pathname === '/ga-week'
+  const isLaunchWeekSection = pathname.includes('/launch-week') || pathname.includes('/ga-week')
 
   if (isLaunchWeekPage || isHomePage) return null
 
