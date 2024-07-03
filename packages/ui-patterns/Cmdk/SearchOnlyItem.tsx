@@ -1,6 +1,6 @@
 import { CommandItem } from './Command.utils'
 import { useRouter } from 'next/router'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 
 interface SearchOnlyItemProps {
   children: React.ReactNode

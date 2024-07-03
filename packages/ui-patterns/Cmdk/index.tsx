@@ -1,5 +1,6 @@
 export { default as CommandMenuProvider } from './CommandMenuProvider'
 export * from './CommandMenuProvider'
+export * from './CommandMenuContext'
 
 export { default as CommandMenu } from './CommandMenu'
 export * from './CommandMenu'

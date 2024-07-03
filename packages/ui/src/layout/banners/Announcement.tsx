@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
-import _announcement from './data/Announcement.json'
-import { IconX, cn } from 'ui'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
+import IconX from '../../components/Icon/icons/IconX/IconX'
+import { cn } from '../../lib/utils/cn'
+import _announcement from './data/Announcement.json'
 
 export interface AnnouncementProps {
   show: boolean

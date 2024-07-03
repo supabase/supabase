@@ -32,7 +32,6 @@
     "@next/bundle-analyzer": "^14.2.3",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@scaleleap/pg-format": "^1.0.0",
     "@sentry/nextjs": "^7.108.0",
     "@stripe/react-stripe-js": "^2.5.0",
     "@stripe/stripe-js": "^3.0.5",
