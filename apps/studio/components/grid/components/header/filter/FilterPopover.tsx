@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -24,6 +25,7 @@ export interface FilterPopoverProps {
 
 const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const snap = useTableEditorStateSnapshot()
 
   const btnText =
     (filters || []).length > 0
@@ -31,6 +33,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
       : 'Filter'
 
   const onApplyFilters = (appliedFilters: Filter[]) => {
+    snap.setEnforceExactCount(false)
     setParams((prevParams) => {
       return {
         ...prevParams,

@@ -65,7 +65,7 @@ export const getTableRowsCountSqlQuery = ({
       })
     const countBaseSql = countQueryChains.toSql().slice(0, -1)
 
-    return `
+    const sql = `
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
@@ -82,6 +82,8 @@ select
   estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
 from approximation;
 `.trim()
+
+    return sql
   }
 }
 

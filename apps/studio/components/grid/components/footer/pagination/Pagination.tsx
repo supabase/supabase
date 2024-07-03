@@ -46,9 +46,6 @@ const Pagination = () => {
   const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const [enforceExactCount, setEnforceExactCount] = useState(
-    rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT
-  )
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
@@ -60,7 +57,7 @@ const Pagination = () => {
       connectionString: project?.connectionString,
       table,
       filters,
-      enforceExactCount,
+      enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
     },
     {
@@ -140,6 +137,12 @@ const Pagination = () => {
     }
   }, [page, totalPages])
 
+  useEffect(() => {
+    if (id !== undefined) {
+      snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
+    }
+  }, [id])
+
   return (
     <div className="flex items-center gap-x-4">
       {isLoading && <p className="text-sm text-foreground-light">Loading records count...</p>}
@@ -207,7 +210,7 @@ const Pagination = () => {
                     icon={<HelpCircle />}
                     onClick={() => {
                       if (data.count > THRESHOLD_COUNT) setIsConfirmFetchExactCountModalOpen(true)
-                      else setEnforceExactCount(true)
+                      else snap.setEnforceExactCount(true)
                     }}
                   />
                 </TooltipTrigger_Shadcn_>
@@ -265,7 +268,7 @@ const Pagination = () => {
         confirmLabel="Retrieve exact count"
         onCancel={() => setIsConfirmFetchExactCountModalOpen(false)}
         onConfirm={() => {
-          setEnforceExactCount(true)
+          snap.setEnforceExactCount(true)
           setIsConfirmFetchExactCountModalOpen(false)
         }}
       >

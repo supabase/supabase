@@ -59,6 +59,11 @@ export const createTableEditorState = () => {
       state.selectedSchemaName = schemaName
     },
 
+    enforceExactCount: false,
+    setEnforceExactCount: (value: boolean) => {
+      state.enforceExactCount = value
+    },
+
     page: 1,
     setPage: (page: number) => {
       state.page = page
