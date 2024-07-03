@@ -30,8 +30,8 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import useTableDefinition from '../../../hooks/misc/useTableDefinition'
-import useEntityType from '../../../hooks/misc/useEntityType'
+import useTableDefinition from 'hooks/misc/useTableDefinition'
+import useEntityType from 'hooks/misc/useEntityType'
 
 export interface EntityListItemProps {
   id: number

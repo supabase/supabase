@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
-import useTableDefinition from '../../../hooks/misc/useTableDefinition'
+import useTableDefinition from 'hooks/misc/useTableDefinition'
 
 export interface TableDefinitionProps {
   id?: number
