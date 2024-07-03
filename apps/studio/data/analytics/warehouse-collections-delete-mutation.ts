@@ -12,7 +12,7 @@ export type DeleteCollectionVariables = {
 
 export async function deleteCollection({ projectRef, collectionToken }: DeleteCollectionVariables) {
   const { data, error } = await del(
-    '/platform/projects/{ref}/analytics/warehouse/collections/{token}',
+    '/platform/projects/{ref}/analytics/warehouse/collections/{token}' as '/v1/projects/{ref}/analytics/warehouse/collections/{token}',
     {
       params: { path: { ref: projectRef, token: collectionToken } } as any,
     }

@@ -15,10 +15,14 @@ export async function getWarehouseAccessTokens(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
-    params: { path: { ref: projectRef } },
-    signal,
-  })
+  // TODO: Remove typecast when codegen types are fixed
+  const response = await get(
+    `/platform/projects/{ref}/analytics/warehouse/access-tokens` as '/v1/projects/{ref}/analytics/warehouse/access-tokens',
+    {
+      params: { path: { ref: projectRef } },
+      signal,
+    }
+  )
 
   if (response.error) {
     handleError(response)

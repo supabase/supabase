@@ -12,12 +12,16 @@ async function createWarehouseAccessToken({
   ref,
   description,
 }: WarehouseAccessTokenCreateVariables) {
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
-    params: {
-      path: { ref },
-    },
-    body: { description },
-  } as any) // TODO: remove type cast when fetcher fn params are typed
+  // TODO: remove type cast when fetcher fn params are typed
+  const { data, error } = await post(
+    `/platform/projects/{ref}/analytics/warehouse/access-tokens` as '/v1/projects/{ref}/analytics/warehouse/access-tokens',
+    {
+      params: {
+        path: { ref },
+      },
+      body: { description },
+    } as any
+  )
 
   if (error) handleError(error)
 

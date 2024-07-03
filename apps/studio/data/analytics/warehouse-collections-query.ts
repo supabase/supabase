@@ -14,10 +14,14 @@ export async function getWarehouseCollections(
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/collections`, {
-    params: { path: { ref: projectRef } },
-    signal,
-  })
+  // TODO: Remove type cast when codegen types are fixed
+  const { data, error } = await get(
+    `/platform/projects/{ref}/analytics/warehouse/collections` as '/v1/projects/{ref}/analytics/warehouse/collections',
+    {
+      params: { path: { ref: projectRef } },
+      signal,
+    }
+  )
 
   if (error) handleError(error)
 

@@ -25,8 +25,9 @@ export const CreateWarehouseCollectionModal = () => {
 
   const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
+      // todo: remove typecast once api types are fixed
       setIsOpen(false)
-      router.push(`/project/${ref}/logs/collections/${data?.token}`)
+      router.push(`/project/${ref}/logs/collections/${(data as any).token}`)
     },
     onError: (error) => {
       toast.error(error.message)
@@ -75,6 +76,7 @@ export const CreateWarehouseCollectionModal = () => {
       >
         New collection
       </ButtonTooltip>
+      <Button onClick={() => setIsOpen(!isOpen)}>Create collection</Button>
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
