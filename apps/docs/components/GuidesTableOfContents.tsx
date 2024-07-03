@@ -1,3 +1,5 @@
+'use client'
+
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
@@ -20,7 +22,7 @@ const formatSlug = (slug: string) => {
 
 const formatTOCHeader = (content: string) => {
   let begin = false
-  const res = []
+  const res: Array<string> = []
   for (const x of content) {
     if (x === '`') {
       if (!begin) {
@@ -52,17 +54,24 @@ const useTocRerenderTrigger = () => {
   return toggleRenderFlag
 }
 
+interface TOCHeader {
+  id?: string
+  text: string
+  link: string
+  level: number
+}
+
 const GuidesTableOfContents = ({
   className,
   overrideToc,
   video,
 }: {
   className?: string
-  overrideToc?: Array<{ text: string; link: string; level: number }>
+  overrideToc?: Array<TOCHeader>
   video?: string
 }) => {
   useSubscribeTocRerender()
-  const [tocList, setTocList] = useState([])
+  const [tocList, setTocList] = useState<TOCHeader[]>([])
   const pathname = usePathname()
   const [hash] = useHash()
 
@@ -87,9 +96,10 @@ const GuidesTableOfContents = ({
           if (!link) return null
 
           const level = heading.tagName === 'H2' ? 2 : 3
-          return { text, link, level }
+
+          return { text, link, level } as Partial<TOCHeader>
         })
-        .filter(Boolean)
+        .filter((x): x is TOCHeader => !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 
@@ -140,3 +150,4 @@ const GuidesTableOfContents = ({
 
 export default GuidesTableOfContents
 export { useTocRerenderTrigger }
+export type { TOCHeader }

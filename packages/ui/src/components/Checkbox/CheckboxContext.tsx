@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext } from 'react'
 
 // Make sure the shape of the default value passed to
