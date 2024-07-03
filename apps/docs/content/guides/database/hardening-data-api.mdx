@@ -2,7 +2,7 @@
 title: 'Hardening the Data API'
 ---
 
-Your database's automatically generated Data API exposes the `public` schema by default. Since the `public` schema is often used by other tools as a default space, you might want to lock down this schema. This helps prevent accidental exposure of data that's automatically added to `public`.
+Your database's automatically generated Data API exposes the `public` schema by default. If your `public` schema is used by other tools as a default space, you might want to lock down this schema. This helps prevent accidental exposure of data that's automatically added to `public`.
 
 There are two levels of security hardening for the Data API:
 
