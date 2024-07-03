@@ -91,7 +91,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       ?.join(' ')
   }
 
-  const formattedDefinition = useTableDefinition(useEntityType(id), project).formattedDefinition
+  const { formattedDefinition } = useTableDefinition(useEntityType(id), project)
   const copyDefinition = async () => {
     try {
       await navigator.clipboard.writeText(formattedDefinition!)
