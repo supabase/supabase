@@ -209,8 +209,10 @@ const Pagination = () => {
                     loading={isFetching}
                     icon={<HelpCircle />}
                     onClick={() => {
-                      if (data.count > THRESHOLD_COUNT) setIsConfirmFetchExactCountModalOpen(true)
-                      else snap.setEnforceExactCount(true)
+                      // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
+                      if (rowsCountEstimate === null || data.count > THRESHOLD_COUNT) {
+                        setIsConfirmFetchExactCountModalOpen(true)
+                      } else snap.setEnforceExactCount(true)
                     }}
                   />
                 </TooltipTrigger_Shadcn_>
@@ -273,8 +275,11 @@ const Pagination = () => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          Your table has a row count of greater than {THRESHOLD_COUNT.toLocaleString()} rows, and
-          retrieving the exact count of the table may cause performance issues on your database.
+          {rowsCountEstimate === null
+            ? `If your table has a row count of greater than ${THRESHOLD_COUNT.toLocaleString()} rows,
+          retrieving the exact count of the table may cause performance issues on your database.`
+            : `Your table has a row count of greater than ${THRESHOLD_COUNT.toLocaleString()} rows, and
+          retrieving the exact count of the table may cause performance issues on your database.`}
         </p>
       </ConfirmationModal>
     </div>
