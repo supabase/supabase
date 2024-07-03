@@ -2,13 +2,23 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { number, object, string } from 'yup'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
   IconAlertTriangle,
   IconEye,
   IconEyeOff,
@@ -16,26 +26,11 @@ import {
   InputNumber,
   Toggle,
 } from 'ui'
-import { number, object, string } from 'yup'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import NoPermission from 'components/ui/NoPermission'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
