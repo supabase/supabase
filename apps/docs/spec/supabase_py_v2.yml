@@ -23,6 +23,57 @@ functions:
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
+    params:
+      - name: supabase_url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: supabase_key
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: options
+        isOptional: true
+        type: ClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: string
+            description: The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'.
+          - name: headers
+            isOptional: true
+            type: dictionary
+            description: Optional headers for initializing the client.
+          - name: auto_refresh_token
+            isOptional: true
+            type: bool
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+          - name: persist_session
+            isOptional: true
+            type: bool
+            description: Whether to persist a logged in session to storage.
+          - name: storage
+            isOptional: true
+            type: SyncSupportedStorage
+            description: A storage provider. Used to store the logged in session.
+          - name: realtime
+            isOptional: true
+            type: string
+            description: Options passed to the realtime-py instance.
+          - name: postgrest_client_timeout
+            isOptional: true
+            type: int, float, Timeout
+            description: Timeout passed to the SyncPostgrestClient instance.
+          - name: storage_client_timeout
+            isOptional: true
+            type: int, float, Timeout
+            description: Timeout passed to the SyncStorageClient instance.
+          - name: flow_type
+            isOptional: true
+            type: AuthFlowType
+            description: flow type to use for authentication.
+
     examples:
       - id: create-client
         name: create_client()
@@ -55,6 +106,46 @@ functions:
 
   - id: sign-up
     title: 'sign_up()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignUpWithPasswordCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of `email` or `phone` must be provided.
+          - name: password
+            type: string
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: email_redirect_to
+                isOptional: true
+                type: string
+                description: >
+                  Only for email signups.
+                  The redirect URL embedded in the email link.
+                  Must be a configured redirect URL for your Supabase instance.
+              - name: data
+                isOptional: true
+                type: object
+                description: >
+                  A custom data object to store additional user metadata.
+              - name: captcha_token
+                isOptional: true
+                type: string
+              - name: channel
+                isOptional: true
+                type: sms | whatsapp
+                description: >
+                  The channel to use for sending messages.
+                  Only for phone signups.
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -64,79 +155,149 @@ functions:
       - If sign_up() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
-      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/python/auth-getuser).
+      - To fetch the currently logged-in user, refer to [`get_user()`](/docs/reference/python/auth-getuser).
     examples:
       - id: signup
-        name: Sign up
+        name: Sign up with an email and password
         code: |
-          ```
-          credentials = {
-              "email": "users_email@email.com",
-              "password": "users_password"
-            }
-          user = supabase.auth.sign_up(credentials)
+          ```python          
+          response = supabase.auth.sign_up(
+              credentials={"email": "hello@example.com", "password": "password"}
+          )
           ```
         response: |
-          ```
-          User(
-            id='11111111-1111-1111-1111-111111111111',
-            app_metadata={
-              'provider': 'email',
-              'providers': ['email']
-            }, 
-            user_metadata={
-              'email': 'users_email@email.com',
-              'email_verified': False,
-              'phone_verified': False,
-              'sub': '11111111-1111-1111-1111-111111111111'
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "hello@example.com",
+              "phone": "",
+              "created_at": "2024-06-17T00:19:25.760110Z",
+              "confirmed_at": null,
+              "email_confirmed_at": "2024-06-17T00:19:25.779181Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-17T00:19:25.785489Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-17T00:19:25.794650Z",
+              "identities": [
+                {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "hello@example.com",
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "created_at": "2024-06-17T00:19:25.774522Z",
+                  "last_sign_in_at": "2024-06-17T00:19:25.774498Z",
+                  "updated_at": "2024-06-17T00:19:25.774522Z"
+                }
+              ],
+              "factors": null
             },
-            aud='authenticated', 
-            confirmation_sent_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)),
-            recovery_sent_at=None,
-            email_change_sent_at=None, 
-            new_email=None,
-            invited_at=None,
-            action_link=None,
-            email='users_email@email.com', 
-            phone='',
-            created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-            confirmed_at=None,
-            email_confirmed_at=None, 
-            phone_confirmed_at=None,
-            last_sign_in_at=None,
-            role='authenticated', 
-            updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-            identities=[
-              UserIdentity(
-                id='22222222-2222-2222-2222-222222222222', 
-                user_id='11111111-1111-1111-1111-111111111111', 
-                identity_data={
-                  'email': 'users_email@email.com', 
-                  'email_verified': False,
-                  'phone_verified': False, 
-                  'sub': '11111111-1111-1111-1111-111111111111'
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4NTg3MTY1LCJpYXQiOjE3MTg1ODM1NjUsImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6NTQzMjEvYXV0aC92MSIsInN1YiI6ImU0MTBkMTBmLTZlNTktNDBlNS1hMmRlLTY5NGE5MzVlNzJlZCIsImVtYWlsIjoiaGVsbG9AZXhhbXBsZS5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODU4MzU2NX1dLCJzZXNzaW9uX2lkIjoiMjRmOGFlMmMtYWM4Mi00NzdhLWIxMTMtZTkwNmRlNzFiMDIxIn0.5KrE1AL4koBJs5dvNQfThMV1HxV8nPP-GPU24aRL9xI",
+              "refresh_token": "mNUp4-LDuYq-kNG61t-2Xw",
+              "expires_in": 3600,
+              "expires_at": 1718587165,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email"
+                  ]
                 },
-                provider='email', 
-                created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-                last_sign_in_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
-                updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC))
-              )
-            ],
-            factors=None
-          ) 
-          session=None
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "hello@example.com",
+                "phone": "",
+                "created_at": "2024-06-17T00:19:25.760110Z",
+                "confirmed_at": null,
+                "email_confirmed_at": "2024-06-17T00:19:25.779181Z",
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-17T00:19:25.785489Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-17T00:19:25.794650Z",
+                "identities": [
+                  {
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "hello@example.com",
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "created_at": "2024-06-17T00:19:25.774522Z",
+                    "last_sign_in_at": "2024-06-17T00:19:25.774498Z",
+                    "updated_at": "2024-06-17T00:19:25.774522Z"
+                  }
+                ],
+                "factors": null
+              }
+            }
+          }
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "phone": "123456789",
+                  "password": "password",
+              }
+          )
+          ```
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        description: |
+          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "phone": "123456789",
+                  "password": "password",
+                  "options": {"channel": "whatsapp"},
+              }
+          )
           ```
       - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         code: |
-          ```
-          res = supabase.auth.sign_up(
-            email= 'example@email.com',
-            password= 'example-password',
-            data= {
-              first_name= 'John',
-              age= 27,
-            }
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "email": "hello@example.com",
+                  "password": "password",
+                  "options": {"data": {"first_name": "John", "age": 27}},
+              }
           )
           ```
       - id: sign-up-with-redirect
@@ -144,11 +305,117 @@ functions:
         description: |
           - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls) to add additional redirect URLs to your project.
         code: |
+          ```python
+          response = supabase.auth.sign_up(
+              credentials={
+                  "email": "hello1@example.com",
+                  "password": "password",
+                  "options": {
+                      "email_redirect_to": "https://example.com/welcome",
+                  },
+              }
+          )
           ```
-          res = supabase.auth.sign_up(
-            email= 'example@email.com',
-            password= 'example-password',
-            redirect_to= 'https://example.com/welcome'
+  - id: sign-in-anonymously
+    title: 'sign_in_anonymously()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignInAnonymouslyCredentials
+        subContent:
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: data
+                isOptional: true
+                type: object
+                description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column. The `data` should be a JSON object that includes user-specific info, such as their first and last name.
+              - name: captcha_token
+                isOptional: true
+                type: string
+                description: Verification token received when the user completes the captcha on the site.
+  
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.sign_in_anonymously(
+              credentials={"options": {"captcha_token": ""}}
+          )
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {},
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "recovery_sent_at": null,
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "",
+              "phone": "",
+              "created_at": "2024-06-23T22:35:47.518626Z",
+              "confirmed_at": null,
+              "email_confirmed_at": null,
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+              "role": "authenticated",
+              "updated_at": "2024-06-23T22:35:47.522241Z",
+              "identities": [],
+              "factors": null
+            },
+            "session": {
+              "provider_token": null,
+              "provider_refresh_token": null,
+              "access_token": "<ACCESS_TOKEN>",
+              "refresh_token": "<REFRESH_TOKEN>",
+              "expires_in": 3600,
+              "expires_at": 1719185747,
+              "token_type": "bearer",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "app_metadata": {},
+                "user_metadata": {},
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "recovery_sent_at": null,
+                "email_change_sent_at": null,
+                "new_email": null,
+                "invited_at": null,
+                "action_link": null,
+                "email": "",
+                "phone": "",
+                "created_at": "2024-06-23T22:35:47.518626Z",
+                "confirmed_at": null,
+                "email_confirmed_at": null,
+                "phone_confirmed_at": null,
+                "last_sign_in_at": "2024-06-23T22:35:47.520855Z",
+                "role": "authenticated",
+                "updated_at": "2024-06-23T22:35:47.522241Z",
+                "identities": [],
+                "factors": null
+              }
+            }
+          }
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.sign_in_anonymously(
+              credentials={"options": {"data": {}}}
           )
           ```
   - id: sign-in-with-password
@@ -300,7 +567,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.enroll({
+          res = supabase.auth.mfa.enroll({
             "factor_type": "totp",
             "friendly_name": "your_friendly_name"
           })
@@ -316,7 +583,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.challenge({
+          res = supabase.auth.mfa.challenge({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
           })
           ```
@@ -330,7 +597,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.verify({
+          res = supabase.auth.mfa.verify({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
             "code": '123456'
@@ -347,7 +614,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.challenge_and_verify({
+          res = supabase.auth.mfa.challenge_and_verify({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
             "code": '123456'
           })
@@ -360,7 +627,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.unenroll({
+          res = supabase.auth.mfa.unenroll({
             "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
           })
           ```
@@ -376,7 +643,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          res = await supabase.auth.mfa.get_authenticator_assurance_level()
+          res = supabase.auth.mfa.get_authenticator_assurance_level()
           ```
   - id: get-user
     title: 'get_user'
@@ -415,8 +682,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
-      - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: set-session
         name: Refresh the session
@@ -429,7 +695,6 @@ functions:
     title: 'refresh_session()'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
-      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
     examples:
       - id: refresh-session
         name: Refresh session using the current session
@@ -440,14 +705,25 @@ functions:
   - id: select
     title: 'Fetch data: select()'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - `select()` can be combined with [Filters](/docs/reference/python/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/python/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: string
+        description: The columns to retrieve, defaults to `*`.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
     examples:
       - id: getting-your-data
         name: Getting your data
         code: |
           ```python
-          response = supabase.table('countries').select("*").execute()
+          response = supabase.table("countries").select("*").execute()
           ```
         data:
           sql: |
@@ -463,17 +739,30 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
-                            {'id': 2, 'name': 'Albania'},
-                            {'id': 3, 'name': 'Algeria'}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
           ```
-          response = supabase.table('countries').select('name').execute()
+          response = supabase.table("countries").select("name").execute()
           ```
         data:
           sql: |
@@ -489,21 +778,29 @@ functions:
               (3, 'Algeria');
             ```
         response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
-          APIResponse(data=[{'name': 'Afghanistan'},
-                            {'name': 'Albania'},
-                            {'name': 'Algeria'}],
-                      count=None)
-          ```
-      - id: query-foreign-tables
-        name: Query foreign tables
+      - id: query-referenced-tables
+        name: Query referenced tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
         code: |
-          ```
-          response = supabase.table('countries')
-            .select('name, cities(name)')
-            .execute()
+          ```python
+          response = supabase.table("countries").select("name, cities(name)").execute()
           ```
         data:
           sql: |
@@ -529,18 +826,34 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
-          APIResponse(data=[{'name': 'Germany', 'cities': [{'name': 'Munich'}]},
-                            {'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}],
-                      count=None)
-          ```
-      - id: query-foreign-tables-through-a-join-table
-        name: Query foreign tables through a join table
+      - id: query-referenced-tables-through-a-join-table
+        name: Query referenced tables through a join table
         code: |
-          ```
-          response = supabase.table('users')
-            .select('name, teams(name)')
-            .execute()
+          ```python
+          response = supabase.table("users").select("name, teams(name)").execute()
           ```
         data:
           sql: |
@@ -582,12 +895,31 @@ functions:
               (2, 2);
             ```
         response: |
-          ```
-          APIResponse(data=[
-                            {'name': 'Kiran', 'teams': [{'name': 'Green'}, {'name': 'Blue'}]},
-                            {'name': 'Evan', 'teams': [{'name': 'Blue'}]}
-                           ],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Kiran",
+                "teams": [
+                  {
+                    "name": "Green"
+                  },
+                  {
+                    "name": "Blue"
+                  }
+                ]
+              },
+              {
+                "name": "Evan",
+                "teams": [
+                  {
+                    "name": "Blue"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           If you're in a situation where your tables are **NOT** directly
@@ -595,13 +927,15 @@ functions:
           the `select()` method to query the related data. The join table needs
           to have the foreign keys as part of its composite primary key.
         hideCodeBlock: true
-      - id: query-the-same-foreign-table-multiple-times
-        name: Query the same foreign table multiple times
+      - id: query-the-same-referenced-table-multiple-times
+        name: Query the same referenced table multiple times
         code: |
-          ```
-          response = supabase.table('messages')
-            .select('content,from:sender_id(name),to:receiver_id(name)')
-            .execute()
+          ```python
+          response = (
+              supabase.table("messages")
+              .select("content,from:sender_id(name),to:receiver_id(name)")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -628,26 +962,37 @@ functions:
                (1, 2, '👋');
              ```
         response: |
-          ```
-          APIResponse(data=[{'content': '👋',
-                            'from': {'name': 'Kiran'},
-                            'to': {'name': 'Evan'}}
-                           ],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "content": "👋",
+                "from": {
+                  "name": "Kiran"
+                },
+                "to": {
+                  "name": "Evan"
+                }
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
-          If you need to query the same foreign table twice, use the name of the
+          If you need to query the same referenced table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
         hideCodeBlock: true
-      - id: filtering-through-foreign-tables
-        name: Filtering through foreign tables
+      - id: filtering-through-referenced-tables
+        name: Filtering through referenced tables
         code: |
-          ```
-          response = supabase.table('cities')
-            .select('name, countries(*)')
-            .eq('countries.name', 'Estonia')
-            .execute()
+          ```python
+          response = (
+              supabase.table("cities")
+              .select("name, countries(*)")
+              .eq("countries.name", "Estonia")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -673,24 +1018,31 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'Bali', 'countries': None},
-                            {'name': 'Munich', 'countries': None}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
-          NOT WORKING CURRENTLY
-          If the filter on a foreign table's column is not satisfied, the foreign
+          If the filter on a referenced table's column is not satisfied, the referenced
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
-      - id: querying-foreign-table-with-count
-        name: Querying foreign table with count
+      - id: querying-referenced-table-with-count
+        name: Querying referenced table with count
         code: |
-          ```
-          response = supabase.table('countries')
-            .select('*, cities(count)')
-            .execute()
+          ```python
+          response = supabase.table("countries").select("*, cities(count)").execute()
           ```
         data:
           sql: |
@@ -717,10 +1069,21 @@ functions:
             ('Bristol', (select id from country));
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Germany', 'cities': [{'count': 1}]},
-                            {'id': 2, 'name': 'Indonesia', 'cities': [{'count': 1}]}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": "c31e7151-5a6f-453c-915b-caf31ec9a0a0",
+                "name": "united kingdom",
+                "cities": [
+                  {
+                    "count": 4
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           You can get the number of rows in a related table by using the
@@ -729,10 +1092,8 @@ functions:
       - id: querying-with-count-option
         name: Querying with count option
         code: |
-          ```
-          response = supabase.table('countries')
-            .select('*', count='exact')
-            .execute()
+          ```python
+          response = supabase.table("countries").select("*", count="exact").execute()
           ```
         data:
           sql: |
@@ -748,10 +1109,24 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Germany'},
-                            {'id': 2, 'name': 'Indonesia'}],
-                      count=2)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": 3
+          }
           ```
         description: |
           You can get the number of rows by using the
@@ -760,10 +1135,8 @@ functions:
       - id: querying-json-data
         name: Querying JSON data
         code: |
-          ```
-          response = supabase.table('users')
-              .select('id, name, address->city')
-              .execute()
+          ```python
+          response = supabase.table("users").select("id, name, address->city").execute()
           ```
         data:
           sql: |
@@ -781,8 +1154,17 @@ functions:
               (1, 'Avdotya', '{"city":"Saint Petersburg"}');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Avdotya', 'city': 'Saint Petersburg'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Avdotya",
+                "city": "Saint Petersburg"
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           You can select and filter data inside of
@@ -790,17 +1172,122 @@ functions:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
         hideCodeBlock: true
+      - id: querying-referenced-table-with-inner-join
+        name: Querying referenced table with inner join
+        code: |
+          ```python
+          response = (
+              supabase.table("cities")
+              .select("name, countries!inner(name)")
+              .eq("countries.name", "Indonesia")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": {
+                  "name": "Indonesia"
+                }
+              }
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          If you don't want to return the referenced table contents, you can leave the parenthesis empty.
+          Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```python
+          response = supabase.schema("myschema").table("mytable").select("*").execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "b1a8c0b5-bdf0-46f1-95a5-f0fb9cb2f410",
+                "data": "mydata"
+              }
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
+        hideCodeBlock: true
 
   - id: insert
     title: 'Create data: insert()'
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+      - name: default_to_null
+        isOptional: true
+        type: bool
+        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: create-a-record
         name: Create a record
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .insert({"id": 1, "name": "Denmark"})
-            .execute()
+          response = (
+              supabase.table("countries")
+              .insert({"id": 1, "name": "Denmark"})
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -809,24 +1296,100 @@ functions:
               countries (id int8 primary key, name text);
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Denmark'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: bulk-create
+        name: Bulk create
+        code: |
+          ```python
+          try:
+            response = supabase.table("countries")
+              .insert([
+                { "id": 1, "name": "Nepal" },
+                { "id": 1, "name": "Vietnam" },
+              ])
+              .execute()
+            return response
+          except Exception as exception:
+            return exception
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "_raw_error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "message": "duplicate key value violates unique constraint \"countries_pkey\"",
+            "code": "23505",
+            "hint": null,
+            "details": "Key (id)=(1) already exists."
+          }
+          ```
+        description: |
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
+        hideCodeBlock: true
   - id: update
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/python/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+      - name: ignore_duplicates
+        isOptional: true
+        type: bool
+        description:  Whether duplicate rows should be ignored.
+      - name: on_conflict
+        isOptional: true
+        type: bool
+        description:  Specified columns to be made to work with UNIQUE constraint.
+      - name: default_to_null
+        isOptional: true
+        type: bool
+        description: |
+          Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under `ignore_duplicates: false`. This also only applies when doing bulk upserts.
     examples:
       - id: updating-your-data
         name: Updating your data
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .update({'name': 'Australia'})
-            .eq('id', 1)
-            .execute()
+          response = (
+              supabase.table("countries")
+              .update({"name": "Australia"})
+              .eq("id", 1)
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -840,23 +1403,103 @@ functions:
               (1, 'Denmark');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Australia'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: updating-json-data
+        name: Updating JSON data
+        code: |
+          ```python
+          response = (
+              supabase.table("users")
+              .update({"address": {"street": "Melrose Place", "postcode": 90210}})
+              .eq("address->postcode", 90210)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": 90210
+                }
+              }
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          Postgres offers some [operators](/docs/guides/database/json#query-the-jsonb-data) for working with JSON data. Currently, it is only possible to update the entire JSON document.
+        hideCodeBlock: true
   - id: upsert
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in the `values` dict to use upsert.
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+      - name: ignore_duplicates
+        isOptional: true
+        type: bool
+        description:  Whether duplicate rows should be ignored.
+      - name: on_conflict
+        isOptional: true
+        type: bool
+        description:  Specified columns to be made to work with UNIQUE constraint.
+      - name: default_to_null
+        isOptional: true
+        type: bool
+        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: upsert-your-data
         name: Upsert your data
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .upsert({'id': 1, 'name': 'Australia'})
-            .execute()
+          response = (
+              supabase.table("countries")
+              .upsert({"id": 1, "name": "Australia"})
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -870,8 +1513,16 @@ functions:
               (1, 'Afghanistan');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Australia'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -879,9 +1530,11 @@ functions:
         name: Bulk Upsert your data
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .upsert([{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}])
-            .execute()
+          response = (
+              supabase.table("countries")
+              .upsert([{"id": 1, "name": "Albania"}, {"id": 2, "name": "Algeria"}])
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -895,9 +1548,68 @@ functions:
               (1, 'Afghanistan');
             ```
         response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              },
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
-          APIResponse(data=[{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}], count=None)
+        hideCodeBlock: true
+      - id: upserting-into-tables-with-constraints
+        name: Upserting into tables with constraints
+        code: |
+          ```python
+          response = (
+              supabase.table("users")
+              .upsert(
+                  {"id": 42, "handle": "saoirse", "display_name": "Saoirse"},
+                  on_conflict="handle",
+              )
+              .execute()
+          )
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 generated by default as identity primary key,
+                handle text not null unique,
+                display_name text
+              );
+
+            insert into
+              users (id, handle, display_name)
+            values
+              (1, 'saoirse', null);
+            ```
+        response: |
+          ```json
+          {
+            "_raw_error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "message": "duplicate key value violates unique constraint \"users_handle_key\"",
+            "code": "23505",
+            "hint": null,
+            "details": "Key (handle)=(saoirse) already exists."
+          }
+          ```
+        description: |
+          In the following query, `upsert()` implicitly uses the `id`(primary key) column to determine conflicts. If there is no existing row with the same `id`, `upsert()` inserts a new row, which will fail in this case as there is already a row with `handle` `"saoirse"`.
+          Using the `on_conflict` option, you can instruct `upsert()` to use another column with a unique constraint to determine conflicts.
         hideCodeBlock: true
 
   - id: delete
@@ -909,15 +1621,22 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - When using `delete().in_()`, specify an array of values to target multiple rows with a single query. This is particularly useful for batch deleting entries that share common criteria, such as deleting users by their IDs. Ensure that the array you provide accurately represents all records you intend to delete to avoid unintended data removal.
+    params:
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
     examples:
       - id: delete-records
         name: Delete records
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .delete()
-            .eq('id', 1)
-            .execute()
+          response = supabase.table('countries').delete().eq('id', 1).execute()
           ```
         data:
           sql: |
@@ -930,12 +1649,221 @@ functions:
             values
               (1, 'Spain');
             ```
-          response: |
+        response: |
+          ```
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Spain"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: delete-multiple-records
+        name: Delete multiple records
+        code: |
+          ```python
+          response = supabase.table("countries").delete().in_("id", [1, 2, 3]).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain'), (2, 'France'), (3, 'Germany');
             ```
-            APIResponse(data=[{'id': 1, 'name': 'United States'], count=None)
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Spain"
+              },
+              {
+                "id": 2,
+                "name": "France"
+              },
+              {
+                "id": 3,
+                "name": "Germany"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: false
+        isSpotlight: false
+
+  - id: rpc
+    title: 'Postgres functions: rpc()'
+    description: |
+      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
+
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
+    params:
+      - name: fn
+        isOptional: false
+        type: callable
+        description: The stored procedure call to be executed.
+      - name: params
+        isOptional: true
+        type: dict of any
+        description:  Parameters passed into the stored procedure call.
+      - name: get
+        isOptional: true
+        type: dict of any
+        description:  When set to `true`, `data` will not be returned. Useful if you only need the count.
+      - name: head
+        isOptional: true
+        type: dict of any
+        description:  When set to `true`, the function will be called with read-only access mode.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: |
+          Count algorithm to use to count rows returned by the function. Only applicable for [set-returning functions](https://www.postgresql.org/docs/current/functions-srf.html). `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the hood. `"planned"`: Approximated but fast count algorithm. Uses the Postgres statistics under the hood. `"estimated"`: Uses exact count for low numbers and planned count for high numbers.
+    examples:
+      - id: call-a-postgres-function-without-arguments
+        name: Call a Postgres function without arguments
+        code: |
+          ```python
+          response = supabase.rpc("hello_world").execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
             ```
-            hideCodeBlock: true
-            isSpotlight: true
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: call-a-postgres-function-with-arguments
+        name: Call a Postgres function with arguments
+        code: |
+          ```python
+          response = supabase.rpc("echo", { "say": "👋" }).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "count": null
+            }
+            ```
+        hideCodeBlock: true
+      - id: bulk-processing
+        name: Bulk processing
+        code: |
+          ```python
+          response = supabase.rpc("add_one_each", {"arr": [1, 2, 3]}).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          You can process large payloads by passing in an array as an argument.
+        hideCodeBlock: true
+      - id: call-a-postgres-function-with-filters
+        name: Call a Postgres function with filters
+        code: |
+          ```python
+          response = supabase.rpc("list_stored_countries").eq("id", 1).single().execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "count": null
+          }
+          ```
+        description: |
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
+        hideCodeBlock: true
+      - id: call-a-read-only-postgres-function
+        name: Call a read-only Postgres function
+        code: |
+          ```python
+          response = supabase.rpc('hello_world', get=True).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+
 
   - id: using-filters
     title: Using Filters
@@ -955,17 +1883,44 @@ functions:
         code: |
           ```python
           # Correct
-          data, count = supabase.from('cities')
-            .select('name, country_id')
-            .eq('name', 'The Shire')
-            .execute()
+          response = (
+              supabase.table("cities")
+              .select("name, country_id")
+              .eq("name", "Bali")
+              .execute()
+          )
 
           # Incorrect
-          data, count = supabase.table('cities')
-            .eq('name', 'The Shire')
-            .select('name, country_id')
-            .execute()
+          response = (
+              supabase.table("cities")
+              .eq("name", "Bali")
+              .select("name, country_id")
+              .execute()
+          )
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
       - id: chaining-filters
         name: Chaining
         description: |
@@ -973,11 +1928,49 @@ functions:
           to query cities with population between 1,000 and 10,000.
         code: |
           ```python
-          data, count = supabase.table('cities')
-            .select('name, country_id')
-            .gte('population', 1000)
-            .lt('population', 10000)
-            .execute()
+          response = (
+              supabase.table("cities")
+              .select("name, country_id")
+              .gte("population", 1000)
+              .lt("population", 10000)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text,
+                population int8
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name, population)
+            values
+              (1, 2, 'Bali', 9980),
+              (2, 1, 'Munich', 250000);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "country_id": 2
+              }
+            ],
+            "count": null
+          }
           ```
       - id: conditional-chaining
         name: Conditional chaining
@@ -989,27 +1982,65 @@ functions:
           filterPopLow = 1000
           filterPopHigh = 10000
 
-          query = supabase.from('cities').select('name, country_id')
+          query = supabase.table("cities").select("name, country_id")
 
           if filterByName:
-            query = query.eq('name', filterByName)
+              query = query.eq("name", filterByName)
 
           if filterPopLow:
-            query = query.gte('population', filterPopLow)
+              query = query.gte("population", filterPopLow)
 
           if filterPopHigh:
-            query = query.lt('population', filterPopHigh)
+              query = query.lt("population", filterPopHigh)
 
           response = query.execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text,
+                population int8
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name, population)
+            values
+              (1, 2, 'Bali', 9980),
+              (2, 1, 'Munich', 250000);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "country_id": 2
+              }
+            ],
+            "count": null
+          }
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within JSON column
         code: |
           ```python
-          data, count = supabase.table('users')
-            .select('*')
-            .eq('address->postcode', 90210)
-            .execute()
+          response = (
+              supabase.table("users")
+              .select("*")
+              .eq("address->postcode", 90210)
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1028,17 +2059,30 @@ functions:
               (2, 'Jane', null);
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Michael', 'address': {'postcode': 90210}}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "postcode": 90210
+                }
+              }
+            ],
+            "count": null
+          }
           ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('name, cities!inner(name)')
-            .eq('cities.name', 'Bali')
-            .execute()
+          response = (
+              supabase.table("countries")
+              .select("name, cities!inner(name)")
+              .eq("cities.name", "Bali")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1064,8 +2108,20 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           You can filter on foreign tables in your `select()` query using dot
@@ -1073,46 +2129,23 @@ functions:
 
   - id: eq
     title: eq()
+    description: |
+      Match only rows where `column` is equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .eq('name', 'Albania')
-            .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-          response: |
-            ```
-            APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
-            ```
-          hideCodeBlock: true
-          isSpotlight: true
-  - id: neq
-    title: neq()
-    examples:
-      - id: with-select
-        name: With `select()`
-        code: |
-          ```python
-            data, count = supabase.table('countries')
-              .select('*')
-              .neq('name', 'Albania')
-              .execute()
+          response = supabase.table("countries").select("*").eq("name", "Albania").execute()
           ```
         data:
           sql: |
@@ -1128,24 +2161,89 @@ functions:
               (3, 'Algeria');
             ```
         response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
-            APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
-                                {'id': 3, 'name': 'Algeria'}],
-                        count=None)
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: neq
+    title: neq()
+    description: |
+      Match only rows where `column` is not equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = supabase.table("countries").select("*").neq("name", "Albania").execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: gt
     title: gt()
+    description: |
+      Match only rows where `column` is greather than `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .gt('id', 2)
-              .execute()
+          response = supabase.table("countries").select("*").gt("id", 2).execute()
           ```
         data:
           sql: |
@@ -1161,8 +2259,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 3, 'name': 'Algeria'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1171,15 +2277,23 @@ functions:
           to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
+    description: |
+      Match only rows where `column` is greater than or equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .gte('id', 2)
-            .execute()
+          response = supabase.table("countries").select("*").gte("id", 2).execute()
           ```
         data:
           sql: |
@@ -1195,24 +2309,42 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'},
-                              {'id': 3, 'name': 'Algeria'}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: lt
     title: lt()
+    description: |
+      Match only rows where `column` is less than `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .lt('id', 2)
-            .execute()
+          response = supabase.table("countries").select("*").lt("id", 2).execute()
           ```
         data:
           sql: |
@@ -1228,22 +2360,38 @@ functions:
             (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: lte
     title: lte()
+    description: |
+      Match only rows where `column` is less than or equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: value
+        isOptional: false
+        type: any
+        description: The value to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .lte('id', 2)
-            .execute()
+          response = supabase.table("countries").select("*").lte("id", 2).execute()
           ```
         data:
           sql: |
@@ -1259,24 +2407,42 @@ functions:
             (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
-                              {'id': 2, 'name': 'Albania'}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: like
     title: like()
+    description: |
+      Match only rows where `column` matches `pattern` case-sensitively.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The name of the column to apply a filter on
+      - name: pattern
+        isOptional: false
+        type: string
+        description: The pattern to match by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .like('name', '%Alba%')
-            .execute()
+          response = supabase.table("countries").select("*").like("name", "%Alba%").execute()
           ```
         data:
           sql: |
@@ -1292,22 +2458,38 @@ functions:
             (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: ilike
     title: ilike()
+    description: |
+      Match only rows where `column` matches `pattern` case-insensitively.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The name of the column to apply a filter on
+      - name: pattern
+        isOptional: false
+        type: string
+        description: The pattern to match by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .ilike('name', '%alba%')
-              .execute()
+          response = supabase.table("countries").select("*").ilike("name", "%alba%").execute()
           ```
         data:
           sql: |
@@ -1323,22 +2505,38 @@ functions:
             (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: is
     title: is_()
+    description: |
+      Match only rows where `column` IS `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The name of the column to apply a filter on
+      - name: value
+        isOptional: false
+        type: null | boolean
+        description: The value to match by
     examples:
       - id: checking-nullness
         name: Checking for nullness, True or False
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .is_('name', 'null')
-            .execute()
+          response = supabase.table("countries").select("*").is_("name", "null").execute()
           ```
         data:
           sql: |
@@ -1353,8 +2551,16 @@ functions:
               (2, null);
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': None}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": null
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           Using the `eq()` filter doesn't work when filtering for `null`. Instead, you need to use `is_()`.
@@ -1366,15 +2572,28 @@ functions:
         isSpotlight: true
   - id: in
     title: in_()
+    description: |
+      Match only rows where `column` is included in the `values` array.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: values
+        isOptional: false
+        type: array
+        description: The values to filter by
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .in_('name', ['Albania', 'Algeria'])
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .in_("name", ["Albania", "Algeria"])
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1390,24 +2609,47 @@ functions:
             (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'},
-                              {'id': 3, 'name': 'Algeria'}],
-                      count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: contains
     title: contains()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: values
+        isOptional: false
+        type: object
+        description: The jsonb, array, or range value to filter with
     examples:
       - id: on-array-columns
         name: On array columns
         code: |
           ```python
-            data, count = supabase.table('issues')
-              .select('*')
-              .contains('tags', ['is:open', 'priority:low'])
+          response = (
+              supabase.table("issues")
+              .select("*")
+              .contains("tags", ["is:open", "priority:low"])
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1425,8 +2667,21 @@ functions:
               (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'title': 'Cache invalidation is not working', 'tags': ['is:open', 'severity:high', 'priority:low']}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "title": "Cache invalidation is not working",
+                "tags": [
+                  "is:open",
+                  "severity:high",
+                  "priority:low"
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1434,10 +2689,12 @@ functions:
         name: On range columns
         code: |
           ```python
-          data, count = supabase.table('reservations')
-              .select('*')
-              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .contains("during", "[2000-01-01 13:00, 2000-01-01 13:30)")
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1456,8 +2713,17 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'room_name': 'Emerald', 'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           Postgres supports a number of [range
@@ -1469,10 +2735,12 @@ functions:
         name: On `jsonb` columns
         code: |
           ```python
-          data, count = supabase.table('users')
-              .select('*')
-              .contains('address', {'postcode': 90210})
+          response = (
+              supabase.table("users")
+              .select("*")
+              .contains("address", {"postcode": 90210})
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1491,21 +2759,46 @@ functions:
               (2, 'Jane', '{}');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Michael', 'address': {'postcode': 90210}}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": 90210
+                }
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
   - id: contained-by
     title: contained_by()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where every element appearing in `column` is contained by `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The jsonb, array, or range column to filter on
+      - name: value
+        isOptional: false
+        type: object
+        description: The jsonb, array, or range value to filter with
     examples:
       - id: on-array-columns
         name: On array columns
         code: |
           ```python
-          data, count = supabase.table('classes')
-            .select('name')
-            .contained_by('days', ['monday', 'tuesday', 'wednesday', 'friday'])
-            .execute()
+          response = (
+              supabase.table("classes")
+              .select("name")
+              .contained_by("days", ["monday", "tuesday", "wednesday", "friday"])
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1524,8 +2817,15 @@ functions:
               (2, 'History', array['monday', 'wednesday', 'thursday']);
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'Chemistry'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Chemistry"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1533,10 +2833,12 @@ functions:
         name: On range columns
         code: |
           ```python
-          data, count = supabase.table('reservations')
-            .select('*')
-            .contained_by('during', '[2000-01-01 00:00, 2000-01-01 23:59)')
-            .execute()
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .contained_by("during", "[2000-01-01 00:00, 2000-01-01 23:59)")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1555,8 +2857,17 @@ functions:
               (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'room_name': 'Emerald', 'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           Postgres supports a number of [range
@@ -1568,10 +2879,12 @@ functions:
         name: On `jsonb` columns
         code: |
           ```python
-          data, count = supabase.table('users')
-              .select('name')
-              .contained_by('address', {})
+          response = (
+              supabase.table("users")
+              .select("name")
+              .contained_by("address", {})
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1590,21 +2903,554 @@ functions:
               (2, 'Jane', '{}');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'Jane'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Jane"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
-  - id: match
-    title: match()
+  - id: range-gt
+    title: range_gt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The range column to filter on
+      - name: range
+        isOptional: false
+        type: array
+        description: The range to filter with
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .match({'id': 2, 'name': 'Albania'})
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .range_gt("during", ["2000-01-02 08:00", "2000-01-02 09:00"])
               .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 2,
+                  "room_name": "Topaz",
+                  "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+                }
+              ],
+              "count": null
+            }
+            ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: range-gte
+    title: range_gte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The range column to filter on
+      - name: range
+        isOptional: false
+        type: string
+        description: The range to filter with
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .range_gte("during", ["2000-01-02 08:30", "2000-01-02 09:30"])
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "room_name": "Topaz",
+                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+              }
+            ],
+            "count": null
+          }  
+          ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: range-lt
+    title: range_lt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The range column to filter on
+      - name: range
+        isOptional: false
+        type: array
+        description: The range to filter with
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .range_lt("during", ["2000-01-01 15:00", "2000-01-01 16:00"])
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: range-lte
+    title: range_lte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The range column to filter on
+      - name: range
+        isOptional: false
+        type: array
+        description: The range to filter with
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .range_lte("during", ["2000-01-01 14:00", "2000-01-01 16:00"])
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "id": 1,
+                  "room_name": "Emerald",
+                  "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+                }
+              ],
+              "count": null
+            }
+          ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+        isSpotlight: true
+  
+  - id: range-adjacent
+    title: range_adjacent()
+    description: |
+      Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The range column to filter on
+      - name: range
+        isOptional: false
+        type: array
+        description: The range to filter with
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .range_adjacent("during", ["2000-01-01 12:00", "2000-01-01 13:00"])
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "count": null
+          }
+          ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: overlaps
+    title: overlaps()
+    description: |
+      Only relevant for array and range columns. Match only rows where `column` and `value` have an element in common.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The array or range column to filter on
+      - name: value
+        isOptional: false
+        type: Iterable[Any]
+        description: The array or range value to filter with
+    examples:
+      - id: on-array-columns
+        name: On array columns
+        code: |
+          ```python
+          response = (
+              supabase.table("issues")
+              .select("title")
+              .overlaps("tags", ["is:closed", "severity:high"])
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "title": "Cache invalidation is not working"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
+        code: |
+          ```python
+          response = (
+              supabase.table("reservations")
+              .select("*")
+              .overlaps("during", "[2000-01-01 12:45, 2000-01-01 13:15)")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "room_name": "Emerald",
+                "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
+        hideCodeBlock: true
+
+  - id: text-search
+    title: text_search()
+    description: |
+      Only relevant for text and tsvector columns. Match only rows where `column` matches the query string in `query`.
+
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The text or tsvector column to filter on
+      - name: query
+        isOptional: false
+        type: string
+        description: The query text to match with
+      - name: options
+        isOptional: true
+        type: object
+        description: Named parameters
+        subContent:
+          - name: type
+            isOptional: true
+            type: '"plain" | "phrase" | "websearch"'
+            description: Change how the `query` text is interpreted
+          - name: config
+            isOptional: true
+            type: string
+            description: The text search configuration to use
+    notes: |
+      - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
+    examples:
+      - id: text-search
+        name: Text search
+        code: |
+          ```python
+          response = (
+              supabase.table("texts")
+              .select("content")
+              .text_search("content", "'eggs' & 'ham'", options={"config": "english"})
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table texts (
+              id      bigint
+                      primary key
+                      generated always as identity,
+              content text
+            );
+
+            insert into texts (content) values
+                ('Four score and seven years ago'),
+                ('The road goes ever on and on'),
+                ('Green eggs and ham')
+            ;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "Green eggs and ham"
+              }
+            ],
+            "count": null
+          }
+          ```
+      - id: basic-normalization
+        name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        code: |
+          ```python
+          response = (
+              supabase.table("quotes")
+              .select("catchphrase")
+              .text_search(
+                  "catchphrase",
+                  "'fat' & 'cat'",
+                  options={"type": "plain", "config": "english"},
+              )
+              .execute()
+          )
+          ```
+      - id: full-normalization
+        name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        code: |
+          ```python
+          response = (
+              supabase.table("quotes")
+              .select("catchphrase")
+              .text_search(
+                  "catchphrase",
+                  "'fat' & 'cat'",
+                  options={"type": "phrase", "config": "english"},
+              )
+              .execute()
+          )
+          ```
+      - id: web-search
+        name: Websearch
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        code: |
+          ```python
+          response = (
+              supabase.table("quotes")
+              .select("catchphrase")
+              .text_search(
+                  "catchphrase",
+                  "'fat or cat'",
+                  options={"type": "websearch", "config": "english"},
+              )
+              .execute()
+          )
+          ```
+
+  - id: match
+    title: match()
+    description: |
+      Match only rows where each column in `query` keys is equal to its associated value. Shorthand for multiple `.eq()`s.
+    params:
+      - name: query
+        isOptional: false
+        type: dict
+        description: The object to filter with, with column names as keys mapped to their filter values
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .match({"id": 2, "name": "Albania"})
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1620,54 +3466,95 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
   - id: not
     title: not_()
+    description: |
+      Match only rows which doesn't satisfy the filter. `not_` expects you to use the raw PostgREST syntax for the filter values.
+    notes: |
+      ```python
+      .not_.in_('id', '(5,6,7)')  # Use `()` for `in` filter
+      .not_.contains('arraycol', '{"a","b"}')  # Use `{}` for array values
+      ```
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .not_.is_('name', 'null')
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .not_.is_("name", "null")
               .execute()
+          )
           ```
         data:
-        sql: |
-          ```sql
-          create table
-            countries (id int8 primary key, name text);
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
-          insert into
-            countries (id, name)
-          values
-            (1, 'Albania'),
-            (2, null);
-          ```
+            insert into
+              countries (id, name)
+            values
+              (1, 'Albania'),
+              (2, null);
+            ```
         response: |
-          ```
-          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
-  - id: filter
-    title: filter()
+  - id: or
+    title: or_()
+    params:
+      - name: filters
+        isOptional: false
+        type: string
+        description: The filters to use, following PostgREST syntax
+      - name: reference_table
+        isOptional: true
+        type: string
+        description: Set this to filter on referenced tables instead of the parent table
     notes: |
-      filter() expects you to use the raw PostgREST syntax for the filter values.
+      or_() expects you to use the raw PostgREST syntax for the filter names and values.
+
+      ```python
+      .or_('id.in.(5,6,7), arraycol.cs.{"a","b"}')  # Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or_('id.in.(5,6,7), arraycol.cd.{"a","b"}')  # Use `cd` for `containedBy()`
+      ```
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('*')
-              .filter('name', 'in', '("Algeria","Japan")')
+          response = (
+              supabase.table("countries")
+              .select("name")
+              .or_("id.eq.2,name.eq.Algeria")
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1683,19 +3570,67 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 3, 'name': 'Algeria'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: use-or-with-and
+        name: Use `or` with `and`
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('name, cities!inner (name)')
-              .filter('cities.name', 'eq', 'Bali')
+          response = (
+              supabase.table("countries")
+              .select("name")
+              .or_("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
               .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        reponse: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+      - id: use-or-on-referenced-tables
+        name: Use `or` on referenced tables
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("name, cities!inner(name)")
+              .or_("country_id.eq.1,name.eq.Beijing", reference_table="cities")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1721,34 +3656,56 @@ functions:
               (2, 1, 'Munich');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
+  
+  - id: filter
+    title: filter()
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to filter on
+      - name: operator
+        isOptional: true
+        type: string
+        description: The operator to filter with, following PostgREST syntax
+      - name: value
+        isOptional: true
+        type: any
+        description: The value to filter with, following PostgREST syntax
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
 
-  - id: using-modifiers
-    title: Using Modifiers
-    description: |
-      Filters work on the row level—they allow you to return rows that
-      only match certain conditions without changing the shape of the rows.
-      Modifiers are everything that don't fit that definition—allowing you to
-      change the format of the response (e.g., returning a CSV string).
-
-      Modifiers must be specified after filters. Some modifiers only apply for
-      queries that return rows (e.g., `select()` or `rpc()` on a function that
-      returns a table response).
-
-  - id: order
-    title: order()
+      ```python
+      .filter('id', 'in', '(5,6,7)')  # Use `()` for `in` filter
+      .filter('arraycol', 'cs', '{"a","b"}')  # Use `cs` for `contains()`, `{}` for array values
+      ```
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .order('name', desc=True)
-            .execute()
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .filter("name", "in", '("Algeria","Japan")')
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1764,14 +3721,16 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(
-            data=[
-              {'id': 1, 'name': None},
-              {'id': 3, 'name': 'Algeria'},
-              {'id': 2, 'name': 'Albania'}],
-            count=None
-          )
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1779,10 +3738,142 @@ functions:
         name: On a foreign table
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('name, cities(name)')
-              .order('name', desc=True, foreign_table='cities')
+          response = (
+              supabase.table("countries")
+              .select("name, cities!inner(name)")
+              .filter("cities.name", "eq", "Bali")
               .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
+
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+
+  - id: order
+    title: order()
+    description: Order the query result by `column`.
+    params:
+      - name: column
+        isOptional: false
+        type: string
+        description: The column to order by
+      - name: desc
+        isOptional: true
+        type: bool
+        description: Whether the rows should be ordered in descending order or not.
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Foreign table name whose results are to be ordered.
+      - name: nullsfirst
+        isOptional: true
+        type: bool
+        description: Order by showing nulls first
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .order("name", desc=True)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .order("name", desc=True, foreign_table="cities")
+              .execute()
+          )
           ```
         data:
           sql: |
@@ -1806,8 +3897,27 @@ functions:
               (1, 1, 'Atlanta'),
               (2, 1, 'New York City');
         response: |
-          ```
-          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'New York City'}, {'name': 'Atlanta'}]}, {'name': 'Vanuatu', 'cities': []}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "New York City"
+                  },
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              },
+              {
+                "name": "Vanuatu",
+                "cities": []
+              }
+            ],
+            "count": null
+          }
           ```
         description: |
           Ordering on foreign tables doesn't affect the ordering of
@@ -1815,15 +3925,21 @@ functions:
         hideCodeBlock: true
   - id: limit
     title: limit()
+    params:
+      - name: size
+        isOptional: false
+        type: number
+        description: The maximum number of rows to return
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Set this to limit rows of foreign tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .limit(1)
-            .execute()
+          response = supabase.table("countries").select("name").limit(1).execute()
           ```
         data:
           sql: |
@@ -1839,8 +3955,15 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-          ```
-          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'}], count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1848,10 +3971,12 @@ functions:
         name: On a foreign table
         code: |
           ```python
-          data, count = supabase.table('countries')
-              .select('name, cities(name)')
-              .limit(1, foreign_table='cities')
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .limit(1, foreign_table="cities")
               .execute()
+          )
           ```
         data:
           sql: |
@@ -1876,54 +4001,301 @@ functions:
               (2, 1, 'New York City');
             ```
         response: |
-          ```
-          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'Atlanta'}]}], count=None)
-          ```
-        hideCodeBlock: true
-  - id: single
-    title: single()
-    examples:
-      - id: with-select()
-        name: With `select()`
-        code: |
-          ```python
-          data, count = supabase.table('countries')
-            .select('name')
-            .limit(1)
-            .single()
-            .execute()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-        response: |
-          ```
-          SingleAPIResponse(data={'name': 'Afghanistan'}, count=None)
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              }
+            ],
+            "count": null
+          }
           ```
         hideCodeBlock: true
-        isSpotlight: true
-  - id: maybe-single
-    title: maybe_single()
+  - id: range
+    title: range()
+    params:
+      - name: start
+        isOptional: false
+        type: number
+        description: The starting index from which to limit the result.
+      - name: end
+        isOptional: false
+        type: number
+        description: The last index to which to limit the result.
+      - name: foreign_table
+        isOptional: true
+        type: string
+        description: Set this to limit rows of foreign tables instead of the parent table.
+    notes: |
+      Limit the query result by starting at an offset (`from`) and ending at the offset (`from + to`). Only records within this range are returned. This respects the query order and if there is no order clause the range could behave unexpectedly.
+      
+      The `from` and `to` values are 0-based and inclusive: `range(1, 3)` will include the second, third and fourth rows of the query.
     examples:
       - id: with-select
         name: With `select()`
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .select('*')
-            .eq('name', 'Albania')
-            .maybe_single()
-            .execute()
+          response = supabase.table("countries").select("name").range(0, 1).execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("name, cities(name)")
+              .range(0, 1, foreign_table="cities")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Kabul'),
+              (2, 1, 'Herat'),
+              (3, 2, 'Berat');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan",
+                "cities": [
+                  {
+                    "name": "Kabul"
+                  },
+                  {
+                    "name": "Herat"
+                  }
+                ]
+              },
+              {
+                "name": "Albania",
+                "cities": [
+                  {
+                    "name": "Berat"
+                  }
+                ]
+              },
+              {
+                "name": "Algeria",
+                "cities": []
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+  - id: single
+    title: single()
+    notes: Return `data` as a single object instead of an array of objects.
+    examples:
+      - id: with-select()
+        name: With `select()`
+        code: |
+          ```python
+          response = supabase.table("countries").select("name").limit(1).single().execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: maybe-single
+    title: maybe_single()
+    notes: Return `data` as a single object instead of an array of objects.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .eq("name", "Albania")
+              .maybe_single()
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 2,
+              "name": "Albania"
+            },
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: csv
+    title: csv()
+    notes: Return `data` as a string in CSV format.
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```python
+          response = supabase.table("countries").select("*").csv().execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "count": null
+          }
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: explain
+    title: Using Explain
+    params:
+      - name: wal
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on WAL record generation.
+      - name: verbose
+        isOptional: true
+        type: boolean
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query.
+      - name: settings
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on configuration parameters that affect query planning.
+      - name: format
+        isOptional: true
+        type: boolean
+        description: The format of the output, can be `"text"` (default) or `"json"`.
+      - name: format
+        isOptional: true
+        type: '"text" | "json"'
+        description: The format of the output, can be `"text"` (default) or `"json"`.
+      - name: buffers
+        isOptional: true
+        type: boolean
+        description: If `true`, include information on buffer usage.
+      - name: analyze
+        isOptional: true
+        type: boolean
+        description: If `true`, the query will be executed and the actual run time will be returned.
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```python
+          response = supabase.table("countries").select("*").explain().execute()
           ```
         data:
           sql: |
@@ -1940,10 +4312,55 @@ functions:
             ```
         response: |
           ```
-          SingleAPIResponse(data={'id': 2, 'name': 'Albania'}, count=None)
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
           ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .select("*")
+              .explain(analyze=True, verbose=True)
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
 
   - id: invoke
     title: 'invoke()'
@@ -1958,11 +4375,8 @@ functions:
         description:
         code: |
           ```python
-          resp = supabase.functions.invoke(
-            "hello-world",
-            invoke_options={
-              "body": { "foo": "bar" }
-            },
+          response = supabase.functions.invoke(
+              "hello-world", invoke_options={"body": {"name": "Functions"}}
           )
           ```
       - id: error-handling
@@ -1978,7 +4392,7 @@ functions:
           from supafunc.errors import FunctionsRelayError, FunctionsHttpError
 
           try:
-            resp = supabase.functions.invoke(
+            response = supabase.functions.invoke(
                 "hello-world",
                 invoke_options={
                     "body": {"foo": "bar"},
@@ -2001,7 +4415,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          resp = supabase.functions.invoke(
+          response = supabase.functions.invoke(
             "hello-world", 
             invoke_options={
               "headers": {

@@ -101,10 +101,14 @@ export const MultiSelectV2 = ({
               if (!option) {
                 return <></>
               } else if (isDisabled) {
-                return <BadgeDisabled key={id} name={value} />
+                return <BadgeDisabled key={id} name={option.name} />
               } else {
                 return (
-                  <BadgeSelected key={id} name={value} handleRemove={() => handleChange(option)} />
+                  <BadgeSelected
+                    key={id}
+                    name={option.name}
+                    handleRemove={() => handleChange(option)}
+                  />
                 )
               }
             })}

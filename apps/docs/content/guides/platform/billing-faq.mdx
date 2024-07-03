@@ -15,7 +15,7 @@ Read more on [how billing is organized](https://supabase.com/docs/guides/platfor
 
 #### How many free projects can I have?
 
-You are entitled to two active free projects. Paused projects do not count towards your quota. Note that within an organization, we count the free project limits from all members that are either Owner or Admin. If you’ve got another organization member with the Admin or Owner role that has already exhausted their free project quota, you won’t be able to launch another free project in that organization. You can create simply create another free plan organization or change the role of the affected member in your [organization’s team settings](https://supabase.com/dashboard/org/_/team).
+You are entitled to two active free projects. Paused projects do not count towards your quota. Note that within an organization, we count the free project limits from all members that are either Owner or Admin. If you’ve got another organization member with the Admin or Owner role that has already exhausted their free project quota, you won’t be able to launch another free project in that organization. You can create another free plan organization or change the role of the affected member in your [organization’s team settings](https://supabase.com/dashboard/org/_/team).
 
 #### Can I mix free and paid projects in a single organization?
 
@@ -86,15 +86,45 @@ We can transfer the amount as credits to another organization of your choice. Yo
 
 #### What will happen when I exceed the free plan quota?
 
-When you exceed the Free plan quota, we will monitor and notify you about the exceeding limits. It is important to take action at this point. If you continue to exceed the limits without reducing your usage, we will pause your projects. To avoid project pausing, you have two options: reduce your usage or upgrade to a paid plan.
+You will be notified when you exceed the free plan quota. It is important to take action at this point. If you continue to exceed the limits without reducing your usage, service restrictions will apply. To avoid service restrictions, you have two options: reduce your usage or upgrade to a paid plan. Learn more about restrictions in the [Fair Use Policy](#fair-use-policy) section.
 
 #### What will happen when I exceed the Pro plan quota and have the spend cap on?
 
-When you exceed the Pro plan quota, we will monitor and notify you about the exceeding limits. To unblock yourself, you can simply toggle off your spend cap in your [organization’s billing settings](https://supabase.com/dashboard/org/_/billing) to pay for over-usage beyond the Pro plans limits. If you continue to exceed the limits without reducing your usage or turning off the spend cap, we will pause your projects.
+You will be notified when you exceed your Pro plan quota. To unblock yourself, you can toggle off your spend cap in your [organization’s billing settings](https://supabase.com/dashboard/org/_/billing) to pay for over-usage beyond the Pro plans limits. If you continue to exceed the limits without reducing your usage or turning off the spend cap, restrictions will apply. Learn more about restrictions in the [Fair Use Policy](#fair-use-policy) section.
 
 #### How do I scale beyond the limits of my Pro plan?
 
-The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, ~~simply~~ switch off the spend cap to pay for additional usage beyond the plans included limits. You can toggle the spend cap in the [organization's billing settings](https://supabase.com/dashboard/org/_/billing). Read more about the [spend cap](https://supabase.com/docs/guides/platform/spend-cap).
+The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, switch off the spend cap to pay for additional usage beyond the plans included limits. You can toggle the spend cap in the [organization's billing settings](https://supabase.com/dashboard/org/_/billing). Read more about the [spend cap](https://supabase.com/docs/guides/platform/spend-cap).
+
+## Fair Use Policy
+
+#### What is the Fair Use Policy?
+
+Our Fair Use Policy gives developers the freedom to build and experiment with Supabase, while protecting our infrastructure. Under the Fair Use policy, service restrictions may apply to your organization if:
+
+- You continually exceed the free plan quota
+- You continually exceed Pro plan quota and have the spend cap enabled
+- You have overdue invoices
+- You have an expired credit card
+
+You will receive a notification before Fair Use Policy restrictions are applied. However, in some cases, like suspected abuse of our services, restrictions may be applied without prior notice.
+
+#### How is the Fair Use Policy applied?
+
+The Fair Use Policy is applied through service restrictions. This could mean:
+
+- Pausing projects
+- Switching databases to read-only mode
+- Disabling new project launches/transfers
+- Responding with a 402 status code for all API requests
+
+The Fair Use Policy is generally applied to all projects of the restricted organization.
+
+#### How can I remove restrictions applied from the Fair Use Policy?
+
+To remove restrictions, you will need to address the issue that caused the restriction. This could be reducing your usage, paying overdue invoices, updating your payment method, or any other issue that caused the restriction. Once the issue is resolved, the restriction will be lifted.
+
+Restrictions due to usage limits are lifted with the next billing cycle as your quota refills at the beginning of each cycle. You can see when your current billing cycle ends on the [billing page](https://supabase.com/dashboard/org/_/usage) under "Billing Breakdown". If your organization is on the free plan, you can also lift restrictions immediately by [upgrading](https://supabase.com/dashboard/org/_/billing?panel=subscriptionPlan) to Pro.
 
 ## Reports and invoices
 

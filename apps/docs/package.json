@@ -38,6 +38,7 @@
     "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",
+    "eslint-config-supabase": "*",
     "framer-motion": "^11.0.3",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
@@ -102,6 +103,6 @@
     "simple-git": "^3.24.0",
     "tsconfig": "*",
     "tsx": "^4.6.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   }
 }

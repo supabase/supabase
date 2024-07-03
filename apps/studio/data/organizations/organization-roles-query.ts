@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError, Role } from 'types'
 import { organizationKeys } from './keys'
 
@@ -16,18 +16,16 @@ export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,
   signal?: AbortSignal
 ) {
-  if (!slug) {
-    throw new Error('slug is required')
-  }
+  if (!slug) throw new Error('slug is required')
 
-  const data = await get(`${API_URL}/organizations/${slug}/roles`, {
+  const { data, error } = await get('/platform/organizations/{slug}/roles', {
+    params: { path: { slug } },
     signal,
   })
-  if (data.error) {
-    throw data.error
-  }
 
-  return { roles: data } as OrganizationRolesResponse
+  if (error) handleError(error)
+
+  return { roles: data } as unknown as OrganizationRolesResponse
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>

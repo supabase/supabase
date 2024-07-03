@@ -60,10 +60,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     },
@@ -389,10 +392,13 @@
                           "INACTIVE",
                           "INIT_FAILED",
                           "REMOVED",
-                          "RESTORING",
+                          "RESTARTING",
                           "UNKNOWN",
                           "UPGRADING",
-                          "PAUSING"
+                          "PAUSING",
+                          "RESTORING",
+                          "RESTORE_FAILED",
+                          "PAUSE_FAILED"
                         ],
                         "type": "string"
                       }
@@ -567,10 +573,13 @@
                         "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTORING",
+                        "RESTARTING",
                         "UNKNOWN",
                         "UPGRADING",
-                        "PAUSING"
+                        "PAUSING",
+                        "RESTORING",
+                        "RESTORE_FAILED",
+                        "PAUSE_FAILED"
                       ],
                       "type": "string"
                     }
@@ -4537,6 +4546,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "external_notion_client_id": {
                       "type": "string",
                       "nullable": true
@@ -4796,6 +4817,10 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5016,6 +5041,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -5081,6 +5109,7 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "security_captcha_enabled",
@@ -5310,6 +5339,11 @@
                     "maximum": 2147483647
                   },
                   "rate_limit_token_refresh": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_otp": {
                     "type": "number",
                     "minimum": 1,
                     "maximum": 2147483647
@@ -5602,6 +5636,15 @@
                   "external_linkedin_oidc_secret": {
                     "type": "string"
                   },
+                  "external_slack_oidc_enabled": {
+                    "type": "boolean"
+                  },
+                  "external_slack_oidc_client_id": {
+                    "type": "string"
+                  },
+                  "external_slack_oidc_secret": {
+                    "type": "string"
+                  },
                   "external_notion_enabled": {
                     "type": "boolean"
                   },
@@ -5875,6 +5918,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "external_notion_client_id": {
                       "type": "string",
                       "nullable": true
@@ -6134,6 +6189,10 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -6354,6 +6413,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -6419,6 +6481,7 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "security_captcha_enabled",
@@ -7421,6 +7484,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -7496,6 +7562,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7643,6 +7712,9 @@
                                           "items": {
                                             "type": "string"
                                           }
+                                        },
+                                        "array": {
+                                          "type": "boolean"
                                         }
                                       }
                                     }
@@ -7801,6 +7873,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -7944,6 +8019,9 @@
                               "items": {
                                 "type": "string"
                               }
+                            },
+                            "array": {
+                              "type": "boolean"
                             }
                           }
                         }
@@ -8016,6 +8094,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8166,6 +8247,9 @@
                                     "items": {
                                       "type": "string"
                                     }
+                                  },
+                                  "array": {
+                                    "type": "boolean"
                                   }
                                 }
                               }
@@ -8545,10 +8629,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           },
@@ -8744,10 +8831,13 @@
               "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTORING",
+              "RESTARTING",
               "UNKNOWN",
               "UPGRADING",
-              "PAUSING"
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED"
             ],
             "type": "string"
           }
@@ -10571,6 +10661,18 @@
             "type": "string",
             "nullable": true
           },
+          "external_slack_oidc_client_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_slack_oidc_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_slack_oidc_secret": {
+            "type": "string",
+            "nullable": true
+          },
           "external_notion_client_id": {
             "type": "string",
             "nullable": true
@@ -10830,6 +10932,10 @@
             "type": "number",
             "nullable": true
           },
+          "rate_limit_otp": {
+            "type": "number",
+            "nullable": true
+          },
           "refresh_token_rotation_enabled": {
             "type": "boolean",
             "nullable": true
@@ -11050,6 +11156,9 @@
           "external_linkedin_oidc_client_id",
           "external_linkedin_oidc_enabled",
           "external_linkedin_oidc_secret",
+          "external_slack_oidc_client_id",
+          "external_slack_oidc_enabled",
+          "external_slack_oidc_secret",
           "external_notion_client_id",
           "external_notion_enabled",
           "external_notion_secret",
@@ -11115,6 +11224,7 @@
           "rate_limit_sms_sent",
           "rate_limit_token_refresh",
           "rate_limit_verify",
+          "rate_limit_otp",
           "refresh_token_rotation_enabled",
           "saml_enabled",
           "security_captcha_enabled",
@@ -11305,6 +11415,11 @@
             "maximum": 2147483647
           },
           "rate_limit_token_refresh": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_otp": {
             "type": "number",
             "minimum": 1,
             "maximum": 2147483647
@@ -11597,6 +11712,15 @@
           "external_linkedin_oidc_secret": {
             "type": "string"
           },
+          "external_slack_oidc_enabled": {
+            "type": "boolean"
+          },
+          "external_slack_oidc_client_id": {
+            "type": "string"
+          },
+          "external_slack_oidc_secret": {
+            "type": "string"
+          },
           "external_notion_enabled": {
             "type": "boolean"
           },
@@ -11881,6 +12005,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "array": {
+            "type": "boolean"
           }
         }
       },
@@ -11916,6 +12043,9 @@
                   "items": {
                     "type": "string"
                   }
+                },
+                "array": {
+                  "type": "boolean"
                 }
               }
             }
@@ -11979,6 +12109,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12040,6 +12173,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12128,6 +12264,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12230,6 +12369,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12337,6 +12479,9 @@
                                 "items": {
                                   "type": "string"
                                 }
+                              },
+                              "array": {
+                                "type": "boolean"
                               }
                             }
                           }
@@ -12445,6 +12590,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12541,6 +12689,9 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "array": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -12605,6 +12756,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }
@@ -12707,6 +12861,9 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "array": {
+                          "type": "boolean"
                         }
                       }
                     }

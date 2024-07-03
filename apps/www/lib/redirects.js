@@ -2340,11 +2340,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/functions/troubleshooting',
-    destination: '/docs/guides/functions/debugging',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/auth-magic-link',
     destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
   },
@@ -2537,5 +2532,36 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/api/data-apis',
     destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/debugging',
+    destination: '/docs/functions/logging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/functions-headers',
+    destination: '/docs/functions/logging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/messagebird',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/twilio',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Twilio',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/vonage',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Vonage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/phone-login/textlocal',
+    destination:
+      '/docs/guides/auth/phone-login?showSmsProvider=Textlocal%2520%28Community%2520Supported%29',
   },
 ]

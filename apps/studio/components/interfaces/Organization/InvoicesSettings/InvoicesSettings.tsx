@@ -16,6 +16,7 @@ import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
+import dayjs from 'dayjs'
 
 const PAGE_LIMIT = 10
 
@@ -52,7 +53,11 @@ const InvoicesSettings = () => {
   }
 
   if (!canReadInvoices) {
-    return <NoPermission resourceText="view invoices" />
+    return (
+      <ScaffoldContainerLegacy>
+        <NoPermission resourceText="view invoices" />
+      </ScaffoldContainerLegacy>
+    )
   }
 
   return (
@@ -66,7 +71,7 @@ const InvoicesSettings = () => {
           head={[
             <Table.th key="header-icon"></Table.th>,
             <Table.th key="header-date">Date</Table.th>,
-            <Table.th key="header-amount">Amount due</Table.th>,
+            <Table.th key="header-amount">Amount</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
             <Table.th key="header-status" className="flex items-center">
               Status
@@ -91,7 +96,7 @@ const InvoicesSettings = () => {
                         <IconFileText size="xxl" />
                       </Table.td>
                       <Table.td>
-                        <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
+                        <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
                       </Table.td>
                       <Table.td>
                         <p>{formatCurrency(x.subtotal / 100)}</p>
@@ -104,19 +109,22 @@ const InvoicesSettings = () => {
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
-                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(
-                            x.status as InvoiceStatus
-                          ) && (
-                            <Button asChild>
-                              <Link
-                                href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Pay Now
-                              </Link>
-                            </Button>
-                          )}
+                          {x.subtotal > 0 &&
+                            [
+                              InvoiceStatus.UNCOLLECTIBLE,
+                              InvoiceStatus.OPEN,
+                              InvoiceStatus.ISSUED,
+                            ].includes(x.status as InvoiceStatus) && (
+                              <Button asChild>
+                                <Link
+                                  href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Pay Now
+                                </Link>
+                              </Button>
+                            )}
 
                           <Button
                             type="outline"
