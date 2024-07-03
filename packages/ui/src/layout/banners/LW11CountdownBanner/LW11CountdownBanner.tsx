@@ -10,7 +10,8 @@ export function LW11CountdownBanner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
   const isLaunchWeekPage = pathname === '/ga-week'
-  const isLaunchWeekSection = pathname.includes('/launch-week') || pathname.includes('/ga-week')
+  const isLaunchWeekSection =
+    (pathname?.includes('/launch-week') || pathname?.includes('/ga-week')) ?? false
 
   if (isLaunchWeekPage || isHomePage) return null
 

@@ -33,7 +33,7 @@ const Announcement = ({
   const [hidden, setHidden] = useState(false)
 
   const pathname = usePathname()
-  const isLaunchWeekSection = pathname.includes('launch-week')
+  const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
 
   // override to hide announcement
   if (!show || !announcement.show) return null
