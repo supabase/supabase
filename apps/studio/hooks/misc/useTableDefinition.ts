@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useViewDefinitionQuery } from '../../data/database/view-definition-query'
 import { useTableDefinitionQuery } from '../../data/database/table-definition-query'
 import { format } from 'sql-formatter'
@@ -55,10 +54,7 @@ function useTableDefinition(entityType: EntityType | undefined, project: Project
     }
   }
 
-  const formattedDefinition = useMemo(
-    () => (definition ? formatDefinition(prepend + definition) : undefined),
-    [definition]
-  )
+  const formattedDefinition = formatDefinition(prepend + definition)
 
   return { formattedDefinition, isLoading }
 }
