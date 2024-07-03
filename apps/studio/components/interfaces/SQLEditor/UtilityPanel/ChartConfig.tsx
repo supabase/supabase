@@ -24,6 +24,8 @@ export type ChartConfig = {
   cumulative: boolean
   xKey: string
   yKey: string
+  showLabels: boolean
+  showGrid: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {
@@ -95,6 +97,19 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               xAxisKey={config.xKey}
               yAxisKey={config.yKey}
               emptyStateMessage="Execute a query and configure the chart options"
+              showGrid={config.showGrid}
+              XAxisProps={{
+                angle: 0,
+                interval: 0,
+                tick: config.showLabels ? {} : false,
+                hide: !config.showLabels,
+              }}
+              YAxisProps={{
+                dataKey: config.yKey,
+                tickFormatter: (value: number) => value.toLocaleString(),
+                label: <></>,
+                hide: !config.showLabels,
+              }}
             />
           )}
         </ResizablePanel>
@@ -166,6 +181,28 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               />
               <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="cumulative">
                 Cumulative
+              </Label_Shadcn_>
+            </div>
+            <div className="flex items-center">
+              <Checkbox_Shadcn_
+                id="showLabels"
+                name="showLabels"
+                checked={config.showLabels}
+                onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
+              />
+              <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="showLabels">
+                Show labels
+              </Label_Shadcn_>
+            </div>
+            <div className="flex items-center">
+              <Checkbox_Shadcn_
+                id="showGrid"
+                name="showGrid"
+                checked={config.showGrid}
+                onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
+              />
+              <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="showGrid">
+                Show grid
               </Label_Shadcn_>
             </div>
           </>
