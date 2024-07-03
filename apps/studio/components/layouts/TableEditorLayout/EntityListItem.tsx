@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconClipboard,
   IconCopy,
   IconDownload,
   IconEdit,
@@ -334,7 +335,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 copyDefinition()
               }}
             >
-              <IconCopy size="tiny" />
+              <IconClipboard size="tiny" />
               <span>Copy Definition</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
