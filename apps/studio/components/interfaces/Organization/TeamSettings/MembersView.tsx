@@ -1,17 +1,20 @@
-import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { AlertCircle, HelpCircle } from 'lucide-react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { Button, IconAlertCircle, Loading, Modal } from 'ui'
-import { getUserDisplayName } from '../Organization.utils'
-import MemberRow, { SelectedMember } from './MemberRow'
-import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
+import { useProfile } from 'lib/profile'
+import {
+  Button,
+  Loading,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
+import { MemberRow } from './MemberRow'
 
 export interface MembersViewProps {
   searchString: string
@@ -19,6 +22,7 @@ export interface MembersViewProps {
 
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
+  const { profile } = useProfile()
 
   const {
     data: members,
@@ -27,34 +31,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     isError: isErrorMembers,
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
-  const {
-    data: rolesData,
-    error: rolesError,
-    isLoading: isLoadingRoles,
-    isError: isErrorRoles,
-  } = useOrganizationRolesQuery({ slug })
-  const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
-    onSuccess() {
-      setUserRoleChangeModalVisible(false)
-      toast.success(`Successfully updated role for ${getUserDisplayName(selectedMember)}`)
-    },
-    onError(error) {
-      toast.error(
-        `Failed to update role for ${getUserDisplayName(selectedMember)}: ${error.message}`
-      )
-    },
+  const { error: rolesError, isError: isErrorRoles } = useOrganizationRolesV2Query({
+    slug,
   })
 
   const allMembers = members ?? []
-  const roles = rolesData?.roles ?? []
-
-  // [Joshen] Proactively adding this, can be removed once infra API changes are in
-  const showMfaEnabledColumn = allMembers.some(
-    (member) => member.gotrue_id !== undefined && member.mfa_enabled !== undefined
-  )
-  const [selectedMember, setSelectedMember] = useState<SelectedMember>()
-  const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
-
   const filteredMembers = (
     !searchString
       ? allMembers
@@ -70,21 +51,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         })
   )
     .slice()
-    .sort((a, b) => a.username.localeCompare(b.username))
-
-  const getRoleNameById = (id: number | undefined) => {
-    if (!roles) return id
-    return roles.find((member) => member.id === id)?.name
-  }
-
-  const handleRoleChange = async () => {
-    if (!selectedMember) return
-
-    const { gotrue_id, newRoleId } = selectedMember
-    if (!slug) return console.error('slug is required')
-    if (!gotrue_id) return console.error('gotrue_id is required')
-    updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
-  }
+    .sort((a, b) => {
+      // [Joshen] Have own account show up top
+      if (a.primary_email === profile?.primary_email) return -1
+      return a.username.localeCompare(b.username)
+    })
 
   return (
     <>
@@ -104,38 +75,41 @@ const MembersView = ({ searchString }: MembersViewProps) => {
             <Table
               head={[
                 <Table.th key="header-user">User</Table.th>,
-                <Table.th key="header-status"></Table.th>,
-                ...(showMfaEnabledColumn
-                  ? [
-                      <Table.th key="header-mfa" className="text-center">
-                        Enabled MFA
-                      </Table.th>,
-                    ]
-                  : []),
-                <Table.th key="header-role" className="flex items-center space-x-2">
-                  <span>Role</span>
-                  <RolesHelperModal />
+                <Table.th key="header-status" className="w-24" />,
+                <Table.th key="header-mfa" className="text-center w-32">
+                  Enabled MFA
                 </Table.th>,
-                <Table.th key="header-action"></Table.th>,
+                <Table.th key="header-role" className="flex items-center space-x-1">
+                  <span>Role</span>
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
+                      <Button asChild type="text" className="px-1">
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://supabase.com/docs/guides/platform/access-control"
+                        >
+                          <HelpCircle size={14} className="text-foreground-light" />
+                        </a>
+                      </Button>
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ side="bottom">
+                      How to configure access control?
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                </Table.th>,
+                <Table.th key="header-action" />,
               ]}
               body={[
                 ...filteredMembers.map((member) => (
-                  <MemberRow
-                    key={member.gotrue_id}
-                    member={member}
-                    roles={roles}
-                    isLoadingRoles={isLoadingRoles}
-                    showMfaEnabledColumn={showMfaEnabledColumn}
-                    setUserRoleChangeModalVisible={setUserRoleChangeModalVisible}
-                    setSelectedMember={setSelectedMember}
-                  />
+                  <MemberRow key={member.gotrue_id} member={member} />
                 )),
                 ...(searchString.length > 0 && filteredMembers.length === 0
                   ? [
                       <Table.tr key="no-results" className="bg-panel-secondary-light">
                         <Table.td colSpan={12}>
                           <div className="flex items-center space-x-3 opacity-75">
-                            <IconAlertCircle size={16} strokeWidth={2} />
+                            <AlertCircle size={16} strokeWidth={2} />
                             <p className="text-foreground-light">
                               No users matched the search query "{searchString}"
                             </p>
@@ -157,47 +131,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
           </Loading>
         </div>
       )}
-
-      <Modal
-        hideFooter
-        size="medium"
-        visible={userRoleChangeModalVisible}
-        onCancel={() => setUserRoleChangeModalVisible(false)}
-        header="Change role of member"
-      >
-        <Modal.Content>
-          <p className="text-sm text-foreground-light">
-            You are changing the role of{' '}
-            <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
-            <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span> to{' '}
-            <span className="text-foreground">{getRoleNameById(selectedMember?.newRoleId)}</span>
-          </p>
-          <p className="mt-3 text-sm text-foreground">
-            By changing the role of this member their permissions will change.
-          </p>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex gap-3">
-          <Button
-            type="default"
-            block
-            size="medium"
-            onClick={() => setUserRoleChangeModalVisible(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            block
-            type="warning"
-            size="medium"
-            disabled={isLoading}
-            loading={isLoading}
-            onClick={() => handleRoleChange()}
-          >
-            Confirm
-          </Button>
-        </Modal.Content>
-      </Modal>
     </>
   )
 }

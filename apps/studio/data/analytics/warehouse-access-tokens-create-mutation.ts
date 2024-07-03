@@ -12,7 +12,7 @@ async function createWarehouseAccessToken({
   ref,
   description,
 }: WarehouseAccessTokenCreateVariables) {
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
+  const { data, error } = await post(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: {
       path: { ref },
     },

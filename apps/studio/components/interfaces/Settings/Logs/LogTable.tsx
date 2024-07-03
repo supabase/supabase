@@ -375,7 +375,6 @@ const LogTable = ({
               rowHeight={40}
               headerRowHeight={queryType ? 0 : 28}
               onSelectedCellChange={(row) => {
-                console.log('row', row)
                 setFocusedLog(row.row as LogData)
               }}
               selectedRows={new Set([])}

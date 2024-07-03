@@ -31,8 +31,8 @@ const AlertError = ({ projectRef, subject, error, className }: AlertErrorProps) 
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
         <div>
-          {error?.message && <p>Error: {formattedErrorMessage}</p>}
-          <p>
+          {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
+          <p className="text-left">
             Try refreshing your browser, but if the issue persists, please reach out to us via
             support.
           </p>

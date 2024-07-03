@@ -23,7 +23,10 @@ export async function getOrganizationMembers(
 
   const [members, invites] = await Promise.all([
     get('/platform/organizations/{slug}/members', { params: { path: { slug } }, signal }),
-    get('/platform/organizations/{slug}/members/invite', { params: { path: { slug } }, signal }),
+    get('/platform/organizations/{slug}/members/invitations', {
+      params: { path: { slug } },
+      signal,
+    }),
   ])
 
   const { data: orgMembers, error: orgMembersError } = members
@@ -33,10 +36,10 @@ export async function getOrganizationMembers(
   if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.map((invite) => {
+  const invitedMembers = orgInvites.invitations.map((invite) => {
     const member = {
       invited_at: invite.invited_at,
-      invited_id: invite.invited_id,
+      invited_id: invite.id,
       mfa_enabled: false,
       username: invite.invited_email.slice(0, 1),
       primary_email: invite.invited_email,

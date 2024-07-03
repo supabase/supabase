@@ -30,6 +30,7 @@ import {
   Input_Shadcn_,
   Modal,
 } from 'ui'
+import { Check, Loader2 } from 'lucide-react'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -145,7 +146,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="">
+          <Modal.Content>
             {isLoadingConnections && <GenericSkeletonLoader />}
             {isErrorConnections && (
               <AlertError
@@ -183,7 +184,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
               control={form.control}
               name="branchName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="relative">
+                <FormItem_Shadcn_ className="relative flex flex-col gap-y-1">
                   <label className="text-sm text-foreground-light">
                     Choose your branch to create a preview from
                   </label>
@@ -192,9 +193,9 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                   </FormControl_Shadcn_>
                   <div className="absolute top-9 right-3">
                     {isChecking ? (
-                      <IconLoader className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                     ) : isValid ? (
-                      <IconCheck className="text-brand" strokeWidth={2} />
+                      <Check size={14} className="text-brand" strokeWidth={2} />
                     ) : null}
                   </div>
 
