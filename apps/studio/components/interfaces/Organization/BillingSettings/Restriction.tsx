@@ -115,7 +115,7 @@ export const Restriction = () => {
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
               . Fair Use Policy applies now. Stay below your plan’s quota or upgrade your plan if
-              you expect to exceed it. If you exceed your quota, requests will responsd with a 402
+              you expect to exceed it. If you exceed your quota, requests will respond with a 402
               status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
