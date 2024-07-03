@@ -68,19 +68,19 @@ We have to set up RLS policies for the `public` schema tables we created in the 
 > ⚠️ All the RLS policies here are meant for this demo. You may refer to them but make sure that your policies are tailored to your use case and secure your application.
 
 ```sql
-CREATE POLICY "authenticated users can view all profiles"
+CREATE POLICY "authenticated can view all profiles"
 ON "public"."profiles"
 AS PERMISSIVE FOR SELECT
 TO authenticated
 USING (true);
 
-CREATE POLICY "supabase_auth_admin user can insert profile"
+CREATE POLICY "supabase_auth_admin can insert profile"
 ON "public"."profiles"
 AS PERMISSIVE FOR INSERT
 TO supabase_auth_admin
 WITH CHECK (true);
 
-CREATE POLICY "authenticated users can read rooms"
+CREATE POLICY "authenticated can read rooms"
 ON "public"."rooms"
 AS PERMISSIVE FOR SELECT
 TO authenticated
@@ -92,7 +92,7 @@ AS PERMISSIVE FOR INSERT
 TO authenticated
 WITH CHECK (TRUE);
 
-CREATE POLICY "authenticated users can read rooms_users"
+CREATE POLICY "authenticated can read rooms_users"
 ON "public"."rooms_users"
 AS PERMISSIVE FOR SELECT
 TO authenticated
@@ -104,7 +104,7 @@ AS PERMISSIVE FOR INSERT
 TO authenticated
 WITH CHECK (TRUE);
 
-CREATE POLICY "authenticated user can read broadcast messages and presence state"
+CREATE POLICY "authenticated can read broadcast and presence state"
 ON "realtime"."messages"
 AS PERMISSIVE FOR SELECT
 TO authenticated
@@ -118,7 +118,7 @@ USING (
   )
 );
 
-CREATE POLICY "authenticated user can send broadcast messages and track presence"
+CREATE POLICY "authenticated can send broadcast and track presence"
 ON "realtime"."messages"
 AS PERMISSIVE FOR INSERT
 TO authenticated
