@@ -1,15 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button } from 'ui'
+import { Button, Image } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'
-import Image from 'next/image'
+import NextImage from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useTheme } from 'next-themes'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 function AuthWidgetSection() {
   const supabase = createClient(
@@ -116,7 +115,7 @@ function AuthWidgetSection() {
               </p>
               <div className="mb-4 flex items-center space-x-2">
                 <div className="relative m-0 w-8 aspect-square flex items-center">
-                  <Image
+                  <NextImage
                     src={`${basePath}/images/product/auth/react-icon.svg`}
                     alt="react icon"
                     layout="fill"
@@ -207,7 +206,7 @@ function AuthWidgetSection() {
                     ].join(' ')}
                   >
                     <div className="relative m-0 w-4 items-center justify-center text-red-900">
-                      <ThemeImage
+                      <Image
                         src={{
                           light: '/images/auth-ui/small--dark.svg',
                           dark: '/images/auth-ui/small--light.svg',
@@ -228,7 +227,7 @@ function AuthWidgetSection() {
                     ].join(' ')}
                   >
                     <div className="relative m-0 w-4 items-center justify-center text-red-900">
-                      <ThemeImage
+                      <Image
                         src={{
                           light: '/images/auth-ui/medium--dark.svg',
                           dark: '/images/auth-ui/medium--light.svg',
@@ -249,7 +248,7 @@ function AuthWidgetSection() {
                     ].join(' ')}
                   >
                     <div className="relative m-0 w-4 items-center justify-center flex text-red-900">
-                      <ThemeImage
+                      <Image
                         src={{
                           light: '/images/auth-ui/large--light.svg',
                           dark: '/images/auth-ui/large--dark.svg',
