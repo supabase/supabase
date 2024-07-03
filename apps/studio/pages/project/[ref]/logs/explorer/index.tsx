@@ -3,28 +3,23 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
 
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import {
-  DatePickerToFrom,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LogTable,
-  LogTemplate,
-  LogsQueryPanel,
   LogsTableName,
-  LogsWarning,
   TEMPLATES,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import {
   maybeShowUpgradePrompt,
   useEditorHints,
-} from 'components/interfaces/Settings/Logs'
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from 'components/ui/CodeEditor'
@@ -38,6 +33,15 @@ import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'

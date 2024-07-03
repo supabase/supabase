@@ -8,8 +8,8 @@ import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'

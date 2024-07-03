@@ -1,4 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Link from 'next/link'
+import React, { useState } from 'react'
+
+import Table from 'components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from 'hooks'
+import { copyToClipboard } from 'lib/helpers'
+import { logConstants } from 'shared-data'
 import {
   Alert,
   Badge,
@@ -17,21 +24,13 @@ import {
   SidePanel,
   Tabs,
 } from 'ui'
-
-import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
-import Link from 'next/link'
-import React, { useState } from 'react'
-import { logConstants } from 'shared-data'
+import DatePickers from './Logs.DatePickers'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
-  LogTemplate,
   LogsTableName,
-  LogsWarning,
-} from '.'
-import DatePickers from './Logs.DatePickers'
+} from './Logs.constants'
+import type { LogTemplate, LogsWarning } from './Logs.types'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
