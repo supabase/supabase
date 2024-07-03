@@ -73,6 +73,7 @@ interface AIPolicyEditorPanelProps {
   selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
+  authContext: 'database' | 'realtime'
 }
 
 /**
@@ -85,6 +86,7 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedTable,
   selectedPolicy,
   onSelectCancel,
+  authContext,
 }: AIPolicyEditorPanelProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -546,6 +548,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           setFieldError(undefined)
                           if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
                         }}
+                        authContext={authContext}
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection
