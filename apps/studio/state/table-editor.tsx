@@ -1,5 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid'
+import type { SupaRow } from 'components/grid/types'
 import type { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
