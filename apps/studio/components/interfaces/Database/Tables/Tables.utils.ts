@@ -17,13 +17,10 @@ export const formatAllEntities = ({
 }) => {
   const formattedTables = tables.map((x) => {
     return {
+      ...x,
       type: ENTITY_TYPE.TABLE,
-      id: x.id,
-      name: x.name,
-      comment: x.comment,
       rows: x.live_rows_estimate,
-      size: x.size,
-      numColumns: x.columns?.length ?? 0,
+      columns: x.columns ?? [],
     }
   })
 
@@ -35,7 +32,7 @@ export const formatAllEntities = ({
       comment: x.comment,
       rows: undefined,
       size: undefined,
-      numColumns: x.columns?.length ?? 0,
+      columns: x.columns ?? [],
     }
   })
 
@@ -47,7 +44,7 @@ export const formatAllEntities = ({
       comment: x.comment,
       rows: undefined,
       size: undefined,
-      numColumns: x.columns?.length ?? 0,
+      columns: x.columns ?? [],
     }
   })
 
@@ -59,7 +56,7 @@ export const formatAllEntities = ({
       comment: x.comment,
       rows: undefined,
       size: undefined,
-      numColumns: x.columns?.length ?? 0,
+      columns: x.columns ?? [],
     }
   })
 

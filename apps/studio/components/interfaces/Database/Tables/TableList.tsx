@@ -466,7 +466,7 @@ const TableList = ({
                             style={{ paddingTop: 3, paddingBottom: 3 }}
                           >
                             <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                              {x.numColumns} columns
+                              {x.columns.length} columns
                             </Link>
                           </Button>
 
@@ -525,7 +525,12 @@ const TableList = ({
                                           disabled={!canUpdateTables || isLocked}
                                           className="!pointer-events-auto gap-x-2"
                                           onClick={() => {
-                                            if (canUpdateTables && !isLocked) onDeleteTable(x)
+                                            if (canUpdateTables && !isLocked) {
+                                              onDeleteTable({
+                                                ...x,
+                                                schema: snap.selectedSchemaName,
+                                              })
+                                            }
                                           }}
                                         >
                                           <Trash stroke="red" size={12} />

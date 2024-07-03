@@ -38,7 +38,7 @@ const ColumnList = ({
   const { id, ref } = useParams()
   const [filterString, setFilterString] = useState<string>('')
   const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
-  const isTableEntity = !!(selectedTable as PostgresTable)?.live_rows_estimate
+  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
 
   const columns =
     (filterString.length === 0
