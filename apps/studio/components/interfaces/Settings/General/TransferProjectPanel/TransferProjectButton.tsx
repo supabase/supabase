@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -6,8 +5,6 @@ import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
-  IconAlertCircle,
-  IconInfo,
   IconLoader,
   IconShield,
   IconTool,
@@ -17,6 +14,7 @@ import {
   Modal,
 } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
@@ -80,39 +78,23 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            onClick={toggle}
-            type="default"
-            disabled={!canTransferProject || disableProjectTransfer}
-          >
-            Transfer project
-          </Button>
-        </Tooltip.Trigger>
-        {(!canTransferProject || disableProjectTransfer) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canTransferProject
-                    ? 'You need additional permissions to transfer this project'
-                    : 'Project transfers are temporarily disabled, please try again later.'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        onClick={toggle}
+        disabled={!canTransferProject || disableProjectTransfer}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canTransferProject
+              ? 'You need additional permissions to transfer this project'
+              : 'Project transfers are temporarily disabled, please try again later.',
+          },
+        }}
+      >
+        Transfer project
+      </ButtonTooltip>
 
       <Modal
-        closable
         onCancel={() => toggle()}
         visible={isOpen}
         loading={isTransferring}
