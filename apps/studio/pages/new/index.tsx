@@ -103,6 +103,10 @@ const Wizard: NextPageWithLayout = () => {
   )
 }
 
-Wizard.getLayout = (page) => <WizardLayout>{page}</WizardLayout>
+Wizard.getLayout = (page) => (
+  <WizardLayout organization={null} project={null}>
+    {page}
+  </WizardLayout>
+)
 
 export default Wizard
