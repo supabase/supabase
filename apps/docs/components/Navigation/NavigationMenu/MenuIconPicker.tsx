@@ -31,7 +31,7 @@ import {
   IconTerraform,
   IconTroubleshooting,
   IconBranching,
-} from './HomeMenuIcons'
+} from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
   switch (menuKey) {
@@ -94,18 +94,18 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
   }
 }
 
-type HomeMenuIconPickerProps = {
+type MenuIconPickerProps = {
   icon: string
   width?: number
   height?: number
   className?: string
 }
 
-export default function HomeMenuIconPicker({
+export default function MenuIconPicker({
   icon,
   width = 16,
   height = 16,
   className,
-}: HomeMenuIconPickerProps) {
+}: MenuIconPickerProps) {
   return getMenuIcon(icon, width, height, className)
 }

@@ -15,7 +15,7 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import MenuIconPicker from './MenuIconPicker'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 import { usePathname } from 'next/navigation'
 
@@ -81,7 +81,7 @@ const GlobalNavigationMenu: FC = () => {
                   )}
                 >
                   {section[0].label === 'Home' ? (
-                    <HomeMenuIconPicker icon={section[0].icon} />
+                    <MenuIconPicker icon={section[0].icon} />
                   ) : (
                     section[0].label
                   )}
@@ -133,7 +133,7 @@ const GlobalNavigationMenu: FC = () => {
                     )}
                   >
                     {section[0].label === 'Home' ? (
-                      <HomeMenuIconPicker icon={section[0].icon} />
+                      <MenuIconPicker icon={section[0].icon} />
                     ) : (
                       section[0].label
                     )}
@@ -168,7 +168,7 @@ export const MenuItem = React.forwardRef<
     >
       {children ?? (
         <>
-          {icon && <HomeMenuIconPicker icon={icon} className="text-foreground-lighter" />}
+          {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
           <span className="flex-1">{title}</span>
           {community && <Badge size="small">Community</Badge>}
         </>

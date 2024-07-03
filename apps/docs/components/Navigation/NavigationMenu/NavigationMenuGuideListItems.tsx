@@ -1,13 +1,11 @@
 import * as Accordion from '@radix-ui/react-accordion'
-import { ChevronLeft } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import React, { useEffect, useRef } from 'react'
 
-import HomeMenuIconPicker from './HomeMenuIconPicker'
-import { getPathWithoutHash } from './NavigationMenu.utils'
+import MenuIconPicker from './MenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
@@ -143,7 +141,7 @@ const Content = (props) => {
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={menu.url ?? ''}>
         <div className="flex items-center gap-3 my-3 text-brand-link">
-          <HomeMenuIconPicker icon={menu.icon} />
+          <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />
         </div>
       </Link>

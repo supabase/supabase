@@ -9,7 +9,7 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import MenuIconPicker from './MenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
 
@@ -183,7 +183,7 @@ const NavigationMenuRefListItems = ({
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
       <div className="flex items-center gap-3 my-3">
-        <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
+        <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>

@@ -20,7 +20,7 @@ import {
   themes,
 } from 'ui'
 
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import MenuIconPicker from './MenuIconPicker'
 
 const menu = [
   [
@@ -82,10 +82,7 @@ const TopNavDropdown = () => {
               >
                 <DropdownMenuItem className="space-x-2" onClick={() => {}}>
                   {sectionItem.icon && (
-                    <HomeMenuIconPicker
-                      icon={sectionItem.icon}
-                      className="text-foreground-lighter"
-                    />
+                    <MenuIconPicker icon={sectionItem.icon} className="text-foreground-lighter" />
                   )}
                   <p>{sectionItem.label}</p>
                 </DropdownMenuItem>
