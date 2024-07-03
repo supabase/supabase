@@ -89,6 +89,14 @@ You can force-mount any command item (force it to always show, regardless of sea
 
 <ComponentPreview name="commandmenu-force" />
 
+### With conditional commands
+
+You can use the dependencies (`deps`) array on the register command options to change the registered commands in response to state changes.
+
+Dependency equality is calculated using the `lodash` [isEqual](https://lodash.com/docs/4.17.15#isEqual) function, so you may need suitable use of `useCallback` or `useMemo` to maintain or break equality.
+
+<ComponentPreview name="commandmenu-conditional" />
+
 ### With subpage
 
 You can define a subpage of commands:

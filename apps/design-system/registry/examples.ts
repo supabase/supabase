@@ -362,6 +362,12 @@ export const examples: Registry = [
     files: ['example/commandmenu-force.tsx'],
   },
   {
+    name: 'commandmenu-conditional',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-conditional.tsx'],
+  },
+  {
     name: 'commandmenu-subpage',
     type: 'components:example',
     registryDependencies: ['commandmenu'],

@@ -544,6 +544,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "commandmenu-conditional": {
+      name: "commandmenu-conditional",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-conditional")),
+      source: "",
+      files: ["registry/default/example/commandmenu-conditional.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "commandmenu-subpage": {
       name: "commandmenu-subpage",
       type: "components:example",
