@@ -32,19 +32,16 @@ A "connection pool" is a system (external to Postgres) which manages Postgres co
 
 When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
-<figure>
-  <Image
-    className="hidden dark:block"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
-  />
-  <Image
-    className="dark:hidden"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
-  />
-  <figcaption>Connecting to the database directly vs using a Connection Pooler</figcaption>
-</figure>
+<Image
+  alt="New migration files trigger migrations on the preview instance."
+  src={{
+    dark: '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png',
+    light:
+      '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
+  }}
+  caption="Connecting to the database directly vs using a Connection Pooler"
+  zoomable
+/>
 
 Every Supabase project comes with a connection pooler for managing connections to your database. The pooler provides 2 important services:
 
@@ -195,15 +192,13 @@ You can obtain your connection info and Server root certificate from your applic
     <StepHikeCompact.Code>
 
     <Image
-      className="hidden dark:block"
       alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2"
-    />
-    <Image
-      className="dark:hidden"
-      alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png"
-    />
+      src={{
+          dark: '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2',
+          light:
+            '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png',
+        }}
+      />
 
     </StepHikeCompact.Code>
 
