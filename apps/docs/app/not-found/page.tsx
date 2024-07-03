@@ -5,6 +5,8 @@ import { DocsSearchResult, type Database } from 'common'
 
 import { NotFound } from '~/features/recommendations/NotFound.client'
 
+export const fetchCache = 'force-no-store'
+
 const metadata: Metadata = {
   robots: {
     index: false,
