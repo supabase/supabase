@@ -16,13 +16,10 @@ export async function getWarehouseQuery(
     throw new Error('SQL must be provided')
   }
 
-  const { data, error } = await get(
-    `/platform/projects/{ref}/analytics/warehouse/query` as `/v1/projects/{ref}/analytics/warehouse/query`,
-    {
-      params: { path: { ref: ref }, query: { bq_sql: sql } },
-      signal,
-    } as any
-  )
+  const { data, error } = await get(`/v1/projects/{ref}/analytics/warehouse/query`, {
+    params: { path: { ref: ref }, query: { bq_sql: sql } },
+    signal,
+  } as any)
 
   if (error) {
     handleError(error)
