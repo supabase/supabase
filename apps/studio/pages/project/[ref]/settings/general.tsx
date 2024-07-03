@@ -4,8 +4,8 @@ import {
   General,
   TransferProjectPanel,
 } from 'components/interfaces/Settings/General'
-import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks'
 import type { NextPageWithLayout } from 'types'

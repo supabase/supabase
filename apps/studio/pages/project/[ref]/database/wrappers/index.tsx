@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { Wrappers } from 'components/interfaces/Database'
 import WrappersDropdown from 'components/interfaces/Database/Wrappers/WrappersDropdown'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,

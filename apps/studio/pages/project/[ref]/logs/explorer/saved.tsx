@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { IconSave, Loading } from 'ui'
 
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'

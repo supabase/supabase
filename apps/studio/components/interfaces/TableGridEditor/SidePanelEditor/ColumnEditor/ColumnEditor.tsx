@@ -1,6 +1,7 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
@@ -27,7 +28,6 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
-import { ExternalLink, Plus } from 'lucide-react'
 import type { Dictionary } from 'types'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import ActionBar from '../ActionBar'

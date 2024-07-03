@@ -1,6 +1,6 @@
 import { withAuth } from 'hooks'
 import { ReactNode, useMemo, useState } from 'react'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { SQLEditorMenu } from './SQLEditorMenu'
 import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 

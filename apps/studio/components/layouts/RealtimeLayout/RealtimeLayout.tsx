@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useFlag, useSelectedProject, withAuth } from 'hooks'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
 export interface RealtimeLayoutProps {

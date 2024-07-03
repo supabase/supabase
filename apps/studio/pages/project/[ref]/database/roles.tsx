@@ -1,5 +1,5 @@
 import { RolesList } from 'components/interfaces/Database'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
 import type { NextPageWithLayout } from 'types'

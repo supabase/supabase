@@ -11,7 +11,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions, withAuth } from 'hooks'
 import { Button, IconCode, IconExternalLink } from 'ui'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import { ProjectLayout } from './'
+import ProjectLayout from './ProjectLayout/ProjectLayout'
 
 interface FunctionsLayoutProps {
   title?: string

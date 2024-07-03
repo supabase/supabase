@@ -30,7 +30,7 @@ import type { Dictionary, SchemaView } from 'types'
 import { Button, toast as UiToast } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
-import { SidePanelEditor } from './SidePanelEditor'
+import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 

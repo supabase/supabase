@@ -18,7 +18,7 @@ import {
 } from 'hooks'
 import { Badge, Menu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
 interface LogsLayoutProps {
   title?: string

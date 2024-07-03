@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
-import { ReportsLayout } from 'components/layouts'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { Loading } from 'components/ui/Loading'
 import { useContentQuery } from 'data/content/content-query'

@@ -26,7 +26,7 @@ import {
   useEditorHints,
 } from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'

@@ -6,7 +6,7 @@ import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-quer
 import { useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 
 export interface StorageLayoutProps {

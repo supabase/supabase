@@ -34,12 +34,12 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import passwordStrength from 'lib/password-strength'
 import { debounce } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import type { NextPageWithLayout } from 'types'
