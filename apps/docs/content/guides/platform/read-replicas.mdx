@@ -10,21 +10,12 @@ Read Replicas are additional databases that are kept in sync with your Primary d
 - **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
 - **Redundancy:** Read Replicas provide data redundancy.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="Map view of all project databases"
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="Map view of all project databases."
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="Map view of all project databases."
+  src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
+  containerClassName="max-w-[700px] !mx-auto"
+  zoomable
+/>
 
 ## About Read Replicas
 
@@ -127,21 +118,12 @@ If you use a [custom domain](/docs/guides/platform/custom-domains), requests wil
 
 In the SQL editor, you can choose if you want to run the query on a particular Read Replica.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="SQL editor view."
+  src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
+  containerClassName="max-w-[700px]"
+  zoomable
+/>
 
 ### Logging
 
@@ -195,13 +177,13 @@ In this replication method, the Primary continuously buffers WAL changes to a lo
 
 ### File-based log shipping 🤝 streaming replication
 
-<figure className="max-w-[700px] mx-auto">
-  <Image
-    alt="Map view of Primary and Read Replica databases"
-    src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
-  />
-  <figcaption>Map view of Primary and Read Replica databases</figcaption>
-</figure>
+<Image
+  alt="Map view of Primary and Read Replica databases"
+  caption="Map view of Primary and Read Replica databases"
+  src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
+  containerClassName="max-w-[700px] mx-auto"
+  zoomable
+/>
 
 We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
 

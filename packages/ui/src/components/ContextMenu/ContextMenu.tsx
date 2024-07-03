@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 
 import { IconCheck } from '../Icon/icons/IconCheck'
