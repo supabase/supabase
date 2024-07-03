@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import { useState, useMemo, useEffect } from 'react'

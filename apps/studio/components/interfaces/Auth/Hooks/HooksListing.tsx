@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'

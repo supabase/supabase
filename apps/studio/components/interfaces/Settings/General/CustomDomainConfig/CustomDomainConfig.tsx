@@ -2,7 +2,7 @@ import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectApiQuery } from 'data/config/project-api-query'

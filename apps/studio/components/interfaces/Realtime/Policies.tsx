@@ -5,7 +5,7 @@ import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolic
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTablesQuery } from 'data/tables/tables-query'
 
