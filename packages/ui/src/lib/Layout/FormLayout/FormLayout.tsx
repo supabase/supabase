@@ -64,12 +64,12 @@ export function FormLayout({
 
   const flex = layout === 'flex'
 
-  let containerClasses = []
+  let containerClasses: Array<string> = []
 
   containerClasses.push(__styles.size[size])
 
-  let labelContainerClasses = []
-  let dataInputContainerClasses = []
+  let labelContainerClasses: Array<string> = []
+  let dataInputContainerClasses: Array<string> = []
 
   if (layout !== 'horizontal' && !labelLayout && !flex) {
     labelContainerClasses.push(__styles.labels_horizontal_layout)
@@ -198,8 +198,8 @@ export function FormLayout({
                 nonBoxInput && label && layout === 'vertical'
                   ? __styles.non_box_data_input_spacing_vertical
                   : nonBoxInput && label && layout === 'horizontal'
-                  ? __styles.non_box_data_input_spacing_horizontal
-                  : ''
+                    ? __styles.non_box_data_input_spacing_horizontal
+                    : ''
               }
             >
               {children}
