@@ -5,7 +5,7 @@ import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs'
+} from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,

@@ -2,9 +2,15 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
+import { Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import toast from 'react-hot-toast'
+
+import CSVButton from 'components/ui/CSVButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { copyToClipboard } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import {
   Alert,
   Button,
@@ -22,13 +28,6 @@ import {
   ResizablePanelGroup,
   cn,
 } from 'ui'
-
-import CSVButton from 'components/ui/CSVButton'
-import { useCheckPermissions } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { Play } from 'lucide-react'
-import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
@@ -36,7 +35,8 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection, { LogSelectionProps } from './LogSelection'
-import type { LogData, QueryType } from './Logs.types'
+import type { LogData, LogQueryError, QueryType } from './Logs.types'
+import { isDefaultLogPreviewFormat } from './Logs.utils'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 

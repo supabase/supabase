@@ -28,7 +28,7 @@ import {
   IconMenuDevCli,
 } from './HomeMenuIcons'
 
-function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className: string) {
+function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
   switch (menuKey) {
     case 'home':
       return <IconMenuHome width={width} height={height} className={className} />

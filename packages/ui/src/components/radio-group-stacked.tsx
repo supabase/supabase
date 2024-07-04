@@ -3,9 +3,9 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import * as React from 'react'
 
-import { cn } from '../lib/utils/cn'
-import { Label_Shadcn_ } from '../..'
 import { Circle } from 'lucide-react'
+import { Label } from '../components/shadcn/ui/label'
+import { cn } from '../lib/utils/cn'
 
 const RadioGroupStacked = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -78,7 +78,7 @@ const RadioGroupStackedItem = React.forwardRef<
           </div>
         )}
         <div className="flex flex-col gap-0.25 items-start">
-          <Label_Shadcn_
+          <Label
             htmlFor={props.value}
             className={cn(
               'block',
@@ -90,7 +90,7 @@ const RadioGroupStackedItem = React.forwardRef<
             )}
           >
             {label}
-          </Label_Shadcn_>
+          </Label>
           {props.description && (
             <p className="text-sm text-foreground-lighter">{props.description}</p>
           )}

@@ -1,10 +1,12 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useUrlState } from 'hooks'
+import useTable from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -15,11 +17,9 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useDispatch, useTrackedState } from '../../../store'
-import { DropdownControl } from '../../common'
-import useTable from 'hooks/misc/useTable'
 import { useParams } from 'common'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { useDispatch, useTrackedState } from '../../../store/Store'
+import { DropdownControl } from '../../common/DropdownControl'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },

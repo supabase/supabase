@@ -1,5 +1,5 @@
 import WarehouseAccessTokens from 'components/interfaces/DataWarehouse/WarehouseAccessTokens'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => <WarehouseAccessTokens />

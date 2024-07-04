@@ -1,5 +1,5 @@
 import { CommandGroup } from 'cmdk'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import { CommandItem, copyToClipboard } from './Command.utils'
 import { IconAlertCircle } from 'ui/src/components/Icon/icons/IconAlertCircle'

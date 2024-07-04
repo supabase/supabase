@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
+import { cn } from 'ui'
 
 interface Props {
   title: string
@@ -9,6 +10,7 @@ interface Props {
   icon?: string | any
   children?: any
   layout?: 'vertical' | 'horizontal'
+  className?: string
 }
 
 const ButtonCard: FC<Props> = ({
@@ -18,14 +20,16 @@ const ButtonCard: FC<Props> = ({
   description = '',
   to,
   layout = 'vertical',
+  className,
 }) => {
   return (
     <Link
       href={to}
-      className={[
+      className={cn(
         'h-full block shadow-none bg-surface-100 rounded transition',
         'border border-transparent hover:border-overlay',
-      ].join(' ')}
+        className
+      )}
     >
       {children ? (
         children

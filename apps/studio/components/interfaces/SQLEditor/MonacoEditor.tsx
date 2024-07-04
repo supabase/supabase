@@ -2,17 +2,18 @@ import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { MutableRefObject, useEffect, useRef } from 'react'
 
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { cn } from 'ui'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type MonacoEditorProps = {
   id: string

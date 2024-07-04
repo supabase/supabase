@@ -1,10 +1,10 @@
-import { Pagination } from './pagination'
-import useTable from 'hooks/misc/useTable'
 import { useParams } from 'common'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useUrlState } from 'hooks'
-import RefreshButton from '../header/RefreshButton'
 import { GridFooter } from 'components/ui/GridFooter'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import useTable from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import RefreshButton from '../header/RefreshButton'
+import { Pagination } from './pagination'
 
 export interface FooterProps {
   isRefetching?: boolean

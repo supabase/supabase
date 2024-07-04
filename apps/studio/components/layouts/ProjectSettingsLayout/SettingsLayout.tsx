@@ -1,12 +1,15 @@
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
-import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { ProjectLayout } from '..'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { generateSettingsMenu } from './SettingsMenu.utils'
 
 interface SettingsLayoutProps {
   title?: string

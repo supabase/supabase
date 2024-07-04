@@ -1,3 +1,5 @@
+'use client'
+
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'

@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import { Check, Clipboard, Edit, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
-import { Check, Clipboard, Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Button,
   DropdownMenu,

@@ -26,21 +26,21 @@
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
   <description>There&apos;s been a lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
-  <pubDate>Wed, 12 Jul 2023 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/new-in-postgres-15</guid>
   <title>What&apos;s new in Postgres 15?</title>
   <link>https://supabase.com/blog/new-in-postgres-15</link>
   <description>Describes the release of Postgres 15, new features and reasons to use it</description>
-  <pubDate>Thu, 15 Dec 2022 16:00:00 GMT</pubDate>
+  <pubDate>Thu, 15 Dec 2022 23:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-commitfest</guid>
   <title>What is PostgreSQL commitfest and how to contribute</title>
   <link>https://supabase.com/blog/postgresql-commitfest</link>
   <description>A time-tested method for contributing to the core Postgres code</description>
-  <pubDate>Wed, 26 Oct 2022 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 26 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 
     </channel>

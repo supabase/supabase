@@ -7,11 +7,11 @@ import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, Input, Modal } from 'ui'
+import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 
 export interface ExitSurveyModalProps {
   visible: boolean

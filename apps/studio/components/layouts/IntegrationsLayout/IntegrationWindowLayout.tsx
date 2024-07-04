@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'
 import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
 
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { ScaffoldContainer } from '../Scaffold'
 

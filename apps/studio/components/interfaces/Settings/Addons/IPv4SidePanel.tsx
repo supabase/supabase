@@ -10,20 +10,21 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
+  Alert_Shadcn_,
   Button,
-  cn,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
   SidePanel,
+  cn,
 } from 'ui'
 
 const IPv4SidePanel = () => {

@@ -15,7 +15,9 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -27,7 +29,6 @@ import {
   Alert_Shadcn_,
   Badge,
   Button,
-  IconAlertTriangle,
   IconExternalLink,
   IconInfo,
   Modal,
@@ -115,7 +116,20 @@ const ComputeInstanceSidePanel = () => {
 
   const availableOptions = useMemo(() => {
     const computeOptions =
-      availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
+      availableAddons
+        .find((addon) => addon.type === 'compute_instance')
+        ?.variants.filter((option) => {
+          if (!selectedProject?.cloud_provider) {
+            return true
+          }
+
+          const meta = option.meta as ProjectAddonVariantMeta
+
+          return (
+            !meta.supported_cloud_providers ||
+            meta.supported_cloud_providers.includes(selectedProject.cloud_provider)
+          )
+        }) ?? []
 
     // Backwards comp until API is deployed
     if (!hasMicroOptionFromApi) {
