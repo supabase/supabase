@@ -7,11 +7,10 @@ import RefreshButton from '../header/RefreshButton'
 import { Pagination } from './pagination'
 
 export interface FooterProps {
-  isLoading?: boolean
   isRefetching?: boolean
 }
 
-const Footer = ({ isLoading, isRefetching }: FooterProps) => {
+const Footer = ({ isRefetching }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: selectedTable } = useTable(id)
@@ -30,7 +29,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
     <GridFooter>
       {selectedView === 'data' && <Pagination />}
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-x-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
         )}
