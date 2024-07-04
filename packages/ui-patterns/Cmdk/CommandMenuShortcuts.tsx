@@ -3,7 +3,7 @@ import { IconArrowLeft } from 'ui/src/components/Icon/icons/IconArrowLeft'
 import { BadgeExperimental } from './Command.Badges'
 import { COMMAND_ROUTES } from './Command.constants'
 import { CommandShortcut } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 
 export default function CommandMenuShortcuts() {
   const { setPages, pages, currentPage } = useCommandMenu()

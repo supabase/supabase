@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { IconChevronRight, cn } from 'ui'
+import { cn } from '../../lib/utils/cn'
+import IconChevronRight from '../Icon/icons/IconChevronRight/IconChevronRight'
 
 interface Props {
   label: string

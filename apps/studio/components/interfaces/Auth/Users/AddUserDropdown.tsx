@@ -3,7 +3,7 @@ import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import semver from 'semver'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,

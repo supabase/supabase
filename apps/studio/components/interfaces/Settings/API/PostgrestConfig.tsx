@@ -9,18 +9,18 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import {
-  FormActions,
   FormPanelContainer,
   FormPanelContent,
   FormPanelFooter,
   FormPanelHeader,
-} from 'components/ui/Forms'
+} from 'components/ui/Forms/FormPanel'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Admonition,
   AlertDescription_Shadcn_,

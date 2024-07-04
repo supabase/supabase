@@ -1,4 +1,4 @@
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Settings: NextPageWithLayout = () => {

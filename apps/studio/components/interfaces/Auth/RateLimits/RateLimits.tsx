@@ -1,9 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,22 +27,6 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import * as z from 'zod'
-
-import AlertError from 'components/ui/AlertError'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
-import toast from 'react-hot-toast'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 

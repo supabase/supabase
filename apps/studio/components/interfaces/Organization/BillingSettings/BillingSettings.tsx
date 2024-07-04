@@ -1,5 +1,7 @@
+import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import BillingEmail from './BillingEmail'
@@ -8,8 +10,6 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
-import { useParams } from 'common'
-import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 
 const BillingSettings = () => {
   const {

@@ -1,4 +1,3 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { FilterIcon, Plus } from 'lucide-react'
@@ -6,6 +5,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
