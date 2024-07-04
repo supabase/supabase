@@ -1,10 +1,10 @@
 import { KeyboardEvent, memo } from 'react'
-import { Button, IconChevronDown, IconX, Input } from 'ui'
+import { Button, IconChevronDown, Input } from 'ui'
 
-import { DropdownControl } from 'components/grid/components/common'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
-import { FilterOperatorOptions } from './Filter.constants'
 import { X } from 'lucide-react'
+import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
   table: SupaTable

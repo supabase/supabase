@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
@@ -14,9 +14,10 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import dayjs from 'dayjs'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
 const PAGE_LIMIT = 10
 

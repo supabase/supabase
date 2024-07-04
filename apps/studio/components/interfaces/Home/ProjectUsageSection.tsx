@@ -5,7 +5,7 @@ import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/Loadi
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
 import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IconAlertCircle } from 'ui'
 import ProjectUsage from './ProjectUsage'
 

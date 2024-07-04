@@ -2,6 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
+import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Alert,
   Button,
@@ -13,12 +21,6 @@ import {
   Loading,
   Modal,
 } from 'ui'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
-import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
 import { InfoIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const TransferProjectButton = () => {

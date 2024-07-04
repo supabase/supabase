@@ -1,15 +1,6 @@
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { Button, cn } from 'ui'
 
-export * from './BooleanEditor'
-export * from './DateEditor'
-export * from './DateTimeEditor'
-export * from './JsonEditor'
-export * from './NumberEditor'
-export * from './SelectEditor'
-export * from './TextEditor'
-export * from './TimeEditor'
-
 export const TruncatedWarningOverlay = ({
   isLoading,
   loadFullValue,

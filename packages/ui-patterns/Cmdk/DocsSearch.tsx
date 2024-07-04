@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 import { StatusIcon } from '../Icons/StatusIcons'
 
 const questions = [

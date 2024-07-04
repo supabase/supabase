@@ -8,10 +8,14 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { doPermissionsCheck, useFlag, useGetPermissions, useSelectedOrganization } from 'hooks'
+import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
+import { isNil } from 'lodash'
 import {
   Button,
   Dialog,
@@ -40,8 +44,6 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { isNil } from 'lodash'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
