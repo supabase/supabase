@@ -24,8 +24,8 @@ export type ChartConfig = {
   cumulative: boolean
   xKey: string
   yKey: string
-  showLabels: boolean
-  showGrid: boolean
+  showLabels?: boolean
+  showGrid?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {

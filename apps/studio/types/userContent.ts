@@ -45,6 +45,8 @@ export namespace SqlSnippets {
       cumulative: boolean
       xKey: string
       yKey: string
+      showLabels?: boolean
+      showGrid?: boolean
     }
   }
 }
