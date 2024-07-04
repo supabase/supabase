@@ -223,7 +223,7 @@ const GitHubIntegrationConnectionForm = ({
         <Alert_Shadcn_ className="w-full mb-0" variant="warning">
           <WarningIcon />
           <div>
-            <AlertTitle_Shadcn_ className="text-sm">Braching is not enabled</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">Branching is not enabled</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
               This integration has no effect without Branching feature being active.
               <br />
