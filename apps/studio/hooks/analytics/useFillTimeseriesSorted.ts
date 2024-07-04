@@ -1,4 +1,4 @@
-import { fillTimeseries } from 'components/interfaces/Settings/Logs'
+import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useMemo } from 'react'
 
 /**

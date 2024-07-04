@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react'
-import { withAuth } from 'hooks'
-import { ProjectLayout } from '../'
+
+import { withAuth } from 'hooks/misc/withAuth'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import ReportsMenu from './ReportsMenu'
 
 interface ReportsLayoutProps {

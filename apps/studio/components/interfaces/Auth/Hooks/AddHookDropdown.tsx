@@ -1,8 +1,13 @@
-import { ChevronDown } from 'lucide-react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronDown } from 'lucide-react'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -11,16 +16,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AddHookDropdownProps {
   buttonText?: string

@@ -1,5 +1,6 @@
 import { useParams } from 'common'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {

@@ -1,19 +1,18 @@
-import { useRouter } from 'next/router'
 import { useParams } from 'common/hooks'
 import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
-import { SettingsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import type { NextPageWithLayout } from 'types'
 import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useRouter } from 'next/router'
+import type { NextPageWithLayout } from 'types'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()

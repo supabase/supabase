@@ -3,18 +3,18 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Alert, Button, Listbox } from 'ui'
 
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { FormPanel } from 'components/ui/Forms'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
+import { Alert, Button, Listbox } from 'ui'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -204,4 +204,5 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 }
 
 APIAuthorizationPage.getLayout = (page) => <APIAuthorizationLayout>{page}</APIAuthorizationLayout>
+
 export default withAuth(APIAuthorizationPage)

@@ -3,14 +3,6 @@ import { XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-} from 'ui'
 
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -22,7 +14,7 @@ import {
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -31,11 +23,19 @@ import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-role
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useLocalStorage } from 'hooks'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconExternalLink,
+} from 'ui'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 

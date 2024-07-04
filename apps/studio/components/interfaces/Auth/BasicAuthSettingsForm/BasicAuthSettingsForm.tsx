@@ -7,19 +7,16 @@ import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,

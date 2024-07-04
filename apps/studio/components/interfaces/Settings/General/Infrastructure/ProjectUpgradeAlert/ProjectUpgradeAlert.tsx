@@ -9,7 +9,7 @@ import { useParams } from 'common'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,

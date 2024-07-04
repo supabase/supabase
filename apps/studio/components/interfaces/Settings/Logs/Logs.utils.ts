@@ -3,11 +3,12 @@ import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-import logConstants from 'shared-data/logConstants'
 
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import type { PlanId } from 'data/subscriptions/types'
-import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import logConstants from 'shared-data/logConstants'
+import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp

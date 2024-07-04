@@ -10,11 +10,11 @@ import {
 } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { DatabaseLayout } from 'components/layouts'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { FormHeader } from 'components/ui/Forms'
-import type { NextPageWithLayout } from 'types'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import type { NextPageWithLayout } from 'types'
 
 const PRESET_MAP = {
   [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',

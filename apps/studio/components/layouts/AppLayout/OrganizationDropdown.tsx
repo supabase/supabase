@@ -5,7 +5,8 @@ import { useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,

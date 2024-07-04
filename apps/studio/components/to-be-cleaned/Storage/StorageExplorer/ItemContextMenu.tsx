@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
