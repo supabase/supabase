@@ -1,3 +1,4 @@
+import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import dayjs from 'dayjs'
@@ -24,6 +25,8 @@ export type ChartConfig = {
   cumulative: boolean
   xKey: string
   yKey: string
+  showLabels?: boolean
+  showGrid?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {
@@ -95,12 +98,30 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               xAxisKey={config.xKey}
               yAxisKey={config.yKey}
               emptyStateMessage="Execute a query and configure the chart options"
+              showGrid={config.showGrid}
+              XAxisProps={{
+                angle: 0,
+                interval: 0,
+                hide: !config.showLabels,
+                tickFormatter: (idx: string) => {
+                  const value = resultToRender[+idx][config.xKey]
+                  if (xKeyDateFormat === 'date') {
+                    return dayjs(value).format('MMM D YYYY')
+                  }
+                  return value
+                },
+              }}
+              YAxisProps={{
+                tickFormatter: (value: number) => value.toLocaleString(),
+                label: <></>,
+                hide: !config.showLabels,
+              }}
             />
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={25} minSize={15} className="px-3 py-3 space-y-4">
-          <>
+          <form className="grid gap-4">
             <div className="flex justify-between items-center h-5">
               <h2 className="text-sm text-foreground-lighter">Chart options</h2>
               {config.xKey && config.yKey && (
@@ -157,18 +178,38 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
                 </SelectGroup_Shadcn_>
               </SelectContent_Shadcn_>
             </Select_Shadcn_>
-            <div className="flex items-center">
-              <Checkbox_Shadcn_
-                id="cumulative"
-                name="cumulative"
-                checked={config.cumulative}
-                onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
-              />
-              <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="cumulative">
+            <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
+              <Label_Shadcn_ className="" htmlFor="cumulative">
+                <Checkbox_Shadcn_
+                  id="cumulative"
+                  name="cumulative"
+                  checked={config.cumulative}
+                  onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
+                />
                 Cumulative
               </Label_Shadcn_>
+
+              <Label_Shadcn_ htmlFor="showLabels">
+                <Checkbox_Shadcn_
+                  id="showLabels"
+                  name="showLabels"
+                  checked={config.showLabels}
+                  onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
+                />
+                Show labels
+              </Label_Shadcn_>
+
+              <Label_Shadcn_ htmlFor="showGrid">
+                <Checkbox_Shadcn_
+                  id="showGrid"
+                  name="showGrid"
+                  checked={config.showGrid}
+                  onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
+                />
+                Show grid
+              </Label_Shadcn_>
             </div>
-          </>
+          </form>
         </ResizablePanel>
       </>
     </ResizablePanelGroup>
