@@ -24,9 +24,9 @@ toc_depth: 3
 
 This tutorial is building upon the previous learnings on Postgis and Supabase and adding Supabase Realtime on top. If you're new to this topic, we recommend you review the following first:
 
-- Getting started with PostGIS and Supabase [[video]](https://supabase.link/postgis-quickstart-yt)[[docs]](/docs/guides/database/extensions/postgis)
-- Self-host Maps with Protomaps and Supabase Storage [[video]](https://supabase.link/protomaps-storage-yt)[[blog]](/blog/self-host-maps-storage-protomaps)
-- Generate Vector Tiles with PostGIS [[video]](https://supabase.link/supa-gis-yt)[[blog]](/blog/postgis-generate-vector-tiles)
+- Getting started with PostGIS and Supabase [[video]](https://supabase.link/postgis-quickstart-yt) [[docs]](/docs/guides/database/extensions/postgis)
+- Self-host Maps with Protomaps and Supabase Storage [[video]](https://supabase.link/protomaps-storage-yt) [[blog]](/blog/self-host-maps-storage-protomaps)
+- Generate Vector Tiles with PostGIS [[video]](https://supabase.link/supa-gis-yt) [[blog]](/blog/postgis-generate-vector-tiles)
 
 In this tutorial, you will learn to
 
@@ -128,8 +128,6 @@ In this section, you will use Supabase Realtime to listen to changes in the data
 The full client-side code for listening to the realtime changes and drawing the marker onto the map is available on [GitHub](https://github.com/thorwebdev/location-tRacer/blob/main/app/app/realtimemap/%5Bevent%5D/page.tsx).
 
 We're going to brake it down into a couple of steps:
-
-### 1. Create a Supabase Realtime channel
 
 Since we're working in React, we will set up the Realtime subscription in the `useEffect` hook. If you're using Next.js, it's important to mark this with `use client` as we will need client-side JavaScript to make this happen:
 
