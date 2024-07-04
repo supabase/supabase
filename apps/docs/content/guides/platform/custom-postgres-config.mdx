@@ -64,7 +64,7 @@ max_parallel_workers    |3        |
 - End of Custom Postgres Config -
 ```
 
-When configuring parameters that require time units, the CLI expects a string value with a time unit for parameters such as statement_timeout. Supported units include 'ms', 's', and 'min'.
+When configuring parameters that require time units, such as `statement_timeout`, the CLI expects a string value with a time unit. Supported units include `ms`, `s`, and `min`.
 
 ```bash
 $ supabase --experimental --project-ref <project-ref> postgres-config update --config statement_timeout=1000ms
