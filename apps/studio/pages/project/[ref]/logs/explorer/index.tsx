@@ -14,35 +14,39 @@ import {
   ResizablePanelGroup,
 } from 'ui'
 
-import {
-  DatePickerToFrom,
-  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LOGS_TABLES,
-  LogTable,
-  LogTemplate,
-  LogsQueryPanel,
-  LogsTableName,
-  LogsWarning,
-  TEMPLATES,
-  maybeShowUpgradePrompt,
-  useEditorHints,
-} from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { LogsLayout } from 'components/layouts'
-import { CodeEditor } from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useLocalStorage, useSelectedOrganization } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useWarehouseCollectionsQuery, useWarehouseQueryQuery } from 'data/analytics'
-import { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import {
+  maybeShowUpgradePrompt,
+  useEditorHints,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useLocalStorage } from '@uidotdev/usehooks'
+import {
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  LOGS_TABLES,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
