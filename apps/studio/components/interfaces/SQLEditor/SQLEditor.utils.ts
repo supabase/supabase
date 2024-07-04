@@ -1,3 +1,4 @@
+import { SnippetDetail } from 'data/content/sql-folders-query'
 import { removeCommentsFromSql } from 'lib/helpers'
 import type { SqlSnippets, UserContent } from 'types'
 import {
@@ -31,6 +32,36 @@ export const createSqlSnippetSkeleton = ({
       content_id: id ?? '',
       sql: sql ?? '',
     },
+  }
+}
+
+export const createSqlSnippetSkeletonV2 = ({
+  id,
+  name,
+  sql,
+  owner_id,
+  project_id,
+}: {
+  id: string
+  name: string
+  sql: string
+  owner_id: number
+  project_id: number
+}): SnippetDetail => {
+  return {
+    ...NEW_SQL_SNIPPET_SKELETON,
+    id,
+    owner_id,
+    project_id,
+    name,
+    folder_id: undefined,
+    inserted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    content: {
+      ...NEW_SQL_SNIPPET_SKELETON.content,
+      content_id: id ?? '',
+      sql: sql ?? '',
+    } as any,
   }
 }
 

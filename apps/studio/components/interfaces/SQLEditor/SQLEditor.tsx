@@ -16,7 +16,7 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useFlag, useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -27,6 +27,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Loading,
@@ -81,7 +82,10 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -92,6 +96,10 @@ const SQLEditor = () => {
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
+
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -105,7 +113,6 @@ const SQLEditor = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
@@ -113,40 +120,28 @@ const SQLEditor = () => {
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
 
+  // Use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
-  // Used for cleaner framer motion transitions
-  useEffect(() => {
-    setIsFirstRender(false)
-  }, [])
-
-  useEffect(() => {
-    if (isSuccessReadReplicas) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
-    }
-  }, [isSuccessReadReplicas, databases, ref])
-
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
     },
     { enabled: includeSchemaMetadata }
   )
 
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-
   const isDiffOpen = !!sourceSqlDiff
 
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const snippetIsLoading = enableFolders
+    ? !(id in snapV2.snippets)
+    : !(id && ref && snap.loaded[ref])
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
 
-  // Use chat id because useChat doesn't have a reset function to clear all messages
-  const [chatId, setChatId] = useState(uuidv4())
   const {
     messages: chatMessages,
     append,
@@ -215,11 +210,6 @@ const SQLEditor = () => {
     },
   })
 
-  const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  /**
-   * Sets the snippet title using AI.
-   */
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
@@ -269,8 +259,6 @@ const SQLEditor = () => {
       )
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
-
-  const getImpersonatedRole = useGetImpersonatedRole()
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -577,6 +565,18 @@ const SQLEditor = () => {
       console.log(e)
     }
   }, [selectedDiffType, sourceSqlDiff])
+
+  // Used for cleaner framer motion transitions
+  useEffect(() => {
+    setIsFirstRender(false)
+  }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas, databases, ref])
 
   const defaultSqlDiff = useMemo(() => {
     if (!sourceSqlDiff) {

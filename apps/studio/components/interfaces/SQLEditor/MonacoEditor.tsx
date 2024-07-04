@@ -6,13 +6,14 @@ import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
+import { useFlag, useLocalStorageQuery, useSelectedProject } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 export type MonacoEditorProps = {
   id: string
@@ -33,18 +34,21 @@ const MonacoEditor = ({
   executeQuery,
   onHasSelection,
 }: MonacoEditorProps) => {
-  const { ref, content } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const { ref, content } = useParams()
   const project = useSelectedProject()
+
+  const snap = useSqlEditorStateSnapshot({ sync: true })
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
 
-  const snap = useSqlEditorStateSnapshot({ sync: true })
-  const snippet = snap.snippets[id]
+  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery

@@ -1,11 +1,12 @@
 import { useTheme } from 'next-themes'
-import { useParams } from 'common/hooks'
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { TableEditorLayout } from 'components/layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import useTable from 'hooks/misc/useTable'
-import { useRouter } from 'next/router'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {

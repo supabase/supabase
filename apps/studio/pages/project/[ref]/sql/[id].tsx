@@ -15,10 +15,12 @@ import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useLocalStorageQuery } from 'hooks'
+import { useFlag, useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useContentIdQuery } from 'data/content/content-id-query'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -26,15 +28,26 @@ const SqlEditor: NextPageWithLayout = () => {
   const { id, ref, content } = useParams()
 
   const { project } = useProjectContext()
-  const snap = useSqlEditorStateSnapshot()
   const appSnap = useAppStateSnapshot()
+  const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippets = useSnippets(ref)
+  const enableFolders = useFlag('sqlFolderOrganization')
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
+  )
+
+  useContentIdQuery(
+    { projectRef: ref, id },
+    {
+      enabled: enableFolders && id !== 'new',
+      onSuccess: (data) =>
+        snapV2.loadRemoteSnippet({ projectRef: ref as string, folderId: 'root', snippet: data }),
+    }
   )
 
   async function formatPgsql(value: string) {
