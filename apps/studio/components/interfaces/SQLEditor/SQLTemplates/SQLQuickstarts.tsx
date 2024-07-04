@@ -6,14 +6,16 @@ import toast from 'react-hot-toast'
 import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeleton, createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 const SQLQuickstarts = () => {
   const { ref } = useParams()

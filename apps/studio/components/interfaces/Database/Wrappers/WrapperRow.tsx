@@ -7,7 +7,7 @@ import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTra
 
 import { useParams } from 'common/hooks'
 import type { FDW } from 'data/fdw/fdws-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { WrapperMeta } from './Wrappers.types'
 
 interface WrapperRowProps {

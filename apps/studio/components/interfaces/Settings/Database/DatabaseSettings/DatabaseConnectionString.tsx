@@ -1,4 +1,5 @@
 import { useParams, useTelemetryProps } from 'common'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
@@ -11,10 +12,9 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { ChevronDown, ExternalLink } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {

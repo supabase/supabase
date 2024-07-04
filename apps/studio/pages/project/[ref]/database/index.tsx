@@ -1,4 +1,4 @@
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Database: NextPageWithLayout = () => {

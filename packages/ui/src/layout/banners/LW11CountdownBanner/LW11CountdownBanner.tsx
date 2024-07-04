@@ -1,15 +1,17 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { Button, cn } from 'ui'
-import announcement from '../data/Announcement.json'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Button } from '../../../components/Button/Button'
+import { cn } from '../../../lib/utils/cn'
+import announcement from '../data/Announcement.json'
 
 export function LW11CountdownBanner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
   const isLaunchWeekPage = pathname === '/ga-week'
-  const isLaunchWeekSection = pathname.includes('/launch-week') || pathname.includes('/ga-week')
+  const isLaunchWeekSection =
+    (pathname?.includes('/launch-week') || pathname?.includes('/ga-week')) ?? false
 
   if (isLaunchWeekPage || isHomePage) return null
 

@@ -10,10 +10,13 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InnerSideMenuItem } from 'ui-patterns/InnerSideMenu'
@@ -32,6 +35,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
 
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
   const { mutate: createFolder, isLoading: isCreating } = useSQLSnippetFolderCreateMutation({
     onSuccess: () => {

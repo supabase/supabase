@@ -24,7 +24,7 @@ import { useOrganizationMembersQuery } from 'data/organizations/organization-mem
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 // [Joshen considerations]

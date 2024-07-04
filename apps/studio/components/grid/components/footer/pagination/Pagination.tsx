@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, InputNumber } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useDispatch, useTrackedState } from '../../../store'
-import { DropdownControl } from '../../common'
+import { useDispatch, useTrackedState } from '../../../store/Store'
+import { DropdownControl } from '../../common/DropdownControl'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },

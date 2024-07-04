@@ -1,9 +1,15 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import BarChart from 'components/ui/Charts/BarChart'
+import Panel from 'components/ui/Panel'
+import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -19,12 +25,6 @@ import {
   IconZap,
   Loading,
 } from 'ui'
-
-import BarChart from 'components/ui/Charts/BarChart'
-import Panel from 'components/ui/Panel'
-import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import { useIsFeatureEnabled } from 'hooks'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {

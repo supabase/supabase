@@ -1,15 +1,15 @@
 import { useState } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { Table } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
-import { useQueryClient } from '@tanstack/react-query'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const queryClient = useQueryClient()
