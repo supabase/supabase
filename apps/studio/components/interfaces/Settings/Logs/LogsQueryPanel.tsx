@@ -16,23 +16,22 @@ import {
   Tabs,
 } from 'ui'
 
-import { useFlag, useIsFeatureEnabled } from 'hooks'
 import Link from 'next/link'
 import React, { ReactNode, useState } from 'react'
-import {
-  EXPLORER_DATEPICKER_HELPERS,
-  LOGS_SOURCE_DESCRIPTION,
-  LogTemplate,
-  WarehouseCollection,
-} from '.'
 import DatePickers from './Logs.DatePickers'
 import Table from 'components/to-be-cleaned/Table'
 import { logConstants } from 'shared-data'
 import { copyToClipboard } from 'lib/helpers'
 import { BookOpen, ChevronDown } from 'lucide-react'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
-import { LogsTableName } from './Logs.constants'
-import { LogsWarning } from './Logs.types'
+import {
+  EXPLORER_DATEPICKER_HELPERS,
+  LOGS_SOURCE_DESCRIPTION,
+  LogsTableName,
+} from './Logs.constants'
+import { LogTemplate, LogsWarning, WarehouseCollection } from './Logs.types'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {

@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks'
 import { FormControl_Shadcn_, FormField_Shadcn_, FormItem_Shadcn_, Form_Shadcn_, Modal } from 'ui'
 import { Input } from '@ui/components/shadcn/ui/input'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 type CreateWarehouseProps = {
   onSubmit: (values: { description: string }) => void
