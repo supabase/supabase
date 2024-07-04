@@ -2,6 +2,7 @@
 
 import React, { FC, Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Badge,
   cn,
@@ -17,7 +18,6 @@ import {
 
 import MenuIconPicker from './MenuIconPicker'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
-import { usePathname } from 'next/navigation'
 
 /**
  * Get TopNav active label based on current pathname

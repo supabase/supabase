@@ -11,7 +11,7 @@ import { ThemeToggle } from 'ui-patterns'
 
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
-import { type DropdownMenuItem } from '../Navigation.types'
+import type { DropdownMenuItem } from '../Navigation.types'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -85,7 +85,7 @@ const Menu = () => (
     type="default"
     openBehaviour="multiple"
     size="small"
-    className="space-y-1"
+    className="space-y-1 mt-2.5"
     justified
     chevronAlign="right"
   >
