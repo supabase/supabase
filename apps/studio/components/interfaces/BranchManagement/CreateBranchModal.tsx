@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { Check, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -12,7 +13,8 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,13 +26,10 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   IconAlertCircle,
-  IconCheck,
   IconExternalLink,
-  IconLoader,
   Input_Shadcn_,
   Modal,
 } from 'ui'
-import { Check, Loader2 } from 'lucide-react'
 
 interface CreateBranchModalProps {
   visible: boolean

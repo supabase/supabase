@@ -7,7 +7,9 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -47,7 +49,6 @@ import {
   ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpdateRolesPanelProps {
   visible: boolean

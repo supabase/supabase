@@ -3,6 +3,37 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import {
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  LogsTableName,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  maybeShowUpgradePrompt,
+  useEditorHints,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import {
   Button,
   Form,
@@ -12,32 +43,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
-
-import {
-  DatePickerToFrom,
-  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LogTable,
-  LogTemplate,
-  LogsQueryPanel,
-  LogsTableName,
-  LogsWarning,
-  TEMPLATES,
-  maybeShowUpgradePrompt,
-  useEditorHints,
-} from 'components/interfaces/Settings/Logs'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { LogsLayout } from 'components/layouts'
-import { CodeEditor } from 'components/ui/CodeEditor'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useLocalStorage, useSelectedOrganization } from 'hooks'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'

@@ -4,9 +4,9 @@ import { IconClipboard, IconEdit, IconTrash } from 'ui'
 import type { SupaRow } from 'components/grid/types'
 import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTrackedState } from '../../store'
-import { copyToClipboard, formatClipboardValue } from '../../utils'
 import { ROW_CONTEXT_MENU_ID } from '.'
+import { useTrackedState } from '../../store/Store'
+import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]

@@ -10,7 +10,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'

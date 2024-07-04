@@ -4,10 +4,13 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { IconLoader, SidePanel } from 'ui'
 
-import { parseSupaTable } from 'components/grid'
-import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  parseSupaTable,
+} from 'components/grid/SupabaseGrid.utils'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import { FilterPopover } from 'components/grid/components/header/filter'
+import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'

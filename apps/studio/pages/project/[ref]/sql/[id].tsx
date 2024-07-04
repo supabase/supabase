@@ -1,24 +1,23 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
+import { useParams } from 'common'
+import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import type { NextPageWithLayout } from 'types'
-
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
-import { SQLEditorLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useLocalStorageQuery } from 'hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()

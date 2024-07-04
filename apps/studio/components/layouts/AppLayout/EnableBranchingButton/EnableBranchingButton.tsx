@@ -2,7 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { GitBranch } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import BranchingWaitListPopover from './BranchingWaitListPopover'
 

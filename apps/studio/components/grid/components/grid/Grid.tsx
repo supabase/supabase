@@ -1,22 +1,20 @@
-/* eslint-disable react/display-name */
-
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
-import 'react-data-grid/lib/styles.css'
 import { memo } from 'react-tracked'
-import { Button } from 'ui'
 
-import { formatClipboardValue } from 'components/grid/utils'
+import { formatClipboardValue } from 'components/grid/utils/common'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useKeyboardShortcuts, useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
-import { useDispatch, useTrackedState } from '../../store'
+import { Button } from 'ui'
+import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
+import { useKeyboardShortcuts } from '../common/Hooks'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {

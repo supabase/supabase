@@ -1,10 +1,11 @@
+import { PanelLeftClose, PanelRightClose } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
-import { PanelLeftClose, PanelRightClose } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Role } from 'types'
 import {
   AlertDescription_Shadcn_,

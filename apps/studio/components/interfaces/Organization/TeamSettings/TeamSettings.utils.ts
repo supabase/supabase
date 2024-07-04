@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks'
+import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
 import type { Permission, Role } from 'types'
 
 export const useGetRolesManagementPermissions = (
