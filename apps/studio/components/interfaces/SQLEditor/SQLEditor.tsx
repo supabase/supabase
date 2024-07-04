@@ -141,7 +141,7 @@ const SQLEditor = () => {
   const isDiffOpen = !!sourceSqlDiff
 
   const snippetIsLoading = enableFolders
-    ? !(id in snapV2.snippets)
+    ? !(id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined)
     : !(id && ref && snap.loaded[ref])
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 

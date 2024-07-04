@@ -18,8 +18,8 @@ import { createSqlSnippetSkeleton, createSqlSnippetSkeletonV2 } from '../SQLEdit
 import SQLCard from './SQLCard'
 
 const SQLQuickstarts = () => {
-  const { ref } = useParams()
   const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -36,13 +36,15 @@ const SQLQuickstarts = () => {
 
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
+
     if (!canCreateSQLSnippet) {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
       if (enableFolders) {
-        if (!profile || !project) return
         const snippet = createSqlSnippetSkeletonV2({
           id: uuidv4(),
           name,
@@ -50,15 +52,16 @@ const SQLQuickstarts = () => {
           owner_id: profile?.id,
           project_id: project?.id,
         })
-        snapV2.addSnippet({ projectRef: ref, folderId: 'root', snippet })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        snapV2.addNeedsSaving(snippet.id)
         router.push(`/project/${ref}/sql/${snippet.id}`)
       } else {
         const snippet = createSqlSnippetSkeleton({
           id: uuidv4(),
           name,
           sql,
-          owner_id: profile?.id,
-          project_id: project?.id,
+          owner_id: profile.id,
+          project_id: project.id,
         })
         snap.addSnippet(snippet as SqlSnippet, ref)
         snap.addNeedsSaving(snippet.id!)

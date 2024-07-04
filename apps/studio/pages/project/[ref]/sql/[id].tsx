@@ -45,8 +45,7 @@ const SqlEditor: NextPageWithLayout = () => {
     { projectRef: ref, id },
     {
       enabled: enableFolders && id !== 'new',
-      onSuccess: (data) =>
-        snapV2.loadRemoteSnippet({ projectRef: ref as string, folderId: 'root', snippet: data }),
+      onSuccess: (data) => snapV2.addSnippet({ projectRef: ref as string, snippet: data }),
     }
   )
 

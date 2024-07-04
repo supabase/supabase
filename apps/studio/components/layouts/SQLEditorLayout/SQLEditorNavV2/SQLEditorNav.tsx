@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { useParams } from 'common'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Snippet, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -13,9 +14,8 @@ import {
   TreeView,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ROOT_NODE, TreeViewItemProps, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
+import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 // Requirements
 // - Asynchronous loading
@@ -28,7 +28,6 @@ export const SQLEditorNav = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
-  const [treeState, setTreeState] = useState<TreeViewItemProps[]>([ROOT_NODE])
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showFavouriteSnippets, setShowFavouriteSnippets] = useState(false)
   const [showSharedSnippets, setShowSharedSnippets] = useState(false)
@@ -40,14 +39,11 @@ export const SQLEditorNav = () => {
   const contents = Object.values(snapV2.snippets)
     .filter((snippet) => snippet.projectRef === projectRef)
     .map((x) => x.snippet)
-  // [Joshen] Needs to default to ROOT_NODE
-  const entities = formatFolderResponseForTreeView({ folders, contents })
+  const treeState =
+    folders.length === 0 && contents.length === 0
+      ? [ROOT_NODE]
+      : formatFolderResponseForTreeView({ folders, contents })
 
-  console.log({ entities, treeState })
-
-  // [Joshen] LEFT OFF HERE, i'm guessing we need
-  // - Store these remote snippets into the snapV2
-  // - Derive tree state from snapV2 snippets
   useSQLSnippetFoldersQuery(
     { projectRef },
     {
@@ -56,8 +52,6 @@ export const SQLEditorNav = () => {
       onSuccess: (data) => {
         if (projectRef !== undefined) {
           snapV2.initializeRemoteSnippets({ projectRef, data })
-          const entities = formatFolderResponseForTreeView(data)
-          setTreeState(entities)
         }
       },
     }

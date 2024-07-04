@@ -1,7 +1,9 @@
+import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { debounce, memoize } from 'lodash'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-import { proxySet } from 'valtio/utils'
+import { devtools, proxySet } from 'valtio/utils'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -63,55 +65,22 @@ export const sqlEditorState = proxy({
     data: SnippetFolderResponse
   }) => {
     const { folders, contents } = data
-    // if (!sqlEditorState.orders[projectRef] && contents !== undefined) {
-    //   const orderedSnippets = sqlEditorState.orderSnippets(contents)
-    //   sqlEditorState.orders[projectRef]['root'] = orderedSnippets.map((s) => s.id!)
-    // }
-
     folders?.forEach((folder) => {
       sqlEditorState.folders[folder.id] = { projectRef, folder }
     })
     contents?.forEach((snippet) => {
-      sqlEditorState.addSnippet({ projectRef, folderId: 'root', snippet })
+      sqlEditorState.addSnippet({ projectRef, snippet })
     })
+    sqlEditorState.loaded[projectRef] = true
+
+    // if (!sqlEditorState.orders[projectRef] && contents !== undefined) {
+    //   const orderedSnippets = sqlEditorState.orderSnippets(contents)
+    //   sqlEditorState.orders[projectRef]['root'] = orderedSnippets.map((s) => s.id!)
+    // }
   },
 
-  // [Joshen] This should just handle the "updating" of the content once the SQL detail is fetched
-  loadRemoteSnippet: ({
-    projectRef,
-    folderId,
-    snippet,
-  }: {
-    projectRef: string
-    folderId: string
-    snippet: Snippet
-  }) => {
-    sqlEditorState.addSnippet({ projectRef, folderId, snippet })
-  },
-
-  // Utils to sort snippets alphabetically
-  orderSnippets: (snippets: Snippet[]) => {
-    return snippets.filter((s) => Boolean(s.id)).sort((a, b) => a.name?.localeCompare(b.name))
-  },
-
-  reorderSnippets: (projectRef: string, folderId: string) => {
-    sqlEditorState.orders[projectRef][folderId] = sqlEditorState
-      .orderSnippets(
-        sqlEditorState.orders[projectRef][folderId].map((id) => sqlEditorState.snippets[id].snippet)
-      )
-      .map((s) => s.id!)
-  },
-
-  addSnippet: ({
-    projectRef,
-    folderId,
-    snippet,
-  }: {
-    projectRef: string
-    folderId: string
-    snippet: Snippet
-  }) => {
-    if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
+  addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
+    if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
       sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
       sqlEditorState.results[snippet.id] = []
       sqlEditorState.savingStates[snippet.id] = 'IDLE'
@@ -123,7 +92,7 @@ export const sqlEditorState = proxy({
       //   sqlEditorState.reorderSnippets(projectRef, folderId)
       // }
     }
-    sqlEditorState.loaded[projectRef] = true
+    // sqlEditorState.loaded[projectRef] = true
   },
 
   removeSnippet: (id: string) => {
@@ -141,9 +110,79 @@ export const sqlEditorState = proxy({
 
     sqlEditorState.needsSaving.delete(id)
   },
+
+  // Asynchronous data management for the snippets
+  addNeedsSaving: (id: string) => sqlEditorState.needsSaving.add(id),
+
+  // Utils to sort snippets alphabetically
+  // orderSnippets: (snippets: Snippet[]) => {
+  //   return snippets.filter((s) => Boolean(s.id)).sort((a, b) => a.name?.localeCompare(b.name))
+  // },
+
+  // reorderSnippets: (projectRef: string, folderId: string) => {
+  //   sqlEditorState.orders[projectRef][folderId] = sqlEditorState
+  //     .orderSnippets(
+  //       sqlEditorState.orders[projectRef][folderId].map((id) => sqlEditorState.snippets[id].snippet)
+  //     )
+  //     .map((s) => s.id!)
+  // },
 })
 
 export const getSqlEditorV2StateSnapshot = () => snapshot(sqlEditorState)
 
 export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(sqlEditorState, options)
+
+// ========================================================================
+// ## Below are all the asynchronous saving logic for the SQL Editor
+// ========================================================================
+
+async function upsert(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
+  try {
+    sqlEditorState.savingStates[id] = 'UPDATING'
+    await upsertContent({
+      projectRef,
+      payload,
+    })
+    sqlEditorState.savingStates[id] = 'IDLE'
+  } catch (error) {
+    sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
+  }
+}
+
+const memoizedUpdate = memoize((_id: string) => debounce(upsert, 1000))
+
+const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentPayloadV2) =>
+  memoizedUpdate(id)(id, projectRef, payload)
+
+if (typeof window !== 'undefined') {
+  devtools(sqlEditorState, {
+    name: 'sqlEditorState',
+    // [Joshen] So that jest unit tests can ignore this
+    enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
+  })
+
+  subscribe(sqlEditorState.needsSaving, () => {
+    const state = getSqlEditorV2StateSnapshot()
+
+    Array.from(state.needsSaving).forEach((id) => {
+      const snippet = state.snippets[id]
+
+      if (snippet) {
+        debouncedUpdate(id, snippet.projectRef, {
+          id,
+          type: 'sql',
+          name: snippet.snippet.name ?? 'Untitled',
+          description: snippet.snippet.description ?? '',
+          visibility: snippet.snippet.visibility ?? 'user',
+          project_id: snippet.snippet.project_id ?? 0,
+          owner_id: snippet.snippet.owner_id,
+          folder_id: snippet.snippet.folder_id,
+          content: { ...snippet.snippet.content, content_id: id },
+        })
+
+        sqlEditorState.needsSaving.delete(id)
+      }
+    })
+  })
+}
