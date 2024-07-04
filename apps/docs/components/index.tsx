@@ -69,7 +69,7 @@ import {
   IconMenuSelfHosting,
   IconMenuStorage,
   IconMenuSwift,
-} from './Navigation/NavigationMenu/HomeMenuIcons'
+} from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
 import SqlToRest from '@ui-patterns/SqlToRest'

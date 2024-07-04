@@ -32,7 +32,11 @@ type MenuItem = {
   community?: boolean
 }
 
-export type HomepageMenuItems = MenuItem[][]
+export type DropdownMenuItem = MenuItem & {
+  menuItems?: MenuItem[][]
+}
+
+export type GlobalMenuItems = DropdownMenuItem[][]
 
 export type NavMenuConstant = Readonly<{
   title: string
