@@ -29,8 +29,7 @@ export function convertArgumentTypes(value: string) {
         return null
       }
     })
-    .filter(Boolean)
-
+    .filter(Boolean) as { name: string; type: string; defaultValue?: string }[]
   return { value: temp }
 }
 
