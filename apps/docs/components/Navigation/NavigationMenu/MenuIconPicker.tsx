@@ -26,12 +26,19 @@ import {
   IconMenuKotlin,
   IconMenuAI,
   IconMenuDevCli,
-} from './HomeMenuIcons'
+  IconGitHub,
+  IconSupport,
+  IconTerraform,
+  IconTroubleshooting,
+  IconBranching,
+} from './MenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
   switch (menuKey) {
     case 'home':
       return <IconMenuHome width={width} height={height} className={className} />
+    case 'branching':
+      return <IconBranching width={width} height={height} className={className} />
     case 'getting-started':
       return <IconMenuGettingStarted width={width} height={height} className={className} />
     case 'database':
@@ -78,23 +85,27 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuCli width={width} height={height} className={className} />
     case 'status':
       return <IconMenuStatus width={width} height={height} className={className} />
+    case 'github':
+      return <IconGitHub width={width} height={height} className={className} />
+    case 'support':
+      return <IconSupport width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }
 }
 
-type HomeMenuIconPickerProps = {
+type MenuIconPickerProps = {
   icon: string
   width?: number
   height?: number
   className?: string
 }
 
-export default function HomeMenuIconPicker({
+export default function MenuIconPicker({
   icon,
   width = 16,
   height = 16,
   className,
-}: HomeMenuIconPickerProps) {
+}: MenuIconPickerProps) {
   return getMenuIcon(icon, width, height, className)
 }
