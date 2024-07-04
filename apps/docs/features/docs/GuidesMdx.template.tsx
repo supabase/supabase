@@ -159,13 +159,15 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           className={cn(
             'hidden md:block',
             'col-span-3 self-start',
-            'sticky top-[calc(var(--header-height)+2rem)]',
+            'sticky',
             /**
-             * [TODO: Charis]
-             *
-             * Figure out what these magic numbers represent
+             * --header-height: height of nav
+             * 1px: height of nav border
+             * 4rem: content padding
              */
-            'max-h-[calc(100vh-60px-5rem)]'
+            'top-[calc(var(--header-height)+1px+4rem)]',
+            // 5rem accounts for 4rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-5rem)]'
           )}
         />
       )}
