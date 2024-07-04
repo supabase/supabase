@@ -32,7 +32,7 @@ type MenuItem = {
   community?: boolean
 }
 
-type DropdownMenuItem = MenuItem & {
+export type DropdownMenuItem = MenuItem & {
   menuItems?: MenuItem[][]
 }
 

@@ -1,7 +1,8 @@
-import React, { Dispatch, Fragment, SetStateAction } from 'react'
+import React, { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
@@ -10,37 +11,29 @@ import { ThemeToggle } from 'ui-patterns'
 
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { type DropdownMenuItem } from '../Navigation.types'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
-interface Props {
-  open: boolean
-  setOpen: Dispatch<SetStateAction<boolean>>
+const container = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
 }
 
-const GlobalMobileMenu = ({ open, setOpen }: Props) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
+const listItem = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: DEFAULT_EASE } },
+  exit: { opacity: 0, transition: { duration: 0.05 } },
+}
+
+const itemClassName =
+  'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
+
+const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
-    exit: { opacity: 0, transition: { duration: 0.15 } },
-  }
-
-  const listItem = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: DEFAULT_EASE } },
-    exit: { opacity: 0, transition: { duration: 0.05 } },
-  }
-
-  useKey('Escape', () => setOpen(false))
-
-  const itemClassName =
-    'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded'
-
-  const AccordionMenuItem = ({ section }: any) => (
+  return (
     <m.div
       variants={listItem}
       className="border-b border-muted [&>div]:!rounded-none [&_div[data-state=open]>div]:py-1"
@@ -85,21 +78,38 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
       )}
     </m.div>
   )
+}
 
-  const Menu = () => (
-    <Accordion
-      type="default"
-      openBehaviour="multiple"
-      size="small"
-      className="space-y-1"
-      justified
-      chevronAlign="right"
-    >
-      {GLOBAL_MENU_ITEMS.map((section) => (
-        <AccordionMenuItem section={section} />
-      ))}
-    </Accordion>
-  )
+const Menu = () => (
+  <Accordion
+    type="default"
+    openBehaviour="multiple"
+    size="small"
+    className="space-y-1"
+    justified
+    chevronAlign="right"
+  >
+    {GLOBAL_MENU_ITEMS.map((section) => (
+      <AccordionMenuItem section={section} />
+    ))}
+  </Accordion>
+)
+interface Props {
+  open: boolean
+  setOpen: Dispatch<SetStateAction<boolean>>
+}
+
+const GlobalMobileMenu = ({ open, setOpen }: Props) => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
+  const pathname = usePathname()
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  useKey('Escape', () => setOpen(false))
 
   return (
     <LazyMotion features={domAnimation}>
