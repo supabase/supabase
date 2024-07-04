@@ -1,4 +1,6 @@
-import { usePathname, useRouter } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import {
   Badge,
   DropdownMenu,
@@ -10,25 +12,25 @@ import {
 } from 'ui'
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 
-const RevVersionDropdown = () => {
-  const pathname = usePathname()
+const RevVersionDropdown = ({
+  library,
+  currentVersion,
+}: {
+  library: string
+  currentVersion: string
+}) => {
   const { push } = useRouter()
-  const pathSegments = pathname.split('/')
 
-  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
 
-  const currentVersion = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
-    ? pathSegments[pathSegments.indexOf(library) + 1]
-    : versions[0]
-
   const onSelectVersion = (version: string) => {
-    if (!library) return
+    const isMigratedVersion = libraryMeta?.__MIGRATED_VERSIONS?.includes(version) ?? false
+
     if (version === versions[0]) {
-      push(`/reference/${library}/start`)
+      push(`/reference/${library}${isMigratedVersion ? '' : '/start'}`)
     } else {
-      push(`/reference/${library}/${version}/start`)
+      push(`/reference/${library}/${version}${isMigratedVersion ? '' : '/start'}`)
     }
   }
 

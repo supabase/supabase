@@ -228,5 +228,5 @@ const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
   return getMenuElement(menu)
 }
 
-export { MenuId }
+export { MenuId, getMenuById }
 export default memo(NavigationMenu)
