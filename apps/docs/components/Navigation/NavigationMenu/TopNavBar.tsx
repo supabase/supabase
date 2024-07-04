@@ -9,8 +9,8 @@ import { Command, Search, Menu } from 'lucide-react'
 
 import Image from 'next/image'
 
+import GlobalNavigationMenu from './GlobalNavigationMenu'
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
-const GlobalNavigationMenu = dynamic(() => import('./GlobalNavigationMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const TopNavBar: FC = () => {
