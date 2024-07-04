@@ -174,7 +174,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     <a
                       target="_blank"
                       rel="noreferrer"
-                      href="https://github.com/orgs/supabase/discussions/22484"
+                      href="https://supabase.com/docs/guides/realtime/authorization"
                     >
                       Documentation
                     </a>
