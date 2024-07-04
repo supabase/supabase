@@ -77,7 +77,7 @@ You also need to grant usage to `supabase_auth_admin`:
 grant usage on schema public to supabase_auth_admin;
 ```
 
-Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the`public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
+Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the `public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
 
 ```sql
 revoke execute
@@ -85,11 +85,11 @@ revoke execute
   from authenticated, anon, public;
 ```
 
-For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+For security, we recommend against the use of the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
 
 We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
-Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
 ### Hook errors
 
