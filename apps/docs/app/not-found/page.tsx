@@ -17,7 +17,7 @@ const metadata: Metadata = {
 const NotFoundPage = async ({ searchParams: { page } }: { searchParams: { page?: string } }) => {
   return (
     <article className="prose max-w-[80ch]">
-      <h1>We couldn&apos;t find that page</h1>
+      <h1>404: We couldn&apos;t find that page</h1>
       <p>
         Sorry, we couldn&apos;t find that page. It might be missing, or we had a temporary error
         generating it.
