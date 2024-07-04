@@ -7,7 +7,7 @@ import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBar from '../components/Navigation/NavigationMenu/TopNavBar'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 const NavigationMenu = dynamic(
