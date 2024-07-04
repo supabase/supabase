@@ -1,20 +1,19 @@
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
+import { RefreshCcw, Rewind } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button } from 'ui'
-import { LogTable } from '../Settings/Logs'
-import {
-  useWarehouseQueryQuery,
-  useWarehouseCollectionsQuery,
-  useWarehouseAccessTokensQuery,
-} from 'data/analytics'
-import Link from 'next/link'
-import { TestCollectionDialog } from './TestCollectionDialog'
-import { RefreshCcw, Rewind } from 'lucide-react'
-import AlertError from 'components/ui/AlertError'
+
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useFlag } from 'hooks'
+import AlertError from 'components/ui/AlertError'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Button } from 'ui'
+import LogTable from '../Settings/Logs/LogTable'
+import { TestCollectionDialog } from './TestCollectionDialog'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()

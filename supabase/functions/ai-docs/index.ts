@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
 import {
   ChatCompletionRequestMessage,

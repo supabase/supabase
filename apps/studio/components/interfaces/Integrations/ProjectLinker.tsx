@@ -1,4 +1,4 @@
-import { PlusIcon } from 'lucide-react'
+import { ChevronDown, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -8,7 +8,7 @@ import {
   IntegrationConnectionsCreateVariables,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
@@ -21,7 +21,6 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconChevronDown,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -205,7 +204,7 @@ const ProjectLinker = ({
                     block
                     disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                     loading={loadingSupabaseProjects}
-                    className="justify-start"
+                    className="justify-start h-[34px]"
                     icon={
                       <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
                         <img
@@ -218,7 +217,7 @@ const ProjectLinker = ({
                     iconRight={
                       defaultSupabaseProjectRef === undefined ? (
                         <span className="grow flex justify-end">
-                          <IconChevronDown className={''} />
+                          <ChevronDown />
                         </span>
                       ) : null
                     }
@@ -302,7 +301,7 @@ const ProjectLinker = ({
                     block
                     disabled={loadingForeignProjects}
                     loading={loadingForeignProjects}
-                    className="justify-start"
+                    className="justify-start h-[34px]"
                     icon={
                       <div>
                         {selectedForeignProject
@@ -312,7 +311,7 @@ const ProjectLinker = ({
                     }
                     iconRight={
                       <span className="grow flex justify-end">
-                        <IconChevronDown className={''} />
+                        <ChevronDown />
                       </span>
                     }
                   >

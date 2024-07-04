@@ -1,6 +1,10 @@
 import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
   DropdownMenu,
@@ -11,10 +15,6 @@ import {
   IconSearch,
   Input,
 } from 'ui'
-
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useIsFeatureEnabled } from 'hooks'
-import { EMPTY_ARR } from 'lib/void'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]

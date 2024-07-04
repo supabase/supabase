@@ -5,6 +5,19 @@ import { capitalize } from 'lodash'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import z from 'zod'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,19 +36,6 @@ import {
   Listbox,
   Separator,
 } from 'ui'
-import z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import { FormActions } from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 

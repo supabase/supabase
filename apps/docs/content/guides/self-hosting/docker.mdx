@@ -67,6 +67,8 @@ docker compose up -d
 </TabPanel>
 </Tabs>
 
+If you are using rootless docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
+
 After all the services have started you can see them running in the background:
 
 ```sh

@@ -365,6 +365,30 @@ export interface paths {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
   }
+  '/platform/organizations/{slug}/oauth/apps': {
+    /** List published or authorized oauth apps */
+    get: operations['OAuthAppsController_listOAuthApps']
+    /** Create an oauth app */
+    post: operations['OAuthAppsController_createOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}': {
+    /** Update an oauth app */
+    put: operations['OAuthAppsController_updateOAuthApp']
+    /** Remove a published oauth app */
+    delete: operations['OAuthAppsController_removeOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}/revoke': {
+    /** Revoke an authorized oauth app */
+    post: operations['OAuthAppsController_revokeAuthorizedOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/authorizations/{id}': {
+    /** [Beta] Get oauth app authorization request */
+    get: operations['AuthorizationsController_getAuthorizationRequest']
+    /** [Beta] Approve oauth app authorization request */
+    post: operations['AuthorizationsController_approveAuthorizationRequest']
+    /** [Beta] Decline oauth app authorization request */
+    delete: operations['AuthorizationsController_declineAuthorizationRequest']
+  }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
     get: operations['getPaymentMethodsV2']
@@ -635,50 +659,6 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
-  '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
-    /** Lists project's warehouse access tokens from logflare */
-    get: operations['AccessTokenController_listAccessTokens']
-    /** Create a warehouse access token */
-    post: operations['AccessTokenController_createAccessToken']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
-    /** Delete a warehouse access token */
-    delete: operations['AccessTokenController_deleteAccessToken']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/collections': {
-    /** Lists project's warehouse collections from logflare */
-    get: operations['CollectionController_listCollections']
-    /** Create a warehouse collection */
-    post: operations['CollectionController_createCollection']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/collections/{token}': {
-    /** Get a warehouse collection */
-    get: operations['CollectionController_getCollection']
-    /** Delete a warehouse collection */
-    delete: operations['CollectionController_deleteCollection']
-    /** Update a warehouse collection */
-    patch: operations['CollectionController_updateCollection']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/endpoints': {
-    /** Lists project's warehouse endpoints from logflare */
-    get: operations['EndpointController_listEndpoints']
-    /** Create a warehouse endpoint */
-    post: operations['EndpointController_createEndpoint']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/endpoints/{token}': {
-    /** Update a warehouse endpoint */
-    put: operations['EndpointController_updateEndpoint']
-    /** Delete a warehouse endpoint */
-    delete: operations['EndpointController_deleteEndpoint']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/query': {
-    /** Lists project's warehouse queries from logflare */
-    get: operations['WarehouseQueryController_runQuery']
-  }
-  '/platform/projects/{ref}/analytics/warehouse/tenant': {
-    /** Gets project's warehouse tenant from logflare */
-    get: operations['TenantController_getTenant']
-  }
   '/platform/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
     post: operations['ProjectsApiController_projectGraphql']
@@ -820,8 +800,8 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/platform/projects/{ref}/restore': {
-    /** Restores project */
-    post: operations['RestoreController_restoreProject']
+    /** Cancels a failed restoration */
+    post: operations['RestoreController_cancelProjectRestoration']
   }
   '/platform/projects/{ref}/run-lints': {
     /** Run project lints */
@@ -1458,50 +1438,6 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
-  '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
-    /** Lists project's warehouse access tokens from logflare */
-    get: operations['AccessTokenController_listAccessTokens']
-    /** Create a warehouse access token */
-    post: operations['AccessTokenController_createAccessToken']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
-    /** Delete a warehouse access token */
-    delete: operations['AccessTokenController_deleteAccessToken']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/collections': {
-    /** Lists project's warehouse collections from logflare */
-    get: operations['CollectionController_listCollections']
-    /** Create a warehouse collection */
-    post: operations['CollectionController_createCollection']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
-    /** Get a warehouse collection */
-    get: operations['CollectionController_getCollection']
-    /** Delete a warehouse collection */
-    delete: operations['CollectionController_deleteCollection']
-    /** Update a warehouse collection */
-    patch: operations['CollectionController_updateCollection']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/endpoints': {
-    /** Lists project's warehouse endpoints from logflare */
-    get: operations['EndpointController_listEndpoints']
-    /** Create a warehouse endpoint */
-    post: operations['EndpointController_createEndpoint']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/endpoints/{token}': {
-    /** Update a warehouse endpoint */
-    put: operations['EndpointController_updateEndpoint']
-    /** Delete a warehouse endpoint */
-    delete: operations['EndpointController_deleteEndpoint']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/query': {
-    /** Lists project's warehouse queries from logflare */
-    get: operations['WarehouseQueryController_runQuery']
-  }
-  '/v0/projects/{ref}/analytics/warehouse/tenant': {
-    /** Gets project's warehouse tenant from logflare */
-    get: operations['TenantController_getTenant']
-  }
   '/v0/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
     post: operations['ProjectsApiController_projectGraphql']
@@ -1625,8 +1561,8 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/v0/projects/{ref}/restore': {
-    /** Restores project */
-    post: operations['RestoreController_restoreProject']
+    /** Cancels a failed restoration */
+    post: operations['RestoreController_cancelProjectRestoration']
   }
   '/v0/projects/{ref}/settings': {
     /** Gets project's settings */
@@ -1772,7 +1708,51 @@ export interface paths {
   }
   '/v1/projects/{ref}': {
     /** Deletes the given project */
-    delete: operations['v1-Delete a project']
+    delete: operations['v1-delete-a-project']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['v1-list-all-warehouse-tokens']
+    /** Create a warehouse access token */
+    post: operations['v1-create-a-warehouse-token']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['v1-delete-a-warehouse-token']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['v1-list-all-warehouse-collections']
+    /** Create a warehouse collection */
+    post: operations['v1-create-a-warehouse-collection']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['v1-get-a-warehouse-collection']
+    /** Delete a warehouse collection */
+    delete: operations['v1-delete-a-warehouse-collection']
+    /** Update a warehouse collection */
+    patch: operations['v1-update-a-warehouse-collection']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['v1-list-all-warehouse-endpoints']
+    /** Create a warehouse endpoint */
+    post: operations['v1-create-a-warehouse-endpoint']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['v1-update-a-warehouse-endpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['v1-delete-a-warehouse-endpoint']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['v1-list-all-warehouse-queries']
+  }
+  '/v1/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['v1-provision-a-warehouse-tenant']
   }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
@@ -2081,6 +2061,9 @@ export interface components {
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
     }
+    ApproveAuthorizationResponse: {
+      url: string
+    }
     AssignMemberRoleBodyV2: {
       role_id: number
       role_scoped_projects?: string[]
@@ -2265,6 +2248,9 @@ export interface components {
       description: string
       name: string
       version: string
+    }
+    AuthorizationsApproveBody: {
+      organization_id: string
     }
     AutoApiService: {
       app: {
@@ -2526,6 +2512,41 @@ export interface components {
       email: string
       role_id: number
       role_scoped_projects?: string[]
+    }
+    CreateOAuthAppBody: {
+      icon?: string
+      name: string
+      redirect_uris: string[]
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
+    }
+    CreateOAuthAppResponse: {
+      client_id: string
+      client_secret: string
+      id: string
     }
     CreateOrganizationBody: {
       kind?: string
@@ -2798,6 +2819,7 @@ export interface components {
         | '6_volume_detachchment_from_original_instance_failed'
         | '7_volume_attachment_to_upgraded_instance_failed'
         | '8_upgrade_completion_failed'
+        | '9_post_physical_backup_failed'
       initiated_at: string
       /** @enum {string} */
       progress?:
@@ -2811,6 +2833,7 @@ export interface components {
         | '7_detached_volume_from_original_instance'
         | '8_attached_volume_to_upgraded_instance'
         | '9_completed_upgrade'
+        | '10_completed_post_physical_backup'
       /** @enum {number} */
       status: 0 | 1 | 2
       target_version: number
@@ -2831,6 +2854,19 @@ export interface components {
       | '8xlarge'
       | '12xlarge'
       | '16xlarge'
+    DeclineAuthorizationResponse: {
+      id: string
+    }
+    DeleteOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     DeleteObjectsBody: {
       paths: string[]
     }
@@ -2980,6 +3016,39 @@ export interface components {
       updated_at: number
       verify_jwt?: boolean
       version: number
+    }
+    GetAuthorizationResponse: {
+      approved_at?: string
+      approved_organization_slug?: string
+      domain: string
+      expires_at: string
+      icon?: string
+      name: string
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -3381,6 +3450,7 @@ export interface components {
       expired_token: boolean
       invite_id?: number
       organization_name: string
+      sso_mismatch: boolean
       token_does_not_exist: boolean
     }
     InvitationResponse: {
@@ -3594,6 +3664,41 @@ export interface components {
       has_warning: boolean
       unread_count: number
     }
+    OAuthAppResponse: {
+      authorized_at?: string
+      client_id?: string
+      client_secret_alias?: string
+      created_at?: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris?: string[]
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
+    }
     OAuthTokenBody: {
       client_id: string
       client_secret: string
@@ -3660,7 +3765,7 @@ export interface components {
       name: string
     }
     OrganizationRole: {
-      description: string
+      description: string | null
       id: number
       name: string
     }
@@ -3670,10 +3775,10 @@ export interface components {
     }
     OrganizationRoleV2: {
       base_role_id: number
-      description: string
+      description: string | null
       id: number
       name: string
-      project_ids: number[]
+      project_ids: number[] | null
     }
     OrganizationSlugResponse: {
       billing_email?: string
@@ -3783,6 +3888,7 @@ export interface components {
     Permission: {
       actions: (
         | 'analytics:Read'
+        | 'analytics:Write'
         | 'auth:Execute'
         | 'billing:Read'
         | 'billing:Write'
@@ -4348,6 +4454,16 @@ export interface components {
     PublicUrlResponse: {
       publicUrl: string
     }
+    PutOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     ReadOnlyStatusResponse: {
       enabled: boolean
       override_active_until: string
@@ -4532,6 +4648,7 @@ export interface components {
     RestartServicesBody: {
       restartRequest: components['schemas']['RestartServiceRequest']
     }
+    RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
       id: number
     }
@@ -4563,6 +4680,13 @@ export interface components {
         | 'exceed_storage_size_quota'
         | 'overdue_payment'
       )[]
+    }
+    RevokeAuthorizedOAuthAppResponse: {
+      authorized_at?: string
+      icon?: string
+      id: string
+      name: string
+      website: string
     }
     RevokeColumnPrivilegesBody: {
       column_id: string
@@ -6883,6 +7007,9 @@ export interface operations {
       204: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to update GitHub connection */
       500: {
         content: never
@@ -7241,6 +7368,9 @@ export interface operations {
           'application/json': components['schemas']['AuditLogsResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to get an organization's audit logs */
       500: {
         content: never
@@ -7459,7 +7589,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to update subscription change */
+      /** @description Failed to delete upcoming subscription schedule */
       500: {
         content: never
       }
@@ -7973,6 +8103,164 @@ export interface operations {
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
         content: never
+      }
+    }
+  }
+  /** List published or authorized oauth apps */
+  OAuthAppsController_listOAuthApps: {
+    parameters: {
+      query: {
+        type: 'published' | 'authorized'
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OAuthAppResponse'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Create an oauth app */
+  OAuthAppsController_createOAuthApp: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Update an oauth app */
+  OAuthAppsController_updateOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PutOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Remove a published oauth app */
+  OAuthAppsController_removeOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DeleteOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Revoke an authorized oauth app */
+  OAuthAppsController_revokeAuthorizedOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['RevokeAuthorizedOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Beta] Get oauth app authorization request */
+  AuthorizationsController_getAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetAuthorizationResponse']
+        }
+      }
+    }
+  }
+  /** [Beta] Approve oauth app authorization request */
+  AuthorizationsController_approveAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AuthorizationsApproveBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ApproveAuthorizationResponse']
+        }
+      }
+    }
+  }
+  /** [Beta] Decline oauth app authorization request */
+  AuthorizationsController_declineAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DeclineAuthorizationResponse']
+        }
       }
     }
   }
@@ -10297,268 +10585,6 @@ export interface operations {
       }
     }
   }
-  /** Lists project's warehouse access tokens from logflare */
-  AccessTokenController_listAccessTokens: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFAccessToken'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse access tokens */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse access token */
-  AccessTokenController_createAccessToken: {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFAccessToken']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse access token */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse access token */
-  AccessTokenController_deleteAccessToken: {
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse access token */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse collections from logflare */
-  CollectionController_listCollections: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse collections */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse collection */
-  CollectionController_createCollection: {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Get a warehouse collection */
-  CollectionController_getCollection: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse collection */
-  CollectionController_deleteCollection: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Update a warehouse collection */
-  CollectionController_updateCollection: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse endpoints from logflare */
-  EndpointController_listEndpoints: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse endpoints */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse endpoint */
-  EndpointController_createEndpoint: {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Update a warehouse endpoint */
-  EndpointController_updateEndpoint: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse endpoint */
-  EndpointController_deleteEndpoint: {
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse queries from logflare */
-  WarehouseQueryController_runQuery: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse endpoints */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's warehouse tenant from logflare */
-  TenantController_getTenant: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFUser']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch or provision warehouse tenant */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Queries project Graphql */
   ProjectsApiController_projectGraphql: {
     parameters: {
@@ -11487,8 +11513,8 @@ export interface operations {
       }
     }
   }
-  /** Restores project */
-  RestoreController_restoreProject: {
+  /** Cancels a failed restoration */
+  RestoreController_cancelProjectRestoration: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11498,10 +11524,10 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['RestoreProjectInfo']
+          'application/json': components['schemas']['RestoreCancellation']
         }
       }
-      /** @description Failed to restore project */
+      /** @description Failed to cancel project restoration */
       500: {
         content: never
       }
@@ -13397,7 +13423,7 @@ export interface operations {
     }
   }
   /** Deletes the given project */
-  'v1-Delete a project': {
+  'v1-delete-a-project': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13411,6 +13437,268 @@ export interface operations {
         }
       }
       403: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse access tokens from logflare */
+  'v1-list-all-warehouse-tokens': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFAccessToken'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse access tokens */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse access token */
+  'v1-create-a-warehouse-token': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFAccessToken']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse access token */
+  'v1-delete-a-warehouse-token': {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse collections from logflare */
+  'v1-list-all-warehouse-collections': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collections */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse collection */
+  'v1-create-a-warehouse-collection': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a warehouse collection */
+  'v1-get-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse collection */
+  'v1-delete-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse collection */
+  'v1-update-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse endpoints from logflare */
+  'v1-list-all-warehouse-endpoints': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse endpoint */
+  'v1-create-a-warehouse-endpoint': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse endpoint */
+  'v1-update-a-warehouse-endpoint': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse endpoint */
+  'v1-delete-a-warehouse-endpoint': {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse queries from logflare */
+  'v1-list-all-warehouse-queries': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse queries */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's warehouse tenant from logflare */
+  'v1-provision-a-warehouse-tenant': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFUser']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch or provision warehouse tenant */
+      500: {
         content: never
       }
     }
@@ -14208,6 +14496,9 @@ export interface operations {
       201: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14229,6 +14520,9 @@ export interface operations {
     }
     responses: {
       201: {
+        content: never
+      }
+      403: {
         content: never
       }
       /** @description Failed to set up read replica */

@@ -25,7 +25,7 @@ import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { AiWarning } from './Command.alerts'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'

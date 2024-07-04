@@ -3,6 +3,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
+
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Checkbox,
   DropdownMenu,
@@ -27,12 +33,6 @@ import {
   IconMusic,
   IconTrash2,
 } from 'ui'
-
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,

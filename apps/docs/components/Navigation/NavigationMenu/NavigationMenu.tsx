@@ -1,10 +1,9 @@
 import { memo } from 'react'
-import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
-  Home = 'home',
   GettingStarted = 'gettingstarted',
   Database = 'database',
   Api = 'api',
@@ -44,10 +43,6 @@ interface BaseMenu {
   type: string
 }
 
-interface HomeMenu extends BaseMenu {
-  type: 'home'
-}
-
 interface GuideMenu extends BaseMenu {
   type: 'guide'
 }
@@ -59,13 +54,9 @@ interface ReferenceMenu extends BaseMenu {
   specFile?: string
 }
 
-type Menu = HomeMenu | GuideMenu | ReferenceMenu
+type Menu = GuideMenu | ReferenceMenu
 
 const menus: Menu[] = [
-  {
-    id: MenuId.Home,
-    type: 'home',
-  },
   {
     id: MenuId.GettingStarted,
     type: 'guide',
@@ -244,14 +235,14 @@ const menus: Menu[] = [
 ]
 
 function getMenuById(id: MenuId) {
-  return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
+  return menus.find((menu) => menu.id === id)
 }
 
-function getMenuElement(menu: Menu) {
+function getMenuElement(menu: Menu | undefined) {
+  if (!menu) throw Error('No menu found for this menuId')
+
   const menuType = menu.type
   switch (menuType) {
-    case 'home':
-      return <NavigationMenuHome />
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
     case 'reference':
@@ -264,13 +255,15 @@ function getMenuElement(menu: Menu) {
         />
       )
     default:
-      throw new Error(`Unknown menu type '${menuType}'`)
+      return null
   }
 }
 
 const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
   const level = menuId
   const menu = getMenuById(level)
+
+  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu)
 }
