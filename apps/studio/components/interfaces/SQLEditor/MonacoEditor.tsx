@@ -15,7 +15,7 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn } from 'ui'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import { createSqlSnippetSkeleton, createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
@@ -97,6 +97,7 @@ const MonacoEditor = ({
     }
   }
 
+  // [Joshen] Also needs updating here
   const debouncedSetSql = debounce((id, value) => {
     snap.setSql(id, value)
   }, 1000)
@@ -106,17 +107,30 @@ const MonacoEditor = ({
       if (snap.snippets[id]) {
         debouncedSetSql(id, value)
       } else {
-        const snippet = createSqlSnippetSkeleton({
-          id,
-          name: untitledSnippetTitle,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        if (ref) {
-          snap.addSnippet(snippet as SqlSnippet, ref)
-          snap.addNeedsSaving(snippet.id!)
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        if (ref && profile !== undefined && project !== undefined) {
+          if (enableFolders) {
+            const snippet = createSqlSnippetSkeletonV2({
+              id,
+              name: untitledSnippetTitle,
+              sql: value,
+              owner_id: profile?.id,
+              project_id: project?.id,
+            })
+            snapV2.addSnippet({ projectRef: ref, snippet })
+            snapV2.addNeedsSaving(snippet.id)
+            router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+          } else {
+            const snippet = createSqlSnippetSkeleton({
+              id,
+              name: untitledSnippetTitle,
+              sql: value,
+              owner_id: profile.id,
+              project_id: project.id,
+            })
+            snap.addSnippet(snippet as SqlSnippet, ref)
+            snap.addNeedsSaving(snippet.id!)
+            router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+          }
         }
       }
     }

@@ -6,7 +6,10 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import {
+  createSqlSnippetSkeleton,
+  createSqlSnippetSkeletonV2,
+} from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -75,24 +78,36 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   })
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project is required')
+    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({
-        id: uuidv4(),
-        name: untitledSnippetTitle,
-        owner_id: profile?.id,
-        project_id: project?.id,
-      })
-
-      snap.addSnippet(snippet as SqlSnippet, ref)
-
-      router.push(`/project/${ref}/sql/${snippet.id}`)
-      setSearchText('')
+      if (enableFolders) {
+        const snippet = createSqlSnippetSkeletonV2({
+          id: uuidv4(),
+          name: untitledSnippetTitle,
+          owner_id: profile.id,
+          project_id: project.id,
+          sql: '',
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+        setSearchText('')
+      } else {
+        const snippet = createSqlSnippetSkeleton({
+          id: uuidv4(),
+          name: untitledSnippetTitle,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snap.addSnippet(snippet as SqlSnippet, ref)
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+        setSearchText('')
+      }
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }
