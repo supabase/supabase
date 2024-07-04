@@ -7240,8 +7240,8 @@ functions:
           ```json
           {
             "data": {
-              "path": "public/avatar1.png"
-              "fullPath": "avatars/public/avatar1.png",
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
             },
             "error": null
           }
@@ -7287,8 +7287,8 @@ functions:
           ```json
           {
             "data": {
-              "path": "public/avatar1.png"
-              "fullPath": "avatars/public/avatar1.png",
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
             },
             "error": null
           }
