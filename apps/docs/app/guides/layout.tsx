@@ -43,7 +43,7 @@ const getMenuId = (pathname: string | null) => {
     case pathname.startsWith('storage'):
       return MenuId.Storage
     default:
-      return MenuId.Home
+      return MenuId.GettingStarted
   }
 }
 
