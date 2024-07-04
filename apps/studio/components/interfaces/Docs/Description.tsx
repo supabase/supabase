@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { timeout } from 'lib/helpers'
 import { Button, IconLoader } from 'ui'
 

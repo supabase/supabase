@@ -2,6 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { noop } from 'lodash'
 import Link from 'next/link'
+
+import type { Bucket } from 'data/storage/buckets-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -12,14 +15,10 @@ import {
   DropdownMenuTrigger,
   IconChevronDown,
   IconEdit2,
-  IconLoader,
   IconTrash,
   IconXCircle,
   cn,
 } from 'ui'
-
-import type { Bucket } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {
   bucket: Bucket

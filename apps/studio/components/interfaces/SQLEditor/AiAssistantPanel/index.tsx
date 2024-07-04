@@ -7,6 +7,13 @@ import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   FormControl_Shadcn_,
@@ -17,12 +24,6 @@ import {
   cn,
 } from 'ui'
 import { AiIcon } from 'ui-patterns/Cmdk'
-import * as z from 'zod'
-
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 

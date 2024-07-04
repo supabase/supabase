@@ -3,6 +3,11 @@ import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useFlag } from 'hooks/ui/useFlag'
+import Telemetry from 'lib/telemetry'
+import { ExternalLink } from 'lucide-react'
 import {
   Button,
   FormControl_Shadcn_,
@@ -18,11 +23,6 @@ import {
   Popover_Shadcn_,
   Switch,
 } from 'ui'
-import * as z from 'zod'
-
-import { useFlag } from 'hooks'
-import Telemetry from 'lib/telemetry'
-import { ExternalLink } from 'lucide-react'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {

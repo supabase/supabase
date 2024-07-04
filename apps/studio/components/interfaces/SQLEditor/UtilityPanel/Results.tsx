@@ -4,10 +4,10 @@ import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 
-import { useKeyboardShortcuts } from 'hooks'
+import { GridFooter } from 'components/ui/GridFooter'
+import { useKeyboardShortcuts } from 'hooks/deprecated'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { GridFooter } from 'components/ui/GridFooter'
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id

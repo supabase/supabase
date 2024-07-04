@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const LogsPage: NextPageWithLayout = () => {

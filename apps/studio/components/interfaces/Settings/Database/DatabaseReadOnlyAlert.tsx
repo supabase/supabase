@@ -1,18 +1,18 @@
 import { useParams } from 'common'
 import Link from 'next/link'
+
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  AlertTitle_Shadcn_,
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
+  IconAlertTriangle,
   IconExternalLink,
 } from 'ui'
-
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useState } from 'react'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
 
 export const DatabaseReadOnlyAlert = () => {

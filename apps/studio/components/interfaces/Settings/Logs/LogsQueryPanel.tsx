@@ -21,8 +21,6 @@ import Link from 'next/link'
 import React, { ReactNode, useState } from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  LogsTableName,
-  LogsWarning,
   LOGS_SOURCE_DESCRIPTION,
   LogTemplate,
   WarehouseCollection,
@@ -33,6 +31,8 @@ import { logConstants } from 'shared-data'
 import { copyToClipboard } from 'lib/helpers'
 import { BookOpen, ChevronDown } from 'lucide-react'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
+import { LogsTableName } from './Logs.constants'
+import { LogsWarning } from './Logs.types'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
