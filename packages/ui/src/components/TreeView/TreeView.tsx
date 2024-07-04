@@ -77,6 +77,8 @@ const TreeViewItem = forwardRef<
       onEditSubmit?.(localValueState)
     }
 
+    console.log({ level, isBranch })
+
     return (
       <div
         ref={ref}
@@ -100,7 +102,7 @@ const TreeViewItem = forwardRef<
         style={{
           paddingLeft:
             level === 1 && !isBranch
-              ? xPadding + levelPadding / 2 - 2
+              ? xPadding
               : level
                 ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
                 : levelPadding,

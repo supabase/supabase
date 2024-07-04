@@ -16,6 +16,8 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { useRouter } from 'next/router'
 
 // Requirements
 // - Asynchronous loading
@@ -24,14 +26,18 @@ import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 // - Context menu
 
 export const SQLEditorNav = () => {
+  const router = useRouter()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showRenameModal, setShowRenameModal] = useState(false)
   const [showFavouriteSnippets, setShowFavouriteSnippets] = useState(false)
   const [showSharedSnippets, setShowSharedSnippets] = useState(false)
   const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
+
+  const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
+  const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
 
   const folders = Object.values(snapV2.folders)
     .filter((folder) => folder.projectRef === projectRef)
@@ -73,13 +79,15 @@ export const SQLEditorNav = () => {
 
   const postDeleteCleanup = (ids: string[]) => {
     setShowDeleteModal(false)
-    // if (ids.length > 0) ids.forEach((id) => snap.removeSnippet(id))
-    // const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => !ids.includes(x))
-    // if (existingSnippetIds.length === 0) {
-    //   router.push(`/project/${ref}/sql/new`)
-    // } else if (ids.includes(activeId as string)) {
-    //   router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-    // }
+    const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
+
+    if (existingSnippetIds.length === 0) {
+      router.push(`/project/${projectRef}/sql/new`)
+    } else if (ids.includes(id as string)) {
+      router.push(`/project/${projectRef}/sql/${existingSnippetIds[0]}`)
+    }
+
+    if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
   }
 
   const onConfirmDelete = () => {
@@ -135,6 +143,10 @@ export const SQLEditorNav = () => {
                   setShowDeleteModal(true)
                   setSelectedSnippets([element.metadata as unknown as Snippet])
                 }}
+                onSelectRename={() => {
+                  setShowRenameModal(true)
+                  setSelectedSnippetToRename(element.metadata as Snippet)
+                }}
               />
             )}
           />
@@ -142,6 +154,13 @@ export const SQLEditorNav = () => {
       </Collapsible_Shadcn_>
 
       <Separator />
+
+      <RenameQueryModal
+        snippet={selectedSnippetToRename}
+        visible={showRenameModal}
+        onCancel={() => setShowRenameModal(false)}
+        onComplete={() => setShowRenameModal(false)}
+      />
 
       <ConfirmationModal
         title="Confirm to delete query"

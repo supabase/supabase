@@ -95,6 +95,25 @@ export const sqlEditorState = proxy({
     // sqlEditorState.loaded[projectRef] = true
   },
 
+  renameSnippet: ({
+    id,
+    name,
+    description,
+  }: {
+    id: string
+    name: string
+    description?: string
+  }) => {
+    if (sqlEditorState.snippets[id]) {
+      const { snippet } = sqlEditorState.snippets[id]
+      snippet.name = name
+      snippet.description = description
+
+      // sqlEditorState.reorderSnippets(projectRef)
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
   removeSnippet: (id: string) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
@@ -102,13 +121,13 @@ export const sqlEditorState = proxy({
     const { [id]: result, ...otherResults } = sqlEditorState.results
     sqlEditorState.results = otherResults
 
-    const { projectRef, snippet: snippetInfo } = snippet
-    const folderId = snippetInfo.folder_id ?? 'root'
-    sqlEditorState.orders[projectRef][folderId] = sqlEditorState.orders[projectRef][
-      folderId
-    ].filter((s) => s !== id)
-
     sqlEditorState.needsSaving.delete(id)
+
+    // const { projectRef, snippet: snippetInfo } = snippet
+    // const folderId = snippetInfo.folder_id ?? 'root'
+    // sqlEditorState.orders[projectRef][folderId] = sqlEditorState.orders[projectRef][
+    //   folderId
+    // ].filter((s) => s !== id)
   },
 
   // Asynchronous data management for the snippets
