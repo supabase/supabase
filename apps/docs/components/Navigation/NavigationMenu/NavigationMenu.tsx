@@ -1,6 +1,6 @@
 import { memo } from 'react'
+
 import NavigationMenuGuideList from './NavigationMenuGuideList'
-import NavigationMenuRefList from './NavigationMenuRefList'
 import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
@@ -50,8 +50,6 @@ interface GuideMenu extends BaseMenu {
 interface ReferenceMenu extends BaseMenu {
   type: 'reference'
   path: string
-  commonSectionsFile: string
-  specFile?: string
 }
 
 type Menu = GuideMenu | ReferenceMenu
@@ -115,120 +113,91 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.RefJavaScriptV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v1.yml',
     type: 'reference',
     path: '/reference/javascript/v1',
   },
   {
     id: MenuId.RefJavaScriptV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v2.yml',
     type: 'reference',
     path: '/reference/javascript',
   },
   {
     id: MenuId.RefDartV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v1.yml',
     type: 'reference',
     path: '/reference/dart/v1',
   },
   {
     id: MenuId.RefDartV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v2.yml',
     type: 'reference',
     path: '/reference/dart',
   },
   {
     id: MenuId.RefCSharpV0,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_csharp_v0.yml',
     type: 'reference',
     path: '/reference/csharp/v0',
   },
   {
     id: MenuId.RefCSharpV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_csharp_v1.yml',
     type: 'reference',
     path: '/reference/csharp',
   },
   {
     id: MenuId.RefPythonV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_py_v2.yml',
     type: 'reference',
     path: '/reference/python',
   },
   {
     id: MenuId.RefSwiftV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v1.yml',
     type: 'reference',
     path: '/reference/swift',
   },
   {
     id: MenuId.RefSwiftV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v2.yml',
     type: 'reference',
     path: '/reference/swift',
   },
   {
     id: MenuId.RefKotlinV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v1.yml',
     type: 'reference',
     path: '/reference/kotlin/v1',
   },
   {
     id: MenuId.RefKotlinV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v2.yml',
     type: 'reference',
     path: '/reference/kotlin',
   },
   {
     id: MenuId.RefCli,
-    commonSectionsFile: 'common-cli-sections.json',
     type: 'reference',
     path: '/reference/cli',
   },
   {
     id: MenuId.RefApi,
-    commonSectionsFile: 'common-api-sections.json',
     type: 'reference',
     path: '/reference/api',
   },
   {
     id: MenuId.SelfHostingAuth,
-    commonSectionsFile: 'common-self-hosting-auth-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-auth',
   },
   {
     id: MenuId.SelfHostingStorage,
-    commonSectionsFile: 'common-self-hosting-storage-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-storage',
   },
   {
     id: MenuId.SelfHostingRealtime,
-    commonSectionsFile: 'common-self-hosting-realtime-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-realtime',
   },
   {
     id: MenuId.SelfHostingAnalytics,
-    commonSectionsFile: 'common-self-hosting-analytics-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-analytics',
   },
   {
     id: MenuId.SelfHostingFunctions,
-    commonSectionsFile: 'common-self-hosting-functions-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-functions',
   },
@@ -245,15 +214,6 @@ function getMenuElement(menu: Menu | undefined) {
   switch (menuType) {
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
-    case 'reference':
-      return (
-        <NavigationMenuRefList
-          id={menu.id}
-          basePath={menu.path}
-          commonSectionsFile={menu.commonSectionsFile}
-          specFile={menu.specFile}
-        />
-      )
     default:
       return null
   }

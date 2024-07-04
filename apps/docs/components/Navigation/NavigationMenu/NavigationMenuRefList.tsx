@@ -1,32 +1,22 @@
-import { useCommonSections, useSpec } from './NavigationMenu.utils'
-import NavigationMenuRefListItems from './NavigationMenuRefListItems'
-
 import React from 'react'
+
+import type { ICommonItem } from '~/components/reference/Reference.types'
+import type { Json } from '~/types'
+import NavigationMenuRefListItems from './NavigationMenuRefListItems'
 
 interface NavigationMenuRefListProps {
   id: string
   basePath: string
-  commonSectionsFile: string
-  specFile?: string
+  commonSections: ICommonItem[]
+  spec: Json
 }
 
 const NavigationMenuRefList = ({
   id,
   basePath,
-  commonSectionsFile,
-  specFile,
+  commonSections,
+  spec,
 }: NavigationMenuRefListProps) => {
-  const commonSections = useCommonSections(commonSectionsFile)
-  const spec = useSpec(specFile)
-
-  if (!commonSections) {
-    return null
-  }
-
-  if (specFile && !spec) {
-    return null
-  }
-
   const filteredSections = commonSections.filter((section) => {
     if (section.type === 'category') {
       section.items = section.items.filter((item) => {
