@@ -1,26 +1,26 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { handleError, post } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
-export type CreateSQLSnippetFolderVariables = {
+export type DeleteSQLSnippetFolderVariables = {
   projectRef: string
   name: string
   parentId?: string
 }
 
-export async function createSQLSnippetFolder(
-  { projectRef, name, parentId }: CreateSQLSnippetFolderVariables,
+export async function deleteSQLSnippetFolder(
+  { projectRef, name, parentId }: DeleteSQLSnippetFolderVariables,
   signal?: AbortSignal
 ) {
   const body: { name: string; parentId?: string } = { name }
   if (parentId) body.parentId = parentId
 
-  const { data, error } = await post('/platform/projects/{ref}/content/folders', {
-    params: { path: { ref: projectRef } },
-    body,
+  const { data, error } = await del('/platform/projects/{ref}/content/folders', {
+    // @ts-ignore [Joshen] API codegen issue
+    params: { path: { ref: projectRef }, query: { ids: [] } },
     signal,
   })
 
@@ -28,23 +28,23 @@ export async function createSQLSnippetFolder(
   return data
 }
 
-export type CreateSQLSnippetFolderData = Awaited<ReturnType<typeof createSQLSnippetFolder>>
+export type DeleteSQLSnippetFolderData = Awaited<ReturnType<typeof deleteSQLSnippetFolder>>
 
-export const useSQLSnippetFolderCreateMutation = ({
+export const useSQLSnippetFolderDeleteMutation = ({
   onError,
   onSuccess,
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>,
+  UseMutationOptions<DeleteSQLSnippetFolderData, ResponseError, DeleteSQLSnippetFolderVariables>,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>(
-    (args) => createSQLSnippetFolder(args),
+  return useMutation<DeleteSQLSnippetFolderData, ResponseError, DeleteSQLSnippetFolderVariables>(
+    (args) => deleteSQLSnippetFolder(args),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
@@ -55,7 +55,7 @@ export const useSQLSnippetFolderCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create folder: ${data.message}`)
+          toast.error(`Failed to delete folder: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
