@@ -6,7 +6,12 @@ import {
 } from 'components/interfaces/Settings/General'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 import { WarehouseAccessTokens } from 'components/interfaces/DataWarehouse/WarehouseAccessTokens'
 
@@ -18,6 +23,7 @@ const WarehouseSettings: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Warehouse Settings</ScaffoldTitle>
+          <ScaffoldDescription>Configure warehouse settings</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
