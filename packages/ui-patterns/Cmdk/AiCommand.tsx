@@ -359,112 +359,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4')}>
-        {!hasError &&
-          messages.map((message, index) => {
-            switch (message.role) {
-              case MessageRole.User:
-                return (
-                  <div key={index} className="flex gap-3 mx-4 [overflow-anchor:none] mb-6">
-                    <div
-                      className="
-                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
-                  ring-background
-                  ring-1
-                  shadow-sm
-              "
-                    >
-                      <IconUser strokeWidth={1.5} size={16} />
-                    </div>
-                    <div className="prose text-foreground-lighter">{message.content}</div>
-                  </div>
-                )
-              case MessageRole.Assistant:
-                return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
-                    <div className="flex gap-4 [overflow-anchor:none] mb-6">
-                      <AiIconChat
-                        loading={
-                          message.status === MessageStatus.Pending ||
-                          message.status === MessageStatus.InProgress
-                        }
-                      />
-                      <>
-                        {message.status === MessageStatus.Pending ? (
-                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              ...markdownComponents,
-                              a: (props) => (
-                                <a {...props} target="_blank" rel="noopener noreferrer" />
-                              ),
-                            }}
-                            className="prose dark:prose-dark"
-                            urlTransform={(href: string) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        )}
-                      </>
-                    </div>
-                  </div>
-                )
-            }
-          })}
-
-        {messages.length === 0 && !hasError && (
-          <CommandGroup heading="Examples">
-            {questions.map((question) => {
-              const key = question.replace(/\s+/g, '_')
-              return (
-                <CommandItem
-                  type="command"
-                  onSelect={() => {
-                    if (!search) {
-                      handleSubmit(question)
-                    }
-                  }}
-                  key={key}
-                >
-                  <AiIconAnimation />
-                  {question}
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
-        )}
-        {hasError && (
-          <div className="p-6 flex flex-col items-center gap-2 mt-4">
-            <StatusIcon variant="warning" />
-            <div>
-              <p className="text-sm text-foreground text-center">
-                Sorry, looks like Supabase AI is having a hard time!
-              </p>
-              <p className="text-sm text-foreground-lighter text-center">
-                Please try again in a bit.
-              </p>
-            </div>
-            <Button size="tiny" type="default" onClick={handleReset}>
-              Try again?
-            </Button>
-          </div>
-        )}
-
-        <div className="[overflow-anchor:auto] h-px w-full"></div>
-      </div>
-      <div className="absolute bottom-0 w-full bg-background py-3">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3 px-4" />}
+      <div className="absolute z-10 top-10 w-full bg-background py-3">
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
@@ -514,6 +409,113 @@ const AiCommand = () => {
             }
           }}
         />
+        {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-4" />}
+      </div>
+      <div>
+        <div className={cn('relative mt-4 py-4')}>
+          {!hasError &&
+            messages.map((message, index) => {
+              switch (message.role) {
+                case MessageRole.User:
+                  return (
+                    <div key={index} className="flex gap-3 mx-4 [overflow-anchor:none] mb-6">
+                      <div
+                        className="
+                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
+                  ring-background
+                  ring-1
+                  shadow-sm
+              "
+                      >
+                        <IconUser strokeWidth={1.5} size={16} />
+                      </div>
+                      <div className="prose text-foreground-lighter">{message.content}</div>
+                    </div>
+                  )
+                case MessageRole.Assistant:
+                  return (
+                    <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
+                      <div className="flex gap-4 [overflow-anchor:none] mb-6">
+                        <AiIconChat
+                          loading={
+                            message.status === MessageStatus.Pending ||
+                            message.status === MessageStatus.InProgress
+                          }
+                        />
+                        <>
+                          {message.status === MessageStatus.Pending ? (
+                            <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                          ) : (
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                ...markdownComponents,
+                                a: (props) => (
+                                  <a {...props} target="_blank" rel="noopener noreferrer" />
+                                ),
+                              }}
+                              className="prose dark:prose-dark"
+                              urlTransform={(href: string) => {
+                                const supabaseUrl = new URL('https://supabase.com')
+                                const linkUrl = new URL(href, 'https://supabase.com')
+
+                                if (linkUrl.origin === supabaseUrl.origin) {
+                                  return linkUrl.toString()
+                                }
+
+                                return href
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          )}
+                        </>
+                      </div>
+                    </div>
+                  )
+              }
+            })}
+
+          {messages.length === 0 && !hasError && (
+            <CommandGroup heading="Examples">
+              {questions.map((question) => {
+                const key = question.replace(/\s+/g, '_')
+                return (
+                  <CommandItem
+                    type="command"
+                    onSelect={() => {
+                      if (!search) {
+                        handleSubmit(question)
+                      }
+                    }}
+                    key={key}
+                  >
+                    <AiIconAnimation />
+                    {question}
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+          {hasError && (
+            <div className="p-6 flex flex-col items-center gap-2 mt-4">
+              <StatusIcon variant="warning" />
+              <div>
+                <p className="text-sm text-foreground text-center">
+                  Sorry, looks like Supabase AI is having a hard time!
+                </p>
+                <p className="text-sm text-foreground-lighter text-center">
+                  Please try again in a bit.
+                </p>
+              </div>
+              <Button size="tiny" type="default" onClick={handleReset}>
+                Try again?
+              </Button>
+            </div>
+          )}
+
+          <div className="[overflow-anchor:auto] h-px w-full"></div>
+        </div>
       </div>
     </div>
   )
