@@ -15,6 +15,16 @@ function deriveHref(basePath: string, section: AbbrevCommonClientLibSection) {
   return 'slug' in section ? `${basePath}/${section.slug}` : ''
 }
 
+function getLinkStyles(isActive: boolean, className?: string) {
+  return cn(
+    'text-sm text-foreground-lighter',
+    !isActive && 'hover:text-foreground',
+    isActive && 'text-brand',
+    'transition-colors',
+    className
+  )
+}
+
 function RefLink({
   basePath,
   section,
@@ -44,13 +54,7 @@ function RefLink({
       ) : (
         <Link
           href={href}
-          className={cn(
-            'text-sm text-foreground-lighter',
-            !isActive && 'hover:text-foreground',
-            isActive && 'text-brand',
-            'transition-colors',
-            className
-          )}
+          className={getLinkStyles(isActive, className)}
           onClick={(evt: MouseEvent) => {
             /*
              * We don't actually want to navigate or rerender anything since
@@ -77,7 +81,7 @@ function RefLink({
 }
 
 function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientLibSection) {
-  const [open, setOpen] = useState(false)
+  const [open, _setOpen] = useState(false)
 
   const pathname = usePathname()
   const parentHref = deriveHref(basePath, section)
@@ -89,11 +93,13 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientL
   )
   const isChildActive = childHrefs.has(pathname)
 
-  if (open && !isParentActive && !isChildActive) {
-    setOpen(false)
+  const isActive = isParentActive || isChildActive
+
+  const setOpen = (open: boolean) => {
+    if (open || !isActive) _setOpen(open)
   }
 
-  return { open, setOpen, isParentActive, isChildActive }
+  return { open, setOpen }
 }
 
 function CompoundRefLink({
@@ -103,40 +109,26 @@ function CompoundRefLink({
   basePath: string
   section: AbbrevCommonClientLibSection
 }) {
-  const { open, setOpen, isParentActive, isChildActive } = useCompoundRefLinkActive(
-    basePath,
-    section
-  )
+  const { open, setOpen } = useCompoundRefLinkActive(basePath, section)
 
   return (
-    <Collapsible.Root
-      open={open}
-      onOpenChange={(open) => void (!isParentActive && !isChildActive && setOpen(open))}
-    >
+    <Collapsible.Root open={open} onOpenChange={setOpen}>
       <Collapsible.Trigger asChild>
-        <div
-          className={cn(
-            'cursor-pointer',
-            'flex items-center justify-between gap-2',
-            isParentActive && 'text-brand'
-          )}
+        <button
+          className={cn('cursor-pointer', 'w-full', 'flex items-center justify-between gap-2')}
         >
-          <RefLink
-            basePath={basePath}
-            section={section}
-            skipChildren
-            onClick={() => setOpen(true)}
-          />
+          <span className={getLinkStyles(false)}>{section.title}</span>
           <ChevronUp
             width={16}
             className={cn('data-open-parent:rotate-0 data-closed-parent:rotate-90', 'transition')}
           />
-        </div>
+        </button>
       </Collapsible.Trigger>
       <Collapsible.Content
         className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
       >
-        <ul>
+        <ul className="space-y-2">
+          <RefLink basePath={basePath} section={section} skipChildren />
           {section.items.map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
