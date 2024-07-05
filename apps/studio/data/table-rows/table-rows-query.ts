@@ -1,7 +1,8 @@
 import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import {
   JSON_TYPES,
   TEXT_TYPES,

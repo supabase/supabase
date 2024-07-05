@@ -1,10 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import { useEffect } from 'react'
-import { IconHelpCircle } from 'ui'
 
 import SqlEditor from 'components/ui/SqlEditor'
-import { usePrevious } from 'hooks'
+import { usePrevious } from 'hooks/deprecated'
+import { IconHelpCircle } from 'ui'
 
 interface PolicyDefinitionProps {
   operation: string

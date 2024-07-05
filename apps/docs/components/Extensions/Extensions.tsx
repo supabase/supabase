@@ -58,7 +58,7 @@ export default function Extensions() {
       </div>
       <div className="lg:grid lg:grid-cols-12">
         <div className="col-span-3 not-prose">
-          <div className="lg:sticky top-24">
+          <div className="lg:sticky top-32">
             <h3 className="text-sm text-foreground-light">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
               {tags.sort().map((tag) => (

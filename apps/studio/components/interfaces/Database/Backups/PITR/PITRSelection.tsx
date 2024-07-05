@@ -10,13 +10,14 @@ import DatePicker from 'react-datepicker'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import InformationBox from 'components/ui/InformationBox'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   Alert,

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { IconBackground, TextLink } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
-import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
+import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
@@ -305,7 +305,7 @@ const HomePage = () => (
           <div className="md:max-w-xs 2xl:max-w-none">
             <div className="flex items-center gap-3 mb-3 text-brand-600">
               <IconBackground>
-                <HomeMenuIconPicker icon="self-hosting" width={18} height={18} />
+                <MenuIconPicker icon="self-hosting" width={18} height={18} />
               </IconBackground>
               <h3 id="self-hosting" className="group scroll-mt-24">
                 Self-Hosting

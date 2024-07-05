@@ -9,11 +9,11 @@ import { z } from 'zod'
 
 import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import { useCreateCollection } from 'data/analytics'
-import { useCheckPermissions } from 'hooks'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)

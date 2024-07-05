@@ -2,12 +2,8 @@
 
 import * as Dialog from '@radix-ui/react-dialog'
 import React from 'react'
-import {
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from '../../../index'
+import { Button } from '../../components/Button/Button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/shadcn/ui/tooltip'
 import styleHandler from '../../lib/theme/styleHandler'
 
 export type SidePanelProps = RadixProps & CustomProps
@@ -77,8 +73,8 @@ const SidePanel = ({
         </Button>
       </div>
       {onConfirm !== undefined && (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               htmlType="submit"
               disabled={disabled || loading}
@@ -87,11 +83,9 @@ const SidePanel = ({
             >
               {confirmText}
             </Button>
-          </TooltipTrigger_Shadcn_>
-          {tooltip !== undefined && (
-            <TooltipContent_Shadcn_ side="bottom">{tooltip}</TooltipContent_Shadcn_>
-          )}
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
+        </Tooltip>
       )}
     </div>
   )
