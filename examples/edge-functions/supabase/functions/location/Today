@@ -1,0 +1,354 @@
+D434D05B-F822-4B3A-A1BC-1D99BDBECB63"}
+Date/Time:        2024-07-01 02:16:05.480 -0400
+End time:         2024-07-01 08:31:28.089 -0400
+OS Version:       iPhone OS 17.5.1 (Build 21F90)
+Architecture:     arm64e
+Report Version:   49
+Incident Identifier: D434D05B-F822-4B3A-A1BC-1D99BDBECB63
+Share With Devs:  Yes
+
+Data Source:      Microstackshots
+Shared Cache:     04F562AE-1F5A-33A5-9B45-7CFA256753D5 slid base address 0x187074000, slide 0x7074000
+
+Command:          Helix
+Path:             /private/var/containers/Bundle/Application/E607C941-5080-4C37-BC14-5E271B7E7221/Helix.app/Helix
+Identifier:       com.ubercab.UberClient
+Version:          3.619.10000 (3.619.10000)
+Adam ID:          368677368
+Is First Party:   No
+Beta Identifier:  9F024C47-1371-48D0-AD3D-9F1B609F9894
+Resource Coalition ID: 604
+On Behalf Of:     7 samples UNKNOWN [34] (6 samples originated by Helix (Uber) [415], 1 sample originated by UNKNOWN [34])
+Architecture:     arm64
+Parent:           UNKNOWN [1]
+PID:              415
+
+Event:            disk writes
+Action taken:     none
+Writes:           1073.74 MB of file backed memory dirtied over 22523 seconds (47.67 KB per second average), exceeding limit of 12.43 KB per second over 86400 seconds
+Writes limit:     1073.74 MB
+Limit duration:   86400s
+Writes caused:    1073.74 MB
+Writes duration:  22523s
+Duration:         22522.61s
+Duration Sampled: 203.51s
+Steps:            108 (10.49 MB/step)
+
+Hardware model:   iPhone14,7
+Active cpus:      6
+HW page size:     16384
+VM page size:     16384
+
+Time Since Boot:  129342s
+Time Awake Since Boot: 23214s
+Time Since Wake:  6s
+
+Total CPU Time:   75.718s
+Advisory levels:  Battery -> 1, User -> 3, ThermalPressure -> 0, Combined -> 1
+Free disk space:  87.03 GB/119.07 GB, low space threshold 150 MB
+Low Power Mode:   Enabled
+Vnodes Available: 69.42% (16661/24000, 12000 allocated, 12000 soft limit)
+
+Preferred User Language: en-US
+Country Code:     US
+Keyboards:        en_US QWERTY, emoji Emoji
+OS Cryptex File Extents: 1
+
+Heaviest stack for the target process:
+  107  ??? (libsystem_pthread.dylib + 4300) [0x1ec1300cc]
+  82   ??? (libsystem_pthread.dylib + 18680) [0x1ec1338f8]
+  82   ??? (libdispatch.dylib + 90268) [0x19719409c]
+  82   ??? (libdispatch.dylib + 88212) [0x197193894]
+  79   ??? (libdispatch.dylib + 26868) [0x1971848f4]
+  79   ??? (libdispatch.dylib + 29400) [0x1971852d8]
+  79   ??? (libdispatch.dylib + 15828) [0x197181dd4]
+  79   ??? (libdispatch.dylib + 77404) [0x197190e5c]
+  79   ??? (Foundation + 651684) [0x18e1a41a4]
+  79   ??? (Foundation + 652632) [0x18e1a4558]
+  79   ??? (Foundation + 109376) [0x18e11fb40]
+  79   ??? (Foundation + 116896) [0x18e1218a0]
+  79   ??? (Foundation + 117408) [0x18e121aa0]
+  79   ??? (Foundation + 117728) [0x18e121be0]
+  79   ??? (Helix + 384704) [0x104315ec0]
+  73   ??? (Helix + 2345284) [0x1044f4944]
+  73   ??? (Helix + 91735984) [0x109a347b0]
+  73   ??? (Helix + 91735608) [0x109a34638]
+  73   ??? (Helix + 91737396) [0x109a34d34]
+  73   ??? (Helix + 2223164) [0x1044d6c3c]
+  51   ??? (libsqlite3.dylib + 179308) [0x1b913cc6c]
+  51   ??? (libsqlite3.dylib + 224080) [0x1b9147b50]
+  51   ??? (libsqlite3.dylib + 89184) [0x1b9126c60]
+  51   ??? (libsqlite3.dylib + 248112) [0x1b914d930]
+  51   ??? (libsqlite3.dylib + 249192) [0x1b914dd68]
+  51   ??? (libsqlite3.dylib + 312852) [0x1b915d614]
+  51   ??? (libsqlite3.dylib + 636260) [0x1b91ac564]
+  51   ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+  51   ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+
+
+Powerstats for:   Helix (Uber) [415]
+UUID:             C92EA5C0-D0D8-383E-8121-5AC1EE7D4E2F
+Path:             /private/var/containers/Bundle/Application/E607C941-5080-4C37-BC14-5E271B7E7221/Helix.app/Helix
+Identifier:       com.ubercab.UberClient
+Version:          3.619.10000 (3.619.10000)
+Adam ID:          368677368
+Is First Party:   No
+Beta Identifier:  9F024C47-1371-48D0-AD3D-9F1B609F9894
+Resource Coalition ID: 604
+On Behalf Of:     7 samples UNKNOWN [34] (6 samples originated by Helix (Uber) [415], 1 sample originated by UNKNOWN [34])
+Architecture:     arm64
+Parent:           UNKNOWN [1]
+UID:              501
+Footprint:        10.56 MB -> 343.58 MB (+333.02 MB) (max 448.53 MB )
+Pageins:          8779 pages
+Start time:       2024-07-01 08:28:04.327 -0400
+End time:         2024-07-01 08:31:27.834 -0400
+Num samples:      108 (100%)
+Num threads:      26
+Primary state:    42 samples Frontmost App, Non-Suppressed, Kernel mode, Effective Thread QoS Background, Requested Thread QoS Background, Override Thread QoS Unspecified, e-core
+User Activity:    49 samples Idle, 59 samples Active
+Power Source:     108 samples on Battery, 0 samples on AC
+  107  ??? (libsystem_pthread.dylib + 4300) [0x1ec1300cc]
+    82   ??? (libsystem_pthread.dylib + 18680) [0x1ec1338f8]
+      82   ??? (libdispatch.dylib + 90268) [0x19719409c]
+        82   ??? (libdispatch.dylib + 88212) [0x197193894]
+          79   ??? (libdispatch.dylib + 26868) [0x1971848f4]
+            79   ??? (libdispatch.dylib + 29400) [0x1971852d8]
+              79   ??? (libdispatch.dylib + 15828) [0x197181dd4]
+                79   ??? (libdispatch.dylib + 77404) [0x197190e5c]
+                  79   ??? (Foundation + 651684) [0x18e1a41a4]
+                    79   ??? (Foundation + 652632) [0x18e1a4558]
+                      79   ??? (Foundation + 109376) [0x18e11fb40]
+                        79   ??? (Foundation + 116896) [0x18e1218a0]
+                          79   ??? (Foundation + 117408) [0x18e121aa0]
+                            79   ??? (Foundation + 117728) [0x18e121be0]
+                              79   ??? (Helix + 384704) [0x104315ec0]
+                                73   ??? (Helix + 2345284) [0x1044f4944]
+                                  73   ??? (Helix + 91735984) [0x109a347b0]
+                                    73   ??? (Helix + 91735608) [0x109a34638]
+                                      73   ??? (Helix + 91737396) [0x109a34d34]
+                                        73   ??? (Helix + 2223164) [0x1044d6c3c]
+                                          51   ??? (libsqlite3.dylib + 179308) [0x1b913cc6c]
+                                            51   ??? (libsqlite3.dylib + 224080) [0x1b9147b50]
+                                              51   ??? (libsqlite3.dylib + 89184) [0x1b9126c60]
+                                                51   ??? (libsqlite3.dylib + 248112) [0x1b914d930]
+                                                  51   ??? (libsqlite3.dylib + 249192) [0x1b914dd68]
+                                                    51   ??? (libsqlite3.dylib + 312852) [0x1b915d614]
+                                                      51   ??? (libsqlite3.dylib + 636260) [0x1b91ac564]
+                                                        51   ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                          51   ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                                            25   <Non-Frontmost App>
+                                          22   ??? (libsqlite3.dylib + 180844) [0x1b913d26c]
+                                            22   ??? (libsqlite3.dylib + 314596) [0x1b915dce4]
+                                              22   ??? (libsqlite3.dylib + 524264) [0x1b9190fe8]
+                                                22   ??? (libsqlite3.dylib + 1067744) [0x1b9215ae0]
+                                                  22   ??? (libsqlite3.dylib + 386040) [0x1b916f3f8]
+                                                    22   ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                      22   ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                                        9    <Non-Frontmost App>
+                                6    ??? (Helix + 2583456) [0x10452eba0]
+                                  6    ??? (Helix + 91736032) [0x109a347e0]
+                                    6    ??? (Helix + 91735860) [0x109a34734]
+                                      6    ??? (Helix + 91737604) [0x109a34e04]
+                                        6    ??? (Helix + 2223164) [0x1044d6c3c]
+                                          3    ??? (libsqlite3.dylib + 180844) [0x1b913d26c]
+                                            3    ??? (libsqlite3.dylib + 314596) [0x1b915dce4]
+                                              3    ??? (libsqlite3.dylib + 524264) [0x1b9190fe8]
+                                                3    ??? (libsqlite3.dylib + 1067744) [0x1b9215ae0]
+                                                  3    ??? (libsqlite3.dylib + 386040) [0x1b916f3f8]
+                                                    3    ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                      3    ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                                        2    <Non-Frontmost App>
+                                          3    ??? (libsqlite3.dylib + 179308) [0x1b913cc6c]
+                                            3    ??? (libsqlite3.dylib + 224080) [0x1b9147b50]
+                                              3    ??? (libsqlite3.dylib + 89184) [0x1b9126c60]
+                                                3    ??? (libsqlite3.dylib + 248112) [0x1b914d930]
+                                                  3    ??? (libsqlite3.dylib + 249192) [0x1b914dd68]
+                                                    3    ??? (libsqlite3.dylib + 312852) [0x1b915d614]
+                                                      3    ??? (libsqlite3.dylib + 636260) [0x1b91ac564]
+                                                        3    ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                          3    ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                                            3    <Non-Frontmost App>
+          3    ??? (libdispatch.dylib + 27016) [0x197184988]
+            3    ??? (libdispatch.dylib + 29400) [0x1971852d8]
+              3    ??? (libdispatch.dylib + 15828) [0x197181dd4]
+                3    ??? (libdispatch.dylib + 77404) [0x197190e5c]
+                  3    ??? (Foundation + 651684) [0x18e1a41a4]
+                    3    ??? (Foundation + 652632) [0x18e1a4558]
+                      3    ??? (Foundation + 109376) [0x18e11fb40]
+                        3    ??? (Foundation + 116896) [0x18e1218a0]
+                          3    ??? (Foundation + 117408) [0x18e121aa0]
+                            3    ??? (Foundation + 117728) [0x18e121be0]
+                              3    ??? (Helix + 384704) [0x104315ec0]
+                                2    ??? (Helix + 2583456) [0x10452eba0]
+                                  2    ??? (Helix + 91736032) [0x109a347e0]
+                                    2    ??? (Helix + 91735860) [0x109a34734]
+                                      2    ??? (Helix + 91737604) [0x109a34e04]
+                                        2    ??? (Helix + 2223164) [0x1044d6c3c]
+                                          1    ??? (libsqlite3.dylib + 180844) [0x1b913d26c]
+                                            1    ??? (libsqlite3.dylib + 314596) [0x1b915dce4]
+                                              1    ??? (libsqlite3.dylib + 524264) [0x1b9190fe8]
+                                                1    ??? (libsqlite3.dylib + 1067744) [0x1b9215ae0]
+                                                  1    ??? (libsqlite3.dylib + 386040) [0x1b916f3f8]
+                                                    1    ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                      1    ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                          1    ??? (libsqlite3.dylib + 179308) [0x1b913cc6c]
+                                            1    ??? (libsqlite3.dylib + 224080) [0x1b9147b50]
+                                              1    ??? (libsqlite3.dylib + 89184) [0x1b9126c60]
+                                                1    ??? (libsqlite3.dylib + 248112) [0x1b914d930]
+                                                  1    ??? (libsqlite3.dylib + 249192) [0x1b914dd68]
+                                                    1    ??? (libsqlite3.dylib + 312852) [0x1b915d614]
+                                                      1    ??? (libsqlite3.dylib + 636260) [0x1b91ac564]
+                                                        1    ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                          1    ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                1    ??? (Helix + 2345284) [0x1044f4944]
+                                  1    ??? (Helix + 91735984) [0x109a347b0]
+                                    1    ??? (Helix + 91735608) [0x109a34638]
+                                      1    ??? (Helix + 91737396) [0x109a34d34]
+                                        1    ??? (Helix + 2223164) [0x1044d6c3c]
+                                          1    ??? (libsqlite3.dylib + 180844) [0x1b913d26c]
+                                            1    ??? (libsqlite3.dylib + 314596) [0x1b915dce4]
+                                              1    ??? (libsqlite3.dylib + 524264) [0x1b9190fe8]
+                                                1    ??? (libsqlite3.dylib + 1067744) [0x1b9215ae0]
+                                                  1    ??? (libsqlite3.dylib + 386040) [0x1b916f3f8]
+                                                    1    ??? (libsqlite3.dylib + 313588) [0x1b915d8f4]
+                                                      1    ??? (libsystem_kernel.dylib + 30768) [0x1d8392830]
+                                                        1    <Non-Frontmost App>
+    25   ??? (libsystem_pthread.dylib + 18740) [0x1ec133934]
+      25   ??? (libdispatch.dylib + 91432) [0x197194528]
+        25   ??? (libdispatch.dylib + 93364) [0x197194cb4]
+          25   ??? (libdispatch.dylib + 48944) [0x197189f30]
+            25   ??? (libdispatch.dylib + 46080) [0x197189400]
+              25   ??? (libdispatch.dylib + 15828) [0x197181dd4]
+                25   ??? (libdispatch.dylib + 8508) [0x19718013c]
+                  15   ??? (Helix + 384704) [0x104315ec0]
+                    10   ??? (Helix + 524896) [0x104338260]
+                      10   ??? (Helix + 695688) [0x104361d88]
+                        10   ??? (Helix + 695380) [0x104361c54]
+                          10   ??? (Helix + 527440) [0x104338c50]
+                            10   ??? (Helix + 527400) [0x104338c28]
+                              10   ??? (Helix + 527180) [0x104338b4c]
+                                10   ??? (Helix + 526952) [0x104338a68]
+                                  10   ??? (Helix + 773820) [0x104374ebc]
+                                    10   ??? (Helix + 98762192) [0x10a0e7dd0]
+                                      10   ??? (Helix + 98762028) [0x10a0e7d2c]
+                                        10   ??? (Helix + 98755908) [0x10a0e6544]
+                                          10   ??? (Helix + 98756208) [0x10a0e6670]
+                                            10   ??? (Helix + 98755104) [0x10a0e6220]
+                                              6    ??? (libdispatch.dylib + 78532) [0x1971912c4]
+                                                6    ??? (libdispatch.dylib + 15828) [0x197181dd4]
+                                                  3    ??? (Helix + 98756484) [0x10a0e6784]
+                                                    3    ??? (Helix + 98656048) [0x10a0cdf30]
+                                                      3    ??? (Helix + 98656284) [0x10a0ce01c]
+                                                        3    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                          2    <Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                          1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                  3    ??? (Helix + 98756468) [0x10a0e6774]
+                                                    3    ??? (Helix + 98757104) [0x10a0e69f0]
+                                                      3    ??? (Helix + 98658504) [0x10a0ce8c8]
+                                                        3    ??? (Helix + 98658676) [0x10a0ce974]
+                                                          3    ??? (Helix + 98656464) [0x10a0ce0d0]
+                                                            3    ??? (Helix + 98656284) [0x10a0ce01c]
+                                                              3    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                                1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                                1    <Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                                1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                              4    ??? (libdispatch.dylib + 78200) [0x197191178]
+                                                4    ??? (libdispatch.dylib + 79608) [0x1971916f8]
+                                                  4    ??? (libdispatch.dylib + 15828) [0x197181dd4]
+                                                    2    ??? (Helix + 98756484) [0x10a0e6784]
+                                                      2    ??? (Helix + 98656048) [0x10a0cdf30]
+                                                        2    ??? (Helix + 98656284) [0x10a0ce01c]
+                                                          2    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                            1    <on behalf of UNKNOWN [34] (originated by UNKNOWN [34]), Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                            1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                    2    ??? (Helix + 98756468) [0x10a0e6774]
+                                                      1    ??? (Helix + 98757124) [0x10a0e6a04]
+                                                        1    ??? (Helix + 98658104) [0x10a0ce738]
+                                                          1    ??? (Helix + 98657516) [0x10a0ce4ec]
+                                                            1    ??? (Helix + 98657944) [0x10a0ce698]
+                                                              1    ??? (Helix + 98656464) [0x10a0ce0d0]
+                                                                1    ??? (Helix + 98656284) [0x10a0ce01c]
+                                                                  1    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                                    1    <Effective Thread QoS Utility, Requested Thread QoS Utility>
+                                                      1    ??? (Helix + 98757104) [0x10a0e69f0]
+                                                        1    ??? (Helix + 98658504) [0x10a0ce8c8]
+                                                          1    ??? (Helix + 98658676) [0x10a0ce974]
+                                                            1    ??? (Helix + 98656464) [0x10a0ce0d0]
+                                                              1    ??? (Helix + 98656284) [0x10a0ce01c]
+                                                                1    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                                  1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Effective Thread QoS Utility, Requested Thread QoS Utility>
+                    3    ??? (Helix + 521272) [0x104337438]
+                      3    ??? (Helix + 521068) [0x10433736c]
+                        3    ??? (Helix + 520296) [0x104337068]
+                          3    ??? (Helix + 520264) [0x104337048]
+                            3    ??? (Helix + 502180) [0x1043329a4]
+                              3    ??? (Helix + 520084) [0x104336f94]
+                                3    ??? (Helix + 3150628) [0x1045b9324]
+                                  3    ??? (Helix + 3150672) [0x1045b9350]
+                                    3    ??? (Foundation + 945276) [0x18e1ebc7c]
+                                      3    ??? (Foundation + 945656) [0x18e1ebdf8]
+                                        3    ??? (Foundation + 945988) [0x18e1ebf44]
+                                          3    ??? (Foundation + 946512) [0x18e1ec150]
+                                            2    ??? (Foundation + 133940) [0x18e125b34]
+                                              2    ??? (Foundation + 69644) [0x18e11600c]
+                                                2    ??? (Foundation + 1194032) [0x18e228830]
+                                                  2    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                                    1    <on behalf of UNKNOWN [34] (originated by Helix (Uber) [415]), Effective Thread QoS User Initiated, Requested Thread QoS User Initiated>
+                                                    1    <Effective Thread QoS User Initiated, Requested Thread QoS User Initiated, p-core>
+                                            1    ??? (Foundation + 134276) [0x18e125c84]
+                                              1    ??? (libsystem_kernel.dylib + 25300) [0x1d83912d4]
+                                                1    <Effective Thread QoS User Initiated, Requested Thread QoS User Initiated>
+                    2    ??? (Helix + 384488) [0x104315de8]
+                      2    ??? (Helix + 3095420) [0x1045abb7c]
+                        2    ??? (Foundation + 946392) [0x18e1ec0d8]
+                          1    ??? (Foundation + 134276) [0x18e125c84]
+                            1    ??? (libsystem_kernel.dylib + 25300) [0x1d83912d4]
+                              1    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                          1    ??? (Foundation + 133940) [0x18e125b34]
+                            1    ??? (Foundation + 69644) [0x18e11600c]
+                              1    ??? (Foundation + 1194032) [0x18e228830]
+                                1    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                                  1    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                  7    ??? (Helix + 2070508) [0x1044b17ec]
+                    7    ??? (Foundation + 135320) [0x18e126098]
+                      7    ??? (Foundation + 69644) [0x18e11600c]
+                        7    ??? (Foundation + 1194196) [0x18e2288d4]
+                          7    ??? (libsystem_kernel.dylib + 24156) [0x1d8390e5c]
+                            4    <Effective Thread QoS Utility, Requested Thread QoS Utility>
+                            3    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                  2    ??? (Helix + 2070424) [0x1044b1798]
+                    1    ??? (Helix + 2482976) [0x104516320]
+                      1    ??? (Foundation + 646516) [0x18e1a2d74]
+                        1    ??? (Foundation + 109376) [0x18e11fb40]
+                          1    ??? (Foundation + 116896) [0x18e1218a0]
+                            1    ??? (Foundation + 119312) [0x18e122210]
+                              1    ??? (libremovefile.dylib + 5304) [0x218e934b8]
+                                1    ??? (libremovefile.dylib + 5832) [0x218e936c8]
+                                  1    ??? (libsystem_kernel.dylib + 28824) [0x1d8392098]
+                                    1    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                    1    ??? (Helix + 2482728) [0x104516228]
+                      1    ??? (Helix + 1374408) [0x1044078c8]
+                        1    ??? (libsystem_kernel.dylib + 7676) [0x1d838cdfc]
+                          1    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+                  1    ??? (Helix + 2070480) [0x1044b17d0]
+                    1    ??? (Helix + 2801828) [0x1045640a4]
+                      1    ??? (Foundation + 946392) [0x18e1ec0d8]
+                        1    ??? (Foundation + 133752) [0x18e125a78]
+                          1    ??? (Foundation + 127832) [0x18e124358]
+                            1    ??? (Foundation + 1208388) [0x18e22c044]
+                              1    ??? (Foundation + 1213320) [0x18e22d388]
+                                1    ??? (libsystem_kernel.dylib + 28692) [0x1d8392014]
+                                  1    <Non-Frontmost App, Effective Thread QoS Utility, Requested Thread QoS Utility>
+  1    ??? (dyld + 248904) [0x1b295dc48]
+    1    ??? (dyld + 98612) [0x1b2939134]
+      1    ??? (dyld + 300428) [0x1b296a58c]
+        1    ??? (dyld + 469468) [0x1b29939dc]
+          1    <Effective Thread QoS User Interactive, Requested Thread QoS User Interactive, p-core>
+
+  Binary Images:
+           0x1042b8000 -                ???  com.ubercab.UberClient 3.619.10000 (3.619.10000) <C92EA5C0-D0D8-383E-8121-5AC1EE7D4E2F>  /private/var/containers/Bundle/Application/E607C941-5080-4C37-BC14-5E271B7E7221/Helix.app/Helix
+           0x18e105000 -        0x18ec7afff  Foundation                                       <3D3A12E3-F5E9-361F-B00A-4A5E8861AA55>  /System/Library/Frameworks/Foundation.framework/Foundation
+           0x19717e000 -        0x1971c4fff  libdispatch.dylib                                <81D355DF-266A-3010-BAB8-113B76A206C1>  /usr/lib/system/libdispatch.dylib
+           0x1b2921000 -        0x1b29adef7  dyld                                             <71846EAC-EE65-3697-BF7D-790B6A07DCDB>  /usr/lib/dyld
+           0x1b9111000 -        0x1b9292ffb  libsqlite3.dylib                                 <9D3D6676-AEBA-33AC-A589-4241DEA0F580> 
