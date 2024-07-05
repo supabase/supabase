@@ -143,7 +143,7 @@ export const SQLEditorTreeViewItem = ({
           )}
           {onSelectCopyPersonal !== undefined &&
             isSharedSnippet &&
-            // !isSnippetOwner &&
+            !isSnippetOwner &&
             canCreateSQLSnippet && (
               <ContextMenuItem_Shadcn_
                 className="gap-x-2"

@@ -204,6 +204,12 @@ export const SQLEditorNav = () => {
                 onSelectDownload={() => {
                   setSelectedSnippetToDownload(element.metadata as Snippet)
                 }}
+                onSelectCopyPersonal={() => {
+                  onSelectCopyPersonal(element.metadata as Snippet)
+                }}
+                onSelectUnshare={() => {
+                  setSelectedSnippetToUnshare(element.metadata as Snippet)
+                }}
               />
             )}
           />
