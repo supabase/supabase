@@ -326,7 +326,7 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
           </span>
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_ className="pt-2">
-          {numPrivateSnippets === 0 ? (
+          {folders.length === 0 && numPrivateSnippets === 0 ? (
             <div className="mx-4">
               <Alert_Shadcn_ className="p-3">
                 <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
