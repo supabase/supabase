@@ -14,7 +14,7 @@ const WarehouseSettings: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Warehouse Settings</ScaffoldTitle>
-          <ScaffoldDescription>Configure warehouse settings</ScaffoldDescription>
+          <ScaffoldDescription>Configure your warehouse settings</ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
