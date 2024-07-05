@@ -66,6 +66,7 @@ export const RealtimePolicies = () => {
         schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => setShowPolicyEditor(false)}
+        authContext="realtime"
       />
     </div>
   )
