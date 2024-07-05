@@ -10,6 +10,7 @@ import { Dialog, DialogContent } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuContext'
+import useDragToClose from 'common/hooks/useDragToClose'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -68,9 +69,14 @@ export const CommandDialog = ({
 }: CommandDialogProps) => {
   const isOpen = props.visible || props.open
 
+  const { ref, handleTouchStart, handleTouchMove, handleTouchEnd } = useDragToClose({
+    onClose: () => setIsOpen(!open),
+  })
+
   return (
     <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
+        ref={ref}
         forceMount
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
@@ -80,7 +86,7 @@ export const CommandDialog = ({
           }
         }}
         hideClose
-        size={'xlarge'}
+        size="xlarge"
         dialogOverlayProps={{
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
@@ -95,6 +101,10 @@ export const CommandDialog = ({
           'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
           'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
         )}
+        // Close on swipe down
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command
