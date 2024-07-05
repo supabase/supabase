@@ -97,7 +97,7 @@ export async function handler(req: Request) {
         fonts: [
           {
             name: 'Circular',
-            data: fontData,
+            data: CIRCULAR_FONT_DATA,
             style: 'normal',
           },
         ],
