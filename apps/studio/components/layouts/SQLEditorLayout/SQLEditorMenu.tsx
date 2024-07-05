@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { FilePlus, FolderPlus, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -14,15 +14,28 @@ import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { InnerSideMenuItem } from 'ui-patterns/InnerSideMenu'
+import {
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+  InnerSideMenuItem,
+} from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNavV1 } from './SQLEditorNavV1'
 import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
 
@@ -31,14 +44,18 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref, id: activeId } = useParams()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
   const [searchText, setSearchText] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
+    'sql-editor-sort',
+    'created-at'
+  )
 
   const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: createFolder, isLoading: isCreating } = useSQLSnippetFolderCreateMutation({
     onSuccess: () => {
@@ -121,29 +138,69 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   return (
     <>
       <div className="h-full flex flex-col justify-between">
-        <div className="mt-4 mb-2 flex flex-col gap-4">
-          <div className="mx-4 space-y-2">
-            <Button
-              block
-              type="default"
-              className="justify-start"
-              onClick={() => handleNewQuery()}
-              icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
-            >
-              New query
-            </Button>
-            <Button
-              block
-              type="default"
-              loading={isCreating}
-              className="justify-start"
-              onClick={async () => {
-                if (ref) createFolder({ projectRef: ref, name: 'test' })
-              }}
-              icon={<Plus strokeWidth={1} size={14} />}
-            >
-              Create folder
-            </Button>
+        <div className="mt-4 mb-2 flex flex-col gap-y-4">
+          <div className="mx-4 flex items-center justify-between gap-x-2">
+            {enableFolders ? (
+              <>
+                {/* [Joshen] Just double check with Jonny if this is okay */}
+                <InnerSideBarFilters className="w-full p-0 gap-0">
+                  <InnerSideBarFilterSearchInput
+                    name="search-queries"
+                    placeholder="Search queries..."
+                    aria-labelledby="Search queries"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value.trim())}
+                  >
+                    <InnerSideBarFilterSortDropdown
+                      value={sort}
+                      onValueChange={(value: any) => setSort(value)}
+                    >
+                      <InnerSideBarFilterSortDropdownItem key="alphabetical" value="alphabetical">
+                        Alphabetical
+                      </InnerSideBarFilterSortDropdownItem>
+                      <InnerSideBarFilterSortDropdownItem key="created-at" value="created-at">
+                        Created At
+                      </InnerSideBarFilterSortDropdownItem>
+                    </InnerSideBarFilterSortDropdown>
+                  </InnerSideBarFilterSearchInput>
+                </InnerSideBarFilters>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="default"
+                      icon={<Plus className="text-foreground" />}
+                      className="w-[26px]"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom" className="w-48">
+                    <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
+                      <FilePlus size={14} />
+                      Create a new snippet
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-x-2">
+                      <FolderPlus
+                        size={14}
+                        onClick={() => {
+                          if (!ref) return console.error('Nono')
+                          createFolder({ projectRef: ref, name: 'test' })
+                        }}
+                      />
+                      Create a new folder
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button
+                block
+                type="default"
+                className="justify-start"
+                onClick={() => handleNewQuery()}
+                icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+              >
+                New query
+              </Button>
+            )}
           </div>
 
           <div className="px-2">
@@ -164,7 +221,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
           </div>
 
           {enableFolders ? (
-            <SQLEditorNavV2 />
+            <SQLEditorNavV2 searchText={searchText} />
           ) : (
             <SQLEditorNavV1
               searchText={searchText}

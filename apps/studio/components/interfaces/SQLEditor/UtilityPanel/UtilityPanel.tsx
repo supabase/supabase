@@ -74,7 +74,7 @@ const UtilityPanel = ({
         },
       }
 
-      if (enableFolders) snapV2.updateSnippet(id, newSnippet as Snippet)
+      if (enableFolders) snapV2.updateSnippet(id, newSnippet as unknown as Snippet)
       else snap.updateSnippet(id, newSnippet)
     },
     onError: async (err, newContent, context) => {

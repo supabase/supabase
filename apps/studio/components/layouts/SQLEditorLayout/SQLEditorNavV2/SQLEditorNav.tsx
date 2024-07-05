@@ -1,4 +1,4 @@
-import { ChevronRight, Eye, EyeOffIcon, Unlock } from 'lucide-react'
+import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -9,6 +9,9 @@ import { Snippet, SnippetDetail, useSQLSnippetFoldersQuery } from 'data/content/
 import { useRouter } from 'next/router'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
@@ -31,7 +34,11 @@ import { getContentById } from 'data/content/content-id-query'
 // - Multi select
 // - Context menu
 
-export const SQLEditorNav = () => {
+interface SQLEditorNavProps {
+  searchText: string
+}
+
+export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -61,21 +68,41 @@ export const SQLEditorNav = () => {
   const folders = Object.values(snapV2.folders).map((x) => x.folder)
   const contents = Object.values(snapV2.snippets).map((x) => x.snippet)
 
-  const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
+  const privateSnippets =
+    searchText.length === 0
+      ? contents.filter((snippet) => snippet.visibility === 'user')
+      : contents.filter(
+          (snippet) =>
+            snippet.visibility === 'user' &&
+            snippet.name.toLowerCase().includes(searchText.toLowerCase())
+        )
   const numPrivateSnippets = Object.keys(snapV2.snippets).length
   const privateSnippetsTreeState =
     folders.length === 0 && numPrivateSnippets === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = contents.filter((snippet) => snippet.favorite)
+  const favoriteSnippets =
+    searchText.length === 0
+      ? contents.filter((snippet) => snippet.favorite)
+      : contents.filter(
+          (snippet) =>
+            snippet.favorite && snippet.name.toLowerCase().includes(searchText.toLowerCase())
+        )
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ contents: favoriteSnippets })
 
-  const projectSnippets = contents.filter((snippet) => snippet.visibility === 'project')
+  const projectSnippets =
+    searchText.length === 0
+      ? contents.filter((snippet) => snippet.visibility === 'project')
+      : contents.filter(
+          (snippet) =>
+            snippet.visibility === 'project' &&
+            snippet.name.toLowerCase().includes(searchText.toLowerCase())
+        )
   const numProjectSnippets = projectSnippets.length
   const projectSnippetsTreeState =
     numProjectSnippets === 0
@@ -178,45 +205,61 @@ export const SQLEditorNav = () => {
     <>
       <Separator />
 
-      <Collapsible_Shadcn_ open={showFavouriteSnippets} onOpenChange={setShowFavouriteSnippets}>
-        <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
-          <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
-          <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
-            Favorites{numFavoriteSnippets > 0 && ` (${numFavoriteSnippets})`}
-          </span>
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_ className="pt-2">
-          <TreeView
-            data={favoritesTreeState}
-            aria-label="favorite-snippets"
-            nodeRenderer={({ element, ...props }) => (
-              <SQLEditorTreeViewItem
-                {...props}
-                element={element}
-                onSelectDelete={() => {
-                  setShowDeleteModal(true)
-                  setSelectedSnippets([element.metadata as unknown as Snippet])
-                }}
-                onSelectRename={() => {
-                  setShowRenameModal(true)
-                  setSelectedSnippetToRename(element.metadata as Snippet)
-                }}
-                onSelectDownload={() => {
-                  setSelectedSnippetToDownload(element.metadata as Snippet)
-                }}
-                onSelectCopyPersonal={() => {
-                  onSelectCopyPersonal(element.metadata as Snippet)
-                }}
-                onSelectUnshare={() => {
-                  setSelectedSnippetToUnshare(element.metadata as Snippet)
-                }}
-              />
-            )}
-          />
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
-
-      <Separator />
+      {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (
+        <>
+          <Collapsible_Shadcn_ open={showFavouriteSnippets} onOpenChange={setShowFavouriteSnippets}>
+            <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
+              <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
+              <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
+                Favorites{numFavoriteSnippets > 0 && ` (${numFavoriteSnippets})`}
+              </span>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="pt-2">
+              {numFavoriteSnippets === 0 ? (
+                <div className="mx-4">
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_ className="text-xs">No favorite queries</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="text-xs ">
+                      Save a query to favorites for easy accessbility by clicking the{' '}
+                      <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                      icon.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                </div>
+              ) : (
+                <TreeView
+                  data={favoritesTreeState}
+                  aria-label="favorite-snippets"
+                  nodeRenderer={({ element, ...props }) => (
+                    <SQLEditorTreeViewItem
+                      {...props}
+                      element={element}
+                      onSelectDelete={() => {
+                        setShowDeleteModal(true)
+                        setSelectedSnippets([element.metadata as unknown as Snippet])
+                      }}
+                      onSelectRename={() => {
+                        setShowRenameModal(true)
+                        setSelectedSnippetToRename(element.metadata as Snippet)
+                      }}
+                      onSelectDownload={() => {
+                        setSelectedSnippetToDownload(element.metadata as Snippet)
+                      }}
+                      onSelectCopyPersonal={() => {
+                        onSelectCopyPersonal(element.metadata as Snippet)
+                      }}
+                      onSelectUnshare={() => {
+                        setSelectedSnippetToUnshare(element.metadata as Snippet)
+                      }}
+                    />
+                  )}
+                />
+              )}
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
+          <Separator />
+        </>
+      )}
 
       <Collapsible_Shadcn_ open={showSharedSnippets} onOpenChange={setShowSharedSnippets}>
         <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
@@ -226,33 +269,44 @@ export const SQLEditorNav = () => {
           </span>
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_ className="pt-2">
-          <TreeView
-            data={projectSnippetsTreeState}
-            aria-label="project-level-snippets"
-            nodeRenderer={({ element, ...props }) => (
-              <SQLEditorTreeViewItem
-                {...props}
-                element={element}
-                onSelectDelete={() => {
-                  setShowDeleteModal(true)
-                  setSelectedSnippets([element.metadata as unknown as Snippet])
-                }}
-                onSelectRename={() => {
-                  setShowRenameModal(true)
-                  setSelectedSnippetToRename(element.metadata as Snippet)
-                }}
-                onSelectDownload={() => {
-                  setSelectedSnippetToDownload(element.metadata as Snippet)
-                }}
-                onSelectCopyPersonal={() => {
-                  onSelectCopyPersonal(element.metadata as Snippet)
-                }}
-                onSelectUnshare={() => {
-                  setSelectedSnippetToUnshare(element.metadata as Snippet)
-                }}
-              />
-            )}
-          />
+          {numProjectSnippets === 0 ? (
+            <div className="mx-4">
+              <Alert_Shadcn_>
+                <AlertTitle_Shadcn_ className="text-xs">No shared queries</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="text-xs ">
+                  Share queries with your team by right-clicking on the query.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </div>
+          ) : (
+            <TreeView
+              data={projectSnippetsTreeState}
+              aria-label="project-level-snippets"
+              nodeRenderer={({ element, ...props }) => (
+                <SQLEditorTreeViewItem
+                  {...props}
+                  element={element}
+                  onSelectDelete={() => {
+                    setShowDeleteModal(true)
+                    setSelectedSnippets([element.metadata as unknown as Snippet])
+                  }}
+                  onSelectRename={() => {
+                    setShowRenameModal(true)
+                    setSelectedSnippetToRename(element.metadata as Snippet)
+                  }}
+                  onSelectDownload={() => {
+                    setSelectedSnippetToDownload(element.metadata as Snippet)
+                  }}
+                  onSelectCopyPersonal={() => {
+                    onSelectCopyPersonal(element.metadata as Snippet)
+                  }}
+                  onSelectUnshare={() => {
+                    setSelectedSnippetToUnshare(element.metadata as Snippet)
+                  }}
+                />
+              )}
+            />
+          )}
         </CollapsibleContent_Shadcn_>
       </Collapsible_Shadcn_>
 

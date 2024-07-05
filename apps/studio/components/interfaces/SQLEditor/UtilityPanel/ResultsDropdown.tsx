@@ -136,7 +136,11 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         className="hidden"
         headers={headers}
         data={csvData}
-        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`}
+        filename={
+          enableFolders
+            ? `supabase_${project?.ref}_${snapV2.snippets[id]?.snippet.name}.csv`
+            : `supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`
+        }
       />
 
       <DropdownMenuContent side="bottom" align="start">
