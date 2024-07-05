@@ -1,10 +1,3 @@
-import {
-  CustomDomainConfig,
-  DeleteProjectPanel,
-  General,
-  TransferProjectPanel,
-} from 'components/interfaces/Settings/General'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -16,8 +9,6 @@ import type { NextPageWithLayout } from 'types'
 import { WarehouseAccessTokens } from 'components/interfaces/DataWarehouse/WarehouseAccessTokens'
 
 const WarehouseSettings: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-
   return (
     <>
       <ScaffoldContainer>
