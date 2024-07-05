@@ -99,7 +99,7 @@ const GuidesTableOfContents = ({
 
           return { text, link, level } as Partial<TOCHeader>
         })
-        .filter((x): x is TOCHeader => !!x.text && !!x.link && !!x.level)
+        .filter((x): x is TOCHeader => !!x && !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 
