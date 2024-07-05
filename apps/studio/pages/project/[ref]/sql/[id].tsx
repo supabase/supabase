@@ -44,8 +44,12 @@ const SqlEditor: NextPageWithLayout = () => {
   useContentIdQuery(
     { projectRef: ref, id },
     {
-      enabled: enableFolders && id !== 'new',
-      onSuccess: (data) => snapV2.addSnippet({ projectRef: ref as string, snippet: data }),
+      // [Joshen] May need to investigate separately, but occassionally addSnippet doesnt exist in
+      // the snapV2 valtio store for some reason hence why the added typeof check here
+      enabled: enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function',
+      onSuccess: (data) => {
+        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
+      },
     }
   )
 

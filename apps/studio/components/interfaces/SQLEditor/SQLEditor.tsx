@@ -170,7 +170,10 @@ const SQLEditor = () => {
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
-      if (id) snap.addResult(id, data.result, vars.autoLimit)
+      if (id) {
+        if (enableFolders) snapV2.addResult(id, data.result, vars.autoLimit)
+        else snap.addResult(id, data.result, vars.autoLimit)
+      }
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
@@ -208,7 +211,8 @@ const SQLEditor = () => {
           }
         }
 
-        snap.addResultError(id, error, vars.autoLimit)
+        if (enableFolders) snapV2.addResultError(id, error, vars.autoLimit)
+        else snap.addResultError(id, error, vars.autoLimit)
       }
     },
   })
@@ -388,8 +392,8 @@ const SQLEditor = () => {
 
   const onDebug = useCallback(async () => {
     try {
-      const snippet = snap.snippets[id]
-      const result = snap.results[id]?.[0]
+      const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+      const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
       const { solution, sql } = await debugSql({
         sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),

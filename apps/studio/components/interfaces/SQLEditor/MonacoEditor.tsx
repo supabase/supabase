@@ -99,12 +99,15 @@ const MonacoEditor = ({
 
   // [Joshen] Also needs updating here
   const debouncedSetSql = debounce((id, value) => {
-    snap.setSql(id, value)
+    if (enableFolders) snapV2.setSql(id, value)
+    else snap.setSql(id, value)
   }, 1000)
 
   function handleEditorChange(value: string | undefined) {
+    const snippetCheck = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+
     if (id && value) {
-      if (snap.snippets[id]) {
+      if (snippetCheck) {
         debouncedSetSql(id, value)
       } else {
         if (ref && profile !== undefined && project !== undefined) {

@@ -77,8 +77,6 @@ const TreeViewItem = forwardRef<
       onEditSubmit?.(localValueState)
     }
 
-    console.log({ level, isBranch })
-
     return (
       <div
         ref={ref}

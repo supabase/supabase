@@ -21,11 +21,7 @@ export type StateSnippet = {
   snippet: SnippetContent
 }
 
-// [Joshen] Quick thought process of how this store will work
-// TBD
-
 export const sqlEditorState = proxy({
-  // Keep folders and snippets as two separate flat lists, instead of a tree
   folders: {} as {
     [folderId: string]: StateSnippetFolder
   },
@@ -34,7 +30,11 @@ export const sqlEditorState = proxy({
   },
   // Query results, if any, for a snippet
   results: {} as {
-    [snippetId: string]: { rows: any[]; error?: any }[]
+    [snippetId: string]: {
+      rows: any[]
+      error?: any
+      autoLimit?: number
+    }[]
   },
   // Project ref as the top level key, followed by folder ID, then IDs of each snippet as the order
   // Folder ID of the root level will just be "root", the rest will be the folder's UUID
@@ -53,6 +53,7 @@ export const sqlEditorState = proxy({
   savingStates: {} as {
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
+  limit: 100,
 
   // Initial loading of data into UI, only called once when first loading data
   // Note that snippets here do not have the content property, and will need to be
@@ -95,6 +96,20 @@ export const sqlEditorState = proxy({
     // sqlEditorState.loaded[projectRef] = true
   },
 
+  updateSnippet: (id: string, snippet: Snippet) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet = snippet
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
+  setSql: (id: string, sql: string) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet.content.sql = sql
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
   renameSnippet: ({
     id,
     name,
@@ -130,8 +145,51 @@ export const sqlEditorState = proxy({
     // ].filter((s) => s !== id)
   },
 
-  // Asynchronous data management for the snippets
+  setLimit: (value: number) => (sqlEditorState.limit = value),
+
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.add(id),
+
+  addFavorite: (id: string) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet.favorite = true
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
+  removeFavorite: (id: string) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet.favorite = false
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
+  shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
+    if (sqlEditorState.snippets[id]) {
+      const { snippet, projectRef } = sqlEditorState.snippets[id]
+      snippet.visibility = visibility
+
+      // sqlEditorState.reorderSnippets(projectRef)
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+
+  addResult: (id: string, results: any[], autoLimit?: number) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id].unshift({ rows: results, autoLimit })
+    }
+  },
+
+  addResultError: (id: string, error: any, autoLimit?: number) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id].unshift({ rows: [], error, autoLimit })
+    }
+  },
+
+  resetResult: (id: string) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
+    }
+  },
 
   // Utils to sort snippets alphabetically
   // orderSnippets: (snippets: Snippet[]) => {

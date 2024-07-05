@@ -55,6 +55,7 @@ export const createSqlSnippetSkeletonV2 = ({
     project_id,
     name,
     folder_id: undefined,
+    favorite: false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     content: {
@@ -95,20 +96,23 @@ export function checkDestructiveQuery(sql: string) {
   return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
 }
 
-export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => `
+export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
 ${isNpx ? 'npx ' : ''}supabase migration new ${name}
-`
+`.trim()
 
-export const generateSeedCliCommand = (id: string, isNpx = false) => `
+export const generateSeedCliCommand = (id: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
   supabase/seed.sql
-`
+`.trim()
 
-export const generateFileCliCommand = (id: string, name: string, isNpx = false) => `
+export const generateFileCliCommand = (id: string, name: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
   ${name}.sql
-`
+`.trim()
 
 export const compareAsModification = (sqlDiff: ContentDiff) => {
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
