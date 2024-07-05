@@ -6,10 +6,13 @@ description: 'Running databases is a shared responsibility between you and Supab
 
 Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for. This is by design: we want to give you the freedom to use your database however you want. While we _could_ put many more restrictions in place to ensure that you can’t do anything wrong, you will eventually find those restrictions prohibitive.
 
-<img
-  alt="Shared responsibility model"
-  src="/docs/img/platform/shared-responsibility-model.png"
-  width="100%"
+<Image
+  alt="Diagram showing the shared responsibility model between Supabase and the customer. The customer is responsible for Application architecture and implementation, information and data, the database schema and user management. The responsibility for API rate-limiting, Postgres security controls, upgrades, performance tuning and resource allocation is shared. Supabase is responsible for Postgres backups and observability, operating system maintenance, infrastructure and the monitoring and security thereof."
+  src={{
+    light: '/docs/img/platform/shared-responsibility-model--light.png',
+    dark: '/docs/img/platform/shared-responsibility-model--dark.png',
+  }}
+  zoomable
 />
 
 To summarize, you are always responsible for:
