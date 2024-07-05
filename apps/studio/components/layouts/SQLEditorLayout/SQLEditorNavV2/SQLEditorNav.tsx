@@ -1,12 +1,18 @@
 import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { getContentById } from 'data/content/content-id-query'
 import { Snippet, SnippetDetail, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
-import { useRouter } from 'next/router'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProfile } from 'lib/profile'
+import uuidv4 from 'lib/uuid'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AlertDescription_Shadcn_,
@@ -21,12 +27,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import uuidv4 from 'lib/uuid'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { getContentById } from 'data/content/content-id-query'
 
 // Requirements
 // - Asynchronous loading
@@ -190,6 +190,19 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
     router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
+  // =================================
+  // [Joshen] useEffects kept at the bottom
+  // =================================
+
+  useEffect(() => {
+    if (id !== undefined && snapV2.loaded && snapV2.snippets[id] !== undefined) {
+      const snippet = snapV2.snippets[id].snippet
+      if (snippet.visibility === 'project') {
+        setShowSharedSnippets(true)
+      }
+    }
+  }, [id, snapV2.loaded])
+
   return (
     <>
       <Separator />
@@ -206,7 +219,7 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
             <CollapsibleContent_Shadcn_ className="pt-2">
               {numFavoriteSnippets === 0 ? (
                 <div className="mx-4">
-                  <Alert_Shadcn_>
+                  <Alert_Shadcn_ className="p-3">
                     <AlertTitle_Shadcn_ className="text-xs">No favorite queries</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="text-xs ">
                       Save a query to favorites for easy accessbility by clicking the{' '}
@@ -262,7 +275,7 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
             <CollapsibleContent_Shadcn_ className="pt-2">
               {numProjectSnippets === 0 ? (
                 <div className="mx-4">
-                  <Alert_Shadcn_>
+                  <Alert_Shadcn_ className="p-3">
                     <AlertTitle_Shadcn_ className="text-xs">No shared queries</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="text-xs ">
                       Share queries with your team by right-clicking on the query.
@@ -313,30 +326,41 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
           </span>
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_ className="pt-2">
-          <TreeView
-            data={privateSnippetsTreeState}
-            aria-label="private-snippets"
-            nodeRenderer={({ element, ...props }) => (
-              <SQLEditorTreeViewItem
-                {...props}
-                element={element}
-                onSelectDelete={() => {
-                  setShowDeleteModal(true)
-                  setSelectedSnippets([element.metadata as unknown as Snippet])
-                }}
-                onSelectRename={() => {
-                  setShowRenameModal(true)
-                  setSelectedSnippetToRename(element.metadata as Snippet)
-                }}
-                onSelectDownload={() => {
-                  setSelectedSnippetToDownload(element.metadata as Snippet)
-                }}
-                onSelectShare={() => {
-                  setSelectedSnippetToShare(element.metadata as Snippet)
-                }}
-              />
-            )}
-          />
+          {numPrivateSnippets === 0 ? (
+            <div className="mx-4">
+              <Alert_Shadcn_ className="p-3">
+                <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="text-xs">
+                  Queries will be automatically saved once you start writing in the editor.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </div>
+          ) : (
+            <TreeView
+              data={privateSnippetsTreeState}
+              aria-label="private-snippets"
+              nodeRenderer={({ element, ...props }) => (
+                <SQLEditorTreeViewItem
+                  {...props}
+                  element={element}
+                  onSelectDelete={() => {
+                    setShowDeleteModal(true)
+                    setSelectedSnippets([element.metadata as unknown as Snippet])
+                  }}
+                  onSelectRename={() => {
+                    setShowRenameModal(true)
+                    setSelectedSnippetToRename(element.metadata as Snippet)
+                  }}
+                  onSelectDownload={() => {
+                    setSelectedSnippetToDownload(element.metadata as Snippet)
+                  }}
+                  onSelectShare={() => {
+                    setSelectedSnippetToShare(element.metadata as Snippet)
+                  }}
+                />
+              )}
+            />
+          )}
         </CollapsibleContent_Shadcn_>
       </Collapsible_Shadcn_>
 
