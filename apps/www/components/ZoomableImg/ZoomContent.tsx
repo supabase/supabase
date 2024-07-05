@@ -1,11 +1,14 @@
-const ZoomContent = ({ img }: { img: React.ReactElement | null }) => {
+const ZoomContent = ({
+  img,
+}: //onUnzoom,
+any) => {
   return (
     <figure
-      className="
+      className={`
         [&_img]:rounded-md
         [&_img]:border
-        [&_img]:bg-default
-      "
+        [&_img]:bg-surface-100
+      `}
     >
       {img}
     </figure>

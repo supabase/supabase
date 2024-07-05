@@ -10,6 +10,11 @@ export interface StepLink {
   href: string
 }
 
+export interface ThemeImage {
+  dark?: string
+  light?: string
+}
+
 export interface StepProps {
   title: string
   icon?: string

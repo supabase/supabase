@@ -55,7 +55,8 @@ export const useTableDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { id, projectRef, schema } = variables
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, schema, true)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, schema, false)),
           queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           // invalidate all views from this schema

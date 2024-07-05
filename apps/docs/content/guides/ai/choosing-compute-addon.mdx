@@ -120,14 +120,15 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 
 </Admonition>
 
-<Image
-  alt="multi database"
-  src={{
-    light: '/docs/img/ai/instance-type/hnsw-dims--light.png',
-    dark: '/docs/img/ai/instance-type/hnsw-dims--dark.png',
-  }}
-  zoomable
-/>
+<div>
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/instance-type/hnsw-dims--light.png',
+      dark: '/docs/img/ai/instance-type/hnsw-dims--dark.png',
+    }}
+  />
+</div>
 
 ## IVFFlat
 
@@ -254,14 +255,15 @@ For 1,000,000 vectors 40 probes results to accuracy of 0.98. Note that exact val
 </TabPanel>
 </Tabs>
 
-<Image
-  alt="multi database"
-  src={{
-    light: '/docs/img/ai/going-prod/size-to-rps--light.png',
-    dark: '/docs/img/ai/going-prod/size-to-rps--dark.png',
-  }}
-  zoomable
-/>
+<div>
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/going-prod/size-to-rps--light.png',
+      dark: '/docs/img/ai/going-prod/size-to-rps--dark.png',
+    }}
+  />
+</div>
 
 <Admonition type="note">
 
@@ -290,27 +292,27 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 >
 <TabPanel id="hnsw" label="HNSW">
 
-<Image
-  alt="multi database"
-  src={{
-    light: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png',
-    dark: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png',
-  }}
-  zoomable
-/>
+<div>
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png',
+      dark: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png',
+    }}
+  />
+</div>
 
 </TabPanel>
 <TabPanel id="ivfflat" label="IVFFlat">
-  
-<Image
-  alt="multi database"
-  src={{
-    light: '/docs/img/ai/instance-type/lists-for-1m--light.png',
-    dark: '/docs/img/ai/instance-type/lists-for-1m--dark.png',
-  }}
-  zoomable
-/>
-
+<div>
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/instance-type/lists-for-1m--light.png',
+      dark: '/docs/img/ai/instance-type/lists-for-1m--dark.png',
+    }}
+  />
+</div>
 </TabPanel>
 </Tabs>
 
@@ -320,15 +322,15 @@ Check out more tips and the complete step-by-step guide in [Going to Production 
 
 We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 
-<Image
-  alt="multi database"
-  src={{
-    light: '/docs/img/ai/instance-type/vecs-benchmark--light.png',
-    dark: '/docs/img/ai/instance-type/vecs-benchmark--dark.png',
-  }}
-  className="max-h-[650px]"
-  zoomable
-/>
+<div>
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/instance-type/vecs-benchmark--light.png',
+      dark: '/docs/img/ai/instance-type/vecs-benchmark--dark.png',
+    }}
+  />
+</div>
 
 Each test is run for a minimum of 30-40 minutes. They include a series of experiments executed at different concurrency levels to measure the engine's performance under different load types. The results are then averaged.
 

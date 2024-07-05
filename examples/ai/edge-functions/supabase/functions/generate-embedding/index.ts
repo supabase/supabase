@@ -1,6 +1,6 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts";
 
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.42.0";
 import { Database, Tables } from "../_shared/database.types.ts";
 
 type EmbeddingsRecord = Tables<"embeddings">;

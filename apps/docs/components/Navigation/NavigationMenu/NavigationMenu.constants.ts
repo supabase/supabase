@@ -735,10 +735,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/column-level-security',
         },
         {
-          name: 'Hardening the Data API',
-          url: '/guides/database/hardening-data-api',
-        },
-        {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
@@ -750,6 +746,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Superuser Access and Unsupported Operations',
           url: '/guides/database/postgres/roles-superuser',
+        },
+        {
+          name: 'Column level privileges',
+          url: '/guides/database/postgres/column-level-security',
         },
       ],
     },
