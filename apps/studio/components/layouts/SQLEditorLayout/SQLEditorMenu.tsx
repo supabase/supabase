@@ -48,10 +48,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   const [searchText, setSearchText] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
-  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
-    'sql-editor-sort',
-    'created-at'
-  )
+  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -155,10 +152,10 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
                       value={sort}
                       onValueChange={(value: any) => setSort(value)}
                     >
-                      <InnerSideBarFilterSortDropdownItem key="alphabetical" value="alphabetical">
+                      <InnerSideBarFilterSortDropdownItem key="name" value="name">
                         Alphabetical
                       </InnerSideBarFilterSortDropdownItem>
-                      <InnerSideBarFilterSortDropdownItem key="created-at" value="created-at">
+                      <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
                         Created At
                       </InnerSideBarFilterSortDropdownItem>
                     </InnerSideBarFilterSortDropdown>
@@ -221,7 +218,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
           </div>
 
           {enableFolders ? (
-            <SQLEditorNavV2 searchText={searchText} />
+            <SQLEditorNavV2 sort={sort} searchText={searchText} />
           ) : (
             <SQLEditorNavV1
               searchText={searchText}
