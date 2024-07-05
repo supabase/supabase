@@ -73,7 +73,6 @@ function parseFnsList(rawSpec: Json): Array<{ id: unknown }> {
 
 interface ClientSdkNavigationProps {
   name: string
-  menuId: MenuId
   menuData: { icon?: string }
   libPath: string
   version: string
@@ -83,14 +82,12 @@ interface ClientSdkNavigationProps {
 
 async function ClientSdkNavigation({
   name,
-  menuId,
   menuData,
   libPath,
   version,
   specFile,
   excludeName,
 }: ClientSdkNavigationProps) {
-  const menu = getMenuById(menuId)
   const navSections = await genClientSdkNav(specFile, excludeName)
 
   const allVersionsMeta = REFERENCES[libPath]

@@ -14,6 +14,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '..')
 export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
+export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 
 export type GuideFrontmatter = {
