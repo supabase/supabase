@@ -49,23 +49,7 @@ We do not wrap Recharts. This means you're not locked into an abstraction. When 
 
 </Callout>
 
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-<Steps>
-
-<Step>Run the following command to install `chart.tsx`</Step>
-
-```bash
-npx shadcn-ui@latest add chart
-```
-
-<Step>Add the following colors to your CSS file</Step>
+Add the following colors to your CSS file
 
 ```css
 @layer base {
@@ -86,52 +70,6 @@ npx shadcn-ui@latest add chart
   }
 }
 ```
-
-</Steps>
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Install the following dependencies:</Step>
-
-```bash
-npm install recharts
-```
-
-<Step>Copy and paste the following code into `components/ui/chart.tsx`.</Step>
-
-<ComponentSource name="chart" />
-
-<Step>Add the following colors to your CSS file</Step>
-
-```css
-@layer base {
-  :root {
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
-
-  .dark {
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-```
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
 
 ## Your First Chart
 
