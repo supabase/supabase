@@ -203,6 +203,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           setShowPolicyAiEditor(false)
           setSelectedPolicyToEdit(undefined)
         }}
+        authContext="database"
       />
     </div>
   )

@@ -11,6 +11,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import type { LogData } from './Messages.types'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 
 function reducer(
   state: LogData[],
@@ -92,6 +93,8 @@ export const useRealtimeMessages = (
   // Instantiate our client with the Realtime server and params to connect with
   let [client, setClient] = useState<RealtimeClient>()
   let [channel, setChannel] = useState<RealtimeChannel | undefined>()
+
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   useEffect(() => {
     if (!enabled) {
@@ -175,8 +178,18 @@ export const useRealtimeMessages = (
         // Let LiveView know we connected so we can update the button text
         // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
 
+        const role = roleImpersonationState.role?.role
+        const computedRole =
+          role === undefined
+            ? 'service_role_'
+            : role === 'anon'
+              ? 'anon_role_'
+              : role === 'authenticated'
+                ? 'authenticated_role_'
+                : 'user_name_'
+
         if (enablePresence) {
-          const name = 'user_name_' + Math.floor(Math.random() * 100)
+          const name = computedRole + Math.floor(Math.random() * 100)
           newChannel.send({
             type: 'presence',
             event: 'TRACK',
@@ -185,12 +198,12 @@ export const useRealtimeMessages = (
         }
       } else if (status === 'CHANNEL_ERROR') {
         toast.error(
-          'Failed to connect to the channel: This may be due to restrictive RLS policies. Check your role and try again.'
+          `Failed to connect to the channel ${channelName}: This may be due to restrictive RLS policies. Check your role and try again.`
         )
 
         newChannel.unsubscribe()
         setChannel(undefined)
-        setRealtimeConfig({ ...config, enabled: false })
+        setRealtimeConfig({ ...config, channelName: '', enabled: false })
       }
     })
 

@@ -1,6 +1,5 @@
 import { type Metadata } from 'next'
 import { type PropsWithChildren } from 'react'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
 
@@ -12,7 +11,7 @@ const metadata: Metadata = {
 }
 
 const NotFoundLayout = ({ children }: PropsWithChildren) => (
-  <MainSkeleton menuId={MenuId.Home}>
+  <MainSkeleton>
     <LayoutMainContent>{children}</LayoutMainContent>
   </MainSkeleton>
 )

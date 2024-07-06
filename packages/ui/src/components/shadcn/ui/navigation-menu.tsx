@@ -6,7 +6,6 @@ import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
-import { buttonVariants } from './../../Button/Button'
 
 interface NavigationMenuProps
   extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
