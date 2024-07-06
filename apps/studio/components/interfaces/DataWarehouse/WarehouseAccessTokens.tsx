@@ -102,7 +102,7 @@ const AccessTokenItem = ({
   )
 }
 
-const WarehouseAccessTokens = () => {
+export const WarehouseAccessTokens = () => {
   const isProjectActive = useIsProjectActive()
   const params = useParams()
   const projectRef = params.ref as string
@@ -139,7 +139,7 @@ const WarehouseAccessTokens = () => {
   const isLoading = deleteLoading || createLoading
 
   return (
-    <section className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
+    <section className="flex flex-col gap-y-10 py-6 pb-32">
       <FormHeader
         className="!mb-0"
         title="Warehouse access tokens"
