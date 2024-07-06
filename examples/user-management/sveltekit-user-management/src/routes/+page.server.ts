@@ -22,7 +22,7 @@ export const actions: Actions = {
 		} = event
 		const formData = await request.formData()
 		const email = formData.get('email') as string
-    const validEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
+    const validEmail = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
     
 		if (!validEmail) {
 			return fail(400, { errors: { email: "Please enter a valid email address" }, email })

@@ -326,7 +326,7 @@ export const actions: Actions = {
     } = event
     const formData = await request.formData()
     const email = formData.get('email') as string
-    const validEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
+    const validEmail = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
 
     if (!validEmail) {
       return fail(400, { errors: { email: 'Please enter a valid email address' }, email })
@@ -358,7 +358,7 @@ Before we proceed, let's change the email template to support sending a token ha
 
 - Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
 - Select `Confirm signup` template.
-- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 - Repeat the previous step for `Magic link` template.
 
 <Admonition type="tip">
@@ -377,8 +377,8 @@ In the following code snippet, we perform the following steps:
 - Exchange this `token_hash` for a session, which we store in storage (in this case, cookies).
 - Finally, the user is redirected to the `account` page or the `error` page.
 
-```ts src/routes/api/auth/confirm/+server.ts
-// src/routes/api/auth/confirm/+server.ts
+```ts src/routes/auth/confirm/+server.ts
+// src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
