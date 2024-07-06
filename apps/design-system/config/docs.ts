@@ -174,6 +174,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Chart',
+          href: '/docs/components/chart',
+          items: [],
+        },
+        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
