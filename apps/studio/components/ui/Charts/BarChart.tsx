@@ -13,7 +13,7 @@ import {
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
