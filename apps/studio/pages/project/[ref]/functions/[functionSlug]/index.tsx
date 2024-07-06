@@ -5,7 +5,6 @@ import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button } from 'ui'
 
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
@@ -15,9 +14,10 @@ import NoPermission from 'components/ui/NoPermission'
 import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
 import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useCheckPermissions } from 'hooks'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {

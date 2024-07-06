@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-
 import { AlertCircleIcon } from 'lucide-react'
+import Link from 'next/link'
+
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSelectedOrganization } from 'hooks'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const BranchingPlanNotice = () => {
   const snap = useAppStateSnapshot()

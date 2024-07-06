@@ -22,12 +22,14 @@ export type UtilityPanelProps = {
   onDebug: () => void
 }
 
-const DEFAULT_CHART_CONFIG = {
+const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
   cumulative: false,
   xKey: '',
   yKey: '',
-} as const
+  showLabels: false,
+  showGrid: false,
+}
 
 const UtilityPanel = ({
   id,

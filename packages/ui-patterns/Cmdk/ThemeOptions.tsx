@@ -1,5 +1,5 @@
 import { CommandGroup } from 'cmdk'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 import ChildItem from './ChildItem'
 import { useTheme } from 'next-themes'
 import { Theme, themes } from 'ui/src/components/ThemeProvider/themes'

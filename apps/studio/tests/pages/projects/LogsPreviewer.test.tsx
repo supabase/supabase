@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 dayjs.extend(utc)
 
 import { useParams } from 'common'
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { logDataFixture } from '../../fixtures'

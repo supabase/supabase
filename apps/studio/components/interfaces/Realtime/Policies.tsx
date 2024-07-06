@@ -1,13 +1,13 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
+import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { FormHeader } from 'components/ui/Forms'
 
 export const RealtimePolicies = () => {
   const { project } = useProjectContext()
@@ -66,6 +66,7 @@ export const RealtimePolicies = () => {
         schema="realtime"
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => setShowPolicyEditor(false)}
+        authContext="realtime"
       />
     </div>
   )

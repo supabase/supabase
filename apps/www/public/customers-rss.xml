@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 03 Jun 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 11 Jun 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/maergo</guid>
+  <title>Maergo&apos;s Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving</title>
+  <link>https://supabase.com/customers/maergo</link>
+  <description>Discover how Maergo, a nationwide expedited parcel delivery service, reduced its codebase by 90%, decreased deployment times to just seconds, and achieved unprecedented scalability with Supabase.</description>
+  <pubDate>Tue, 11 Jun 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/voypost</guid>
   <title>Voypost uses Supabase’s strong relational model to overcome NoSQL challenges</title>
   <link>https://supabase.com/customers/voypost</link>
@@ -18,7 +25,7 @@
   <guid>https://supabase.com/customers/tinloof</guid>
   <title>Streamlining Success: How Tinloof Scaled Seamlessly with Supabase</title>
   <link>https://supabase.com/customers/tinloof</link>
-  <description>Discover Tinloof, how a full-stack development agency, managed and scaled backend services using Supabase, without having to dedicate resources to infrastructure management.</description>
+  <description>Discover how Shotgun, an event ticketing platform with over 3 million users, reduced costs and consolidated systems through migration to Supabase.</description>
   <pubDate>Mon, 03 Jun 2024 22:00:00 GMT</pubDate>
 </item>
 <item>

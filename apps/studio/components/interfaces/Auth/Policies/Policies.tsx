@@ -6,7 +6,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { PolicyTableRow } from 'components/interfaces/Auth/Policies'
+import PolicyTableRow from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'

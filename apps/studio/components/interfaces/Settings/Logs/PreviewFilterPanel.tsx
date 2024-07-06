@@ -8,9 +8,14 @@ import { useParams } from 'common'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
-import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {

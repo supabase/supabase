@@ -1,5 +1,5 @@
 import Reports from 'components/interfaces/Reports/Reports'
-import { ReportsLayout } from 'components/layouts'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (

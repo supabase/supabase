@@ -15,7 +15,7 @@ export const generateSettingsMenu = (
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}/building`
+  const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Button, IconCheck, IconClipboard, IconSave } from 'ui'
-import { useCommandMenu } from '../CommandMenuProvider'
+import { useCommandMenu } from '../CommandMenuContext'
 import { stripIndent } from 'common-tags'
 import { formatTitle } from './GenerateSQL.utils'
 import { Message, MessageRole, MessageStatus, queryAi } from './../AiCommand'

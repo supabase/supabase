@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,

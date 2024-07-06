@@ -1,13 +1,12 @@
 import { type PropsWithChildren } from 'react'
 
 import HomePageCover from '~/components/HomePageCover'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { LayoutMainContent } from './DefaultLayout'
 import { MainSkeleton } from './MainSkeleton'
 
 const HomeLayout = ({ children }: PropsWithChildren) => {
   return (
-    <MainSkeleton menuId={MenuId.Home}>
+    <MainSkeleton>
       <article>
         <HomePageCover title="Supabase Documentation" />
         <LayoutMainContent>
