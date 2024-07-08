@@ -4,6 +4,7 @@ import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -79,7 +80,7 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  const response = await fetch(
+  const response = await fetchRevalidatePerDay(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
   )
 
