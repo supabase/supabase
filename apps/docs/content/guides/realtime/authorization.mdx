@@ -110,12 +110,12 @@ to authenticated
 using (
 exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.topic())
+      user_id = (select auth.uid())
+      and topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -159,12 +159,12 @@ to authenticated
 with check (
   exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.topic())
+      user_id = (select auth.uid())
+      and topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -186,12 +186,12 @@ to authenticated
 using (
   exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.topic())
+      user_id = (select auth.uid())
+      and topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -209,12 +209,12 @@ to authenticated
 with check (
   exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.name = (select realtime.topic())
+      user_id = (select auth.uid())
+      and name = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -236,12 +236,12 @@ to authenticated
 using (
   exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.topic = (select realtime.topic())
+      user_id = (select auth.uid())
+      and topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
@@ -259,12 +259,12 @@ to authenticated
 with check (
   exists (
     select
-      ru.user_id
+      user_id
     from
-      rooms_users ru
+      rooms_users
     where
-      ru.user_id = (select auth.uid())
-      and ru.name = (select realtime.topic())
+      user_id = (select auth.uid())
+      and name = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
