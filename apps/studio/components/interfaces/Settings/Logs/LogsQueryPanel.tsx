@@ -134,7 +134,7 @@ const LogsQueryPanel = ({
                     Templates
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent side="bottom" align="start">
                   {warehouseTemplates.map((template) => (
                     <DropdownMenuItem
                       key={template.name}
