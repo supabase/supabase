@@ -360,7 +360,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="absolute z-10 top-9.5 w-full bg-background py-3">
+      <div className="absolute z-10 top-[45px] w-full bg-background py-2">
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
