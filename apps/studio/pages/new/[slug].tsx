@@ -588,262 +588,252 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
-                      <>
-                        <Panel.Content>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="instanceSize"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                layout="horizontal"
-                                label={
-                                  <div className="space-y-4">
-                                    <span>Compute Size</span>
-
-                                    <div className="flex flex-col space-y-2">
-                                      <Link
-                                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                                        target="_blank"
-                                      >
-                                        <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                          <p className="text-sm m-0">Compute Add-Ons</p>
-                                          <ExternalLink size={16} strokeWidth={1.5} />
-                                        </div>
-                                      </Link>
-                                    </div>
-                                  </div>
-                                }
-                                description={
-                                  <>
-                                    <p>
-                                      The size for your dedicated database. You can change this
-                                      later.
-                                    </p>
-                                  </>
-                                }
-                              >
-                                <Select_Shadcn_
-                                  value={field.value}
-                                  onValueChange={(value) => field.onChange(value)}
-                                >
-                                  <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                    <SelectValue_Shadcn_ placeholder="Select an instance size" />
-                                  </SelectTrigger_Shadcn_>
-                                  <SelectContent_Shadcn_>
-                                    <SelectGroup_Shadcn_>
-                                      {sizes
-                                        .filter((option) =>
-                                          instanceSizeSpecs[option].cloud_providers.includes(
-                                            form.getValues('cloudProvider') as CloudProvider
-                                          )
-                                        )
-                                        .map((option) => {
-                                          return (
-                                            <SelectItem_Shadcn_ key={option} value={option}>
-                                              <div className="flex flex-row i gap-2">
-                                                <div className="text-center w-[80px]">
-                                                  <Badge
-                                                    variant={
-                                                      option === 'micro' ? 'default' : 'brand'
-                                                    }
-                                                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                                                  >
-                                                    {instanceSizeSpecs[option].label}
-                                                  </Badge>
-                                                </div>
-                                                <div className="text-sm">
-                                                  <span className="text-foreground">
-                                                    {instanceSizeSpecs[option].ram} RAM /{' '}
-                                                    {instanceSizeSpecs[option].cpu}{' '}
-                                                    {getCloudProviderArchitecture(
-                                                      form.getValues(
-                                                        'cloudProvider'
-                                                      ) as CloudProvider
-                                                    )}{' '}
-                                                    CPU
-                                                  </span>
-                                                  <p className="text-xs text-muted instance-details">
-                                                    ${instanceSizeSpecs[option].priceHourly}/hour
-                                                    (~$
-                                                    {instanceSizeSpecs[option].priceMonthly}/month)
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </SelectItem_Shadcn_>
-                                          )
-                                        })}
-                                    </SelectGroup_Shadcn_>
-                                  </SelectContent_Shadcn_>
-                                </Select_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                          <div>
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="instanceSize"
+                          render={({ field }) => (
                             <FormItemLayout
-                              className="pt-4"
+                              layout="horizontal"
                               label={
                                 <div className="space-y-4">
-                                  <span>Compute Billing</span>
+                                  <span>Compute Size</span>
+
                                   <div className="flex flex-col space-y-2">
                                     <Link
-                                      href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                       target="_blank"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Docs</p>
+                                        <p className="text-sm m-0">Compute Add-Ons</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
                                   </div>
                                 </div>
                               }
-                              layout="horizontal"
+                              description={
+                                <>
+                                  <p>
+                                    The size for your dedicated database. You can change this later.
+                                  </p>
+                                </>
+                              }
                             >
-                              <div className="flex justify-between mr-2">
-                                <span>Additional Monthly Compute Costs</span>
-                                <div className="text-brand flex gap-1 items-center">
-                                  {organizationProjects.length > 0 ? (
-                                    <>
-                                      <span>${additionalMonthlySpend}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="text-foreground-lighter line-through">
-                                        $
-                                        {
-                                          instanceSizeSpecs[instanceSize as DbInstanceSize]!
-                                            .priceMonthly
-                                        }
-                                      </span>
-                                      <span>${additionalMonthlySpend}</span>
-                                    </>
-                                  )}
-                                  <InfoTooltip side="top" className="max-w-[450px] p-0">
-                                    <Table className="mt-2">
-                                      <TableHeader className="[&_th]:h-7">
-                                        <TableRow className="py-2">
-                                          <TableHead className="w-[170px]">Project</TableHead>
-                                          <TableHead>Compute Size</TableHead>
-                                          <TableHead className="text-right">
-                                            Monthly Costs
-                                          </TableHead>
-                                        </TableRow>
-                                      </TableHeader>
-                                      <TableBody className="[&_td]:py-2">
-                                        {organizationProjects.map((project) => (
-                                          <TableRow
-                                            key={project.ref}
-                                            className="text-foreground-light"
-                                          >
-                                            <TableCell className="w-[170px] truncate">
-                                              {project.name}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                              {instanceLabel(project.infra_compute_size)}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                              ${monthlyInstancePrice(project.infra_compute_size)}
-                                            </TableCell>
-                                          </TableRow>
-                                        ))}
-
-                                        <TableRow>
-                                          <TableCell className="w-[170px] flex gap-2">
-                                            <span className="truncate">
-                                              {form.getValues('projectName')
-                                                ? form.getValues('projectName')
-                                                : 'New project'}
-                                            </span>
-                                            <Badge size={'small'} variant={'default'}>
-                                              NEW
-                                            </Badge>
-                                          </TableCell>
-                                          <TableCell className="text-center">
-                                            {instanceLabel(instanceSize)}
-                                          </TableCell>
-                                          <TableCell className="text-right">
-                                            ${monthlyInstancePrice(instanceSize)}
-                                          </TableCell>
-                                        </TableRow>
-                                      </TableBody>
-                                    </Table>
-                                    <PopoverSeparator />
-                                    <Table className="mt-3">
-                                      <TableHeader className="[&_th]:h-7">
-                                        <TableRow>
-                                          <TableHead colSpan={2}>Compute Credits</TableHead>
-                                          <TableHead colSpan={1} className="text-right">
-                                            -$10
-                                          </TableHead>
-                                        </TableRow>
-                                      </TableHeader>
-                                      <TableBody className="[&_td]:py-2">
-                                        <TableRow className="text-foreground">
-                                          <TableCell colSpan={2}>
-                                            Total Monthly Compute Costs
-                                            {/**
-                                             * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                             *
-                                             * Will be adjusted in the future [kevin]
-                                             */}
-                                            {organizationProjects.length > 0 && (
-                                              <p className="text-xs text-foreground-lighter">
-                                                Excluding Read replicas
-                                              </p>
-                                            )}
-                                          </TableCell>
-                                          <TableCell colSpan={1} className="text-right">
-                                            ${monthlyComputeCosts}
-                                          </TableCell>
-                                        </TableRow>
-                                      </TableBody>
-                                    </Table>
-
-                                    <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
-                                      <p>
-                                        Compute is charged usage-based whenever your billing cycle
-                                        resets. Given compute charges are hourly, your invoice will
-                                        contain "Compute Hours" for each hour a project ran on a
-                                        specific instance size.
-                                      </p>
-                                      {monthlyComputeCosts > 0 && (
-                                        <p>
-                                          Compute costs are applied on top of your subscription plan
-                                          costs.
-                                        </p>
-                                      )}
+                              <Select_Shadcn_
+                                value={field.value}
+                                onValueChange={(value) => field.onChange(value)}
+                              >
+                                <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
+                                  <SelectValue_Shadcn_ placeholder="Select an instance size" />
+                                </SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    {sizes
+                                      .filter((option) =>
+                                        instanceSizeSpecs[option].cloud_providers.includes(
+                                          form.getValues('cloudProvider') as CloudProvider
+                                        )
+                                      )
+                                      .map((option) => {
+                                        return (
+                                          <SelectItem_Shadcn_ key={option} value={option}>
+                                            <div className="flex flex-row i gap-2">
+                                              <div className="text-center w-[80px]">
+                                                <Badge
+                                                  variant={option === 'micro' ? 'default' : 'brand'}
+                                                  className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                                >
+                                                  {instanceSizeSpecs[option].label}
+                                                </Badge>
+                                              </div>
+                                              <div className="text-sm">
+                                                <span className="text-foreground">
+                                                  {instanceSizeSpecs[option].ram} RAM /{' '}
+                                                  {instanceSizeSpecs[option].cpu}{' '}
+                                                  {getCloudProviderArchitecture(
+                                                    form.getValues('cloudProvider') as CloudProvider
+                                                  )}{' '}
+                                                  CPU
+                                                </span>
+                                                <p className="text-xs text-muted instance-details">
+                                                  ${instanceSizeSpecs[option].priceHourly}/hour (~$
+                                                  {instanceSizeSpecs[option].priceMonthly}/month)
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </SelectItem_Shadcn_>
+                                        )
+                                      })}
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <div>
+                          <FormItemLayout
+                            className="pt-4"
+                            label={
+                              <div className="space-y-4">
+                                <span>Compute Billing</span>
+                                <div className="flex flex-col space-y-2">
+                                  <Link
+                                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                                    target="_blank"
+                                  >
+                                    <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                      <p className="text-sm m-0">Docs</p>
+                                      <ExternalLink size={16} strokeWidth={1.5} />
                                     </div>
-                                  </InfoTooltip>
+                                  </Link>
                                 </div>
                               </div>
-
-                              <div className="mt-2 text-foreground-lighter space-y-1">
-                                {additionalMonthlySpend > 0 && availableComputeCredits === 0 ? (
-                                  <p>
-                                    Your monthly spend will increase, and can be more than above if
-                                    you exceed your plan's usage quota. Your organization includes
-                                    $10/month of compute credits, which you already exceed with your
-                                    existing projects.
-                                  </p>
-                                ) : additionalMonthlySpend > 0 && availableComputeCredits > 0 ? (
-                                  <p>
-                                    Your monthly spend will increase, and can be more than above if
-                                    you exceed your plan's usage quota. Your organization includes
-                                    $10/month of compute credits, which you exceed with the selected
-                                    compute size.
-                                  </p>
+                            }
+                            layout="horizontal"
+                          >
+                            <div className="flex justify-between mr-2">
+                              <span>Additional Monthly Compute Costs</span>
+                              <div className="text-brand flex gap-1 items-center">
+                                {organizationProjects.length > 0 ? (
+                                  <>
+                                    <span>${additionalMonthlySpend}</span>
+                                  </>
                                 ) : (
-                                  <p>
-                                    Your monthly spend won't increase, unless you exceed your plan's
-                                    usage quota. Your organization includes $10/month of compute
-                                    credits, which cover this project.
-                                  </p>
+                                  <>
+                                    <span className="text-foreground-lighter line-through">
+                                      $
+                                      {
+                                        instanceSizeSpecs[instanceSize as DbInstanceSize]!
+                                          .priceMonthly
+                                      }
+                                    </span>
+                                    <span>${additionalMonthlySpend}</span>
+                                  </>
                                 )}
+                                <InfoTooltip side="top" className="max-w-[450px] p-0">
+                                  <Table className="mt-2">
+                                    <TableHeader className="[&_th]:h-7">
+                                      <TableRow className="py-2">
+                                        <TableHead className="w-[170px]">Project</TableHead>
+                                        <TableHead>Compute Size</TableHead>
+                                        <TableHead className="text-right">Monthly Costs</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="[&_td]:py-2">
+                                      {organizationProjects.map((project) => (
+                                        <TableRow
+                                          key={project.ref}
+                                          className="text-foreground-light"
+                                        >
+                                          <TableCell className="w-[170px] truncate">
+                                            {project.name}
+                                          </TableCell>
+                                          <TableCell className="text-center">
+                                            {instanceLabel(project.infra_compute_size)}
+                                          </TableCell>
+                                          <TableCell className="text-right">
+                                            ${monthlyInstancePrice(project.infra_compute_size)}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+
+                                      <TableRow>
+                                        <TableCell className="w-[170px] flex gap-2">
+                                          <span className="truncate">
+                                            {form.getValues('projectName')
+                                              ? form.getValues('projectName')
+                                              : 'New project'}
+                                          </span>
+                                          <Badge size={'small'} variant={'default'}>
+                                            NEW
+                                          </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                          {instanceLabel(instanceSize)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                          ${monthlyInstancePrice(instanceSize)}
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableBody>
+                                  </Table>
+                                  <PopoverSeparator />
+                                  <Table className="mt-3">
+                                    <TableHeader className="[&_th]:h-7">
+                                      <TableRow>
+                                        <TableHead colSpan={2}>Compute Credits</TableHead>
+                                        <TableHead colSpan={1} className="text-right">
+                                          -$10
+                                        </TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="[&_td]:py-2">
+                                      <TableRow className="text-foreground">
+                                        <TableCell colSpan={2}>
+                                          Total Monthly Compute Costs
+                                          {/**
+                                           * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                           *
+                                           * Will be adjusted in the future [kevin]
+                                           */}
+                                          {organizationProjects.length > 0 && (
+                                            <p className="text-xs text-foreground-lighter">
+                                              Excluding Read replicas
+                                            </p>
+                                          )}
+                                        </TableCell>
+                                        <TableCell colSpan={1} className="text-right">
+                                          ${monthlyComputeCosts}
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableBody>
+                                  </Table>
+
+                                  <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
+                                    <p>
+                                      Compute is charged usage-based whenever your billing cycle
+                                      resets. Given compute charges are hourly, your invoice will
+                                      contain "Compute Hours" for each hour a project ran on a
+                                      specific instance size.
+                                    </p>
+                                    {monthlyComputeCosts > 0 && (
+                                      <p>
+                                        Compute costs are applied on top of your subscription plan
+                                        costs.
+                                      </p>
+                                    )}
+                                  </div>
+                                </InfoTooltip>
                               </div>
-                            </FormItemLayout>
-                          </div>
-                        </Panel.Content>
-                      </>
+                            </div>
+
+                            <div className="mt-2 text-foreground-lighter space-y-1">
+                              {additionalMonthlySpend > 0 && availableComputeCredits === 0 ? (
+                                <p>
+                                  Your monthly spend will increase, and can be more than above if
+                                  you exceed your plan's usage quota. Your organization includes
+                                  $10/month of compute credits, which you already exceed with your
+                                  existing projects.
+                                </p>
+                              ) : additionalMonthlySpend > 0 && availableComputeCredits > 0 ? (
+                                <p>
+                                  Your monthly spend will increase, and can be more than above if
+                                  you exceed your plan's usage quota. Your organization includes
+                                  $10/month of compute credits, which you exceed with the selected
+                                  compute size.
+                                </p>
+                              ) : (
+                                <p>
+                                  Your monthly spend won't increase, unless you exceed your plan's
+                                  usage quota. Your organization includes $10/month of compute
+                                  credits, which cover this project.
+                                </p>
+                              )}
+                            </div>
+                          </FormItemLayout>
+                        </div>
+                      </Panel.Content>
                     )}
 
                     <Panel.Content>
