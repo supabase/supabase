@@ -493,7 +493,6 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
  */
 export function useAutoInputFocus() {
   const [input, setInput] = React.useState<HTMLInputElement>()
-  const isMobile = useBreakpoint()
 
   // Use a callback-style ref to access the element when it mounts
   const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
@@ -504,14 +503,14 @@ export function useAutoInputFocus() {
       // due to order of operations
       setTimeout(() => {
         inputElement.focus()
-      }, 10)
+      }, 100)
     }
   }, [])
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (!isMobile && !e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
         input?.focus()
       }
     }

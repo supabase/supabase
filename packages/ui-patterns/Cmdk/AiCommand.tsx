@@ -31,7 +31,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
 import { StatusIcon } from '../Icons/StatusIcons'
-import { useBreakpoint } from 'common'
+import { isBrowser } from 'common'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -321,6 +321,7 @@ export function queryAi(messages: Message[], timeout = 0) {
 
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const isMobile = isBrowser && window.screen.width <= 480
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
@@ -354,7 +355,6 @@ const AiCommand = () => {
       handleSubmit(search)
     }
   }, [])
-  const isMobile = useBreakpoint()
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
 
@@ -363,8 +363,8 @@ const AiCommand = () => {
       <div className="absolute z-10 top-[45px] w-full bg-background py-2">
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
-          inputRef={inputRef}
-          autoFocus={!isMobile}
+          // inputRef={inputRef}
+          autoFocus={isMobile ? false : true}
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
