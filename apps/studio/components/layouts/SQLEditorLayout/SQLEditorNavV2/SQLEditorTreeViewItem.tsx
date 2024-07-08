@@ -78,10 +78,11 @@ export const SQLEditorTreeViewItem = ({
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}
+            // [Joshen] Do not shift getNodeProps below onClick
+            {...getNodeProps()}
             onClick={() => {
               if (!isBranch) router.push(`/project/${ref}/sql/${element.id}`)
             }}
-            {...getNodeProps()}
           />
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>

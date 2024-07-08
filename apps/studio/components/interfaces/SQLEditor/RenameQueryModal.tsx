@@ -12,6 +12,7 @@ import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.
 import { Snippet } from 'data/content/sql-folders-query'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useFlag } from 'hooks/ui/useFlag'
+import { getContentById } from 'data/content/content-id-query'
 
 export interface RenameQueryModalProps {
   snippet?: SqlSnippet | Snippet
@@ -58,6 +59,16 @@ const RenameQueryModal = ({
   const generateTitle = async () => {
     if (enableFolders) {
       // [Joshen TODO] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+      if ('content' in snippet) {
+        titleSql({ sql: snippet.content.sql })
+      } else {
+        try {
+          const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+          titleSql({ sql: content.sql })
+        } catch (error) {
+          toast.error('Unable to generate title based on query contents')
+        }
+      }
     } else {
       if ('content' in snippet) titleSql({ sql: snippet.content.sql })
     }
@@ -87,7 +98,10 @@ const RenameQueryModal = ({
     }
   }
 
-  useEffect(() => setNameInput(name), [name])
+  useEffect(() => {
+    setNameInput(name)
+    setDescriptionInput(description)
+  }, [snippet.id])
 
   return (
     <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
