@@ -735,7 +735,7 @@ const Wizard: NextPageWithLayout = () => {
                     <Panel.Content>
                       <Collapsible_Shadcn_>
                         <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
-                          Advanced options
+                          Security options
                           <ChevronRight
                             size={16}
                             strokeWidth={1}
