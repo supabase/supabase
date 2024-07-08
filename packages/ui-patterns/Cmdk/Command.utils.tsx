@@ -139,8 +139,8 @@ export const CommandDialog = ({
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
         className={cn(
-          'absolute my-0 mx-auto rounded-t-lg overflow-y-scroll',
-          'h-[80dvh] md:max-h-[450px] inset-0 top-[20dvh] md:top-auto md:bottom-auto',
+          'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
+          'h-[80dvh] md:max-h-[450px] mt-[20vh] md:mt-0 left-0 bottom-0 md:bottom-auto',
           'place-self-start md:place-self-auto',
           isOpen && '!animate-in !slide-in-from-bottom !duration-300',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
