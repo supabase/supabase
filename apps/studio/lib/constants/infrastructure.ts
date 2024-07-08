@@ -34,7 +34,7 @@ export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
-const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -69,7 +69,7 @@ export const PROVIDERS = {
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
@@ -79,12 +79,12 @@ export const PROJECT_STATUS: {
   GOING_DOWN: 'GOING_DOWN',
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
+  RESTARTING: 'RESTARTING',
   RESTORING: 'RESTORING',
+  RESTORE_FAILED: 'RESTORE_FAILED',
   UPGRADING: 'UPGRADING',
-  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
-  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
+  PAUSE_FAILED: 'PAUSE_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

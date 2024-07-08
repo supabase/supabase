@@ -9,7 +9,7 @@ import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { SupaRow } from '../../types'
-import { NullValue } from '../common'
+import { NullValue } from '../common/NullValue'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   projectRef?: string

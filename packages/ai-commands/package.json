@@ -34,6 +34,6 @@
     "sql-formatter": "^15.0.2",
     "ts-jest": "^29.1.1",
     "tsconfig": "*",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   }
 }

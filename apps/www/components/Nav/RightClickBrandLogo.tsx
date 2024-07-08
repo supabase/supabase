@@ -107,7 +107,7 @@ const RightClickBrandLogo = () => {
       >
         {menuItems.map((section, sectionIdx) => (
           <Fragment key={`cxtMenu-section-${sectionIdx}`}>
-            {sectionIdx !== 0 && <DropdownSeperator />}
+            {sectionIdx !== 0 && <DropdownSeparator />}
             <div className="p-1">
               {section.map((menuItem, i) => (
                 <DropdownMenuItem
@@ -144,7 +144,7 @@ const RightClickBrandLogo = () => {
   )
 }
 
-const DropdownSeperator = () => <div className="h-px w-full bg-border" />
+const DropdownSeparator = () => <div className="h-px w-full bg-border" />
 
 interface MenuItemProps {
   label: string

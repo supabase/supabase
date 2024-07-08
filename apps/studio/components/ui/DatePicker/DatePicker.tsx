@@ -1,5 +1,9 @@
+import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
+
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
   IconArrowRight,
@@ -11,10 +15,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
-import { format } from 'date-fns'
-import dayjs from 'dayjs'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 import TimeSplitInput from './TimeSplitInput'
 

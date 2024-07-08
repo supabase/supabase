@@ -14,6 +14,7 @@ interface GridResizeProps {
   endDate: string
   interval: string
   editableReport: any
+  disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   setEditableReport: (payload: any) => void
 }
@@ -23,6 +24,7 @@ const GridResize = ({
   endDate,
   interval,
   editableReport,
+  disableUpdate,
   onRemoveChart,
   setEditableReport,
 }: GridResizeProps) => {
@@ -74,17 +76,19 @@ const GridResize = ({
                 label={`${x.label}${ref !== state.selectedDatabaseId ? (x.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
                 customDateFormat={'MMM D, YYYY'}
               >
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button
-                      type="text"
-                      icon={<X />}
-                      className="ml-2 px-1"
-                      onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
-                    />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">Remove chart</TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                {!disableUpdate && (
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ asChild>
+                      <Button
+                        type="text"
+                        icon={<X />}
+                        className="ml-2 px-1"
+                        onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
+                      />
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ side="bottom">Remove chart</TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                )}
               </ChartHandler>
 
               <div className="absolute inset-x-0 top-3 ">

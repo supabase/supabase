@@ -530,24 +530,26 @@ class StorageExplorerStore {
     const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
-    const formattedFilesToUpload = filesWithinUploadLimit.map((file) => {
-      // If the files are from clicking "Upload button", just take them as they are since users cannot
-      // upload folders from clicking that button, only via drag drop
-      if (!file.path) return file
+    const formattedFilesToUpload = filesWithinUploadLimit
+      .filter((file) => file.name !== '.DS_Store')
+      .map((file) => {
+        // If the files are from clicking "Upload button", just take them as they are since users cannot
+        // upload folders from clicking that button, only via drag drop
+        if (!file.path) return file
 
-      const path = file.path.split('/')
-      const topLevelFolder = path.length > 1 ? path[0] : null
-      if (topLevelFolders.includes(topLevelFolder as string)) {
-        const newTopLevelFolder = this.sanitizeNameForDuplicateInColumn(
-          topLevelFolder as string,
-          autofix,
-          columnIndex
-        )
-        path[0] = newTopLevelFolder as string
-        file.path = path.join('/')
-      }
-      return file
-    })
+        const path = file.path.split('/')
+        const topLevelFolder = path.length > 1 ? path[0] : null
+        if (topLevelFolders.includes(topLevelFolder as string)) {
+          const newTopLevelFolder = this.sanitizeNameForDuplicateInColumn(
+            topLevelFolder as string,
+            autofix,
+            columnIndex
+          )
+          path[0] = newTopLevelFolder as string
+          file.path = path.join('/')
+        }
+        return file
+      })
 
     this.uploadProgress = 0
     const uploadedTopLevelFolders: string[] = []
@@ -585,8 +587,13 @@ class StorageExplorerStore {
        * Storage maintains a list of allowed characters, which excludes
        * characters such as the narrow no-break space used in Mac screenshots.
        * To preempt errors, replace all non-word characters with underscores.
+       * [Joshen] Except backslashes as this will indicate a folder path, and paranthesis
+       * since our UI appends them to make duplicate names unique
        */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(/[^\w.-]/g, '_')
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(
+        /[^\w.-\/()]/g,
+        '_'
+      )
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 

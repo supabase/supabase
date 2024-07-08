@@ -2,25 +2,22 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import NoPermission from 'components/ui/NoPermission'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import {
-  useCheckPermissions,
-  useFlag,
-  useIsFeatureEnabled,
-  useSelectedProject,
-  withAuth,
-} from 'hooks'
-import { ProjectLayout } from '../'
-import { generateLogsMenu } from './LogsMenu.utils'
-import { Badge, Menu } from 'ui'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
+import NoPermission from 'components/ui/NoPermission'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
-import { useParams } from 'common'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Badge, Menu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { generateLogsMenu } from './LogsMenu.utils'
 interface LogsLayoutProps {
   title?: string
 }

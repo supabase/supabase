@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
-import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 export type CreateUserModalProps = {
   visible: boolean

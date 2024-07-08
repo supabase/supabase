@@ -28,6 +28,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
 - Think hard about how _you_ would abuse your service as an attacker, and mitigate.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
+- Check and review issues in your database using [Security Advisor](https://supabase.com/dashboard/project/_/database/security-advisor).
 
 ## Performance
 
@@ -39,6 +40,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
 - If you are expecting a surge in traffic (for a big launch) and are on a teams or enterprise plan, [contact support](https://supabase.com/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
 - If you expect your database size to be > 4 GB, [enable](https://supabase.com/dashboard/project/_/settings/addons?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
+- Check and review issues in your database using [Performance Advisor](https://supabase.com/dashboard/project/_/database/performance-advisor).
 
 ## Availability
 
@@ -57,7 +59,7 @@ After developing your project and deciding it's Production Ready, you should run
 ## Rate limiting, resource allocation, & abuse prevention
 
 - Supabase employs a number of safeguards against bursts of incoming traffic to prevent abuse and help maximize stability across the platform
-  - If you're expecting high load events including production launches or heavy load testing, or prolonged high resource usage please give us at least 2 weeks notice. You can do this by opening a ticket via the [support form](https://supabase.com/dashboard/support/new).
+  - If you're on a teams or enterprise plan and expect high load events, such as production launches, heavy load testing, or prolonged high resource usage, open a ticket via the [support form](https://supabase.help) for help. Provide at least 2 weeks notice.
 
 ### Auth rate limits
 
