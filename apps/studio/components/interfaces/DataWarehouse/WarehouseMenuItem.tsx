@@ -117,7 +117,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             onClick={(e) => {
               e.stopPropagation()
             }}
-            align="end"
+            align="start"
             className="w-44 *:space-x-2"
           >
             <Tooltip_Shadcn_>
@@ -188,7 +188,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 render={({ field }) => (
                   <FormItemLayout label="Collection name">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input_Shadcn_ defaultValue={item.name} type="text" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
