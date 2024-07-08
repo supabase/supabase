@@ -86,7 +86,7 @@ const CommandMenu = () => {
     currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
     currentPage === COMMAND_ROUTES.AI ||
     currentPage === COMMAND_ROUTES.GENERATE_SQL
-      ? 'min(600px, 50vh)'
+      ? 'min(600px, 70vh)'
       : 'auto'
 
   return (
