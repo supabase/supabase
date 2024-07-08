@@ -412,7 +412,7 @@ const RateLimits = () => {
                       </p>
                     }
                   >
-                    Rate limit for OTP sign ins
+                    Rate limit for OTP sign up and sign ins
                   </FormSectionLabel>
                 }
               >
