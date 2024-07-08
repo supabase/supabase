@@ -12,9 +12,16 @@ interface ClientSdkReferenceProps {
   libPath: string
   libVersion: string
   specFile: string
+  useTypeSpec?: boolean
 }
 
-function ClientSdkReferencePage({ libId, libPath, libVersion, specFile }: ClientSdkReferenceProps) {
+function ClientSdkReferencePage({
+  libId,
+  libPath,
+  libVersion,
+  specFile,
+  useTypeSpec = false,
+}: ClientSdkReferenceProps) {
   const menuData = NavItems[libId]
 
   return (
@@ -35,7 +42,12 @@ function ClientSdkReferencePage({ libId, libPath, libVersion, specFile }: Client
         <article>
           <ClientLibHeader menuData={menuData} className="mb-8" />
           <ClientLibIntroduction libPath={libPath} excludeName={libId} />
-          <ClientLibRefSections libPath={libPath} specFile={specFile} excludeName={libId} />
+          <ClientLibRefSections
+            libPath={libPath}
+            specFile={specFile}
+            excludeName={libId}
+            useTypeSpec={useTypeSpec}
+          />
         </article>
       </LayoutMainContent>
     </SidebarSkeleton>

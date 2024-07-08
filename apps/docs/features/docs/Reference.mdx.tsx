@@ -2,6 +2,9 @@ import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { components } from '~/features/docs/MdxBase.shared'
+import { RefSubLayout } from '~/features/docs/Reference.ui'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { REF_DOCS_DIRECTORY } from '~/lib/docs'
 
@@ -17,7 +20,7 @@ async function getRefMarkdownInternal(relPath: string) {
     const { content } = matter(mdx)
     return content
   } catch (err) {
-    console.error(`Error fetching reference markdown from file: ${fullPath}`)
+    console.error(`Error fetching reference markdown from file: ${fullPath}:\n\n${err}`)
     return ''
   }
 }
@@ -33,4 +36,14 @@ const getRefMarkdown = cache_fullProcess_withDevCacheBust(
   (filename: string) => filename.replace(/\.mdx$/, '')
 )
 
-export { getRefMarkdown }
+interface MDXRemoteRefsProps {
+  source: string
+}
+
+function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
+  const refComponents = { ...components, RefSubLayout }
+
+  return <MDXRemoteBase source={source} components={refComponents} />
+}
+
+export { getRefMarkdown, MDXRemoteRefs }

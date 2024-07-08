@@ -1,75 +1,15 @@
-import { isPlainObject } from 'lodash'
-import { readFile } from 'node:fs/promises'
-import { basename, extname, join } from 'node:path'
 import { Fragment, type PropsWithChildren } from 'react'
-import { parse } from 'yaml'
 
 import { cn } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
-import { getMenuById, MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { deepFilterRec } from '~/features/helpers.fn'
-import type { Json } from '~/features/helpers.types'
-import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-import { SPEC_DIRECTORY } from '~/lib/docs'
-import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 import { REFERENCES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { RefLink } from './Reference.navigation.client'
-
-interface AbbrevCommonClientLibSection {
-  id: string
-  type: string
-  title?: string
-  slug?: string
-  items?: Array<AbbrevCommonClientLibSection>
-  excludes?: Array<string>
-}
-
-async function genClientSdkNav(specFile: string, excludeName: string) {
-  const rawSpec = await getSpecCached(specFile)
-  const spec = parse(rawSpec) as Json
-
-  const fns = parseFnsList(spec)
-  const validSections = deepFilterRec(
-    commonClientLibSections as Array<AbbrevCommonClientLibSection>,
-    'items',
-    (section) =>
-      section.type === 'markdown'
-        ? !('excludes' in section && section.excludes.includes(excludeName))
-        : section.type === 'function'
-          ? fns.some(({ id }) => section.id === id)
-          : true
-  )
-  return validSections
-}
-
-async function _getSpec(specFile: string, { ext = 'yml' }: { ext?: string } = {}) {
-  const specFullPath = join(SPEC_DIRECTORY, `${specFile}.${ext}`)
-  const rawSpec = await readFile(specFullPath, 'utf-8')
-  return rawSpec
-}
-const getSpecCached = cache_fullProcess_withDevCacheBust(
-  _getSpec,
-  SPEC_DIRECTORY,
-  (filename: string) => {
-    const ext = extname(filename).substring(1)
-    return ext === 'yml'
-      ? JSON.stringify([basename(filename)])
-      : JSON.stringify([basename(filename), { ext }])
-  }
-)
-
-function parseFnsList(rawSpec: Json): Array<{ id: unknown }> {
-  if (isPlainObject(rawSpec) && 'functions' in (rawSpec as object)) {
-    const _rawSpec = rawSpec as { functions: unknown }
-    if (Array.isArray(_rawSpec.functions)) {
-      return _rawSpec.functions.filter(({ id }) => !!id)
-    }
-  }
-
-  return []
-}
+import { RefLink } from '~/features/docs/Reference.navigation.client'
+import {
+  genClientSdkSectionTree,
+  type AbbrevCommonClientLibSection,
+} from '~/features/docs/Reference.utils'
 
 interface ClientSdkNavigationProps {
   name: string
@@ -88,7 +28,7 @@ async function ClientSdkNavigation({
   specFile,
   excludeName,
 }: ClientSdkNavigationProps) {
-  const navSections = await genClientSdkNav(specFile, excludeName)
+  const navSections = await genClientSdkSectionTree(specFile, excludeName)
 
   const allVersionsMeta = REFERENCES[libPath]
   const availableVersions = allVersionsMeta?.versions ?? []

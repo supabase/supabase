@@ -12,6 +12,7 @@ function JsReferenceV2() {
       libPath={LIB_PATH}
       libVersion={LIB_VERSION}
       specFile={SPEC_FILE}
+	  useTypeSpec
     />
   )
 }

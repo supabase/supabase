@@ -1,4 +1,4 @@
-import { MDXRemoteGuides } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 
@@ -26,7 +26,7 @@ async function ClientLibIntroduction({ libPath, excludeName }: ClientLibIntroduc
 
   return (
     <section className="prose">
-      <MDXRemoteGuides source={content} />
+      <MDXRemoteBase source={content} />
     </section>
   )
 }
