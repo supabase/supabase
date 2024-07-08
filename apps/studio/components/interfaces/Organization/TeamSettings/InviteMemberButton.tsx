@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
@@ -20,7 +21,6 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -45,6 +45,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import InformationBox from 'components/ui/InformationBox'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -338,17 +339,32 @@ export const InviteMemberButton = () => {
                   </FormItem_Shadcn_>
                 )}
               />
-              <DialogDescription>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground transition"
-                  href="https://supabase.com/docs/guides/platform/sso"
-                >
-                  Enable SSO
-                </a>{' '}
-                for your organization to provide additional account security.
-              </DialogDescription>
+              <InformationBox
+                defaultVisibility={false}
+                title="Single Sign-on (SSO) login option available"
+                hideCollapse={false}
+                description={
+                  <div className="space-y-4 mb-1">
+                    <p>
+                      Supabase offers single sign-on (SSO) as a login option to provide additional
+                      account security for your team. This allows company administrators to enforce
+                      the use of an identity provider when logging into Supabase.
+                    </p>
+                    <p>This is only available for organizations on teams plan or above.</p>
+                    <div className="flex items-center space-x-2">
+                      <Button asChild type="default">
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/sso"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          How SSO works
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                }
+              />
             </DialogSection>
             <DialogSectionSeparator />
             <DialogSection className="pt-0">
