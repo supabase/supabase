@@ -33,7 +33,7 @@
 }
 
 body {
-  @apply bg-background text-foreground;
+  @apply bg-background text-foreground relative;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -335,4 +335,3 @@ th code {
     background-position: 1000px 0;
   }
 }
-
