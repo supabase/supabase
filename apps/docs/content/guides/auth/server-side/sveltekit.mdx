@@ -134,11 +134,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.user = user
 
   if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-    return redirect(303, '/auth')
+    redirect(303, '/auth')
   }
 
   if (event.locals.session && event.url.pathname === '/auth') {
-    return redirect(303, '/private')
+    redirect(303, '/private')
   }
 
   return resolve(event)
@@ -352,7 +352,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 </StepHikeCompact.Details>
 
@@ -384,9 +384,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/')
+      redirect(303, '/')
     }
   },
   login: async ({ request, locals: { supabase } }) => {
@@ -397,9 +397,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/private')
+      redirect(303, '/private')
     }
   },
 }
@@ -449,7 +449,7 @@ Finish the signup flow by creating the API route to handle email verification.
 
 <StepHikeCompact.Code>
 
-```ts src/routes/api/auth/confirm/+server.ts
+```ts src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -474,12 +474,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
 ```
 
