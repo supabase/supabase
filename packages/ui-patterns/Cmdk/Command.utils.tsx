@@ -79,7 +79,7 @@ export const CommandDialog = ({
     onClose: () => setIsOpen(!open),
   })
   // const [isInputFocused, setIsInputFocused] = React.useState(false)
-  const [dialogHeight, setDialogHeight] = React.useState('80vh')
+  const [dialogHeight, setDialogHeight] = React.useState('85vh')
   const { inputRef: commandInputRef } = useCommandMenu()
   const isMobile = useBreakpoint()
 
@@ -99,11 +99,11 @@ export const CommandDialog = ({
 
   const handleFocus = () => {
     // setIsInputFocused(true)
-    setDialogHeight('calc(var(--vh, 1vh) * 80)')
+    setDialogHeight('calc(var(--vh, 1vh) * 85)')
   }
   const handleBlur = () => {
     // setIsInputFocused(false)
-    setDialogHeight('80vh')
+    setDialogHeight('85vh')
   }
 
   React.useEffect(() => {
@@ -144,7 +144,7 @@ export const CommandDialog = ({
         }}
         className={cn(
           'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
-          'h-[80dvh] md:max-h-[450px] mt-[20vh] md:mt-0 left-0 bottom-0 md:bottom-auto',
+          'h-[85dvh] md:max-h-[450px] mt-[15vh] md:mt-0 left-0 bottom-0 md:bottom-auto',
           'place-self-start md:place-self-auto',
           isOpen && '!animate-in !slide-in-from-bottom !duration-300',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
@@ -503,7 +503,7 @@ export function useAutoInputFocus() {
       // due to order of operations
       setTimeout(() => {
         inputElement.focus()
-      }, 1000)
+      }, 0)
     }
   }, [])
 

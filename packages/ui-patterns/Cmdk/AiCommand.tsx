@@ -31,6 +31,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
 import { StatusIcon } from '../Icons/StatusIcons'
+import { useBreakpoint } from 'common'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -353,16 +354,18 @@ const AiCommand = () => {
       handleSubmit(search)
     }
   }, [])
-
+  const isMobile = useBreakpoint()
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="absolute z-10 top-9.5 w-full bg-background py-3">
+      <div className="absolute z-10 bottom-0 w-full bg-background py-3">
+        {messages.length > 0 && !hasError && <AiWarning className="mb-2 pt-1 mx-3 px-4" />}
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
+          autoFocus={!isMobile}
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
@@ -408,9 +411,8 @@ const AiCommand = () => {
             }
           }}
         />
-        {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-4" />}
       </div>
-      <div className="pt-11">
+      <div>
         <div className={cn('relative mt-4 py-4')}>
           {!hasError &&
             messages.map((message, index) => {
