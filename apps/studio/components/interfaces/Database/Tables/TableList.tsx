@@ -184,7 +184,7 @@ const TableList = ({
   const isLoading =
     isLoadingTables || isLoadingViews || isLoadingMaterializedViews || isLoadingForeignTables
   const isSuccess =
-    (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews || isSuccessForeignTables
+    isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
