@@ -9,7 +9,12 @@ import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
-import { Snippet, SnippetDetail, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
+import {
+  Snippet,
+  SnippetDetail,
+  SnippetFolder,
+  useSQLSnippetFoldersQuery,
+} from 'data/content/sql-folders-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
@@ -27,6 +32,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 
 // Requirements
 // - Asynchronous loading
@@ -57,6 +63,8 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
+
+  const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
   const COLLAPSIBLE_TRIGGER_CLASS_NAMES =
     'flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90'
@@ -128,6 +136,17 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
     },
   })
 
+  const { mutate: deleteFolder, isLoading: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
+    onSuccess: (_, vars) => {
+      // [Joshen] To check: Can we delete folders with queries inside? Does the API support that? If yes we need to redirect
+      toast.success('Successfully deleted folder')
+
+      const { ids } = vars
+      snapV2.removeFolder(ids[0])
+      setSelectedFolderToDelete(undefined)
+    },
+  })
+
   // =================================
   // [Joshen] UI functions
   // =================================
@@ -188,6 +207,12 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
     snapV2.addSnippet({ projectRef, snippet: snippetCopy })
     snapV2.addNeedsSaving(snippetCopy.id!)
     router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
+  }
+
+  const onConfirmDeleteFolder = () => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (selectedFolderToDelete === undefined) return console.error('No folder is selected')
+    deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
   }
 
   // =================================
@@ -343,19 +368,33 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
                 <SQLEditorTreeViewItem
                   {...props}
                   element={element}
+                  status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
                   onSelectDelete={() => {
-                    setShowDeleteModal(true)
-                    setSelectedSnippets([element.metadata as unknown as Snippet])
+                    if (props.isBranch) {
+                      setSelectedFolderToDelete(element.metadata as SnippetFolder)
+                    } else {
+                      setShowDeleteModal(true)
+                      setSelectedSnippets([element.metadata as unknown as Snippet])
+                    }
                   }}
                   onSelectRename={() => {
-                    setShowRenameModal(true)
-                    setSelectedSnippetToRename(element.metadata as Snippet)
+                    if (props.isBranch) {
+                      snapV2.editFolder(element.id as string)
+                    } else {
+                      setShowRenameModal(true)
+                      setSelectedSnippetToRename(element.metadata as Snippet)
+                    }
                   }}
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
                   onSelectShare={() => {
                     setSelectedSnippetToShare(element.metadata as Snippet)
+                  }}
+                  onEditSave={(name: string) => {
+                    // [Joshen] Inline editing only for folders for now
+                    if (name.length === 0) snapV2.removeFolder(element.id as string)
+                    else snapV2.saveFolder({ id: element.id as string, name })
                   }}
                 />
               )}
@@ -432,7 +471,7 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
         confirmLabelLoading="Deleting query"
         loading={isDeleting}
         visible={showDeleteModal}
-        variant={'destructive'}
+        variant="destructive"
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={onConfirmDelete}
         alert={
@@ -446,6 +485,27 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
         }
       >
         <p className="text-sm">Are you sure you want to delete '{selectedSnippets[0]?.name}'?</p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        title="Confirm to delete folder"
+        confirmLabel="Delete folder"
+        confirmLabelLoading="Deleting folder"
+        loading={isDeletingFolder}
+        visible={selectedFolderToDelete !== undefined}
+        variant="destructive"
+        onCancel={() => setSelectedFolderToDelete(undefined)}
+        onConfirm={onConfirmDeleteFolder}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'All SQL snippets within the folder will be permanently removed, and cannot be recovered.',
+        }}
+      >
+        <p className="text-sm">
+          Are you sure you want to delete the folder '{selectedFolderToDelete?.name}'?
+        </p>
       </ConfirmationModal>
     </>
   )

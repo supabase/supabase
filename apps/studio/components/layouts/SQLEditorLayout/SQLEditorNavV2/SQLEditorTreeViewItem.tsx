@@ -10,7 +10,6 @@ import {
   ContextMenuTrigger_Shadcn_,
   ContextMenu_Shadcn_,
   TreeViewItem,
-  cn,
 } from 'ui'
 import { useProfile } from 'lib/profile'
 import { IS_PLATFORM } from 'common'
@@ -22,6 +21,7 @@ interface SQLEditorTreeViewItemProps {
   isBranch: boolean
   isSelected: boolean
   isExpanded: boolean
+  status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any
   onSelectDelete?: () => void
   onSelectRename?: () => void
@@ -29,6 +29,8 @@ interface SQLEditorTreeViewItemProps {
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
   onSelectCopyPersonal?: () => void
+  onSelectDeleteFolder?: () => void
+  onEditSave?: (name: string) => void
 }
 
 export const SQLEditorTreeViewItem = ({
@@ -37,6 +39,7 @@ export const SQLEditorTreeViewItem = ({
   isExpanded,
   level,
   isSelected,
+  status,
   getNodeProps,
   onSelectDelete,
   onSelectRename,
@@ -44,13 +47,16 @@ export const SQLEditorTreeViewItem = ({
   onSelectUnshare,
   onSelectDownload,
   onSelectCopyPersonal,
+  onEditSave,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref } = useParams()
   const { profile } = useProfile()
 
-  const isSnippetOwner = profile?.id === element?.metadata.owner_id
+  const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
+
+  const isEditing = status === 'editing'
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -68,26 +74,14 @@ export const SQLEditorTreeViewItem = ({
             isExpanded={isExpanded}
             isBranch={isBranch}
             isSelected={isSelected || id === element.id}
-            isEditing={element.metadata?.isEditing === true}
-            // onEditSubmit={(value) => {
-            //   let updatedTreeData = { ...treeData }
-            //   const findNode = (node: any) => {
-            //     if (node.id === element.id) {
-            //       node.name = value
-            //       node.metadata = { isEditing: false }
-            //     }
-            //     if (node.children) {
-            //       node.children.forEach(findNode)
-            //     }
-            //   }
-            //   updatedTreeData.children.forEach(findNode)
-            //   setDataTreeState(updatedTreeData)
-            // }}
-            {...getNodeProps()}
-            className={cn('bg-brand')}
+            isEditing={isEditing}
+            onEditSubmit={(value) => {
+              if (onEditSave !== undefined) onEditSave(value)
+            }}
             onClick={() => {
               if (!isBranch) router.push(`/project/${ref}/sql/${element.id}`)
             }}
+            {...getNodeProps()}
           />
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
@@ -101,11 +95,29 @@ export const SQLEditorTreeViewItem = ({
                 <Plus size={14} />
                 Create new snippet
               </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={() => {}}>
-                <Trash size={14} />
-                Delete folder
-              </ContextMenuItem_Shadcn_>
+              {onSelectRename !== undefined && isOwner && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectRename()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Edit size={14} />
+                  Rename folder
+                </ContextMenuItem_Shadcn_>
+              )}
+              {onSelectDelete !== undefined && isOwner && (
+                <>
+                  <ContextMenuSeparator_Shadcn_ />
+                  <ContextMenuItem_Shadcn_
+                    className="gap-x-2"
+                    onSelect={() => onSelectDelete()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <Trash size={14} />
+                    Delete folder
+                  </ContextMenuItem_Shadcn_>
+                </>
+              )}
             </>
           ) : (
             <>
@@ -121,7 +133,7 @@ export const SQLEditorTreeViewItem = ({
                 </a>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />
-              {onSelectRename !== undefined && isSnippetOwner && (
+              {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
                   onSelect={() => onSelectRename()}
@@ -141,7 +153,7 @@ export const SQLEditorTreeViewItem = ({
                   Share query with team
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectUnshare !== undefined && isSharedSnippet && isSnippetOwner && (
+              {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
                   onSelect={() => onSelectUnshare()}
@@ -153,7 +165,7 @@ export const SQLEditorTreeViewItem = ({
               )}
               {onSelectCopyPersonal !== undefined &&
                 isSharedSnippet &&
-                !isSnippetOwner &&
+                !isOwner &&
                 canCreateSQLSnippet && (
                   <ContextMenuItem_Shadcn_
                     className="gap-x-2"
@@ -174,7 +186,7 @@ export const SQLEditorTreeViewItem = ({
                   Download as migration file
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectDelete !== undefined && isSnippetOwner && (
+              {onSelectDelete !== undefined && isOwner && (
                 <>
                   <ContextMenuSeparator_Shadcn_ />
                   <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={() => onSelectDelete()}>

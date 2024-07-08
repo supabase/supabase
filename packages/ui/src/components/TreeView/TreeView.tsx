@@ -58,13 +58,11 @@ const TreeViewItem = forwardRef<
           onEditSubmit?.(localValueState)
         }
       }
-
-      document.addEventListener('mousedown', handleClickOutside)
-
+      if (isEditing) document.addEventListener('mousedown', handleClickOutside)
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
+        if (isEditing) document.removeEventListener('mousedown', handleClickOutside)
       }
-    }, [localValueState])
+    }, [isEditing])
 
     useEffect(() => {
       if (isEditing) {
@@ -81,7 +79,7 @@ const TreeViewItem = forwardRef<
       <div
         ref={ref}
         aria-selected={isSelected}
-        aria-expanded={isExpanded}
+        aria-expanded={!isEditing && isExpanded}
         {...props}
         className={cn(
           'group relative',

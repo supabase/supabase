@@ -91,6 +91,14 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
     subject: { id: profile?.id },
   })
 
+  const createNewFolder = () => {
+    // [Joshen] LEFT OFF: We need to figure out a good UX for creating folders
+    // - Modal? Directly chuck into the tree view like storage explorer?
+    if (!ref) return console.error('Project ref is required')
+    snapV2.addNewFolder({ projectRef: ref })
+    // createFolder({ projectRef: ref, name: 'test' })
+  }
+
   const handleNewQuery = async () => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
@@ -174,14 +182,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
                       <FilePlus size={14} />
                       Create a new snippet
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-x-2">
-                      <FolderPlus
-                        size={14}
-                        onClick={() => {
-                          if (!ref) return console.error('Nono')
-                          createFolder({ projectRef: ref, name: 'test' })
-                        }}
-                      />
+                    <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
+                      <FolderPlus size={14} />
                       Create a new folder
                     </DropdownMenuItem>
                   </DropdownMenuContent>

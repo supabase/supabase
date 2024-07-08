@@ -1,13 +1,18 @@
 import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
+import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
+import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
+import uuidv4 from 'lib/uuid'
 import { debounce, memoize } from 'lodash'
+import toast from 'react-hot-toast'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
 export type StateSnippetFolder = {
   projectRef: string
   folder: SnippetFolder
+  status?: 'editing' | 'saving' | 'idle'
 }
 
 // [Joshen] API codegen is somehow missing the content property
@@ -20,6 +25,8 @@ export type StateSnippet = {
   splitSizes: number[]
   snippet: SnippetContent
 }
+
+const NEW_FOLDER_ID = 'new-folder'
 
 export const sqlEditorState = proxy({
   folders: {} as {
@@ -47,7 +54,7 @@ export const sqlEditorState = proxy({
   loaded: {} as {
     [projectRef: string]: boolean
   },
-  // Synchronous saving of snippets (debounce behaviour)
+  // Synchronous saving of folders and snippets (debounce behaviour)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
   savingStates: {} as {
@@ -145,6 +152,45 @@ export const sqlEditorState = proxy({
     // ].filter((s) => s !== id)
   },
 
+  addNewFolder: ({ projectRef }: { projectRef: string }) => {
+    // [Joshen] Use this to identify new folders that have yet to be saved
+    const id = NEW_FOLDER_ID
+    sqlEditorState.folders[id] = {
+      projectRef,
+      status: 'editing',
+      folder: {
+        id,
+        name: '',
+        owner_id: -1,
+        project_id: -1,
+        parent_id: null,
+      },
+    }
+  },
+
+  editFolder: (id: string) => {
+    sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'editing' }
+  },
+
+  saveFolder: ({ id, name }: { id: string; name: string }) => {
+    const hasChanges = sqlEditorState.folders[id].folder.name !== name
+    sqlEditorState.folders[id] = {
+      projectRef: sqlEditorState.folders[id].projectRef,
+      status: hasChanges ? 'saving' : 'idle',
+      folder: {
+        ...sqlEditorState.folders[id].folder,
+        id,
+        name,
+      },
+    }
+    if (hasChanges) sqlEditorState.needsSaving.add(id)
+  },
+
+  removeFolder: (id: string) => {
+    const { [id]: folder, ...otherFolders } = sqlEditorState.folders
+    sqlEditorState.folders = otherFolders
+  },
+
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.add(id),
@@ -214,7 +260,7 @@ export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnaps
 // ## Below are all the asynchronous saving logic for the SQL Editor
 // ========================================================================
 
-async function upsert(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
+async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
     await upsertContent({
@@ -227,10 +273,27 @@ async function upsert(id: string, projectRef: string, payload: UpsertContentPayl
   }
 }
 
-const memoizedUpdate = memoize((_id: string) => debounce(upsert, 1000))
+const memoizedUpdateSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
 
-const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentPayloadV2) =>
-  memoizedUpdate(id)(id, projectRef, payload)
+const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertContentPayloadV2) =>
+  memoizedUpdateSnippet(id)(id, projectRef, payload)
+
+async function upsertFolder(id: string, projectRef: string, name: string) {
+  try {
+    if (id === NEW_FOLDER_ID) {
+      const res = await createSQLSnippetFolder({ projectRef, name })
+      toast.success('Successfully created folder')
+      sqlEditorState.removeFolder(NEW_FOLDER_ID)
+      sqlEditorState.folders[res.id] = { projectRef, status: 'idle', folder: res }
+    } else {
+      await updateSQLSnippetFolder({ projectRef, id, name })
+      toast.success('Successfully updated folder')
+      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+    }
+  } catch (error) {
+    toast.error('Oh no')
+  }
+}
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
@@ -244,9 +307,10 @@ if (typeof window !== 'undefined') {
 
     Array.from(state.needsSaving).forEach((id) => {
       const snippet = state.snippets[id]
+      const folder = state.folders[id]
 
       if (snippet) {
-        debouncedUpdate(id, snippet.projectRef, {
+        debouncedUpdateSnippet(id, snippet.projectRef, {
           id,
           type: 'sql',
           name: snippet.snippet.name ?? 'Untitled',
@@ -257,7 +321,9 @@ if (typeof window !== 'undefined') {
           folder_id: snippet.snippet.folder_id,
           content: { ...snippet.snippet.content, content_id: id },
         })
-
+        sqlEditorState.needsSaving.delete(id)
+      } else if (folder) {
+        upsertFolder(id, folder.projectRef, folder.folder.name)
         sqlEditorState.needsSaving.delete(id)
       }
     })

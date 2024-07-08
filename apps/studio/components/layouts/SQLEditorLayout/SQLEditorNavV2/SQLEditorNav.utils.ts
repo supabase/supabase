@@ -10,12 +10,6 @@ export interface TreeViewItemProps {
 
 export const ROOT_NODE = { id: 0, name: '', parent: null, children: [] }
 
-export const splitProjectPrivateSnippets = () => {
-  // TODO
-
-  return { project: [], private: [] }
-}
-
 export const formatFolderResponseForTreeView = (
   response?: SnippetFolderResponse
 ): TreeViewItemProps[] => {
