@@ -7,6 +7,96 @@
   },
   {
     "type": "category",
+    "title": "analytics",
+    "items": [
+      {
+        "id": "v1-create-a-warehouse-collection",
+        "title": "Create a warehouse collection",
+        "slug": "v1-create-a-warehouse-collection",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-a-warehouse-endpoint",
+        "title": "Create a warehouse endpoint",
+        "slug": "v1-create-a-warehouse-endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-a-warehouse-token",
+        "title": "Create a warehouse token",
+        "slug": "v1-create-a-warehouse-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-warehouse-collection",
+        "title": "Delete a warehouse collection",
+        "slug": "v1-delete-a-warehouse-collection",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-warehouse-endpoint",
+        "title": "Delete a warehouse endpoint",
+        "slug": "v1-delete-a-warehouse-endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-warehouse-token",
+        "title": "Delete a warehouse token",
+        "slug": "v1-delete-a-warehouse-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-warehouse-collection",
+        "title": "Get a warehouse collection",
+        "slug": "v1-get-a-warehouse-collection",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-warehouse-collections",
+        "title": "List all warehouse collections",
+        "slug": "v1-list-all-warehouse-collections",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-warehouse-endpoints",
+        "title": "List all warehouse endpoints",
+        "slug": "v1-list-all-warehouse-endpoints",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-warehouse-queries",
+        "title": "List all warehouse queries",
+        "slug": "v1-list-all-warehouse-queries",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-warehouse-tokens",
+        "title": "List all warehouse tokens",
+        "slug": "v1-list-all-warehouse-tokens",
+        "type": "operation"
+      },
+      {
+        "id": "v1-provision-a-warehouse-tenant",
+        "title": "Provision a warehouse tenant",
+        "slug": "v1-provision-a-warehouse-tenant",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-warehouse-collection",
+        "title": "Update a warehouse collection",
+        "slug": "v1-update-a-warehouse-collection",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-warehouse-endpoint",
+        "title": "Update a warehouse endpoint",
+        "slug": "v1-update-a-warehouse-endpoint",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "auth",
     "items": [
       {
@@ -361,6 +451,12 @@
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-a-project",
+        "title": "Delete a project",
+        "slug": "v1-delete-a-project",
         "type": "operation"
       },
       {

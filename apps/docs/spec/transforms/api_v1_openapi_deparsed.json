@@ -2463,7 +2463,7 @@
     },
     "/v1/projects/{ref}": {
       "delete": {
-        "operationId": "v1-Delete a project",
+        "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
         "parameters": [
           {
@@ -3383,7 +3383,8 @@
                                 "5_data_upgrade_completion_failed",
                                 "6_volume_detachchment_from_original_instance_failed",
                                 "7_volume_attachment_to_upgraded_instance_failed",
-                                "8_upgrade_completion_failed"
+                                "8_upgrade_completion_failed",
+                                "9_post_physical_backup_failed"
                               ]
                             },
                             "progress": {
@@ -3398,7 +3399,8 @@
                                 "6_completed_data_upgrade",
                                 "7_detached_volume_from_original_instance",
                                 "8_attached_volume_to_upgraded_instance",
-                                "9_completed_upgrade"
+                                "9_completed_upgrade",
+                                "10_completed_post_physical_backup"
                               ]
                             },
                             "status": {
@@ -4829,6 +4831,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "saml_external_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5112,6 +5118,7 @@
                     "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -5293,6 +5300,10 @@
                   },
                   "saml_enabled": {
                     "type": "boolean"
+                  },
+                  "saml_external_url": {
+                    "type": "string",
+                    "pattern": "/^[^,]+$/"
                   },
                   "security_captcha_enabled": {
                     "type": "boolean"
@@ -6201,6 +6212,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "saml_external_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -6484,6 +6499,7 @@
                     "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6539,6 +6555,974 @@
         },
         "tags": [
           "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/tenant": {
+      "get": {
+        "operationId": "v1-provision-a-warehouse-tenant",
+        "summary": "Gets project's warehouse tenant from logflare",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_project_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_dataset_location": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_dataset_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email_me_product": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "phone": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "company": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "project_ref": {
+                          "required": true,
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "email",
+                    "bigquery_project_id",
+                    "bigquery_dataset_location",
+                    "bigquery_dataset_id",
+                    "email_me_product",
+                    "phone",
+                    "company",
+                    "metadata"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch or provision warehouse tenant"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/collections": {
+      "get": {
+        "operationId": "v1-list-all-warehouse-collections",
+        "summary": "Lists project's warehouse collections from logflare",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "token": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "favourite": {
+                        "type": "boolean"
+                      },
+                      "webhook_notification_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "slack_hook_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "bigquery_table_ttl": {
+                        "type": "number"
+                      },
+                      "public_token": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "custom_event_message_keys": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "token",
+                      "id",
+                      "name",
+                      "favourite",
+                      "webhook_notification_url",
+                      "slack_hook_url",
+                      "bigquery_table_ttl",
+                      "public_token",
+                      "custom_event_message_keys"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch warehouse collections"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-create-a-warehouse-collection",
+        "summary": "Create a warehouse collection",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "favourite": {
+                      "type": "boolean"
+                    },
+                    "webhook_notification_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "slack_hook_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_table_ttl": {
+                      "type": "number"
+                    },
+                    "public_token": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_event_message_keys": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "favourite",
+                    "webhook_notification_url",
+                    "slack_hook_url",
+                    "bigquery_table_ttl",
+                    "public_token",
+                    "custom_event_message_keys"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create warehouse collection"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/collections/{token}": {
+      "get": {
+        "operationId": "v1-get-a-warehouse-collection",
+        "summary": "Get a warehouse collection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "favourite": {
+                      "type": "boolean"
+                    },
+                    "webhook_notification_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "slack_hook_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_table_ttl": {
+                      "type": "number"
+                    },
+                    "public_token": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_event_message_keys": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "favourite",
+                    "webhook_notification_url",
+                    "slack_hook_url",
+                    "bigquery_table_ttl",
+                    "public_token",
+                    "custom_event_message_keys"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch warehouse collection"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-a-warehouse-collection",
+        "summary": "Update a warehouse collection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "favourite": {
+                      "type": "boolean"
+                    },
+                    "webhook_notification_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "slack_hook_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_table_ttl": {
+                      "type": "number"
+                    },
+                    "public_token": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_event_message_keys": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "favourite",
+                    "webhook_notification_url",
+                    "slack_hook_url",
+                    "bigquery_table_ttl",
+                    "public_token",
+                    "custom_event_message_keys"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update warehouse collection"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-delete-a-warehouse-collection",
+        "summary": "Delete a warehouse collection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "favourite": {
+                      "type": "boolean"
+                    },
+                    "webhook_notification_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "slack_hook_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "bigquery_table_ttl": {
+                      "type": "number"
+                    },
+                    "public_token": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_event_message_keys": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "favourite",
+                    "webhook_notification_url",
+                    "slack_hook_url",
+                    "bigquery_table_ttl",
+                    "public_token",
+                    "custom_event_message_keys"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete warehouse collection"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/access-tokens": {
+      "get": {
+        "operationId": "v1-list-all-warehouse-tokens",
+        "summary": "Lists project's warehouse access tokens from logflare",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "token": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "number"
+                      },
+                      "inserted_at": {
+                        "type": "string"
+                      },
+                      "scopes": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "token",
+                      "id",
+                      "inserted_at",
+                      "scopes",
+                      "description"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch warehouse access tokens"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-create-a-warehouse-token",
+        "summary": "Create a warehouse access token",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "inserted_at",
+                    "scopes",
+                    "description"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create warehouse access token"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/access-tokens/{token}": {
+      "delete": {
+        "operationId": "v1-delete-a-warehouse-token",
+        "summary": "Delete a warehouse access token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete warehouse access token"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/endpoints": {
+      "get": {
+        "operationId": "v1-list-all-warehouse-endpoints",
+        "summary": "Lists project's warehouse endpoints from logflare",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "token": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "query": {
+                        "type": "string"
+                      },
+                      "language": {
+                        "type": "object"
+                      },
+                      "sandboxable": {
+                        "type": "boolean",
+                        "nullable": true
+                      },
+                      "cache_duration_seconds": {
+                        "type": "number"
+                      },
+                      "proactive_requerying_seconds": {
+                        "type": "number"
+                      },
+                      "max_limit": {
+                        "type": "number"
+                      },
+                      "enable_auth": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "token",
+                      "id",
+                      "name",
+                      "description",
+                      "query",
+                      "language",
+                      "sandboxable",
+                      "cache_duration_seconds",
+                      "proactive_requerying_seconds",
+                      "max_limit",
+                      "enable_auth"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch warehouse endpoints"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-create-a-warehouse-endpoint",
+        "summary": "Create a warehouse endpoint",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "object"
+                    },
+                    "sandboxable": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "cache_duration_seconds": {
+                      "type": "number"
+                    },
+                    "proactive_requerying_seconds": {
+                      "type": "number"
+                    },
+                    "max_limit": {
+                      "type": "number"
+                    },
+                    "enable_auth": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "description",
+                    "query",
+                    "language",
+                    "sandboxable",
+                    "cache_duration_seconds",
+                    "proactive_requerying_seconds",
+                    "max_limit",
+                    "enable_auth"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create warehouse endpoint"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/endpoints/{token}": {
+      "put": {
+        "operationId": "v1-update-a-warehouse-endpoint",
+        "summary": "Update a warehouse endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "object"
+                    },
+                    "sandboxable": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "cache_duration_seconds": {
+                      "type": "number"
+                    },
+                    "proactive_requerying_seconds": {
+                      "type": "number"
+                    },
+                    "max_limit": {
+                      "type": "number"
+                    },
+                    "enable_auth": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "id",
+                    "name",
+                    "description",
+                    "query",
+                    "language",
+                    "sandboxable",
+                    "cache_duration_seconds",
+                    "proactive_requerying_seconds",
+                    "max_limit",
+                    "enable_auth"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update warehouse endpoint"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "v1-delete-a-warehouse-endpoint",
+        "summary": "Delete a warehouse endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete warehouse endpoint"
+          }
+        },
+        "tags": [
+          "analytics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/warehouse/query": {
+      "get": {
+        "operationId": "v1-list-all-warehouse-queries",
+        "summary": "Lists project's warehouse queries from logflare",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to fetch warehouse queries"
+          }
+        },
+        "tags": [
+          "analytics"
         ],
         "security": [
           {
@@ -9943,7 +10927,8 @@
               "5_data_upgrade_completion_failed",
               "6_volume_detachchment_from_original_instance_failed",
               "7_volume_attachment_to_upgraded_instance_failed",
-              "8_upgrade_completion_failed"
+              "8_upgrade_completion_failed",
+              "9_post_physical_backup_failed"
             ]
           },
           "progress": {
@@ -9958,7 +10943,8 @@
               "6_completed_data_upgrade",
               "7_detached_volume_from_original_instance",
               "8_attached_volume_to_upgraded_instance",
-              "9_completed_upgrade"
+              "9_completed_upgrade",
+              "10_completed_post_physical_backup"
             ]
           },
           "status": {
@@ -10001,7 +10987,8 @@
                       "5_data_upgrade_completion_failed",
                       "6_volume_detachchment_from_original_instance_failed",
                       "7_volume_attachment_to_upgraded_instance_failed",
-                      "8_upgrade_completion_failed"
+                      "8_upgrade_completion_failed",
+                      "9_post_physical_backup_failed"
                     ]
                   },
                   "progress": {
@@ -10016,7 +11003,8 @@
                       "6_completed_data_upgrade",
                       "7_detached_volume_from_original_instance",
                       "8_attached_volume_to_upgraded_instance",
-                      "9_completed_upgrade"
+                      "9_completed_upgrade",
+                      "10_completed_post_physical_backup"
                     ]
                   },
                   "status": {
@@ -10944,6 +11932,10 @@
             "type": "boolean",
             "nullable": true
           },
+          "saml_external_url": {
+            "type": "string",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -11227,6 +12219,7 @@
           "rate_limit_otp",
           "refresh_token_rotation_enabled",
           "saml_enabled",
+          "saml_external_url",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -11369,6 +12362,10 @@
           },
           "saml_enabled": {
             "type": "boolean"
+          },
+          "saml_external_url": {
+            "type": "string",
+            "pattern": "/^[^,]+$/"
           },
           "security_captcha_enabled": {
             "type": "boolean"
@@ -11794,6 +12791,189 @@
             "type": "number"
           }
         }
+      },
+      "LFUser": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "bigquery_project_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "bigquery_dataset_location": {
+            "type": "string",
+            "nullable": true
+          },
+          "bigquery_dataset_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_me_product": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "company": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "project_ref": {
+                "required": true,
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "token",
+          "email",
+          "bigquery_project_id",
+          "bigquery_dataset_location",
+          "bigquery_dataset_id",
+          "email_me_product",
+          "phone",
+          "company",
+          "metadata"
+        ]
+      },
+      "LFSource": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "favourite": {
+            "type": "boolean"
+          },
+          "webhook_notification_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "slack_hook_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "bigquery_table_ttl": {
+            "type": "number"
+          },
+          "public_token": {
+            "type": "string",
+            "nullable": true
+          },
+          "custom_event_message_keys": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "token",
+          "id",
+          "name",
+          "favourite",
+          "webhook_notification_url",
+          "slack_hook_url",
+          "bigquery_table_ttl",
+          "public_token",
+          "custom_event_message_keys"
+        ]
+      },
+      "LFAccessToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number"
+          },
+          "inserted_at": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "token",
+          "id",
+          "inserted_at",
+          "scopes",
+          "description"
+        ]
+      },
+      "LFEndpoint": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "language": {
+            "type": "object"
+          },
+          "sandboxable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "cache_duration_seconds": {
+            "type": "number"
+          },
+          "proactive_requerying_seconds": {
+            "type": "number"
+          },
+          "max_limit": {
+            "type": "number"
+          },
+          "enable_auth": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "token",
+          "id",
+          "name",
+          "description",
+          "query",
+          "language",
+          "sandboxable",
+          "cache_duration_seconds",
+          "proactive_requerying_seconds",
+          "max_limit",
+          "enable_auth"
+        ]
       },
       "V1RunQueryBody": {
         "type": "object",
