@@ -23,7 +23,6 @@ export type ProjectCreateVariables = {
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
-  configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
   dbInstanceSize?: DbInstanceSize
@@ -37,7 +36,6 @@ export async function createProject({
   dbRegion,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
-  configurationId,
   authSiteUrl,
   customSupabaseRequest,
   dbInstanceSize,
@@ -51,7 +49,6 @@ export async function createProject({
     db_region: dbRegion,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
-    vercel_configuration_id: configurationId,
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
