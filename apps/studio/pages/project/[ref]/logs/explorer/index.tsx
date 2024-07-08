@@ -188,7 +188,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const whQuery = warehouseEditorValue
 
       if (!warehouseCollections?.length) {
-        toast.error("You don't have any collections in your warehouse yet.")
+        toast.error("You do not have any collections in your warehouse yet.")
         return
       }
 
