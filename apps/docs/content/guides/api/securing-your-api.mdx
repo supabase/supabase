@@ -73,6 +73,10 @@ The expected value for `useconfig` should be:
 ;['session_preload_libraries=supautils, safeupdate']
 ```
 
+## Disable the API or restrict to custom schema
+
+If you don't use the Data API, or if you don't want to expose the `public` schema, you can either disable it entirely or change the automatically exposed schema to one of your choice. See **[Hardening the Data API](/docs/guides/database/hardening-data-api)** for instructions.
+
 ## Enforce additional rules on each request
 
 Using Row Level Security policies may not always be adequate or sufficient to protect APIs.
