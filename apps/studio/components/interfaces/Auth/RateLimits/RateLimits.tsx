@@ -407,12 +407,12 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of OTP sign-ins and sign up requests that can be made per hour for a given IP
-                        address.
+                        Number of sign up and sign-in requests that can be made per hour per IP
+                        address (excludes anonymous users).
                       </p>
                     }
                   >
-                    Rate limit for OTP sign up and sign ins
+                    Rate limit for sign ups and sign ins
                   </FormSectionLabel>
                 }
               >
@@ -423,8 +423,15 @@ const RateLimits = () => {
                     render={({ field }) => (
                       <FormItem_Shadcn_>
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_ type="number" {...field} />
+                          <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
+                        {field.value > 0 && (
+                          <>
+                            <p className="text-foreground-lighter text-sm">
+                              This is equivalent to {field.value * 12} requests per hour
+                            </p>
+                          </>
+                        )}
                       </FormItem_Shadcn_>
                     )}
                   />
