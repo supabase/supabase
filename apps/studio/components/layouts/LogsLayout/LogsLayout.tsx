@@ -119,7 +119,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                 <Link href={`/project/${ref}/settings/warehouse`}>
                   <Menu.Item rounded>
                     <div className="flex px-3 items-center justify-between">
-                      <p className="truncate">Settings</p>
+                      <p className="truncate">Warehouse Settings</p>
                       <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
                     </div>
                   </Menu.Item>
