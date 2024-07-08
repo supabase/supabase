@@ -363,7 +363,6 @@ const AiCommand = () => {
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
-          autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
