@@ -12,7 +12,12 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import {
+  doPermissionsCheck,
+  useGetPermissions,
+  useCheckPermissions,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
@@ -62,6 +67,15 @@ export const InviteMemberButton = () => {
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
   )
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+  const currentPlan = subscription?.plan
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -361,6 +375,14 @@ export const InviteMemberButton = () => {
                           How SSO works
                         </Link>
                       </Button>
+                      {isSuccessSubscription &&
+                        (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                          <Button asChild type="default">
+                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                              Upgrade to Teams
+                            </Link>
+                          </Button>
+                        )}
                     </div>
                   </div>
                 }
