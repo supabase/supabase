@@ -407,7 +407,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of OTP sign-ins and sign up request that can be made per hour per IP
+                        Number of OTP sign-ins and sign up requests that can be made per hour for a given IP
                         address.
                       </p>
                     }
