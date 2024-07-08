@@ -321,13 +321,13 @@ export function queryAi(messages: Message[], timeout = 0) {
 
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
-  const isMobile = isBrowser && window.screen.width <= 480
+  const isMobile = isBrowser && window.screen.width <= 640
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
   })
 
-  const inputRef = useAutoInputFocus()
+  const inputRef = useAutoInputFocus(!isMobile)
 
   useHistoryKeys({
     enable: !isResponding,

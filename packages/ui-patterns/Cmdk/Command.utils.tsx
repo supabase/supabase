@@ -78,7 +78,6 @@ export const CommandDialog = ({
   } = useDragToClose({
     onClose: () => setIsOpen(!open),
   })
-  // const [isInputFocused, setIsInputFocused] = React.useState(false)
   const [dialogHeight, setDialogHeight] = React.useState('85vh')
   const { inputRef: commandInputRef } = useCommandMenu()
   const isMobile = useBreakpoint()
@@ -98,11 +97,9 @@ export const CommandDialog = ({
   }, [])
 
   const handleFocus = () => {
-    // setIsInputFocused(true)
     setDialogHeight('calc(var(--vh, 1vh) * 85)')
   }
   const handleBlur = () => {
-    // setIsInputFocused(false)
     setDialogHeight('85vh')
   }
 
@@ -128,7 +125,6 @@ export const CommandDialog = ({
         ref={dialogContentRef}
         forceMount
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        // style={{ height: `minmax(${dialogHeight}, ${isInputFocused ? '300px' : 'auto'})` }}
         style={{ height: `minmax(${dialogHeight}, auto)` }}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
@@ -491,19 +487,19 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
  *
  * @returns An input ref for the input to focus
  */
-export function useAutoInputFocus() {
+export function useAutoInputFocus(isEnabled: boolean = true) {
   const [input, setInput] = React.useState<HTMLInputElement>()
 
   // Use a callback-style ref to access the element when it mounts
   const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
-    if (inputElement) {
+    if (isEnabled && inputElement) {
       setInput(inputElement)
 
       // We need to delay the focus until the end of the call stack
       // due to order of operations
       setTimeout(() => {
         inputElement.focus()
-      }, 100)
+      }, 0)
     }
   }, [])
 
@@ -515,7 +511,7 @@ export function useAutoInputFocus() {
       }
     }
 
-    window.addEventListener('keydown', onKeyDown)
+    isEnabled && window.addEventListener('keydown', onKeyDown)
 
     return () => {
       window.removeEventListener('keydown', onKeyDown)
