@@ -11,6 +11,7 @@ import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuContext'
 import useDragToClose from 'common/hooks/useDragToClose'
+import { useBreakpoint } from 'common'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -77,9 +78,10 @@ export const CommandDialog = ({
   } = useDragToClose({
     onClose: () => setIsOpen(!open),
   })
-  const [isInputFocused, setIsInputFocused] = React.useState(false)
+  // const [isInputFocused, setIsInputFocused] = React.useState(false)
   const [dialogHeight, setDialogHeight] = React.useState('80vh')
   const { inputRef: commandInputRef } = useCommandMenu()
+  const isMobile = useBreakpoint()
 
   React.useEffect(() => {
     const adjustHeight = () => {
@@ -96,11 +98,11 @@ export const CommandDialog = ({
   }, [])
 
   const handleFocus = () => {
-    setIsInputFocused(true)
+    // setIsInputFocused(true)
     setDialogHeight('calc(var(--vh, 1vh) * 80)')
   }
   const handleBlur = () => {
-    setIsInputFocused(false)
+    // setIsInputFocused(false)
     setDialogHeight('80vh')
   }
 
@@ -125,7 +127,9 @@ export const CommandDialog = ({
       <DialogContent
         ref={dialogContentRef}
         forceMount
-        style={{ height: `minmax(${dialogHeight}, ${isInputFocused ? '300px' : 'auto'})` }}
+        onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
+        // style={{ height: `minmax(${dialogHeight}, ${isInputFocused ? '300px' : 'auto'})` }}
+        style={{ height: `minmax(${dialogHeight}, auto)` }}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
@@ -188,7 +192,8 @@ export const CommandInput = React.forwardRef<
     <div className="flex flex-col items-center" cmdk-input-wrapper="">
       <CommandPrimitive.Input
         value={value}
-        autoFocus
+        autoComplete="off"
+        autoCorrect="off"
         onValueChange={onValueChange}
         ref={ref}
         className={cn(
@@ -212,6 +217,7 @@ type CommandPrimitiveListProps = React.ComponentPropsWithoutRef<typeof CommandPr
 export const CommandList = React.forwardRef<CommandPrimitiveListElement, CommandPrimitiveListProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive.List
+      autoFocus
       ref={ref}
       className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}

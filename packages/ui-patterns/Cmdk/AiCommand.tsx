@@ -325,7 +325,7 @@ const AiCommand = () => {
     setIsLoading,
   })
 
-  // const inputRef = useAutoInputFocus()
+  const inputRef = useAutoInputFocus()
 
   useHistoryKeys({
     enable: !isResponding,
@@ -362,7 +362,7 @@ const AiCommand = () => {
       <div className="absolute z-10 top-9.5 w-full bg-background py-3">
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
-          // inputRef={inputRef}
+          inputRef={inputRef}
           autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
