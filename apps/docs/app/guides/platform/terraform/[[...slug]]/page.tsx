@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -111,7 +112,7 @@ const getContent = async ({ slug }: Params) => {
     `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
   )
 
-  let response = await fetch(
+  let response = await fetchRevalidatePerDay(
     `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
   )
 

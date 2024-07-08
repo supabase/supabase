@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
@@ -11,7 +12,12 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import {
+  doPermissionsCheck,
+  useGetPermissions,
+  useCheckPermissions,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
@@ -44,6 +50,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import InformationBox from 'components/ui/InformationBox'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -60,6 +67,15 @@ export const InviteMemberButton = () => {
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
   )
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+  const currentPlan = subscription?.plan
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -336,6 +352,40 @@ export const InviteMemberButton = () => {
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
                 )}
+              />
+              <InformationBox
+                defaultVisibility={false}
+                title="Single Sign-on (SSO) login option available"
+                hideCollapse={false}
+                description={
+                  <div className="space-y-4 mb-1">
+                    <p>
+                      Supabase offers single sign-on (SSO) as a login option to provide additional
+                      account security for your team. This allows company administrators to enforce
+                      the use of an identity provider when logging into Supabase.
+                    </p>
+                    <p>This is only available for organizations on teams plan or above.</p>
+                    <div className="flex items-center space-x-2">
+                      <Button asChild type="default">
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/sso"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Learn more
+                        </Link>
+                      </Button>
+                      {isSuccessSubscription &&
+                        (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                          <Button asChild type="default">
+                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                              Upgrade to Teams
+                            </Link>
+                          </Button>
+                        )}
+                    </div>
+                  </div>
+                }
               />
             </DialogSection>
             <DialogSectionSeparator />
