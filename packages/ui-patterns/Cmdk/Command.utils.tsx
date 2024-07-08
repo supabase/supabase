@@ -73,11 +73,51 @@ export const CommandDialog = ({
     onClose: () => setIsOpen(!open),
   })
 
+  const [dialogHeight, setDialogHeight] = React.useState('80vh')
+  const { inputRef: commandInputRef } = useCommandMenu()
+
+  React.useEffect(() => {
+    const adjustHeight = () => {
+      const vh = window.innerHeight * 0.01
+      document.documentElement.style.setProperty('--vh', `${vh}px`)
+    }
+
+    adjustHeight()
+    window.addEventListener('resize', adjustHeight)
+
+    return () => {
+      window.removeEventListener('resize', adjustHeight)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    const handleFocus = () => {
+      setDialogHeight('calc(var(--vh, 1vh) * 80)')
+    }
+    const handleBlur = () => {
+      setDialogHeight('80vh')
+    }
+
+    const input = commandInputRef.current
+    if (input) {
+      input.addEventListener('focus', handleFocus)
+      input.addEventListener('blur', handleBlur)
+    }
+
+    return () => {
+      if (input) {
+        input.removeEventListener('focus', handleFocus)
+        input.removeEventListener('blur', handleBlur)
+      }
+    }
+  }, [])
+
   return (
     <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
         ref={ref}
         forceMount
+        style={{ height: dialogHeight }}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening

@@ -359,7 +359,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="absolute z-10 top-10 w-full bg-background py-3">
+      <div className="absolute z-10 top-9.5 w-full bg-background py-3">
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
           inputRef={inputRef}
@@ -411,7 +411,7 @@ const AiCommand = () => {
         />
         {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-4" />}
       </div>
-      <div>
+      <div className="pt-11">
         <div className={cn('relative mt-4 py-4')}>
           {!hasError &&
             messages.map((message, index) => {
@@ -444,7 +444,7 @@ const AiCommand = () => {
                         />
                         <>
                           {message.status === MessageStatus.Pending ? (
-                            <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                            <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse"></div>
                           ) : (
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}

@@ -87,7 +87,7 @@ const CommandMenu = () => {
     currentPage === COMMAND_ROUTES.AI ||
     currentPage === COMMAND_ROUTES.GENERATE_SQL
       ? 'min(600px, 50vh)'
-      : 'min(600px, 50vh)'
+      : 'auto'
 
   return (
     <>
@@ -110,6 +110,7 @@ const CommandMenu = () => {
         )}
         <CommandList
           style={{
+            paddingBottom: '12rem',
             maxHeight: commandListMaxHeight,
             height:
               currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
