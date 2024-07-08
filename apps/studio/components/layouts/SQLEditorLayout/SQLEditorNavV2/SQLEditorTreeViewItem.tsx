@@ -21,6 +21,7 @@ interface SQLEditorTreeViewItemProps {
   isBranch: boolean
   isSelected: boolean
   isExpanded: boolean
+  isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any
   onSelectDelete?: () => void
@@ -39,8 +40,9 @@ export const SQLEditorTreeViewItem = ({
   isBranch,
   isExpanded,
   level,
-  isSelected,
   status,
+  isSelected,
+  isMultiSelected,
   getNodeProps,
   onSelectDelete,
   onSelectRename,
@@ -91,6 +93,8 @@ export const SQLEditorTreeViewItem = ({
                 } else {
                   router.push(`/project/${ref}/sql/${element.id}`)
                 }
+              } else {
+                onClick(e)
               }
             }}
           />
@@ -128,6 +132,19 @@ export const SQLEditorTreeViewItem = ({
                     Delete folder
                   </ContextMenuItem_Shadcn_>
                 </>
+              )}
+            </>
+          ) : isMultiSelected ? (
+            <>
+              {onSelectDelete !== undefined && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectDelete()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Trash size={14} />
+                  Delete selected queries
+                </ContextMenuItem_Shadcn_>
               )}
             </>
           ) : (

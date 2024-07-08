@@ -112,7 +112,9 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
-      toast.success('Successfully deleted query')
+      toast.success(
+        `Successfully deleted ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`
+      )
       postDeleteCleanup(data)
     },
     onError: (error, data) => {
@@ -141,6 +143,7 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
   const postDeleteCleanup = (ids: string[]) => {
     setShowDeleteModal(false)
+    setSelectedSnippets([])
     const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
 
     if (existingSnippetIds.length === 0) {
@@ -386,6 +389,7 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
                 <SQLEditorTreeViewItem
                   {...props}
                   element={element}
+                  isMultiSelected={selectedSnippets.length > 1}
                   status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
                   onMultiSelect={onMultiSelect}
                   onSelectDelete={() => {
@@ -393,7 +397,9 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
                       setSelectedFolderToDelete(element.metadata as SnippetFolder)
                     } else {
                       setShowDeleteModal(true)
-                      setSelectedSnippets([element.metadata as unknown as Snippet])
+                      if (selectedSnippets.length === 0) {
+                        setSelectedSnippets([element.metadata as unknown as Snippet])
+                      }
                     }
                   }}
                   onSelectRename={() => {
@@ -485,13 +491,16 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
       <ConfirmationModal
         size="small"
-        title="Confirm to delete query"
-        confirmLabel="Delete query"
+        title={`Confirm to delete ${selectedSnippets.length === 1 ? 'query' : `${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`}`}
+        confirmLabel={`Delete ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`}
         confirmLabelLoading="Deleting query"
         loading={isDeleting}
         visible={showDeleteModal}
         variant="destructive"
-        onCancel={() => setShowDeleteModal(false)}
+        onCancel={() => {
+          setShowDeleteModal(false)
+          setSelectedSnippets([])
+        }}
         onConfirm={onConfirmDelete}
         alert={
           (selectedSnippets[0]?.visibility as unknown as string) === 'project'
@@ -503,7 +512,12 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
             : undefined
         }
       >
-        <p className="text-sm">Are you sure you want to delete '{selectedSnippets[0]?.name}'?</p>
+        <p className="text-sm">
+          This action cannot be undone.{' '}
+          {selectedSnippets.length === 1
+            ? `Are you sure you want to delete '${selectedSnippets[0]?.name}'?`
+            : `Are you sure you want to delete the selected ${selectedSnippets.length} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}?`}
+        </p>
       </ConfirmationModal>
 
       <ConfirmationModal
