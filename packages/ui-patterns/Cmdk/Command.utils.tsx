@@ -69,10 +69,15 @@ export const CommandDialog = ({
 }: CommandDialogProps) => {
   const isOpen = props.visible || props.open
 
-  const { ref, handleTouchStart, handleTouchMove, handleTouchEnd } = useDragToClose({
+  const {
+    ref: dialogContentRef,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useDragToClose({
     onClose: () => setIsOpen(!open),
   })
-
+  const [isInputFocused, setIsInputFocused] = React.useState(false)
   const [dialogHeight, setDialogHeight] = React.useState('80vh')
   const { inputRef: commandInputRef } = useCommandMenu()
 
@@ -90,15 +95,18 @@ export const CommandDialog = ({
     }
   }, [])
 
-  React.useEffect(() => {
-    const handleFocus = () => {
-      setDialogHeight('calc(var(--vh, 1vh) * 80)')
-    }
-    const handleBlur = () => {
-      setDialogHeight('80vh')
-    }
+  const handleFocus = () => {
+    setIsInputFocused(true)
+    setDialogHeight('calc(var(--vh, 1vh) * 80)')
+  }
+  const handleBlur = () => {
+    setIsInputFocused(false)
+    setDialogHeight('80vh')
+  }
 
+  React.useEffect(() => {
     const input = commandInputRef.current
+
     if (input) {
       input.addEventListener('focus', handleFocus)
       input.addEventListener('blur', handleBlur)
@@ -115,9 +123,9 @@ export const CommandDialog = ({
   return (
     <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
-        ref={ref}
+        ref={dialogContentRef}
         forceMount
-        style={{ height: dialogHeight }}
+        style={{ height: `minmax(${dialogHeight}, ${isInputFocused ? '300px' : 'auto'})` }}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
@@ -148,14 +156,14 @@ export const CommandDialog = ({
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <Command
-            className={[
+            className={cn(
               '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
               '[&_[cmdk-item]_svg]:h-5',
               '[&_[cmdk-item]_svg]:w-5',
               '[&_[cmdk-input-wrapper]_svg]:h-5',
               '[&_[cmdk-input-wrapper]_svg]:w-5',
-              '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
-            ].join(' ')}
+              '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
+            )}
           >
             {children}
           </Command>
@@ -489,7 +497,7 @@ export function useAutoInputFocus() {
       // due to order of operations
       setTimeout(() => {
         inputElement.focus()
-      }, 100)
+      }, 1000)
     }
   }, [])
 
