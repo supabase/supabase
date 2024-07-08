@@ -311,7 +311,7 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 
   // if the user is already logged in return them to the account page
   if (session) {
-    throw redirect(303, '/account')
+    redirect(303, '/account')
   }
 
   return { url: url.origin }
@@ -403,12 +403,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
 ```
 

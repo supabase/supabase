@@ -1,4 +1,4 @@
-// src/routes/api/auth/confirm/+server.js
+// src/routes/auth/confirm/+server.js
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -23,10 +23,10 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
