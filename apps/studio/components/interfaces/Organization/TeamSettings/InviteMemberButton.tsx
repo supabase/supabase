@@ -372,7 +372,7 @@ export const InviteMemberButton = () => {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          How SSO works
+                          Learn more
                         </Link>
                       </Button>
                       {isSuccessSubscription &&
