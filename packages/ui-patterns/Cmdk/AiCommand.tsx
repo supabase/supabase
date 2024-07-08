@@ -357,13 +357,17 @@ const AiCommand = () => {
   }, [])
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
+  const showSubmitButton = !isLoading && !isResponding && search
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className="absolute z-10 top-[45px] w-full bg-background py-2">
         <Input
-          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40 [&_input]:text-base [&_input]:placeholder:text-sm"
-          // inputRef={inputRef}
+          className={cn(
+            'bg-alternative rounded mx-3 [&_input]:text-base [&_input]:placeholder:text-sm',
+            showSubmitButton && '[&_input]:pr-32 md:[&_input]:pr-40'
+          )}
+          inputRef={inputRef}
           autoFocus={isMobile ? false : true}
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
@@ -371,7 +375,7 @@ const AiCommand = () => {
           value={search}
           actions={
             <>
-              {!isLoading && !isResponding ? (
+              {showSubmitButton ? (
                 <Button
                   onClick={() => {
                     if (!search || isLoading || isResponding || isImeComposing) {
@@ -379,14 +383,14 @@ const AiCommand = () => {
                     }
                     return handleSubmit(search)
                   }}
-                  className={`flex items-center gap-3 mr-3 transition-opacity duration-700 ${
-                    search ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  className={`flex items-center mr-3 ${search ? 'opacity-100' : 'opacity-0'}`}
+                  iconRight={
+                    <div className="hidden md:flex">
+                      <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                    </div>
+                  }
                 >
-                  <span className="text-foreground-light">Submit message</span>
-                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
-                    <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                  </div>
+                  Submit message
                 </Button>
               ) : null}
             </>
@@ -413,7 +417,7 @@ const AiCommand = () => {
         {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-4" />}
       </div>
       <div className="pt-11">
-        <div className={cn('relative mt-4 py-4')}>
+        <div className={cn('relative py-4')}>
           {!hasError &&
             messages.map((message, index) => {
               switch (message.role) {
