@@ -489,7 +489,7 @@ export function useAutoInputFocus() {
       // due to order of operations
       setTimeout(() => {
         inputElement.focus()
-      }, 0)
+      }, 100)
     }
   }, [])
 
