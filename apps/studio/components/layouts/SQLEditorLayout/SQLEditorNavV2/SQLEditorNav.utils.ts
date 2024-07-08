@@ -1,4 +1,5 @@
 import { SnippetFolderResponse } from 'data/content/sql-folders-query'
+import { flattenTree } from 'ui'
 
 export interface TreeViewItemProps {
   id: string | number

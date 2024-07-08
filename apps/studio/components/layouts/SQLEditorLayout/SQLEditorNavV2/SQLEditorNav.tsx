@@ -33,6 +33,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 
 // Requirements
 // - Asynchronous loading
@@ -42,15 +43,15 @@ import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-del
 
 interface SQLEditorNavProps {
   searchText: string
-  sort: 'name' | 'inserted_at'
 }
 
-export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
+export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
@@ -63,7 +64,6 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
-
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
   const COLLAPSIBLE_TRIGGER_CLASS_NAMES =
@@ -75,15 +75,9 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
   // [Joshen] Set up favorites, shared, and private snippets
   // =================================
   const folders = Object.values(snapV2.folders).map((x) => x.folder)
-  const contents = Object.values(snapV2.snippets)
-    .map((x) => x.snippet)
-    .filter((x) =>
-      searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
-    )
-    .sort((a, b) => {
-      if (sort === 'name') return a.name.localeCompare(b.name)
-      else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-    })
+  const contents = snapV2.sortedSnippets.filter((x) =>
+    searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
+  )
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
   const numPrivateSnippets = Object.keys(snapV2.snippets).length
@@ -94,17 +88,11 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
 
   const favoriteSnippets = contents.filter((snippet) => snippet.favorite)
   const numFavoriteSnippets = favoriteSnippets.length
-  const favoritesTreeState =
-    numFavoriteSnippets === 0
-      ? [ROOT_NODE]
-      : formatFolderResponseForTreeView({ contents: favoriteSnippets })
+  const favoritesTreeState = numFavoriteSnippets === 0 ? [ROOT_NODE] : [ROOT_NODE] // formatFolderResponseForTreeView({ contents: favoriteSnippets })
 
   const projectSnippets = contents.filter((snippet) => snippet.visibility === 'project')
   const numProjectSnippets = projectSnippets.length
-  const projectSnippetsTreeState =
-    numProjectSnippets === 0
-      ? [ROOT_NODE]
-      : formatFolderResponseForTreeView({ contents: projectSnippets })
+  const projectSnippetsTreeState = numProjectSnippets === 0 ? [ROOT_NODE] : [ROOT_NODE] // formatFolderResponseForTreeView({ contents: projectSnippets })
 
   // =================================
   // [Joshen] React Queries
@@ -116,7 +104,7 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
       staleTime: 5 * 60 * 1000, // 5 minutes
       onSuccess: (data) => {
         if (projectRef !== undefined) {
-          snapV2.initializeRemoteSnippets({ projectRef, data })
+          snapV2.initializeRemoteSnippets({ projectRef, data, sort })
         }
       },
     }
@@ -215,6 +203,27 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
     deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
   }
 
+  // [Joshen] Just FYI doing a controlled state instead of letting the TreeView component doing it because
+  // 1. There seems to be no way of accessing the internal state of the TreeView to retrieve the selected nodes
+  // 2. The component itself doesn't handle UUID for node IDs well - trying to multi select doesn't select the expected nodes
+  // We're only supporting shift clicks (not cmd/control click) - this is even with the react tree view component itself
+  const onMultiSelect = (selectedId: string) => {
+    // The base is always the current query thats selected
+    const contentIds = contents.map((x) => x.id)
+    const baseIndex = contentIds.indexOf(id as string)
+    const targetIndex = contentIds.indexOf(selectedId)
+
+    const floor = Math.min(baseIndex, targetIndex)
+    const ceiling = Math.max(baseIndex, targetIndex)
+
+    const _selectedSnippets = []
+    for (let i = floor; i <= ceiling; i++) {
+      _selectedSnippets.push(contents[i])
+    }
+
+    setSelectedSnippets(_selectedSnippets)
+  }
+
   // =================================
   // [Joshen] useEffects kept at the bottom
   // =================================
@@ -227,6 +236,11 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
       }
     }
   }, [id, snapV2.loaded])
+
+  useEffect(() => {
+    // Unselect all snippets whenever opening another snippet
+    setSelectedSnippets([])
+  }, [id])
 
   return (
     <>
@@ -362,13 +376,18 @@ export const SQLEditorNav = ({ sort, searchText }: SQLEditorNavProps) => {
             </div>
           ) : (
             <TreeView
+              multiSelect
+              togglableSelect
+              clickAction="EXCLUSIVE_SELECT"
               data={privateSnippetsTreeState}
+              selectedIds={selectedSnippets.map((x) => x.id)}
               aria-label="private-snippets"
               nodeRenderer={({ element, ...props }) => (
                 <SQLEditorTreeViewItem
                   {...props}
                   element={element}
                   status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
+                  onMultiSelect={onMultiSelect}
                   onSelectDelete={() => {
                     if (props.isBranch) {
                       setSelectedFolderToDelete(element.metadata as SnippetFolder)

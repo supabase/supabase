@@ -11,10 +11,8 @@ import {
   createSqlSnippetSkeletonV2,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
@@ -48,20 +46,10 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
   const [searchText, setSearchText] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
-  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const enableFolders = useFlag('sqlFolderOrganization')
-
-  const { mutate: createFolder, isLoading: isCreating } = useSQLSnippetFolderCreateMutation({
-    onSuccess: () => {
-      toast.success('Done')
-    },
-    onError: () => {
-      toast.error('Nope')
-    },
-  })
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => postDeleteCleanup(data),
@@ -157,8 +145,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
                     onChange={(e) => setSearchText(e.target.value.trim())}
                   >
                     <InnerSideBarFilterSortDropdown
-                      value={sort}
-                      onValueChange={(value: any) => setSort(value)}
+                      value={snapV2.order}
+                      onValueChange={(value: any) => snapV2.setOrder(value)}
                     >
                       <InnerSideBarFilterSortDropdownItem key="name" value="name">
                         Alphabetical
@@ -220,7 +208,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
           </div>
 
           {enableFolders ? (
-            <SQLEditorNavV2 sort={sort} searchText={searchText} />
+            <SQLEditorNavV2 searchText={searchText} />
           ) : (
             <SQLEditorNavV1
               searchText={searchText}

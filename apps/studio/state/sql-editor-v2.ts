@@ -1,13 +1,12 @@
-import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
-import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
-import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
-import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import uuidv4 from 'lib/uuid'
 import { debounce, memoize } from 'lodash'
 import toast from 'react-hot-toast'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
+
+import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
+import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
+import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
+import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -29,6 +28,9 @@ export type StateSnippet = {
 const NEW_FOLDER_ID = 'new-folder'
 
 export const sqlEditorState = proxy({
+  // ========================================================================
+  // ## Data properties within the store
+  // ========================================================================
   folders: {} as {
     [folderId: string]: StateSnippetFolder
   },
@@ -43,13 +45,6 @@ export const sqlEditorState = proxy({
       autoLimit?: number
     }[]
   },
-  // Project ref as the top level key, followed by folder ID, then IDs of each snippet as the order
-  // Folder ID of the root level will just be "root", the rest will be the folder's UUID
-  // This is so that snippets are sorted within each folder, not across
-  // [Joshen] TBD - do we really need this? why not just client side sorting?
-  orders: {} as {
-    [projectRef: string]: { [folderId: string]: string[] }
-  },
   // Project ref as the key, marks which project already has snippets loaded
   loaded: {} as {
     [projectRef: string]: boolean
@@ -62,15 +57,32 @@ export const sqlEditorState = proxy({
   },
   limit: 100,
 
+  order: 'inserted_at' as 'name' | 'inserted_at',
+
+  get sortedSnippets() {
+    return Object.values(sqlEditorState.snippets)
+      .map((x) => x.snippet)
+      .sort((a, b) => {
+        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
+        else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+      })
+  },
+
+  // ========================================================================
+  // ## Methods to interact the store with
+  // ========================================================================
+
   // Initial loading of data into UI, only called once when first loading data
   // Note that snippets here do not have the content property, and will need to be
   // further loaded on demand instead. Entry point from SQLEditorNav.tsx
   initializeRemoteSnippets: ({
     projectRef,
     data,
+    sort,
   }: {
     projectRef: string
     data: SnippetFolderResponse
+    sort: 'name' | 'inserted_at'
   }) => {
     const { folders, contents } = data
     folders?.forEach((folder) => {
@@ -80,27 +92,17 @@ export const sqlEditorState = proxy({
       sqlEditorState.addSnippet({ projectRef, snippet })
     })
     sqlEditorState.loaded[projectRef] = true
-
-    // if (!sqlEditorState.orders[projectRef] && contents !== undefined) {
-    //   const orderedSnippets = sqlEditorState.orderSnippets(contents)
-    //   sqlEditorState.orders[projectRef]['root'] = orderedSnippets.map((s) => s.id!)
-    // }
+    sqlEditorState.order = sort
   },
+
+  setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
 
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
     if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
       sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
       sqlEditorState.results[snippet.id] = []
       sqlEditorState.savingStates[snippet.id] = 'IDLE'
-      // if (
-      //   sqlEditorState.orders[projectRef] !== undefined &&
-      //   !sqlEditorState.orders[projectRef][folderId].includes(snippet.id)
-      // ) {
-      //   sqlEditorState.orders[projectRef][folderId].unshift(snippet.id)
-      //   sqlEditorState.reorderSnippets(projectRef, folderId)
-      // }
     }
-    // sqlEditorState.loaded[projectRef] = true
   },
 
   updateSnippet: (id: string, snippet: Snippet) => {
@@ -131,7 +133,6 @@ export const sqlEditorState = proxy({
       snippet.name = name
       snippet.description = description
 
-      // sqlEditorState.reorderSnippets(projectRef)
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -144,12 +145,6 @@ export const sqlEditorState = proxy({
     sqlEditorState.results = otherResults
 
     sqlEditorState.needsSaving.delete(id)
-
-    // const { projectRef, snippet: snippetInfo } = snippet
-    // const folderId = snippetInfo.folder_id ?? 'root'
-    // sqlEditorState.orders[projectRef][folderId] = sqlEditorState.orders[projectRef][
-    //   folderId
-    // ].filter((s) => s !== id)
   },
 
   addNewFolder: ({ projectRef }: { projectRef: string }) => {
@@ -236,20 +231,11 @@ export const sqlEditorState = proxy({
       sqlEditorState.results[id] = []
     }
   },
-
-  // Utils to sort snippets alphabetically
-  // orderSnippets: (snippets: Snippet[]) => {
-  //   return snippets.filter((s) => Boolean(s.id)).sort((a, b) => a.name?.localeCompare(b.name))
-  // },
-
-  // reorderSnippets: (projectRef: string, folderId: string) => {
-  //   sqlEditorState.orders[projectRef][folderId] = sqlEditorState
-  //     .orderSnippets(
-  //       sqlEditorState.orders[projectRef][folderId].map((id) => sqlEditorState.snippets[id].snippet)
-  //     )
-  //     .map((s) => s.id!)
-  // },
 })
+
+// ========================================================================
+// ## Expose entry points into this Valtio store
+// ========================================================================
 
 export const getSqlEditorV2StateSnapshot = () => snapshot(sqlEditorState)
 
@@ -290,8 +276,8 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
       toast.success('Successfully updated folder')
       sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
     }
-  } catch (error) {
-    toast.error('Oh no')
+  } catch (error: any) {
+    toast.error(`Failed to save folder: ${error.message}`)
   }
 }
 

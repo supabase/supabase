@@ -117,7 +117,7 @@ const TreeViewItem = forwardRef<
             }
           ></div>
         )}
-        {/* [Joshen] Temp fix */}
+        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (

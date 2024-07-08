@@ -31,6 +31,7 @@ interface SQLEditorTreeViewItemProps {
   onSelectCopyPersonal?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
+  onMultiSelect?: (id: string) => void
 }
 
 export const SQLEditorTreeViewItem = ({
@@ -48,10 +49,12 @@ export const SQLEditorTreeViewItem = ({
   onSelectDownload,
   onSelectCopyPersonal,
   onEditSave,
+  onMultiSelect,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref } = useParams()
   const { profile } = useProfile()
+  const { className, onClick } = getNodeProps()
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -71,6 +74,7 @@ export const SQLEditorTreeViewItem = ({
             level={level}
             xPadding={16}
             name={element.name}
+            className={className}
             isExpanded={isExpanded}
             isBranch={isBranch}
             isSelected={isSelected || id === element.id}
@@ -78,10 +82,16 @@ export const SQLEditorTreeViewItem = ({
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}
-            // [Joshen] Do not shift getNodeProps below onClick
-            {...getNodeProps()}
-            onClick={() => {
-              if (!isBranch) router.push(`/project/${ref}/sql/${element.id}`)
+            onClick={(e) => {
+              if (!isBranch) {
+                if (!e.shiftKey) {
+                  router.push(`/project/${ref}/sql/${element.id}`)
+                } else if (id !== 'new') {
+                  onMultiSelect?.(element.id)
+                } else {
+                  router.push(`/project/${ref}/sql/${element.id}`)
+                }
+              }
             }}
           />
         </ContextMenuTrigger_Shadcn_>
