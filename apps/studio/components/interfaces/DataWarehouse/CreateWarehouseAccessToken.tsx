@@ -1,8 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormControl_Shadcn_, FormField_Shadcn_, FormItem_Shadcn_, Form_Shadcn_, Modal } from 'ui'
 import { Input } from '@ui/components/shadcn/ui/input'
@@ -59,10 +59,22 @@ const CreateWarehouseAccessToken = ({ onSubmit, loading, open, setOpen }: Create
           form.handleSubmit((data) => {
             onSubmit(data)
           })()
+
+          form.reset()
         }}
       >
         <Form_Shadcn_ {...form}>
-          <form id="create-access-token-form">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              form.handleSubmit((data) => {
+                onSubmit(data)
+              })()
+
+              form.reset()
+            }}
+            id="create-access-token-form"
+          >
             <Modal.Content className="py-4">
               <p className="pb-5 text-foreground-light text-sm">
                 Enter a unique description to identify this token.
