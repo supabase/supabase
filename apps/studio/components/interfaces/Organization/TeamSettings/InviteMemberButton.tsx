@@ -20,6 +20,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -337,6 +338,17 @@ export const InviteMemberButton = () => {
                   </FormItem_Shadcn_>
                 )}
               />
+              <DialogDescription>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground transition"
+                  href="https://supabase.com/docs/guides/platform/sso"
+                >
+                  Enable SSO
+                </a>{' '}
+                for your organization to provide additional account security.
+              </DialogDescription>
             </DialogSection>
             <DialogSectionSeparator />
             <DialogSection className="pt-0">
