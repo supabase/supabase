@@ -103,40 +103,48 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
     if (!ref) return console.error('Project ref is required')
     if (!snippet) return console.error('Snippet is required')
 
-    if (selectedId === 'new-folder') {
-      // [Joshen TODO] Need to create folder first
-    }
+    try {
+      let folderId = selectedId
 
-    let snippetContent = (snippet as SnippetDetail)?.content
-    if (snippetContent === undefined) {
-      const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-      snippetContent = content
-    }
+      if (selectedId === 'new-folder') {
+        const { id } = await createFolder({ projectRef: ref, name: values.name })
+        folderId = id
+      }
 
-    // [Joshen] Idk if this is necessary but its just to double check that snippetContent should NOT be undefined
-    if (snippetContent === undefined) {
-      return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
-    } else {
-      moveSnippet({
-        projectRef: ref,
-        payload: {
-          id: snippet.id,
-          type: 'sql',
-          name: snippet.name,
-          description: snippet.description,
-          visibility: snippet.visibility,
-          project_id: snippet.project_id,
-          owner_id: snippet.owner_id,
-          folder_id: selectedId === 'root' ? (null as any) : selectedId,
-          content: snippetContent as any,
-        },
-      })
+      let snippetContent = (snippet as SnippetDetail)?.content
+      if (snippetContent === undefined) {
+        const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+        snippetContent = content
+      }
+
+      // [Joshen] Idk if this is necessary but its just to double check that snippetContent should NOT be undefined
+      if (snippetContent === undefined) {
+        return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
+      } else {
+        moveSnippet({
+          projectRef: ref,
+          payload: {
+            id: snippet.id,
+            type: 'sql',
+            name: snippet.name,
+            description: snippet.description,
+            visibility: snippet.visibility,
+            project_id: snippet.project_id,
+            owner_id: snippet.owner_id,
+            folder_id: selectedId === 'root' ? (null as any) : folderId,
+            content: snippetContent as any,
+          },
+        })
+      }
+    } catch (error: any) {
+      toast.error(`Failed to create new folder: ${error.message}`)
     }
   }
 
   useEffect(() => {
     if (visible && snippet !== undefined) {
       setSelectedId(snippet.folder_id ?? 'root')
+      form.reset({ name: '' })
     }
   }, [visible, snippet])
 

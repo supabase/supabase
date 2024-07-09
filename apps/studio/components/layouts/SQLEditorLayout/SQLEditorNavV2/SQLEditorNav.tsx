@@ -113,12 +113,6 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   )
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
-    onSuccess: (data) => {
-      toast.success(
-        `Successfully deleted ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`
-      )
-      postDeleteCleanup(data)
-    },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
         postDeleteCleanup(data.ids)
@@ -130,9 +124,7 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
   const { mutate: deleteFolder, isLoading: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
     onSuccess: (_, vars) => {
-      // [Joshen] To check: Can we delete folders with queries inside? Does the API support that? If yes we need to redirect
       toast.success('Successfully deleted folder')
-
       const { ids } = vars
       snapV2.removeFolder(ids[0])
       setSelectedFolderToDelete(undefined)
@@ -159,7 +151,17 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
   const onConfirmDelete = () => {
     if (!projectRef) return console.error('Project ref is required')
-    deleteContent({ projectRef, ids: selectedSnippets.map((x) => x.id) })
+    deleteContent(
+      { projectRef, ids: selectedSnippets.map((x) => x.id) },
+      {
+        onSuccess: (data) => {
+          toast.success(
+            `Successfully deleted ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`
+          )
+          postDeleteCleanup(data)
+        },
+      }
+    )
   }
 
   const onConfirmShare = () => {
@@ -202,10 +204,28 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
     router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
-  const onConfirmDeleteFolder = () => {
+  const onConfirmDeleteFolder = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFolderToDelete === undefined) return console.error('No folder is selected')
-    deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
+
+    const folderSnippets = contents.filter(
+      (content) => content.folder_id === selectedFolderToDelete.id
+    )
+    if (folderSnippets.length > 0) {
+      const ids = folderSnippets.map((x) => x.id)
+      deleteContent(
+        { projectRef, ids },
+        {
+          onSuccess: () => {
+            ids.forEach((id) => snapV2.removeSnippet(id))
+            postDeleteCleanup(ids)
+            deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
+          },
+        }
+      )
+    } else {
+      deleteFolder({ projectRef, ids: [selectedFolderToDelete?.id] })
+    }
   }
 
   // [Joshen] Just FYI doing a controlled state instead of letting the TreeView component doing it because
