@@ -443,7 +443,7 @@ const AiCommand = () => {
                   )
                 case MessageRole.Assistant:
                   return (
-                    <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
+                    <div key={index} className="px-4 pb-8 [overflow-anchor:none] mb-[25px]">
                       <div className="flex gap-4 [overflow-anchor:none] mb-6">
                         <AiIconChat
                           loading={
