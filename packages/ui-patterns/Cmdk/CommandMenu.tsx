@@ -39,6 +39,7 @@ import SearchableStudioItems from './SearchableStudioItems'
 import ThemeOptions from './ThemeOptions'
 import sharedItems from './utils/shared-nav-items.json'
 import useDragToClose from 'common/hooks/useDragToClose'
+import { DialogHeader } from 'ui'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -110,19 +111,23 @@ const CommandMenu = () => {
           setIsOpen(!isOpen)
         }}
       >
-        {pages.length > 0 && <CommandMenuShortcuts />}
-        {showCommandInput && (
-          <CommandInput
-            ref={commandInputRef}
-            placeholder="Type a command or search..."
-            value={search}
-            onValueChange={handleInputChange}
-            // Close on swipe down
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          />
-        )}
+        <DialogHeader
+          className="p-0 gap-0"
+          // Close on swipe down
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {pages.length > 0 && <CommandMenuShortcuts />}
+          {showCommandInput && (
+            <CommandInput
+              ref={commandInputRef}
+              placeholder="Type a command or search..."
+              value={search}
+              onValueChange={handleInputChange}
+            />
+          )}
+        </DialogHeader>
         <CommandList
           style={{
             paddingBottom: '12rem',
