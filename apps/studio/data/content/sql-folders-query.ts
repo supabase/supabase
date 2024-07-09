@@ -46,8 +46,7 @@ export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
   }: UseQueryOptions<SQLSnippetFoldersData, SQLSnippetFoldersError, TData> = {}
 ) =>
   useQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>(
-    // [Joshen] TODO: Need to think about how to store the query key
-    contentKeys.folders(projectRef),
+    contentKeys.folders(projectRef, folderId),
     ({ signal }) => getSQLSnippetFolders({ projectRef, folderId }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

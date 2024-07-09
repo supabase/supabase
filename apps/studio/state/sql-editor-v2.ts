@@ -105,10 +105,18 @@ export const sqlEditorState = proxy({
     }
   },
 
-  updateSnippet: (id: string, snippet: Snippet) => {
+  updateSnippet: ({
+    id,
+    snippet,
+    skipSave = false,
+  }: {
+    id: string
+    snippet: Snippet
+    skipSave?: boolean
+  }) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet = snippet
-      sqlEditorState.needsSaving.add(id)
+      if (!skipSave) sqlEditorState.needsSaving.add(id)
     }
   },
 

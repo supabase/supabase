@@ -31,8 +31,6 @@ export async function upsertContent(
     signal,
   })
 
-  console.log('Upsert content', { data, error })
-
   if (error) handleError(error)
   return data
 }

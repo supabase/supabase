@@ -1,4 +1,4 @@
-import { Copy, Download, Edit, ExternalLink, Lock, Plus, Share, Trash } from 'lucide-react'
+import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -14,6 +14,8 @@ import {
 import { useProfile } from 'lib/profile'
 import { IS_PLATFORM } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 interface SQLEditorTreeViewItemProps {
   element: any
@@ -26,6 +28,7 @@ interface SQLEditorTreeViewItemProps {
   getNodeProps: () => any
   onSelectDelete?: () => void
   onSelectRename?: () => void
+  onSelectMove?: () => void
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
@@ -46,6 +49,7 @@ export const SQLEditorTreeViewItem = ({
   getNodeProps,
   onSelectDelete,
   onSelectRename,
+  onSelectMove,
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
@@ -57,6 +61,7 @@ export const SQLEditorTreeViewItem = ({
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const { className, onClick } = getNodeProps()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -67,6 +72,16 @@ export const SQLEditorTreeViewItem = ({
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  // [Joshen] Folder contents are loaded on demand too
+  const onOpenFolder = async (id: string) => {
+    if (!ref) return console.error('Project ref is required')
+
+    const { contents } = await getSQLSnippetFolders({ projectRef: ref, folderId: id })
+    contents?.forEach((snippet) => {
+      snapV2.addSnippet({ projectRef: ref, snippet })
+    })
+  }
 
   return (
     <>
@@ -95,6 +110,7 @@ export const SQLEditorTreeViewItem = ({
                 }
               } else {
                 onClick(e)
+                if (!isExpanded) onOpenFolder(element.id)
               }
             }}
           />
@@ -169,6 +185,16 @@ export const SQLEditorTreeViewItem = ({
                 >
                   <Edit size={14} />
                   Rename query
+                </ContextMenuItem_Shadcn_>
+              )}
+              {onSelectMove !== undefined && isOwner && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectMove()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Move size={14} />
+                  Move query
                 </ContextMenuItem_Shadcn_>
               )}
               {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (

@@ -34,6 +34,7 @@ import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 
 // Requirements
 // - Asynchronous loading
@@ -63,6 +64,7 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const [selectedSnippetToShare, setSelectedSnippetToShare] = useState<Snippet>()
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
+  const [selectedSnippetToMove, setSelectedSnippetToMove] = useState<Snippet>()
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
@@ -410,12 +412,9 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
                       setSelectedSnippetToRename(element.metadata as Snippet)
                     }
                   }}
-                  onSelectDownload={() => {
-                    setSelectedSnippetToDownload(element.metadata as Snippet)
-                  }}
-                  onSelectShare={() => {
-                    setSelectedSnippetToShare(element.metadata as Snippet)
-                  }}
+                  onSelectMove={() => setSelectedSnippetToMove(element.metadata as Snippet)}
+                  onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
+                  onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now
                     if (name.length === 0) snapV2.removeFolder(element.id as string)
@@ -435,6 +434,12 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
         visible={showRenameModal}
         onCancel={() => setShowRenameModal(false)}
         onComplete={() => setShowRenameModal(false)}
+      />
+
+      <MoveQueryModal
+        snippet={selectedSnippetToMove}
+        visible={selectedSnippetToMove !== undefined}
+        onClose={() => setSelectedSnippetToMove(undefined)}
       />
 
       <DownloadSnippetModal
