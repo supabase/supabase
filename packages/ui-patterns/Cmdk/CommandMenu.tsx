@@ -38,6 +38,7 @@ import GenerateSQL from './GenerateSQL'
 import SearchableStudioItems from './SearchableStudioItems'
 import ThemeOptions from './ThemeOptions'
 import sharedItems from './utils/shared-nav-items.json'
+import useDragToClose from 'common/hooks/useDragToClose'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -89,9 +90,19 @@ const CommandMenu = () => {
       ? 'min(600px, 70vh)'
       : 'auto'
 
+  const {
+    ref: dialogRef,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useDragToClose({
+    onClose: () => setIsOpen(!open),
+  })
+
   return (
     <>
       <CommandDialog
+        ref={dialogRef}
         setIsOpen={setIsOpen}
         page={currentPage}
         visible={isOpen}
@@ -106,6 +117,10 @@ const CommandMenu = () => {
             placeholder="Type a command or search..."
             value={search}
             onValueChange={handleInputChange}
+            // Close on swipe down
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           />
         )}
         <CommandList

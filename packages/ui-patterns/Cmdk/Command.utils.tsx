@@ -61,77 +61,62 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   setIsOpen: (open: boolean) => void
 }
 
-export const CommandDialog = ({
-  children,
-  onKeyDown,
-  page,
-  setIsOpen,
-  ...props
-}: CommandDialogProps) => {
-  const isOpen = props.visible || props.open
-  const isMobile = useBreakpoint()
+type CommandPrimitiveDialogElement = React.ElementRef<typeof CommandPrimitive.Dialog>
 
-  const {
-    ref: dialogContentRef,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-  } = useDragToClose({
-    onClose: () => setIsOpen(!open),
-  })
+export const CommandDialog = React.forwardRef<CommandPrimitiveDialogElement, CommandDialogProps>(
+  ({ children, onKeyDown, page, setIsOpen, ...props }: CommandDialogProps, ref) => {
+    const isOpen = props.visible || props.open
+    const isMobile = useBreakpoint()
 
-  return (
-    <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent
-        ref={dialogContentRef}
-        forceMount
-        onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        onInteractOutside={(e) => {
-          // Only hide menu when clicking outside, not focusing outside
-          // Prevents Firefox dropdown issue that immediately closes menu after opening
-          if (e.type === 'dismissableLayer.pointerDownOutside') {
-            setIsOpen(!open)
-          }
-        }}
-        hideClose
-        size="xlarge"
-        dialogOverlayProps={{
-          className: cn('overflow-hidden flex data-closed:delay-100'),
-        }}
-        className={cn(
-          'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
-          'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          'place-self-start md:place-self-auto',
-          isOpen && '!animate-in !slide-in-from-bottom !duration-300',
-          'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
-          'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
-          'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
-          'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
-          'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
-        )}
-        // Close on swipe down
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <ErrorBoundary FallbackComponent={CommandError}>
-          <Command
-            className={cn(
-              '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-              '[&_[cmdk-item]_svg]:h-5',
-              '[&_[cmdk-item]_svg]:w-5',
-              '[&_[cmdk-input-wrapper]_svg]:h-5',
-              '[&_[cmdk-input-wrapper]_svg]:w-5',
-              '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
-            )}
-          >
-            {children}
-          </Command>
-        </ErrorBoundary>
-      </DialogContent>
-    </Dialog>
-  )
-}
+    return (
+      <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent
+          ref={ref}
+          forceMount
+          onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
+          onInteractOutside={(e) => {
+            // Only hide menu when clicking outside, not focusing outside
+            // Prevents Firefox dropdown issue that immediately closes menu after opening
+            if (e.type === 'dismissableLayer.pointerDownOutside') {
+              setIsOpen(!open)
+            }
+          }}
+          hideClose
+          size="xlarge"
+          dialogOverlayProps={{
+            className: cn('overflow-hidden flex data-closed:delay-100'),
+          }}
+          className={cn(
+            'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
+            'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
+            'place-self-start md:place-self-auto',
+            isOpen && '!animate-in !slide-in-from-bottom !duration-300',
+            'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
+            'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
+            'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
+            'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
+            'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
+          )}
+        >
+          <ErrorBoundary FallbackComponent={CommandError}>
+            <Command
+              className={cn(
+                '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+                '[&_[cmdk-item]_svg]:h-5',
+                '[&_[cmdk-item]_svg]:w-5',
+                '[&_[cmdk-input-wrapper]_svg]:h-5',
+                '[&_[cmdk-input-wrapper]_svg]:w-5',
+                '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
+              )}
+            >
+              {children}
+            </Command>
+          </ErrorBoundary>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+)
 
 CommandDialog.displayName = 'CommandDialog'
 
