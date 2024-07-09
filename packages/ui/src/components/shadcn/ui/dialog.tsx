@@ -102,11 +102,6 @@ const DialogContent = React.forwardRef<
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
-      <span
-        data-radix-focus-guard=""
-        tabIndex={0}
-        style={{ outline: 'none', opacity: '0', position: 'fixed', pointerEvents: 'none' }}
-      ></span>
     </DialogOverlay>
   </DialogPortal>
 ))

@@ -113,7 +113,7 @@ const CommandMenu = () => {
       >
         <DialogHeader
           className="p-0 gap-0"
-          // Close dialog dragging the header down
+          // Close dialog by dragging the header down
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -129,7 +129,6 @@ const CommandMenu = () => {
           )}
         </DialogHeader>
         <CommandList
-          className="pb-20 md:pb-0"
           style={{
             maxHeight: commandListMaxHeight,
             height:
@@ -139,6 +138,7 @@ const CommandMenu = () => {
                 ? commandListMaxHeight
                 : 'auto',
           }}
+          className="pb-20 md:pb-0"
         >
           {!currentPage && (
             <>
