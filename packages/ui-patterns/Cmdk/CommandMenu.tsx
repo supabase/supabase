@@ -113,7 +113,7 @@ const CommandMenu = () => {
       >
         <DialogHeader
           className="p-0 gap-0"
-          // Close on swipe down
+          // Close dialog dragging the header down
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}

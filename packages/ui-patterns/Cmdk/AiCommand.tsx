@@ -327,6 +327,10 @@ const AiCommand = () => {
     setIsLoading,
   })
 
+  /**
+   * Disable autofocusing on the input on mobile
+   * since it messes up with the dialog height and positioning
+   * */
   const inputRef = useAutoInputFocus(!isMobile)
 
   useHistoryKeys({
@@ -368,7 +372,7 @@ const AiCommand = () => {
             showSubmitButton && '[&_input]:pr-32 md:[&_input]:pr-40'
           )}
           inputRef={inputRef}
-          autoFocus={isMobile ? false : true}
+          autoFocus={!isMobile}
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }

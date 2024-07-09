@@ -10,7 +10,6 @@ import { Dialog, DialogContent } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuContext'
-import useDragToClose from 'common/hooks/useDragToClose'
 import { useBreakpoint } from 'common'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>

@@ -1,6 +1,5 @@
 const deepMerge = require('deepmerge')
 const forms = require('@tailwindcss/forms')
-const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 const svgToDataUri = require('mini-svg-data-uri')
@@ -212,6 +211,7 @@ const uiConfig = {
           '0%': { height: 'inherit', opacity: 1 },
           '100%': { height: 0, opacity: 0 },
         },
+
         panelSlideLeftOut: {
           '0%': { transform: 'translateX(-100%)', opacity: 0 },
           '100%': {
