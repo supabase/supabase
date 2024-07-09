@@ -73,9 +73,9 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const COLLAPSIBLE_ICON_CLASS_NAMES = 'text-foreground-light transition-transform duration-200'
   const COLLASIBLE_HEADER_CLASS_NAMES = 'text-foreground-light font-mono text-sm uppercase'
 
-  // =================================
+  // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
-  // =================================
+  // =======================================================
   const folders = Object.values(snapV2.folders).map((x) => x.folder)
   const contents = snapV2.sortedSnippets.filter((x) =>
     searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
@@ -249,9 +249,9 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
     setSelectedSnippets(_selectedSnippets)
   }
 
-  // =================================
+  // ======================================
   // [Joshen] useEffects kept at the bottom
-  // =================================
+  // ======================================
 
   useEffect(() => {
     if (id !== undefined && snapV2.loaded && snapV2.snippets[id] !== undefined) {

@@ -58,7 +58,6 @@ const RenameQueryModal = ({
 
   const generateTitle = async () => {
     if (enableFolders) {
-      // [Joshen TODO] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
       if ('content' in snippet) {
         titleSql({ sql: snippet.content.sql })
       } else {
@@ -87,6 +86,12 @@ const RenameQueryModal = ({
     setSubmitting(true)
     try {
       if (enableFolders) {
+        // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+        if (!('content' in snippet)) {
+          // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
+          const snippet = await getContentById({ projectRef: ref, id })
+          snapV2.addSnippet({ projectRef: ref, snippet })
+        }
         snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
       } else {
         snap.renameSnippet(id, nameInput, descriptionInput)
