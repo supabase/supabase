@@ -53,8 +53,7 @@ const SqlEditor: NextPageWithLayout = () => {
         snapV2.addSnippet({ projectRef: ref as string, snippet: data })
       },
       onError: () => {
-        toast.error('Unable to find snippet with the given ID')
-        router.push(`/project/${ref}/sql/new`)
+        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
       },
     }
   )
