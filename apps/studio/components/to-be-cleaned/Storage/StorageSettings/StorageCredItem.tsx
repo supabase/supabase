@@ -1,7 +1,9 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 
 import CopyButton from 'components/ui/CopyButton'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -23,6 +25,8 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
+  const canRemoveAccessKey = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
   function daysSince(date: string) {
     const now = new Date()
     const created = new Date(date)
@@ -52,27 +56,29 @@ export const StorageCredItem = ({
       </td>
       <td>{daysSince(created_at)}</td>
       <td className="text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              icon={<MoreVertical size={14} strokeWidth={1} />}
-              type="text"
-              className="px-1.5 text-foreground-lighter hover:text-foreground"
-            ></Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-w-40" align="end">
-            <DropdownMenuItem
-              className="flex gap-1.5 "
-              onClick={(e) => {
-                e.preventDefault()
-                onDeleteClick(id)
-              }}
-            >
-              <TrashIcon size="14" />
-              Revoke key
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {canRemoveAccessKey && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                icon={<MoreVertical size={14} strokeWidth={1} />}
+                type="text"
+                className="px-1.5 text-foreground-lighter hover:text-foreground"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-w-40" align="end">
+              <DropdownMenuItem
+                className="flex gap-1.5 "
+                onClick={(e) => {
+                  e.preventDefault()
+                  onDeleteClick(id)
+                }}
+              >
+                <TrashIcon size="14" />
+                Revoke key
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </td>
     </tr>
   )

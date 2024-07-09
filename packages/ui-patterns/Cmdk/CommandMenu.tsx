@@ -4,11 +4,10 @@ import { useParams } from 'common'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
-import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'
-import { IconHome } from 'ui/src/components/Icon/icons/IconHome'
 import { IconArrowRight } from 'ui/src/components/Icon/icons/IconArrowRight'
 import { IconBook } from 'ui/src/components/Icon/icons/IconBook'
 import { IconColumns } from 'ui/src/components/Icon/icons/IconColumns'
+import { IconHome } from 'ui/src/components/Icon/icons/IconHome'
 import { IconInbox } from 'ui/src/components/Icon/icons/IconInbox'
 import { IconKey } from 'ui/src/components/Icon/icons/IconKey'
 import { IconLifeBuoy } from 'ui/src/components/Icon/icons/IconLifeBuoy'
@@ -16,6 +15,7 @@ import { IconLink } from 'ui/src/components/Icon/icons/IconLink'
 import { IconMonitor } from 'ui/src/components/Icon/icons/IconMonitor'
 import { IconPhone } from 'ui/src/components/Icon/icons/IconPhone'
 import { IconUser } from 'ui/src/components/Icon/icons/IconUser'
+import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'
 import APIKeys from './APIKeys'
 import AiCommand from './AiCommand'
 import ChildItem from './ChildItem'
@@ -31,7 +31,7 @@ import {
   CommandList,
   copyToClipboard,
 } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import DocsSearch from './DocsSearch'
 import GenerateSQL from './GenerateSQL'
@@ -86,8 +86,8 @@ const CommandMenu = () => {
     currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
     currentPage === COMMAND_ROUTES.AI ||
     currentPage === COMMAND_ROUTES.GENERATE_SQL
-      ? 'min(600px, 50vh)'
-      : '300px'
+      ? 'min(600px, 60vh)'
+      : '425px'
 
   return (
     <>

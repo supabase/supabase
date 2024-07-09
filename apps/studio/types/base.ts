@@ -80,6 +80,8 @@ export interface Permission {
   condition: jsonLogic.RulesLogic
   organization_id: number
   resources: string[]
+  restrictive?: boolean
+  project_ids?: number[]
 }
 
 export interface ResponseFailure {

@@ -35,7 +35,7 @@ The following script is a good example to get started with testing your Edge Fun
 ```typescript function-one-test.ts
 // Import required libraries and modules
 import { assert, assertEquals } from 'https://deno.land/std@0.192.0/testing/asserts.ts'
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0'
+import { createClient, SupabaseClient } from 'jsr:@supabase/supabase-js@2'
 
 // Set up the configuration for the Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''

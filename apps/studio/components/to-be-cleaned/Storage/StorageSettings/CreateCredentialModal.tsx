@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -7,6 +8,7 @@ import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -35,6 +37,8 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
+
+  const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const FormSchema = z.object({
     description: z.string().min(3, {
@@ -74,14 +78,22 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
           <DialogTrigger asChild>
-            <Button type="default" disabled={!isProjectActive}>
+            <Button
+              type="default"
+              disabled={!isProjectActive || !canCreateCredentials}
+              className="pointer-events-auto"
+            >
               New access key
             </Button>
           </DialogTrigger>
         </TooltipTrigger_Shadcn_>
-        {!isProjectActive && (
-          <TooltipContent_Shadcn_>
-            Restore your project to create new access keys
+        {(!isProjectActive || !canCreateCredentials) && (
+          <TooltipContent_Shadcn_ side="bottom">
+            {!isProjectActive
+              ? 'Restore your project to create new access keys'
+              : !canCreateCredentials
+                ? 'You need additional permissions to create new access keys'
+                : ''}
           </TooltipContent_Shadcn_>
         )}
       </Tooltip_Shadcn_>

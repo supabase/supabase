@@ -17,7 +17,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Content, ContentData } from 'data/content/content-query'
 import { contentKeys } from 'data/content/keys'
-import { useLocalStorageQuery } from 'hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'

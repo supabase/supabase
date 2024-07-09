@@ -34,6 +34,7 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
+
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -72,7 +73,7 @@ const nextConfig = {
     'api-types',
     'icons',
   ],
-	/**
+  /**
    * The SQL to REST API translator relies on libpg-query, which packages a
    * native Node.js module that wraps the Postgres query parser.
    *

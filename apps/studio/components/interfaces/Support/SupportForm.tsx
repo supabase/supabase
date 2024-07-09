@@ -1,5 +1,5 @@
+import * as Sentry from '@sentry/nextjs'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { CLIENT_LIBRARIES } from 'common/constants'
 import {
   AlertCircle,
   Book,
@@ -14,6 +14,10 @@ import {
   Plus,
   X,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import {
   DocsSearchResultType as PageType,
@@ -22,9 +26,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-
-import * as Sentry from '@sentry/nextjs'
-
+import { CLIENT_LIBRARIES } from 'common/constants'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -33,16 +35,10 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
+import { useFlag } from 'hooks/ui/useFlag'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -55,12 +51,12 @@ import {
   Separator,
   cn,
 } from 'ui'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-
-import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']

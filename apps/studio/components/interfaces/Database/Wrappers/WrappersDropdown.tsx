@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 
 import { useParams } from 'common'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,

@@ -22,12 +22,14 @@ export type UtilityPanelProps = {
   onDebug: () => void
 }
 
-const DEFAULT_CHART_CONFIG = {
+const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
   cumulative: false,
   xKey: '',
   yKey: '',
-} as const
+  showLabels: false,
+  showGrid: false,
+}
 
 const UtilityPanel = ({
   id,
@@ -110,7 +112,7 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 pl-6 pr-2">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
