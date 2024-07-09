@@ -21,6 +21,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
+import toast from 'react-hot-toast'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -46,9 +47,14 @@ const SqlEditor: NextPageWithLayout = () => {
     {
       // [Joshen] May need to investigate separately, but occassionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
+      retry: false,
       enabled: enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function',
       onSuccess: (data) => {
         snapV2.addSnippet({ projectRef: ref as string, snippet: data })
+      },
+      onError: () => {
+        toast.error('Unable to find snippet with the given ID')
+        router.push(`/project/${ref}/sql/new`)
       },
     }
   )

@@ -5,16 +5,19 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
+import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
+import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
   Snippet,
   SnippetDetail,
   SnippetFolder,
   useSQLSnippetFoldersQuery,
 } from 'data/content/sql-folders-query'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
@@ -30,11 +33,9 @@ import {
   TreeView,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 
 // Requirements
 // - Asynchronous loading
@@ -390,7 +391,11 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
           </span>
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_ className="pt-2">
-          {folders.length === 0 && numPrivateSnippets === 0 ? (
+          {!snapV2.loaded[projectRef as string] ? (
+            <div className="px-4">
+              <GenericSkeletonLoader />
+            </div>
+          ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <div className="mx-4">
               <Alert_Shadcn_ className="p-3">
                 <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
