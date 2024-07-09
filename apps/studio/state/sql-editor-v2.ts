@@ -200,24 +200,28 @@ export const sqlEditorState = proxy({
 
   addFavorite: (id: string) => {
     if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].snippet.favorite = true
+      sqlEditorState.snippets[id] = {
+        ...sqlEditorState.snippets[id],
+        snippet: { ...sqlEditorState.snippets[id].snippet, favorite: true },
+      }
       sqlEditorState.needsSaving.add(id)
     }
   },
 
   removeFavorite: (id: string) => {
     if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].snippet.favorite = false
+      sqlEditorState.snippets[id] = {
+        ...sqlEditorState.snippets[id],
+        snippet: { ...sqlEditorState.snippets[id].snippet, favorite: false },
+      }
       sqlEditorState.needsSaving.add(id)
     }
   },
 
   shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
     if (sqlEditorState.snippets[id]) {
-      const { snippet, projectRef } = sqlEditorState.snippets[id]
+      const { snippet } = sqlEditorState.snippets[id]
       snippet.visibility = visibility
-
-      // sqlEditorState.reorderSnippets(projectRef)
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -313,7 +317,11 @@ if (typeof window !== 'undefined') {
           project_id: snippet.snippet.project_id ?? 0,
           owner_id: snippet.snippet.owner_id,
           folder_id: snippet.snippet.folder_id,
-          content: { ...snippet.snippet.content, content_id: id },
+          content: {
+            ...snippet.snippet.content,
+            content_id: id,
+            favorite: snippet.snippet.favorite,
+          },
         })
         sqlEditorState.needsSaving.delete(id)
       } else if (folder) {
