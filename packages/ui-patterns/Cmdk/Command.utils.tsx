@@ -132,9 +132,6 @@ export const CommandInput = React.forwardRef<
     <div className="flex flex-col items-center" cmdk-input-wrapper="">
       <CommandPrimitive.Input
         value={value}
-        autoFocus
-        autoComplete="off"
-        autoCorrect="off"
         onValueChange={onValueChange}
         ref={ref}
         className={cn(
