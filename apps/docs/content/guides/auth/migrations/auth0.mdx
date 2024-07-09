@@ -53,11 +53,11 @@ When migrating over users who use passwords to sign-in, we recommend adopting a 
 1. Start signing up new users with password using Supabase Auth
 2. Migrate existing users to Supabase Auth so that they can continue to sign-in (one-off)
 
-**Sign up new users**
+#### Sign up new users
 
 To signup a new user with password, you can call the [`signUp`](/docs/reference/javascript/auth-signup) method. You can refer to [this guide](/docs/guides/auth/passwords#signing-up-with-an-email-and-password) to learn how to sign up a user with a password.
 
-**Migrate existing users to Supabase Auth (one-off)**
+#### Migrate existing users to Supabase Auth (one-off)
 
 - Filter through Auth0 user export list by checking for users with an identity that has `auth0` as the provider. An Auth0 user object contains an `identities` field, which stores all the identities that the user can use to login. An Auth0 identity object contains a `provider` and a `user_id` field. A provider that is labeled as `auth0` indicates that the user potentially has a password-based login method.
 - Map each password user to their corresponding password hash by comparing the provider id to the `oid` field in the password hash export. This will give you an Auth0 user object that contains the password hash.
