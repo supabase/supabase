@@ -91,11 +91,17 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
 
   const favoriteSnippets = contents.filter((snippet) => snippet.favorite)
   const numFavoriteSnippets = favoriteSnippets.length
-  const favoritesTreeState = numFavoriteSnippets === 0 ? [ROOT_NODE] : [ROOT_NODE]
+  const favoritesTreeState =
+    numFavoriteSnippets === 0
+      ? [ROOT_NODE]
+      : formatFolderResponseForTreeView({ contents: favoriteSnippets })
 
   const projectSnippets = contents.filter((snippet) => snippet.visibility === 'project')
   const numProjectSnippets = projectSnippets.length
-  const projectSnippetsTreeState = numProjectSnippets === 0 ? [ROOT_NODE] : [ROOT_NODE]
+  const projectSnippetsTreeState =
+    numProjectSnippets === 0
+      ? [ROOT_NODE]
+      : formatFolderResponseForTreeView({ contents: projectSnippets })
 
   // =================================
   // [Joshen] React Queries
