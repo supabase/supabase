@@ -415,7 +415,7 @@ const AiCommand = () => {
           }}
         />
       </div>
-      <div className="pt-14 md:pt-0 md:pb-14">
+      <div className="pt-14 md:pt-0">
         {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-3" />}
         <div className={cn('relative py-3')}>
           {!hasError &&
