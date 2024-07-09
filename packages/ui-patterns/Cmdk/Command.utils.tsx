@@ -1,5 +1,5 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
+import { Command as CommandPrimitive } from 'cmdk'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { cn } from 'ui/src/lib/utils'
@@ -69,6 +69,7 @@ export const CommandDialog = ({
   ...props
 }: CommandDialogProps) => {
   const isOpen = props.visible || props.open
+  const isMobile = useBreakpoint()
 
   const {
     ref: dialogContentRef,
@@ -78,46 +79,6 @@ export const CommandDialog = ({
   } = useDragToClose({
     onClose: () => setIsOpen(!open),
   })
-  const [dialogHeight, setDialogHeight] = React.useState('85vh')
-  const { inputRef: commandInputRef } = useCommandMenu()
-  const isMobile = useBreakpoint()
-
-  React.useEffect(() => {
-    const adjustHeight = () => {
-      const vh = window.innerHeight * 0.01
-      document.documentElement.style.setProperty('--vh', `${vh}px`)
-    }
-
-    adjustHeight()
-    window.addEventListener('resize', adjustHeight)
-
-    return () => {
-      window.removeEventListener('resize', adjustHeight)
-    }
-  }, [])
-
-  const handleFocus = () => {
-    setDialogHeight('calc(var(--vh, 1vh) * 85)')
-  }
-  const handleBlur = () => {
-    setDialogHeight('85vh')
-  }
-
-  React.useEffect(() => {
-    const input = commandInputRef.current
-
-    if (input) {
-      input.addEventListener('focus', handleFocus)
-      input.addEventListener('blur', handleBlur)
-    }
-
-    return () => {
-      if (input) {
-        input.removeEventListener('focus', handleFocus)
-        input.removeEventListener('blur', handleBlur)
-      }
-    }
-  }, [])
 
   return (
     <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
@@ -125,7 +86,6 @@ export const CommandDialog = ({
         ref={dialogContentRef}
         forceMount
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        style={{ height: `minmax(${dialogHeight}, auto)` }}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
