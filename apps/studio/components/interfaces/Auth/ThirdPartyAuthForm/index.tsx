@@ -5,13 +5,13 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useDeleteThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-delete-mutation'
 import {
   ThirdPartyAuthIntegration,
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
