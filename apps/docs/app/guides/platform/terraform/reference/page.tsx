@@ -2,6 +2,7 @@ import { codeBlock } from 'common-tags'
 import { Check, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+
 import {
   CodeBlock,
   Heading,
@@ -9,8 +10,10 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
@@ -391,7 +394,7 @@ const TerraformReferencePage = async () => {
  * Fetch JSON schema from external repo
  */
 const getSchema = async () => {
-  let response = await fetch(
+  let response = await fetchRevalidatePerDay(
     `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
   )
   if (!response.ok) throw Error('Failed to fetch Terraform JSON schema from GitHub')

@@ -16,21 +16,30 @@ import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-w
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
+import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
-import { Button, IconPlus } from 'ui'
+import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
   search: string
+  filterStatus?: string[]
+  resetFilterStatus?: () => void
 }
 
-const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
+const ProjectList = ({
+  search,
+  rewriteHref,
+  filterStatus,
+  resetFilterStatus,
+}: ProjectListProps) => {
   const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
+    isSuccess: isSuccessProjects,
     isError: isErrorProjects,
     error: projectsError,
   } = useProjectsQuery()
@@ -43,15 +52,21 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
-  const noResults =
+
+  const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
+  const noResultsFromSearch =
     search.length > 0 &&
-    allProjects !== undefined &&
+    isSuccessProjects &&
     allProjects.filter((project) => {
       return (
         project.name.toLowerCase().includes(search.toLowerCase()) ||
         project.ref.includes(search.toLowerCase())
       )
     }).length === 0
+  const noResultsFromStatusFilter =
+    hasFilterStatusApplied &&
+    isSuccessProjects &&
+    allProjects.filter((project) => filterStatus.includes(project.status)).length === 0
 
   if (isLoading) {
     return (
@@ -62,8 +77,33 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
     )
   }
 
-  if (noResults) {
+  if (noResultsFromSearch) {
     return <NoSearchResults searchString={search} />
+  }
+
+  if (noResultsFromStatusFilter) {
+    return (
+      <div
+        className={cn(
+          'bg-surface-100 border border-default px-6 py-4 rounded flex items-center justify-between'
+        )}
+      >
+        <div className="space-y-1">
+          {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
+          <p className="text-sm text-foreground">
+            No projects found with status as {filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'}
+          </p>
+          <p className="text-sm text-foreground-light">
+            Your search for projects with the specified status did not return any results
+          </p>
+        </div>
+        {resetFilterStatus !== undefined && (
+          <Button type="default" onClick={() => resetFilterStatus()}>
+            Reset filter
+          </Button>
+        )}
+      </div>
+    )
   }
 
   return isSuccess && organizations && organizations?.length > 0 ? (
@@ -86,6 +126,7 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
             isErrorProjects={isErrorProjects}
             projectsError={projectsError}
             search={search}
+            filterStatus={filterStatus}
           />
         )
       })}
@@ -110,6 +151,7 @@ type OrganizationProjectsProps = {
   projectsError: ResponseError | null
   rewriteHref?: (projectRef: string) => string
   search: string
+  filterStatus?: string[]
 }
 
 const OrganizationProjects = ({
@@ -125,6 +167,7 @@ const OrganizationProjects = ({
   projectsError,
   rewriteHref,
   search,
+  filterStatus,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
@@ -137,6 +180,10 @@ const OrganizationProjects = ({
           )
         })
       : sortedProjects
+  const filteredProjectsByStatus =
+    filterStatus !== undefined
+      ? filteredProjects.filter((project) => filterStatus.includes(project.status))
+      : filteredProjects
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
@@ -160,7 +207,11 @@ const OrganizationProjects = ({
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
-  if (search.length > 0 && filteredProjects.length === 0) return null
+  if (
+    (search.length > 0 || (filterStatus !== undefined && filterStatus.length !== 2)) &&
+    filteredProjectsByStatus.length === 0
+  )
+    return null
 
   return (
     <div className="space-y-3" key={organization.slug}>
@@ -221,7 +272,7 @@ const OrganizationProjects = ({
           ) : isEmpty ? (
             <NoProjectsState slug={organization.slug} />
           ) : (
-            filteredProjects?.map((project) => (
+            filteredProjectsByStatus?.map((project) => (
               <ProjectCard
                 key={makeRandomString(5)}
                 project={project}
@@ -255,7 +306,7 @@ const NoProjectsState = ({ slug }: { slug: string }) => {
       </div>
 
       {projectCreationEnabled && (
-        <Button asChild icon={<IconPlus />}>
+        <Button asChild icon={<Plus />}>
           <Link href={`/new/${slug}`}>New Project</Link>
         </Button>
       )}

@@ -206,7 +206,7 @@ const countriesWithCities: CountriesWithCities = data
 
 One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
 
-Add the script above to your `package.json` to run it using `npm run update-types`
+Add the following script to your `package.json` to run it using `npm run update-types`
 
 ```json
 "update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"

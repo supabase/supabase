@@ -16,6 +16,7 @@ import type { NextPageWithLayout } from 'types'
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string[]>(['ACTIVE_HEALTHY', 'INACTIVE'])
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
@@ -55,10 +56,20 @@ const ProjectsPage: NextPageWithLayout = () => {
       {!navLayoutV2 && (
         <div className="p-5">
           {IS_PLATFORM && projectCreationEnabled && isSuccess && (
-            <HomePageActions search={search} setSearch={setSearch} organizations={organizations} />
+            <HomePageActions
+              search={search}
+              filterStatus={filterStatus}
+              setSearch={setSearch}
+              setFilterStatus={setFilterStatus}
+              organizations={organizations}
+            />
           )}
           <div className="my-6 space-y-8">
-            <ProjectList search={search} />
+            <ProjectList
+              search={search}
+              filterStatus={filterStatus}
+              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+            />
           </div>
         </div>
       )}
