@@ -49,7 +49,7 @@ export const sqlEditorState = proxy({
   loaded: {} as {
     [projectRef: string]: boolean
   },
-  // Synchronous saving of folders and snippets (debounce behaviour)
+  // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
   savingStates: {} as {
