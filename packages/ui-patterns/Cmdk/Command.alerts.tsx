@@ -1,4 +1,4 @@
-import { Alert } from 'ui'
+import { Alert, Button } from 'ui'
 import { Microscope } from 'lucide-react'
 
 export const AiWarning = ({ className }: { className?: string }) => (

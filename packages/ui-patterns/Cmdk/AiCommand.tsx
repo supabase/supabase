@@ -361,7 +361,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className="absolute z-10 top-[45px] w-full bg-background py-2">
+      <div className="absolute z-10 top-[45px] md:top-auto md:bottom-0 w-full bg-background pt-2 md:pt-0 md:pb-2">
         <Input
           className={cn(
             'bg-alternative rounded mx-3 [&_input]:text-base [&_input]:placeholder:text-sm',
@@ -414,10 +414,10 @@ const AiCommand = () => {
             }
           }}
         />
-        {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-4" />}
       </div>
-      <div className="pt-11">
-        <div className={cn('relative py-4')}>
+      <div className="pt-14 md:pt-0 md:pb-14">
+        {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-3" />}
+        <div className={cn('relative py-3')}>
           {!hasError &&
             messages.map((message, index) => {
               switch (message.role) {
