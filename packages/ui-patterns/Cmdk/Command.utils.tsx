@@ -132,6 +132,7 @@ export const CommandInput = React.forwardRef<
     <div className="flex flex-col items-center" cmdk-input-wrapper="">
       <CommandPrimitive.Input
         value={value}
+        autoFocus
         autoComplete="off"
         autoCorrect="off"
         onValueChange={onValueChange}
@@ -157,7 +158,6 @@ type CommandPrimitiveListProps = React.ComponentPropsWithoutRef<typeof CommandPr
 export const CommandList = React.forwardRef<CommandPrimitiveListElement, CommandPrimitiveListProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive.List
-      autoFocus
       ref={ref}
       className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}

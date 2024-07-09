@@ -129,8 +129,8 @@ const CommandMenu = () => {
           )}
         </DialogHeader>
         <CommandList
+          className="pb-20 md:pb-0"
           style={{
-            paddingBottom: '12rem',
             maxHeight: commandListMaxHeight,
             height:
               currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
