@@ -31,6 +31,10 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
+  '/partners/flyio/extensions/eligibility': {
+    /** Checks database provisioning eligibility */
+    post: operations['FlyExtensionsController_checkEligibility']
+  }
   '/partners/flyio/organizations/{organization_id}': {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
@@ -307,11 +311,13 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member role */
-    patch: operations['MembersController_updateMemberRoleV2']
+    /** Assign organization member with new role */
+    patch: operations['MembersController_assignMemberRoleV2']
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Removes organization member */
+    /** Update organization member role */
+    put: operations['MembersController_UpdateMemberRole']
+    /** Removes organization member role */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/platform/organizations/{slug}/members/invitations': {
@@ -997,6 +1003,10 @@ export interface paths {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
   }
+  '/system/orb/webhooks': {
+    /** Processes Orb events */
+    post: operations['OrbWebhooksController_processEvent']
+  }
   '/system/organizations/{slug}/billing/partner/usage-and-costs': {
     /** Gets the partner usage and costs */
     get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
@@ -1209,11 +1219,13 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member role */
-    patch: operations['MembersController_updateMemberRoleV2']
+    /** Assign organization member with new role */
+    patch: operations['MembersController_assignMemberRoleV2']
   }
   '/v0/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
-    /** Removes organization member */
+    /** Update organization member role */
+    put: operations['MembersController_UpdateMemberRole']
+    /** Removes organization member role */
     delete: operations['MembersController_deleteMemberRole']
   }
   '/v0/organizations/{slug}/members/invite': {
@@ -2145,6 +2157,9 @@ export interface components {
       external_phone_enabled: boolean | null
       external_slack_client_id: string | null
       external_slack_enabled: boolean | null
+      external_slack_oidc_client_id: string | null
+      external_slack_oidc_enabled: boolean | null
+      external_slack_oidc_secret: string | null
       external_slack_secret: string | null
       external_spotify_client_id: string | null
       external_spotify_enabled: boolean | null
@@ -2207,6 +2222,7 @@ export interface components {
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_enabled: boolean | null
+      saml_external_url: string | null
       security_captcha_enabled: boolean | null
       security_captcha_provider: string | null
       security_captcha_secret: string | null
@@ -3148,6 +3164,7 @@ export interface components {
     GetUserContentByIdResponse: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -3290,6 +3307,9 @@ export interface components {
       EXTERNAL_PHONE_ENABLED: boolean
       EXTERNAL_SLACK_CLIENT_ID: string
       EXTERNAL_SLACK_ENABLED: boolean
+      EXTERNAL_SLACK_OIDC_CLIENT_ID: string
+      EXTERNAL_SLACK_OIDC_ENABLED: boolean
+      EXTERNAL_SLACK_OIDC_SECRET: string
       EXTERNAL_SLACK_SECRET: string
       EXTERNAL_SPOTIFY_CLIENT_ID: string
       EXTERNAL_SPOTIFY_ENABLED: boolean
@@ -3352,6 +3372,7 @@ export interface components {
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       SAML_ENABLED: boolean
+      SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
@@ -4574,6 +4595,21 @@ export interface components {
        */
       DATABASE_URL: string
     }
+    ResourceProvisioningEligibilityBody: {
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description Unique ID representing an organization */
+      organization_id: string
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description The full request target URL */
+      url: string
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string
+    }
+    ResourceProvisioningEligibilityResponse: {
+      free_db_eligible: boolean
+    }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
       config: components['schemas']['ResourceProvisioningConfigResponse']
@@ -4676,6 +4712,7 @@ export interface components {
       grace_period_end?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
+      usage_stats?: components['schemas']['UsageStats']
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -5252,6 +5289,9 @@ export interface components {
       external_phone_enabled?: boolean
       external_slack_client_id?: string
       external_slack_enabled?: boolean
+      external_slack_oidc_client_id?: string
+      external_slack_oidc_enabled?: boolean
+      external_slack_oidc_secret?: string
       external_slack_secret?: string
       external_spotify_client_id?: string
       external_spotify_enabled?: boolean
@@ -5319,6 +5359,7 @@ export interface components {
       rate_limit_verify?: number
       refresh_token_rotation_enabled?: boolean
       saml_enabled?: boolean
+      saml_external_url?: string
       security_captcha_enabled?: boolean
       security_captcha_provider?: string
       security_captcha_secret?: string
@@ -5483,6 +5524,9 @@ export interface components {
       EXTERNAL_PHONE_ENABLED?: boolean
       EXTERNAL_SLACK_CLIENT_ID?: string
       EXTERNAL_SLACK_ENABLED?: boolean
+      EXTERNAL_SLACK_OIDC_CLIENT_ID?: string
+      EXTERNAL_SLACK_OIDC_ENABLED?: boolean
+      EXTERNAL_SLACK_OIDC_SECRET?: string
       EXTERNAL_SLACK_SECRET?: string
       EXTERNAL_SPOTIFY_CLIENT_ID?: string
       EXTERNAL_SPOTIFY_ENABLED?: boolean
@@ -5550,6 +5594,7 @@ export interface components {
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       SAML_ENABLED?: boolean
+      SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
@@ -5595,9 +5640,10 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
-    UpdateMemberRoleBodyV2: {
-      role_id: number
-      role_scoped_projects?: string[]
+    UpdateMemberRoleBody: {
+      description?: string
+      name: string
+      role_scoped_projects: string[]
     }
     UpdateNotificationBodyV2: {
       id: string
@@ -5811,7 +5857,7 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -5824,11 +5870,19 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    UsageStats: {
+      report_date: string
+      total_auth_billing_period_mau_billing_period?: number
+      total_db_size_gb_billing_period?: number
+      total_realtime_message_count_billing_period?: number
+      total_storage_size_gb_billing_period?: number
+      total_unified_egress_gb_billing_period?: number
     }
     UserBody: {
       aud?: string
@@ -5891,6 +5945,7 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -5907,6 +5962,7 @@ export interface components {
     UserContentObjectV2: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -6199,6 +6255,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Checks database provisioning eligibility */
+  FlyExtensionsController_checkEligibility: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceProvisioningEligibilityBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ResourceProvisioningEligibilityResponse']
+        }
       }
     }
   }
@@ -7018,9 +7089,6 @@ export interface operations {
       204: {
         content: never
       }
-      403: {
-        content: never
-      }
       /** @description Failed to update GitHub connection */
       500: {
         content: never
@@ -7799,8 +7867,8 @@ export interface operations {
       }
     }
   }
-  /** Updates organization member role */
-  MembersController_updateMemberRoleV2: {
+  /** Assign organization member with new role */
+  MembersController_assignMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7810,7 +7878,32 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
+        'application/json': components['schemas']['AssignMemberRoleBodyV2']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to assign organization member with new role */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update organization member role */
+  MembersController_UpdateMemberRole: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        gotrue_id: string
+        role_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateMemberRoleBody']
       }
     }
     responses: {
@@ -7823,7 +7916,7 @@ export interface operations {
       }
     }
   }
-  /** Removes organization member */
+  /** Removes organization member role */
   MembersController_deleteMemberRole: {
     parameters: {
       path: {
@@ -7837,7 +7930,7 @@ export interface operations {
       200: {
         content: never
       }
-      /** @description Failed to remove organization member */
+      /** @description Failed to remove organization member role */
       500: {
         content: never
       }
@@ -11009,6 +11102,12 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContentV2: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentBodyV2']
@@ -12595,6 +12694,23 @@ export interface operations {
         content: never
       }
       /** @description Failed to process Vercel event */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Processes Orb events */
+  OrbWebhooksController_processEvent: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['Buffer']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to process Orb event */
       500: {
         content: never
       }
@@ -14565,9 +14681,6 @@ export interface operations {
       201: {
         content: never
       }
-      403: {
-        content: never
-      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14589,9 +14702,6 @@ export interface operations {
     }
     responses: {
       201: {
-        content: never
-      }
-      403: {
         content: never
       }
       /** @description Failed to set up read replica */
