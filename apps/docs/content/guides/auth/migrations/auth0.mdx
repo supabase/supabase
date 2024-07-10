@@ -4,12 +4,14 @@ subtitle: 'Learn how to migrate your users from Auth0'
 breadcrumb: 'Auth0 migration'
 ---
 
-## Migration Strategies
+## Migration strategies
 
-When it comes to migrating your users to a different authentication service, these are some of the considerations that we've seen across other projects.
+Changing authentication providers is a significant migration that impacts nearly all aspects of your application. This migration guide highlights common migration strategies, explains key migration steps, and answers various FAQs to ensure your migration goes smoothly, and safely.
+
+When it comes to migrating your users to a different authentication service, these are some of the considerations common across supabase projects:
 
 - How does the cost scale as your user base grows?
-- Does the new auth provider selected cover the same set of features needed (e.g OAuth, password logins, SAML, MFA)?
+- Does the new auth provider selected cover the same set of features needed (e.g OAuth, password logins, Security Assertion Markup Language (SAML), Multi-Factor Authentication (MFA))?
 - Is it acceptable to have some downtime during the migration?
 - What is your timeline to migrate before terminating the old auth provider?
 
@@ -27,7 +29,7 @@ Depending on your evaluation, you may choose to go with one of the following str
 
 You can obtain your user data from Auth0 through the following ways:
 
-1. Use [Auth0 export data functionality](https://auth0.com/docs/troubleshoot/customer-support/manage-subscriptions/export-data)
+1. Use [Auth0 export data feature](https://auth0.com/docs/troubleshoot/customer-support/manage-subscriptions/export-data)
 2. Use [Auth0's management API](https://auth0.com/docs/api/management/v2/users/get-users) to retrieve your users. This endpoint has a rate limit, so you may not be able to retrieve your entire user base immediately.
 
 <Admonition type="note" label="Export password hashes and MFA factors">
@@ -48,10 +50,10 @@ Supabase supports both BCrypt and Argon2 password hashes.
 
 </Admonition>
 
-When migrating over users who use passwords to sign-in, we recommend adopting a hybrid approach to reduce downtime. This approach ensures that you won't have users that aren't migrated to Supabase Auth after the Auth0 service has been terminated.
+When migrating over users who use passwords to sign in, it is recommended to adopt a hybrid approach to reduce downtime. This approach ensures that you won't have users that aren't migrated to Supabase Auth after the Auth0 service has been terminated.
 
 1. Start signing up new users with password using Supabase Auth
-2. Migrate existing users to Supabase Auth so that they can continue to sign-in (one-off)
+2. Migrate existing users to Supabase Auth so that they can continue to sign in (one-off)
 
 #### Sign up new users
 
@@ -111,7 +113,7 @@ Before your users can sign-in, you need to configure the following:
 - The OAuth Client ID and Client secret in [your project](/dashboard/project/_/auth/providers)
 - Add the new callback / redirect URL to the social provider's platform
 
-Once this has been configured, the user can just sign-in using the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) method. This method works for both new and existing users since they will always need to sign-in through the oauth provider's platform before being redirected to your service.
+Once this has been configured, the user can just sign-in using the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) method. This method works for both new and existing users since they will always need to sign-in through the OAuth provider's platform before being redirected to your service.
 
 <Admonition type="note" label="How to identity if an Auth0 user uses OAuth as a login method">
 
@@ -150,13 +152,13 @@ const { data, error } = await supabase.auth.admin.createUser({
 
 <Admonition type="warning">
 
-These fields will be exposed in the user's access token JWT so we recommend not to store excessive metadata in these fields.
+These fields will be exposed in the user's access token JWT so it is recommended not to store excessive metadata in these fields.
 
 </Admonition>
 
 These fields are stored as columns in the `auth.users` table using the `jsonb` type. Both fields can be updated by using the admin [`updateUserById` method](/docs/reference/javascript/auth-admin-updateuserbyid). If you want to allow the user to update their own `raw_user_meta_data` , you can use the [`updateUser` method](/docs/reference/javascript/auth-updateuser).
 
-If you have a lot of user-specific metadata to store, it is recommended to create your own table in a private schema that uses the user id as a foreign key. For example:
+If you have a lot of user-specific metadata to store, it is recommended to create your own table in a private schema that uses the user id as a foreign key:
 
 ```sql
 create table private.user_metadata (
@@ -170,7 +172,7 @@ create table private.user_metadata (
 
 > I have IDs assigned to existing users in my database, how can I maintain these IDs?
 
-All users stored in Supabase Auth use the UUID V4 format as the ID. If your UUID format is identical, you can simply specify it in the admin create user method like this:
+All users stored in Supabase Auth use the UUID V4 format as the ID. If your UUID format is identical, you can specify it in the admin create user method like this:
 
 <Admonition type="note">
 
@@ -188,7 +190,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 
 > How can I allow my users to retain their existing password?
 
-Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading BCrypt and argon2 password hashes, you can simply import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a BCrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
+Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading BCrypt and argon2 password hashes, you can import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a BCrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
 
 > My users have multi-factor authentication (MFA) enabled, how do I make sure they don't have to set up MFA again?
 
@@ -196,7 +198,7 @@ You can obtain an export of your users' MFA secrets by opening a support ticket 
 
 > How do I migrate existing SAML Single Sign-On (SSO) connections?
 
-Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, please reach out to us and we can help provide guidance.
+Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, please reach out to us via support.
 
 > How do I migrate my Auth0 organizations to Supabase?
 
