@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import InformationBox from 'components/ui/InformationBox'
 
 interface HardenAPIModalProps {
   visible: boolean
@@ -87,11 +88,9 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
     })
   }
 
-  const onSelectRemovePublicSchemaAndDisablePgGraphql = () => {
+  const onSelectRemovePublicSchema = () => {
     if (project === undefined) return console.error('Project is required')
     if (config === undefined) return console.error('Postgrest config is required')
-    if (pgGraphqlExtension === undefined)
-      return console.error('Unable to find pg_graphql extension')
 
     removePublicSchemaAndDisablePgGraphql({
       projectRef: project.ref,
@@ -163,29 +162,49 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             )}
           </CollapsibleTrigger_Shadcn_>
           <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-4 px-5 ">
-              <p>
-                Run the following command to create a new schema named{' '}
-                <code className="text-xs text-foreground">api</code> and grant the{' '}
-                <code className="text-xs text-foreground">anon</code> and{' '}
-                <code className="text-xs text-foreground">authenticated</code> roles usage on this
-                schema. Alternatively, you can click on the button below to run the command from
-                here.
-              </p>
-              <CodeBlock
-                language="sql"
-                className="p-1 language-bash prose dark:prose-dark max-w-[93.2ch]"
-              >
-                {`create schema if not exists api;\ngrant usage on schema api to anon, authenticated;`}
-              </CodeBlock>
-            </div>
-            <p className="px-5">
-              Once the schema is created, you can add{' '}
-              <code className="text-xs text-foreground">api</code> to Exposed schemas under the Data
-              API settings. Ensure that it is the first schema in the list so that it will be
-              searched first by default.
+            <p className="mx-5">
+              Click the button below to create a new schema named{' '}
+              <code className="text-xs text-foreground">api</code> and grant the{' '}
+              <code className="text-xs text-foreground">anon</code> and{' '}
+              <code className="text-xs text-foreground">authenticated</code> roles usage privileges
+              on this schema. This schema will thereafter also be exposed to the Data API.
             </p>
-            <div className="flex flex-col gap-y-4 px-5">
+
+            <div className="px-5">
+              <InformationBox
+                title="How is the schema created?"
+                description={
+                  <div className="flex flex-col gap-y-2">
+                    <p>
+                      The following query will be run to create the{' '}
+                      <code className="text-xs text-foreground">api</code> schema , as well as to
+                      grant the necessary privileges to the respective roles
+                    </p>
+                    <CodeBlock
+                      language="sql"
+                      className="p-1 language-bash prose dark:prose-dark max-w-[93.2ch]"
+                    >
+                      {`create schema if not exists api;\ngrant usage on schema api to anon, authenticated;`}
+                    </CodeBlock>
+                  </div>
+                }
+              />
+            </div>
+
+            <ButtonTooltip
+              type="primary"
+              className="w-min mx-5"
+              onClick={onSelectCreateAndExposeAPISchema}
+              disabled={hasAPISchema && isAPISchemaExposed}
+              loading={isCreatingAPISchema}
+              tooltip={{
+                content: { side: 'right', text: 'Schema has already been created and exposed' },
+              }}
+            >
+              Create and expose schema to Data API
+            </ButtonTooltip>
+
+            <div className="flex flex-col gap-y-4 px-5 pb-4">
               <p>
                 Under these new settings, the <code className="text-xs text-foreground">anon</code>{' '}
                 and <code className="text-xs text-foreground">authenticated</code> roles can execute
@@ -199,20 +218,6 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               >
                 {`grant select on table api.<your_table> to anon;\ngrant select, insert, update, delete on table api.<your_table> to authenticated;`}
               </CodeBlock>
-            </div>
-            <div className="px-5 pb-4 flex items-center justify-end gap-x-2">
-              <ButtonTooltip
-                type="primary"
-                className="w-min"
-                onClick={onSelectCreateAndExposeAPISchema}
-                disabled={hasAPISchema && isAPISchemaExposed}
-                loading={isCreatingAPISchema}
-                tooltip={{
-                  content: { side: 'bottom', text: 'Schema has already been created and exposed' },
-                }}
-              >
-                Create schema and expose via Data API
-              </ButtonTooltip>
             </div>
           </CollapsibleContent_Shadcn_>
         </Collapsible_Shadcn_>
@@ -244,40 +249,25 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   The <code className="text-xs text-foreground">public</code> schema will no longer
-                  be accessible via the API once it has been removed.
+                  be accessible via the API once it has been hidden.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
-              <div className="flex flex-col gap-y-1">
-                <p>
-                  Under Data API settings, remove{' '}
-                  <code className="text-xs text-foreground">public</code> from Exposed schemas, and
-                  remove <code className="text-xs text-foreground">public</code> from Extra search
-                  path. You will also need to disable the{' '}
-                  <code className="text-xs text-foreground">pg_graphql</code> extension under the{' '}
-                  <Link
-                    href={`/project/${project?.ref}/database/extensions`}
-                    className="transition text-foreground-light hover:text-foreground underline"
-                  >
-                    Database Extensions
-                  </Link>{' '}
-                  page.
-                </p>
-                <p>
-                  Alternatively, you can click on the button below to run these actions from here.
-                </p>
-              </div>
-              <div className="flex items-center justify-end">
-                <ButtonTooltip
-                  type="primary"
-                  className="w-min"
-                  disabled={!isPublicSchemaExposed && !isPgGraphqlInstalled}
-                  loading={isRemovingPublicSchemaAndDisablingPgGraphql}
-                  tooltip={{ content: { side: 'bottom', text: 'Public schema no longer exposed' } }}
-                  onClick={onSelectRemovePublicSchemaAndDisablePgGraphql}
-                >
-                  Remove public schema from exposed schemas and disable pg_graphql
-                </ButtonTooltip>
-              </div>
+              <p>
+                Click the button below to remove{' '}
+                <code className="text-xs text-foreground">public</code> from Exposed schemas, and
+                remove <code className="text-xs text-foreground">public</code> from Extra search
+                path.
+              </p>
+              <ButtonTooltip
+                type="primary"
+                className="w-min"
+                disabled={!isPublicSchemaExposed && !isPgGraphqlInstalled}
+                loading={isRemovingPublicSchemaAndDisablingPgGraphql}
+                tooltip={{ content: { side: 'right', text: 'Public schema no longer exposed' } }}
+                onClick={onSelectRemovePublicSchema}
+              >
+                Remove public schema from exposed schemas
+              </ButtonTooltip>
             </div>
           </CollapsibleContent_Shadcn_>
         </Collapsible_Shadcn_>
