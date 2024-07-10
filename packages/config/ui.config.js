@@ -1,6 +1,5 @@
 const deepMerge = require('deepmerge')
 const forms = require('@tailwindcss/forms')
-const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 const svgToDataUri = require('mini-svg-data-uri')
