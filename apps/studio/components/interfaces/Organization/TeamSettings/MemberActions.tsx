@@ -282,23 +282,16 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       </div>
 
       <ConfirmationModal
-        variant={'destructive'}
         visible={isDeleteModalOpen}
-        size="small"
         title="Confirm to remove"
         confirmLabel="Remove"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           handleMemberDelete()
         }}
-        alert={{
-          title: 'This action is permanent and cannot be undone',
-          description:
-            'Removing a member is permanent and will delete all their content, including SQL snippets, reports, etc. Are you sure you want to proceed?',
-        }}
       >
         <p className="text-sm text-foreground-light">
-          You are about to remove {member.primary_email}.
+          This is permanent! Are you sure you want to remove {member.primary_email}
         </p>
       </ConfirmationModal>
 
