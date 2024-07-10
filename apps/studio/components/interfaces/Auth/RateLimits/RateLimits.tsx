@@ -22,6 +22,7 @@ import {
   Alert_Shadcn_,
   Button,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
@@ -426,11 +427,9 @@ const RateLimits = () => {
                           <Input_Shadcn_ type="number" {...field} disabled={!canUpdateConfig} />
                         </FormControl_Shadcn_>
                         {field.value > 0 && (
-                          <>
-                            <p className="text-foreground-lighter text-sm">
-                              This is equivalent to {field.value * 12} requests per hour
-                            </p>
-                          </>
+                          <FormDescription_Shadcn_ className="text-foreground-lighter">
+                            This is equivalent to {field.value * 12} requests per hour
+                          </FormDescription_Shadcn_>
                         )}
                       </FormItem_Shadcn_>
                     )}
