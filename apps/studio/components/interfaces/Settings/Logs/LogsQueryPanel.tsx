@@ -31,6 +31,7 @@ import {
   LogsTableName,
 } from './Logs.constants'
 import type { LogTemplate, LogsWarning } from './Logs.types'
+import { IS_PLATFORM } from 'common'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -99,25 +100,28 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconChevronDown />}>
-                  Templates
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                {templates
-                  .sort((a, b) => a.label!.localeCompare(b.label!))
-                  .map((template) => (
-                    <DropdownMenuItem
-                      key={template.label}
-                      onClick={() => onSelectTemplate(template)}
-                    >
-                      <p>{template.label}</p>
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {IS_PLATFORM && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<IconChevronDown />}>
+                    Templates
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="start">
+                  {templates
+                    .sort((a, b) => a.label!.localeCompare(b.label!))
+                    .map((template) => (
+                      <DropdownMenuItem
+                        key={template.label}
+                        onClick={() => onSelectTemplate(template)}
+                      >
+                        <p>{template.label}</p>
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <DatePickers
               to={defaultTo}
               from={defaultFrom}
