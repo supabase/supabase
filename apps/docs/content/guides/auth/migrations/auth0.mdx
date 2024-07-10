@@ -181,7 +181,19 @@ create table private.user_metadata (
 
 ## Frequently Asked Questions (FAQ)
 
-> I have IDs assigned to existing users in my database, how can I maintain these IDs?
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
+>
+
+<AccordionItem
+header={<span className="text-foreground">I have IDs assigned to existing users in my database, how can I maintain these IDs?</span>}
+id="custom-user-id"
+>
 
 All users stored in Supabase Auth use the UUID V4 format as the ID. If your UUID format is identical, you can specify it in the admin create user method like this:
 
@@ -199,14 +211,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 })
 ```
 
-<Accordion
-  type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
->
+</AccordionItem>
 
 <AccordionItem
 header={<span className="text-foreground">How can I allow my users to retain their existing password?</span>}
