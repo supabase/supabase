@@ -1,19 +1,17 @@
 import { type PropsWithChildren } from 'react'
 
 import { cn } from 'ui'
-import { StickyHeader, type StickyHeaderProps } from './Reference.ui.client'
 
 type SectionProps = PropsWithChildren & {
   id: string
   columns?: 'single' | 'double'
-} & StickyHeaderProps
+}
 
-function Section({ id, columns = 'single', children, ...props }: SectionProps) {
+function Section({ id, columns = 'single', children }: SectionProps) {
   const singleColumn = columns === 'single'
 
   return (
     <section>
-      <StickyHeader {...props} />
       <div className={cn('grid', singleColumn ? 'lg:max-w-3xl' : 'lg:grid-cols-2')}>{children}</div>
     </section>
   )
@@ -35,15 +33,8 @@ function Examples({ children }: PropsWithChildren) {
   return <div className="w-full min-w-full sticky top-32">{children}</div>
 }
 
-type EducationSectionProps = PropsWithChildren & { hideTitle?: boolean } & StickyHeaderProps
-
-function EducationSection({ hideTitle = false, children, ...props }: EducationSectionProps) {
-  return (
-    <section className={'prose max-w-none'}>
-      {!hideTitle && <StickyHeader {...props} />}
-      {children}
-    </section>
-  )
+function EducationSection({ children, ...props }: PropsWithChildren) {
+  return <section className={'prose max-w-none'}>{children}</section>
 }
 
 interface EducationRowProps extends PropsWithChildren {

@@ -1,13 +1,13 @@
+import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+
 import { Fragment } from 'react'
 
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
-import {
-  genClientSdkSectionTree,
-  getSpecFnsCached,
-  type AbbrevCommonClientLibSection,
-} from '~/features/docs/Reference.utils'
+import { StickyHeader } from './Reference.ui.client'
+import { genClientSdkSectionTree, getSpecFnsCached } from '~/features/docs/Reference.utils'
 
 interface ClientLibRefSectionsProps {
   libPath: string
@@ -78,11 +78,20 @@ interface SectionSwitchProps {
 }
 
 function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitchProps) {
+  const sectionLink = `/docs/reference/${libPath}/${section.slug}`
+
   switch (section.type) {
     case 'markdown':
-      return <MarkdownSection libPath={libPath} section={section} />
+      return <MarkdownSection libPath={libPath} link={sectionLink} section={section} />
     case 'function':
-      return <FunctionSection section={section} specFile={specFile} useTypeSpec={useTypeSpec} />
+      return (
+        <FunctionSection
+          link={sectionLink}
+          section={section}
+          specFile={specFile}
+          useTypeSpec={useTypeSpec}
+        />
+      )
     case 'category':
       return null
     default:
@@ -93,41 +102,46 @@ function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitc
 
 interface MarkdownSectionProps {
   libPath: string
+  link: string
   section: AbbrevCommonClientLibSection
 }
 
-async function MarkdownSection({ libPath, section }: MarkdownSectionProps) {
+async function MarkdownSection({ libPath, link, section }: MarkdownSectionProps) {
   const content = await getRefMarkdown(
     section.meta?.shared ? `shared/${section.id}` : `${libPath}/${section.id}`
   )
 
   return (
-    <RefSubLayout.EducationSection {...section} scrollSpyHeader>
+    <RefSubLayout.EducationSection {...section}>
+      <StickyHeader {...section} link={link} scrollSpyHeader />
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
 }
 
 interface FunctionSectionProps {
+  link: string
   section: AbbrevCommonClientLibSection
   specFile: string
   useTypeSpec: boolean
 }
 
-async function FunctionSection({ section, specFile, useTypeSpec }: FunctionSectionProps) {
+async function FunctionSection({ link, section, specFile, useTypeSpec }: FunctionSectionProps) {
   const fns = await getSpecFnsCached(specFile)
 
   const fn = fns.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: any
+  let types: MethodTypes
   if (useTypeSpec && '$ref' in fn) {
-    types = getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(fn['$ref'] as string)
   }
 
   return (
-    <RefSubLayout.Section {...section} scrollSpyHeader>
+    <RefSubLayout.Section {...section}>
+      <StickyHeader {...section} link={link} scrollSpyHeader />
       <pre>{JSON.stringify(fn, null, 2)}</pre>
+      <pre>{JSON.stringify(types, null, 2)}</pre>
     </RefSubLayout.Section>
   )
 }

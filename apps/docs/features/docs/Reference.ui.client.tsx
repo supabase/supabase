@@ -7,6 +7,10 @@ import { cn } from 'ui'
 interface StickyHeaderProps {
   title?: string
   slug?: string
+  /**
+   * The URL that leads directly to this section
+   */
+  link?: string
   monoFont?: boolean
   /**
    * Whether the header updates the URL on scroll
@@ -21,6 +25,7 @@ interface StickyHeaderProps {
 function StickyHeader({
   title,
   slug,
+  link,
   monoFont = false,
   scrollSpyHeader = false,
   crawlerPage = false,
@@ -30,7 +35,7 @@ function StickyHeader({
     rootMargin: '0% 0% -50% 0%',
     onChange: (inView, entry) => {
       if (inView && scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
+        window.history.replaceState(null, '', link)
       }
     },
   })
