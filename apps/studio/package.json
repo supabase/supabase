@@ -38,7 +38,7 @@
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/pg-meta": "*",
     "@supabase/shared-types": "0.1.70",
-    "@supabase/supabase-js": "^2.44.2",
+    "@supabase/supabase-js": "^2.44.3",
     "@tanstack/react-query": "4.35.7",
     "@tanstack/react-query-devtools": "4.35.7",
     "@uidotdev/usehooks": "^2.4.1",
