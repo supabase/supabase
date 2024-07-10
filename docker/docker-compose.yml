@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240422-5cf8f30
+    image: supabase/studio:20240701-05dfbec
     restart: unless-stopped
     healthcheck:
       test:
@@ -150,7 +150,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v12.0.1
+    image: postgrest/postgrest:v12.2.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -274,7 +274,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.80.0
+    image: supabase/postgres-meta:v0.83.2
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -292,7 +292,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.54.2
+    image: supabase/edge-runtime:v1.54.10
     restart: unless-stopped
     depends_on:
       analytics:

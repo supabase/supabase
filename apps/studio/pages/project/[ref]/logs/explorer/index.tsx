@@ -43,9 +43,15 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
+import { IS_PLATFORM } from 'common'
 
-const PLACEHOLDER_QUERY =
+const LOCAL_PLACEHOLDER_QUERY =
+  'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
+
+const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
+const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACEHOLDER_QUERY
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
