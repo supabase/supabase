@@ -12,7 +12,17 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { Check, ChevronUp } from 'lucide-react'
-import { Alert, Button, Collapsible, Form, Input } from 'ui'
+import {
+  Alert,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Collapsible,
+  Form,
+  IconAlertTriangle,
+  Input,
+} from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -155,6 +165,25 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             border-strong bg-surface-100 py-6 px-6 text-foreground
             "
               >
+                {provider.title === 'Slack (Deprecated)' && (
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC)
+                      provider below. Developers using this provider should move over to the new
+                      provider. Please refer to our{' '}
+                      <a
+                        href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+                        className="underline"
+                        target="_blank"
+                      >
+                        documentation
+                      </a>{' '}
+                      for more details.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
                 <div className="mx-auto my-6 max-w-lg space-y-6">
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
@@ -162,7 +191,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       name={x}
                       properties={provider.properties[x]}
                       formValues={values}
-                      disabled={!canUpdateConfig}
+                      disabled={
+                        // TODO (KM): Remove after 10th October when we disable the provider
+                        ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(x) ||
+                        !canUpdateConfig
+                      }
                     />
                   ))}
 
