@@ -164,7 +164,7 @@ limit 100;
     case 'postgres_logs':
       if (IS_PLATFORM === false) {
         return `
-select id as identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity
+select postgres_logs.timestamp, id, event_message, parsed.error_severity
 from postgres_logs
 ${joins}
 ${where}
