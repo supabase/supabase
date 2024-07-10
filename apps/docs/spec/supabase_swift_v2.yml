@@ -49,6 +49,26 @@ functions:
             )
           )
           ```
+      - id: api-schemas
+        name: With custom schemas
+        code: |
+          ```swift
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "public-anon-key",
+            options: SupabaseClientOptions(
+              db: .init(
+                // Provide a custom schema. Defaults to "public".
+                schema: "other_schema"
+              )
+            )
+          ) 
+          ```
+        description: |
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
   - id: auth-api
     title: "Overview"
     notes: |
@@ -1756,6 +1776,40 @@ functions:
         description: |
           If you don't want to return the foreign table contents, you can leave the parenthesis empty.
           Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```swift
+          try await supabase
+            .schema("myschema")
+            .from("mytable")
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "4162e008-27b0-4c0f-82dc-ccaeee9a624d",
+              "data": "mydata"
+            }
+          ]
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert
