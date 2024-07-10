@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level 
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
 from edge_logs 
 ${joins}
 ${where}
