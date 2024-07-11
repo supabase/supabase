@@ -183,7 +183,7 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            {dataSource === 'logs' && IS_PLATFORMx && (
+            {dataSource === 'logs' && IS_PLATFORM && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
