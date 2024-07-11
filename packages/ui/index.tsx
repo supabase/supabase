@@ -56,6 +56,7 @@ export * from './src/components/Radio'
 export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
+export * from './src/components/ExpandingTextArea'
 
 // layout
 export * from './src/components/LoadingLine'
