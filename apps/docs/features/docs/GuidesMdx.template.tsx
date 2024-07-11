@@ -121,12 +121,12 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
         )}
       >
+        <Breadcrumbs className="mb-3 w-full" />
         <article
           // Used to get headings for the table of contents
           id="sb-docs-guide-main-article"
           className="prose max-w-none"
         >
-          <Breadcrumbs className="-mt-1" />
           <h1 className="mb-0">{meta?.title || 'Supabase Docs'}</h1>
           {meta?.subtitle && (
             <h2 className="mt-3 text-xl text-foreground-light">{meta.subtitle}</h2>

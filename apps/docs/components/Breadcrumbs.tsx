@@ -1,7 +1,8 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import React, { Fragment } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Breadcrumb_Shadcn_ as Breadcrumb,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
@@ -10,28 +11,103 @@ import {
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbEllipsis_Shadcn_ as BreadcrumbEllipsis,
+  Button,
+  cn,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from 'ui'
 import { getMenuId } from '../app/guides/layout'
+import { useBreakpoint } from 'common'
 import * as NavItems from './Navigation/NavigationMenu/NavigationMenu.constants'
 
 const Breadcrumbs = ({ className }: { className?: string }) => {
   const pathname = usePathname()
   const menuId = getMenuId(pathname)
   const menu = NavItems[menuId]
-  const breadcrumbs = findParentsByUrl(menu, pathname, [], { removeChild: false })
+  const breadcrumbs = findMenuItemByUrl(menu, pathname, [])
+  const [open, setOpen] = React.useState(false)
+  const isMobile = useBreakpoint('md')
+
+  const ITEMS_TO_DISPLAY = 3
 
   if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
 
   return (
     <Breadcrumb className={className}>
-      <BreadcrumbList className="m-0 mb-2 text-foreground-lighter p-0 [&>li]:before:hidden [&>li]:p-0">
-        {/* <BreadcrumbItem>
-          <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
-        </BreadcrumbItem> */}
-        {breadcrumbs?.map((crumb, i) => (
+      <BreadcrumbList className="text-foreground-lighter p-0">
+        <BreadcrumbItem>
+          {breadcrumbs[0].url ? (
+            <BreadcrumbLink href={`/docs${breadcrumbs[0].url}`}>
+              {breadcrumbs[0].title || breadcrumbs[0].name}
+            </BreadcrumbLink>
+          ) : (
+            <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
+          )}
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        {breadcrumbs.length > ITEMS_TO_DISPLAY && (
+          <>
+            <BreadcrumbItem>
+              {!isMobile ? (
+                <DropdownMenu open={open} onOpenChange={setOpen}>
+                  <DropdownMenuTrigger className="flex items-center gap-1" aria-label="Toggle menu">
+                    <BreadcrumbEllipsis className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {breadcrumbs.slice(1, -2).map((crumb, index) => (
+                      <DropdownMenuItem
+                        key={index}
+                        className={cn(!crumb.url && 'pointer-events-none')}
+                      >
+                        {crumb.url ? (
+                          <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                        ) : (
+                          crumb.title || crumb.name
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Drawer open={open} onOpenChange={setOpen}>
+                  <DrawerTrigger aria-label="Toggle Menu">
+                    <BreadcrumbEllipsis className="h-4 w-4" />
+                  </DrawerTrigger>
+                  <DrawerContent showHandle={false}>
+                    <div className="grid gap-1 px-4">
+                      {breadcrumbs
+                        .slice(1, -2)
+                        .map((crumb) =>
+                          crumb.url ? (
+                            <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
+                          ) : (
+                            crumb.title || crumb.name
+                          )
+                        )}
+                    </div>
+                    <DrawerFooter className="pt-4">
+                      <DrawerClose asChild>
+                        <Button type="outline">Close</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              )}
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+          </>
+        )}
+        {breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1).map((crumb, i) => (
           <Fragment key={crumb.url}>
             {i !== 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem>
+            <BreadcrumbItem className="flex items-center overflow-hidden">
               {crumb.url ? (
                 <BreadcrumbLink href={`/docs${crumb.url}`}>
                   {crumb.title || crumb.name}
@@ -42,27 +118,21 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
             </BreadcrumbItem>
           </Fragment>
         ))}
-        {/* <BreadcrumbItem>
-          <BreadcrumbEllipsis />
-        </BreadcrumbItem> */}
       </BreadcrumbList>
     </Breadcrumb>
   )
 }
-interface Options {
-  removeChild?: boolean
-}
 
-function findParentsByUrl(menu, targetUrl, parents = [], options?: Options) {
+function findMenuItemByUrl(menu, targetUrl, parents = []) {
   // Check if the current menu object itself has the target URL
   if (menu.url === targetUrl) {
-    return options?.removeChild ? parents : [...parents, menu]
+    return [...parents, menu]
   }
 
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {
-      const result = findParentsByUrl(item, targetUrl, [...parents, menu])
+      const result = findMenuItemByUrl(item, targetUrl, [...parents, menu])
       if (result) {
         return result
       }

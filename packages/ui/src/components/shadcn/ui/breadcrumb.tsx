@@ -27,7 +27,11 @@ BreadcrumbList.displayName = 'BreadcrumbList'
 
 const BreadcrumbItem = React.forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<'li'>>(
   ({ className, ...props }, ref) => (
-    <li ref={ref} className={cn('inline-flex items-center gap-1.5', className)} {...props} />
+    <li
+      ref={ref}
+      className={cn('inline-flex items-center gap-1.5 leading-5', className)}
+      {...props}
+    />
   )
 )
 BreadcrumbItem.displayName = 'BreadcrumbItem'
@@ -60,7 +64,7 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn('no-underline inline-flex h-[22px] text-foreground-lighter', className)}
+      className={cn('no-underline text-foreground-lighter', className)}
       {...props}
     />
   )

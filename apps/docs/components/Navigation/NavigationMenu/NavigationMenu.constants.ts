@@ -245,6 +245,7 @@ export const REFERENCES: References = {
 export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
   title: 'Start with Supabase',
+  url: '/guides/getting-started',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
