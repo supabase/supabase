@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { Loading } from 'components/ui/Loading'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse/warehouse-query'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import {
   Button,

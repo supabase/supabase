@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import { analyticsKeys } from './keys'
+import { analyticsKeys } from '../keys'
 
 type WarehouseCollectionsVariables = {
   projectRef: string

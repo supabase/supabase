@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import CopyButton from 'components/ui/CopyButton'
-import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
-import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
+import type { WarehouseAccessTokensData } from 'data/analytics/warehouse/warehouse-access-tokens-query'
+import type { WarehouseCollectionsData } from 'data/analytics/warehouse/warehouse-collections-query'
 import { useEffect, useState } from 'react'
 import {
   Button,

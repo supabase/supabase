@@ -13,7 +13,7 @@ import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Modal } f
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Input } from '@ui/components/shadcn/ui/input'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
+import { useCreateCollection } from 'data/analytics/warehouse/warehouse-collections-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 export const CreateWarehouseCollectionModal = () => {

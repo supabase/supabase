@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
+import { analyticsKeys } from '../keys'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 

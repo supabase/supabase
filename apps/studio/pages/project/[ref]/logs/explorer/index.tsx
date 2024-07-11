@@ -25,7 +25,7 @@ import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse/warehouse-collections-query'
 import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
 import {
@@ -38,7 +38,7 @@ import {
   LogTemplate,
   LogsWarning,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse/warehouse-query'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,

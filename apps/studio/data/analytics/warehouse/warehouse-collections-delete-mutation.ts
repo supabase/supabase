@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { handleError, del } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { analyticsKeys } from './keys'
+import { analyticsKeys } from '../keys'
 
 export type DeleteCollectionVariables = {
   projectRef: string

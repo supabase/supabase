@@ -11,9 +11,9 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
-import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
-import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse/warehouse-access-tokens-create-mutation'
+import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse/warehouse-access-tokens-delete-mutation'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse/warehouse-access-tokens-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,

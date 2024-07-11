@@ -1,5 +1,5 @@
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
+import { analyticsKeys } from '../keys'
 import { handleError, post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import toast from 'react-hot-toast'
