@@ -13,6 +13,7 @@ import { components } from '~/features/docs/mdx.shared'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { MDXProviderGuides } from './GuidesMdx.client'
+import Breadcrumbs from '~/components/Breadcrumbs'
 
 const codeHikeOptions: CodeHikeConfig = {
   theme: codeHikeTheme,
@@ -125,6 +126,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           id="sb-docs-guide-main-article"
           className="prose max-w-none"
         >
+          <Breadcrumbs className="-mt-1" />
           <h1 className="mb-0">{meta?.title || 'Supabase Docs'}</h1>
           {meta?.subtitle && (
             <h2 className="mt-3 text-xl text-foreground-light">{meta.subtitle}</h2>
@@ -163,11 +165,11 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             /**
              * --header-height: height of nav
              * 1px: height of nav border
-             * 4rem: content padding
+             * 2rem: content padding
              */
-            'top-[calc(var(--header-height)+1px+4rem)]',
+            'top-[calc(var(--header-height)+1px+2rem)]',
             // 5rem accounts for 4rem of top padding + 1rem of extra breathing room
-            'max-h-[calc(100vh-var(--header-height)-5rem)]'
+            'max-h-[calc(100vh-var(--header-height)-3rem)]'
           )}
         />
       )}

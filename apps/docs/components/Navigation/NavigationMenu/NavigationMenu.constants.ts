@@ -1198,7 +1198,7 @@ export const functions: NavMenuConstant = {
     },
     {
       name: 'Examples',
-      url: '/guides/functions/examples',
+      url: undefined,
       items: [
         {
           name: 'CORS support for invoking from the browser',
