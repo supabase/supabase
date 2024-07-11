@@ -1,7 +1,7 @@
 import Editor, { EditorProps, OnChange, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import { editor } from 'monaco-editor'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { timeout } from 'lib/helpers'
@@ -42,19 +42,17 @@ const CodeEditor = ({
   placeholder,
   disableTabToUsePlaceholder = false,
 }: CodeEditorProps) => {
-  const placeholderId = `monaco-placeholder-${id}`
   const hasValue = useRef<any>()
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
+
+  const [showPlaceholder, setShowPlaceholder] = useState(placeholder !== undefined)
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     alignEditor(editor)
 
     hasValue.current = editor.createContextKey('hasValue', false)
-    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-    if (placeholderEl && placeholder !== undefined && (value ?? '').trim().length === 0) {
-      placeholderEl.style.display = 'block'
-    }
+    setShowPlaceholder(placeholder !== undefined && (value ?? '').trim().length === 0)
 
     if (!disableTabToUsePlaceholder) {
       editor.addCommand(
@@ -97,16 +95,7 @@ const CodeEditor = ({
 
   const onChangeContent: OnChange = (value) => {
     hasValue.current.set((value ?? '').length > 0)
-
-    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-    if (placeholderEl) {
-      if (!value) {
-        placeholderEl.style.display = 'block'
-      } else {
-        placeholderEl.style.display = 'none'
-      }
-    }
-
+    setShowPlaceholder(!value)
     onInputChange(value)
   }
 
@@ -130,8 +119,7 @@ const CodeEditor = ({
 
   useEffect(() => {
     if (value !== undefined && value.trim().length > 0) {
-      const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-      if (placeholderEl) placeholderEl.style.display = 'none'
+      setShowPlaceholder(false)
     }
   }, [value])
 
@@ -151,9 +139,11 @@ const CodeEditor = ({
       />
       {placeholder !== undefined && (
         <div
-          id={placeholderId}
-          className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
-          style={{ display: 'none' }}
+          className={cn(
+            'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter',
+            showPlaceholder ? 'block' : 'hidden'
+          )}
         >
           <Markdown content={placeholder} />
         </div>

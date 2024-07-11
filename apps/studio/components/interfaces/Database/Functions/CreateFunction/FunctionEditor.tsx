@@ -28,10 +28,7 @@ export const FunctionEditor = ({
           language="pgsql"
           placeholder={`BEGIN\n\nEND;`}
           defaultValue={field.value}
-          onInputChange={(value: string | undefined) => {
-            console.log('onInputChange', value)
-            field.onChange(value)
-          }}
+          onInputChange={field.onChange}
         />
       </FormControl_Shadcn_>
       <div
