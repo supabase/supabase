@@ -168,7 +168,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
              * 2rem: content padding
              */
             'top-[calc(var(--header-height)+1px+2rem)]',
-            // 5rem accounts for 4rem of top padding + 1rem of extra breathing room
+            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
             'max-h-[calc(100vh-var(--header-height)-3rem)]'
           )}
         />
