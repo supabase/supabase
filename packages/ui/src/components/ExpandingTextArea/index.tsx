@@ -4,7 +4,10 @@ import React, { createRef, useEffect } from 'react'
 import { cn } from '../../lib/utils'
 import { TextArea } from '../shadcn/ui/text-area'
 
-export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /* The value of the textarea. Required to calculate the height of the textarea. */
+  value: string
+}
 
 /**
  * This is a custom TextArea component that expands based on the content.
