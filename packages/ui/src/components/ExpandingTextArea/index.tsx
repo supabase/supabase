@@ -7,16 +7,9 @@ import { TextArea } from '../shadcn/ui/text-area'
 export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 /**
- * This is a custom TextArea component that expands based on the content
+ * This is a custom TextArea component that expands based on the content.
  */
-const ExpandingTextArea = ({
-  className,
-  disabled = false,
-  value,
-  onSubmit,
-  placeholder,
-  ...props
-}: ExpandingTextAreaProps) => {
+const ExpandingTextArea = ({ className, value, ...props }: ExpandingTextAreaProps) => {
   const textAreaRef = createRef<HTMLTextAreaElement>()
 
   /**
@@ -37,14 +30,8 @@ const ExpandingTextArea = ({
     <TextArea
       ref={textAreaRef}
       rows={1}
-      contentEditable
       aria-expanded={false}
-      className={cn(
-        'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6',
-        className
-      )}
-      placeholder={placeholder}
-      spellCheck={false}
+      className={cn('transition-all resize-none leading-6 box-border', className)}
       value={value}
       {...props}
     />

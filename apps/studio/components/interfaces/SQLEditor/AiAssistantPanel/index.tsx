@@ -180,7 +180,8 @@ export const AiAssistantPanel = ({
                       autoComplete="off"
                       disabled={loading}
                       autoFocus
-                      className="pl-12"
+                      spellCheck={false}
+                      className="pl-12 text-sm rounded-[18px]"
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' && !event.shiftKey) {
                           event.preventDefault()
