@@ -6,7 +6,6 @@ import InformationBox from 'components/ui/InformationBox'
 import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
@@ -43,7 +42,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const hasAPISchema = (schemas ?? []).find((schema) => schema.name === 'api')
-  const exposedSchemas = config?.db_schema.split(', ') ?? []
+  const exposedSchemas = config?.db_schema.split(',').map((x) => x.trim()) ?? []
   const isAPISchemaExposed = exposedSchemas.includes('api')
   const isPublicSchemaExposed = exposedSchemas.includes('public')
 
