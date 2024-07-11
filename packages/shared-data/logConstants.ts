@@ -245,7 +245,6 @@ const schemas = [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
-      { path: 'log_file', type: 'string' },
     ],
   },
 ]
