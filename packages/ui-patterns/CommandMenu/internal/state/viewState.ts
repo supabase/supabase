@@ -1,6 +1,14 @@
+import type { TouchEventHandler } from 'react'
+
 import { proxy } from 'valtio'
 
 type DialogSize = 'small' | 'tiny' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge'
+
+interface ITouchHandlers {
+  handleTouchStart: TouchEventHandler
+  handleTouchMove: TouchEventHandler
+  handleTouchEnd: TouchEventHandler
+}
 
 type IViewState = {
   initiated: boolean
@@ -10,6 +18,8 @@ type IViewState = {
   toggleOpen: () => void
   size: DialogSize
   setSize: (size: DialogSize) => void
+  touchHandlers: ITouchHandlers
+  setTouchHandlers: (handlers: ITouchHandlers) => void
 }
 
 const initViewState = () => {
@@ -27,9 +37,15 @@ const initViewState = () => {
     },
     size: 'large',
     setSize: (size) => (state.size = size),
+    touchHandlers: {
+      handleTouchStart: () => {},
+      handleTouchMove: () => {},
+      handleTouchEnd: () => {},
+    },
+    setTouchHandlers: (handlers) => (state.touchHandlers = handlers),
   })
   return state
 }
 
 export { initViewState }
-export type { DialogSize, IViewState }
+export type { DialogSize, IViewState, ITouchHandlers }
