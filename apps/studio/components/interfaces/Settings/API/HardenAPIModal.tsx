@@ -1,11 +1,11 @@
 import { Check, ChevronDown, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import toast from 'react-hot-toast'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import InformationBox from 'components/ui/InformationBox'
 import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
-import { useRemovePublicSchemaAndDisablePgGraphqlMutation } from 'data/api-settings/remove-public-schema-from-expose-and-disable-pg_graphql-mutation'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -27,7 +27,6 @@ import {
   DialogTitle,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import InformationBox from 'components/ui/InformationBox'
 
 interface HardenAPIModalProps {
   visible: boolean
@@ -62,16 +61,12 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
       },
     })
 
-  const {
-    mutate: removePublicSchemaAndDisablePgGraphql,
-    isLoading: isRemovingPublicSchemaAndDisablingPgGraphql,
-  } = useRemovePublicSchemaAndDisablePgGraphqlMutation({
-    onSuccess: () => {
-      toast.success(
-        'Success removed public schema from exposed schemas and disabled pg_graphql extension'
-      )
-    },
-  })
+  const { mutate: updatePostgrestConfig, isLoading: isUpdatingConfig } =
+    useProjectPostgrestConfigUpdateMutation({
+      onSuccess: () => {
+        toast.success('Success removed public schema from exposed schemas')
+      },
+    })
 
   const onSelectCreateAndExposeAPISchema = () => {
     if (project === undefined) return console.error('Project is required')
@@ -92,23 +87,28 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
     if (project === undefined) return console.error('Project is required')
     if (config === undefined) return console.error('Postgrest config is required')
 
-    removePublicSchemaAndDisablePgGraphql({
+    const updatedDbExtraSearchPath = config.db_extra_search_path
+      .split(', ')
+      .filter((x) => x !== 'public')
+      .join(', ')
+    const updatedDbSchema = config.db_schema
+      .split(', ')
+      .filter((x) => x !== 'public')
+      .join(', ')
+    updatePostgrestConfig({
       projectRef: project.ref,
-      connectionString: project.connectionString,
-      existingPostgrestConfig: {
-        max_rows: config.max_rows,
-        db_pool: config.db_pool,
-        db_schema: config.db_schema,
-        db_extra_search_path: config?.db_extra_search_path,
-      },
+      maxRows: config.max_rows,
+      dbPool: config.db_pool,
+      dbSchema: updatedDbSchema,
+      dbExtraSearchPath: updatedDbExtraSearchPath,
     })
   }
 
   return (
     <Dialog open={visible} onOpenChange={onClose}>
-      <DialogContent size="xlarge">
+      <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Prevent accidental exposure of data via the API</DialogTitle>
+          <DialogTitle>Switch the default API schema</DialogTitle>
           <DialogDescription>
             Expose a custom schema instead of the{' '}
             <code className="text-xs text-foreground">public</code> schema
@@ -119,19 +119,11 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
         <DialogSection className="text-sm text-foreground-light">
           <p>
-            If you want to use the Data API with increased security, we recommend exposing a custom
-            schema instead of the <code className="text-xs text-foreground">public</code> schema to
-            get more <span className="text-brand">conscious control</span> over your exposed data.
-            Any data, views, or functions that should be exposed need to be deliberately put within
-            your custom schema instead.
-          </p>
-          <p className="mt-2">
-            This will be particularly useful if your{' '}
-            <code className="text-xs text-foreground">public</code> schema is used by other tools as
-            a default space, as it will help{' '}
-            <span className="text-brand">prevent accidental exposure of data</span> that's
-            automatically added to the <code className="text-xs text-foreground">public</code>{' '}
-            schema.
+            By default, the <code className="text-xs text-foreground">public</code> schema is used
+            to generate API routes. In some cases, it's better to use a custom schema. This is
+            important if you use tools that generate tables in the{' '}
+            <code className="text-xs text-foreground">public</code> schema to{' '}
+            <span className="text-brand">prevent accidental exposure of data</span>.
           </p>
           <Button asChild type="default" icon={<ExternalLink />} className="w-min mt-4">
             <a
@@ -182,7 +174,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                     </p>
                     <CodeBlock
                       language="sql"
-                      className="p-1 language-bash prose dark:prose-dark max-w-[93.2ch]"
+                      className="p-1 language-bash prose dark:prose-dark max-w-[68.3ch]"
                     >
                       {`create schema if not exists api;\ngrant usage on schema api to anon, authenticated;`}
                     </CodeBlock>
@@ -214,7 +206,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               </p>
               <CodeBlock
                 language="sql"
-                className="p-1 language-bash prose dark:prose-dark max-w-[93.2ch]"
+                className="p-1 language-bash prose dark:prose-dark max-w-[68.3ch]"
               >
                 {`grant select on table api.<your_table> to anon;\ngrant select, insert, update, delete on table api.<your_table> to authenticated;`}
               </CodeBlock>
@@ -248,21 +240,21 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                   <code className="text-xs text-foreground">public</code> schema
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The <code className="text-xs text-foreground">public</code> schema will no longer
-                  be accessible via the API once it has been hidden.
+                  The <code className="text-xs text-foreground">public</code> schema will not be
+                  accessible via the API once its not exposed. You should be using the{' '}
+                  <code className="text-xs text-foreground">api</code> schema instead.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
               <p>
-                Click the button below to remove{' '}
-                <code className="text-xs text-foreground">public</code> from Exposed schemas, and
-                remove <code className="text-xs text-foreground">public</code> from Extra search
-                path.
+                Click the button below to remove the{' '}
+                <code className="text-xs text-foreground">public</code> schema from both Exposed
+                schemas and Extra search path in your API configuration.
               </p>
               <ButtonTooltip
                 type="primary"
                 className="w-min"
                 disabled={!isPublicSchemaExposed && !isPgGraphqlInstalled}
-                loading={isRemovingPublicSchemaAndDisablingPgGraphql}
+                loading={isUpdatingConfig}
                 tooltip={{ content: { side: 'right', text: 'Public schema no longer exposed' } }}
                 onClick={onSelectRemovePublicSchema}
               >
