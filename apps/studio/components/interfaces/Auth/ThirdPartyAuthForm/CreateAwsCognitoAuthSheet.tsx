@@ -36,7 +36,11 @@ const FORM_ID = 'create-aws-cognito-auth-integration-form'
 
 const FormSchema = z.object({
   enabled: z.boolean(),
-  awsCognitoUserPoolId: z.string().min(1),
+  awsCognitoUserPoolId: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^[A-Za-z0-9-_]+$/, 'The project ID contains invalid characters.'), // Only allow alphanumeric characters and hyphens.
   awsRegion: z.string(),
 })
 
@@ -81,6 +85,8 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
       oidcIssuerUrl: `https://cognito-idp.${values.awsRegion}.amazonaws.com/${values.awsCognitoUserPoolId}`,
     })
   }
+
+  const awsRegion = form.watch('awsRegion')
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -142,9 +148,19 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
                 name="awsCognitoUserPoolId"
                 render={({ field }) => (
                   <FormItemLayout label="AWS Cognito User Pool ID">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <div className="flex flex-row">
+                      <Button
+                        type="default"
+                        size="small"
+                        className="px-2 text-foreground-light rounded-r-none"
+                        onClick={() => form.setFocus('awsCognitoUserPoolId')}
+                      >
+                        https://cognito-idp.{awsRegion}.amazonaws.com/
+                      </Button>
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ className="rounded-l-none border-l-0 z-50" {...field} />
+                      </FormControl_Shadcn_>
+                    </div>
                   </FormItemLayout>
                 )}
               />

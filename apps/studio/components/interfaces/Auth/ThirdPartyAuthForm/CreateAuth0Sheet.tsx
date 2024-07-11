@@ -35,7 +35,11 @@ const FORM_ID = 'create-auth0-auth-integration-form'
 
 const FormSchema = z.object({
   enabled: z.boolean(),
-  auth0DomainName: z.string().min(1),
+  auth0DomainName: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^[A-Za-z0-9-.]+$/, 'The project ID contains invalid characters.'), // Only allow alphanumeric characters and hyphens.
 })
 
 export const CreateAuth0IntegrationSheet = ({
@@ -68,6 +72,11 @@ export const CreateAuth0IntegrationSheet = ({
         enabled: true,
         auth0DomainName: '',
       })
+
+      // the form input doesn't exist when the form is reset
+      setTimeout(() => {
+        form.setFocus('auth0DomainName')
+      }, 25)
     }
   }, [visible])
 
@@ -136,9 +145,30 @@ export const CreateAuth0IntegrationSheet = ({
                 name="auth0DomainName"
                 render={({ field }) => (
                   <FormItemLayout label="Auth0 domain name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <div className="flex flex-row">
+                      <Button
+                        type="default"
+                        size="small"
+                        className="px-2 text-foreground-light rounded-r-none"
+                        onClick={() => form.setFocus('auth0DomainName')}
+                      >
+                        https://
+                      </Button>
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          className="border-l-0 rounded-none border-r-0 z-50"
+                          {...field}
+                        />
+                      </FormControl_Shadcn_>
+                      <Button
+                        type="default"
+                        size="small"
+                        className="px-2 text-foreground-light rounded-l-none"
+                        onClick={() => form.setFocus('auth0DomainName')}
+                      >
+                        .auth0.com
+                      </Button>
+                    </div>
                   </FormItemLayout>
                 )}
               />

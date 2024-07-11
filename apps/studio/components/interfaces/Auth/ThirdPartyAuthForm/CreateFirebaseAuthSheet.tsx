@@ -7,6 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
+import { Postgres } from 'icons'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,7 +24,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Switch,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -39,8 +39,11 @@ const FORM_ID = 'create-firebase-auth-integration-form'
 
 const FormSchema = z.object({
   enabled: z.boolean(),
-  firebaseProjectId: z.string().min(1),
-  createRLSPolicy: z.boolean(),
+  firebaseProjectId: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^[A-Za-z0-9-]+$/, 'The project ID contains invalid characters.'), // Only allow alphanumeric characters and hyphens.
 })
 
 export const CreateFirebaseAuthIntegrationSheet = ({
@@ -64,7 +67,6 @@ export const CreateFirebaseAuthIntegrationSheet = ({
     defaultValues: {
       enabled: true,
       firebaseProjectId: '',
-      createRLSPolicy: true,
     },
   })
 
@@ -73,7 +75,6 @@ export const CreateFirebaseAuthIntegrationSheet = ({
       form.reset({
         enabled: true,
         firebaseProjectId: '',
-        createRLSPolicy: true,
       })
     }
   }, [visible])
@@ -84,8 +85,6 @@ export const CreateFirebaseAuthIntegrationSheet = ({
       oidcIssuerUrl: `https://securetoken.google.com/${values.firebaseProjectId}`,
     })
   }
-
-  const createRLSPolicy = form.watch('createRLSPolicy')
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -153,38 +152,19 @@ export const CreateFirebaseAuthIntegrationSheet = ({
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
-                key="createRLSPolicy"
-                control={form.control}
-                name="createRLSPolicy"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Create restrictive RLS policies for Firebase Auth"
-                    layout="flex"
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-              {!createRLSPolicy ? (
-                <Alert_Shadcn_>
-                  <div>
-                    <AlertTitle_Shadcn_>
-                      This connection requires a Row Level Security (RLS) policy
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You will need to manually insert the policy after creating this 3rd party Auth
-                      connection.
-                    </AlertDescription_Shadcn_>
-                  </div>
-                </Alert_Shadcn_>
-              ) : null}
+
+              <Alert_Shadcn_ variant="warning">
+                <Postgres />
+                <div>
+                  <AlertTitle_Shadcn_>
+                    This connection requires a Row Level Security (RLS) policy
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    You will need to manually insert the policy after creating this 3rd party Auth
+                    connection.
+                  </AlertDescription_Shadcn_>
+                </div>
+              </Alert_Shadcn_>
             </div>
           </form>
         </Form_Shadcn_>
