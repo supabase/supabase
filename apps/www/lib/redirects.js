@@ -2415,18 +2415,8 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/launch-week',
-    destination: '/ga-week',
-  },
-  {
-    permanent: false,
     source: '/special-announcement',
     destination: '/ga-week',
-  },
-  {
-    permanent: false,
-    source: '/launch-week/tickets/:path*',
-    destination: '/ga-week/tickets/:path*',
   },
   {
     permanent: false,
