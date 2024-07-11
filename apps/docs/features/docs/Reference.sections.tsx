@@ -132,7 +132,7 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
   const fn = fns.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes
+  let types: MethodTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
