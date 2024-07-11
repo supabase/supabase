@@ -80,11 +80,13 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
     if (config === undefined) return console.error('Postgrest config is required')
 
     const updatedDbExtraSearchPath = config.db_extra_search_path
-      .split(', ')
+      .split(',')
+      .map((x) => x.trim())
       .filter((x) => x !== 'public')
       .join(', ')
     const updatedDbSchema = config.db_schema
-      .split(', ')
+      .split(',')
+      .map((x) => x.trim())
       .filter((x) => x !== 'public')
       .join(', ')
     updatePostgrestConfig({
