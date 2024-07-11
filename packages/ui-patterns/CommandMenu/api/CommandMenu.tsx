@@ -1,10 +1,10 @@
 'use client'
 
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
-import { type PropsWithChildren, forwardRef } from 'react'
+import { type PropsWithChildren, type ReactNode, forwardRef, memo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
+import { Button, Command_Shadcn_, Dialog, DialogContent, DialogTrigger, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
@@ -82,7 +82,13 @@ function PageSwitch({ children }: PropsWithChildren) {
   return PageComponent ? <PageComponent /> : <CommandWrapper>{children}</CommandWrapper>
 }
 
-function CommandMenu({ children }: PropsWithChildren) {
+interface CommandMenuProps extends PropsWithChildren {
+  trigger?: ReactNode
+}
+
+const CommandMenuTrigger = memo(DialogTrigger)
+
+function CommandMenu({ children, trigger }: CommandMenuProps) {
   const open = useCommandMenuOpen()
   const setOpen = useSetCommandMenuOpen()
 
@@ -96,6 +102,7 @@ function CommandMenu({ children }: PropsWithChildren) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {trigger}
       <DialogContent
         hideClose
         onInteractOutside={() => setOpen(false)}
@@ -114,4 +121,4 @@ function CommandMenu({ children }: PropsWithChildren) {
   )
 }
 
-export { Breadcrumb, CommandMenu, CommandWrapper }
+export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandWrapper }

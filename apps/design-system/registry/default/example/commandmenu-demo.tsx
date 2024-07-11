@@ -3,9 +3,9 @@ import {
   CommandInput,
   CommandList,
   CommandMenu,
+  CommandMenuTrigger as CommandMenuTriggerPrimitive,
   CommandProvider,
   useRegisterCommands,
-  useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
 
 function Commands() {
@@ -28,17 +28,18 @@ function Commands() {
 }
 
 function CommandMenuTrigger() {
-  const setOpen = useSetCommandMenuOpen()
-
-  return <Button onClick={() => setOpen(true)}>Open command menu</Button>
+  return (
+    <CommandMenuTriggerPrimitive>
+      <Button>Open command menu</Button>
+    </CommandMenuTriggerPrimitive>
+  )
 }
 
 export default function CommandMenuDemo() {
   return (
     <CommandProvider openKey="j">
-      <CommandMenuTrigger />
       <Commands />
-      <CommandMenu>
+      <CommandMenu trigger={<CommandMenuTrigger />}>
         <CommandInput />
         <CommandList />
       </CommandMenu>
