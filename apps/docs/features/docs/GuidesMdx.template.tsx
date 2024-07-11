@@ -121,7 +121,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
         )}
       >
-        <Breadcrumbs className="mb-3 w-full" />
+        <Breadcrumbs className="mb-2" />
         <article
           // Used to get headings for the table of contents
           id="sb-docs-guide-main-article"

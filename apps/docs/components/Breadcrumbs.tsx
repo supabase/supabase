@@ -38,20 +38,24 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
   const ITEMS_TO_DISPLAY = 3
 
   if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
-
+  console.log(breadcrumbs?.length, breadcrumbs.length <= ITEMS_TO_DISPLAY)
   return (
     <Breadcrumb className={className}>
       <BreadcrumbList className="text-foreground-lighter p-0">
-        <BreadcrumbItem>
-          {breadcrumbs[0].url ? (
-            <BreadcrumbLink href={`/docs${breadcrumbs[0].url}`}>
-              {breadcrumbs[0].title || breadcrumbs[0].name}
-            </BreadcrumbLink>
-          ) : (
-            <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
-          )}
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        {breadcrumbs.length >= ITEMS_TO_DISPLAY && (
+          <>
+            <BreadcrumbItem>
+              {breadcrumbs[0].url ? (
+                <BreadcrumbLink href={`/docs${breadcrumbs[0].url}`}>
+                  {breadcrumbs[0].title || breadcrumbs[0].name}
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+          </>
+        )}
         {breadcrumbs.length > ITEMS_TO_DISPLAY && (
           <>
             <BreadcrumbItem>
@@ -107,7 +111,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
         {breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1).map((crumb, i) => (
           <Fragment key={crumb.url}>
             {i !== 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem className="flex items-center overflow-hidden last:text-foreground">
+            <BreadcrumbItem className="flex items-center overflow-hidden">
               {crumb.url ? (
                 <BreadcrumbLink href={`/docs${crumb.url}`}>
                   {crumb.title || crumb.name}
