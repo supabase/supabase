@@ -174,16 +174,18 @@ function CaseStudyPage(props: any) {
                         <div className="flex flex-col space-y-2">
                           <span className="text-foreground-lighter">About</span>
                           <p>{about}</p>
-                          <span className="not-prose ">
-                            <a
-                              href={company_url}
-                              className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
-                              target="_blank"
-                            >
-                              <span>{company_url}</span>
-                              <IconExternalLink size={14} />
-                            </a>
-                          </span>
+                          {company_url && (
+                            <span className="not-prose ">
+                              <a
+                                href={company_url}
+                                className="flex cursor-pointer items-center space-x-1 transition-opacity text-foreground-lightround-ligtext-foreground-light:text-foreground-light"
+                                target="_blank"
+                              >
+                                <span>{company_url}</span>
+                                <IconExternalLink size={14} />
+                              </a>
+                            </span>
+                          )}
                         </div>
 
                         {misc?.map((x: any) => {
