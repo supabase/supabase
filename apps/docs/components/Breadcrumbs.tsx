@@ -131,7 +131,6 @@ function findMenuItemByUrl(menu, targetUrl, parents = []) {
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {
-      console.log('items', item)
       const result = findMenuItemByUrl(item, targetUrl, [...parents, menu])
       if (result) {
         return result
