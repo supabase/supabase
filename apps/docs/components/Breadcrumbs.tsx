@@ -38,7 +38,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
   const ITEMS_TO_DISPLAY = 3
 
   if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
-  console.log(breadcrumbs?.length, breadcrumbs.length <= ITEMS_TO_DISPLAY)
+
   return (
     <Breadcrumb className={className}>
       <BreadcrumbList className="text-foreground-lighter p-0">
@@ -128,19 +128,20 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
 }
 
 function findMenuItemByUrl(menu, targetUrl, parents = []) {
-  // Check if the current menu object itself has the target URL
-  if (menu.url === targetUrl) {
-    return [...parents, menu]
-  }
-
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {
+      console.log('items', item)
       const result = findMenuItemByUrl(item, targetUrl, [...parents, menu])
       if (result) {
         return result
       }
     }
+  }
+
+  // Check if the current menu object itself has the target URL
+  if (menu.url === targetUrl) {
+    return [...parents, menu]
   }
 
   // If the URL is not found, return null
