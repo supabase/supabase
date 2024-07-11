@@ -235,7 +235,6 @@ const CreateProject = observer(() => {
         dbRegion: dbRegion,
         dbSql: dbSql || '',
         dbPricingTierId: PRICING_TIER_PRODUCT_IDS.FREE,
-        configurationId: _store.configurationId,
         authSiteUrl: _store.selectedVercelProjectUrl,
       })
     } catch (error) {
