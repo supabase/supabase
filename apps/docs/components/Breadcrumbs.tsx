@@ -107,7 +107,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
         {breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1).map((crumb, i) => (
           <Fragment key={crumb.url}>
             {i !== 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem className="flex items-center overflow-hidden">
+            <BreadcrumbItem className="flex items-center overflow-hidden last:text-foreground">
               {crumb.url ? (
                 <BreadcrumbLink href={`/docs${crumb.url}`}>
                   {crumb.title || crumb.name}
