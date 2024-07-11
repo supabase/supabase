@@ -1382,7 +1382,8 @@ const PROVIDER_SAML = {
     },
     SAML_EXTERNAL_URL: {
       // TODO: Update this
-      title: 'Allows the advertised SAML metadata to be different than the one defined with the API external URL.',
+      title:
+        'Allows the advertised SAML metadata to be different than the one defined with the API external URL.',
       type: 'string',
     },
   },
