@@ -9,6 +9,7 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 
 export const FunctionEditor = ({
   field,
@@ -22,12 +23,15 @@ export const FunctionEditor = ({
   return (
     <div className={cn('rounded-md relative group flex-grow')}>
       <FormControl_Shadcn_>
-        <SqlEditor
+        <CodeEditor
+          id="database-functions-editor"
+          language="pgsql"
+          placeholder={`BEGIN\n\nEND;`}
           defaultValue={field.value}
           onInputChange={(value: string | undefined) => {
+            console.log('onInputChange', value)
             field.onChange(value)
           }}
-          contextmenu={false}
         />
       </FormControl_Shadcn_>
       <div
@@ -42,7 +46,7 @@ export const FunctionEditor = ({
               type="text"
               size="tiny"
               className={cn(
-                'px-2 text-foreground-lighter hover:text-foreground',
+                'px-1.5 text-foreground-lighter hover:text-foreground',
                 'transition z-50'
               )}
               onClick={() => setFocused(!focused)}
