@@ -13,6 +13,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
+import { IS_PLATFORM } from 'common'
 
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -48,11 +49,15 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 
-const PLACEHOLDER_QUERY =
-  'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
-
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
+const LOCAL_PLACEHOLDER_QUERY =
+  'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
+
+const PLATFORM_PLACEHOLDER_QUERY =
+  'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
+const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACEHOLDER_QUERY
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
@@ -188,7 +193,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const whQuery = warehouseEditorValue
 
       if (!warehouseCollections?.length) {
-        toast.error("You do not have any collections in your warehouse yet.")
+        toast.error('You do not have any collections in your warehouse yet.')
         return
       }
 

@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconCheck,
+  IconChevronDown,
   IconClipboard,
   IconExternalLink,
   IconX,
@@ -32,6 +33,7 @@ import {
 import { LogTemplate, LogsWarning, WarehouseCollection } from './Logs.types'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
+import { IS_PLATFORM } from 'common'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
@@ -112,7 +114,6 @@ const LogsQueryPanel = ({
                   <DropdownMenuItem onClick={() => onDataSourceChange('logs')}>
                     <DropdownMenuItemContent name="Logs" desc="Logs for all Supabase products" />
                   </DropdownMenuItem>
-
                   <DropdownMenuItem onClick={() => onDataSourceChange('warehouse')}>
                     <DropdownMenuItemContent
                       name={
@@ -182,7 +183,7 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            {dataSource === 'logs' && (
+            {dataSource === 'logs' && IS_PLATFORMx && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>

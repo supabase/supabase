@@ -23,7 +23,7 @@ export const generateLogsMenu = (
           { key: 'explorer', name: 'Query', root: true },
           IS_PLATFORM ? { key: 'saved', name: 'Saved Queries' } : null,
           { key: 'recent', name: 'Recent Queries' },
-          { key: 'templates', name: 'Templates' },
+          IS_PLATFORM ? { key: 'templates', name: 'Templates' } : null,
         ].filter((item) => item) as { name: string; key: string; root: boolean }[]
       ).map(({ key, name, root }) => ({
         name,

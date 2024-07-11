@@ -2,11 +2,13 @@ import { Octokit } from '@octokit/core'
 import { capitalize } from 'lodash'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import rehypeSlug from 'rehype-slug'
+
 import { Heading } from 'ui'
+
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
-
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -109,7 +111,7 @@ const urlTransform: (lints: Array<{ path: string }>) => UrlTransformFunction = (
  * Fetch lint remediation Markdown from external repo
  */
 const getLints = async () => {
-  const octokit = new Octokit()
+  const octokit = new Octokit({ request: { fetch: fetchRevalidatePerDay } })
 
   const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
     owner: org,
@@ -135,7 +137,7 @@ const getLints = async () => {
 
   const lints = await Promise.all(
     lintsList.map(async ({ path }) => {
-      const fileResponse = await fetch(
+      const fileResponse = await fetchRevalidatePerDay(
         `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${path}`
       )
 

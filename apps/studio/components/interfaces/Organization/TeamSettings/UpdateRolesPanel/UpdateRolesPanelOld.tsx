@@ -1,4 +1,4 @@
-import { PanelLeftClose, PanelRightClose } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
@@ -20,14 +20,10 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { RolesAccessMatrix } from './RolesAccessMatrix'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -44,7 +40,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data } = useOrganizationRolesQuery({ slug })
   const { data: projects } = useProjectsQuery()
 
-  const [showRolesAccessMatrix, setShowRolesAccessMatrix] = useState(false)
   const [roleConfiguration, setRoleConfiguration] = useState<
     { id: number; name: string; projects: string[] }[]
   >([])
@@ -101,8 +96,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
           return { ...role, projects: [] }
         })
       )
-    } else {
-      setShowRolesAccessMatrix(false)
     }
   }, [visible])
 
@@ -110,37 +103,21 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     <Sheet open={visible} onOpenChange={() => onClose()}>
       <SheetContent
         showClose={false}
-        size={showRolesAccessMatrix ? 'lg' : 'default'}
-        className={cn(
-          'bg-surface-200 p-0 flex flex-row gap-0',
-          showRolesAccessMatrix ? '!min-w-[1000px]' : '!min-w-[400px]'
-        )}
+        size="default"
+        className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[400px]')}
       >
-        <div className={cn('flex flex-col grow', showRolesAccessMatrix ? 'w-[48%]' : 'w-full')}>
+        <div className={cn('flex flex-col grow w-full')}>
           <SheetHeader className={cn('py-3 flex flex-row justify-between items-center border-b')}>
             <p>Manage access for team member</p>
-            <Tooltip_Shadcn_ delayDuration={100}>
-              <TooltipTrigger_Shadcn_ asChild>
-                <button
-                  aria-expanded={showRolesAccessMatrix}
-                  aria-controls="show-roles-matrix"
-                  className={cn(
-                    !showRolesAccessMatrix ? 'text-foreground-lighter' : 'text-light',
-                    'mt-1 hover:text-foreground transition'
-                  )}
-                  onClick={() => setShowRolesAccessMatrix(!showRolesAccessMatrix)}
-                >
-                  {!showRolesAccessMatrix ? (
-                    <PanelLeftClose size={19} strokeWidth={1} />
-                  ) : (
-                    <PanelRightClose size={19} strokeWidth={1} />
-                  )}
-                </button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="left">
-                {showRolesAccessMatrix ? 'Hide' : 'Show'} role permissions
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/platform/access-control"
+              >
+                Documentation
+              </a>
+            </Button>
           </SheetHeader>
 
           <div className="h-full flex flex-col gap-y-4 px-5 py-5">
@@ -249,7 +226,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </Button>
           </SheetFooter>
         </div>
-        {showRolesAccessMatrix && <RolesAccessMatrix visible={showRolesAccessMatrix} />}
       </SheetContent>
     </Sheet>
   )
