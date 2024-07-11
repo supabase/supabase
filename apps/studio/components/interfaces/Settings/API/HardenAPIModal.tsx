@@ -40,19 +40,12 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const hasAPISchema = (schemas ?? []).find((schema) => schema.name === 'api')
   const exposedSchemas = config?.db_schema.split(', ') ?? []
   const isAPISchemaExposed = exposedSchemas.includes('api')
   const isPublicSchemaExposed = exposedSchemas.includes('public')
-
-  const pgGraphqlExtension = (extensions ?? []).find((ext) => ext.name === 'pg_graphql')
-  const isPgGraphqlInstalled = !!pgGraphqlExtension?.installed_version
 
   const { mutate: createAndExposeAPISchema, isLoading: isCreatingAPISchema } =
     useCreateAndExposeAPISchemaMutation({
@@ -222,7 +215,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               2. Remove the <code className="text-xs text-foreground">public</code> schema from the
               exposed schemas
             </p>
-            {!isPublicSchemaExposed && !isPgGraphqlInstalled ? (
+            {!isPublicSchemaExposed ? (
               <Check size={16} className="text-brand" />
             ) : (
               <ChevronDown
@@ -253,7 +246,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               <ButtonTooltip
                 type="primary"
                 className="w-min"
-                disabled={!isPublicSchemaExposed && !isPgGraphqlInstalled}
+                disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}
                 tooltip={{ content: { side: 'right', text: 'Public schema no longer exposed' } }}
                 onClick={onSelectRemovePublicSchema}
