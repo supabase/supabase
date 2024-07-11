@@ -88,5 +88,18 @@ export const generateLogsMenu = (
           : null,
       ].filter((item) => item) as ProductMenuGroupItem[],
     },
+    {
+      title: 'Database operations',
+      items: [
+        IS_PLATFORM
+          ? {
+              name: 'Version Upgrade',
+              key: 'pg-upgrade-logs',
+              url: `/project/${ref}/logs/pg-upgrade-logs`,
+              items: [],
+            }
+          : null,
+      ].filter((item) => item) as ProductMenuGroupItem[],
+    },
   ]
 }

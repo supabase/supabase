@@ -238,6 +238,16 @@ const schemas = [
       { path: 'metadata.host', type: 'string' },
     ],
   },
+  {
+    name: 'Database Version Upgrade',
+    reference: 'pg_upgrade_logs',
+    fields: [
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
+      { path: 'log_file', type: 'string' },
+    ],
+  },
 ]
 
 export default {

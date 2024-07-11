@@ -19,6 +19,7 @@ export type ProjectUpgradingStatusResponse = {
     progress?: DatabaseUpgradeProgress
     status: DatabaseUpgradeStatus
     initiated_at: string
+    latest_status_at: string
     target_version: number
   } | null
 }
