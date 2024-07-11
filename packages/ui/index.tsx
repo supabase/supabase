@@ -258,10 +258,6 @@ export * from './src/layout/banners'
 
 // export { default as Config } from './../ui.config'
 
-// ARCHIVE
-
-// export * from './src/components/Textarea'
-
 // AUTH
 
 // export * from './src/components/Auth'
