@@ -1,11 +1,10 @@
-import React from 'react'
-import { createRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
 import { AssistantCommandsPopover } from 'ui-patterns/AssistantChat/AssistantCommandsPopover'
 
 export default function AssistantChatCommands() {
   const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
-  const textAreaRef = createRef<HTMLTextAreaElement>()
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const [value, setValueState] = useState('')
   const [loading, setLoading] = useState(false)
 

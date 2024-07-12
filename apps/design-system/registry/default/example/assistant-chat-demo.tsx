@@ -1,9 +1,8 @@
-import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
 import { Box } from 'lucide-react'
-import { createRef, useState } from 'react'
+import { useState } from 'react'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
 
 export default function AssistantChatDemo() {
-  const textAreaRef = createRef<HTMLTextAreaElement>()
   const [value, setValueState] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,7 +16,6 @@ export default function AssistantChatDemo() {
 
   return (
     <AssistantChatForm
-      textAreaRef={textAreaRef}
       icon={<Box strokeWidth={1.5} size={24} className="text-foreground-muted" />}
       value={value}
       loading={loading}

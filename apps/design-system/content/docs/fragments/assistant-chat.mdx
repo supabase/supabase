@@ -2,12 +2,6 @@
 title: Assistant Chat
 description: Bespoke Assistant chat text area, with support for a commands Popover.
 component: true
-links:
-  doc: https://www.radix-ui.com/docs/primitives/components/avatar
-  api: https://www.radix-ui.com/docs/primitives/components/avatar#api-reference
-source:
-  radix: true
-  shadcn: true
 ---
 
 <ComponentPreview name="assistant-chat-demo" peekCode wide />
@@ -15,11 +9,21 @@ source:
 ## Usage
 
 ```tsx
-import { InfoTooltip } from 'ui'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat/AssistantChatForm'
 ```
 
 ```tsx
-<InfoTooltip side="top">This is the tooltip content</InfoTooltip>
+<AssistantChatForm
+  icon={<Box strokeWidth={1.5} size={24} className="text-foreground-muted" />}
+  value={value}
+  loading={loading}
+  disabled={loading}
+  onValueChange={(e) => setValueState(e.target.value)}
+  onSubmit={async (event) => {
+    event.preventDefault()
+    handleSubmit(event)
+  }}
+/>
 ```
 
 ## Commands
@@ -43,7 +47,6 @@ const textAreaRef = createRef<HTMLTextAreaElement>()
     setCommandsOpen={setCommandsOpen}
   />
 </AssistantCommandPopover>
-
+```
 
 <ComponentPreview name="assistant-chat-commands" />
-```
