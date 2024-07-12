@@ -374,6 +374,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/components/tree-view',
           items: [],
         },
+        {
+          title: 'Expanding Textarea',
+          href: '/docs/components/expanding-textarea',
+          items: [],
+        },
       ],
     },
   ],
