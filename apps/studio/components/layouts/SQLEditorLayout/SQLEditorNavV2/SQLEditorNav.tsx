@@ -249,8 +249,15 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
     const ceiling = Math.max(baseIndex, targetIndex)
 
     const _selectedSnippets = []
+    const sameFolder = contents[floor].folder_id === contents[ceiling].folder_id
+
     for (let i = floor; i <= ceiling; i++) {
-      _selectedSnippets.push(contents[i])
+      if (sameFolder) {
+        if (contents[i].folder_id === contents[floor].folder_id) _selectedSnippets.push(contents[i])
+      } else {
+        // [Joshen] Temp don't allow selecting across folders for now
+        // _selectedSnippets.push(contents[i])
+      }
     }
 
     setSelectedSnippets(_selectedSnippets)
