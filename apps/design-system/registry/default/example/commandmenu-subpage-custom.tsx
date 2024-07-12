@@ -1,4 +1,4 @@
-import { Button } from '@ui/components/shadcn/ui/button'
+import { Button } from 'ui'
 import { useMemo } from 'react'
 import {
   Breadcrumb,
@@ -47,7 +47,11 @@ function Commands() {
 function CommandMenuTrigger() {
   const setOpen = useSetCommandMenuOpen()
 
-  return <Button onClick={() => setOpen(true)}>Open command menu</Button>
+  return (
+    <Button onClick={() => setOpen(true)} type="default">
+      Open command menu
+    </Button>
+  )
 }
 
 export default function CommandMenuDemo() {

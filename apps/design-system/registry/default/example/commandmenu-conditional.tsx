@@ -1,4 +1,4 @@
-import { Button } from '@ui/components/shadcn/ui/button'
+import { Button } from 'ui'
 import { useMemo, useState } from 'react'
 import {
   CommandInput,
@@ -41,7 +41,7 @@ function Commands() {
   useRegisterCommands('Commands', command, { deps: [command] })
 
   return (
-    <Button onClick={toggleCommands}>
+    <Button onClick={toggleCommands} type="default">
       {activeCommand === 1 ? 'Change command to command two' : 'Change command to command one'}
     </Button>
   )
