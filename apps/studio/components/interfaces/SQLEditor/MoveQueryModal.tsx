@@ -98,6 +98,8 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
     resolver: zodResolver(FormSchema),
     defaultValues: { name: '' },
   })
+  const isMovingToSameFolder =
+    (!snippet?.folder_id && selectedId === 'root') || snippet?.folder_id === selectedId
 
   const onConfirmMove = async (values: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -287,6 +289,7 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
               <Button
                 type="primary"
                 htmlType="submit"
+                disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >
                 Move file

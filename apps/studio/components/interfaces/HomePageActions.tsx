@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { EMPTY_ARR } from 'lib/void'
+import { Search } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -12,7 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  IconSearch,
   Input,
 } from 'ui'
 
@@ -65,7 +65,7 @@ const HomePageActions = ({
       <Input
         size="tiny"
         placeholder="Search for a project"
-        icon={<IconSearch size={16} />}
+        icon={<Search size={16} />}
         className="w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
         value={search}
         onChange={(event) => setSearch(event.target.value)}

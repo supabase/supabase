@@ -61,6 +61,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { Loader2 } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -683,9 +684,7 @@ const SQLEditor = () => {
 
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
-                  <Loading active={true}>
-                    <></>
-                  </Loading>
+                  <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
                 <>
@@ -738,9 +737,7 @@ const SQLEditor = () => {
           <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
-                <Loading active={true}>
-                  <></>
-                </Loading>
+                <Loader2 className="animate-spin text-brand" />
               </div>
             ) : (
               <UtilityPanel

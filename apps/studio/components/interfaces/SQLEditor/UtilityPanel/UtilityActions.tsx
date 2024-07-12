@@ -243,7 +243,7 @@ const UtilityActions = ({
               type="text"
               onClick={prettifyQuery}
               className="px-1"
-              icon={<AlignLeft size="tiny" strokeWidth={2} />}
+              icon={<AlignLeft strokeWidth={2} />}
             />
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
