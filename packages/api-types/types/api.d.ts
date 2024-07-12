@@ -2078,6 +2078,9 @@ export interface components {
       api_key: string
       name: string
     }
+    ApiResponse: {
+      autoApiService: components['schemas']['AutoApiService']
+    }
     ApproveAuthorizationResponse: {
       url: string
     }
@@ -2270,6 +2273,24 @@ export interface components {
     AuthorizationsApproveBody: {
       organization_id: string
     }
+    AutoApiService: {
+      app: {
+        id?: number
+        name?: string
+      }
+      app_config: Record<string, never>
+      defaultApiKey: string
+      endpoint: string
+      id: number
+      name: string
+      project: {
+        ref?: string
+      }
+      protocol: string
+      restUrl: string
+      service_api_keys: components['schemas']['ServiceApiKey'][]
+      serviceApiKey: string
+    }
     AvailableAddonResponse: {
       name: string
       type: components['schemas']['ProjectAddonType']
@@ -2451,7 +2472,8 @@ export interface components {
       defaultValue?: Record<string, never>
       /** @enum {string} */
       defaultValueFormat?: 'expression' | 'literal'
-      identityGeneration?: Record<string, never>
+      /** @enum {string} */
+      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
       isIdentity?: boolean
       isNullable?: boolean
       isPrimaryKey?: boolean
@@ -2558,7 +2580,8 @@ export interface components {
       name: string
       payment_method?: string
       size?: string
-      tier: Record<string, never>
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
     CreateOrganizationBodyV1: {
       name: string
@@ -3075,8 +3098,10 @@ export interface components {
       website: string
     }
     GetMetricsBody: {
-      interval: string
-      metric: string
+      /** @enum {string} */
+      interval: '1d' | '3d' | '7d'
+      /** @enum {string} */
+      metric: 'user_queries'
       project_refs: string[]
       region: string
     }
@@ -4264,6 +4289,10 @@ export interface components {
       ref: string
       usage: number
     }
+    ProjectAppConfigResponse: {
+      db_schema: string
+      endpoint: string
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4400,6 +4429,47 @@ export interface components {
       /** @enum {string|null} */
       need_pitr: 'critical' | 'warning' | null
       project: string
+    }
+    ProjectResponse: {
+      cloud_provider: string
+      db_dns_name: string
+      db_host: string
+      db_name: string
+      db_port: string
+      db_user: string
+      id: number
+      inserted_at: string
+      jwt_secret: string
+      name: string
+      ref: string
+      region: string
+      services?: components['schemas']['ServiceResponse'][]
+      ssl_enforced: boolean
+      status: string
+    }
+    ProjectServiceApiKeyResponse: {
+      api_key: string
+      name: string
+      tags: string
+    }
+    ProjectSettingsResponse: {
+      app_config?: components['schemas']['ProjectAppConfigResponse']
+      cloud_provider: string
+      db_dns_name: string
+      db_host: string
+      /** @enum {string|null} */
+      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
+      db_name: string
+      db_port: string
+      db_user: string
+      inserted_at: string
+      jwt_secret?: string
+      name: string
+      ref: string
+      region: string
+      service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
+      ssl_enforced: boolean
+      status: string
     }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
@@ -4588,7 +4658,7 @@ export interface components {
       /** @description Unique ID representing the fly extension */
       id: string
       /** @description Supabase project services health status */
-      services: string[]
+      services: components['schemas']['ServiceHealthResponse'][]
       /**
        * @description Supabase project status
        * @example ACTIVE_HEALTHY
@@ -4790,10 +4860,52 @@ export interface components {
       prevPlan?: string
       reasons: string[]
     }
+    ServiceApiKey: {
+      api_key_encrypted?: string
+      name: string
+      tags: string
+    }
+    ServiceApiKeyResponse: {
+      api_key?: string
+      api_key_encrypted?: string
+      name: string
+      tags: string
+    }
+    ServiceHealthResponse: {
+      /** @description Service health check error */
+      error?: string
+      /** @description Whether the service is healthy */
+      healthy: boolean
+      /**
+       * @description Service name
+       * @enum {string}
+       */
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
+      /**
+       * @description Service health status
+       * @example COMING_UP
+       * @enum {string}
+       */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
+    }
+    ServiceResponse: {
+      app: {
+        id?: number
+        name?: string
+      }
+      app_config: Record<string, never>
+      id: number
+      name: string
+      service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
+    }
     ServiceVersions: {
       gotrue: string
       postgrest: string
       'supabase-postgres': string
+    }
+    SettingsResponse: {
+      project: components['schemas']['ProjectResponse']
+      services: components['schemas']['ServiceResponse'][]
     }
     SetupIntentResponse: {
       client_secret: string
@@ -4933,10 +5045,12 @@ export interface components {
       order?: string
     }
     StorageObjectTransformOptions: {
-      format?: string
+      /** @enum {string} */
+      format?: 'origin'
       height?: number
       quality?: number
-      resize?: Record<string, never>
+      /** @enum {string} */
+      resize?: 'cover' | 'contain' | 'fill'
       width?: number
     }
     SubdomainAvailabilityResponse: {
@@ -5252,7 +5366,12 @@ export interface components {
       mfa_max_enrolled_factors?: number
       password_hibp_enabled?: boolean
       password_min_length?: number
-      password_required_characters?: string
+      /** @enum {string} */
+      password_required_characters?:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
+        | ''
       rate_limit_anonymous_users?: number
       rate_limit_email_sent?: number
       rate_limit_otp?: number
@@ -5318,7 +5437,8 @@ export interface components {
       defaultValueFormat?: 'expression' | 'literal'
       dropDefault?: boolean
       id?: number
-      identityGeneration?: Record<string, never>
+      /** @enum {string} */
+      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
       isIdentity?: boolean
       isNullable?: boolean
       isUnique?: boolean
@@ -5481,7 +5601,12 @@ export interface components {
       MFA_MAX_ENROLLED_FACTORS?: number
       PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
-      PASSWORD_REQUIRED_CHARACTERS?: string
+      /** @enum {string} */
+      PASSWORD_REQUIRED_CHARACTERS?:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
+        | ''
       RATE_LIMIT_ANONYMOUS_USERS?: number
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_OTP?: number
@@ -5543,7 +5668,8 @@ export interface components {
     }
     UpdateNotificationBodyV2: {
       id: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
     }
     UpdateNotificationsBodyV1: {
       ids: string[]
@@ -5688,13 +5814,15 @@ export interface components {
     }
     UpdateSubscriptionBody: {
       payment_method?: string
-      tier: Record<string, never>
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
     UpdateSubscriptionV2AdminBody: {
       payment_method?: string
       price_id?: string
       skip_free_plan_validations?: boolean
-      tier: Record<string, never>
+      /** @enum {string} */
+      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -6411,7 +6539,13 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template: string
+        template:
+          | 'confirmation'
+          | 'email-change'
+          | 'invite'
+          | 'magic-link'
+          | 'recovery'
+          | 'reauthentication'
       }
     }
     responses: {
@@ -7162,6 +7296,8 @@ export interface operations {
   NotificationsController_getNotificationsV2: {
     parameters: {
       query: {
+        status: 'new' | 'seen' | 'archived'
+        priority: 'Critical' | 'Warning' | 'Info'
         org_slug?: string[]
         project_ref?: string[]
         offset: number
@@ -7385,6 +7521,10 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: unknown
+        }
         content: never
       }
       403: {
@@ -11535,7 +11675,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ProjectSettingsResponse']
+        }
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -11665,7 +11807,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ApiResponse']
+        }
       }
       /** @description Failed to retrieve project's api info */
       500: {
@@ -11706,7 +11850,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['SettingsResponse']
+        }
       }
       /** @description Failed to retrieve project's settings */
       500: {
@@ -12461,7 +12607,13 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template: string
+        template:
+          | 'confirmation'
+          | 'email-change'
+          | 'invite'
+          | 'magic-link'
+          | 'recovery'
+          | 'reauthentication'
       }
     }
     responses: {
@@ -12544,6 +12696,7 @@ export interface operations {
     parameters: {
       header: {
         'x-github-delivery': string
+        'x-github-event': string
         'x-hub-signature-256': string
       }
     }
@@ -12827,6 +12980,11 @@ export interface operations {
       }
     }
     responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['FunctionResponse'][]
+        }
+      }
       403: {
         content: never
       }
@@ -12904,6 +13062,9 @@ export interface operations {
       }
     }
     responses: {
+      200: {
+        content: never
+      }
       403: {
         content: never
       }
@@ -12941,6 +13102,11 @@ export interface operations {
       }
     }
     responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['FunctionResponse']
+        }
+      }
       403: {
         content: never
       }

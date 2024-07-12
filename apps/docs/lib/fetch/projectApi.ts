@@ -23,9 +23,7 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
   })
   if (error) throw error
 
-  // [Joshen] API typing issue
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/props/project/ref/api.controller.ts#L40
-  return data as any
+  return data
 }
 
 export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
