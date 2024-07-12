@@ -4,9 +4,17 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { cn } from 'ui/src/lib/utils'
 
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Link } from 'lucide-react'
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { Dialog, DialogContent } from 'ui'
+import {
+  Dialog,
+  DialogContent,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuContext'
@@ -67,7 +75,30 @@ export const CommandDialog = React.forwardRef<CommandPrimitiveDialogElement, Com
     const isOpen = props.visible || props.open
     const isMobile = useBreakpoint()
 
-    return (
+    const Content = () => (
+      <ErrorBoundary FallbackComponent={CommandError}>
+        <Command
+          className={cn(
+            '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+            '[&_[cmdk-item]_svg]:h-5',
+            '[&_[cmdk-item]_svg]:w-5',
+            '[&_[cmdk-input-wrapper]_svg]:h-5',
+            '[&_[cmdk-input-wrapper]_svg]:w-5',
+            '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
+          )}
+        >
+          {children}
+        </Command>
+      </ErrorBoundary>
+    )
+
+    return isMobile ? (
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <DrawerContent className="h-[80vh] max-h-[80vh]" showHandle={false}>
+          <Content />
+        </DrawerContent>
+      </Drawer>
+    ) : (
       <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
           ref={ref}
@@ -97,20 +128,7 @@ export const CommandDialog = React.forwardRef<CommandPrimitiveDialogElement, Com
             'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
           )}
         >
-          <ErrorBoundary FallbackComponent={CommandError}>
-            <Command
-              className={cn(
-                '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-                '[&_[cmdk-item]_svg]:h-5',
-                '[&_[cmdk-item]_svg]:w-5',
-                '[&_[cmdk-input-wrapper]_svg]:h-5',
-                '[&_[cmdk-input-wrapper]_svg]:w-5',
-                '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
-              )}
-            >
-              {children}
-            </Command>
-          </ErrorBoundary>
+          <Content />
         </DialogContent>
       </Dialog>
     )
