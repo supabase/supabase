@@ -10,7 +10,7 @@ export type CreateCollectionArgs = {
 }
 
 export async function createCollection({ projectRef, name }: CreateCollectionArgs) {
-  const { data, error } = await post('/v1/projects/{ref}/analytics/warehouse/collections', {
+  const { data, error } = await post('/v0/projects/{ref}/analytics/warehouse/collections', {
     params: { path: { ref: projectRef } },
     body: { name },
   } as any)
