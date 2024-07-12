@@ -145,7 +145,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         className={cn(
           'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          'place-self-start md:place-self-auto',
+          'place-self-end md:place-self-auto',
           open && '!animate-in !slide-in-from-bottom !duration-300',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
           'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
