@@ -112,7 +112,7 @@ USING (
   EXISTS (
     SELECT 1
     FROM public.rooms_users
-    WHERE user_id = auth.uid()
+    WHERE user_id = (select auth.uid())
     AND room_topic = realtime.topic()
     AND realtime.messages.extension in ('broadcast', 'presence')
   )
@@ -126,7 +126,7 @@ WITH CHECK (
   EXISTS (
     SELECT 1
     FROM public.rooms_users
-    WHERE user_id = auth.uid()
+    WHERE user_id = (select auth.uid())
     AND room_topic = realtime.topic()
     AND realtime.messages.extension in ('broadcast', 'presence')
   )
