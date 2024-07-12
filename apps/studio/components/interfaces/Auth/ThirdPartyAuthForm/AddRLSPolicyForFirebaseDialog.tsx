@@ -49,9 +49,11 @@ export const AddRLSPolicyForFirebaseDialog = ({
   return (
     <>
       <DialogHeader padding={'small'}>
-        <DialogTitle>Edit profile</DialogTitle>
+        <DialogTitle>Add RLS policy</DialogTitle>
         <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
+          By adding a Row Level Security (RLS) policy, you can expose specific tables to be
+          accessible with Firebase JWT keys. Failing to do so can open up your project to security
+          issues.
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
