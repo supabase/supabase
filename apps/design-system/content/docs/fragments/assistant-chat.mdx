@@ -22,4 +22,28 @@ import { InfoTooltip } from 'ui'
 <InfoTooltip side="top">This is the tooltip content</InfoTooltip>
 ```
 
+## Commands
+
+The Assistant Chat support a commands Popover that can be used to display a list of available commands.
+
+It requires a useState and a ref though for it to work correctly.
+This is so that the input is still in focus, and the user can still interact with the Popover with the keyboard.
+
+```tsx
+const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
+const textAreaRef = createRef<HTMLTextAreaElement>()
+
+<AssistantCommandPopover
+  open={commandsOpen}
+  setOpen={setCommandsOpen}
+  textAreaRef={textAreaRef}
+>
+  <AssistantChatForm
+    commandsOpen={commandsOpen}
+    setCommandsOpen={setCommandsOpen}
+  />
+</AssistantCommandPopover>
+
+
 <ComponentPreview name="assistant-chat-commands" />
+```
