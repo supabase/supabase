@@ -1,21 +1,15 @@
 'use client'
 
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
-import { type PropsWithChildren, type ReactNode, forwardRef, memo, useEffect, useMemo } from 'react'
+import { type PropsWithChildren, type ReactNode, forwardRef, memo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
-import useDragToClose from 'common/hooks/useDragToClose'
 import { Button, Command_Shadcn_, Dialog, DialogContent, DialogTrigger, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
-import {
-  useCommandMenuSize,
-  useCommandMenuOpen,
-  useSetCommandMenuOpen,
-  useSetupCommandMenuTouchEvents,
-} from './hooks/viewHooks'
+import { useCommandMenuSize, useCommandMenuOpen, useSetCommandMenuOpen } from './hooks/viewHooks'
 import { PageType } from './utils'
 
 function Breadcrumb({ className }: { className?: string }) {
@@ -89,23 +83,6 @@ function PageSwitch({ children }: PropsWithChildren) {
   return PageComponent ? <PageComponent /> : <CommandWrapper>{children}</CommandWrapper>
 }
 
-function useTouchGestures({ toggleOpen }: { toggleOpen: () => void }) {
-  const { ref, handleTouchStart, handleTouchMove, handleTouchEnd } = useDragToClose({
-    onClose: toggleOpen,
-  })
-
-  const setupTouchHandlers = useSetupCommandMenuTouchEvents()
-  const touchHandlers = useMemo(
-    () => ({ handleTouchStart, handleTouchMove, handleTouchEnd }),
-    [handleTouchStart, handleTouchMove, handleTouchEnd]
-  )
-  useEffect(() => {
-    setupTouchHandlers(touchHandlers)
-  }, [touchHandlers])
-
-  return { ref }
-}
-
 const CommandMenuTrigger = memo(DialogTrigger)
 
 interface CommandMenuProps extends PropsWithChildren {
@@ -126,15 +103,12 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   const query = useQuery()
   const setQuery = useSetQuery()
 
-  const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger}
       <DialogContent
         hideClose
         forceMount
-        ref={contentRef}
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
         onInteractOutside={() => setOpen(false)}
         onEscapeKeyDown={(e) => {
