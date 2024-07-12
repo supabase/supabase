@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Assistant Chat',
+          href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
           items: [],
