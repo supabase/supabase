@@ -35,9 +35,11 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
   const [open, setOpen] = React.useState(false)
   const isMobile = useBreakpoint('md')
 
-  const ITEMS_TO_DISPLAY = 3
+  const ITEMS_TO_DISPLAY = isMobile ? 4 : 3
 
   if (!breadcrumbs?.length || breadcrumbs?.length === 1) return null
+
+  const appendedBreadcrumbs = breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1, isMobile ? -1 : undefined)
 
   return (
     <Breadcrumb className={className}>
@@ -108,10 +110,14 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
             <BreadcrumbSeparator />
           </>
         )}
-        {breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1).map((crumb, i) => (
+        {appendedBreadcrumbs?.map((crumb, i) => (
           <Fragment key={crumb.url}>
-            {i !== 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem className="flex items-center overflow-hidden last:text-foreground-light">
+            <BreadcrumbItem
+              className={cn(
+                'flex items-center overflow-hidden',
+                i === appendedBreadcrumbs.length - 1 && 'md:text-foreground-light'
+              )}
+            >
               {crumb.url ? (
                 <BreadcrumbLink href={`/docs${crumb.url}`}>
                   {crumb.title || crumb.name}
@@ -120,6 +126,9 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
                 <BreadcrumbPage>{crumb.title || crumb.name}</BreadcrumbPage>
               )}
             </BreadcrumbItem>
+            <BreadcrumbSeparator
+              className={cn(i === appendedBreadcrumbs.length - 1 && 'md:hidden')}
+            />
           </Fragment>
         ))}
       </BreadcrumbList>
