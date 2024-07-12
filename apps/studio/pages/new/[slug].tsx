@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
@@ -9,7 +10,6 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
@@ -287,6 +287,7 @@ const Wizard: NextPageWithLayout = () => {
         .min(1, 'Password is required.'),
       instanceSize: z.string(),
       dataApi: z.boolean(),
+      useApiSchema: z.boolean(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -311,6 +312,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: defaultRegion || undefined,
       instanceSize: sizes[0],
       dataApi: true,
+      useApiSchema: false,
     },
   })
 
@@ -344,8 +346,16 @@ const Wizard: NextPageWithLayout = () => {
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize, dataApi } =
-      values
+    const {
+      cloudProvider,
+      projectName,
+      dbPass,
+      dbRegion,
+      postgresVersion,
+      instanceSize,
+      dataApi,
+      useApiSchema,
+    } = values
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -359,6 +369,7 @@ const Wizard: NextPageWithLayout = () => {
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
+      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -422,7 +433,7 @@ const Wizard: NextPageWithLayout = () => {
             <div key="panel-title">
               <h3>Create a new project</h3>
               <p className="text-sm text-foreground-lighter">
-                Your project will have its own dedicated instance and full postgres database.
+                Your project will have its own dedicated instance and full Postgres database.
                 <br />
                 An API will be set up so you can easily interact with your new database.
                 <br />
@@ -839,14 +850,12 @@ const Wizard: NextPageWithLayout = () => {
                             label="Database Password"
                             layout="horizontal"
                             description={
-                              <>
-                                <PasswordStrengthBar
-                                  passwordStrengthScore={form.getValues('dbPassStrength')}
-                                  password={field.value}
-                                  passwordStrengthMessage={passwordStrengthMessage}
-                                  generateStrongPassword={generateStrongPassword}
-                                />
-                              </>
+                              <PasswordStrengthBar
+                                passwordStrengthScore={form.getValues('dbPassStrength')}
+                                password={field.value}
+                                passwordStrengthMessage={passwordStrengthMessage}
+                                generateStrongPassword={generateStrongPassword}
+                              />
                             }
                           >
                             <FormControl_Shadcn_>
@@ -898,16 +907,19 @@ const Wizard: NextPageWithLayout = () => {
                             className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
                           />
                         </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                        <CollapsibleContent_Shadcn_
+                          className={cn(
+                            'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                          )}
+                        >
                           <FormField_Shadcn_
-                            control={form.control}
                             name="dataApi"
+                            control={form.control}
                             render={({ field }) => (
                               <>
                                 <FormItemLayout
-                                  label="What connections do you plan to use?"
-                                  description="This setting can be changed after the project is created"
                                   layout="horizontal"
+                                  label="What connections do you plan to use?"
                                 >
                                   <FormControl_Shadcn_>
                                     <RadioGroupStacked
@@ -919,9 +931,10 @@ const Wizard: NextPageWithLayout = () => {
                                       <FormItem_Shadcn_ asChild>
                                         <FormControl_Shadcn_>
                                           <RadioGroupStackedItem
-                                            value={'true'}
+                                            value="true"
+                                            className="[&>div>div>p]:text-left"
                                             label="Data API + Connection String"
-                                            description="For connecting from the browser, mobile and server."
+                                            description="Connect to Postgres via autogenerated HTTP APIs or the Postgres protocol"
                                           />
                                         </FormControl_Shadcn_>
                                       </FormItem_Shadcn_>
@@ -930,7 +943,7 @@ const Wizard: NextPageWithLayout = () => {
                                           <RadioGroupStackedItem
                                             label="Only Connection String"
                                             value="false"
-                                            description="For connecting via server."
+                                            description="Use Postgres without the autogenerated APIs"
                                             className={cn(
                                               !form.getValues('dataApi') && '!rounded-b-none'
                                             )}
@@ -942,7 +955,7 @@ const Wizard: NextPageWithLayout = () => {
                                   {!form.getValues('dataApi') && (
                                     <Admonition
                                       className="rounded-t-none"
-                                      type={'warning'}
+                                      type="warning"
                                       title="Data API will effectively be disabled"
                                     >
                                       PostgREST which powers the Data API will have no schemas
@@ -953,6 +966,72 @@ const Wizard: NextPageWithLayout = () => {
                               </>
                             )}
                           />
+
+                          {form.getValues('dataApi') && (
+                            <FormField_Shadcn_
+                              name="useApiSchema"
+                              control={form.control}
+                              render={({ field }) => (
+                                <>
+                                  <FormItemLayout
+                                    className="mt-6"
+                                    layout="horizontal"
+                                    label="Data API Configuration"
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <RadioGroupStacked
+                                        defaultValue={field.value.toString()}
+                                        onValueChange={(value) => field.onChange(value === 'true')}
+                                      >
+                                        <FormItem_Shadcn_ asChild>
+                                          <FormControl_Shadcn_>
+                                            <RadioGroupStackedItem
+                                              value="false"
+                                              // @ts-ignore
+                                              label={
+                                                <>
+                                                  Use public schema for Data API
+                                                  <Badge color="scale" className="ml-2">
+                                                    Default
+                                                  </Badge>
+                                                </>
+                                              }
+                                              // @ts-ignore
+                                              description={
+                                                <>
+                                                  Query all tables in the{' '}
+                                                  <code className="text-xs">public</code> schema
+                                                </>
+                                              }
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItem_Shadcn_>
+                                        <FormItem_Shadcn_ asChild>
+                                          <FormControl_Shadcn_>
+                                            <RadioGroupStackedItem
+                                              value="true"
+                                              label="Use dedicated API schema for Data API"
+                                              // @ts-ignore
+                                              description={
+                                                <>
+                                                  Query allowlisted tables in a dedicated{' '}
+                                                  <code className="text-xs">api</code> schema
+                                                </>
+                                              }
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItem_Shadcn_>
+                                      </RadioGroupStacked>
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                </>
+                              )}
+                            />
+                          )}
+                          <p className="text-xs text-foreground-lighter text-right mt-3">
+                            These settings can be changed after the project is created via the
+                            project's settings
+                          </p>
                         </CollapsibleContent_Shadcn_>
                       </Collapsible_Shadcn_>
                     </Panel.Content>
