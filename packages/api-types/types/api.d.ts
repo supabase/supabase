@@ -31,6 +31,10 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
+  '/partners/flyio/extensions/eligibility': {
+    /** Checks database provisioning eligibility */
+    post: operations['FlyExtensionsController_checkEligibility']
+  }
   '/partners/flyio/organizations/{organization_id}': {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
@@ -999,6 +1003,10 @@ export interface paths {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
   }
+  '/system/orb/webhooks': {
+    /** Processes Orb events */
+    post: operations['OrbWebhooksController_processEvent']
+  }
   '/system/organizations/{slug}/billing/partner/usage-and-costs': {
     /** Gets the partner usage and costs */
     get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
@@ -1438,6 +1446,50 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['v1-list-all-warehouse-tokens']
+    /** Create a warehouse access token */
+    post: operations['v1-create-a-warehouse-token']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['v1-delete-a-warehouse-token']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['v1-list-all-warehouse-collections']
+    /** Create a warehouse collection */
+    post: operations['v1-create-a-warehouse-collection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['v1-get-a-warehouse-collection']
+    /** Delete a warehouse collection */
+    delete: operations['v1-delete-a-warehouse-collection']
+    /** Update a warehouse collection */
+    patch: operations['v1-update-a-warehouse-collection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['v1-list-all-warehouse-endpoints']
+    /** Create a warehouse endpoint */
+    post: operations['v1-create-a-warehouse-endpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['v1-update-a-warehouse-endpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['v1-delete-a-warehouse-endpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['v1-list-all-warehouse-queries']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['v1-provision-a-warehouse-tenant']
+  }
   '/v0/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
     post: operations['ProjectsApiController_projectGraphql']
@@ -1710,50 +1762,6 @@ export interface paths {
     /** Deletes the given project */
     delete: operations['v1-delete-a-project']
   }
-  '/v1/projects/{ref}/analytics/warehouse/access-tokens': {
-    /** Lists project's warehouse access tokens from logflare */
-    get: operations['v1-list-all-warehouse-tokens']
-    /** Create a warehouse access token */
-    post: operations['v1-create-a-warehouse-token']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
-    /** Delete a warehouse access token */
-    delete: operations['v1-delete-a-warehouse-token']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/collections': {
-    /** Lists project's warehouse collections from logflare */
-    get: operations['v1-list-all-warehouse-collections']
-    /** Create a warehouse collection */
-    post: operations['v1-create-a-warehouse-collection']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/collections/{token}': {
-    /** Get a warehouse collection */
-    get: operations['v1-get-a-warehouse-collection']
-    /** Delete a warehouse collection */
-    delete: operations['v1-delete-a-warehouse-collection']
-    /** Update a warehouse collection */
-    patch: operations['v1-update-a-warehouse-collection']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/endpoints': {
-    /** Lists project's warehouse endpoints from logflare */
-    get: operations['v1-list-all-warehouse-endpoints']
-    /** Create a warehouse endpoint */
-    post: operations['v1-create-a-warehouse-endpoint']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/endpoints/{token}': {
-    /** Update a warehouse endpoint */
-    put: operations['v1-update-a-warehouse-endpoint']
-    /** Delete a warehouse endpoint */
-    delete: operations['v1-delete-a-warehouse-endpoint']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/query': {
-    /** Lists project's warehouse queries from logflare */
-    get: operations['v1-list-all-warehouse-queries']
-  }
-  '/v1/projects/{ref}/analytics/warehouse/tenant': {
-    /** Gets project's warehouse tenant from logflare */
-    get: operations['v1-provision-a-warehouse-tenant']
-  }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
@@ -1794,6 +1802,18 @@ export interface paths {
     put: operations['v1-update-a-sso-provider']
     /** Removes a SSO provider by its UUID */
     delete: operations['v1-delete-a-sso-provider']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** [Alpha] Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** [Alpha] Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** [Alpha] Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** [Alpha] Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
   }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
@@ -2202,6 +2222,7 @@ export interface components {
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_enabled: boolean | null
+      saml_external_url: string | null
       security_captcha_enabled: boolean | null
       security_captcha_provider: string | null
       security_captcha_secret: string | null
@@ -2388,6 +2409,12 @@ export interface components {
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
       id: string
+    }
+    CfResponse: {
+      errors: Record<string, never>[]
+      messages: Record<string, never>[]
+      result: components['schemas']['CustomHostnameDetails']
+      success: boolean
     }
     Column: {
       id: number
@@ -2576,6 +2603,7 @@ export interface components {
       cloud_provider: string
       custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
       data_api_exposed_schemas?: string[]
+      data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
       db_region: string
@@ -2583,7 +2611,6 @@ export interface components {
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
       org_id: number
-      vercel_configuration_id?: string
     }
     CreateProjectResponse: {
       anon_key: string
@@ -2692,6 +2719,11 @@ export interface components {
       type: string
       value: string
     }
+    CreateThirdPartyAuthBody: {
+      custom_jwks?: Record<string, never>
+      jwks_url?: string
+      oidc_issuer_url?: string
+    }
     CreateTriggerBody: {
       /** @enum {string} */
       activation: 'AFTER' | 'BEFORE'
@@ -2761,6 +2793,23 @@ export interface components {
       billing_via_partner: boolean
       email: string
     }
+    CustomHostnameDetails: {
+      custom_origin_server: string
+      hostname: string
+      id: string
+      ownership_verification: {
+        name?: string
+        type?: string
+        value?: string
+      }
+      ssl: {
+        status?: string
+        validation_errors?: components['schemas']['ValidationError'][]
+        validation_records?: components['schemas']['ValidationRecord'][]
+      }
+      status: string
+      verification_errors?: string[]
+    }
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
@@ -2821,6 +2870,7 @@ export interface components {
         | '8_upgrade_completion_failed'
         | '9_post_physical_backup_failed'
       initiated_at: string
+      latest_status_at: string
       /** @enum {string} */
       progress?:
         | '0_requested'
@@ -2961,11 +3011,8 @@ export interface components {
       organization_plan?: components['schemas']['SelfServePlanId']
       /** @description The three-letter, primary Fly.io region where the target app intends to write from */
       primary_region: string
-      /**
-       * @description An array of Fly.io region codes where read replicas should be provisioned
-       * @default []
-       */
-      read_regions: string[]
+      /** @description An array of Fly.io region codes where read replicas should be provisioned */
+      read_regions?: string[]
       /** @description A UNIX epoch timestamp value */
       timestamp: number
       /** @description The full request target URL */
@@ -3138,6 +3185,7 @@ export interface components {
     GetUserContentByIdResponse: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -3345,6 +3393,7 @@ export interface components {
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       SAML_ENABLED: boolean
+      SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
@@ -4567,6 +4616,21 @@ export interface components {
        */
       DATABASE_URL: string
     }
+    ResourceProvisioningEligibilityBody: {
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description Unique ID representing an organization */
+      organization_id: string
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description The full request target URL */
+      url: string
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string
+    }
+    ResourceProvisioningEligibilityResponse: {
+      free_db_eligible: boolean
+    }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
       config: components['schemas']['ResourceProvisioningConfigResponse']
@@ -4669,6 +4733,7 @@ export interface components {
       grace_period_end?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
+      usage_stats?: components['schemas']['UsageStats']
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -5157,6 +5222,17 @@ export interface components {
       referrer: string
       title: string
     }
+    ThirdPartyAuth: {
+      custom_jwks?: unknown
+      id: string
+      inserted_at: string
+      jwks_url?: string | null
+      oidc_issuer_url?: string | null
+      resolved_at?: string | null
+      resolved_jwks?: unknown
+      type: string
+      updated_at: string
+    }
     TransferOrganizationBody: {
       member_gotrue_id: string
       member_id: number
@@ -5304,6 +5380,7 @@ export interface components {
       rate_limit_verify?: number
       refresh_token_rotation_enabled?: boolean
       saml_enabled?: boolean
+      saml_external_url?: string
       security_captcha_enabled?: boolean
       security_captcha_provider?: string
       security_captcha_secret?: string
@@ -5387,7 +5464,7 @@ export interface components {
     }
     UpdateCustomHostnameResponse: {
       custom_hostname: string
-      data: Record<string, never>
+      data: components['schemas']['CfResponse']
       /** @enum {string} */
       status:
         | '1_not_started'
@@ -5538,6 +5615,7 @@ export interface components {
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       SAML_ENABLED?: boolean
+      SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
@@ -5800,7 +5878,7 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -5813,11 +5891,19 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    UsageStats: {
+      report_date: string
+      total_auth_billing_period_mau_billing_period?: number
+      total_db_size_gb_billing_period?: number
+      total_realtime_message_count_billing_period?: number
+      total_storage_size_gb_billing_period?: number
+      total_unified_egress_gb_billing_period?: number
     }
     UserBody: {
       aud?: string
@@ -5880,6 +5966,7 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -5896,6 +5983,7 @@ export interface components {
     UserContentObjectV2: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -6093,6 +6181,13 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
+    ValidationError: {
+      message: string
+    }
+    ValidationRecord: {
+      txt_name: string
+      txt_value: string
+    }
     VanitySubdomainBody: {
       vanity_subdomain: string
     }
@@ -6188,6 +6283,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Checks database provisioning eligibility */
+  FlyExtensionsController_checkEligibility: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceProvisioningEligibilityBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ResourceProvisioningEligibilityResponse']
+        }
       }
     }
   }
@@ -7005,9 +7115,6 @@ export interface operations {
     }
     responses: {
       204: {
-        content: never
-      }
-      403: {
         content: never
       }
       /** @description Failed to update GitHub connection */
@@ -11023,6 +11130,12 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContentV2: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentBodyV2']
@@ -12614,6 +12727,23 @@ export interface operations {
       }
     }
   }
+  /** Processes Orb events */
+  OrbWebhooksController_processEvent: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['Buffer']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to process Orb event */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the partner usage and costs */
   PartnerBillingSystemController_getPartnerUsageAndCosts: {
     parameters: {
@@ -13177,6 +13307,268 @@ export interface operations {
       }
     }
   }
+  /** Lists project's warehouse access tokens from logflare */
+  'v1-list-all-warehouse-tokens': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFAccessToken'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse access tokens */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse access token */
+  'v1-create-a-warehouse-token': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFAccessToken']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse access token */
+  'v1-delete-a-warehouse-token': {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse collections from logflare */
+  'v1-list-all-warehouse-collections': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collections */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse collection */
+  'v1-create-a-warehouse-collection': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a warehouse collection */
+  'v1-get-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse collection */
+  'v1-delete-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse collection */
+  'v1-update-a-warehouse-collection': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse endpoints from logflare */
+  'v1-list-all-warehouse-endpoints': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse endpoint */
+  'v1-create-a-warehouse-endpoint': {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse endpoint */
+  'v1-update-a-warehouse-endpoint': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse endpoint */
+  'v1-delete-a-warehouse-endpoint': {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse queries from logflare */
+  'v1-list-all-warehouse-queries': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse queries */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's warehouse tenant from logflare */
+  'v1-provision-a-warehouse-tenant': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFUser']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch or provision warehouse tenant */
+      500: {
+        content: never
+      }
+    }
+  }
   /**
    * Get metrics
    * @description At most 50 projects can be queried at a time.
@@ -13437,268 +13829,6 @@ export interface operations {
         }
       }
       403: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse access tokens from logflare */
-  'v1-list-all-warehouse-tokens': {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFAccessToken'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse access tokens */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse access token */
-  'v1-create-a-warehouse-token': {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFAccessToken']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse access token */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse access token */
-  'v1-delete-a-warehouse-token': {
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse access token */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse collections from logflare */
-  'v1-list-all-warehouse-collections': {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse collections */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse collection */
-  'v1-create-a-warehouse-collection': {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Get a warehouse collection */
-  'v1-get-a-warehouse-collection': {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse collection */
-  'v1-delete-a-warehouse-collection': {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Update a warehouse collection */
-  'v1-update-a-warehouse-collection': {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update warehouse collection */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse endpoints from logflare */
-  'v1-list-all-warehouse-endpoints': {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse endpoints */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Create a warehouse endpoint */
-  'v1-create-a-warehouse-endpoint': {
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Update a warehouse endpoint */
-  'v1-update-a-warehouse-endpoint': {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFEndpoint']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Delete a warehouse endpoint */
-  'v1-delete-a-warehouse-endpoint': {
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete warehouse endpoint */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Lists project's warehouse queries from logflare */
-  'v1-list-all-warehouse-queries': {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch warehouse queries */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's warehouse tenant from logflare */
-  'v1-provision-a-warehouse-tenant': {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['LFUser']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to fetch or provision warehouse tenant */
-      500: {
         content: never
       }
     }
@@ -13969,6 +14099,89 @@ export interface operations {
       }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
       404: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
         content: never
       }
     }
@@ -14496,9 +14709,6 @@ export interface operations {
       201: {
         content: never
       }
-      403: {
-        content: never
-      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14520,9 +14730,6 @@ export interface operations {
     }
     responses: {
       201: {
-        content: never
-      }
-      403: {
         content: never
       }
       /** @description Failed to set up read replica */

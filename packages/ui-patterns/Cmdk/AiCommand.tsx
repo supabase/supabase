@@ -31,6 +31,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui/src/lib/utils'
 import { StatusIcon } from '../Icons/StatusIcons'
+import { isBrowser } from 'common'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -320,12 +321,17 @@ export function queryAi(messages: Message[], timeout = 0) {
 
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const isMobile = isBrowser && window.screen.width <= 640
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
   })
 
-  const inputRef = useAutoInputFocus()
+  /**
+   * Disable autofocusing on the input on mobile
+   * since it messes up with the dialog height and positioning
+   * */
+  const inputRef = useAutoInputFocus(!isMobile)
 
   useHistoryKeys({
     enable: !isResponding,
@@ -353,139 +359,43 @@ const AiCommand = () => {
       handleSubmit(search)
     }
   }, [])
-
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
+  const showSubmitButton = !isLoading && !isResponding && search
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4')}>
-        {!hasError &&
-          messages.map((message, index) => {
-            switch (message.role) {
-              case MessageRole.User:
-                return (
-                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                    <div
-                      className="
-                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
-                  ring-background
-                  ring-1
-                  shadow-sm
-              "
-                    >
-                      <IconUser strokeWidth={1.5} size={16} />
-                    </div>
-                    <div className="prose text-foreground-lighter">{message.content}</div>
-                  </div>
-                )
-              case MessageRole.Assistant:
-                return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
-                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                      <AiIconChat
-                        loading={
-                          message.status === MessageStatus.Pending ||
-                          message.status === MessageStatus.InProgress
-                        }
-                      />
-                      <>
-                        {message.status === MessageStatus.Pending ? (
-                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              ...markdownComponents,
-                              a: (props) => (
-                                <a {...props} target="_blank" rel="noopener noreferrer" />
-                              ),
-                            }}
-                            className="prose dark:prose-dark"
-                            urlTransform={(href: string) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
-
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
-
-                              return href
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        )}
-                      </>
-                    </div>
-                  </div>
-                )
-            }
-          })}
-
-        {messages.length === 0 && !hasError && (
-          <CommandGroup heading="Examples">
-            {questions.map((question) => {
-              const key = question.replace(/\s+/g, '_')
-              return (
-                <CommandItem
-                  type="command"
-                  onSelect={() => {
-                    if (!search) {
-                      handleSubmit(question)
-                    }
-                  }}
-                  key={key}
-                >
-                  <AiIconAnimation />
-                  {question}
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
-        )}
-        {hasError && (
-          <div className="p-6 flex flex-col items-center gap-2 mt-4">
-            <StatusIcon variant="warning" />
-            <div>
-              <p className="text-sm text-foreground text-center">
-                Sorry, looks like Supabase AI is having a hard time!
-              </p>
-              <p className="text-sm text-foreground-lighter text-center">
-                Please try again in a bit.
-              </p>
-            </div>
-            <Button size="tiny" type="default" onClick={handleReset}>
-              Try again?
-            </Button>
-          </div>
-        )}
-
-        <div className="[overflow-anchor:auto] h-px w-full"></div>
-      </div>
-      <div className="absolute bottom-0 w-full bg-background py-3">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
+      <div className="absolute z-10 top-[45px] md:top-auto md:bottom-0 w-full bg-background pt-2 md:pt-0 md:pb-2">
         <Input
-          className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
+          className={cn(
+            'bg-alternative rounded mx-3 [&_input]:text-base [&_input]:placeholder:text-sm',
+            showSubmitButton && '[&_input]:pr-32 md:[&_input]:pr-40'
+          )}
           inputRef={inputRef}
-          autoFocus
+          autoFocus={!isMobile}
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
           value={search}
           actions={
             <>
-              {!isLoading && !isResponding ? (
-                <div
-                  className={`flex items-center gap-3 mr-3 transition-opacity duration-700 ${
-                    search ? 'opacity-100' : 'opacity-0'
-                  }`}
+              {showSubmitButton ? (
+                <Button
+                  onClick={() => {
+                    if (!search || isLoading || isResponding || isImeComposing) {
+                      return
+                    }
+                    return handleSubmit(search)
+                  }}
+                  className={`flex items-center mr-3 ${search ? 'opacity-100' : 'opacity-0'}`}
+                  iconRight={
+                    <div className="hidden md:flex">
+                      <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                    </div>
+                  }
                 >
-                  <span className="text-foreground-light">Submit message</span>
-                  <div className="hidden text-foreground-light md:flex items-center justify-center h-6 w-6 rounded bg-overlay-hover">
-                    <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                  </div>
-                </div>
+                  Submit message
+                </Button>
               ) : null}
             </>
           }
@@ -508,6 +418,113 @@ const AiCommand = () => {
             }
           }}
         />
+      </div>
+      <div className="pt-14 md:pt-0">
+        {messages.length > 0 && !hasError && <AiWarning className="mt-2 mx-3 px-3" />}
+        <div className={cn('relative py-3')}>
+          {!hasError &&
+            messages.map((message, index) => {
+              switch (message.role) {
+                case MessageRole.User:
+                  return (
+                    <div key={index} className="flex gap-3 mx-4 [overflow-anchor:none] mb-6">
+                      <div
+                        className="
+                  w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
+                  ring-background
+                  ring-1
+                  shadow-sm
+              "
+                      >
+                        <IconUser strokeWidth={1.5} size={16} />
+                      </div>
+                      <div className="prose text-foreground-lighter">{message.content}</div>
+                    </div>
+                  )
+                case MessageRole.Assistant:
+                  return (
+                    <div key={index} className="px-4 pb-8 [overflow-anchor:none] mb-[25px]">
+                      <div className="flex gap-4 [overflow-anchor:none] mb-6">
+                        <AiIconChat
+                          loading={
+                            message.status === MessageStatus.Pending ||
+                            message.status === MessageStatus.InProgress
+                          }
+                        />
+                        <>
+                          {message.status === MessageStatus.Pending ? (
+                            <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse"></div>
+                          ) : (
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                ...markdownComponents,
+                                a: (props) => (
+                                  <a {...props} target="_blank" rel="noopener noreferrer" />
+                                ),
+                              }}
+                              className="prose dark:prose-dark"
+                              urlTransform={(href: string) => {
+                                const supabaseUrl = new URL('https://supabase.com')
+                                const linkUrl = new URL(href, 'https://supabase.com')
+
+                                if (linkUrl.origin === supabaseUrl.origin) {
+                                  return linkUrl.toString()
+                                }
+
+                                return href
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          )}
+                        </>
+                      </div>
+                    </div>
+                  )
+              }
+            })}
+
+          {messages.length === 0 && !hasError && (
+            <CommandGroup heading="Examples">
+              {questions.map((question) => {
+                const key = question.replace(/\s+/g, '_')
+                return (
+                  <CommandItem
+                    type="command"
+                    onSelect={() => {
+                      if (!search) {
+                        handleSubmit(question)
+                      }
+                    }}
+                    key={key}
+                  >
+                    <AiIconAnimation />
+                    {question}
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+          {hasError && (
+            <div className="p-6 flex flex-col items-center gap-2 mt-4">
+              <StatusIcon variant="warning" />
+              <div>
+                <p className="text-sm text-foreground text-center">
+                  Sorry, looks like Supabase AI is having a hard time!
+                </p>
+                <p className="text-sm text-foreground-lighter text-center">
+                  Please try again in a bit.
+                </p>
+              </div>
+              <Button size="tiny" type="default" onClick={handleReset}>
+                Try again?
+              </Button>
+            </div>
+          )}
+
+          <div className="[overflow-anchor:auto] h-px w-full"></div>
+        </div>
       </div>
     </div>
   )

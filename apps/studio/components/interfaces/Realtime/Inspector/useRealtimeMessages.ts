@@ -1,4 +1,4 @@
-import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js-next'
+import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js'
 import {
   DEFAULT_GLOBAL_OPTIONS,
   DEFAULT_REALTIME_OPTIONS,

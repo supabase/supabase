@@ -10,11 +10,12 @@ export async function getWarehouseCollections(
   { projectRef }: WarehouseCollectionsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef || projectRef === 'undefined') {
+  if (!projectRef) {
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get(`/v1/projects/{ref}/analytics/warehouse/collections`, {
+  // TODO: Remove type cast when codegen types are fixed
+  const { data, error } = await get(`/v0/projects/{ref}/analytics/warehouse/collections`, {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -28,12 +29,12 @@ export type WarehouseCollectionsData = Awaited<ReturnType<typeof getWarehouseCol
 
 export const useWarehouseCollectionsQuery = (
   { projectRef }: WarehouseCollectionsVariables,
-  { enabled }: { enabled: boolean }
+  { enabled }: { enabled: boolean } = { enabled: true }
 ) =>
   useQuery(
     analyticsKeys.warehouseCollections(projectRef),
     ({ signal }) => getWarehouseCollections({ projectRef }, signal),
     {
-      enabled: !!projectRef || enabled,
+      enabled: enabled && !!projectRef,
     }
   )

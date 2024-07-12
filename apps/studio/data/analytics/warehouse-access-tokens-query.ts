@@ -15,7 +15,8 @@ export async function getWarehouseAccessTokens(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
+  // TODO: Remove typecast when codegen types are fixed
+  const response = await get(`/v0/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: { path: { ref: projectRef } },
     signal,
   })

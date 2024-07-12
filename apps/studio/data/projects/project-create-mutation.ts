@@ -23,11 +23,11 @@ export type ProjectCreateVariables = {
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
-  configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
   dbInstanceSize?: DbInstanceSize
   dataApiExposedSchemas?: string[]
+  dataApiUseApiSchema?: boolean
 }
 
 export async function createProject({
@@ -37,11 +37,11 @@ export async function createProject({
   dbRegion,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
-  configurationId,
   authSiteUrl,
   customSupabaseRequest,
   dbInstanceSize,
   dataApiExposedSchemas,
+  dataApiUseApiSchema,
 }: ProjectCreateVariables) {
   const body: components['schemas']['CreateProjectBody'] = {
     cloud_provider: cloudProvider,
@@ -51,12 +51,12 @@ export async function createProject({
     db_region: dbRegion,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
-    vercel_configuration_id: configurationId,
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
     desired_instance_size: dbInstanceSize,
     data_api_exposed_schemas: dataApiExposedSchemas,
+    data_api_use_api_schema: dataApiUseApiSchema,
   }
 
   const { data, error } = await post(`/platform/projects`, {

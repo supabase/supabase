@@ -11,7 +11,7 @@ export type DeleteAccessTokenArgs = {
 
 export async function deleteWarehouseAccessToken({ projectRef, token }: DeleteAccessTokenArgs) {
   const { data, error } = await del(
-    '/v1/projects/{ref}/analytics/warehouse/access-tokens/{token}',
+    '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}',
     {
       params: { path: { ref: projectRef, token } } as any,
     }

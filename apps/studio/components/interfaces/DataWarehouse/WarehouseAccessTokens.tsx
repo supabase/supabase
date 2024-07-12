@@ -142,7 +142,7 @@ export const WarehouseAccessTokens = () => {
     <section className="flex flex-col gap-y-10 py-6 pb-32">
       <FormHeader
         className="!mb-0"
-        title="Warehouse access tokens"
+        title="Access tokens"
         description="Manage your warehouse access tokens for this project."
         actions={
           <CreateWarehouseAccessToken
@@ -179,7 +179,7 @@ export const WarehouseAccessTokens = () => {
                   <Table
                     head={[
                       <Table.th key="description">Description</Table.th>,
-                      <Table.th key="token">Created at</Table.th>,
+                      <Table.th key="created_at">Created at</Table.th>,
                       <Table.th key="token">Token</Table.th>,
                       <Table.th key="actions" />,
                     ]}

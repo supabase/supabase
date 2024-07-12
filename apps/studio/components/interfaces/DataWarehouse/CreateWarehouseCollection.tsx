@@ -9,11 +9,12 @@ import { z } from 'zod'
 
 import { FormMessage } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Modal } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Input } from '@ui/components/shadcn/ui/input'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Input, Modal } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const CreateWarehouseCollectionModal = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -24,8 +25,9 @@ export const CreateWarehouseCollectionModal = () => {
 
   const { mutate: createCollection, isLoading } = useCreateCollection({
     onSuccess: (data) => {
+      // todo: remove typecast once api types are fixed
       setIsOpen(false)
-      router.push(`/project/${ref}/logs/collections/${data?.token}`)
+      router.push(`/project/${ref}/logs/collections/${(data as any).token}`)
     },
     onError: (error) => {
       toast.error(error.message)
@@ -74,6 +76,7 @@ export const CreateWarehouseCollectionModal = () => {
       >
         New collection
       </ButtonTooltip>
+      {/* <Button onClick={() => setIsOpen(!isOpen)}>Create collection</Button> */}
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
@@ -96,7 +99,7 @@ export const CreateWarehouseCollectionModal = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Collection name" layout="horizontal">
                     <FormControl_Shadcn_>
-                      <Input {...field} placeholder="Events" />
+                      <Input placeholder="Events" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
