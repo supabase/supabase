@@ -42,7 +42,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
   const appendedBreadcrumbs = breadcrumbs?.slice(-ITEMS_TO_DISPLAY + 1, isMobile ? -1 : undefined)
 
   return (
-    <Breadcrumb className={className}>
+    <Breadcrumb className={cn(className)}>
       <BreadcrumbList className="text-foreground-lighter p-0">
         {breadcrumbs.length >= ITEMS_TO_DISPLAY && (
           <>
