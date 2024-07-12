@@ -13,10 +13,12 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 
 export const FunctionEditor = ({
   field,
+  language,
   focused,
   setFocused,
 }: {
   field: any
+  language: string
   focused: boolean
   setFocused: (b: boolean) => void
 }) => {
@@ -26,7 +28,7 @@ export const FunctionEditor = ({
         <CodeEditor
           id="database-functions-editor"
           language="pgsql"
-          placeholder={`BEGIN\n\nEND;`}
+          placeholder={language === 'plpgsql' ? `BEGIN\n\nEND;` : undefined}
           defaultValue={field.value}
           onInputChange={field.onChange}
         />
