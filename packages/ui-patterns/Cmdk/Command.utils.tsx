@@ -13,6 +13,7 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerFooter,
+  DrawerPortal,
   DrawerTrigger,
 } from 'ui'
 import { Button } from 'ui/src/components/Button'
@@ -93,10 +94,24 @@ export const CommandDialog = React.forwardRef<CommandPrimitiveDialogElement, Com
     )
 
     return isMobile ? (
-      <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerContent className="h-[80vh] max-h-[80vh]" showHandle={false}>
-          <Content />
-        </DrawerContent>
+      <Drawer {...props} open={isOpen} onOpenChange={setIsOpen}>
+        <DrawerPortal>
+          <DrawerContent
+            ref={ref}
+            onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
+            onInteractOutside={(e) => {
+              // Only hide menu when clicking outside, not focusing outside
+              // Prevents Firefox dropdown issue that immediately closes menu after opening
+              if (e.type === 'dismissableLayer.pointerDownOutside') {
+                setIsOpen(!open)
+              }
+            }}
+            className="h-[calc(100vh-100px)] max-h-[calc(100vh-100px)]"
+            showHandle={false}
+          >
+            <Content />
+          </DrawerContent>
+        </DrawerPortal>
       </Drawer>
     ) : (
       <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
