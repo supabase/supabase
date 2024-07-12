@@ -20,6 +20,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
@@ -94,8 +95,8 @@ const HomePageActions = ({
               <p className="text-xs">Filter projects by status</p>
               <div className="flex flex-col">
                 {[
-                  { key: 'ACTIVE_HEALTHY', label: 'Active' },
-                  { key: 'INACTIVE', label: 'Paused' },
+                  { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+                  { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
                 ].map(({ key, label }) => (
                   <div key={key} className="group flex items-center justify-between py-0.5">
                     <div className="flex items-center gap-x-2">

@@ -2597,6 +2597,7 @@ export interface components {
       cloud_provider: string
       custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
       data_api_exposed_schemas?: string[]
+      data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
       db_region: string

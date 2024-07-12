@@ -1831,6 +1831,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "assistant-chat-demo": {
+      name: "assistant-chat-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/assistant-chat-demo")),
+      source: "",
+      files: ["registry/default/example/assistant-chat-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "assistant-chat-commands": {
+      name: "assistant-chat-commands",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/assistant-chat-commands")),
+      source: "",
+      files: ["registry/default/example/assistant-chat-commands.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",
@@ -1860,6 +1882,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/color-usage-surface-studio-frame")),
       source: "",
       files: ["registry/default/example/color-usage-surface-studio-frame.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "expanding-textarea-demo": {
+      name: "expanding-textarea-demo",
+      type: "docs:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
+      source: "",
+      files: ["registry/default/example/expanding-textarea-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
