@@ -55,6 +55,7 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
+  const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
   const [showFavouriteSnippets, setShowFavouriteSnippets] = useState(false)
@@ -65,7 +66,6 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
   const [selectedSnippetToShare, setSelectedSnippetToShare] = useState<Snippet>()
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
-  const [selectedSnippetToMove, setSelectedSnippetToMove] = useState<Snippet>()
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
@@ -443,7 +443,12 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
                       setSelectedSnippetToRename(element.metadata as Snippet)
                     }
                   }}
-                  onSelectMove={() => setSelectedSnippetToMove(element.metadata as Snippet)}
+                  onSelectMove={() => {
+                    setShowMoveModal(true)
+                    if (selectedSnippets.length === 0) {
+                      setSelectedSnippets([element.metadata as Snippet])
+                    }
+                  }}
                   onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
@@ -468,9 +473,12 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
       />
 
       <MoveQueryModal
-        snippet={selectedSnippetToMove}
-        visible={selectedSnippetToMove !== undefined}
-        onClose={() => setSelectedSnippetToMove(undefined)}
+        snippets={selectedSnippets}
+        visible={showMoveModal}
+        onClose={() => {
+          setShowMoveModal(false)
+          setSelectedSnippets([])
+        }}
       />
 
       <DownloadSnippetModal

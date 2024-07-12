@@ -44,7 +44,7 @@ import toast from 'react-hot-toast'
 
 interface MoveQueryModalProps {
   visible: boolean
-  snippet?: Snippet
+  snippets?: Snippet[]
   onClose: () => void
 }
 
@@ -56,7 +56,7 @@ interface MoveQueryModalProps {
  * doesn't support drag drop into a folder kind of UX.
  */
 
-export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProps) => {
+export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -65,20 +65,22 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
 
   const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
     useSQLSnippetFolderCreateMutation()
-  const { mutate: moveSnippet, isLoading: isMovingSnippet } = useContentUpsertV2Mutation({
-    onSuccess: () => {
-      if (!snippet) return
-      toast.success(`Successfully moved ${snippet.name} to ${selectedFolder}`)
-      snapV2.updateSnippet({
-        id: snippet.id,
-        snippet: { ...snippet, folder_id: selectedId === 'root' ? (null as any) : selectedId },
-        skipSave: true,
-      })
-      onClose()
-    },
+  const {
+    mutate: moveSnippet,
+    mutateAsync: moveSnippetAsync,
+    isLoading: isMovingSnippet,
+  } = useContentUpsertV2Mutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },
+  })
+
+  const FormSchema = z.object({ name: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { name: '' },
   })
 
   const folders = Object.values(snapV2.folders).map((x) => x.folder)
@@ -89,21 +91,14 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
         ? 'Create a new folder'
         : folders.find((f) => f.id === selectedId)?.name
   const isCurrentFolder =
-    (!snippet?.folder_id && selectedId === 'root') || snippet?.folder_id === selectedId
-
-  const FormSchema = z.object({ name: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { name: '' },
-  })
+    snippets.length === 1 &&
+    ((!snippets[0].folder_id && selectedId === 'root') || snippets[0].folder_id === selectedId)
   const isMovingToSameFolder =
-    (!snippet?.folder_id && selectedId === 'root') || snippet?.folder_id === selectedId
+    snippets.length === 1 &&
+    ((!snippets[0].folder_id && selectedId === 'root') || snippets[0].folder_id === selectedId)
 
   const onConfirmMove = async (values: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
-    if (!snippet) return console.error('Snippet is required')
 
     try {
       let folderId = selectedId
@@ -113,42 +108,61 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
         folderId = id
       }
 
-      let snippetContent = (snippet as SnippetDetail)?.content
-      if (snippetContent === undefined) {
-        const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        snippetContent = content
-      }
+      await Promise.all(
+        snippets.map(async (snippet) => {
+          let snippetContent = (snippet as SnippetDetail)?.content
+          if (snippetContent === undefined) {
+            const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+            snippetContent = content
+          }
 
-      // [Joshen] Idk if this is necessary but its just to double check that snippetContent should NOT be undefined
-      if (snippetContent === undefined) {
-        return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
-      } else {
-        moveSnippet({
-          projectRef: ref,
-          payload: {
-            id: snippet.id,
-            type: 'sql',
-            name: snippet.name,
-            description: snippet.description,
-            visibility: snippet.visibility,
-            project_id: snippet.project_id,
-            owner_id: snippet.owner_id,
-            folder_id: selectedId === 'root' ? (null as any) : folderId,
-            content: snippetContent as any,
-          },
+          if (snippetContent === undefined) {
+            return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
+          } else {
+            moveSnippetAsync({
+              projectRef: ref,
+              payload: {
+                id: snippet.id,
+                type: 'sql',
+                name: snippet.name,
+                description: snippet.description,
+                visibility: snippet.visibility,
+                project_id: snippet.project_id,
+                owner_id: snippet.owner_id,
+                folder_id: selectedId === 'root' ? (null as any) : folderId,
+                content: snippetContent as any,
+              },
+            })
+          }
         })
-      }
+      )
+
+      toast.success(
+        `Successfully moved ${snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length} snippets`} to ${selectedId === 'root' ? 'the root of the editor' : selectedFolder}`
+      )
+      snippets.forEach((snippet) => {
+        snapV2.updateSnippet({
+          id: snippet.id,
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? (null as any) : selectedId },
+          skipSave: true,
+        })
+      })
+      onClose()
     } catch (error: any) {
       toast.error(`Failed to create new folder: ${error.message}`)
     }
   }
 
   useEffect(() => {
-    if (visible && snippet !== undefined) {
-      setSelectedId(snippet.folder_id ?? 'root')
+    if (visible && snippets !== undefined) {
+      if (snippets.length === 1) {
+        setSelectedId(snippets[0].folder_id ?? 'root')
+      } else {
+        setSelectedId('root')
+      }
       form.reset({ name: '' })
     }
-  }, [visible, snippet])
+  }, [visible, snippets])
 
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
@@ -156,8 +170,13 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
         <Form_Shadcn_ {...form}>
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
-              <DialogTitle>Move "{snippet?.name}" to a folder</DialogTitle>
-              <DialogDescription>Select which folder to move your query to</DialogDescription>
+              <DialogTitle>
+                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`} to a
+                folder
+              </DialogTitle>
+              <DialogDescription>
+                Select which folder to move your quer{snippets.length > 1 ? 'ies' : 'y'} to
+              </DialogDescription>
             </DialogHeader>
 
             <DialogSectionSeparator />
@@ -208,7 +227,9 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
                             >
                               <span>
                                 Root of the editor
-                                {snippet?.folder_id === null && ` (Current)`}
+                                {snippets.length === 1 &&
+                                  snippets[0].folder_id === null &&
+                                  ` (Current)`}
                               </span>
                               {selectedId === 'root' && <Check size={14} />}
                             </CommandItem_Shadcn_>
@@ -228,7 +249,9 @@ export const MoveQueryModal = ({ visible, snippet, onClose }: MoveQueryModalProp
                               >
                                 <span>
                                   {folder.name}
-                                  {snippet?.folder_id === folder.id && ` (Current)`}
+                                  {snippets.length === 1 &&
+                                    snippets[0].folder_id === folder.id &&
+                                    ` (Current)`}
                                 </span>
                                 {folder.id === selectedId && <Check size={14} />}
                               </CommandItem_Shadcn_>

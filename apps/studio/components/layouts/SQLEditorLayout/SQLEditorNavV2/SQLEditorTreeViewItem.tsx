@@ -152,6 +152,17 @@ export const SQLEditorTreeViewItem = ({
             </>
           ) : isMultiSelected ? (
             <>
+              {onSelectMove !== undefined && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectMove()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Move size={14} />
+                  Move selected queries
+                </ContextMenuItem_Shadcn_>
+              )}
+              <ContextMenuSeparator_Shadcn_ />
               {onSelectDelete !== undefined && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

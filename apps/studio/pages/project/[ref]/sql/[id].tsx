@@ -21,7 +21,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
-import toast from 'react-hot-toast'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
