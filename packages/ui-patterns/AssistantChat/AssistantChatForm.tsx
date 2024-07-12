@@ -77,18 +77,13 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
         <ExpandingTextArea
           ref={textAreaRef}
           autoFocus
-          rows={1}
           disabled={disabled}
           contentEditable
-          aria-expanded={false}
-          className={cn(
-            icon ? 'pl-12' : '',
-            'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
-          )}
+          className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}
           spellCheck={false}
           value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
+          onChange={(event) => onValueChange(event)}
           onKeyDown={handleKeyDown}
         />
         <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
