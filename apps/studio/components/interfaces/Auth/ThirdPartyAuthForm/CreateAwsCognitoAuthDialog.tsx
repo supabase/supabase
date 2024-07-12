@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash, X } from 'lucide-react'
+import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -9,18 +9,18 @@ import { useParams } from 'common'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Separator,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AwsRegionSelector } from './AwsRegionSelector'
@@ -28,7 +28,7 @@ import { AwsRegionSelector } from './AwsRegionSelector'
 interface CreateAwsCognitoAuthIntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this sheet is only used for creating.
+  // TODO: Remove this if this Dialog is only used for creating.
   onDelete: () => void
 }
 
@@ -44,12 +44,12 @@ const FormSchema = z.object({
   awsRegion: z.string(),
 })
 
-export const CreateAwsCognitoAuthIntegrationSheet = ({
+export const CreateAwsCognitoAuthIntegrationDialog = ({
   visible,
   onClose,
   onDelete,
 }: CreateAwsCognitoAuthIntegrationProps) => {
-  // TODO: Remove this if this sheet is only used for creating.
+  // TODO: Remove this if this Dialog is only used for creating.
   const isCreating = true
 
   const { ref: projectRef } = useParams()
@@ -76,6 +76,10 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
         awsCognitoUserPoolId: '',
         awsRegion: 'us-east-1',
       })
+      // the form input doesn't exist when the form is reset
+      setTimeout(() => {
+        form.setFocus('awsCognitoUserPoolId')
+      }, 25)
     }
   }, [visible])
 
@@ -89,37 +93,25 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
   const awsRegion = form.watch('awsRegion')
 
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent showClose={false} className="flex flex-col gap-0">
-        <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
-          <div className="flex flex-row gap-3 items-center">
-            <SheetClose
-              className={cn(
-                'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                'transition'
-              )}
-            >
-              <X className="h-3 w-3" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-            <SheetTitle className="truncate">
-              {isCreating
-                ? `Add new AWS Cognito Auth connection`
-                : `Update existing AWS Cognito Auth connection`}
-            </SheetTitle>
-          </div>
-        </SheetHeader>
+    <Dialog open={visible} onOpenChange={() => onClose()}>
+      <DialogContent size="large">
+        <DialogHeader>
+          <DialogTitle className="truncate">
+            {isCreating
+              ? `Add new AWS Cognito Auth connection`
+              : `Update existing AWS Cognito Auth connection`}
+          </DialogTitle>
+          <DialogDescription>
+            By adding an AWS Cognito Auth connection, you can authenticate users using AWS Cognito
+            User Pools.
+          </DialogDescription>
+        </DialogHeader>
         <Separator />
-        <Form_Shadcn_ {...form}>
-          <form
-            id={FORM_ID}
-            className="space-y-6 w-full py-8 flex-1"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-            {/* <FormField_Shadcn_
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
+              {/* <FormField_Shadcn_
               key="enabled"
               control={form.control}
               name="enabled"
@@ -140,8 +132,10 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
               )}
             />
             <Separator /> */}
-
-            <div className="flex flex-col px-8 gap-4">
+              <p className="text-sm text-foreground-light">
+                This will enable a JWT token from Auth0 project to access data from this Supabase
+                project.
+              </p>
               <FormField_Shadcn_
                 key="awsCognitoUserPoolId"
                 control={form.control}
@@ -173,10 +167,10 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
                   </FormItemLayout>
                 )}
               />
-            </div>
-          </form>
-        </Form_Shadcn_>
-        <SheetFooter>
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
               <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
@@ -191,8 +185,8 @@ export const CreateAwsCognitoAuthIntegrationSheet = ({
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
             {isCreating ? 'Create' : 'Update'}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

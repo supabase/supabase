@@ -16,9 +16,9 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
-import { CreateAuth0IntegrationSheet } from './CreateAuth0Sheet'
-import { CreateAwsCognitoAuthIntegrationSheet } from './CreateAwsCognitoAuthSheet'
-import { CreateFirebaseAuthIntegrationSheet } from './CreateFirebaseAuthSheet'
+import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
+import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
+import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
   INTEGRATION_TYPES,
@@ -112,19 +112,19 @@ export const ThirdPartyAuthForm = () => {
         )
       ) : null}
 
-      <CreateFirebaseAuthIntegrationSheet
+      <CreateFirebaseAuthIntegrationDialog
         visible={selectedIntegration === 'firebase'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />
 
-      <CreateAwsCognitoAuthIntegrationSheet
+      <CreateAwsCognitoAuthIntegrationDialog
         visible={selectedIntegration === 'awsCognito'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />
 
-      <CreateAuth0IntegrationSheet
+      <CreateAuth0IntegrationDialog
         visible={selectedIntegration === 'auth0'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}

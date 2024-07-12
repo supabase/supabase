@@ -1,37 +1,33 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash, X } from 'lucide-react'
+import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
-import { Postgres } from 'icons'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Separator,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this sheet is only used for creating.
+  // TODO: Remove this if this Dialog is only used for creating.
   onDelete: () => void
 }
 
@@ -46,12 +42,12 @@ const FormSchema = z.object({
     .regex(/^[A-Za-z0-9-]+$/, 'The project ID contains invalid characters.'), // Only allow alphanumeric characters and hyphens.
 })
 
-export const CreateFirebaseAuthIntegrationSheet = ({
+export const CreateFirebaseAuthIntegrationDialog = ({
   visible,
   onClose,
   onDelete,
 }: CreateFirebaseAuthIntegrationProps) => {
-  // TODO: Remove this if this sheet is only used for creating.
+  // TODO: Remove this if this Dialog is only used for creating.
   const isCreating = true
 
   const { ref: projectRef } = useParams()
@@ -76,6 +72,10 @@ export const CreateFirebaseAuthIntegrationSheet = ({
         enabled: true,
         firebaseProjectId: '',
       })
+      // the form input doesn't exist when the form is reset
+      setTimeout(() => {
+        form.setFocus('firebaseProjectId')
+      }, 25)
     }
   }, [visible])
 
@@ -87,37 +87,22 @@ export const CreateFirebaseAuthIntegrationSheet = ({
   }
 
   return (
-    <Sheet open={visible} onOpenChange={() => onClose()}>
-      <SheetContent showClose={false} className="flex flex-col gap-0">
-        <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
-          <div className="flex flex-row gap-3 items-center">
-            <SheetClose
-              className={cn(
-                'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                'transition'
-              )}
-            >
-              <X className="h-3 w-3" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-            <SheetTitle className="truncate">
-              {isCreating
-                ? `Add new Firebase Auth connection`
-                : `Update existing Firebase Auth connection`}
-            </SheetTitle>
-          </div>
-        </SheetHeader>
+    <Dialog open={visible} onOpenChange={() => onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="truncate">
+            {isCreating
+              ? `Add new Firebase Auth connection`
+              : `Update existing Firebase Auth connection`}
+          </DialogTitle>
+        </DialogHeader>
+
         <Separator />
-        <Form_Shadcn_ {...form}>
-          <form
-            id={FORM_ID}
-            className="space-y-6 w-full py-8 flex-1"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-            {/* <FormField_Shadcn_
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
+              {/* <FormField_Shadcn_
               key="enabled"
               control={form.control}
               name="enabled"
@@ -139,7 +124,10 @@ export const CreateFirebaseAuthIntegrationSheet = ({
             />
             <Separator /> */}
 
-            <div className="flex flex-col px-8 gap-4">
+              <p className="text-sm text-foreground-light">
+                This will enable a JWT token from a specific Firebase project to access data from
+                this Supabase project.
+              </p>
               <FormField_Shadcn_
                 key="firebaseProjectId"
                 control={form.control}
@@ -153,22 +141,14 @@ export const CreateFirebaseAuthIntegrationSheet = ({
                 )}
               />
 
-              <Alert_Shadcn_ variant="warning">
-                <Postgres />
-                <div>
-                  <AlertTitle_Shadcn_>
-                    This connection requires a Row Level Security (RLS) policy
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    You will need to manually insert the policy after creating this 3rd party Auth
-                    connection.
-                  </AlertDescription_Shadcn_>
-                </div>
-              </Alert_Shadcn_>
-            </div>
-          </form>
-        </Form_Shadcn_>
-        <SheetFooter>
+              <InformationBox
+                title="Note: This connection requires a Row Level Security (RLS) policy"
+                description="You will need to manually insert the policy after creating this 3rd party Auth connection."
+              />
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
               <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
@@ -183,8 +163,8 @@ export const CreateFirebaseAuthIntegrationSheet = ({
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
             {isCreating ? 'Create' : 'Update'}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
