@@ -105,7 +105,7 @@ const BarChart = ({
   }
 
   return (
-    <div className={['flex flex-col gap-3', className].join(' ')}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -124,7 +124,7 @@ const BarChart = ({
           margin={{
             top: 0,
             right: 0,
-            left: 0,
+            left: -58, // [Joshen] 120724 Not sure why bar charts have a weird left margin suddenly, but this is a temp fix
             bottom: 0,
           }}
           className="overflow-visible"
