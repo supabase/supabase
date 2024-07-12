@@ -3,6 +3,17 @@ import { ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
+import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -29,15 +40,6 @@ import {
   Switch,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
-import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface GitHubIntegrationConnectionFormProps {
@@ -221,7 +223,7 @@ const GitHubIntegrationConnectionForm = ({
         <Alert_Shadcn_ className="w-full mb-0" variant="warning">
           <WarningIcon />
           <div>
-            <AlertTitle_Shadcn_ className="text-sm">Braching is not enabled</AlertTitle_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">Branching is not enabled</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
               This integration has no effect without Branching feature being active.
               <br />

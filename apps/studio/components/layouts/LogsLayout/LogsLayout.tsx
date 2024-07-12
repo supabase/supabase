@@ -9,17 +9,17 @@ import NoPermission from 'components/ui/NoPermission'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
-import {
-  useCheckPermissions,
-  useFlag,
-  useIsFeatureEnabled,
-  useSelectedProject,
-  withAuth,
-} from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Badge, Menu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { ProjectLayout } from '../'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateLogsMenu } from './LogsMenu.utils'
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 interface LogsLayoutProps {
   title?: string
 }
@@ -38,7 +38,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const showWarehouse = useFlag('warehouse')
   const project = useSelectedProject()
   const { ref } = useParams()
-  const projectRef = ref || 'default'
+  const projectRef = ref as string
 
   const { data: tenant } = useWarehouseTenantQuery(
     { projectRef },
@@ -48,7 +48,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   )
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     {
-      projectRef: !tenant ? 'undefined' : projectRef,
+      projectRef,
     },
     { enabled: !!tenant }
   )
@@ -68,7 +68,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   return (
     <ProjectLayout
       title={title}
-      product="Logs"
+      product="Logs & Analytics"
       productMenu={
         <>
           <ProductMenu
@@ -81,13 +81,13 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
           />
           {showWarehouse && (
             <>
-              <div className="h-px w-full bg-overlay"></div>
+              <div className="h-px w-full bg-border" />
               <div className="py-6">
                 <div className="px-6 uppercase font-mono">
                   <Menu.Group
                     title={
                       <div>
-                        Events
+                        Warehouse Events
                         <Badge variant="warning" size="small" className="ml-2">
                           New
                         </Badge>
@@ -98,7 +98,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                 <div className="px-3 flex flex-col">
                   <div className="space-y-1">
                     <CreateWarehouseCollectionModal />
-                    <div className="py-3">
+                    <div className="pt-3">
                       {collectionsLoading ? (
                         <GenericSkeletonLoader />
                       ) : (
@@ -109,6 +109,21 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="h-px w-full bg-border" />
+
+              <div className="py-6 px-3">
+                <Menu.Group
+                  title={<span className="uppercase font-mono px-3">Configuration</span>}
+                />
+                <Link href={`/project/${ref}/settings/warehouse`}>
+                  <Menu.Item rounded>
+                    <div className="flex px-3 items-center justify-between">
+                      <p className="truncate">Warehouse Settings</p>
+                      <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+                    </div>
+                  </Menu.Item>
+                </Link>
               </div>
             </>
           )}

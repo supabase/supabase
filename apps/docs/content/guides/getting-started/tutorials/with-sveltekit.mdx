@@ -45,7 +45,7 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
-### Creating a Supabase client for SSR:
+### Creating a Supabase client for SSR
 
 The ssr package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
 
@@ -238,51 +238,73 @@ Update your `src/routes/+layout.svelte`:
 </div>
 ```
 
-### Set up a login page
+## Set up a login page
 
-#### Supabase Auth UI
-
-We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui), a pre-built Svelte component, for authenticating users via OAuth, email, and magic links.
-
-Install the Supabase Auth UI for Svelte
-
-```bash
-npm install @supabase/auth-ui-svelte @supabase/auth-ui-shared
-```
-
-Add the `Auth` component to your home page
+Create a magic link login/signup page for your application:
 
 ```svelte src/routes/+page.svelte
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-	import { Auth } from '@supabase/auth-ui-svelte'
-	import { ThemeSupa } from '@supabase/auth-ui-shared'
+	import { enhance } from '$app/forms'
+	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let data
+	export let form: ActionData;
+
+	let loading = false
+
+	const handleSubmit: SubmitFunction = () => {
+		loading = true
+		return async ({ update }) => {
+			update()
+			loading = false
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>User Management</title>
 </svelte:head>
 
-<div class="row flex-center flex">
+<form class="row flex flex-center" method="POST" use:enhance={handleSubmit}>
 	<div class="col-6 form-widget">
-		<Auth
-			supabaseClient={data.supabase}
-			view="magic_link"
-			showLinks={false}
-			appearance={{ theme: ThemeSupa, style: { input: 'color: #fff' } }}
-		/>
+		<h1 class="header">Supabase + SvelteKit</h1>
+		<p class="description">Sign in via magic link with your email below</p>
+		{#if form?.message !== undefined}
+		<div class="success {form?.success ? '' : 'fail'}">
+			{form?.message}
+		</div>
+		{/if}
+		<div>
+			<label for="email">Email address</label>
+			<input
+				id="email"
+				name="email"
+				class="inputField"
+				type="email"
+				placeholder="Your email"
+				value={form?.email ?? ''}
+			/>
+		</div>
+		{#if form?.errors?.email}
+		<span class="flex items-center text-sm error">
+			{form?.errors?.email}
+		</span>
+		{/if}
+		<div>
+			<button class="button primary block">
+				{ loading ? 'Loading' : 'Send magic link' }
+			</button>
+		</div>
 	</div>
-</div>
+</form>
 ```
 
-Create a `src/routes/+page.server.ts` file that will return our website URL to be used in our `redirectTo` above.
+Create a `src/routes/+page.server.ts` file that will handle our magic link form when submitted.
 
-```ts
+```ts src/routes/+page.server.ts
 // src/routes/+page.server.ts
-import { redirect } from '@sveltejs/kit'
-import type { PageServerLoad } from './$types'
+import { fail, redirect } from '@sveltejs/kit'
+import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) => {
   const { session } = await safeGetSession()
@@ -294,13 +316,56 @@ export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) 
 
   return { url: url.origin }
 }
+
+export const actions: Actions = {
+  default: async (event) => {
+    const {
+      url,
+      request,
+      locals: { supabase },
+    } = event
+    const formData = await request.formData()
+    const email = formData.get('email') as string
+    const validEmail = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
+
+    if (!validEmail) {
+      return fail(400, { errors: { email: 'Please enter a valid email address' }, email })
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({ email })
+
+    if (error) {
+      return fail(400, {
+        success: false,
+        email,
+        message: `There was an issue, Please contact support.`,
+      })
+    }
+
+    return {
+      success: true,
+      message: 'Please check your email for a magic link to log into the website.',
+    }
+  },
+}
 ```
 
 ### Email template
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+Before we proceed, let's change the email template to support sending a token hash:
+
+- Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
+- Select `Confirm signup` template.
+- Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+- Repeat the previous step for `Magic link` template.
+
+<Admonition type="tip">
+
+Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+
+</Admonition>
 
 ### Confirmation endpoint
 
@@ -312,8 +377,8 @@ In the following code snippet, we perform the following steps:
 - Exchange this `token_hash` for a session, which we store in storage (in this case, cookies).
 - Finally, the user is redirected to the `account` page or the `error` page.
 
-```ts title=src/routes/api/auth/confirm/+server.ts
-// src/routes/api/auth/confirm/+server.js
+```ts src/routes/auth/confirm/+server.ts
+// src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -338,12 +403,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
 ```
 

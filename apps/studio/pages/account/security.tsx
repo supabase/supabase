@@ -1,10 +1,9 @@
+import { TOTPFactors } from 'components/interfaces/Account'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
-
-import { TOTPFactors } from 'components/interfaces/Account'
-import { AccountLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 
 const collapsibleClasses = [
   'bg-surface-100',

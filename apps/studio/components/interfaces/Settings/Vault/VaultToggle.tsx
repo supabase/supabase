@@ -10,7 +10,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { Button, IconExternalLink } from 'ui'
 

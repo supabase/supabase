@@ -9,7 +9,7 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge } from 'ui'
 
 const CreditBalance = () => {

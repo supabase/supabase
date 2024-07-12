@@ -1,8 +1,7 @@
-import { IconTruck } from 'ui'
-
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { IconTruck } from 'ui'
 import TransferProjectButton from './TransferProjectButton'
 
 const TransferProjectPanel = () => {

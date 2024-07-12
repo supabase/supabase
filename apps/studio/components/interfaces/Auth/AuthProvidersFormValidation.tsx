@@ -1170,7 +1170,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Slack',
+  title: 'Slack (Deprecated)',
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1194,6 +1194,44 @@ const EXTERNAL_PROVIDER_SLACK = {
       otherwise: (schema) => schema,
     }),
     EXTERNAL_SLACK_SECRET: string().when('EXTERNAL_SLACK_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_SECRET: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
       is: true,
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
@@ -1369,6 +1407,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,

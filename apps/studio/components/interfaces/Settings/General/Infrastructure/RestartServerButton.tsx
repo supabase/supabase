@@ -11,7 +11,8 @@ import {
 import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { ChevronDown } from 'lucide-react'
 import {
   Button,

@@ -1,4 +1,4 @@
-import { ident, literal } from 'pg-format'
+import { ident, literal } from './pg-format'
 import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'

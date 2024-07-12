@@ -18,7 +18,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface TriggerListProps {
   schema: string

@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { CalculatedColumn } from 'react-data-grid'
 import {
   Button,
-  Divider,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,7 +14,7 @@ import {
   Separator,
 } from 'ui'
 
-import { useDispatch, useTrackedState } from '../../store'
+import { useDispatch, useTrackedState } from '../../store/Store'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>

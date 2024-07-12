@@ -31,6 +31,10 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
+  '/partners/flyio/extensions/eligibility': {
+    /** Checks database provisioning eligibility */
+    post: operations['FlyExtensionsController_checkEligibility']
+  }
   '/partners/flyio/organizations/{organization_id}': {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
@@ -999,6 +1003,10 @@ export interface paths {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
   }
+  '/system/orb/webhooks': {
+    /** Processes Orb events */
+    post: operations['OrbWebhooksController_processEvent']
+  }
   '/system/organizations/{slug}/billing/partner/usage-and-costs': {
     /** Gets the partner usage and costs */
     get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
@@ -1795,6 +1803,18 @@ export interface paths {
     /** Removes a SSO provider by its UUID */
     delete: operations['v1-delete-a-sso-provider']
   }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** [Alpha] Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** [Alpha] Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** [Alpha] Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** [Alpha] Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
+  }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
     get: operations['v1-get-project-pgbouncer-config']
@@ -2202,6 +2222,7 @@ export interface components {
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_enabled: boolean | null
+      saml_external_url: string | null
       security_captcha_enabled: boolean | null
       security_captcha_provider: string | null
       security_captcha_secret: string | null
@@ -2576,6 +2597,7 @@ export interface components {
       cloud_provider: string
       custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
       data_api_exposed_schemas?: string[]
+      data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
       db_region: string
@@ -2691,6 +2713,11 @@ export interface components {
       id: string
       type: string
       value: string
+    }
+    CreateThirdPartyAuthBody: {
+      custom_jwks?: Record<string, never>
+      jwks_url?: string
+      oidc_issuer_url?: string
     }
     CreateTriggerBody: {
       /** @enum {string} */
@@ -3138,6 +3165,7 @@ export interface components {
     GetUserContentByIdResponse: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -3345,6 +3373,7 @@ export interface components {
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       SAML_ENABLED: boolean
+      SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
@@ -4567,6 +4596,21 @@ export interface components {
        */
       DATABASE_URL: string
     }
+    ResourceProvisioningEligibilityBody: {
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description Unique ID representing an organization */
+      organization_id: string
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description The full request target URL */
+      url: string
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string
+    }
+    ResourceProvisioningEligibilityResponse: {
+      free_db_eligible: boolean
+    }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
       config: components['schemas']['ResourceProvisioningConfigResponse']
@@ -4669,6 +4713,7 @@ export interface components {
       grace_period_end?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
+      usage_stats?: components['schemas']['UsageStats']
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -5157,6 +5202,17 @@ export interface components {
       referrer: string
       title: string
     }
+    ThirdPartyAuth: {
+      custom_jwks?: unknown
+      id: string
+      inserted_at: string
+      jwks_url?: string | null
+      oidc_issuer_url?: string | null
+      resolved_at?: string | null
+      resolved_jwks?: unknown
+      type: string
+      updated_at: string
+    }
     TransferOrganizationBody: {
       member_gotrue_id: string
       member_id: number
@@ -5304,6 +5360,7 @@ export interface components {
       rate_limit_verify?: number
       refresh_token_rotation_enabled?: boolean
       saml_enabled?: boolean
+      saml_external_url?: string
       security_captcha_enabled?: boolean
       security_captcha_provider?: string
       security_captcha_secret?: string
@@ -5538,6 +5595,7 @@ export interface components {
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       SAML_ENABLED?: boolean
+      SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
@@ -5800,7 +5858,7 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -5813,11 +5871,19 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    UsageStats: {
+      report_date: string
+      total_auth_billing_period_mau_billing_period?: number
+      total_db_size_gb_billing_period?: number
+      total_realtime_message_count_billing_period?: number
+      total_storage_size_gb_billing_period?: number
+      total_unified_egress_gb_billing_period?: number
     }
     UserBody: {
       aud?: string
@@ -5880,6 +5946,7 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -5896,6 +5963,7 @@ export interface components {
     UserContentObjectV2: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -6188,6 +6256,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Checks database provisioning eligibility */
+  FlyExtensionsController_checkEligibility: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceProvisioningEligibilityBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ResourceProvisioningEligibilityResponse']
+        }
       }
     }
   }
@@ -7005,9 +7088,6 @@ export interface operations {
     }
     responses: {
       204: {
-        content: never
-      }
-      403: {
         content: never
       }
       /** @description Failed to update GitHub connection */
@@ -11023,6 +11103,12 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContentV2: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentBodyV2']
@@ -12614,6 +12700,23 @@ export interface operations {
       }
     }
   }
+  /** Processes Orb events */
+  OrbWebhooksController_processEvent: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['Buffer']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to process Orb event */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the partner usage and costs */
   PartnerBillingSystemController_getPartnerUsageAndCosts: {
     parameters: {
@@ -13973,6 +14076,89 @@ export interface operations {
       }
     }
   }
+  /** [Alpha] Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
   /** Get project's pgbouncer config */
   'v1-get-project-pgbouncer-config': {
     parameters: {
@@ -14496,9 +14682,6 @@ export interface operations {
       201: {
         content: never
       }
-      403: {
-        content: never
-      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14520,9 +14703,6 @@ export interface operations {
     }
     responses: {
       201: {
-        content: never
-      }
-      403: {
         content: never
       }
       /** @description Failed to set up read replica */
