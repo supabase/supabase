@@ -100,12 +100,6 @@
         "title": "Generate types (Postgres schema)",
         "slug": "supabase-gen-types",
         "type": "cli-command"
-      },
-      {
-        "id": "supabase-gen-types-typescript",
-        "title": "Generate types (TypeScript)",
-        "slug": "supabase-gen-types-typescript",
-        "type": "cli-command"
       }
     ]
   },
