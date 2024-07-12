@@ -171,7 +171,7 @@ export const AiAssistantPanel = ({
             control={form.control}
             name="chat"
             render={({ field }) => (
-              <FormItem_Shadcn_>
+              <FormItem_Shadcn_ asChild>
                 <FormControl_Shadcn_>
                   <div className="relative">
                     <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
@@ -181,7 +181,7 @@ export const AiAssistantPanel = ({
                       disabled={loading}
                       autoFocus
                       spellCheck={false}
-                      className="pl-12 text-sm rounded-[18px]"
+                      className="pl-12 text-sm rounded-[18px] max-h-96"
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' && !event.shiftKey) {
                           event.preventDefault()
