@@ -29,7 +29,9 @@ Your project's metrics endpoint is accessible at `https://<project-ref>.supabase
 ```
 
 ## Configuring Prometheus
+
 For self-hosted prometheus, modify your `prometheus.yaml` file to add a Supabase job, and set the `metrics_path`, `scheme`, `basic_auth` and `targets` parameters. For example:
+
 ```yaml
 scrape_configs:
   - job_name: "MyJob"
