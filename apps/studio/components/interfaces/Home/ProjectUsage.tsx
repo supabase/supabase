@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
+import { Archive, ChevronDown, Database, Key, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -18,11 +19,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconArchive,
-  IconChevronDown,
-  IconDatabase,
-  IconKey,
-  IconZap,
   Loading,
 } from 'ui'
 
@@ -49,7 +45,7 @@ const ProjectUsage = () => {
 
   const [interval, setInterval] = useState<string>('hourly')
 
-  const { data, error, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDateLocal = dayjs().subtract(
@@ -87,10 +83,10 @@ const ProjectUsage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<IconChevronDown />}>
+            <Button type="default" iconRight={<ChevronDown size={14} />}>
               <span>{selectedInterval.label}</span>
             </Button>
           </DropdownMenuTrigger>
@@ -108,13 +104,13 @@ const ProjectUsage = () => {
           Statistics for past {selectedInterval.label}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
         <Panel>
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <IconDatabase strokeWidth={2} size={16} />
+                  <Database strokeWidth={2} size={16} />
                 </div>
               }
               title="Database"
@@ -140,7 +136,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <IconKey strokeWidth={2} size={16} />
+                    <Key strokeWidth={2} size={16} />
                   </div>
                 }
                 title="Auth"
@@ -166,7 +162,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <IconArchive strokeWidth={2} size={16} />
+                    <Archive strokeWidth={2} size={16} />
                   </div>
                 }
                 title="Storage"
@@ -192,7 +188,7 @@ const ProjectUsage = () => {
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <IconZap strokeWidth={2} size={16} />
+                  <Zap strokeWidth={2} size={16} />
                 </div>
               }
               title="Realtime"

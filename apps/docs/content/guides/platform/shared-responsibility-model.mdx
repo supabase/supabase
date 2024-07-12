@@ -6,10 +6,13 @@ description: 'Running databases is a shared responsibility between you and Supab
 
 Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for. This is by design: we want to give you the freedom to use your database however you want. While we _could_ put many more restrictions in place to ensure that you can’t do anything wrong, you will eventually find those restrictions prohibitive.
 
-<img
-  alt="Shared responsibility model"
-  src="/docs/img/platform/shared-responsibility-model.png"
-  width="100%"
+<Image
+  alt="Diagram showing the shared responsibility model between Supabase and the customer. The customer is responsible for Application architecture and implementation, information and data, the database schema and user management. The responsibility for API rate-limiting, Postgres security controls, upgrades, performance tuning and resource allocation is shared. Supabase is responsible for Postgres backups and observability, operating system maintenance, infrastructure and the monitoring and security thereof."
+  src={{
+    light: '/docs/img/platform/shared-responsibility-model--light.png',
+    dark: '/docs/img/platform/shared-responsibility-model--dark.png',
+  }}
+  zoomable
 />
 
 To summarize, you are always responsible for:
@@ -70,10 +73,13 @@ We recommend reviewing and applying the recommendations offered in our [Producti
 You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
 
 - Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team plan](https://supabase.com/pricing) to sign a BAA with us.
+- Ensuring [MFA is enabled](/docs/guides/platform/multi-factor-authentication) on all Supabase accounts.
 - Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
 - Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
 - Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
 - Not using [Edge functions](/docs/guides/functions) or [Fly Postgres](/docs/guides/platform/fly-postgres) to process PHI.
+- Not using [branching](/docs/guides/platform/branching) to process PHI.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
+- Not [transferring projects](/docs/guides/platform/project-transfer) to a non-HIPAA organization.

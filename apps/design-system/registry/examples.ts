@@ -1065,4 +1065,9 @@ export const examples: Registry = [
     type: 'docs:example',
     files: ['example/color-usage-surface-studio-frame.tsx'],
   },
+  {
+    name: 'expanding-textarea-demo',
+    type: 'docs:example',
+    files: ['example/expanding-textarea-demo.tsx'],
+  },
 ]

@@ -95,6 +95,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             {icon}
           </div>
         )}
+        {/* TODO: Replace this with ExpandingTextArea */}
         <TextArea
           ref={textAreaRef}
           autoFocus
