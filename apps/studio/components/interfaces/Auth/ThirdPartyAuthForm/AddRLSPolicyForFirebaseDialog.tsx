@@ -17,7 +17,6 @@ export const AddRLSPolicyForFirebaseDialog = ({
   projectRef,
   firebaseProjectId,
 }: {
-  visible: boolean
   projectRef: string
   firebaseProjectId: string
 }) => {
