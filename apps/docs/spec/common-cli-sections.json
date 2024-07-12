@@ -207,6 +207,24 @@
   },
   {
     "type": "category",
+    "title": "Seed",
+    "items": [
+      {
+        "id": "supabase-seed",
+        "title": "Seed a Supabase project",
+        "slug": "supabase-seed",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-seed-buckets",
+        "title": "Seed storage buckets from config file",
+        "slug": "supabase-seed-buckets",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Inspect",
     "items": [
       {

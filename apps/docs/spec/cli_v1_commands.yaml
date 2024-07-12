@@ -2493,7 +2493,57 @@ commands:
     links: []
     usage: supabase gen types [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: Generate types from a database url.
+        default_value: ''
+      - id: lang
+        name: --lang <[ typescript | go | swift ]>
+        description: Output language of the generated types.
+        default_value: typescript
+        accepted_values:
+          - id: typescript
+            name: typescript
+            type: '[ typescript | go | swift ]'
+          - id: go
+            name: go
+            type: '[ typescript | go | swift ]'
+          - id: swift
+            name: swift
+            type: '[ typescript | go | swift ]'
+      - id: linked
+        name: --linked
+        description: Generate types from the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Generate types from the local dev database.
+        default_value: 'false'
+      - id: postgrest-v9-compat
+        name: --postgrest-v9-compat
+        description: |
+          Generate types compatible with PostgREST v9 and below. Only use together with --db-url.
+        default_value: 'false'
+      - id: project-id
+        name: --project-id <string>
+        description: Generate types from a project ID.
+        default_value: ''
+      - id: schema
+        name: -s, --schema <strings>
+        description: Comma separated list of schema to include.
+        default_value: '[]'
+      - id: swift-access-control
+        name: --swift-access-control <[ internal | public ]>
+        description: Access control for Swift generated types.
+        default_value: internal
+        accepted_values:
+          - id: internal
+            name: internal
+            type: '[ internal | public ]'
+          - id: public
+            name: public
+            type: '[ internal | public ]'
   - id: supabase-gen-keys
     title: supabase gen keys
     summary: Generate keys for preview branch
@@ -2819,11 +2869,13 @@ commands:
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project
-    description: |-
+    description: |2
+
       Activates the custom hostname configuration for a project.
 
       This reconfigures your Supabase project to respond to requests on your custom hostname.
-      After the custom hostname is activated, your project's auth services will no longer function on the Supabase-provisioned subdomain.
+
+      After the custom hostname is activated, your project's third-party auth providers will no longer function on the Supabase-provisioned subdomain. Please refer to [Prepare to activate your domain](/docs/guides/platform/custom-domains#prepare-to-activate-your-domain) section in our documentation to learn more about the steps you need to follow.
     tags: []
     links: []
     usage: supabase domains activate
