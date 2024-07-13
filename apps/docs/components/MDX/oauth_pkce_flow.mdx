@@ -67,6 +67,11 @@ export async function GET(request: Request) {
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/'
 
+  // Create redirect link without the code
+  const redirectTo = request.nextUrl.clone()
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('code')
+
   if (code) {
     const cookieStore = cookies()
     const supabase = createServerClient(
@@ -74,26 +79,33 @@ export async function GET(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
+          getAll() {
+            return cookieStore.getAll()
           },
-          set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options: CookieOptions) {
-            cookieStore.delete({ name, ...options })
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
           },
         },
       }
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      redirectTo.searchParams.delete('next')
+      return NextResponse.redirect(redirectTo)
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  redirectTo.pathname = '/auth/auth-code-error'
+  return NextResponse.redirect(redirectTo)
 }
 ```
 
@@ -113,15 +125,22 @@ export const GET = async (event) => {
 	const code = url.searchParams.get('code') as string;
 	const next = url.searchParams.get('next') ?? '/';
 
+  // Create redirect link without the code
+  const redirectTo = url;
+  redirectTo.pathname = next;
+  redirectTo.searchParams.delete('code');
+  
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      throw redirect(303, `/${next.slice(1)}`);
+      redirectTo.searchParams.delete('next');
+      redirect(303, redirectTo);
     }
   }
 
   // return the user to an error page with instructions
-  throw redirect(303, '/auth/auth-code-error');
+  redirectTo.pathname = '/auth/auth-code-error';
+  redirect(303, redirectTo);
 };
 ```
 
@@ -132,7 +151,7 @@ export const GET = async (event) => {
 Create a new file at `src/pages/auth/callback.ts` and populate with the following:
 
 ```ts src/pages/auth/callback.ts
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { type APIRoute } from 'astro'
 
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
@@ -140,20 +159,23 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next') || '/'
 
+  // Create redirect link without the code
+  const redirectTo = requestUrl
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('code')
+
   if (code) {
     const supabase = createServerClient(
       import.meta.env.PUBLIC_SUPABASE_URL,
       import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
-          get(key) {
-            return cookies.get(key)?.value
+          getAll() {
+            return parseCookieHeader(request.headers.get('Cookie') ?? '')
           },
-          set(key, value, options) {
-            cookies.set(key, value, options)
-          },
-          remove(key, options) {
-            cookies.delete(key, options)
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookies.set(name, value, options))
           },
         },
       }
@@ -162,12 +184,14 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(next)
+      redirectTo.searchParams.delete('next')
+      return redirect(redirectTo.toString())
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error')
+  redirectTo.pathname = '/auth/auth-code-error'
+  return redirect(redirectTo.toString())
 }
 ```
 
@@ -179,7 +203,7 @@ Create a new file at `app/routes/auth.callback.tsx` and populate with the follow
 
 ```ts app/routes/auth.callback.tsx
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, parse, serialize } from '@supabase/ssr'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
@@ -187,18 +211,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const next = requestUrl.searchParams.get('next') || '/'
   const headers = new Headers()
 
+  // Create redirect link without the code
+  const redirectTo = requestUrl;
+  redirectTo.pathname = next;
+  redirectTo.searchParams.delete('code');
+
   if (code) {
-    const cookies = parse(request.headers.get('Cookie') ?? '')
     const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
       cookies: {
-        get(key) {
-          return cookies[key]
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
-        set(key, value, options) {
-          headers.append('Set-Cookie', serialize(key, value, options))
-        },
-        remove(key, options) {
-          headers.append('Set-Cookie', serialize(key, '', options))
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
         },
       },
     })
@@ -206,12 +233,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(next, { headers })
+      redirectTo.searchParams.delete('next')
+      return redirect(redirectTo.toString(), { headers })
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error', { headers })
+  redirectTo.pathname = '/auth/auth-code-error'
+  return redirect(redirectTo.toString(), { headers })
 }
 ```
 
