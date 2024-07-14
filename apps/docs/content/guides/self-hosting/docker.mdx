@@ -32,6 +32,11 @@ git clone --depth 1 https://github.com/supabase/supabase
 # Make your new supabase project directory
 mkdir supabase-project
 
+# Tree should look like this
+# .
+# ├── supabase
+# └── supabase-project
+
 # Copy the compose files over to your project
 cp -rf supabase/docker/* supabase-project
 
@@ -138,7 +143,7 @@ You will also likely want to connect to your postgres database via an ORM or ano
 For this you will use the following URL which uses connection pooling by default.
 You can find the the environment values mentioned below in the `.env` file which will be covered in the next section.
 ```
-postgres://postgres:[your-POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
+postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
 ```
 
 
