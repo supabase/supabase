@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import TicketHeader from '../Ticket/TicketHeader'
-import TicketNumber from '../Ticket/TicketNumber'
+// import TicketHeader from '../Ticket/TicketHeader'
+// import TicketNumber from '../Ticket/TicketNumber'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import Image from 'next/image'
 
@@ -41,7 +41,7 @@ export function TicketBrick({ user }: Props) {
           alt=""
         />
         <div className="z-20 relative">
-          <TicketHeader size="small" />
+          {/* <TicketHeader size="small" /> */}
           <div className="rounded-full grid gap-4 mx-auto justify-center mt-8">
             <img
               src={`https://github.com/${user.username}.png`}
@@ -53,7 +53,7 @@ export function TicketBrick({ user }: Props) {
               {user.name && <p className="gradient-text-100 text-sm">@{user.username}</p>}
             </div>
           </div>
-          <TicketNumber number={user.ticketNumber} size="small" />
+          {/* <TicketNumber number={user.ticketNumber} size="small" /> */}
         </div>
       </div>
     </>

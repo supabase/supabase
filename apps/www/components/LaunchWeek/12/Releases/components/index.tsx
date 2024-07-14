@@ -3,7 +3,7 @@ import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn 
 import { Music } from 'lucide-react'
 
 import Link from 'next/link'
-import { StepLink } from '../data/lw11_data'
+import { StepLink } from '../data/lw12_data'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 interface DayLink extends StepLink {

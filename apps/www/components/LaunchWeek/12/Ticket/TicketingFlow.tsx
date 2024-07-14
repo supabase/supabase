@@ -10,8 +10,7 @@ import useLwGame from '../../hooks/useLwGame'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketContainer from '~/components/LaunchWeek/11/Ticket/TicketContainer'
-import LW11Background from '../LW11Background'
+import TicketContainer from './TicketContainer'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketPresence from './TicketPresence'
@@ -200,12 +199,6 @@ const TicketingFlow = () => {
           </div>
         </div>
       </SectionContainer>
-      <LW11Background
-        className={cn(
-          'absolute z-0 inset-0 w-full h-full flex items-center justify-center opacity-100 transition-opacity',
-          hasTicket && 'opacity-20'
-        )}
-      />
     </>
   )
 }

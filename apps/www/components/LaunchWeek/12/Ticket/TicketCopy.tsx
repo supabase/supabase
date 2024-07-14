@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
+import { LW_URL } from '~/lib/constants'
 import { Check, Copy } from 'lucide-react'
 import useConfData from '../../hooks/use-conf-data'
 
@@ -9,7 +9,7 @@ export default function TicketCopy() {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = secret
-  const url = `${SPECIAL_ANNOUNCEMENT_URL}/tickets/${username}?lw=11${
+  const url = `${LW_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
 

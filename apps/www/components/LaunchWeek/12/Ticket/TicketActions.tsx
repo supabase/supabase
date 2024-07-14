@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import {
-  SPECIAL_ANNOUNCEMENT_URL,
-  TWEET_TEXT,
-  TWEET_TEXT_PLATINUM,
-  TWEET_TEXT_SECRET,
-} from '~/lib/constants'
+import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
@@ -19,7 +14,7 @@ export default function TicketActions() {
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${SPECIAL_ANNOUNCEMENT_URL}/tickets/${username}?lw=11${
+  const link = `${LW_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)

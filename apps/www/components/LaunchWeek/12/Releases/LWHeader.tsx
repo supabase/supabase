@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import LW11Background from '../LW11Background'
+// import LW11Background from '../LW11Background'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -41,7 +41,7 @@ const LW11Header = ({ className }: { className?: string }) => {
       </SectionContainer>
       <div className="absolute z-0 inset-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute z-0 inset-0 w-full aspect-video">
-          <LW11Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity h-full" />
+          {/* <LW11Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity h-full" /> */}
         </div>
         <div className="absolute inset-0 bg-[linear-gradient(to_top,#060809)_0%,transparent_100%)]" />
       </div>

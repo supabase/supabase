@@ -7,7 +7,7 @@ import { cn } from 'ui'
 import { useBreakpoint } from 'common'
 
 import { AdventDay } from '../data'
-import { AdventLink } from '../data/lw11_build_stage'
+import { AdventLink } from '../data/lw12_build_stage'
 
 const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   const isTablet = useBreakpoint(1024)
