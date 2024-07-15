@@ -140,10 +140,10 @@ export const sqlEditorState = proxy({
     description?: string
   }) => {
     if (sqlEditorState.snippets[id]) {
-      const { snippet } = sqlEditorState.snippets[id]
-      snippet.name = name
-      snippet.description = description
-
+      sqlEditorState.snippets[id] = {
+        ...sqlEditorState.snippets[id],
+        snippet: { ...sqlEditorState.snippets[id].snippet, name, description },
+      }
       sqlEditorState.needsSaving.add(id)
     }
   },

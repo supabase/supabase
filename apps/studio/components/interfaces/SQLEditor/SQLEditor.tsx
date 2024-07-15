@@ -30,7 +30,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Loading,
@@ -221,8 +221,13 @@ const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title } = await generateSqlTitle({ sql })
-        snap.renameSnippet(id, title)
+        const { title: name } = await generateSqlTitle({ sql })
+
+        if (enableFolders) {
+          snapV2.renameSnippet({ id, name })
+        } else {
+          snap.renameSnippet(id, name)
+        }
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
@@ -234,7 +239,7 @@ const SQLEditor = () => {
     if (isDiffOpen) return
 
     // use the latest state
-    const state = getSqlEditorStateSnapshot()
+    const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
     const snippet = state.snippets[id]
 
     if (editorRef.current && project) {
@@ -273,7 +278,7 @@ const SQLEditor = () => {
       if (isDiffOpen) return
 
       // use the latest state
-      const state = getSqlEditorStateSnapshot()
+      const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
       const snippet = state.snippets[id]
 
       if (editorRef.current !== null && !isExecuting && project !== undefined) {
