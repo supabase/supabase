@@ -185,7 +185,10 @@ const RLSCodeEditor = ({
       {placeholder !== undefined && (
         <div
           id={placeholderId}
-          className="monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
+          className={cn(
+            'monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0'
+          )}
           style={{ display: 'none' }}
         >
           <Markdown content={placeholder} />
