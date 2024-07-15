@@ -225,6 +225,7 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.snippets[id]) {
       const { snippet } = sqlEditorState.snippets[id]
       snippet.visibility = visibility
+      snippet.folder_id = undefined
       sqlEditorState.needsSaving.add(id)
     }
   },
