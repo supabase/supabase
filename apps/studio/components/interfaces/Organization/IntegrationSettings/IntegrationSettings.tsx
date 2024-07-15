@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
+import SupabaseSection from 'components/interfaces/Settings/Integrations/SupabaseIntegration/SupabaseSection'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
@@ -29,6 +30,9 @@ import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+
+// Enable local and staging testing only for now.
+const IS_INTEGRATIONS_DIRECTORY_ENABLED = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -191,6 +195,8 @@ The GitHub app will watch for changes in your repository such as file changes, b
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
+      {IS_INTEGRATIONS_DIRECTORY_ENABLED && <ScaffoldDivider />}
+      {IS_INTEGRATIONS_DIRECTORY_ENABLED && <SupabaseSection />}
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>

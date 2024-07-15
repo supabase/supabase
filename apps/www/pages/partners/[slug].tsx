@@ -1,34 +1,29 @@
-import { GetStaticPaths, GetStaticProps } from 'next'
+import type { GetServerSideProps } from 'next'
 import supabase from '~/lib/supabaseMisc'
 import Error404 from '../404'
+import { API_URL } from '~/lib/constants'
+import type { IntegrationsDirectoryEntry } from './integrations'
 
 function PartnerPage() {
   // Should be redirected to ./experts/:slug or ./integrations/:slug
   return <Error404 />
 }
 
-// This function gets called at build time
-export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+  // Try new integrations directory first, and bail to the old solution if entry is not present.
+  const url = `${API_URL}/integrations-directory/${params!.slug}${query.preview_token ? `?preview_token=${query.preview_token}` : ''}`
+  const response = await fetch(url)
+  const entry = (await response.json()) as IntegrationsDirectoryEntry
 
-  const paths: {
-    params: { slug: string }
-    locale?: string | undefined
-  }[] =
-    slugs?.map(({ slug }) => ({
-      params: {
-        slug,
+  if (entry && response.status === 200) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/partners/integrations/${entry.slug}${query.preview_token ? `?preview_token=${query.preview_token}` : ''}`,
       },
-    })) ?? []
-
-  return {
-    paths,
-    fallback: 'blocking',
+    }
   }
-}
 
-// This also gets called at build time
-export const getStaticProps: GetStaticProps = async ({ params }) => {
   let { data: partner } = await supabase
     .from('partners')
     .select('*')

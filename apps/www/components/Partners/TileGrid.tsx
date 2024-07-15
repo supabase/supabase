@@ -1,6 +1,27 @@
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IntegrationCategory } from '~/pages/partners/integrations'
 import type { Partner } from '~/types/partners'
+
+const NEW_ENTRIES_THRESHOLD = 30 // days
+
+// TODO(Kamil): Use `IntegrationsDirectoryEntry` type instead of `Partner` everywhere
+// once we migrate "Experts" away from the website.
+function renderNewPill(partner: Partner) {
+  // We need this guard to not break existing Experts tiles during migration.
+  if (!('approved_at' in partner) || typeof partner.approved_at !== 'string') {
+    return null
+  }
+  if (dayjs().subtract(NEW_ENTRIES_THRESHOLD, 'days').isBefore(dayjs(partner.approved_at))) {
+    return (
+      <span className="text-xs h-12 w-12 bg-alternative rounded-md p-1 mr-2 relative -top-0.5">
+        New
+      </span>
+    )
+  }
+  return null
+}
 
 export default function TileGrid({
   partners,
@@ -49,6 +70,7 @@ export default function TileGrid({
                     </div>
                     <div>
                       <h3 className="text-foreground-light group-hover:text-foreground mb-2 text-xl transition-colors">
+                        {renderNewPill(p)}
                         {p.title}
                       </h3>
                       <p
@@ -67,7 +89,11 @@ export default function TileGrid({
       ) : null}
       {Object.keys(partnersByCategory).map((category) => (
         <div key={category} id={category.toLowerCase()} className="space-y-8">
-          {!hideCategories && <h2 className="h2">{category}</h2>}
+          {!hideCategories && (
+            <h2 className="h2">
+              {IntegrationCategory[category as keyof typeof IntegrationCategory]}
+            </h2>
+          )}
           <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {partnersByCategory[category].map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
@@ -92,6 +118,7 @@ export default function TileGrid({
                     </div>
                     <div>
                       <h3 className="text-light group-hover:text-foreground mb-2 text-xl transition-colors">
+                        {renderNewPill(p)}
                         {p.title}
                       </h3>
                       <p

@@ -16,7 +16,6 @@ import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import type { Profile } from 'data/profile/types'
-import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
