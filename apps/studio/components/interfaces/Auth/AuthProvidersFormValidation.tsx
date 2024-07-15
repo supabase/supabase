@@ -1368,7 +1368,6 @@ const EXTERNAL_PROVIDER_ZOOM = {
   },
 }
 
-// TODO: Check htis
 const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1381,14 +1380,26 @@ const PROVIDER_SAML = {
       type: 'boolean',
     },
     SAML_EXTERNAL_URL: {
-      // TODO: Update this
-      title:
-        'Allows the advertised SAML metadata to be different than the one defined with the API external URL.',
+      title: 'Set a custom SAML metadata URL distinct from the API external URL.',
       type: 'string',
     },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
+    SAML_EXTERNAL_URL: string()
+      .matches(urlRegex, 'Must be a valid URL')
+      .test(
+        'SAML_EXTERNAL_URL-can-only-be-set-when-enabled',
+        'SAML External URL can only be set when SAML is enabled',
+        function (value) {
+          const { SAML_ENABLED } = this.parent
+          if (!SAML_ENABLED && value) {
+            return false
+          }
+          return true
+        }
+      )
+      .notRequired(),
   }),
   misc: {
     iconKey: 'saml-icon',
