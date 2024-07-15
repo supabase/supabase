@@ -545,6 +545,10 @@ export const auth = {
       ],
     },
     {
+      name: 'Migrations',
+      items: [{ name: 'Migrate from Auth0', url: '/guides/auth/migrations/auth0' }],
+    },
+    {
       name: 'Concepts',
       items: [
         { name: 'Users', url: '/guides/auth/users' },
