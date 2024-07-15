@@ -1,4 +1,4 @@
-import Editor, { EditorProps, OnChange, OnMount } from '@monaco-editor/react'
+import Editor, { EditorProps, Monaco, OnChange, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import { editor } from 'monaco-editor'
 import { useEffect, useRef, useState } from 'react'
@@ -43,13 +43,16 @@ const CodeEditor = ({
   disableTabToUsePlaceholder = false,
 }: CodeEditorProps) => {
   const hasValue = useRef<any>()
+
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const monacoRef = useRef<Monaco>()
 
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     alignEditor(editor)
 
     hasValue.current = editor.createContextKey('hasValue', false)
@@ -126,10 +129,38 @@ const CodeEditor = ({
   )
 
   useEffect(() => {
-    if (value !== undefined && value.trim().length > 0) {
-      setShowPlaceholder(false)
+    setShowPlaceholder(showPlaceholderDefault)
+  }, [showPlaceholderDefault])
+
+  useEffect(() => {
+    if (
+      !disableTabToUsePlaceholder &&
+      editorRef.current !== undefined &&
+      monacoRef.current !== undefined
+    ) {
+      const editor = editorRef.current
+      const monaco = monacoRef.current
+
+      editor.addCommand(
+        monaco.KeyCode.Tab,
+        () => {
+          editor.executeEdits('source', [
+            {
+              // @ts-ignore
+              identifier: 'add-placeholder',
+              range: new monaco.Range(1, 1, 1, 1),
+              text: (placeholder ?? '  ')
+                .split('\n\n')
+                .join('\n')
+                .replaceAll('*', '')
+                .replaceAll('&nbsp;', ''),
+            },
+          ])
+        },
+        '!hasValue'
+      )
     }
-  }, [value])
+  }, [placeholder, disableTabToUsePlaceholder])
 
   return (
     <>
