@@ -208,7 +208,6 @@ export const sqlEditorState = proxy({
         snippet: {
           ...sqlEditorState.snippets[id].snippet,
           favorite: true,
-          folder_id: null as any,
         },
       }
       sqlEditorState.needsSaving.add(id)

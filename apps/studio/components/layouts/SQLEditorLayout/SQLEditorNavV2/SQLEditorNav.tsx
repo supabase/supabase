@@ -90,7 +90,10 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = contents.filter((snippet) => snippet.favorite)
+  // [Joshen] We're setting folder_id as undefined here as favorites are a flat list
+  const favoriteSnippets = contents
+    .filter((snippet) => snippet.favorite)
+    .map((snippet) => ({ ...snippet, folder_id: undefined }))
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
