@@ -1051,6 +1051,16 @@ export const examples: Registry = [
     files: ['example/modal-hide-footer.tsx'],
   },
   {
+    name: 'assistant-chat-demo',
+    type: 'components:example',
+    files: ['example/assistant-chat-demo.tsx'],
+  },
+  {
+    name: 'assistant-chat-commands',
+    type: 'components:example',
+    files: ['example/assistant-chat-commands.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],
@@ -1064,5 +1074,10 @@ export const examples: Registry = [
     name: 'color-usage-surface-studio-frame',
     type: 'docs:example',
     files: ['example/color-usage-surface-studio-frame.tsx'],
+  },
+  {
+    name: 'expanding-textarea-demo',
+    type: 'docs:example',
+    files: ['example/expanding-textarea-demo.tsx'],
   },
 ]

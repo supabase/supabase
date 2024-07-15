@@ -14,6 +14,7 @@ import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
 import {
   AuthRateLimits,
+  CreateClientSnippet,
   DatabaseSetup,
   GetSessionWarning,
   HuggingFaceDeployment,
@@ -47,6 +48,7 @@ const components = {
   ButtonCard,
   CH,
   CostWarning,
+  CreateClientSnippet,
   DatabaseSetup,
   Extensions,
   GetSessionWarning,
