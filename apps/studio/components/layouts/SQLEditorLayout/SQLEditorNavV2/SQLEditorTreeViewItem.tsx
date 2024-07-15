@@ -1,8 +1,14 @@
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
+import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
+import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProfile } from 'lib/profile'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
@@ -11,11 +17,6 @@ import {
   ContextMenu_Shadcn_,
   TreeViewItem,
 } from 'ui'
-import { useProfile } from 'lib/profile'
-import { IS_PLATFORM } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 interface SQLEditorTreeViewItemProps {
   element: any
@@ -26,6 +27,7 @@ interface SQLEditorTreeViewItemProps {
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any
+  onSelectCreate?: () => void
   onSelectDelete?: () => void
   onSelectRename?: () => void
   onSelectMove?: () => void
@@ -47,6 +49,7 @@ export const SQLEditorTreeViewItem = ({
   isSelected,
   isMultiSelected,
   getNodeProps,
+  onSelectCreate,
   onSelectDelete,
   onSelectRename,
   onSelectMove,
@@ -118,14 +121,16 @@ export const SQLEditorTreeViewItem = ({
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           {isBranch ? (
             <>
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onSelect={() => {}}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <Plus size={14} />
-                Create new snippet
-              </ContextMenuItem_Shadcn_>
+              {onSelectCreate !== undefined && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectCreate()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Plus size={14} />
+                  Create new snippet
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
@@ -182,10 +187,10 @@ export const SQLEditorTreeViewItem = ({
                 onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <a href={`/project/${ref}/sql/${element.id}`} target="_blank" rel="noreferrer">
+                <Link href={`/project/${ref}/sql/${element.id}`} target="_blank" rel="noreferrer">
                   <ExternalLink size={14} />
                   Open in new tab
-                </a>
+                </Link>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />
               {onSelectRename !== undefined && isOwner && (

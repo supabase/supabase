@@ -41,12 +41,14 @@ export const createSqlSnippetSkeletonV2 = ({
   sql,
   owner_id,
   project_id,
+  folder_id,
 }: {
   id: string
   name: string
   sql: string
   owner_id: number
   project_id: number
+  folder_id?: string
 }): SnippetDetail => {
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
@@ -54,7 +56,7 @@ export const createSqlSnippetSkeletonV2 = ({
     owner_id,
     project_id,
     name,
-    folder_id: undefined,
+    folder_id,
     favorite: false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

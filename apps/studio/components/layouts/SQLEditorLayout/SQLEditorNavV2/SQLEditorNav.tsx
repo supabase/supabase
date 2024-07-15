@@ -36,6 +36,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 
 // Requirements
 // - Asynchronous loading
@@ -432,6 +433,20 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
                   isMultiSelected={selectedSnippets.length > 1}
                   status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
                   onMultiSelect={onMultiSelect}
+                  onSelectCreate={() => {
+                    if (profile && project) {
+                      const snippet = createSqlSnippetSkeletonV2({
+                        id: uuidv4(),
+                        name: untitledSnippetTitle,
+                        owner_id: profile?.id,
+                        project_id: project?.id,
+                        folder_id: element.id as string,
+                        sql: '',
+                      })
+                      snapV2.addSnippet({ projectRef: project.ref, snippet })
+                      router.push(`/project/${projectRef}/sql/${snippet.id}`)
+                    }
+                  }}
                   onSelectDelete={() => {
                     if (props.isBranch) {
                       setSelectedFolderToDelete(element.metadata as SnippetFolder)
