@@ -4,9 +4,6 @@ import { useContext } from 'react'
 export function useFlag<T = any>(name: string) {
   const store: any = useContext(FlagContext)
 
-  // [Joshen] REMOVE THIS AT THE END
-  if (name === 'sqlFolderOrganization') return true
-
   const isObjectEmpty = (objectName: Object) => {
     return Object.keys(objectName).length === 0
   }
