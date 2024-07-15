@@ -58,8 +58,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         initialValues[key] = configValue
           ? configValue
           : provider.properties[key].type === 'boolean'
-          ? false
-          : ''
+            ? false
+            : ''
       } else {
         if (isDoubleNegative) {
           initialValues[key] = !(config as any)[key]
@@ -68,8 +68,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-            ? false
-            : ''
+              ? false
+              : ''
         }
       }
     })
