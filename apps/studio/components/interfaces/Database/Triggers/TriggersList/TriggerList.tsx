@@ -107,6 +107,12 @@ const TriggerList = ({
             </div>
           </Table.td>
 
+          <Table.td className="hidden space-x-2 xl:table-cell">
+            <p title={x.orientation} className="truncate">
+              {x.orientation}
+            </p>
+          </Table.td>
+
           <Table.td className="hidden xl:table-cell">
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
