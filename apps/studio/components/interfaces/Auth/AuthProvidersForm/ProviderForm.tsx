@@ -54,7 +54,12 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       if (provider.title === 'SAML 2.0') {
-        initialValues[key] = (config as any)[key] ?? false
+        const configValue = (config as any)[key]
+        initialValues[key] = configValue
+          ? configValue
+          : provider.properties[key].type === 'boolean'
+          ? false
+          : ''
       } else {
         if (isDoubleNegative) {
           initialValues[key] = !(config as any)[key]
@@ -63,8 +68,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+            ? false
+            : ''
         }
       }
     })

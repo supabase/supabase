@@ -1382,24 +1382,12 @@ const PROVIDER_SAML = {
     SAML_EXTERNAL_URL: {
       title: 'Set a custom SAML metadata URL distinct from the API external URL.',
       type: 'string',
+      default: '',
     },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string()
-      .matches(urlRegex, 'Must be a valid URL')
-      .test(
-        'SAML_EXTERNAL_URL-can-only-be-set-when-enabled',
-        'SAML External URL can only be set when SAML is enabled',
-        function (value) {
-          const { SAML_ENABLED } = this.parent
-          if (!SAML_ENABLED && value) {
-            return false
-          }
-          return true
-        }
-      )
-      .notRequired(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'saml-icon',
