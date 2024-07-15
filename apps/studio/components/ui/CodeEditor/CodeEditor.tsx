@@ -45,14 +45,16 @@ const CodeEditor = ({
   const hasValue = useRef<any>()
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
-  const [showPlaceholder, setShowPlaceholder] = useState(placeholder !== undefined)
+  const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
+  const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     alignEditor(editor)
 
     hasValue.current = editor.createContextKey('hasValue', false)
-    setShowPlaceholder(placeholder !== undefined && (value ?? '').trim().length === 0)
+    hasValue.current.set(value !== undefined && value.trim().length > 0)
+    setShowPlaceholder(showPlaceholderDefault)
 
     if (!disableTabToUsePlaceholder) {
       editor.addCommand(
@@ -88,6 +90,12 @@ const CodeEditor = ({
         onInputRun(selectedValue || (editorRef?.current as any)?.getValue())
       },
     })
+
+    const model = editor.getModel()
+    if (model) {
+      const position = model.getPositionAt((value ?? '').length)
+      editor.setPosition(position)
+    }
 
     await timeout(500)
     if (autofocus) editor?.focus()

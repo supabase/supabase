@@ -25,13 +25,15 @@ export const FunctionEditor = ({
   return (
     <div className={cn('rounded-md relative group flex-grow')}>
       <FormControl_Shadcn_>
-        <CodeEditor
-          id="database-functions-editor"
-          language="pgsql"
-          placeholder={language === 'plpgsql' ? `BEGIN\n\nEND;` : undefined}
-          defaultValue={field.value}
-          onInputChange={field.onChange}
-        />
+        {language !== undefined && (
+          <CodeEditor
+            id="database-functions-editor"
+            language="pgsql"
+            placeholder={language === 'plpgsql' ? `BEGIN\n\nEND;` : undefined}
+            value={field.value}
+            onInputChange={field.onChange}
+          />
+        )}
       </FormControl_Shadcn_>
       <div
         className={cn(
@@ -50,7 +52,7 @@ export const FunctionEditor = ({
               )}
               onClick={() => setFocused(!focused)}
               icon={focused ? <Minimize2 /> : <Maximize2 />}
-            ></Button>
+            />
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">
             {focused ? 'Minimize editor' : 'Maximize editor'}
