@@ -1380,9 +1380,10 @@ const PROVIDER_SAML = {
       type: 'boolean',
     },
     SAML_EXTERNAL_URL: {
-      title: 'Set a custom SAML metadata URL distinct from the API external URL.',
+      title: 'Set a SAML metadata URL different from what is defined with the API External URL',
+      description:
+        'Please validate that your SAML External URL can reach the Custom Domain or Project URL',
       type: 'string',
-      default: '',
     },
   },
   validationSchema: object().shape({
