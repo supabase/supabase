@@ -1,9 +1,16 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Check, Code, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import toast from 'react-hot-toast'
 import * as z from 'zod'
 
+import { useParams } from 'common'
+import { getContentById } from 'data/content/content-id-query'
+import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
+import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -34,13 +41,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { Check, Code, Plus } from 'lucide-react'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
-import { useParams } from 'common'
-import { getContentById } from 'data/content/content-id-query'
-import toast from 'react-hot-toast'
 
 interface MoveQueryModalProps {
   visible: boolean
@@ -306,7 +306,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
             </DialogSection>
 
             <DialogFooter>
-              <Button type="default" disabled={isMovingSnippet || isCreatingFolder}>
+              <Button
+                type="default"
+                disabled={isMovingSnippet || isCreatingFolder}
+                onClick={() => onClose()}
+              >
                 Cancel
               </Button>
               <Button

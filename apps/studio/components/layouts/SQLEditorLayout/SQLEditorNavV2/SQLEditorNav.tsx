@@ -176,12 +176,14 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
     if (!selectedSnippetToShare) return console.error('Snippet ID is required')
     snapV2.shareSnippet(selectedSnippetToShare.id, 'project')
     setSelectedSnippetToShare(undefined)
+    setShowSharedSnippets(true)
   }
 
   const onConfirmUnshare = () => {
     if (!selectedSnippetToUnshare) return console.error('Snippet ID is required')
     snapV2.shareSnippet(selectedSnippetToUnshare.id, 'user')
     setSelectedSnippetToUnshare(undefined)
+    setShowPrivateSnippets(true)
   }
 
   const onSelectCopyPersonal = async (snippet: Snippet) => {
