@@ -13,7 +13,7 @@ async function createWarehouseAccessToken({
   description,
 }: WarehouseAccessTokenCreateVariables) {
   // TODO: remove type cast when fetcher fn params are typed
-  const { data, error } = await post(`/v0/projects/{ref}/analytics/warehouse/access-tokens`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: {
       path: { ref },
     },
