@@ -88,6 +88,7 @@ const GuidesTableOfContents = ({
       const headings = Array.from(
         document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
       )
+
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
