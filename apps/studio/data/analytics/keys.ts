@@ -1,6 +1,6 @@
 export const analyticsKeys = {
   // Backends
-  backends: (projectRef: string) => ['projects', projectRef, 'backends'] as const,
+  backends: (projectRef?: string) => ['projects', projectRef, 'backends'] as const,
 
   // warehouse
   warehouseQuery: (projectRef: string, query: string) =>
