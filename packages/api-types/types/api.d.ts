@@ -151,6 +151,22 @@ export interface paths {
     /** Gets user's integrations */
     get: operations['IntegrationsController_getUserInstallations']
   }
+  '/platform/integrations-directory': {
+    /** Retrieves an integrations directory list */
+    get: operations['IntegrationsDirectoryController_getIntegrationsDirectory']
+    /** Creates integrations directory entry */
+    post: operations['IntegrationsDirectoryController_createIntegrationsDirectoryEntry']
+  }
+  '/platform/integrations-directory/{entry_id}': {
+    /** Deletes integrations directory entry */
+    delete: operations['IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry']
+    /** Updates integrations directory entry */
+    patch: operations['IntegrationsDirectoryController_updateIntegrationsDirectoryEntry']
+  }
+  '/platform/integrations-directory/{slug}': {
+    /** Retrieves integrations directory entry by slug */
+    get: operations['IntegrationsDirectoryController_getIntegrationsDirectoryEntry']
+  }
   '/platform/integrations/{slug}': {
     /** Gets integration with the given organization slug */
     get: operations['IntegrationsController_getUserInstallationForOrg']
@@ -2579,6 +2595,7 @@ export interface components {
       project_ref: string
       repository_id: number
     }
+    CreateIntegrationsDirectoryEntryBody: Record<string, never>
     CreateInvitationBody: {
       email: string
       role_id: number
@@ -5702,6 +5719,7 @@ export interface components {
       SMTP_USER?: string
       URI_ALLOW_LIST?: string
     }
+    UpdateIntegrationsDirectoryEntryBody: Record<string, never>
     UpdateMemberBody: {
       role_id: number
     }
@@ -6994,6 +7012,105 @@ export interface operations {
         }
       }
       /** @description Failed to get user's integrations */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieves an integrations directory list */
+  IntegrationsDirectoryController_getIntegrationsDirectory: {
+    parameters: {
+      query: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory list */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates integrations directory entry */
+  IntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateIntegrationsDirectoryEntryBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes integrations directory entry */
+  IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        entry_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates integrations directory entry */
+  IntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        entry_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateIntegrationsDirectoryEntryBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieves integrations directory entry by slug */
+  IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory entry */
       500: {
         content: never
       }
