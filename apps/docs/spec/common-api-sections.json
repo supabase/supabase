@@ -7,97 +7,7 @@
   },
   {
     "type": "category",
-    "title": "analytics",
-    "items": [
-      {
-        "id": "v1-create-a-warehouse-collection",
-        "title": "Create a warehouse collection",
-        "slug": "v1-create-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-create-a-warehouse-endpoint",
-        "title": "Create a warehouse endpoint",
-        "slug": "v1-create-a-warehouse-endpoint",
-        "type": "operation"
-      },
-      {
-        "id": "v1-create-a-warehouse-token",
-        "title": "Create a warehouse token",
-        "slug": "v1-create-a-warehouse-token",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-collection",
-        "title": "Delete a warehouse collection",
-        "slug": "v1-delete-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-endpoint",
-        "title": "Delete a warehouse endpoint",
-        "slug": "v1-delete-a-warehouse-endpoint",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-token",
-        "title": "Delete a warehouse token",
-        "slug": "v1-delete-a-warehouse-token",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-a-warehouse-collection",
-        "title": "Get a warehouse collection",
-        "slug": "v1-get-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-collections",
-        "title": "List all warehouse collections",
-        "slug": "v1-list-all-warehouse-collections",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-endpoints",
-        "title": "List all warehouse endpoints",
-        "slug": "v1-list-all-warehouse-endpoints",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-queries",
-        "title": "List all warehouse queries",
-        "slug": "v1-list-all-warehouse-queries",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-tokens",
-        "title": "List all warehouse tokens",
-        "slug": "v1-list-all-warehouse-tokens",
-        "type": "operation"
-      },
-      {
-        "id": "v1-provision-a-warehouse-tenant",
-        "title": "Provision a warehouse tenant",
-        "slug": "v1-provision-a-warehouse-tenant",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-a-warehouse-collection",
-        "title": "Update a warehouse collection",
-        "slug": "v1-update-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-a-warehouse-endpoint",
-        "title": "Update a warehouse endpoint",
-        "slug": "v1-update-a-warehouse-endpoint",
-        "type": "operation"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "auth",
+    "title": "Auth",
     "items": [
       {
         "id": "v1-create-a-sso-provider",
@@ -145,7 +55,7 @@
   },
   {
     "type": "category",
-    "title": "database",
+    "title": "Database",
     "items": [
       {
         "id": "v1-disable-readonly-mode-temporarily",
@@ -259,7 +169,7 @@
   },
   {
     "type": "category",
-    "title": "domains",
+    "title": "Domains",
     "items": [
       {
         "id": "v1-activate-custom-hostname",
@@ -313,7 +223,7 @@
   },
   {
     "type": "category",
-    "title": "edge functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "v1-delete-a-function",
@@ -349,7 +259,7 @@
   },
   {
     "type": "category",
-    "title": "environments",
+    "title": "Environments",
     "items": [
       {
         "id": "v1-create-a-branch",
@@ -397,7 +307,7 @@
   },
   {
     "type": "category",
-    "title": "oauth",
+    "title": "OAuth",
     "items": [
       {
         "id": "v1-authorize-user",
@@ -415,7 +325,7 @@
   },
   {
     "type": "category",
-    "title": "organizations",
+    "title": "Organizations",
     "items": [
       {
         "id": "v1-create-an-organization",
@@ -445,7 +355,7 @@
   },
   {
     "type": "category",
-    "title": "projects",
+    "title": "Projects",
     "items": [
       {
         "id": "v1-create-a-project",
@@ -517,7 +427,7 @@
   },
   {
     "type": "category",
-    "title": "rest",
+    "title": "Rest",
     "items": [
       {
         "id": "v1-get-postgrest-service-config",
@@ -535,7 +445,7 @@
   },
   {
     "type": "category",
-    "title": "secrets",
+    "title": "Secrets",
     "items": [
       {
         "id": "v1-bulk-create-secrets",
@@ -577,7 +487,7 @@
   },
   {
     "type": "category",
-    "title": "storage",
+    "title": "Storage",
     "items": [
       {
         "id": "v1-list-all-buckets",
