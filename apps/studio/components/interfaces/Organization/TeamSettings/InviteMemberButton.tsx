@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isNil } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
-import Link from 'next/link'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
@@ -15,13 +17,12 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import {
   doPermissionsCheck,
-  useGetPermissions,
   useCheckPermissions,
+  useGetPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-import { isNil } from 'lodash'
 import {
   Button,
   Dialog,
@@ -50,7 +51,6 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import InformationBox from 'components/ui/InformationBox'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -66,6 +66,9 @@ export const InviteMemberButton = () => {
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
+  )
+  const orgProjects = (projects ?? []).filter(
+    (project) => project.organization_id === organization?.id
   )
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -195,7 +198,7 @@ export const InviteMemberButton = () => {
 
   useEffect(() => {
     if (!applyToOrg) {
-      const firstProject = projects?.[0]
+      const firstProject = orgProjects?.[0]
       if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
     } else {
       form.setValue('projectRef', '')
@@ -234,7 +237,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && (
+              {projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -306,13 +309,13 @@ export const InviteMemberButton = () => {
                           value={field.value}
                           onValueChange={(value) => form.setValue('projectRef', value)}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
-                            {(projects ?? []).find((project) => project.ref === field.value)
-                              ?.name ?? 'Unknown'}
+                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize text-left truncate max-w-[470px]">
+                            {orgProjects.find((project) => project.ref === field.value)?.name ??
+                              'Unknown'}
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
                             <SelectGroup_Shadcn_>
-                              {(projects ?? []).map((project) => {
+                              {orgProjects.map((project) => {
                                 return (
                                   <SelectItem_Shadcn_
                                     key={project.id}
