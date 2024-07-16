@@ -29,7 +29,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const FORM_ID = 'create-function-sidepanel'
+const FORM_ID = 'create-integration-sidepanel'
 
 interface CreateIntegrationSheetProps {
   integrationEntry?: IntegrationEntry
@@ -190,7 +190,7 @@ export const CreateIntegrationSheet = ({
         {!isCreating && (
           <div className="flex-1">
             <Button type="danger" onClick={() => onDelete()} loading={isLoading}>
-              Delete hook
+              Delete integration
             </Button>
           </div>
         )}
