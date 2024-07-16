@@ -234,8 +234,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {/* projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' */}
-              {true && (
+              {projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
