@@ -7,6 +7,7 @@ import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upse
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
+import { SqlSnippet, SqlSnippets } from 'data/content/sql-snippets-query'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -34,8 +35,17 @@ export const sqlEditorState = proxy({
   folders: {} as {
     [folderId: string]: StateSnippetFolder
   },
+  // Private and Shared snippets only
   snippets: {} as {
     [snippetId: string]: StateSnippet
+  },
+  // We're storing favorites separately as they need to be a flat list and hence
+  // cannot be derived from snippets as folder contents are loaded on demand
+  favoriteSnippets: {} as {
+    [snippetId: string]: {
+      projectRef: string
+      snippet: SqlSnippet
+    }
   },
   // Query results, if any, for a snippet
   results: {} as {
@@ -56,7 +66,6 @@ export const sqlEditorState = proxy({
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
   limit: 100,
-
   order: 'inserted_at' as 'name' | 'inserted_at',
 
   get sortedSnippets() {
@@ -65,6 +74,16 @@ export const sqlEditorState = proxy({
       .sort((a, b) => {
         if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
         else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+      })
+  },
+
+  get sortedFavoriteSnippets() {
+    return Object.values(sqlEditorState.favoriteSnippets)
+      .map((x) => x.snippet)
+      .sort((a, b) => {
+        if (sqlEditorState.order === 'name') return a.name.localeCompare(b.name)
+        else
+          return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
       })
   },
 
@@ -93,6 +112,20 @@ export const sqlEditorState = proxy({
     })
     sqlEditorState.loaded[projectRef] = true
     sqlEditorState.order = sort
+  },
+
+  initializeFavoriteSnippets: ({
+    projectRef,
+    snippets,
+  }: {
+    projectRef: string
+    snippets: SqlSnippet[]
+  }) => {
+    snippets.forEach((snippet) => {
+      if (snippet.id && sqlEditorState.favoriteSnippets[snippet.id]?.snippet === undefined) {
+        sqlEditorState.favoriteSnippets[snippet.id] = { projectRef, snippet }
+      }
+    })
   },
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
@@ -210,6 +243,15 @@ export const sqlEditorState = proxy({
           favorite: true,
         },
       }
+
+      sqlEditorState.favoriteSnippets[id] = {
+        projectRef: sqlEditorState.snippets[id].projectRef,
+        snippet: {
+          ...sqlEditorState.snippets[id].snippet,
+          folder_id: undefined,
+        } as unknown as SqlSnippet,
+      }
+
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -223,6 +265,10 @@ export const sqlEditorState = proxy({
           favorite: false,
         },
       }
+
+      const { [id]: snippet, ...otherSnippets } = sqlEditorState.favoriteSnippets
+      sqlEditorState.favoriteSnippets = otherSnippets
+
       sqlEditorState.needsSaving.add(id)
     }
   },

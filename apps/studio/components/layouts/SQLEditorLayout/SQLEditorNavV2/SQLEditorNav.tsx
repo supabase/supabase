@@ -37,6 +37,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 
 // Requirements
 // - Asynchronous loading
@@ -90,15 +91,12 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  // [Joshen] We're setting folder_id as undefined here as favorites are a flat list
-  const favoriteSnippets = contents
-    .filter((snippet) => snippet.favorite)
-    .map((snippet) => ({ ...snippet, folder_id: undefined }))
+  const favoriteSnippets = snapV2.sortedFavoriteSnippets
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
       ? [ROOT_NODE]
-      : formatFolderResponseForTreeView({ contents: favoriteSnippets })
+      : formatFolderResponseForTreeView({ contents: favoriteSnippets as any })
 
   const projectSnippets = contents.filter((snippet) => snippet.visibility === 'project')
   const numProjectSnippets = projectSnippets.length
@@ -122,6 +120,15 @@ export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
       },
     }
   )
+
+  useSqlSnippetsQuery(projectRef, {
+    onSuccess(data) {
+      if (projectRef !== undefined) {
+        const favoriteSnippets = data.snippets.filter((snippet) => snippet.content.favorite)
+        snapV2.initializeFavoriteSnippets({ projectRef, snippets: favoriteSnippets })
+      }
+    },
+  })
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
