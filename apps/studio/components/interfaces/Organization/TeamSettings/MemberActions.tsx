@@ -107,8 +107,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
-  const { mutate: deleteInvitationOld, isLoading: isDeletingInviteOld } =
-    useOrganizationMemberInviteDeleteMutation()
+  const { mutate: deleteInvitationOld } = useOrganizationMemberInviteDeleteMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
@@ -283,6 +282,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
+        loading={isDeletingMember}
         title="Confirm to remove"
         confirmLabel="Remove"
         onCancel={() => setIsDeleteModalOpen(false)}
