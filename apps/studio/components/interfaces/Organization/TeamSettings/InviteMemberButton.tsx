@@ -198,7 +198,7 @@ export const InviteMemberButton = () => {
 
   useEffect(() => {
     if (!applyToOrg) {
-      const firstProject = projects?.[0]
+      const firstProject = orgProjects?.[0]
       if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
     } else {
       form.setValue('projectRef', '')
