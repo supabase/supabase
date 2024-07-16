@@ -3,7 +3,6 @@
 import * as Accordion from '@radix-ui/react-accordion'
 
 import * as NavItems from './NavigationMenu.constants'
-import { getPathWithoutHash } from './NavigationMenu.utils'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 import { usePathname } from 'next/navigation'
 

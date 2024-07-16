@@ -31,7 +31,7 @@ const PasswordStrengthBar = ({
             className={`relative h-1 w-full ${
               (PASSWORD_STRENGTH_COLOR as any)[passwordStrengthScore]
             } transition-all duration-500 ease-out shadow-inner`}
-          ></div>
+          />
         </div>
       )}
       <p>
