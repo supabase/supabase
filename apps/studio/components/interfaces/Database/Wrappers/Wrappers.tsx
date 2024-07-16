@@ -30,7 +30,7 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
             <div
               className={[
                 'border rounded border-default px-20 py-16',
-                'flex flex-col items-center justify-center space-y-4',
+                'flex flex-col items-center justify-center gap-y-4',
               ].join(' ')}
             >
               <p className="text-foreground-light text-sm">No wrappers created yet</p>
@@ -38,7 +38,6 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
             </div>
           ) : (
             <>
-              {/* [Joshen] This probably needs to change anyways so dont get too stuck with this */}
               {WRAPPERS.map((wrapper, i) => {
                 const createdWrappers = wrappers.filter((w) => {
                   if (wrapper.handlerName === 'wasm_fdw_handler') {

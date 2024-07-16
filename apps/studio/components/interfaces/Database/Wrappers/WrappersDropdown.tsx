@@ -18,6 +18,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
 import { WRAPPERS } from './Wrappers.constants'
 
@@ -74,29 +75,31 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
       <PopoverContent_Shadcn_ className="w-[200px] p-0" align={align}>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search wrappers..." />
-          <CommandEmpty_Shadcn_>No wrappers found</CommandEmpty_Shadcn_>
+          <CommandEmpty_Shadcn_ className="py-3">No wrappers found</CommandEmpty_Shadcn_>
           <CommandGroup_Shadcn_>
-            {WRAPPERS.map((wrapper) => (
-              <CommandItem_Shadcn_
-                key={wrapper.name}
-                value={wrapper.name}
-                onSelect={() => {
-                  setOpen(false)
-                  router.push(
-                    `/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`
-                  )
-                }}
-                className="gap-2 cursor-pointer"
-              >
-                <Image
-                  src={wrapper.icon}
-                  width={20}
-                  height={20}
-                  alt={`${wrapper.name} wrapper icon`}
-                />
-                {wrapper.label}
-              </CommandItem_Shadcn_>
-            ))}
+            <ScrollArea className="max-h-[270px] overflow-scroll">
+              {WRAPPERS.map((wrapper) => (
+                <CommandItem_Shadcn_
+                  key={wrapper.name}
+                  value={wrapper.name}
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(
+                      `/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`
+                    )
+                  }}
+                  className="gap-2 cursor-pointer"
+                >
+                  <Image
+                    width={20}
+                    height={20}
+                    src={wrapper.icon}
+                    alt={`${wrapper.name} wrapper icon`}
+                  />
+                  {wrapper.label}
+                </CommandItem_Shadcn_>
+              ))}
+            </ScrollArea>
           </CommandGroup_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>
