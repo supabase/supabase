@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.178.2
+  version: 1.183.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -963,6 +963,31 @@ commands:
     usage: supabase services
     subcommands: []
     flags: []
+  - id: supabase-seed
+    title: supabase seed
+    summary: Seed a Supabase project from supabase/config.toml
+    tags:
+      - local-dev
+    links: []
+    subcommands:
+      - supabase-seed-buckets
+    flags: []
+  - id: supabase-seed-buckets
+    title: supabase seed buckets
+    summary: Seed buckets declared in [storage.buckets]
+    tags: []
+    links: []
+    usage: supabase seed buckets
+    subcommands: []
+    flags:
+      - id: linked
+        name: --linked
+        description: Seeds the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Seeds the local database.
+        default_value: 'true'
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
@@ -2466,21 +2491,27 @@ commands:
     summary: Generate types from Postgres schema
     tags: []
     links: []
-    subcommands:
-      - supabase-gen-types-typescript
-    flags: []
-  - id: supabase-gen-types-typescript
-    title: supabase gen types typescript
-    summary: Generate types for TypeScript
-    tags: []
-    links: []
-    usage: supabase gen types typescript [flags]
+    usage: supabase gen types [flags]
     subcommands: []
     flags:
       - id: db-url
         name: --db-url <string>
         description: Generate types from a database url.
         default_value: ''
+      - id: lang
+        name: --lang <[ typescript | go | swift ]>
+        description: Output language of the generated types.
+        default_value: typescript
+        accepted_values:
+          - id: typescript
+            name: typescript
+            type: '[ typescript | go | swift ]'
+          - id: go
+            name: go
+            type: '[ typescript | go | swift ]'
+          - id: swift
+            name: swift
+            type: '[ typescript | go | swift ]'
       - id: linked
         name: --linked
         description: Generate types from the linked project.
@@ -2502,6 +2533,17 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: swift-access-control
+        name: --swift-access-control <[ internal | public ]>
+        description: Access control for Swift generated types.
+        default_value: internal
+        accepted_values:
+          - id: internal
+            name: internal
+            type: '[ internal | public ]'
+          - id: public
+            name: public
+            type: '[ internal | public ]'
   - id: supabase-gen-keys
     title: supabase gen keys
     summary: Generate keys for preview branch
@@ -2827,11 +2869,12 @@ commands:
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project
-    description: |-
+    description: |2
+
       Activates the custom hostname configuration for a project.
 
       This reconfigures your Supabase project to respond to requests on your custom hostname.
-      
+
       After the custom hostname is activated, your project's third-party auth providers will no longer function on the Supabase-provisioned subdomain. Please refer to [Prepare to activate your domain](/docs/guides/platform/custom-domains#prepare-to-activate-your-domain) section in our documentation to learn more about the steps you need to follow.
     tags: []
     links: []

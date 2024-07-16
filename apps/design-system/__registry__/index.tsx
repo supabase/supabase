@@ -489,6 +489,94 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "commandmenu-demo": {
+      name: "commandmenu-demo",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-demo")),
+      source: "",
+      files: ["registry/default/example/commandmenu-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-badge": {
+      name: "commandmenu-badge",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-badge")),
+      source: "",
+      files: ["registry/default/example/commandmenu-badge.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-icon": {
+      name: "commandmenu-icon",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-icon")),
+      source: "",
+      files: ["registry/default/example/commandmenu-icon.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-hidden": {
+      name: "commandmenu-hidden",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-hidden")),
+      source: "",
+      files: ["registry/default/example/commandmenu-hidden.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-force": {
+      name: "commandmenu-force",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-force")),
+      source: "",
+      files: ["registry/default/example/commandmenu-force.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-conditional": {
+      name: "commandmenu-conditional",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-conditional")),
+      source: "",
+      files: ["registry/default/example/commandmenu-conditional.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-subpage": {
+      name: "commandmenu-subpage",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-subpage")),
+      source: "",
+      files: ["registry/default/example/commandmenu-subpage.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-subpage-custom": {
+      name: "commandmenu-subpage-custom",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-subpage-custom")),
+      source: "",
+      files: ["registry/default/example/commandmenu-subpage-custom.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "context-menu-demo": {
       name: "context-menu-demo",
       type: "components:example",
