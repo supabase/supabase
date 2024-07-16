@@ -131,20 +131,14 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
   queryGroup="language"
 >
   <TabPanel id="js" label="JavaScript">
-    ```typescript
-    import { createClient } from 'npm:@supabase/supabase-js@2.38.5'
-    const url = 'https://<project_ref>.supabase.com'
-    const apikey = '<api_key>'
-
-    const client = createClient(url, apikey)
-
-    const channel = client.channel('room-1', {
+    ```javascript
+    const channel = supabase.channel('room-1', {
       config: { private: true },
     })
 
     channel
       .on('broadcast', { event: 'test' }, (payload) => console.log(payload))
-      .subscribe((status: string, err: any) => {
+      .subscribe((status, err) => {
         if (status === 'SUBSCRIBED') {
           console.log('Connected!')
         } else {
