@@ -8,20 +8,27 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge } from 'ui'
+import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 
 const CreditBalance = () => {
   const { slug } = useParams()
-  const canReadCredits = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
 
-  const { data, error, isLoading, isError, isSuccess } = useOrganizationCustomerProfileQuery(
-    { slug },
-    { enabled: canReadCredits }
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
   )
 
-  const customerBalance = (data?.balance ?? 0) / 100
+  const {
+    data: subscription,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
+
+  const customerBalance = (subscription?.customer_balance ?? 0) / 100
   const isCredit = customerBalance < 0
   const isDebt = customerBalance > 0
   const balance =
@@ -44,7 +51,7 @@ const CreditBalance = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadCredits ? (
+        {!canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
           <>
