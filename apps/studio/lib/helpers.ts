@@ -1,6 +1,5 @@
 import toast from 'react-hot-toast'
 
-export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
 
 export const tryParseJson = (jsonString: any) => {

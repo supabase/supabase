@@ -5,7 +5,7 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "test": "jest",
+    "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -35,6 +35,7 @@
   "devDependencies": {
     "@supabase/auth-helpers-react": "^0.4.2",
     "@testing-library/dom": "^10.1.0",
+    "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/common-tags": "^1.8.4",
@@ -42,10 +43,8 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "api-types": "*",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
     "next-router-mock": "^0.9.13",
-    "ts-jest": "^29.1.2"
+    "vitest": "^2.0.3"
   },
   "peerDependencies": {
     "next": "*",

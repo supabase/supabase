@@ -5,11 +5,11 @@ import {
   CommandInput,
   CommandList,
   CommandMenu,
+  CommandMenuTrigger as CommandMenuTriggerPrimitive,
   CommandProvider,
   PageType,
   useRegisterCommands,
   useRegisterPage,
-  useSetCommandMenuOpen,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
 
@@ -45,21 +45,18 @@ function Commands() {
 }
 
 function CommandMenuTrigger() {
-  const setOpen = useSetCommandMenuOpen()
-
   return (
-    <Button onClick={() => setOpen(true)} type="default">
-      Open command menu
-    </Button>
+    <CommandMenuTriggerPrimitive>
+      <Button type="default">Open command menu</Button>
+    </CommandMenuTriggerPrimitive>
   )
 }
 
 export default function CommandMenuDemo() {
   return (
     <CommandProvider openKey="">
-      <CommandMenuTrigger />
       <Commands />
-      <CommandMenu>
+      <CommandMenu trigger={<CommandMenuTrigger />}>
         <CommandInput />
         <CommandList />
       </CommandMenu>

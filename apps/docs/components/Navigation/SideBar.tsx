@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/legacy/image'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
 import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
 
@@ -8,8 +8,8 @@ import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
-  const { asPath } = useRouter()
-  const pathSegments = asPath.split('/')
+  const pathname = usePathname()
+  const pathSegments = pathname.split('/')
 
   const isInReferencePages = pathSegments.includes('reference') && pathSegments.length >= 3
   const referenceMeta = pathSegments.length >= 3 ? REFERENCES[pathSegments[2]] : undefined
@@ -18,11 +18,11 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     const foundItem = group.items.find((section) => {
       if (section.items.length > 0) {
         const foundSubItem = section.items.find((item) => {
-          if (item.url === asPath) return item
+          if (item.url === pathname) return item
         })
         if (foundSubItem) return section
       } else {
-        if (section.url === asPath) return section
+        if (section.url === pathname) return section
       }
     })
     if (foundItem) return group
@@ -35,7 +35,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
             return undefined
           } else {
             return section.items.find((item) => {
-              if (item.url === asPath) return item
+              if (item.url === pathname) return item
             })
           }
         })
@@ -43,7 +43,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="bg-background border-muted sidebar-width sticky top-16
+      className="bg-background border-muted sidebar-width sticky top-44
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container hidden lg:block"
     >
       {isInReferencePages && (
@@ -79,7 +79,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 className={[
                   'py-1.5 px-5 rounded text-sm transition',
                   `${
-                    item.url === asPath
+                    item.url === pathname
                       ? 'bg-background text-brand-link'
                       : 'text-foreground-light hover:text-foreground'
                   }`,
@@ -118,7 +118,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           className={[
                             'py-1.5 px-5 rounded text-sm transition',
                             `${
-                              section.url === asPath
+                              section.url === pathname
                                 ? 'bg-background text-brand'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
@@ -156,7 +156,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                   className={[
                                     'py-1.5 ml-4 px-5 rounded text-sm transition',
                                     `${
-                                      item.url === asPath
+                                      item.url === pathname
                                         ? 'bg-background text-brand'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,

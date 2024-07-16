@@ -3,9 +3,9 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import * as React from 'react'
 
-import { cn } from '../lib/utils/cn'
-import { Label_Shadcn_ } from '../..'
 import { Circle } from 'lucide-react'
+import { Label } from '../components/shadcn/ui/label'
+import { cn } from '../lib/utils/cn'
 
 const RadioGroupStacked = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -59,18 +59,18 @@ const RadioGroupStackedItem = React.forwardRef<
       <div className="flex gap-3 w-full px-[21px] py-3">
         {showIndicator && (
           <div
-            className="
-                aspect-square h-4 w-4 
-                rounded-full border group-data-[state=checked]:border-foreground-muted
-                group-focus:border-foreground-muted
-                group-hover:border-foreground-muted
-                ring-offset-background 
-                group-focus:outline-none 
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 
-                group-disabled:cursor-not-allowed group-disabled:opacity-50
-                flex items-center justify-center
-                transition
-          "
+            className={cn(
+              'aspect-square h-4 w-4 min-w-4 min-h-4',
+              'rounded-full border group-data-[state=checked]:border-foreground-muted',
+              'group-focus:border-foreground-muted',
+              'group-hover:border-foreground-muted',
+              'ring-offset-background',
+              'group-focus:outline-none',
+              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              'group-disabled:cursor-not-allowed group-disabled:opacity-50',
+              'flex items-center justify-center',
+              'transition'
+            )}
           >
             <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
               <Circle className="h-2.5 w-2.5 fill-current text-current" />
@@ -78,7 +78,7 @@ const RadioGroupStackedItem = React.forwardRef<
           </div>
         )}
         <div className="flex flex-col gap-0.25 items-start">
-          <Label_Shadcn_
+          <Label
             htmlFor={props.value}
             className={cn(
               'block',
@@ -90,7 +90,7 @@ const RadioGroupStackedItem = React.forwardRef<
             )}
           >
             {label}
-          </Label_Shadcn_>
+          </Label>
           {props.description && (
             <p className="text-sm text-foreground-lighter">{props.description}</p>
           )}

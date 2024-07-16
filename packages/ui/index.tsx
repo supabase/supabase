@@ -9,6 +9,7 @@ export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/Icon/IconBackground'
+export * from './src/components/Image'
 
 // DISPLAYS
 
@@ -55,6 +56,7 @@ export * from './src/components/Radio'
 export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
+export * from './src/components/ExpandingTextArea'
 
 // layout
 export * from './src/components/LoadingLine'
@@ -255,10 +257,6 @@ export * from './src/layout/banners'
 // config
 
 // export { default as Config } from './../ui.config'
-
-// ARCHIVE
-
-// export * from './src/components/Textarea'
 
 // AUTH
 

@@ -1,14 +1,21 @@
 'use client'
 
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
-import { type PropsWithChildren, forwardRef } from 'react'
+import { type PropsWithChildren, type ReactNode, forwardRef, memo, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
+import { useBreakpoint } from 'common'
+import useDragToClose from 'common/hooks/useDragToClose'
+import { Button, Command_Shadcn_, Dialog, DialogContent, DialogTrigger, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
-import { useCommandMenuSize, useCommandMenuOpen, useSetCommandMenuOpen } from './hooks/viewHooks'
+import {
+  useCommandMenuSize,
+  useCommandMenuOpen,
+  useSetCommandMenuOpen,
+  useSetupCommandMenuTouchEvents,
+} from './hooks/viewHooks'
 import { PageType } from './utils'
 
 function Breadcrumb({ className }: { className?: string }) {
@@ -82,9 +89,34 @@ function PageSwitch({ children }: PropsWithChildren) {
   return PageComponent ? <PageComponent /> : <CommandWrapper>{children}</CommandWrapper>
 }
 
-function CommandMenu({ children }: PropsWithChildren) {
+function useTouchGestures({ toggleOpen }: { toggleOpen: () => void }) {
+  const { ref, handleTouchStart, handleTouchMove, handleTouchEnd } = useDragToClose({
+    onClose: toggleOpen,
+  })
+
+  const setupTouchHandlers = useSetupCommandMenuTouchEvents()
+  const touchHandlers = useMemo(
+    () => ({ handleTouchStart, handleTouchMove, handleTouchEnd }),
+    [handleTouchStart, handleTouchMove, handleTouchEnd]
+  )
+  useEffect(() => {
+    setupTouchHandlers(touchHandlers)
+  }, [touchHandlers])
+
+  return { ref }
+}
+
+const CommandMenuTrigger = memo(DialogTrigger)
+
+interface CommandMenuProps extends PropsWithChildren {
+  trigger?: ReactNode
+}
+
+function CommandMenu({ children, trigger }: CommandMenuProps) {
   const open = useCommandMenuOpen()
   const setOpen = useSetCommandMenuOpen()
+
+  const isMobile = useBreakpoint()
 
   const size = useCommandMenuSize()
 
@@ -94,17 +126,36 @@ function CommandMenu({ children }: PropsWithChildren) {
   const query = useQuery()
   const setQuery = useSetQuery()
 
+  const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {trigger}
       <DialogContent
         hideClose
+        forceMount
+        ref={contentRef}
+        onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
         onInteractOutside={() => setOpen(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
           return query ? setQuery('') : page ? popPage() : setOpen(false)
         }}
         size={size}
-        className={cn('place-self-start mx-auto top-24')}
+        className={cn(
+          'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
+          'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
+          'place-self-end md:place-self-auto',
+          open && '!animate-in !slide-in-from-bottom !duration-300',
+          'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
+          'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
+          'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
+          'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
+          'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
+        )}
+        dialogOverlayProps={{
+          className: cn('overflow-hidden flex data-closed:delay-100'),
+        }}
       >
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>
@@ -114,4 +165,4 @@ function CommandMenu({ children }: PropsWithChildren) {
   )
 }
 
-export { Breadcrumb, CommandMenu, CommandWrapper }
+export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandWrapper }

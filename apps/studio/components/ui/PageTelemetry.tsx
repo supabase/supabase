@@ -3,7 +3,7 @@ import { useIsLoggedIn, useParams, useTelemetryProps, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { getAnonId } from 'lib/telemetry'

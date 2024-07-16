@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
@@ -88,7 +88,8 @@ export const Restriction = () => {
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
               . After that, the Fair Use Policy will apply. If you plan to maintain this level of
-              usage, upgrade your plan to avoid any restrictions.
+              usage, upgrade your plan to avoid any restrictions. If restrictions are applied,
+              requests to your projects will return a 402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
@@ -114,7 +115,8 @@ export const Restriction = () => {
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
               . Fair Use Policy applies now. Stay below your plan’s quota or upgrade your plan if
-              you expect to exceed it.
+              you expect to exceed it. If you exceed your quota, requests will respond with a 402
+              status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
@@ -136,7 +138,8 @@ export const Restriction = () => {
           <AlertDescription_Shadcn_>
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
-              serve requests. You have exceeded your plan’s quota and your grace period ended on{' '}
+              serve requests and will respond with a 402 status code. You have exceeded your plan’s
+              quota and your grace period ended on{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>

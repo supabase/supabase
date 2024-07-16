@@ -8,40 +8,28 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormsContainer,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import { Loading } from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions, useImmutableValue } from 'hooks'
-import {
-  Button,
-  Form,
-  IconArrowLeft,
-  IconEdit,
-  IconExternalLink,
-  IconLoader,
-  IconTrash,
-  Input,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useImmutableValue } from 'hooks/misc/useImmutableValue'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { Button, Form, IconEdit, IconLoader, IconTrash, Input } from 'ui'
 import InputField from './InputField'
+import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
   makeValidateRequired,
 } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'

@@ -4,6 +4,14 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+import { object, string } from 'yup'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -14,14 +22,6 @@ import {
   Input,
   Modal,
 } from 'ui'
-import { object, string } from 'yup'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormHeader } from 'components/ui/Forms'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
