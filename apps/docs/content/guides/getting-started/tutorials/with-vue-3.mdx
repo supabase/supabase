@@ -324,7 +324,7 @@ const uploadAvatar = async (evt) => {
   }
 }
 
-watch(path, () => {
+watchEffect(() => {
   if (path.value) downloadImage()
 })
 </script>
@@ -365,6 +365,9 @@ And then we can add the widget to the Account page in `src/components/Account.vu
 <script>
 // Import the new component
 import Avatar from './Avatar.vue'
+//...
+const avatar_url = ref('')
+//...
 </script>
 
 <template>

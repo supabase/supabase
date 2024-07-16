@@ -1,15 +1,27 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import saveAs from 'file-saver'
-import { Eye, MoreHorizontal, Table2, Unlock } from 'lucide-react'
+import {
+  Copy,
+  Download,
+  Edit,
+  Eye,
+  Lock,
+  MoreHorizontal,
+  Table2,
+  Trash,
+  Unlock,
+} from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import toast from 'react-hot-toast'
 
 import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Entity } from 'data/entity-types/entity-type-query'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -19,16 +31,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconCopy,
-  IconDownload,
-  IconEdit,
-  IconLock,
-  IconTrash,
   cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 
 export interface EntityListItemProps {
   id: number
@@ -280,7 +285,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 snap.onEditTable()
               }}
             >
-              <IconEdit size="tiny" />
+              <Edit size={12} />
               <span>Edit Table</span>
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -291,7 +296,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 snap.onDuplicateTable()
               }}
             >
-              <IconCopy size="tiny" />
+              <Copy size={12} />
               <span>Duplicate Table</span>
             </DropdownMenuItem>
             <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
@@ -299,7 +304,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 key="view-policies"
                 href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
               >
-                <IconLock size="tiny" />
+                <Lock size={12} />
                 <span>View Policies</span>
               </Link>
             </DropdownMenuItem>
@@ -311,7 +316,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 exportTableAsCSV()
               }}
             >
-              <IconDownload size="tiny" />
+              <Download size={12} />
               <span>Export as CSV</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -323,7 +328,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 snap.onDeleteTable()
               }}
             >
-              <IconTrash size="tiny" />
+              <Trash size={12} />
               <span>Delete Table</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

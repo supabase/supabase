@@ -1175,6 +1175,11 @@ module.exports = [
     source: '/blog/2022/08/03/supabase-beta-update-july-2022',
     destination: '/blog/supabase-beta-update-july-2022',
   },
+  {
+    permanent: true,
+    source: '/blog/supabase-aquires-oriole',
+    destination: '/blog/supabase-acquires-oriole',
+  },
 
   //  DOCS
   {

@@ -1,10 +1,11 @@
 import { useInView } from 'react-intersection-observer'
 import { FC, PropsWithChildren } from 'react'
 import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 import Image from 'next/legacy/image'
+import { cn } from 'ui'
 
 interface ISectionContainer {
   id: string
@@ -66,7 +67,7 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
       key={props.id + 'section'}
       className={[
         props.singleColumn ? 'prose w-full' : 'w-full',
-        'py-16 lg:py-32 first:pt-8 last:pb-8',
+        'py-16 first:pt-8 last:pb-8',
       ].join(' ')}
     >
       <StickyHeader {...props} />
@@ -120,11 +121,11 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           ref={ref}
           id={props.slug}
           data-ref-id={props.id}
-          className={[
-            'text-2xl font-medium text-foreground scroll-mt-24',
+          className={cn(
+            'text-2xl font-medium text-foreground scroll-mt-[calc(32px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
             !icon && 'mb-8',
-            props.monoFont && 'font-mono',
-          ].join(' ')}
+            props.monoFont && 'font-mono'
+          )}
         >
           {props.title && <span className="max-w-xl">{props.title}</span>}
         </h2>
@@ -148,7 +149,7 @@ const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
    */
   return (
     <div className="w-full min-w-full">
-      <div className="sticky top-24">{props.children}</div>
+      <div className="sticky top-32">{props.children}</div>
     </div>
   )
 }
@@ -169,7 +170,7 @@ const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
   return (
     <article
       key={props.id + 'education'}
-      className={'prose max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+      className={'prose max-w-none py-16 first:pb-8 first:pt-0 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}

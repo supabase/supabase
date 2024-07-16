@@ -269,7 +269,7 @@ Supabase will adhere to the RLS policy of the signed-in user, even if the client
 You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
-grant bypassrls on "table_name" to "role_name";
+alter role "role_name" with bypassrls;
 ```
 
 This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.

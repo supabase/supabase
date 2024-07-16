@@ -488,12 +488,12 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     // No need to subscribe to channel
 
     channel
-    .send({
-    type: 'broadcast',
-    event: 'test',
-    payload: { message: 'Hi' },
-    })
-    .then((resp) => console.log(resp))
+      .send({
+        type: 'broadcast',
+        event: 'test',
+        payload: { message: 'Hi' },
+      })
+      .then((resp) => console.log(resp))
 
     // Remember to clean up the channel
 

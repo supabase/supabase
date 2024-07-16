@@ -1,8 +1,12 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
+import { Check, Clipboard, Edit, MoreVertical, Trash } from 'lucide-react'
+import { useState } from 'react'
+
 import Table from 'components/to-be-cleaned/Table'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import dayjs from 'dayjs'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
-import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -10,11 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconCheck,
-  IconClipboard,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 export interface OAuthAppRowProps {
@@ -25,6 +27,9 @@ export interface OAuthAppRowProps {
 
 const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
   const [isCopied, setIsCopied] = useState(false)
+
+  const canUpdateOAuthApps = useCheckPermissions(PermissionAction.UPDATE, 'approved_oauth_apps')
+  const canDeleteOAuthApps = useCheckPermissions(PermissionAction.DELETE, 'approved_oauth_apps')
 
   return (
     <Table.tr>
@@ -48,9 +53,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
           </p>
           <Button
             type="default"
-            icon={
-              isCopied ? <IconCheck className="text-brand" strokeWidth={3} /> : <IconClipboard />
-            }
+            icon={isCopied ? <Check className="text-brand" strokeWidth={3} /> : <Clipboard />}
             className="ml-2 px-1"
             onClick={() => {
               copyToClipboard(app.client_id)
@@ -71,18 +74,50 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
       <Table.td align="right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<IconMoreVertical />} className="px-1" />
+            <Button type="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
-            <DropdownMenuItem className="space-x-2" key="edit" onClick={() => onSelectEdit()}>
-              <IconEdit />
-              <p>Edit app</p>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  key="edit"
+                  disabled={!canUpdateOAuthApps}
+                  className="space-x-2 !pointer-events-auto"
+                  onClick={() => {
+                    if (canUpdateOAuthApps) onSelectEdit()
+                  }}
+                >
+                  <Edit size={16} />
+                  <p>Edit app</p>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canUpdateOAuthApps && (
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to edit apps
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="space-x-2" key="delete" onClick={() => onSelectDelete()}>
-              <IconTrash />
-              <p>Delete app</p>
-            </DropdownMenuItem>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuItem
+                  disabled={!canDeleteOAuthApps}
+                  className="space-x-2 !pointer-events-auto"
+                  key="delete"
+                  onClick={() => {
+                    if (canDeleteOAuthApps) onSelectDelete()
+                  }}
+                >
+                  <Trash size={16} />
+                  <p>Delete app</p>
+                </DropdownMenuItem>
+              </TooltipTrigger_Shadcn_>
+              {!canDeleteOAuthApps && (
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to delete apps
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </Table.td>

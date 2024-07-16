@@ -31,6 +31,10 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
+  '/partners/flyio/extensions/eligibility': {
+    /** Checks database provisioning eligibility */
+    post: operations['FlyExtensionsController_checkEligibility']
+  }
   '/partners/flyio/organizations/{organization_id}': {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
@@ -365,6 +369,30 @@ export interface paths {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
   }
+  '/platform/organizations/{slug}/oauth/apps': {
+    /** List published or authorized oauth apps */
+    get: operations['OAuthAppsController_listOAuthApps']
+    /** Create an oauth app */
+    post: operations['OAuthAppsController_createOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}': {
+    /** Update an oauth app */
+    put: operations['OAuthAppsController_updateOAuthApp']
+    /** Remove a published oauth app */
+    delete: operations['OAuthAppsController_removeOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/apps/{id}/revoke': {
+    /** Revoke an authorized oauth app */
+    post: operations['OAuthAppsController_revokeAuthorizedOAuthApp']
+  }
+  '/platform/organizations/{slug}/oauth/authorizations/{id}': {
+    /** [Beta] Get oauth app authorization request */
+    get: operations['AuthorizationsController_getAuthorizationRequest']
+    /** [Beta] Approve oauth app authorization request */
+    post: operations['AuthorizationsController_approveAuthorizationRequest']
+    /** [Beta] Decline oauth app authorization request */
+    delete: operations['AuthorizationsController_declineAuthorizationRequest']
+  }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
     get: operations['getPaymentMethodsV2']
@@ -637,47 +665,47 @@ export interface paths {
   }
   '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
-    get: operations['AccessTokenController_listAccessTokens']
+    get: operations['v1-list-all-warehouse-tokens']
     /** Create a warehouse access token */
-    post: operations['AccessTokenController_createAccessToken']
+    post: operations['v1-create-a-warehouse-token']
   }
   '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
     /** Delete a warehouse access token */
-    delete: operations['AccessTokenController_deleteAccessToken']
+    delete: operations['v1-delete-a-warehouse-token']
   }
   '/platform/projects/{ref}/analytics/warehouse/collections': {
     /** Lists project's warehouse collections from logflare */
-    get: operations['CollectionController_listCollections']
+    get: operations['v1-list-all-warehouse-collections']
     /** Create a warehouse collection */
-    post: operations['CollectionController_createCollection']
+    post: operations['v1-create-a-warehouse-collection']
   }
   '/platform/projects/{ref}/analytics/warehouse/collections/{token}': {
     /** Get a warehouse collection */
-    get: operations['CollectionController_getCollection']
+    get: operations['v1-get-a-warehouse-collection']
     /** Delete a warehouse collection */
-    delete: operations['CollectionController_deleteCollection']
+    delete: operations['v1-delete-a-warehouse-collection']
     /** Update a warehouse collection */
-    patch: operations['CollectionController_updateCollection']
+    patch: operations['v1-update-a-warehouse-collection']
   }
   '/platform/projects/{ref}/analytics/warehouse/endpoints': {
     /** Lists project's warehouse endpoints from logflare */
-    get: operations['EndpointController_listEndpoints']
+    get: operations['v1-list-all-warehouse-endpoints']
     /** Create a warehouse endpoint */
-    post: operations['EndpointController_createEndpoint']
+    post: operations['v1-create-a-warehouse-endpoint']
   }
   '/platform/projects/{ref}/analytics/warehouse/endpoints/{token}': {
     /** Update a warehouse endpoint */
-    put: operations['EndpointController_updateEndpoint']
+    put: operations['v1-update-a-warehouse-endpoint']
     /** Delete a warehouse endpoint */
-    delete: operations['EndpointController_deleteEndpoint']
+    delete: operations['v1-delete-a-warehouse-endpoint']
   }
   '/platform/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
-    get: operations['WarehouseQueryController_runQuery']
+    get: operations['v1-list-all-warehouse-queries']
   }
   '/platform/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
-    get: operations['TenantController_getTenant']
+    get: operations['v1-provision-a-warehouse-tenant']
   }
   '/platform/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
@@ -820,8 +848,8 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/platform/projects/{ref}/restore': {
-    /** Restores project */
-    post: operations['RestoreController_restoreProject']
+    /** Cancels a failed restoration */
+    post: operations['RestoreController_cancelProjectRestoration']
   }
   '/platform/projects/{ref}/run-lints': {
     /** Run project lints */
@@ -1018,6 +1046,10 @@ export interface paths {
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
     post: operations['VercelWebhooksController_processEvent']
+  }
+  '/system/orb/webhooks': {
+    /** Processes Orb events */
+    post: operations['OrbWebhooksController_processEvent']
   }
   '/system/organizations/{slug}/billing/partner/usage-and-costs': {
     /** Gets the partner usage and costs */
@@ -1460,47 +1492,47 @@ export interface paths {
   }
   '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
-    get: operations['AccessTokenController_listAccessTokens']
+    get: operations['v1-list-all-warehouse-tokens']
     /** Create a warehouse access token */
-    post: operations['AccessTokenController_createAccessToken']
+    post: operations['v1-create-a-warehouse-token']
   }
   '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
     /** Delete a warehouse access token */
-    delete: operations['AccessTokenController_deleteAccessToken']
+    delete: operations['v1-delete-a-warehouse-token']
   }
   '/v0/projects/{ref}/analytics/warehouse/collections': {
     /** Lists project's warehouse collections from logflare */
-    get: operations['CollectionController_listCollections']
+    get: operations['v1-list-all-warehouse-collections']
     /** Create a warehouse collection */
-    post: operations['CollectionController_createCollection']
+    post: operations['v1-create-a-warehouse-collection']
   }
   '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
     /** Get a warehouse collection */
-    get: operations['CollectionController_getCollection']
+    get: operations['v1-get-a-warehouse-collection']
     /** Delete a warehouse collection */
-    delete: operations['CollectionController_deleteCollection']
+    delete: operations['v1-delete-a-warehouse-collection']
     /** Update a warehouse collection */
-    patch: operations['CollectionController_updateCollection']
+    patch: operations['v1-update-a-warehouse-collection']
   }
   '/v0/projects/{ref}/analytics/warehouse/endpoints': {
     /** Lists project's warehouse endpoints from logflare */
-    get: operations['EndpointController_listEndpoints']
+    get: operations['v1-list-all-warehouse-endpoints']
     /** Create a warehouse endpoint */
-    post: operations['EndpointController_createEndpoint']
+    post: operations['v1-create-a-warehouse-endpoint']
   }
   '/v0/projects/{ref}/analytics/warehouse/endpoints/{token}': {
     /** Update a warehouse endpoint */
-    put: operations['EndpointController_updateEndpoint']
+    put: operations['v1-update-a-warehouse-endpoint']
     /** Delete a warehouse endpoint */
-    delete: operations['EndpointController_deleteEndpoint']
+    delete: operations['v1-delete-a-warehouse-endpoint']
   }
   '/v0/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
-    get: operations['WarehouseQueryController_runQuery']
+    get: operations['v1-list-all-warehouse-queries']
   }
   '/v0/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
-    get: operations['TenantController_getTenant']
+    get: operations['v1-provision-a-warehouse-tenant']
   }
   '/v0/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
@@ -1625,8 +1657,8 @@ export interface paths {
     post: operations['RestartServicesController_restartServices']
   }
   '/v0/projects/{ref}/restore': {
-    /** Restores project */
-    post: operations['RestoreController_restoreProject']
+    /** Cancels a failed restoration */
+    post: operations['RestoreController_cancelProjectRestoration']
   }
   '/v0/projects/{ref}/settings': {
     /** Gets project's settings */
@@ -1772,7 +1804,7 @@ export interface paths {
   }
   '/v1/projects/{ref}': {
     /** Deletes the given project */
-    delete: operations['v1-Delete a project']
+    delete: operations['v1-delete-a-project']
   }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
@@ -1814,6 +1846,18 @@ export interface paths {
     put: operations['v1-update-a-sso-provider']
     /** Removes a SSO provider by its UUID */
     delete: operations['v1-delete-a-sso-provider']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** [Alpha] Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** [Alpha] Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** [Alpha] Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** [Alpha] Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
   }
   '/v1/projects/{ref}/config/database/pgbouncer': {
     /** Get project's pgbouncer config */
@@ -2081,6 +2125,9 @@ export interface components {
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
     }
+    ApproveAuthorizationResponse: {
+      url: string
+    }
     AssignMemberRoleBodyV2: {
       role_id: number
       role_scoped_projects?: string[]
@@ -2219,6 +2266,7 @@ export interface components {
       rate_limit_verify: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_enabled: boolean | null
+      saml_external_url: string | null
       security_captcha_enabled: boolean | null
       security_captcha_provider: string | null
       security_captcha_secret: string | null
@@ -2265,6 +2313,9 @@ export interface components {
       description: string
       name: string
       version: string
+    }
+    AuthorizationsApproveBody: {
+      organization_id: string
     }
     AutoApiService: {
       app: {
@@ -2403,6 +2454,12 @@ export interface components {
     BulkDeleteUserContentResponse: {
       id: string
     }
+    CfResponse: {
+      errors: Record<string, never>[]
+      messages: Record<string, never>[]
+      result: components['schemas']['CustomHostnameDetails']
+      success: boolean
+    }
     Column: {
       id: number
       name: string
@@ -2527,6 +2584,41 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
+    CreateOAuthAppBody: {
+      icon?: string
+      name: string
+      redirect_uris: string[]
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
+    }
+    CreateOAuthAppResponse: {
+      client_id: string
+      client_secret: string
+      id: string
+    }
     CreateOrganizationBody: {
       kind?: string
       name: string
@@ -2555,6 +2647,7 @@ export interface components {
       cloud_provider: string
       custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
       data_api_exposed_schemas?: string[]
+      data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
       db_region: string
@@ -2562,7 +2655,6 @@ export interface components {
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
       org_id: number
-      vercel_configuration_id?: string
     }
     CreateProjectResponse: {
       anon_key: string
@@ -2671,6 +2763,11 @@ export interface components {
       type: string
       value: string
     }
+    CreateThirdPartyAuthBody: {
+      custom_jwks?: Record<string, never>
+      jwks_url?: string
+      oidc_issuer_url?: string
+    }
     CreateTriggerBody: {
       /** @enum {string} */
       activation: 'AFTER' | 'BEFORE'
@@ -2740,6 +2837,23 @@ export interface components {
       billing_via_partner: boolean
       email: string
     }
+    CustomHostnameDetails: {
+      custom_origin_server: string
+      hostname: string
+      id: string
+      ownership_verification: {
+        name?: string
+        type?: string
+        value?: string
+      }
+      ssl: {
+        status?: string
+        validation_errors?: components['schemas']['ValidationError'][]
+        validation_records?: components['schemas']['ValidationRecord'][]
+      }
+      status: string
+      verification_errors?: string[]
+    }
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
@@ -2798,7 +2912,9 @@ export interface components {
         | '6_volume_detachchment_from_original_instance_failed'
         | '7_volume_attachment_to_upgraded_instance_failed'
         | '8_upgrade_completion_failed'
+        | '9_post_physical_backup_failed'
       initiated_at: string
+      latest_status_at: string
       /** @enum {string} */
       progress?:
         | '0_requested'
@@ -2811,6 +2927,7 @@ export interface components {
         | '7_detached_volume_from_original_instance'
         | '8_attached_volume_to_upgraded_instance'
         | '9_completed_upgrade'
+        | '10_completed_post_physical_backup'
       /** @enum {number} */
       status: 0 | 1 | 2
       target_version: number
@@ -2831,6 +2948,19 @@ export interface components {
       | '8xlarge'
       | '12xlarge'
       | '16xlarge'
+    DeclineAuthorizationResponse: {
+      id: string
+    }
+    DeleteOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     DeleteObjectsBody: {
       paths: string[]
     }
@@ -2925,11 +3055,8 @@ export interface components {
       organization_plan?: components['schemas']['SelfServePlanId']
       /** @description The three-letter, primary Fly.io region where the target app intends to write from */
       primary_region: string
-      /**
-       * @description An array of Fly.io region codes where read replicas should be provisioned
-       * @default []
-       */
-      read_regions: string[]
+      /** @description An array of Fly.io region codes where read replicas should be provisioned */
+      read_regions?: string[]
       /** @description A UNIX epoch timestamp value */
       timestamp: number
       /** @description The full request target URL */
@@ -2980,6 +3107,39 @@ export interface components {
       updated_at: number
       verify_jwt?: boolean
       version: number
+    }
+    GetAuthorizationResponse: {
+      approved_at?: string
+      approved_organization_slug?: string
+      domain: string
+      expires_at: string
+      icon?: string
+      name: string
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -3069,6 +3229,7 @@ export interface components {
     GetUserContentByIdResponse: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -3276,6 +3437,7 @@ export interface components {
       RATE_LIMIT_VERIFY: number
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
       SAML_ENABLED: boolean
+      SAML_EXTERNAL_URL: string
       SECURITY_CAPTCHA_ENABLED: boolean
       SECURITY_CAPTCHA_PROVIDER: string
       SECURITY_CAPTCHA_SECRET: string
@@ -3381,6 +3543,7 @@ export interface components {
       expired_token: boolean
       invite_id?: number
       organization_name: string
+      sso_mismatch: boolean
       token_does_not_exist: boolean
     }
     InvitationResponse: {
@@ -3594,6 +3757,41 @@ export interface components {
       has_warning: boolean
       unread_count: number
     }
+    OAuthAppResponse: {
+      authorized_at?: string
+      client_id?: string
+      client_secret_alias?: string
+      created_at?: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris?: string[]
+      scopes?: (
+        | 'analytics:read'
+        | 'analytics:write'
+        | 'auth:read'
+        | 'auth:write'
+        | 'database:read'
+        | 'database:write'
+        | 'domains:read'
+        | 'domains:write'
+        | 'edge_functions:read'
+        | 'edge_functions:write'
+        | 'environment:read'
+        | 'environment:write'
+        | 'organizations:read'
+        | 'organizations:write'
+        | 'projects:read'
+        | 'projects:write'
+        | 'rest:read'
+        | 'rest:write'
+        | 'secrets:read'
+        | 'secrets:write'
+        | 'storage:read'
+        | 'storage:write'
+      )[]
+      website: string
+    }
     OAuthTokenBody: {
       client_id: string
       client_secret: string
@@ -3660,7 +3858,7 @@ export interface components {
       name: string
     }
     OrganizationRole: {
-      description: string
+      description: string | null
       id: number
       name: string
     }
@@ -3670,10 +3868,10 @@ export interface components {
     }
     OrganizationRoleV2: {
       base_role_id: number
-      description: string
+      description: string | null
       id: number
       name: string
-      project_ids: number[]
+      project_ids: number[] | null
     }
     OrganizationSlugResponse: {
       billing_email?: string
@@ -3783,6 +3981,7 @@ export interface components {
     Permission: {
       actions: (
         | 'analytics:Read'
+        | 'analytics:Write'
         | 'auth:Execute'
         | 'billing:Read'
         | 'billing:Write'
@@ -4348,6 +4547,16 @@ export interface components {
     PublicUrlResponse: {
       publicUrl: string
     }
+    PutOAuthAppResponse: {
+      client_id: string
+      client_secret_alias: string
+      created_at: string
+      icon?: string
+      id: string
+      name: string
+      redirect_uris: string[]
+      website: string
+    }
     ReadOnlyStatusResponse: {
       enabled: boolean
       override_active_until: string
@@ -4451,6 +4660,21 @@ export interface components {
        */
       DATABASE_URL: string
     }
+    ResourceProvisioningEligibilityBody: {
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description Unique ID representing an organization */
+      organization_id: string
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description The full request target URL */
+      url: string
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string
+    }
+    ResourceProvisioningEligibilityResponse: {
+      free_db_eligible: boolean
+    }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
       config: components['schemas']['ResourceProvisioningConfigResponse']
@@ -4532,6 +4756,7 @@ export interface components {
     RestartServicesBody: {
       restartRequest: components['schemas']['RestartServiceRequest']
     }
+    RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
       id: number
     }
@@ -4552,6 +4777,7 @@ export interface components {
       grace_period_end?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
+      usage_stats?: components['schemas']['UsageStats']
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -4563,6 +4789,13 @@ export interface components {
         | 'exceed_storage_size_quota'
         | 'overdue_payment'
       )[]
+    }
+    RevokeAuthorizedOAuthAppResponse: {
+      authorized_at?: string
+      icon?: string
+      id: string
+      name: string
+      website: string
     }
     RevokeColumnPrivilegesBody: {
       column_id: string
@@ -5033,6 +5266,17 @@ export interface components {
       referrer: string
       title: string
     }
+    ThirdPartyAuth: {
+      custom_jwks?: unknown
+      id: string
+      inserted_at: string
+      jwks_url?: string | null
+      oidc_issuer_url?: string | null
+      resolved_at?: string | null
+      resolved_jwks?: unknown
+      type: string
+      updated_at: string
+    }
     TransferOrganizationBody: {
       member_gotrue_id: string
       member_id: number
@@ -5180,6 +5424,7 @@ export interface components {
       rate_limit_verify?: number
       refresh_token_rotation_enabled?: boolean
       saml_enabled?: boolean
+      saml_external_url?: string
       security_captcha_enabled?: boolean
       security_captcha_provider?: string
       security_captcha_secret?: string
@@ -5263,7 +5508,7 @@ export interface components {
     }
     UpdateCustomHostnameResponse: {
       custom_hostname: string
-      data: Record<string, never>
+      data: components['schemas']['CfResponse']
       /** @enum {string} */
       status:
         | '1_not_started'
@@ -5414,6 +5659,7 @@ export interface components {
       RATE_LIMIT_VERIFY?: number
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       SAML_ENABLED?: boolean
+      SAML_EXTERNAL_URL?: string
       SECURITY_CAPTCHA_ENABLED?: boolean
       SECURITY_CAPTCHA_PROVIDER?: string
       SECURITY_CAPTCHA_SECRET?: string
@@ -5676,7 +5922,7 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -5689,11 +5935,19 @@ export interface components {
       id?: string
       name: string
       owner_id?: number
-      project_id: number
+      project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    UsageStats: {
+      report_date: string
+      total_auth_billing_period_mau_billing_period?: number
+      total_db_size_gb_billing_period?: number
+      total_realtime_message_count_billing_period?: number
+      total_storage_size_gb_billing_period?: number
+      total_unified_egress_gb_billing_period?: number
     }
     UserBody: {
       aud?: string
@@ -5756,6 +6010,7 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -5772,6 +6027,7 @@ export interface components {
     UserContentObjectV2: {
       content: Record<string, never>
       description?: string
+      favorite: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -5969,6 +6225,13 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
+    ValidationError: {
+      message: string
+    }
+    ValidationRecord: {
+      txt_name: string
+      txt_value: string
+    }
     VanitySubdomainBody: {
       vanity_subdomain: string
     }
@@ -6064,6 +6327,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Checks database provisioning eligibility */
+  FlyExtensionsController_checkEligibility: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResourceProvisioningEligibilityBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ResourceProvisioningEligibilityResponse']
+        }
       }
     }
   }
@@ -7241,6 +7519,9 @@ export interface operations {
           'application/json': components['schemas']['AuditLogsResponse']
         }
       }
+      403: {
+        content: never
+      }
       /** @description Failed to get an organization's audit logs */
       500: {
         content: never
@@ -7459,7 +7740,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to update subscription change */
+      /** @description Failed to delete upcoming subscription schedule */
       500: {
         content: never
       }
@@ -7973,6 +8254,164 @@ export interface operations {
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
         content: never
+      }
+    }
+  }
+  /** List published or authorized oauth apps */
+  OAuthAppsController_listOAuthApps: {
+    parameters: {
+      query: {
+        type: 'published' | 'authorized'
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OAuthAppResponse'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Create an oauth app */
+  OAuthAppsController_createOAuthApp: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Update an oauth app */
+  OAuthAppsController_updateOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOAuthAppBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PutOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Remove a published oauth app */
+  OAuthAppsController_removeOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DeleteOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Revoke an authorized oauth app */
+  OAuthAppsController_revokeAuthorizedOAuthApp: {
+    parameters: {
+      path: {
+        slug: string
+        id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['RevokeAuthorizedOAuthAppResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Beta] Get oauth app authorization request */
+  AuthorizationsController_getAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetAuthorizationResponse']
+        }
+      }
+    }
+  }
+  /** [Beta] Approve oauth app authorization request */
+  AuthorizationsController_approveAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AuthorizationsApproveBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ApproveAuthorizationResponse']
+        }
+      }
+    }
+  }
+  /** [Beta] Decline oauth app authorization request */
+  AuthorizationsController_declineAuthorizationRequest: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DeclineAuthorizationResponse']
+        }
       }
     }
   }
@@ -10298,7 +10737,7 @@ export interface operations {
     }
   }
   /** Lists project's warehouse access tokens from logflare */
-  AccessTokenController_listAccessTokens: {
+  'v1-list-all-warehouse-tokens': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10321,7 +10760,7 @@ export interface operations {
     }
   }
   /** Create a warehouse access token */
-  AccessTokenController_createAccessToken: {
+  'v1-create-a-warehouse-token': {
     responses: {
       201: {
         content: {
@@ -10338,7 +10777,7 @@ export interface operations {
     }
   }
   /** Delete a warehouse access token */
-  AccessTokenController_deleteAccessToken: {
+  'v1-delete-a-warehouse-token': {
     responses: {
       200: {
         content: never
@@ -10353,7 +10792,7 @@ export interface operations {
     }
   }
   /** Lists project's warehouse collections from logflare */
-  CollectionController_listCollections: {
+  'v1-list-all-warehouse-collections': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10376,7 +10815,7 @@ export interface operations {
     }
   }
   /** Create a warehouse collection */
-  CollectionController_createCollection: {
+  'v1-create-a-warehouse-collection': {
     responses: {
       201: {
         content: {
@@ -10393,7 +10832,7 @@ export interface operations {
     }
   }
   /** Get a warehouse collection */
-  CollectionController_getCollection: {
+  'v1-get-a-warehouse-collection': {
     responses: {
       200: {
         content: {
@@ -10410,7 +10849,7 @@ export interface operations {
     }
   }
   /** Delete a warehouse collection */
-  CollectionController_deleteCollection: {
+  'v1-delete-a-warehouse-collection': {
     responses: {
       200: {
         content: {
@@ -10427,7 +10866,7 @@ export interface operations {
     }
   }
   /** Update a warehouse collection */
-  CollectionController_updateCollection: {
+  'v1-update-a-warehouse-collection': {
     responses: {
       200: {
         content: {
@@ -10444,7 +10883,7 @@ export interface operations {
     }
   }
   /** Lists project's warehouse endpoints from logflare */
-  EndpointController_listEndpoints: {
+  'v1-list-all-warehouse-endpoints': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10467,7 +10906,7 @@ export interface operations {
     }
   }
   /** Create a warehouse endpoint */
-  EndpointController_createEndpoint: {
+  'v1-create-a-warehouse-endpoint': {
     responses: {
       201: {
         content: {
@@ -10484,7 +10923,7 @@ export interface operations {
     }
   }
   /** Update a warehouse endpoint */
-  EndpointController_updateEndpoint: {
+  'v1-update-a-warehouse-endpoint': {
     responses: {
       200: {
         content: {
@@ -10501,7 +10940,7 @@ export interface operations {
     }
   }
   /** Delete a warehouse endpoint */
-  EndpointController_deleteEndpoint: {
+  'v1-delete-a-warehouse-endpoint': {
     responses: {
       200: {
         content: never
@@ -10516,7 +10955,7 @@ export interface operations {
     }
   }
   /** Lists project's warehouse queries from logflare */
-  WarehouseQueryController_runQuery: {
+  'v1-list-all-warehouse-queries': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10530,14 +10969,14 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to fetch warehouse endpoints */
+      /** @description Failed to fetch warehouse queries */
       500: {
         content: never
       }
     }
   }
   /** Gets project's warehouse tenant from logflare */
-  TenantController_getTenant: {
+  'v1-provision-a-warehouse-tenant': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -10997,6 +11436,12 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContentV2: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentBodyV2']
@@ -11487,8 +11932,8 @@ export interface operations {
       }
     }
   }
-  /** Restores project */
-  RestoreController_restoreProject: {
+  /** Cancels a failed restoration */
+  RestoreController_cancelProjectRestoration: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -11498,10 +11943,10 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['RestoreProjectInfo']
+          'application/json': components['schemas']['RestoreCancellation']
         }
       }
-      /** @description Failed to restore project */
+      /** @description Failed to cancel project restoration */
       500: {
         content: never
       }
@@ -12588,6 +13033,23 @@ export interface operations {
       }
     }
   }
+  /** Processes Orb events */
+  OrbWebhooksController_processEvent: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['Buffer']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to process Orb event */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the partner usage and costs */
   PartnerBillingSystemController_getPartnerUsageAndCosts: {
     parameters: {
@@ -13397,7 +13859,7 @@ export interface operations {
     }
   }
   /** Deletes the given project */
-  'v1-Delete a project': {
+  'v1-delete-a-project': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -13681,6 +14143,89 @@ export interface operations {
       }
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
       404: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** [Alpha] Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
         content: never
       }
     }

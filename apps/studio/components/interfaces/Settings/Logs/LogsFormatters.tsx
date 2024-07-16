@@ -8,7 +8,7 @@ import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
 import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>

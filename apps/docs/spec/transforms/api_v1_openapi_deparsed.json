@@ -2,19 +2,55 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Supabase API (v1)",
-    "description": "",
+    "description": "Supabase API generated from the OpenAPI specification.<br>Visit [https://supabase.com/docs](https://supabase.com/docs) for a complete documentation.",
     "version": "1.0.0",
     "contact": {}
   },
   "servers": [],
   "tags": [
     {
-      "name": "organizations",
-      "description": "Organization endpoints"
+      "name": "Auth",
+      "description": "Auth related endpoints"
     },
     {
-      "name": "projects",
-      "description": "Project endpoints"
+      "name": "Database",
+      "description": "Database related endpoints"
+    },
+    {
+      "name": "Domains",
+      "description": "Domains related endpoints"
+    },
+    {
+      "name": "Edge Functions",
+      "description": "Edge related endpoints"
+    },
+    {
+      "name": "Environments",
+      "description": "Environments related endpoints"
+    },
+    {
+      "name": "OAuth",
+      "description": "OAuth related endpoints"
+    },
+    {
+      "name": "Organizations",
+      "description": "Organizations related endpoints"
+    },
+    {
+      "name": "Projects",
+      "description": "Projects related endpoints"
+    },
+    {
+      "name": "Rest",
+      "description": "Rest related endpoints"
+    },
+    {
+      "name": "Secrets",
+      "description": "Secrets related endpoints"
+    },
+    {
+      "name": "Storage",
+      "description": "Storage related endpoints"
     }
   ],
   "paths": {
@@ -99,7 +135,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -223,7 +259,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -270,7 +306,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -319,7 +355,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -418,7 +454,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -598,7 +634,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -644,7 +680,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -702,7 +738,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -797,7 +833,7 @@
           }
         },
         "tags": [
-          "oauth"
+          "OAuth"
         ],
         "security": [
           {
@@ -891,7 +927,7 @@
           }
         },
         "tags": [
-          "oauth"
+          "OAuth"
         ],
         "security": [
           {
@@ -1031,7 +1067,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -1178,7 +1214,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -1235,7 +1271,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -1342,7 +1378,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1468,7 +1504,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1502,7 +1538,7 @@
           }
         },
         "tags": [
-          "environments"
+          "Environments"
         ],
         "security": [
           {
@@ -1570,7 +1606,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1606,7 +1642,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1692,7 +1728,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1760,7 +1796,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1828,7 +1864,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -1884,7 +1920,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -1943,7 +1979,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2043,7 +2079,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2167,7 +2203,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2220,7 +2256,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2289,7 +2325,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2359,7 +2395,7 @@
           }
         },
         "tags": [
-          "rest"
+          "Rest"
         ],
         "security": [
           {
@@ -2452,7 +2488,7 @@
           }
         },
         "tags": [
-          "rest"
+          "Rest"
         ],
         "security": [
           {
@@ -2463,7 +2499,7 @@
     },
     "/v1/projects/{ref}": {
       "delete": {
-        "operationId": "v1-Delete a project",
+        "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
         "parameters": [
           {
@@ -2510,7 +2546,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -2571,7 +2607,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2638,7 +2674,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2695,7 +2731,7 @@
           }
         },
         "tags": [
-          "secrets"
+          "Secrets"
         ],
         "security": [
           {
@@ -2760,7 +2796,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2849,7 +2885,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2912,7 +2948,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -2973,7 +3009,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3009,7 +3045,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3080,7 +3116,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3151,7 +3187,7 @@
           }
         },
         "tags": [
-          "domains"
+          "Domains"
         ],
         "security": [
           {
@@ -3222,7 +3258,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3327,7 +3363,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3383,7 +3419,8 @@
                                 "5_data_upgrade_completion_failed",
                                 "6_volume_detachchment_from_original_instance_failed",
                                 "7_volume_attachment_to_upgraded_instance_failed",
-                                "8_upgrade_completion_failed"
+                                "8_upgrade_completion_failed",
+                                "9_post_physical_backup_failed"
                               ]
                             },
                             "progress": {
@@ -3398,7 +3435,8 @@
                                 "6_completed_data_upgrade",
                                 "7_detached_volume_from_original_instance",
                                 "8_attached_volume_to_upgraded_instance",
-                                "9_completed_upgrade"
+                                "9_completed_upgrade",
+                                "10_completed_post_physical_backup"
                               ]
                             },
                             "status": {
@@ -3434,7 +3472,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3492,7 +3530,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3527,7 +3565,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3599,7 +3637,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3652,7 +3690,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -3800,7 +3838,7 @@
           }
         },
         "tags": [
-          "projects"
+          "Projects"
         ],
         "security": [
           {
@@ -3903,7 +3941,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4075,7 +4113,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4139,7 +4177,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ]
       }
     },
@@ -4237,7 +4275,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4324,7 +4362,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -4543,6 +4581,18 @@
                       "nullable": true
                     },
                     "external_linkedin_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
                       "type": "string",
                       "nullable": true
                     },
@@ -4805,12 +4855,20 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "saml_enabled": {
                       "type": "boolean",
+                      "nullable": true
+                    },
+                    "saml_external_url": {
+                      "type": "string",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -5025,6 +5083,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -5090,8 +5151,10 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -5146,7 +5209,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -5274,6 +5337,10 @@
                   "saml_enabled": {
                     "type": "boolean"
                   },
+                  "saml_external_url": {
+                    "type": "string",
+                    "pattern": "/^[^,]+$/"
+                  },
                   "security_captcha_enabled": {
                     "type": "boolean"
                   },
@@ -5319,6 +5386,11 @@
                     "maximum": 2147483647
                   },
                   "rate_limit_token_refresh": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_otp": {
                     "type": "number",
                     "minimum": 1,
                     "maximum": 2147483647
@@ -5611,6 +5683,15 @@
                   "external_linkedin_oidc_secret": {
                     "type": "string"
                   },
+                  "external_slack_oidc_enabled": {
+                    "type": "boolean"
+                  },
+                  "external_slack_oidc_client_id": {
+                    "type": "string"
+                  },
+                  "external_slack_oidc_secret": {
+                    "type": "string"
+                  },
                   "external_notion_enabled": {
                     "type": "boolean"
                   },
@@ -5884,6 +5965,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_oidc_client_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "external_slack_oidc_secret": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "external_notion_client_id": {
                       "type": "string",
                       "nullable": true
@@ -6143,12 +6236,20 @@
                       "type": "number",
                       "nullable": true
                     },
+                    "rate_limit_otp": {
+                      "type": "number",
+                      "nullable": true
+                    },
                     "refresh_token_rotation_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "saml_enabled": {
                       "type": "boolean",
+                      "nullable": true
+                    },
+                    "saml_external_url": {
+                      "type": "string",
                       "nullable": true
                     },
                     "security_captcha_enabled": {
@@ -6363,6 +6464,9 @@
                     "external_linkedin_oidc_client_id",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
+                    "external_slack_oidc_client_id",
+                    "external_slack_oidc_enabled",
+                    "external_slack_oidc_secret",
                     "external_notion_client_id",
                     "external_notion_enabled",
                     "external_notion_secret",
@@ -6428,8 +6532,10 @@
                     "rate_limit_sms_sent",
                     "rate_limit_token_refresh",
                     "rate_limit_verify",
+                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
+                    "saml_external_url",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -6484,7 +6590,371 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth": {
+      "post": {
+        "operationId": "createTPAForProject",
+        "summary": "[Alpha] Creates a new third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oidc_issuer_url": {
+                    "type": "string"
+                  },
+                  "jwks_url": {
+                    "type": "string"
+                  },
+                  "custom_jwks": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listTPAForProject",
+        "summary": "[Alpha] Lists all third-party auth integrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "oidc_issuer_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "jwks_url": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "custom_jwks": {
+                        "type": "object",
+                        "nullable": true
+                      },
+                      "resolved_jwks": {
+                        "type": "object",
+                        "nullable": true
+                      },
+                      "inserted_at": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
+                      },
+                      "resolved_at": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "inserted_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
+      "delete": {
+        "operationId": "deleteTPAForProject",
+        "summary": "[Alpha] Removes a third-party auth integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tpa_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getTPAForProject",
+        "summary": "[Alpha] Get a third-party integration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tpa_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "oidc_issuer_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jwks_url": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "custom_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "resolved_jwks": {
+                      "type": "object",
+                      "nullable": true
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    },
+                    "resolved_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "inserted_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
         ],
         "security": [
           {
@@ -6547,7 +7017,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -6585,7 +7055,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -6784,7 +7254,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -6880,7 +7350,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -6985,7 +7455,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7174,7 +7644,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7221,7 +7691,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7270,7 +7740,7 @@
           }
         },
         "tags": [
-          "edge functions"
+          "Edge Functions"
         ],
         "security": [
           {
@@ -7346,7 +7816,7 @@
           }
         },
         "tags": [
-          "storage"
+          "Storage"
         ],
         "security": [
           {
@@ -7571,7 +8041,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -7727,7 +8197,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -7882,7 +8352,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -8103,7 +8573,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -8256,7 +8726,7 @@
           }
         },
         "tags": [
-          "auth"
+          "Auth"
         ],
         "security": [
           {
@@ -8356,7 +8826,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -8406,7 +8876,7 @@
           }
         },
         "tags": [
-          "database"
+          "Database"
         ],
         "security": [
           {
@@ -8468,7 +8938,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -8535,7 +9005,7 @@
           }
         },
         "tags": [
-          "organizations"
+          "Organizations"
         ],
         "security": [
           {
@@ -9889,7 +10359,8 @@
               "5_data_upgrade_completion_failed",
               "6_volume_detachchment_from_original_instance_failed",
               "7_volume_attachment_to_upgraded_instance_failed",
-              "8_upgrade_completion_failed"
+              "8_upgrade_completion_failed",
+              "9_post_physical_backup_failed"
             ]
           },
           "progress": {
@@ -9904,7 +10375,8 @@
               "6_completed_data_upgrade",
               "7_detached_volume_from_original_instance",
               "8_attached_volume_to_upgraded_instance",
-              "9_completed_upgrade"
+              "9_completed_upgrade",
+              "10_completed_post_physical_backup"
             ]
           },
           "status": {
@@ -9947,7 +10419,8 @@
                       "5_data_upgrade_completion_failed",
                       "6_volume_detachchment_from_original_instance_failed",
                       "7_volume_attachment_to_upgraded_instance_failed",
-                      "8_upgrade_completion_failed"
+                      "8_upgrade_completion_failed",
+                      "9_post_physical_backup_failed"
                     ]
                   },
                   "progress": {
@@ -9962,7 +10435,8 @@
                       "6_completed_data_upgrade",
                       "7_detached_volume_from_original_instance",
                       "8_attached_volume_to_upgraded_instance",
-                      "9_completed_upgrade"
+                      "9_completed_upgrade",
+                      "10_completed_post_physical_backup"
                     ]
                   },
                   "status": {
@@ -10607,6 +11081,18 @@
             "type": "string",
             "nullable": true
           },
+          "external_slack_oidc_client_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "external_slack_oidc_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "external_slack_oidc_secret": {
+            "type": "string",
+            "nullable": true
+          },
           "external_notion_client_id": {
             "type": "string",
             "nullable": true
@@ -10866,12 +11352,20 @@
             "type": "number",
             "nullable": true
           },
+          "rate_limit_otp": {
+            "type": "number",
+            "nullable": true
+          },
           "refresh_token_rotation_enabled": {
             "type": "boolean",
             "nullable": true
           },
           "saml_enabled": {
             "type": "boolean",
+            "nullable": true
+          },
+          "saml_external_url": {
+            "type": "string",
             "nullable": true
           },
           "security_captcha_enabled": {
@@ -11086,6 +11580,9 @@
           "external_linkedin_oidc_client_id",
           "external_linkedin_oidc_enabled",
           "external_linkedin_oidc_secret",
+          "external_slack_oidc_client_id",
+          "external_slack_oidc_enabled",
+          "external_slack_oidc_secret",
           "external_notion_client_id",
           "external_notion_enabled",
           "external_notion_secret",
@@ -11151,8 +11648,10 @@
           "rate_limit_sms_sent",
           "rate_limit_token_refresh",
           "rate_limit_verify",
+          "rate_limit_otp",
           "refresh_token_rotation_enabled",
           "saml_enabled",
+          "saml_external_url",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -11296,6 +11795,10 @@
           "saml_enabled": {
             "type": "boolean"
           },
+          "saml_external_url": {
+            "type": "string",
+            "pattern": "/^[^,]+$/"
+          },
           "security_captcha_enabled": {
             "type": "boolean"
           },
@@ -11341,6 +11844,11 @@
             "maximum": 2147483647
           },
           "rate_limit_token_refresh": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_otp": {
             "type": "number",
             "minimum": 1,
             "maximum": 2147483647
@@ -11633,6 +12141,15 @@
           "external_linkedin_oidc_secret": {
             "type": "string"
           },
+          "external_slack_oidc_enabled": {
+            "type": "boolean"
+          },
+          "external_slack_oidc_client_id": {
+            "type": "string"
+          },
+          "external_slack_oidc_secret": {
+            "type": "string"
+          },
           "external_notion_enabled": {
             "type": "boolean"
           },
@@ -11706,6 +12223,63 @@
             "type": "number"
           }
         }
+      },
+      "CreateThirdPartyAuthBody": {
+        "type": "object",
+        "properties": {
+          "oidc_issuer_url": {
+            "type": "string"
+          },
+          "jwks_url": {
+            "type": "string"
+          },
+          "custom_jwks": {
+            "type": "object"
+          }
+        }
+      },
+      "ThirdPartyAuth": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "oidc_issuer_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "jwks_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "custom_jwks": {
+            "type": "object",
+            "nullable": true
+          },
+          "resolved_jwks": {
+            "type": "object",
+            "nullable": true
+          },
+          "inserted_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "resolved_at": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "inserted_at",
+          "updated_at"
+        ]
       },
       "V1RunQueryBody": {
         "type": "object",
