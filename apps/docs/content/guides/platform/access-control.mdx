@@ -8,7 +8,7 @@ Supabase provides granular access controls to manage permissions across your org
 For each organization and project, a member can have one of the following roles:
 
 - **Owner**: full access to everything in organization and project resources.
-- **Administrator**: full access to everything in organization and project resources except updating organization settings, transferring projects outside of the organization, and adding new owners.
+- **Administrator**: full access to everything in organization and project resources **except** updating organization settings, transferring projects outside of the organization, and adding new owners.
 - **Developer**: read-only access to organization resources and content access to project resources but cannot change any project settings.
 - **Read-Only**: read-only access to organization and project resources.
 
@@ -37,6 +37,18 @@ This is a security measure to prevent accidental invites to accounts not managed
 Each Supabase organization must have at least one owner. If your organization has other owners then you can relinquish ownership and leave the organization by clicking **Leave team** in your organization's team [settings](/dashboard/org/_/team).
 
 Otherwise, you'll need to invite a user as **Owner**, and they need to accept the invitation, or promote an existing organization member to **Owner** before you can leave the organization.
+
+
+### Organization Roles vs Project Roles
+
+Each member in the organization can be assigned a role at either the organisation level, or for one or more specific projects. If the member has a role on the organization, the member will have the equivalent permissions for that role across all projects under the organization. However, if you might want to only allow access to specific projects for a member, you may assign roles for the member on the projects that you want to permit access to.
+
+<Admonition type="note">
+
+Project level roles are only available on the [Enterprise plan](https://supabase.com/pricing)
+
+</Admonition>
+
 
 ### Organization permissions across roles
 
