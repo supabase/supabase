@@ -80,8 +80,8 @@ const WrapperRow = ({
                 wrapper.server_options.map((option: any) => option.split('='))
               )
               const [encryptedMetadata, visibleMetadata] = partition(
-                wrapperMeta.server.options,
-                'hidden'
+                wrapperMeta.server.options.filter((option) => !option.hidden),
+                'secureEntry'
               )
 
               return (

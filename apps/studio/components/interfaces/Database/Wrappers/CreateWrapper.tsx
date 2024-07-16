@@ -225,14 +225,16 @@ const CreateWrapper = () => {
                   header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
                 >
                   <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options.map((option) => (
-                      <InputField
-                        key={option.name}
-                        option={option}
-                        loading={false}
-                        error={formErrors[option.name]}
-                      />
-                    ))}
+                    {wrapperMeta.server.options
+                      .filter((option) => !option.hidden)
+                      .map((option) => (
+                        <InputField
+                          key={option.name}
+                          option={option}
+                          loading={false}
+                          error={formErrors[option.name]}
+                        />
+                      ))}
                   </FormSectionContent>
                 </FormSection>
                 <FormSection
