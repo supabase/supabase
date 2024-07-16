@@ -1,4 +1,3 @@
-import { groupBy } from 'lodash'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -6,9 +5,9 @@ import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import WrapperRow from './WrapperRow'
 import { WRAPPERS } from './Wrappers.constants'
+import { wrapperMetaComparator } from './Wrappers.utils'
 import WrappersDisabledState from './WrappersDisabledState'
 import WrappersDropdown from './WrappersDropdown'
-import { convertKVStringArrayToJson } from './Wrappers.utils'
 
 const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
   const { project } = useProjectContext()
@@ -39,17 +38,7 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
           ) : (
             <>
               {WRAPPERS.map((wrapper, i) => {
-                const createdWrappers = wrappers.filter((w) => {
-                  if (wrapper.handlerName === 'wasm_fdw_handler') {
-                    const serverOptions = convertKVStringArrayToJson(w.server_options)
-                    return (
-                      wrapper.server.options.find((option) => option.name === 'fdw_package_name')
-                        ?.defaultValue === serverOptions['fdw_package_name']
-                    )
-                  }
-
-                  return wrapper.handlerName === w.handler
-                })
+                const createdWrappers = wrappers.filter((w) => wrapperMetaComparator(wrapper, w))
 
                 if (createdWrappers.length > 0) {
                   return (

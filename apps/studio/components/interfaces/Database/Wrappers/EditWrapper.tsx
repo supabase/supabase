@@ -24,10 +24,10 @@ import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { Button, Form, IconEdit, IconLoader, IconTrash, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
-import { WRAPPERS } from './Wrappers.constants'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
+  getWrapperMetaForWrapper,
   makeValidateRequired,
 } from './Wrappers.utils'
 
@@ -52,7 +52,7 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-  const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
+  const wrapperMeta = getWrapperMetaForWrapper(wrapper)
 
   const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
