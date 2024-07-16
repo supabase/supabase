@@ -234,7 +234,8 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' && (
+              {/* projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' */}
+              {true && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -306,7 +307,7 @@ export const InviteMemberButton = () => {
                           value={field.value}
                           onValueChange={(value) => form.setValue('projectRef', value)}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
+                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize text-left truncate max-w-[470px]">
                             {(projects ?? []).find((project) => project.ref === field.value)
                               ?.name ?? 'Unknown'}
                           </SelectTrigger_Shadcn_>
