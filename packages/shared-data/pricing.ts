@@ -388,9 +388,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '10 included',
-          pro: ['100 included', 'then $10 per additional 100'],
-          team: ['100 included', 'then $10 per additional 100'],
-          enterprise: 'Custom',
+          pro: '500 included',
+          team: '1000 included',
+          enterprise: 'Unlimited',
         },
         usage_based: true,
       },
