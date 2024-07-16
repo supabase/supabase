@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
+import SupabaseSection from 'components/interfaces/Settings/Integrations/SupabaseIntegration/SupabaseSection'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
@@ -191,6 +192,8 @@ The GitHub app will watch for changes in your repository such as file changes, b
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
+      <ScaffoldDivider />
+      <SupabaseSection />
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>
