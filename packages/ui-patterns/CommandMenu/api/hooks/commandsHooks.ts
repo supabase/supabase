@@ -1,3 +1,5 @@
+'use client'
+
 import { isEqual } from 'lodash'
 import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
