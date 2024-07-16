@@ -276,7 +276,7 @@ const EmptyIntegrationConnection = React.forwardRef<
     onClick: () => void
     disabled?: boolean
   }
->(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
+>(({ className, showNode = true, onClick, disabled, orgSlug, ...props }, ref) => {
   return (
     <div
       ref={ref}
