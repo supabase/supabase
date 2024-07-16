@@ -2,6 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
@@ -66,10 +68,13 @@ export const SQLEditorTreeViewItem = ({
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
+  const [isFetching, setIsFetching] = useState(false)
+
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
 
   const isEditing = status === 'editing'
+  const isSaving = status === 'saving'
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -80,10 +85,17 @@ export const SQLEditorTreeViewItem = ({
   const onOpenFolder = async (id: string) => {
     if (!ref) return console.error('Project ref is required')
 
-    const { contents } = await getSQLSnippetFolders({ projectRef: ref, folderId: id })
-    contents?.forEach((snippet) => {
-      snapV2.addSnippet({ projectRef: ref, snippet })
-    })
+    try {
+      setIsFetching(true)
+      const { contents } = await getSQLSnippetFolders({ projectRef: ref, folderId: id })
+      contents?.forEach((snippet) => {
+        snapV2.addSnippet({ projectRef: ref, snippet })
+      })
+    } catch (error: any) {
+      toast.error(`Failed to retrieve folder contents: ${error.message}`)
+    } finally {
+      setIsFetching(false)
+    }
   }
 
   return (
@@ -99,6 +111,7 @@ export const SQLEditorTreeViewItem = ({
             isBranch={isBranch}
             isSelected={isSelected || id === element.id}
             isEditing={isEditing}
+            isLoading={isFetching || isSaving}
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}

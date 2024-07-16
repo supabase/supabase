@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, FolderClosed, FolderOpen } from 'lucide-react'
+import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
 import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
@@ -31,15 +31,18 @@ const TreeViewItem = forwardRef<
     isEditing?: boolean
     /** Callback for when the item is edited */
     onEditSubmit?: (value: string) => void
+    /** For asynchronous loading */
+    isLoading?: boolean
   }
 >(
   (
     {
       level = 1,
+      levelPadding = 56,
       isExpanded = false,
       isBranch = false,
-      levelPadding = 56,
       isSelected = false,
+      isLoading = false,
       xPadding = 16,
       name = '',
       icon,
@@ -122,16 +125,20 @@ const TreeViewItem = forwardRef<
         {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (
           <>
-            <ChevronRight
-              className={cn(
-                'text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light',
-                'transition-transform duration-200',
-                'group-aria-expanded:rotate-90'
-              )}
-              size={14}
-            />
+            {isLoading ? (
+              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+            ) : (
+              <ChevronRight
+                className={cn(
+                  'text-foreground-muted',
+                  'group-aria-selected:text-foreground-light',
+                  'group-aria-expanded:text-foreground-light',
+                  'transition-transform duration-200',
+                  'group-aria-expanded:rotate-90'
+                )}
+                size={14}
+              />
+            )}
             <TreeViewFolderIcon
               className={cn(
                 'transition-colors',
