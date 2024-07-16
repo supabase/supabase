@@ -14,6 +14,7 @@ export const WRAPPER_HANDLERS = {
   MSSQL: 'mssql_fdw_handler',
   REDIS: 'redis_fdw_handler',
   PADDLE: 'wasm_fdw_handler',
+  SNOWFLAKE: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -1226,7 +1227,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'paddleFdw',
     label: 'Paddle',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/paddle',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
@@ -1305,6 +1306,108 @@ export const WRAPPERS: WrapperMeta[] = [
               { label: 'Notification Settings', value: 'notification-settings' },
               { label: 'notifications', value: 'notifications' },
             ],
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'snowflake_wrapper',
+    handlerName: WRAPPER_HANDLERS.SNOWFLAKE,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+    extensionName: 'snowflakeFdw',
+    label: 'Snowflake',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/snowflake',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_snowflake_fdw_v0.1.0/snowflake_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:snowflake-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '2fb46fd8afa63f3975dadf772338106b609b131861849356e0c09dde032d1af8',
+          hidden: true,
+        },
+        {
+          name: 'account_identifier',
+          label: 'Account Identifier',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'user',
+          label: 'User',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'public_key_fingerprint',
+          label: 'Public Key Fingerprint',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'private_key_id',
+          label: 'Private Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Snowflake Table',
+        description: 'Map to an Snowflake Table',
+        options: [
+          {
+            name: 'table',
+            label: 'Table',
+            editable: true,
+            required: true,
+            type: 'text',
           },
           {
             name: 'rowid_column',

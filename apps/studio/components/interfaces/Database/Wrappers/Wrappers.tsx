@@ -8,6 +8,7 @@ import WrapperRow from './WrapperRow'
 import { WRAPPERS } from './Wrappers.constants'
 import WrappersDisabledState from './WrappersDisabledState'
 import WrappersDropdown from './WrappersDropdown'
+import { convertKVStringArrayToJson } from './Wrappers.utils'
 
 const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
   const { project } = useProjectContext()
@@ -20,7 +21,6 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
   const [selectedWrapperToDelete, setSelectedWrapperToDelete] = useState<FDW>()
 
   const wrappers = data?.result ?? []
-  const groupedWrappers = groupBy(wrappers, 'handler')
 
   return (
     <>
@@ -40,7 +40,18 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
             <>
               {/* [Joshen] This probably needs to change anyways so dont get too stuck with this */}
               {WRAPPERS.map((wrapper, i) => {
-                const createdWrappers = groupedWrappers[wrapper.handlerName] ?? []
+                const createdWrappers = wrappers.filter((w) => {
+                  if (wrapper.handlerName === 'wasm_fdw_handler') {
+                    const serverOptions = convertKVStringArrayToJson(w.server_options)
+                    return (
+                      wrapper.server.options.find((option) => option.name === 'fdw_package_name')
+                        ?.defaultValue === serverOptions['fdw_package_name']
+                    )
+                  }
+
+                  return wrapper.handlerName === w.handler
+                })
+
                 if (createdWrappers.length > 0) {
                   return (
                     <WrapperRow
