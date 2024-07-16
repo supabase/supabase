@@ -1242,6 +1242,11 @@ module.exports = [
     source: '/docs/reference/cli/supabase-db-remote-commit',
     destination: '/docs/reference/supabase-db-pull',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-gen-types-typescript',
+    destination: '/docs/reference/supabase-gen-types',
+  },
 
   {
     permanent: true,
