@@ -31,6 +31,7 @@ import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-li
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { toast as UiToast } from 'ui'
 
@@ -586,7 +587,11 @@ class StorageExplorerStore {
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file, index) => {
-      const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
+      const extension = file.name.split('.').pop()
+      const metadata = {
+        mimetype: (file.type || lookupMime(extension)) ?? '',
+        size: file.size,
+      } as StorageItemMetadata
       const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
