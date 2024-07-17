@@ -3,7 +3,7 @@ import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
-import { toast as UiToast } from 'ui'
+import * as tus from 'tus-js-client'
 
 import {
   STORAGE_ROW_STATUS,
@@ -31,7 +31,9 @@ import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-li
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -75,6 +77,9 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
+  private resumableUploadUrl: string = ''
+  private serviceKey: string = ''
+
   /* Supabase client, will get initialized immediately after constructing the instance */
   supabaseClient: SupabaseClient<any, 'public', any> = null as any as SupabaseClient<
     any,
@@ -86,7 +91,7 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgress: number = 0
+  private uploadProgresses: number[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
@@ -107,6 +112,8 @@ class StorageExplorerStore {
     protocol: string = PROJECT_ENDPOINT_PROTOCOL
   ) {
     this.projectRef = projectRef
+    this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
+    this.serviceKey = serviceKey
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
@@ -474,6 +481,20 @@ class StorageExplorerStore {
     }
   }
 
+  onUploadProgress(toastId?: string) {
+    const totalFiles = this.uploadProgresses.length
+    const progress = this.uploadProgresses.reduce((acc, progress) => acc + progress, 0) / totalFiles
+
+    return toast.loading(
+      <ToastLoader
+        progress={progress * 100}
+        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />,
+      { id: toastId }
+    )
+  }
+
   uploadFiles = async (
     files: FileList | DataTransferItemList,
     columnIndex: number,
@@ -525,6 +546,23 @@ class StorageExplorerStore {
       if (numberOfFilesRejected === filesToUpload.length) return
     }
 
+    const filesWithNonZeroSize = filesWithinUploadLimit.filter((file) => file.size > 0)
+    if (filesWithNonZeroSize.length < filesWithinUploadLimit.length) {
+      const numberOfFilesRejected = filesWithinUploadLimit.length - filesWithNonZeroSize.length
+      toast.error(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
+            {numberOfFilesRejected > 1 ? 'their' : 'its'} size
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
+          </p>
+        </div>,
+        { duration: 8000 }
+      )
+
+      if (numberOfFilesRejected === filesWithinUploadLimit.length) return
+    }
+
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
     const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
@@ -551,7 +589,7 @@ class StorageExplorerStore {
         return file
       })
 
-    this.uploadProgress = 0
+    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill(0)
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
@@ -562,20 +600,16 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const toastId = toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Uploading ${formattedFilesToUpload.length} file${
-          formattedFilesToUpload.length > 1 ? 's' : ''
-        }...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />
-    )
+    const toastId = this.onUploadProgress()
 
     // Upload files in batches
-    const promises = formattedFilesToUpload.map((file) => {
-      const fileOptions = { cacheControl: '3600' }
-      const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
+    const promises = formattedFilesToUpload.map((file, index) => {
+      const extension = file.name.split('.').pop()
+      const metadata = {
+        mimetype: (file.type || lookupMime(extension)) ?? '',
+        size: file.size,
+      } as StorageItemMetadata
+      const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
@@ -586,14 +620,10 @@ class StorageExplorerStore {
       /**
        * Storage maintains a list of allowed characters, which excludes
        * characters such as the narrow no-break space used in Mac screenshots.
-       * To preempt errors, replace all non-word characters with underscores.
-       * [Joshen] Except backslashes as this will indicate a folder path, and paranthesis
-       * since our UI appends them to make duplicate names unique
-       */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(
-        /[^\w.-\/()]/g,
-        '_'
-      )
+       * [Joshen] Am limiting to just replacing nbsp with a blank space instead of
+       * all non-word characters per before
+       * */
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(/\xA0/g, ' ')
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
@@ -620,21 +650,46 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return new Promise<void>(async (resolve) => {
-          const { error } = await this.supabaseClient.storage
-            .from(this.selectedBucket.name)
-            .upload(formattedPathToFile, file, fileOptions)
+        return new Promise<void>(async (resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: this.resumableUploadUrl,
+            retryDelays: [0, 3000, 5000, 10000, 20000],
+            headers: {
+              authorization: `Bearer ${this.serviceKey}`,
+            },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: this.selectedBucket.name,
+              objectName: formattedPathToFile,
+              ...fileOptions,
+            },
+            chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
+            onError(error) {
+              numberOfFilesUploadedFail += 1
+              toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              reject(error)
+            },
+            onProgress: (bytesUploaded, bytesTotal) => {
+              const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
+              this.uploadProgresses[index] = percentage
+              this.onUploadProgress(toastId)
+            },
+            onSuccess() {
+              numberOfFilesUploadedSuccess += 1
+              resolve()
+            },
+          })
 
-          this.uploadProgress = this.uploadProgress + 1 / formattedFilesToUpload.length
+          // Check if there are any previous uploads to continue.
+          return upload.findPreviousUploads().then(function (previousUploads) {
+            // Found previous uploads so we select the first one.
+            if (previousUploads.length) {
+              upload.resumeFromPreviousUpload(previousUploads[0])
+            }
 
-          if (error) {
-            numberOfFilesUploadedFail += 1
-            toast.error(`Failed to upload ${file.name}: ${error.message}`)
-            resolve()
-          } else {
-            numberOfFilesUploadedSuccess += 1
-            resolve()
-          }
+            upload.start()
+          })
         })
       }
     })
@@ -648,16 +703,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader
-            progress={this.uploadProgress * 100}
-            message={`Uploading ${formattedFilesToUpload.length} file${
-              formattedFilesToUpload.length > 1 ? 's' : ''
-            }...`}
-            description={STORAGE_PROGRESS_INFO_TEXT}
-          />,
-          { id: toastId }
-        )
+        this.onUploadProgress(toastId)
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
