@@ -1,14 +1,10 @@
-import ReadAndWritesChart from '@/src/components/charts/read-and-writes-chart'
-import ProjectList from './projects/project-list'
-import ProjectsCharts from './projects/projects-charts'
-import ProjectsHeader from './projects/projects-header'
 import QueriesChart from '@/src/components/charts/queries-chart'
-import IOPSChart from '@/src/components/charts/iops-chart'
-import StorageChart from '@/src/components/charts/storage-chart'
-import CPUAndMemoryChart from '@/src/components/charts/cpu-and-memory-chart'
-import { Button, Separator } from 'ui'
+import ReadAndWritesChart from '@/src/components/charts/read-and-writes-chart'
 import { Clock, MoreVertical } from 'lucide-react'
 import Image from 'next/image'
+import { Button, Separator } from 'ui'
+import ProjectList from './project-list'
+import ProjectsHeader from './projects-header'
 
 export default function ProjectsPage() {
   return (

@@ -63,7 +63,7 @@ export default function OrgMenu() {
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => router.push(`/${selectedOrg?.key}`)}>
+            <DropdownMenuItem onSelect={() => router.push(`/${selectedOrg?.key}/projects`)}>
               All Projects
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -83,7 +83,7 @@ export default function OrgMenu() {
                     <DropdownMenuItem
                       key={org.key}
                       onSelect={() => {
-                        router.push(`/${org.key}`)
+                        router.push(`/${org.key}/projects`)
                         setConfig({
                           ...config,
                           selectedOrg: db.orgs.find((o: Org) => o.key === org.key),

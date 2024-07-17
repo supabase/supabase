@@ -10,7 +10,10 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
   const [config] = useConfig()
   const { selectedOrg, selectedProject } = config
   const pathname = usePathname()
-  const isActive = pathname.startsWith(`/${org}/${selectedProject?.key}${product.href}`)
+
+  const isActive =
+    pathname.startsWith(`/${org}/${selectedProject?.key}${product.href}`) ||
+    pathname.startsWith(`/${org}${product.href}`)
 
   // console.log('config.tableEditor.activeTabId', config.tableEditor.activeTabId)
 

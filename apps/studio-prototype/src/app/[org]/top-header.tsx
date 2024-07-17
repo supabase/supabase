@@ -48,7 +48,7 @@ export default function TopHeader() {
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex gap-3">
-          <Link href={`/${selectedOrg?.key}`}>
+          <Link href={`/${selectedOrg?.key}/projects`}>
             <svg
               width="109"
               height="113"
