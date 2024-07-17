@@ -16,15 +16,13 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconEdit,
-  IconTrash,
   Input,
 } from 'ui'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
@@ -258,7 +256,7 @@ const CreateWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconEdit />}
+                                  icon={<Edit />}
                                   onClick={() => {
                                     setIsEditingTable(true)
                                     setSelectedTableToEdit({ ...table, tableIndex: i })
@@ -267,7 +265,7 @@ const CreateWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconTrash />}
+                                  icon={<Trash />}
                                   onClick={() => {
                                     setNewTables((prev) => prev.filter((_, j) => j !== i))
                                   }}
@@ -299,16 +297,19 @@ const CreateWrapper = () => {
             <AlertTitle_Shadcn_>
               Your extension version is outdated for this wrapper.
             </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              The wrapper type {type} requires a minimum extension version of{' '}
-              {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-              {wrappersExtension?.installed_version} installed.
-              <br />
-              Please {databaseNeedsUpgrading && 'upgrade your database then '}update the extension
-              by disabling and enabling the wrappers extension to create this wrapper.
-              <br />
-              Warning: Before reinstalling the wrapper extension, you must first remove all existing
-              wrappers. Afterward, you can recreate the wrappers.
+            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+              <p>
+                The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+                {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+                {wrappersExtension?.installed_version} installed. Please{' '}
+                {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
+                disabling and enabling the <code className="text-xs">wrappers</code> extension to
+                create this wrapper.
+              </p>
+              <p className="text-warning">
+                Warning: Before reinstalling the wrapper extension, you must first remove all
+                existing wrappers. Afterward, you can recreate the wrappers.
+              </p>
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
               <Button asChild type="default">
@@ -319,7 +320,7 @@ const CreateWrapper = () => {
                       : `/project/${ref}/database/extensions?filter=wrappers`
                   }
                 >
-                  {databaseNeedsUpgrading ? 'Upgrade Database' : 'View Wrappers Extension'}
+                  {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
                 </Link>
               </Button>
             </AlertDescription_Shadcn_>
