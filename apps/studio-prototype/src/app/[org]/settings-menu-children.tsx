@@ -33,9 +33,9 @@ const SettingsMenuChildren = () => {
   const getBasePath = (section: string): string => {
     switch (section) {
       case 'PROJECT_SETTINGS':
-        return `/${selectedOrg?.key}/settings/project/${selectedProject?.key}`
+        return `/${selectedOrg?.key}/${selectedProject?.key}/settings/project`
       case 'ENV_SETTINGS':
-        return `/${selectedOrg?.key}/settings/project/${selectedProject?.key}`
+        return `/${selectedOrg?.key}/${selectedProject?.key}/settings/project`
       case 'ORGANIZATION_SETTINGS':
         return `/${selectedOrg?.key}/settings`
       case 'ACCOUNT_SETTINGS':
@@ -65,7 +65,7 @@ const SettingsMenuChildren = () => {
           basePath={getBasePath('PROJECT_SETTINGS')}
           hasBranchingEnabled={hasBranchingEnabled}
         />
-        <SettingsGroup
+        {/* <SettingsGroup
           key={'organization-settings'}
           group="Organization settings"
           items={settingsData.ORGANIZATION_SETTINGS.items}
@@ -76,7 +76,7 @@ const SettingsMenuChildren = () => {
           group="Account settings"
           items={settingsData.ACCOUNT_SETTINGS.items}
           basePath={getBasePath('ACCOUNT_SETTINGS')}
-        />
+        /> */}
       </nav>
       <ScrollBar />
     </ScrollArea>

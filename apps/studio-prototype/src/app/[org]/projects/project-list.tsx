@@ -3,6 +3,7 @@
 import SparkChart from '@/src/components/charts/spark-chart'
 import { useConfig } from '@/src/hooks/use-config'
 import { Grid, List, MoreVertical, Search } from 'lucide-react'
+import Link from 'next/link'
 import { Badge, Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -38,7 +39,8 @@ export default function ProjectList() {
       <ul role="list" className="-space-y-px mt-3 divide-y">
         {selectedOrg?.projects.map((project) => {
           return (
-            <div
+            <Link
+              href={`/${selectedOrg?.key}/${project?.key}/table-editor/1`}
               key={project.key}
               className="bg-surface-100/50 border px-5 first-of-type:rounded-t-md last-of-type:rounded-b-md h-16 flex items-center gap-10"
             >
@@ -76,7 +78,7 @@ export default function ProjectList() {
               <div className="grow"></div>
 
               <MoreVertical size={14} className="text-foreground-muted" strokeWidth={1} />
-            </div>
+            </Link>
           )
         })}
       </ul>

@@ -11,14 +11,16 @@ export default function OrgLayout({
 }>) {
   return (
     <div className="w-screen h-screen flex">
-      <SideNav />
-      <EntranceTransition>
+      {/* <SideNav /> */}
+      {/* <EntranceTransition>
         <SettingsMenuPanel />
-        <div className="flex flex-col grow">
-          {/* <TopHeader /> */}
-          <ProjectContentTransition>{children}</ProjectContentTransition>
-        </div>
-      </EntranceTransition>
+        <div className="flex flex-col grow"> */}
+      {/* <TopHeader /> */}
+      {/* <ProjectContentTransition> */}
+      {children}
+      {/* </ProjectContentTransition> */}
+      {/* </div> */}
+      {/* </EntranceTransition> */}
       <RedirectCatcher />
     </div>
   )
