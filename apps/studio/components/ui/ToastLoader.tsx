@@ -8,9 +8,15 @@ interface ToastLoaderProps {
   progress: number
   message: string
   description?: string
+  labelTopOverride?: string
 }
 
-export const ToastLoader = ({ progress, message, description }: ToastLoaderProps) => {
+export const ToastLoader = ({
+  progress,
+  message,
+  description,
+  labelTopOverride,
+}: ToastLoaderProps) => {
   return (
     <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
       <SparkBar
@@ -19,8 +25,8 @@ export const ToastLoader = ({ progress, message, description }: ToastLoaderProps
         type="horizontal"
         barClass="bg-brand"
         labelBottom={message}
-        labelTop={`${progress.toFixed(2)}%`}
-        labelTopClass="tabular-nums"
+        labelTop={labelTopOverride || `${progress.toFixed(2)}%`}
+        labelTopClass="font-mono"
       />
       {description !== undefined && <p className="text-xs text-foreground-light">{description}</p>}
     </div>

@@ -37,6 +37,14 @@ import { toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
+type UploadProgress = {
+  percentage: number
+  elapsed: number
+  uploadSpeed: number
+  remainingBytes: number
+  remainingTime: number
+}
+
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
  * If we can switch to this method, we can remove the implementation below, and we don't need compose() within the react components
@@ -91,7 +99,7 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgresses: {percentage: number, elapsed: number, uploadSpeed: number, remainingBytes: number, remainingTime: number}[] = []
+  private uploadProgresses: UploadProgress[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
@@ -483,14 +491,16 @@ class StorageExplorerStore {
 
   onUploadProgress(toastId?: string) {
     const totalFiles = this.uploadProgresses.length
-    const progress = this.uploadProgresses.reduce((acc, {percentage}) => acc + percentage, 0) / totalFiles
+    const progress =
+      this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles
     const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast.loading(
       <ToastLoader
         progress={progress * 100}
-        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}... ${'\n'} Remaining time: ${this.formatTime(remainingTime)}`}
+        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
         description={STORAGE_PROGRESS_INFO_TEXT}
+        labelTopOverride={`${progress.toFixed(2)}% (${this.formatTime(remainingTime)} remaining)`}
       />,
       { id: toastId }
     )
@@ -591,7 +601,11 @@ class StorageExplorerStore {
       })
 
     this.uploadProgresses = new Array(formattedFilesToUpload.length).fill({
-      percentage: 0, elapsed: 0, uploadSpeed: 0, remainingBytes: 0, remainingTime: 0
+      percentage: 0,
+      elapsed: 0,
+      uploadSpeed: 0,
+      remainingBytes: 0,
+      remainingTime: 0,
     })
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
@@ -655,7 +669,7 @@ class StorageExplorerStore {
       return () => {
         return new Promise<void>(async (resolve, reject) => {
           const fileSizeInMB = file.size / (1024 * 1024)
-          const startTime = Date.now();
+          const startTime = Date.now()
 
           let chunkSize: number
 
@@ -699,12 +713,18 @@ class StorageExplorerStore {
             },
             onProgress: (bytesUploaded, bytesTotal) => {
               const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
-              const elapsed = (Date.now() - startTime) / 1000; // in seconds
-              const uploadSpeed = bytesUploaded / elapsed; // in bytes per second
-              const remainingBytes = bytesTotal - bytesUploaded;
-              const remainingTime = remainingBytes / uploadSpeed; // in seconds
+              const elapsed = (Date.now() - startTime) / 1000 // in seconds
+              const uploadSpeed = bytesUploaded / elapsed // in bytes per second
+              const remainingBytes = bytesTotal - bytesUploaded
+              const remainingTime = remainingBytes / uploadSpeed // in seconds
 
-              this.uploadProgresses[index] = { percentage, elapsed, uploadSpeed, remainingBytes, remainingTime }
+              this.uploadProgresses[index] = {
+                percentage,
+                elapsed,
+                uploadSpeed,
+                remainingBytes,
+                remainingTime,
+              }
               this.onUploadProgress(toastId)
             },
             onSuccess() {
@@ -1813,36 +1833,33 @@ class StorageExplorerStore {
     }
   }
 
-  private calculateTotalRemainingTime(progresses: this['uploadProgresses']) {
-    let totalRemainingTime = 0;
-    let totalRemainingBytes = 0;
+  private calculateTotalRemainingTime(progresses: UploadProgress[]) {
+    let totalRemainingTime = 0
+    let totalRemainingBytes = 0
 
-    progresses.forEach(progress => {
+    progresses.forEach((progress) => {
       if (progress) {
-        totalRemainingBytes += progress.remainingBytes;
-        const weight = progress.remainingBytes / totalRemainingBytes;
-        totalRemainingTime += weight * progress.remainingTime;
+        totalRemainingBytes += progress.remainingBytes
+        const weight = progress.remainingBytes / totalRemainingBytes
+        totalRemainingTime += weight * progress.remainingTime
       }
-    });
+    })
 
-    return totalRemainingTime;
+    return totalRemainingTime
   }
 
   private formatTime(seconds: number) {
-    const days = Math.floor(seconds / (24 * 3600));
-    seconds %= 24 * 3600;
-    const hours = Math.floor(seconds / 3600);
-    seconds %= 3600;
-    const minutes = Math.floor(seconds / 60);
-    seconds = Math.floor(seconds % 60);
+    const days = Math.floor(seconds / (24 * 3600))
+    seconds %= 24 * 3600
+    const hours = Math.floor(seconds / 3600)
+    seconds %= 3600
+    const minutes = Math.floor(seconds / 60)
+    seconds = Math.floor(seconds % 60)
 
-    let timeString = '';
-    if (days > 0) timeString += `${days}d `;
-    if (hours > 0) timeString += `${hours}h `;
-    if (minutes > 0) timeString += `${minutes}m `;
-    timeString += `${seconds}s`;
-
-    return timeString;
+    if (days > 0) return `${days}d `
+    if (hours > 0) return `${hours}h `
+    if (minutes > 0) return `${minutes}m `
+    return `${seconds}s`
   }
 }
 
