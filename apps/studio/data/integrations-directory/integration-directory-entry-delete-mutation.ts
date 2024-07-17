@@ -6,7 +6,7 @@ import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationDirectoryEntryDeleteVariables = {
-  entryId: string
+  entryId: number
 }
 
 export async function deleteIntegrationDirectoryEntry({
@@ -15,7 +15,7 @@ export async function deleteIntegrationDirectoryEntry({
   const { data, error } = await del('/platform/integrations-directory/{entry_id}', {
     params: {
       path: {
-        entry_id: entryId,
+        entry_id: String(entryId),
       },
     },
   })

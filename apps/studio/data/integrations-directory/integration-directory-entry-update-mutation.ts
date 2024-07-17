@@ -1,23 +1,23 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { handleError, patch } from 'data/fetchers'
+import { handleError, patch, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationDirectoryEntryUpdateVariables = {
-  entryId: string
+  orgSlug: string
   params: Record<string, any>
 }
 
 export async function updateIntegrationDirectoryEntry({
-  entryId,
+  orgSlug,
   params,
 }: IntegrationDirectoryEntryUpdateVariables) {
-  const { data, error } = await patch('/platform/integrations-directory/{entry_id}', {
+  const { data, error } = await put('/platform/integrations-directory/{slug}', {
     params: {
       path: {
-        entry_id: entryId,
+        slug: orgSlug,
       },
     },
     body: params as any,

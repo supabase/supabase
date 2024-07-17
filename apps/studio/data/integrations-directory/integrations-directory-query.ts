@@ -5,28 +5,35 @@ import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationsDirectoryVariables = {
-  orgId?: number
+  orgSlug?: string
   integrationId?: string
 }
 
 export type IntegrationEntry = {
-  id: string
-  organization_id: number
+  id: number
+  parent_id: number | null
+  organization_slug: string | null
+  approved: boolean
   slug: string
   overview: string
 }
 
 export async function getIntegrationsDirectory(
-  { orgId, integrationId }: IntegrationsDirectoryVariables,
+  { orgSlug, integrationId }: IntegrationsDirectoryVariables,
   signal?: AbortSignal
 ) {
-  const { data, error } = await get('/platform/integrations-directory', {
-    params: { query: { organization_id: orgId } },
+  if (!orgSlug) {
+    return
+  }
+
+  const { data, error } = await get('/platform/integrations-directory/{slug}', {
+    params: { path: { slug: orgSlug } },
     signal,
   } as never)
 
   if (error) handleError(error)
-  return data
+  // TODO(Ivan): Please fix me
+  return data as IntegrationEntry
 }
 
 export type IntegrationsDirectoryData = Awaited<ReturnType<typeof getIntegrationsDirectory>>
@@ -40,7 +47,7 @@ export const useIntegrationsDirectoryQuery = <TData = IntegrationsDirectoryData>
   }: UseQueryOptions<IntegrationsDirectoryData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsDirectoryData, IntegrationsError, TData>(
-    integrationsDirectoryKeys.integrationsDirectoryList(vars.orgId, vars.integrationId),
+    integrationsDirectoryKeys.integrationsDirectoryList(vars.orgSlug, vars.integrationId),
     ({ signal }) => getIntegrationsDirectory(vars, signal),
     { enabled: enabled, ...options }
   )

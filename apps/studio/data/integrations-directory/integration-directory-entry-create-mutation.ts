@@ -6,13 +6,18 @@ import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationDirectoryEntryCreateVariables = {
+  orgSlug: string
   params: Record<string, any>
 }
 
 export async function createIntegrationDirectoryEntry({
+  orgSlug,
   params,
 }: IntegrationDirectoryEntryCreateVariables) {
-  const { data, error } = await post('/platform/integrations-directory', {
+  const { data, error } = await post('/platform/integrations-directory/{slug}', {
+    params: {
+      path: { slug: orgSlug },
+    },
     body: params as any,
   })
 

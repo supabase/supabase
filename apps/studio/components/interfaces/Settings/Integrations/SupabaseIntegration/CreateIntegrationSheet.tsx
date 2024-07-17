@@ -12,6 +12,9 @@ import { IntegrationEntry } from 'data/integrations-directory/integrations-direc
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { FormSchema } from 'types'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   ExpandingTextArea,
   FormControl_Shadcn_,
@@ -24,10 +27,10 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Switch,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const FORM_ID = 'create-integration-sidepanel'
 
@@ -37,7 +40,6 @@ interface CreateIntegrationSheetProps {
 }
 
 const FormSchema = z.object({
-  enabled: z.boolean(),
   slug: z.string(),
   overview: z.string(),
 })
@@ -51,11 +53,12 @@ export const CreateIntegrationSheet = ({
 
   const isEditing = !!integrationEntry?.id
 
+  {
+    /* TODO(Ivan): Pass the data correctly. It wont revalidate like that, but I just wanted to make it work. */
+  }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      enabled: true,
-    },
+    defaultValues: integrationEntry,
   })
 
   const { mutate: createIntegrationEntry, isLoading: isCreating } =
@@ -65,17 +68,16 @@ export const CreateIntegrationSheet = ({
   const { mutate: deleteIntegrationEntry, isLoading: isDeleting } =
     useIntegrationDirectoryEntryDeleteMutation()
 
-  const onDelete = () => {
-    deleteIntegrationEntry({ entryId: '' })
+  const onDelete = (entryId: number) => {
+    deleteIntegrationEntry({ entryId })
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (isEditing) {
       updateIntegrationEntry(
         {
-          entryId: integrationEntry!.id,
+          orgSlug: organization!.slug,
           params: {
-            organization_id: organization!.id,
             slug: data.slug,
             overview: data.overview,
           },
@@ -90,8 +92,8 @@ export const CreateIntegrationSheet = ({
     } else {
       createIntegrationEntry(
         {
+          orgSlug: organization!.slug,
           params: {
-            organization_id: organization!.id,
             slug: data.slug,
             overview: data.overview,
           },
@@ -133,26 +135,38 @@ export const CreateIntegrationSheet = ({
       <Separator />
       <Form_Shadcn_ {...form}>
         <form id={FORM_ID} className="w-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
-          <SheetSection>
-            <FormField_Shadcn_
-              key="enabled"
-              control={form.control}
-              name="enabled"
-              render={({ field }) => (
-                <FormItemLayout label={`Enable integration`} layout="flex">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={field.disabled}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </SheetSection>
           <Separator />
           <SheetSection className="space-y-4">
+            {integrationEntry?.id &&
+              !integrationEntry?.parent_id &&
+              !integrationEntry?.approved && (
+                <Alert_Shadcn_ className="w-full mb-0" variant="warning">
+                  <WarningIcon />
+                  <div>
+                    <AlertTitle_Shadcn_ className="text-sm">Awaiting Approval</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="text-xs">
+                      Your entry awaits approval by Supabase team. In the meantime, you can see the
+                      preview at https://supabase.com/integrations/{integrationEntry?.slug}{' '}
+                      (available only to logged-in organization members.)
+                    </AlertDescription_Shadcn_>
+                  </div>
+                </Alert_Shadcn_>
+              )}
+
+            {integrationEntry?.parent_id && (
+              <Alert_Shadcn_ className="w-full mb-0" variant="warning">
+                <WarningIcon />
+                <div>
+                  <AlertTitle_Shadcn_ className="text-sm">Draft View</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="text-xs">
+                    Your entry awaits approval by Supabase team. In the meantime, you can see the
+                    preview at https://supabase.com/integrations/{integrationEntry?.slug} (available
+                    only to logged-in organization members.)
+                  </AlertDescription_Shadcn_>
+                </div>
+              </Alert_Shadcn_>
+            )}
+
             <FormField_Shadcn_
               key="slug"
               control={form.control}
@@ -187,11 +201,26 @@ export const CreateIntegrationSheet = ({
         </form>
       </Form_Shadcn_>
       <SheetFooter>
-        {!isCreating && (
-          <div className="flex-1">
-            <Button type="danger" onClick={() => onDelete()} loading={isLoading}>
-              Delete integration
+        {/* TODO(Ivan): Add confirmation prompts for both buttons */}
+        {/* TODO(Ivan): Close the sidebar and show a toast after deletion/discarding */}
+        {!isCreating && integrationEntry?.id && (
+          <div className="flex-1 flex flex-row gap-2">
+            <Button
+              type="danger"
+              onClick={() => onDelete(integrationEntry?.parent_id || integrationEntry?.id)}
+              loading={isLoading}
+            >
+              Delete Entry
             </Button>
+            {integrationEntry?.parent_id && (
+              <Button
+                type="danger"
+                onClick={() => onDelete(integrationEntry.id!)}
+                loading={isLoading}
+              >
+                Discard Draft
+              </Button>
+            )}
           </div>
         )}
 
@@ -199,7 +228,7 @@ export const CreateIntegrationSheet = ({
           Cancel
         </Button>
         <Button form={FORM_ID} htmlType="submit" loading={isLoading}>
-          {isCreating ? 'Create' : 'Update'}
+          {!integrationEntry?.id ? 'Create' : 'Update'}
         </Button>
       </SheetFooter>
     </>
