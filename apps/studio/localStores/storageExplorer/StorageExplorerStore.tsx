@@ -651,11 +651,27 @@ class StorageExplorerStore {
 
       return () => {
         return new Promise<void>(async (resolve, reject) => {
+          const fileSizeInMB = file.size / (1024 * 1024)
+          let chunkSize: number
+
+          if (fileSizeInMB < 50) {
+            chunkSize = 6 * 1024 * 1024
+          } else if (fileSizeInMB < 500) {
+            chunkSize = Math.floor(file.size / 10)
+          } else if (fileSizeInMB < 1024) {
+            chunkSize = Math.floor(file.size / 20)
+          } else if (fileSizeInMB < 10 * 1024) {
+            chunkSize = Math.floor(file.size / 20)
+          } else {
+            chunkSize = Math.floor(file.size / 50)
+          }
+
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
             retryDelays: [0, 3000, 5000, 10000, 20000],
             headers: {
               authorization: `Bearer ${this.serviceKey}`,
+              'x-source': 'supabase-dashboard',
             },
             uploadDataDuringCreation: true,
             removeFingerprintOnSuccess: true,
@@ -664,7 +680,13 @@ class StorageExplorerStore {
               objectName: formattedPathToFile,
               ...fileOptions,
             },
-            chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
+            chunkSize,
+            onShouldRetry(error) {
+              const status = error.originalResponse ? error.originalResponse.getStatus() : 0
+              const doNotRetryStatuses = [400, 403, 404, 429, 409, 404]
+
+              return doNotRetryStatuses.includes(status)
+            },
             onError(error) {
               numberOfFilesUploadedFail += 1
               toast.error(`Failed to upload ${file.name}: ${error.message}`)
