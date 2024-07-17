@@ -176,7 +176,9 @@ const Tab = ({
         'transition-all'
       )}
       aria-current={active}
-      onClick={() => router.push(`/${config.selectedOrg?.key}/table-editor/${id}`)}
+      onClick={() =>
+        router.push(`/${config.selectedOrg?.key}/${config.selectedProject?.key}/table-editor/${id}`)
+      }
     >
       <div className="flex items-center gap-1.5">
         <div className="w-5 h-5 flex items-center justify-center">

@@ -6,9 +6,9 @@ import SettingsMenuChildren from './settings-menu-children'
 import { ClickCounter } from './click-counter'
 
 export default function SettingsMenuPanel() {
-  const { org } = useParams()
+  const { org, project } = useParams()
   const pathname = usePathname()
-  const isActive = pathname.startsWith(`/${org}/settings`)
+  const isActive = pathname.startsWith(`/${org}/${project}/settings`)
 
   return (
     <div

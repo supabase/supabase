@@ -10,7 +10,7 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
   const [config] = useConfig()
   const { selectedOrg, selectedProject } = config
   const pathname = usePathname()
-  const isActive = pathname.startsWith(`/${org}${product.href}`)
+  const isActive = pathname.startsWith(`/${org}/${selectedProject?.key}${product.href}`)
 
   // console.log('config.tableEditor.activeTabId', config.tableEditor.activeTabId)
 
@@ -20,16 +20,16 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
    */
   let overrideHref = null
   if (product.name === 'settings') {
-    overrideHref = `/${selectedOrg?.key}/settings/project/${selectedProject?.key}/general`
+    overrideHref = `/${selectedOrg?.key}/${selectedProject?.key}/settings/project/${selectedProject?.key}/general`
   }
   if (product.name === 'table-editor' && config.tableEditor.activeTabId) {
-    overrideHref = `/${selectedOrg?.key}/table-editor/${config.tableEditor.activeTabId}`
+    overrideHref = `/${selectedOrg?.key}/${selectedProject?.key}/table-editor/${config.tableEditor.activeTabId}`
   }
 
   return (
     <Link
       key={product.name}
-      href={overrideHref || `/${org}${product.href}`}
+      href={overrideHref || `/${org}/${selectedProject?.key}${product.href}`}
       className={cn('relative', 'w-full', 'group/nav-item-anchor', 'flex flex-col items-center')}
       aria-current={isActive ? 'page' : undefined}
     >

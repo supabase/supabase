@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './Providers'
 import SideNav from './[org]/side-nav'
+import TopHeader from './[org]/top-header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -24,8 +25,9 @@ export default function RootLayout({
           defaultTheme="deep-dark"
           enableSystem
         >
-          <main className="h-screen w-screen flex">
-            <SideNav />
+          <main className="h-screen w-screen flex flex-col">
+            <TopHeader />
+            {/* <SideNav /> */}
             {children}
           </main>
         </ThemeProvider>

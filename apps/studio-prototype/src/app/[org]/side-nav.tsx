@@ -1,16 +1,15 @@
-import SideNavMenuIcon from './side-nav-menu-icon'
-import UserMenu from './user-menu'
 import { SideNav as SideNavData } from '@/src/config/nav'
-import SideMenuOrgMenu from './side-menu-org-menu'
-import SideNavMotion from './side-nav-motion'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Separator } from 'ui'
+import SideMenuOrgMenu from './side-menu-org-menu'
+import SideNavMenuIcon from './side-nav-menu-icon'
+import SideNavMotion from './side-nav-motion'
 
 function SideNav() {
   return (
     <SideNavMotion>
-      <SideMenuOrgMenu />
-      <div className="grow w-full flex flex-col my-6 gap-6">
+      {/* <SideMenuOrgMenu /> */}
+      <div className="grow w-full flex flex-col my-5 gap-6">
         {SideNavData.map((group, i) => {
           return (
             <>
@@ -24,7 +23,6 @@ function SideNav() {
           )
         })}
       </div>
-      <UserMenu />
     </SideNavMotion>
   )
 }

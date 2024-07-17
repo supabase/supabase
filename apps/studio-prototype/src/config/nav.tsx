@@ -37,12 +37,12 @@ const iconsClasses = cn(
 
 const SideNav = [
   [
-    {
-      name: 'projects',
-      label: 'Projects',
-      icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-      href: '/projects',
-    },
+    // {
+    //   name: 'projects',
+    //   label: 'Projects',
+    //   icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
+    //   href: '/projects',
+    // },
     {
       name: 'table-editor',
       label: 'Table Editor',

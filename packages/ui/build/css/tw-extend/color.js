@@ -493,7 +493,7 @@ module.exports = {
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(0, 0%, 16.1%)"
+  value: "hsl(0, 0%, 18%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
@@ -521,7 +521,7 @@ module.exports = {
 },
 "border-stronger": {
   cssVariable: "var(--border-stronger)",
-  value: "hsl(0, 0%, 22%)"
+  value: "hsl(0, 0%, 27.1%)"
 },
 "border-button-DEFAULT": {
   cssVariable: "var(--border-button-default)",
