@@ -20,7 +20,10 @@ After developing your project and deciding it's Production Ready, you should run
   - Go to the Database > Publications page in the Supabase Dashboard to manage replication tables.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement)
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database.
-- Enable 2FA on GitHub. Since your GitHub account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
+- Ensure that your Supabase Account is protected with multi-factor authentication (MFA).
+  - If using a GitHub signin, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
+  - If using email+password signin, set up [MFA for your Supabase account](https://supabase.com/docs/guides/platform/multi-factor-authentication#enable-mfa).
+- Consider [adding multiple owners on your Supabase org](https://supabase.com/dashboard/org/_/team). This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
 - Ensure email confirmations are [enabled](https://supabase.com/dashboard/project/_/auth/providers) in the `Settings > Auth` page.
 - Ensure that you've [set the expiry](https://supabase.com/dashboard/project/_/auth/providers) for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
 - Increase the length of the OTP if you need a higher level of entropy.
