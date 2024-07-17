@@ -15,11 +15,13 @@ export default function RedirectCatcher() {
     if (
       selectedOrg?.key &&
       selectedProject?.key &&
-      (selectedOrg.key !== org || selectedProject.key !== project)
+      // &&
+      // (selectedOrg?.key !== org || selectedProject.key !== project)
+      selectedOrg.key === org
     ) {
       // Construct the new URL with the updated parameters
       const newUrl = asPath
-        .replace(`/${org}`, `/${selectedOrg.key}`)
+        .replace(`/${org}`, `/${selectedOrg?.key}`)
         .replace(`/${project}`, `/${selectedProject.key}`)
 
       // Navigate to the new URL

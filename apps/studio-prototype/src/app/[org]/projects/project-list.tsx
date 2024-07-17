@@ -2,7 +2,7 @@
 
 import SparkChart from '@/src/components/charts/spark-chart'
 import { useConfig } from '@/src/hooks/use-config'
-import { Grid, List, MoreVertical, Search } from 'lucide-react'
+import { Box, Grid, List, MoreVertical, Search } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -44,6 +44,7 @@ export default function ProjectList() {
               key={project.key}
               className="bg-surface-100/50 border px-5 first-of-type:rounded-t-md last-of-type:rounded-b-md h-16 flex items-center gap-10"
             >
+              <Box className="text-foreground-muted" strokeWidth={1} />
               <div className="flex flex-col gap-0">
                 <div className="flex gap-2 min-w-64">
                   <div className="text-foreground">{project.name}</div>

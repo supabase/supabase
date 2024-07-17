@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './Providers'
-import SideNav from './[org]/side-nav'
+import SideNav from './[org]/[project]/side-nav'
 import TopHeader from './[org]/top-header'
 
 const inter = Inter({ subsets: ['latin'] })

@@ -1,8 +1,8 @@
 import RedirectCatcher from '@/src/components/redirect-catcher'
-import EntranceTransition from './../entrance-transition'
-import ProjectContentTransition from './../project-content-transition'
-import SettingsMenuPanel from './../settings-menu-panel'
-import SideNav from './../side-nav'
+import EntranceTransition from '../entrance-transition'
+import ProjectContentTransition from '../project-content-transition'
+import SettingsMenuPanel from '../settings-menu-panel'
+import SideNav from './side-nav'
 
 export default function ProjectLayout({
   children,
@@ -10,7 +10,7 @@ export default function ProjectLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="w-screen h-screen flex">
+    <div className="w-full h-full flex">
       <SideNav />
       <EntranceTransition>
         <SettingsMenuPanel />
@@ -19,7 +19,7 @@ export default function ProjectLayout({
           <ProjectContentTransition>{children}</ProjectContentTransition>
         </div>
       </EntranceTransition>
-      {/* <RedirectCatcher /> */}
+      <RedirectCatcher />
     </div>
   )
 }
