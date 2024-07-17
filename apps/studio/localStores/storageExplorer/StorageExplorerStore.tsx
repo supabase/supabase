@@ -1845,7 +1845,6 @@ class StorageExplorerStore {
       }
     })
 
-    console.log('totalRemainingTime:', totalRemainingTime)
     return totalRemainingTime
   }
 
