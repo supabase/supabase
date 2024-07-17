@@ -678,8 +678,10 @@ class StorageExplorerStore {
 
           let chunkSize: number
 
-          if (fileSizeInMB < 50) {
+          if (fileSizeInMB < 30) {
             chunkSize = 6 * 1024 * 1024
+          } else if (fileSizeInMB < 100) {
+            chunkSize = Math.floor(file.size / 8)
           } else if (fileSizeInMB < 500) {
             chunkSize = Math.floor(file.size / 10)
           } else if (fileSizeInMB < 1024) {
@@ -691,11 +693,11 @@ class StorageExplorerStore {
           }
 
           // Max chunk size is 500MB
-          chunkSize = Math.max(chunkSize, 500 * 1024 * 1024)
+          chunkSize = Math.min(chunkSize, 500 * 1024 * 1024)
 
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
-            retryDelays: [0, 3000, 5000, 10000, 20000],
+            retryDelays: [0, 200, 500, 1500, 3000, 5000],
             headers: {
               authorization: `Bearer ${this.serviceKey}`,
               'x-source': 'supabase-dashboard',
