@@ -502,7 +502,7 @@ class StorageExplorerStore {
       <ToastLoader
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        labelTopOverride={`${!isNaN(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
+        labelTopOverride={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
       >
         <div className="flex items-center gap-2">
           <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
