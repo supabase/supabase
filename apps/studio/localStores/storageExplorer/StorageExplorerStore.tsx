@@ -91,7 +91,7 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgresses: number[] = []
+  private uploadProgresses: {percentage: number, elapsed: number, uploadSpeed: number, remainingBytes: number, remainingTime: number}[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
@@ -483,12 +483,13 @@ class StorageExplorerStore {
 
   onUploadProgress(toastId?: string) {
     const totalFiles = this.uploadProgresses.length
-    const progress = this.uploadProgresses.reduce((acc, progress) => acc + progress, 0) / totalFiles
+    const progress = this.uploadProgresses.reduce((acc, {percentage}) => acc + percentage, 0) / totalFiles
+    const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast.loading(
       <ToastLoader
         progress={progress * 100}
-        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
+        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}... ${'\n'} Remaining time: ${this.formatTime(remainingTime)}`}
         description={STORAGE_PROGRESS_INFO_TEXT}
       />,
       { id: toastId }
@@ -589,7 +590,9 @@ class StorageExplorerStore {
         return file
       })
 
-    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill(0)
+    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill({
+      percentage: 0, elapsed: 0, uploadSpeed: 0, remainingBytes: 0, remainingTime: 0
+    })
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
@@ -652,6 +655,8 @@ class StorageExplorerStore {
       return () => {
         return new Promise<void>(async (resolve, reject) => {
           const fileSizeInMB = file.size / (1024 * 1024)
+          const startTime = Date.now();
+
           let chunkSize: number
 
           if (fileSizeInMB < 50) {
@@ -683,7 +688,7 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 429, 409, 404]
+              const doNotRetryStatuses = [400, 403, 404, 429, 409]
 
               return doNotRetryStatuses.includes(status)
             },
@@ -694,7 +699,12 @@ class StorageExplorerStore {
             },
             onProgress: (bytesUploaded, bytesTotal) => {
               const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
-              this.uploadProgresses[index] = percentage
+              const elapsed = (Date.now() - startTime) / 1000; // in seconds
+              const uploadSpeed = bytesUploaded / elapsed; // in bytes per second
+              const remainingBytes = bytesTotal - bytesUploaded;
+              const remainingTime = remainingBytes / uploadSpeed; // in seconds
+
+              this.uploadProgresses[index] = { percentage, elapsed, uploadSpeed, remainingBytes, remainingTime }
               this.onUploadProgress(toastId)
             },
             onSuccess() {
@@ -1801,6 +1811,38 @@ class StorageExplorerStore {
       // Select items within the range
       this.setSelectedItems(uniqBy(this.selectedItems.concat(rangeToSelect), 'id'))
     }
+  }
+
+  private calculateTotalRemainingTime(progresses: this['uploadProgresses']) {
+    let totalRemainingTime = 0;
+    let totalRemainingBytes = 0;
+
+    progresses.forEach(progress => {
+      if (progress) {
+        totalRemainingBytes += progress.remainingBytes;
+        const weight = progress.remainingBytes / totalRemainingBytes;
+        totalRemainingTime += weight * progress.remainingTime;
+      }
+    });
+
+    return totalRemainingTime;
+  }
+
+  private formatTime(seconds: number) {
+    const days = Math.floor(seconds / (24 * 3600));
+    seconds %= 24 * 3600;
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    seconds = Math.floor(seconds % 60);
+
+    let timeString = '';
+    if (days > 0) timeString += `${days}d `;
+    if (hours > 0) timeString += `${hours}h `;
+    if (minutes > 0) timeString += `${minutes}m `;
+    timeString += `${seconds}s`;
+
+    return timeString;
   }
 }
 
