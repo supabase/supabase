@@ -41,18 +41,20 @@ Otherwise, you'll need to invite a user as **Owner**, and they need to accept th
 
 ### Organization Roles vs Project Roles
 
-Each member in the organization can be assigned a role at either the organisation level, or for one or more specific projects. If the member has a role on the organization, the member will have the equivalent permissions for that role across all projects under the organization. However, if you might want to only allow access to specific projects for a member, you may assign roles for the member on the projects that you want to permit access to.
-
 <Admonition type="note">
 
 Project level roles are only available on the [Enterprise plan](https://supabase.com/pricing)
 
 </Admonition>
 
+Each member in the organization can be assigned a role scoped to the organization or to specific projects. If the member has a role at the organization level, they will have the equivalent permissions for that role across all current and future projects in the organization. 
+
+With project scoped permissions, you can assign members to roles scoped to specific projects. 
+
 
 ### Organization permissions across roles
 
-The table below shows the corresponding organization permissions, by resource and action, for each available role you can assign an organization member in Studio.
+The table below shows the actions each role can take on the resources belonging to the organization.
 
 | Resource                        | Action     |                  Owner                  |              Administrator              |                Developer                |              Read-Only[^1]              |
 | ------------------------------- | ---------- | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: |
@@ -113,7 +115,7 @@ The table below shows the corresponding organization permissions, by resource an
 
 ### Project permissions across roles
 
-The table below shows the corresponding project permissions, by resource and action, for each available role you can assign an organization member in Studio.
+The table below shows the actions each role can take on the resources belonging to the project.
 
 | Resource                         | Action                 |                  Owner                  |                  Admin                  |                Developer                |                         Read-Only [^3]                          |
 | -------------------------------- | ---------------------- | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: | :-------------------------------------------------------------: |
@@ -127,7 +129,7 @@ The table below shows the corresponding project permissions, by resource and act
 |                                  | Restart                | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 | Custom Domains                   | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                  | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
-| Data (Database)                  | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" /> [^4] |
+| Data (Database)                  | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" />      |
 |                                  | Manage                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 | **Infrastructure**               |                        |                                         |                                         |                                         |                                                                 |
 | Read Replicas                    | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
@@ -179,7 +181,7 @@ The table below shows the corresponding project permissions, by resource and act
 |                                  | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 |                                  | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | **Edge Functions Configuration** |                        |                                         |                                         |                                         |                                                                 |
-| Secrets                          | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" /> [^5] |
+| Secrets                          | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" /> [^4] |
 |                                  | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 |                                  | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | **SQL Editor**                   |                        |                                         |                                         |                                         |                                                                 |
@@ -188,7 +190,7 @@ The table below shows the corresponding project permissions, by resource and act
 |                                  | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                  | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                  | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-|                                  | Run                    | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" /> [^6] |
+|                                  | Run                    | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck className="inline" size={14} color="#3FCF8E" /> [^5] |
 | **Database**                     |                        |                                         |                                         |                                         |                                                                 |
 | Scheduled Backups                | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                  | Download               | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
@@ -258,13 +260,7 @@ The table below shows the corresponding project permissions, by resource and act
 |                                  | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 
 [^1]: Available on the Team and Enterprise Plans.
-[^2]:
-    Invites sent from a SSO account can only be accepted by another SSO account
-    coming from the same identity provider. This is a security measure that
-    prevents accidental invites to accounts not managed by your company's
-    enterprise systems.
-
-[^3]: Available on the Team and Enterprise Plans.
-[^4]: Only available on projects using PostgreSQL 14 and above. You can upgrade your project through [infrastructure settings](https://supabase.com/dashboard/project/_/settings/infrastructure).
-[^5]: Read-Only role is able to access secrets.
-[^6]: Only select queries.
+[^2]: Invites sent from a SSO account can only be accepted by another SSO account coming from the same identity provider. This is a security measure that prevents accidental invites to accounts not managed by your company's enterprise systems.
+[^3]: Available on the Enterprise Plan.
+[^4]: Read-Only role is able to access secrets.
+[^5]: Only select queries.
