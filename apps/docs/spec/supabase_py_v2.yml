@@ -605,6 +605,14 @@ functions:
               }
           )
           ```
+        response: |
+          ```json
+          {
+            "message_id": null,
+            "user": null,
+            "session": null
+          }
+          ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
@@ -613,6 +621,19 @@ functions:
           ```python
           supabase.auth.sign_in_with_otp({
             "phone": '+13334445555',
+          })
+          ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```python
+          supabase.auth.sign_in_with_otp({
+            "phone": "+13334445555",
+            "options": {
+              "channel": "whatsapp",
+            }
           })
           ```
   - id: sign-in-with-oauth
@@ -660,6 +681,131 @@ functions:
             }
           })
           oauth_token = data.session.provider_token # use to access provider API
+          ```
+  
+  - id: sign-in-with-id-token
+    title: 'sign_in_with_id_token'
+    params:
+      - name: credentials
+        type: SignInWithIdTokenCredentials
+        subContent:
+          - name: provider
+            isOptional: false
+            type: '"google" | "apple" | "azure" | "facebook" | string'
+            description: | 
+              Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `keycloak` (deprecated).
+          - name: token
+            isOptional: false
+            type: string
+            description: |
+              OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: captcha_token
+                isOptional: true
+                type: string
+          - name: nonce
+            isOptional: true
+            type: string
+            description: |
+              If the ID token contains a `nonce` claim, then the hash of this value is compared to the value in the ID token.
+          - name: access_token
+            isOptional: true
+            type: string
+            description: |
+              If the ID token contains an `at_hash` claim, then the hash of this value is compared to the value in the ID token.
+    notes: |
+      Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
+    examples:
+      - id: sign-in-with-id-token
+        name: 'Sign In using ID Token'
+        code: |
+          ```python
+          response = supabase.auth.sign_in_with_id_token(
+            {"provider": "google", "token": "your-id-token"}
+          )
+          ```
+        response: |
+          ```json
+          {
+            "session": {
+              "access_token": "<ACCESS_TOKEN>",
+              "expires_at": 1721236789,
+              "expires_in": 60,
+              "provider_refresh_token": null,
+              "provider_token": null,
+              "refresh_token": "<REFRESH_TOKEN>",
+              "token_type": "bearer",
+              "user": {
+                "action_link": null,
+                "app_metadata": {
+                  ...
+                },
+                "aud": "authenticated",
+                "confirmation_sent_at": null,
+                "confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "created_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "email": "hello@example.com",
+                "email_change_sent_at": null,
+                "email_confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+                "factors": null,
+                "id": "11111111-1111-1111-1111-111111111111",
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "provider": "google",
+                    "user_id": "11111111-1111-1111-1111-111111111111"
+                  }
+                ],
+                "invited_at": null,
+                "last_sign_in_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+                "new_email": null,
+                "phone": "",
+                "phone_confirmed_at": null,
+                "recovery_sent_at": null,
+                "role": "authenticated",
+                "updated_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+                "user_metadata": {
+                  ...
+                }
+              }
+            },
+            "user": {
+              "action_link": null,
+              "app_metadata": {
+                ...
+              },
+              "aud": "authenticated",
+              "confirmation_sent_at": null,
+              "confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "created_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "email": "hello@example.com",
+              "email_change_sent_at": null,
+              "email_confirmed_at": "Wed, 17 Jul 2024 16:34:24 GMT",
+              "factors": null,
+              "id": "11111111-1111-1111-1111-111111111111",
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "provider": "google",
+                  "user_id": "11111111-1111-1111-1111-111111111111"
+                }
+              ],
+              "invited_at": null,
+              "last_sign_in_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+              "new_email": null,
+              "phone": "",
+              "phone_confirmed_at": null,
+              "recovery_sent_at": null,
+              "role": "authenticated",
+              "updated_at": "Wed, 17 Jul 2024 17:18:49 GMT",
+              "user_metadata": {
+                ...
+              }
+            }
+          }
           ```
   - id: sign-out
     title: 'sign_out()'
