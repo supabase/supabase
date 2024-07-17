@@ -1,23 +1,8 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
+import { Eye, Unlock } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Checkbox_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
-  HoverCard_Shadcn_,
-  IconAlertTriangle,
-  IconEye,
-  IconUnlock,
-  Modal,
-  cn,
-} from 'ui'
-import { InnerSideMenuItem } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -26,9 +11,16 @@ import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import {
+  Checkbox_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
+  cn,
+} from 'ui'
+import { InnerSideMenuItem } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { QueryItemActions } from './QueryItemActions'
-import { Eye, Unlock } from 'lucide-react'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet

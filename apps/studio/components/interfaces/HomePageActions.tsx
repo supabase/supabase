@@ -1,11 +1,12 @@
-import { IS_PLATFORM } from 'common'
+import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import { Filter, Search } from 'lucide-react'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -20,7 +21,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PROJECT_STATUS } from 'lib/constants'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
