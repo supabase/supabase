@@ -671,7 +671,7 @@ class StorageExplorerStore {
               reject(error)
             },
             onProgress: (bytesUploaded, bytesTotal) => {
-              const percentage = bytesUploaded / bytesTotal
+              const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
               this.uploadProgresses[index] = percentage
               this.onUploadProgress(toastId)
             },
