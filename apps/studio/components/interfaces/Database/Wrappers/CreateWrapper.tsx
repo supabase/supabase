@@ -304,8 +304,11 @@ const CreateWrapper = () => {
               {wrapperMeta.minimumExtensionVersion}. You have version{' '}
               {wrappersExtension?.installed_version} installed.
               <br />
-              Please {databaseNeedsUpgrading && 'upgrade your database then '}reinstall the
-              extension to create this wrapper.
+              Please {databaseNeedsUpgrading && 'upgrade your database then '}update the extension
+              by disabling and enabling the wrappers extension to create this wrapper.
+              <br />
+              Warning: Before reinstalling the wrapper extension, you must first remove all existing
+              wrappers. Afterward, you can recreate the wrappers.
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
               <Button asChild type="default">
@@ -316,7 +319,7 @@ const CreateWrapper = () => {
                       : `/project/${ref}/database/extensions?filter=wrappers`
                   }
                 >
-                  {databaseNeedsUpgrading ? 'Upgrade Database' : 'Reinstall Extension'}
+                  {databaseNeedsUpgrading ? 'Upgrade Database' : 'View Wrappers Extension'}
                 </Link>
               </Button>
             </AlertDescription_Shadcn_>
