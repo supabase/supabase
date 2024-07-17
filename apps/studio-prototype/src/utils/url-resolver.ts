@@ -4,6 +4,7 @@ export function resolveHideBranchesDropdown(
   projectKey: string | undefined
 ) {
   return (
+    pathName === `/${organizationKey}` ||
     (pathName.startsWith(`/${organizationKey}/settings`) &&
       !pathName.startsWith(`/${organizationKey}/settings/project`)) ||
     pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}/general`) ||
@@ -21,6 +22,7 @@ export function resolveHideProjectsDropdown(
   projectKey: string | undefined
 ) {
   return (
+    pathName === `/${organizationKey}` ||
     (pathName.startsWith(`/${organizationKey}/settings`) &&
       !pathName.startsWith(`/${organizationKey}/settings/project/${projectKey}`) &&
       !pathName.startsWith(`/${organizationKey}/settings/account`)) ||

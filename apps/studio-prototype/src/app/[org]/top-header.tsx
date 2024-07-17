@@ -96,7 +96,6 @@ export default function TopHeader() {
               </defs>
             </svg>
           </Link>
-          {/* <SideMenuOrgMenu /> */}
           <OrgMenu />
           <div className="flex items-center -space-x-px">
             <BranchMenu />
@@ -127,7 +126,8 @@ export default function TopHeader() {
       {/* // border bottom */}
       <div
         className={cn(
-          pickersHidden ? 'top-0 bg-transparent' : 'bottom-0 bg-border',
+          // pickersHidden ? 'top-0 bg-transparent' : 'bottom-0 bg-border',
+          'bottom-0 bg-border',
           'absolute left-0 h-px w-full',
           isPreview && 'bg-[#377995]',
           'transition-all ease-out duration-200'

@@ -1,32 +1,5 @@
-import {
-  Auth,
-  EdgeFunctions,
-  Logs,
-  Database,
-  Realtime,
-  Reports,
-  SqlEditor,
-  Storage,
-  TableEditor,
-  Settings,
-  Postgres,
-} from 'icons'
+import { Boxes, ClipboardMinus, Lightbulb, Plug, Users2, Wallet } from 'lucide-react'
 import { cn } from 'ui'
-import { IconHandler } from '../app/[org]/icon-handler'
-import {
-  BarChart2,
-  BarChartBig,
-  Boxes,
-  ClipboardMinus,
-  Coins,
-  Compass,
-  CreditCard,
-  Lightbulb,
-  ListTree,
-  Plug,
-  Users2,
-  Wallet,
-} from 'lucide-react'
 
 const STROKE_WIDTH = 1
 const ICON_SIZE = 21
@@ -41,24 +14,12 @@ const iconsClasses = cn(
 
 const SideNav = [
   [
-    // {
-    //   name: 'projects',
-    //   label: 'Projects',
-    //   icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    //   href: '/projects',
-    // },
     {
       name: 'projects',
       label: 'Projects',
       icon: <Boxes strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
       href: '/projects',
     },
-    // {
-    //   name: 'sql-editor',
-    //   label: 'SQL Editor',
-    //   icon: <SqlEditor strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
-    //   href: '/sql-editor',
-    // },
   ],
   [
     {
