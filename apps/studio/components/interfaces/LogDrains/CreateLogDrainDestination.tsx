@@ -111,14 +111,11 @@ export function CreateLogDrainDestination({
     resolver: zodResolver(formSchema),
   })
 
-  const source = form.watch('source', defaultSource)
+  const source = form.watch('source', defaultSource || 'webhook')
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    toast.success('Submit called')
     console.log(values)
-    // action('form form.handleSubmit(onSubmit)')(values)
+    toast.success('Submit called')
   }
 
   return (
@@ -175,7 +172,6 @@ export function CreateLogDrainDestination({
                   ))}
                 </RadioGroupStacked>
               </div>
-              <Separator />
 
               <div className="p-4 grid gap-4">
                 {source === 'webhook' && (
@@ -200,7 +196,12 @@ export function CreateLogDrainDestination({
                       render={({ field }) => (
                         <FormItemLayout layout="horizontal" label={'Region'}>
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_ {...field}>
+                            <Select_Shadcn_
+                              {...field}
+                              onValueChange={(v) => {
+                                form.setValue('region', v)
+                              }}
+                            >
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
                               </SelectTrigger_Shadcn_>
@@ -247,12 +248,10 @@ export function CreateLogDrainDestination({
           </form>
         </Form_Shadcn_>
 
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button form={FORM_ID} htmlType="submit" type="primary">
-              Create destination
-            </Button>
-          </SheetClose>
+        <SheetFooter className="p-4">
+          <Button form={FORM_ID} htmlType="submit" type="primary">
+            Create destination
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
