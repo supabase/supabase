@@ -102,6 +102,7 @@
     "shared-data": "*",
     "sql-formatter": "^13.1.0",
     "sqlstring": "^2.3.2",
+    "tus-js-client": "^4.1.0",
     "ui": "*",
     "ui-patterns": "*",
     "uuid": "^9.0.1",

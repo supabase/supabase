@@ -3,7 +3,7 @@ import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
-import { toast as UiToast } from 'ui'
+import * as tus from 'tus-js-client'
 
 import {
   STORAGE_ROW_STATUS,
@@ -32,6 +32,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -75,6 +76,9 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
+  private resumableUploadUrl: string = ''
+  private serviceKey: string = ''
+
   /* Supabase client, will get initialized immediately after constructing the instance */
   supabaseClient: SupabaseClient<any, 'public', any> = null as any as SupabaseClient<
     any,
@@ -107,6 +111,8 @@ class StorageExplorerStore {
     protocol: string = PROJECT_ENDPOINT_PROTOCOL
   ) {
     this.projectRef = projectRef
+    this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
+    this.serviceKey = serviceKey
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
@@ -574,8 +580,8 @@ class StorageExplorerStore {
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
-      const fileOptions = { cacheControl: '3600' }
       const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
+      const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
@@ -620,21 +626,45 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return new Promise<void>(async (resolve) => {
-          const { error } = await this.supabaseClient.storage
-            .from(this.selectedBucket.name)
-            .upload(formattedPathToFile, file, fileOptions)
+        return new Promise<void>(async (resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: this.resumableUploadUrl,
+            retryDelays: [0, 3000, 5000, 10000, 20000],
+            headers: {
+              authorization: `Bearer ${this.serviceKey}`,
+            },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: this.selectedBucket.name,
+              objectName: formattedPathToFile,
+              ...fileOptions,
+            },
+            chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
+            onError: function (error) {
+              numberOfFilesUploadedFail += 1
+              toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              reject(error)
+            },
+            // onProgress: function (bytesUploaded, bytesTotal) {
+            //   const percentage = (bytesUploaded / bytesTotal)
+            //   // TODO: update toast progress based on the total progress of all files
+            // },
+            onSuccess: function () {
+              numberOfFilesUploadedSuccess += 1
+              resolve()
+            },
+          })
 
-          this.uploadProgress = this.uploadProgress + 1 / formattedFilesToUpload.length
+          // Check if there are any previous uploads to continue.
+          return upload.findPreviousUploads().then(function (previousUploads) {
+            // Found previous uploads so we select the first one.
+            if (previousUploads.length) {
+              upload.resumeFromPreviousUpload(previousUploads[0])
+            }
 
-          if (error) {
-            numberOfFilesUploadedFail += 1
-            toast.error(`Failed to upload ${file.name}: ${error.message}`)
-            resolve()
-          } else {
-            numberOfFilesUploadedSuccess += 1
-            resolve()
-          }
+            upload.start()
+          })
         })
       }
     })
