@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Image from 'next/image'
+import { kebabCase } from 'lodash'
 import Link from 'next/link'
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 // import { NpmCommands } from 'types/unist'
@@ -56,15 +57,27 @@ const components = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
   ),
-  h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2
-      className={cn(
-        'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0',
-        className
-      )}
-      {...props}
-    />
-  ),
+  h2: ({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+    const arrayChildren = React.Children.toArray(children)
+    // construct an id from the children strings. It's good enough to be unique and shareable.
+    const id = kebabCase(arrayChildren.filter((str) => typeof str === 'string').join(' '))
+
+    return (
+      <h2
+        className={cn(
+          'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0',
+          className
+        )}
+        {...props}
+        id={id}
+      >
+        <a href={`#${id}`} className="pr-2 text-foreground-lighter">
+          #
+        </a>
+        {children}
+      </h2>
+    )
+  },
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       className={cn('font-heading mt-8 scroll-m-20 text-xl tracking-tight', className)}
