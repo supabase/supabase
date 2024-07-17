@@ -688,9 +688,9 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 429, 409]
+              const doNotRetryStatuses = [400, 403, 404, 409, 429]
 
-              return doNotRetryStatuses.includes(status)
+              return !doNotRetryStatuses.includes(status)
             },
             onError(error) {
               numberOfFilesUploadedFail += 1
