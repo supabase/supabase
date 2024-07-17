@@ -103,7 +103,11 @@ const CommandItem = forwardRef<
               }
             : () => {}
       }
-      value={command.forceMount ? `${query} ${command.value}` : command.value}
+      value={
+        command.forceMount
+          ? `${query} ${command.value ?? command.name}`
+          : command.value ?? command.name
+      }
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),
         className,

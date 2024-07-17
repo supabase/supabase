@@ -1,10 +1,11 @@
-import { CommandMenuProvider } from '@ui-patterns/Cmdk'
+import { CommandProvider } from '@ui-patterns/CommandMenu'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
 import { type PropsWithChildren } from 'react'
 
 import SiteLayout from '~/layouts/SiteLayout'
 import { AuthContainer } from './auth/auth.client'
+import { DocsCommandMenu } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { ShortcutPreviewBuild } from './envs/staging.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
@@ -22,15 +23,16 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <PageTelemetry />
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-            <CommandMenuProvider site="docs">
+            <CommandProvider>
               <div className="flex flex-col">
                 <SiteLayout>
                   <PortalToast />
                   {children}
+                  <DocsCommandMenu />
                 </SiteLayout>
                 <ThemeSandbox />
               </div>
-            </CommandMenuProvider>
+            </CommandProvider>
           </ThemeProvider>
         </AuthContainer>
       </QueryClientProvider>
