@@ -9,18 +9,30 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { Snippet } from 'data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
+import { getContentById } from 'data/content/content-id-query'
 
 export interface RenameQueryModalProps {
-  snippet: SqlSnippet
+  snippet?: SqlSnippet | Snippet
   visible: boolean
   onCancel: () => void
   onComplete: () => void
 }
 
-const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
+const RenameQueryModal = ({
+  snippet = {} as any,
+  visible,
+  onCancel,
+  onComplete,
+}: RenameQueryModalProps) => {
   const { ref } = useParams()
   const organization = useSelectedOrganization()
+
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -31,9 +43,35 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
 
-  useEffect(() => {
-    setNameInput(name)
-  }, [name])
+  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
+    onSuccess: (data) => {
+      const { title, description } = data
+      setNameInput(title)
+      if (!descriptionInput) setDescriptionInput(description)
+    },
+    onError: (error) => {
+      toast.error(`Failed to rename query: ${error.message}`)
+    },
+  })
+
+  const isAiButtonVisible = enableFolders ? true : 'content' in snippet && !!snippet.content.sql
+
+  const generateTitle = async () => {
+    if (enableFolders) {
+      if ('content' in snippet) {
+        titleSql({ sql: snippet.content.sql })
+      } else {
+        try {
+          const { content } = await getContentById({ projectRef: ref, id: snippet.id })
+          titleSql({ sql: content.sql })
+        } catch (error) {
+          toast.error('Unable to generate title based on query contents')
+        }
+      }
+    } else {
+      if ('content' in snippet) titleSql({ sql: snippet.content.sql })
+    }
+  }
 
   const validate = () => {
     const errors: any = {}
@@ -47,26 +85,28 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      snap.renameSnippet(id, nameInput, descriptionInput)
+      if (enableFolders) {
+        // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+        if (!('content' in snippet)) {
+          // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
+          const snippet = await getContentById({ projectRef: ref, id })
+          snapV2.addSnippet({ projectRef: ref, snippet })
+        }
+        snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      } else {
+        snap.renameSnippet(id, nameInput, descriptionInput)
+      }
       if (onComplete) onComplete()
-      return Promise.resolve()
     } catch (error: any) {
+      // [Joshen] We probably need some rollback cause all the saving is async
       toast.error(`Failed to rename query: ${error.message}`)
     }
   }
 
-  const { mutate: titleSql, isLoading: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
-    onSuccess: (data) => {
-      const { title, description } = data
-      setNameInput(title)
-      if (!descriptionInput) setDescriptionInput(description)
-    },
-    onError: (error) => {
-      toast.error(`Failed to rename query: ${error.message}`)
-    },
-  })
-
-  const isAiButtonVisible = !!snippet.content.sql
+  useEffect(() => {
+    setNameInput(name)
+    setDescriptionInput(description)
+  }, [snippet.id])
 
   return (
     <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
@@ -94,7 +134,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 {!hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
-                    onClick={() => titleSql({ sql: snippet.content.sql })}
+                    onClick={() => generateTitle()}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
                   >
