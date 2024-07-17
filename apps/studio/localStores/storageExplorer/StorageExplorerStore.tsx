@@ -104,7 +104,9 @@ class StorageExplorerStore {
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
 
-  private abortUploadCallbacks: (() => void)[] = []
+  private abortUploadCallbacks: {
+    [key: string]: (() => void)[]
+  } = {}
 
   constructor() {
     makeAutoObservable(this, { supabaseClient: false })
@@ -506,9 +508,11 @@ class StorageExplorerStore {
       >
         <div className="flex items-center gap-2">
           <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          <Button type="default" size="tiny" onClick={this.abortUploads}>
-            Cancel
-          </Button>
+          {toastId && (
+            <Button type="default" size="tiny" onClick={() => this.abortUploads(toastId)}>
+              Cancel
+            </Button>
+          )}
         </div>
       </ToastLoader>,
       { id: toastId }
@@ -754,7 +758,10 @@ class StorageExplorerStore {
             },
           })
 
-          this.abortUploadCallbacks.push(() => {
+          if (!Array.isArray(this.abortUploadCallbacks[toastId])) {
+            this.abortUploadCallbacks[toastId] = []
+          }
+          this.abortUploadCallbacks[toastId].push(() => {
             upload.abort()
             reject(new Error('Upload aborted by user'))
           })
@@ -829,9 +836,9 @@ class StorageExplorerStore {
     )
   }
 
-  abortUploads = () => {
-    this.abortUploadCallbacks.forEach((callback) => callback())
-    this.abortUploadCallbacks = []
+  abortUploads = (toastId: string) => {
+    this.abortUploadCallbacks[toastId].forEach((callback) => callback())
+    this.abortUploadCallbacks[toastId] = []
   }
 
   moveFiles = async (newPathToFile: string) => {
