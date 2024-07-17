@@ -4,11 +4,10 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { TabPanel, Tabs } from '~/components/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
@@ -28,6 +27,7 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import Table from '~/components/Table'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -69,7 +69,7 @@ import {
   IconMenuSelfHosting,
   IconMenuStorage,
   IconMenuSwift,
-} from './Navigation/NavigationMenu/HomeMenuIcons'
+} from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
 import SqlToRest from '@ui-patterns/SqlToRest'
@@ -142,7 +142,7 @@ const components = {
   IconMenuStorage,
   IconMenuSwift,
   IconPanel,
-  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
+  Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
   Link,
@@ -163,6 +163,7 @@ const components = {
   SocialProviderSetup,
   SqlToRest,
   StepHikeCompact,
+  table: Table,
   TabPanel,
   Tabs,
 }

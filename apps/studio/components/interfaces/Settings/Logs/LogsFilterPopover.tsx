@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react'
 
 import { Button, Checkbox, Form, Popover } from 'ui'
-import { FilterSet, Filters } from '.'
+import type { FilterSet, Filters } from './Logs.types'
 
 interface LogsFilterPopoverProps {
   options: FilterSet

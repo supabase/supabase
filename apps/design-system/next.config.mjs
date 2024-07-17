@@ -1,5 +1,7 @@
 import { withContentlayer } from 'next-contentlayer2'
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
@@ -22,11 +24,11 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
+      ...(BASE_PATH.length
         ? [
             {
               source: '/',
-              destination: process.env.NEXT_PUBLIC_BASE_PATH,
+              destination: BASE_PATH,
               basePath: false,
               permanent: false,
             },

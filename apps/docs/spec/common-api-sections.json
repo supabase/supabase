@@ -7,7 +7,7 @@
   },
   {
     "type": "category",
-    "title": "auth",
+    "title": "Auth",
     "items": [
       {
         "id": "v1-create-a-sso-provider",
@@ -55,7 +55,7 @@
   },
   {
     "type": "category",
-    "title": "database",
+    "title": "Database",
     "items": [
       {
         "id": "v1-disable-readonly-mode-temporarily",
@@ -82,9 +82,9 @@
         "type": "operation"
       },
       {
-        "id": "get-postgres-config",
+        "id": "v1-get-postgres-config",
         "title": "Get postgres config",
-        "slug": "get-postgres-config",
+        "slug": "v1-get-postgres-config",
         "type": "operation"
       },
       {
@@ -103,6 +103,12 @@
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-supavisor-config",
+        "title": "Get supavisor config",
+        "slug": "v1-get-supavisor-config",
         "type": "operation"
       },
       {
@@ -142,9 +148,9 @@
         "type": "operation"
       },
       {
-        "id": "update-postgres-config",
+        "id": "v1-update-postgres-config",
         "title": "Update postgres config",
-        "slug": "update-postgres-config",
+        "slug": "v1-update-postgres-config",
         "type": "operation"
       },
       {
@@ -152,12 +158,18 @@
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
         "type": "operation"
+      },
+      {
+        "id": "v1-update-supavisor-config",
+        "title": "Update supavisor config",
+        "slug": "v1-update-supavisor-config",
+        "type": "operation"
       }
     ]
   },
   {
     "type": "category",
-    "title": "domains",
+    "title": "Domains",
     "items": [
       {
         "id": "v1-activate-custom-hostname",
@@ -178,9 +190,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-deactive-vanity-subdomain-config",
-        "title": "Deactive vanity subdomain config",
-        "slug": "v1-deactive-vanity-subdomain-config",
+        "id": "v1-deactivate-vanity-subdomain-config",
+        "title": "Deactivate vanity subdomain config",
+        "slug": "v1-deactivate-vanity-subdomain-config",
         "type": "operation"
       },
       {
@@ -211,7 +223,7 @@
   },
   {
     "type": "category",
-    "title": "edge functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "v1-delete-a-function",
@@ -247,7 +259,7 @@
   },
   {
     "type": "category",
-    "title": "environments",
+    "title": "Environments",
     "items": [
       {
         "id": "v1-create-a-branch",
@@ -295,7 +307,7 @@
   },
   {
     "type": "category",
-    "title": "oauth",
+    "title": "OAuth",
     "items": [
       {
         "id": "v1-authorize-user",
@@ -313,7 +325,7 @@
   },
   {
     "type": "category",
-    "title": "organizations",
+    "title": "Organizations",
     "items": [
       {
         "id": "v1-create-an-organization",
@@ -343,7 +355,7 @@
   },
   {
     "type": "category",
-    "title": "projects",
+    "title": "Projects",
     "items": [
       {
         "id": "v1-create-a-project",
@@ -352,15 +364,15 @@
         "type": "operation"
       },
       {
-        "id": "v1-delete-network-bans",
-        "title": "Delete network bans",
-        "slug": "v1-delete-network-bans",
+        "id": "v1-delete-a-project",
+        "title": "Delete a project",
+        "slug": "v1-delete-a-project",
         "type": "operation"
       },
       {
-        "id": "v1-get-all-projects",
-        "title": "Get all projects",
-        "slug": "v1-get-all-projects",
+        "id": "v1-delete-network-bans",
+        "title": "Delete network bans",
+        "slug": "v1-delete-network-bans",
         "type": "operation"
       },
       {
@@ -394,6 +406,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-all-projects",
+        "title": "List all projects",
+        "slug": "v1-list-all-projects",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-network-restrictions",
         "title": "Update network restrictions",
         "slug": "v1-update-network-restrictions",
@@ -409,7 +427,7 @@
   },
   {
     "type": "category",
-    "title": "rest",
+    "title": "Rest",
     "items": [
       {
         "id": "v1-get-postgrest-service-config",
@@ -427,7 +445,7 @@
   },
   {
     "type": "category",
-    "title": "secrets",
+    "title": "Secrets",
     "items": [
       {
         "id": "v1-bulk-create-secrets",
@@ -469,7 +487,7 @@
   },
   {
     "type": "category",
-    "title": "storage",
+    "title": "Storage",
     "items": [
       {
         "id": "v1-list-all-buckets",

@@ -1,12 +1,13 @@
+'use client'
+
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
-import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'
-import { IconHome } from 'ui/src/components/Icon/icons/IconHome'
 import { IconArrowRight } from 'ui/src/components/Icon/icons/IconArrowRight'
 import { IconBook } from 'ui/src/components/Icon/icons/IconBook'
 import { IconColumns } from 'ui/src/components/Icon/icons/IconColumns'
+import { IconHome } from 'ui/src/components/Icon/icons/IconHome'
 import { IconInbox } from 'ui/src/components/Icon/icons/IconInbox'
 import { IconKey } from 'ui/src/components/Icon/icons/IconKey'
 import { IconLifeBuoy } from 'ui/src/components/Icon/icons/IconLifeBuoy'
@@ -14,6 +15,7 @@ import { IconLink } from 'ui/src/components/Icon/icons/IconLink'
 import { IconMonitor } from 'ui/src/components/Icon/icons/IconMonitor'
 import { IconPhone } from 'ui/src/components/Icon/icons/IconPhone'
 import { IconUser } from 'ui/src/components/Icon/icons/IconUser'
+import { AiIconAnimation } from 'ui/src/layout/ai-icon-animation/ai-icon-animation'
 import APIKeys from './APIKeys'
 import AiCommand from './AiCommand'
 import ChildItem from './ChildItem'
@@ -29,13 +31,15 @@ import {
   CommandList,
   copyToClipboard,
 } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
+import { useCommandMenu } from './CommandMenuContext'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import DocsSearch from './DocsSearch'
 import GenerateSQL from './GenerateSQL'
 import SearchableStudioItems from './SearchableStudioItems'
 import ThemeOptions from './ThemeOptions'
 import sharedItems from './utils/shared-nav-items.json'
+import useDragToClose from 'common/hooks/useDragToClose'
+import { DialogHeader } from 'ui'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -84,12 +88,22 @@ const CommandMenu = () => {
     currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
     currentPage === COMMAND_ROUTES.AI ||
     currentPage === COMMAND_ROUTES.GENERATE_SQL
-      ? 'min(600px, 50vh)'
-      : '300px'
+      ? 'min(600px, 70vh)'
+      : 'auto'
+
+  const {
+    ref: dialogRef,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useDragToClose({
+    onClose: () => setIsOpen(!open),
+  })
 
   return (
     <>
       <CommandDialog
+        ref={dialogRef}
         setIsOpen={setIsOpen}
         page={currentPage}
         visible={isOpen}
@@ -97,15 +111,23 @@ const CommandMenu = () => {
           setIsOpen(!isOpen)
         }}
       >
-        {pages.length > 0 && <CommandMenuShortcuts />}
-        {showCommandInput && (
-          <CommandInput
-            ref={commandInputRef}
-            placeholder="Type a command or search..."
-            value={search}
-            onValueChange={handleInputChange}
-          />
-        )}
+        <DialogHeader
+          className="p-0 gap-0"
+          // Close dialog by dragging the header down
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {pages.length > 0 && <CommandMenuShortcuts />}
+          {showCommandInput && (
+            <CommandInput
+              ref={commandInputRef}
+              placeholder="Type a command or search..."
+              value={search}
+              onValueChange={handleInputChange}
+            />
+          )}
+        </DialogHeader>
         <CommandList
           style={{
             maxHeight: commandListMaxHeight,
@@ -116,7 +138,7 @@ const CommandMenu = () => {
                 ? commandListMaxHeight
                 : 'auto',
           }}
-          className="my-2"
+          className="pb-20 md:pb-0"
         >
           {!currentPage && (
             <>

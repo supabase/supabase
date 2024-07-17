@@ -3,7 +3,7 @@ import {
   DatabaseSettings,
   NetworkRestrictions,
 } from 'components/interfaces/Settings/Database'
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
 
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'

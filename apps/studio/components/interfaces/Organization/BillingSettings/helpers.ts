@@ -17,7 +17,16 @@ export const formatUsage = (pricingMetric: PricingMetric, usage: number) => {
 export const billingMetricUnit = (pricingMetric: PricingMetric) => {
   if (pricingMetricBytes.includes(pricingMetric)) {
     return 'GB'
-  } else if (pricingMetric.startsWith('COMPUTE_HOURS')) {
+  } else if (
+    pricingMetric.startsWith('COMPUTE_HOURS') ||
+    [
+      PricingMetric.CUSTOM_DOMAIN,
+      PricingMetric.IPV4,
+      PricingMetric.PITR_7,
+      PricingMetric.PITR_14,
+      PricingMetric.PITR_28,
+    ].includes(pricingMetric)
+  ) {
     return 'Hours'
   } else {
     return null

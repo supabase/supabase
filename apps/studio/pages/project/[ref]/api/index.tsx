@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
-import { DocsLayout } from 'components/layouts'
+import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'

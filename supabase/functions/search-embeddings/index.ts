@@ -1,5 +1,5 @@
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { Database } from '../common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'

@@ -2,11 +2,9 @@ import { noop, pull } from 'lodash'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import {
-  POLICY_MODAL_VIEWS,
-  PolicySelection,
-  PolicyTemplates,
-} from 'components/interfaces/Auth/Policies'
+import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
+import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
+import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
 import { Button, IconChevronLeft, IconExternalLink, Modal } from 'ui'
 import {
   applyBucketIdToTemplateDefinition,

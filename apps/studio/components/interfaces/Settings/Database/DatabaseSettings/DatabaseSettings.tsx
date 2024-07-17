@@ -224,7 +224,7 @@ const DatabaseSettings = () => {
                   value={
                     state.selectedDatabaseId !== projectRef
                       ? '[The password for your primary database]'
-                      : '[The password you provided when you created this project]'
+                      : '[The password for your database]'
                   }
                   label="Password"
                 />

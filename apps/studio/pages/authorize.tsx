@@ -3,18 +3,18 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Alert, Button, Listbox } from 'ui'
 
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { FormPanel } from 'components/ui/Forms'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
+import { Alert, Button, Listbox } from 'ui'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -22,10 +22,15 @@ import type { NextPageWithLayout } from 'types'
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { auth_id } = useParams()
-  const [selectedOrg, setSelectedOrg] = useState<string>()
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
+  const {
+    data: requester,
+    isLoading,
+    isError,
+    error,
+  } = useApiAuthorizationQuery({ id: auth_id, slug: selectedOrgSlug })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
@@ -44,7 +49,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!isLoadingOrganizations) {
-      setSelectedOrg(organizations?.[0].slug ?? undefined)
+      setSelectedOrgSlug(organizations?.[0].slug ?? undefined)
     }
   }, [isLoadingOrganizations])
 
@@ -52,18 +57,22 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     if (!auth_id) {
       return toast.error('Unable to approve request: auth_id is missing ')
     }
-    if (!selectedOrg) {
+    if (!selectedOrgSlug) {
       return toast.error('Unable to approve request: No organization selected')
     }
 
-    approveRequest({ id: auth_id, organization_id: selectedOrg })
+    approveRequest({ id: auth_id, slug: selectedOrgSlug })
   }
 
   const onDeclineRequest = async () => {
     if (!auth_id) {
       return toast.error('Unable to decline request: auth_id is missing ')
     }
-    declineRequest({ id: auth_id })
+    if (!selectedOrgSlug) {
+      return toast.error('Unable to decline request: No organization selected')
+    }
+
+    declineRequest({ id: auth_id, slug: selectedOrgSlug })
   }
 
   if (isLoading) {
@@ -174,13 +183,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         ) : (
           <Listbox
             label="Select an organization to grant API access to"
-            value={selectedOrg}
+            value={selectedOrgSlug}
             disabled={isExpired}
-            onChange={setSelectedOrg}
+            onChange={setSelectedOrgSlug}
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.id}
+                key={organization.slug}
                 label={organization.name}
                 value={organization.slug}
               >
@@ -195,4 +204,5 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 }
 
 APIAuthorizationPage.getLayout = (page) => <APIAuthorizationLayout>{page}</APIAuthorizationLayout>
+
 export default withAuth(APIAuthorizationPage)

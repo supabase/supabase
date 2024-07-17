@@ -18,6 +18,12 @@ test('run and clear', async () => {
       warnings={[]}
       onClear={mockClear}
       hasEditorValue
+      warehouseCollections={[]}
+      dataSource="logs"
+      onDataSourceChange={() => {}}
+      templates={[]}
+      warehouseTemplates={[]}
+      onSelectWarehouseTemplate={() => {}}
     />
   )
   await expect(screen.findByPlaceholderText(/Search/)).rejects.toThrow()
