@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
@@ -9,16 +8,10 @@ import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Meetup } from '~/components/LaunchWeek/11/LW11Meetups'
 
 const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/12/Ticket/TicketingFlow'))
 
-interface Props {
-  meetups?: Meetup[]
-}
-
-export default function LaunchWeekIndex({ meetups }: Props) {
+export default function LaunchWeekIndex() {
   const { query } = useRouter()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
@@ -93,25 +86,10 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="bg-alternative">
-          <SectionContainer className="!pb-8" id="ticket">
-            <TicketingFlow />
-          </SectionContainer>
+        <DefaultLayout className="bg-alternative overflow-hidden h-screen !min-h-fit !max-h-[calc(100vh-60px)]">
+          <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!
-    .from('lw11_meetups')
-    .select('*')
-    .neq('isPublished', false)
-
-  return {
-    props: {
-      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
-    },
-  }
 }

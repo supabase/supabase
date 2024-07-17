@@ -15,6 +15,7 @@ import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
+import LW12Background from '../LW12Background'
 
 const LWGame = dynamic(() => import('./LW11Game'))
 
@@ -78,27 +79,28 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] max-w-md mx-auto flex flex-col justify-center gap-8 lg:gap-12 opacity-0 invisible',
+                      'w-full min-h-[400px] max-w-3xl mx-auto text-left md:text-center flex flex-col md:items-center justify-center gap-6 lg:gap-8 opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
-                    <div className="flex flex-col gap-2">
-                      <h2 className="text-foreground text-2xl">
-                        Join us for a Special Announcement
-                      </h2>
-                      <p className="text-foreground-lighter text-lg">
-                        Celebrate a major milestone with us and explore all the features that come
-                        with it.
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-1 font-mono uppercase text-sm">
-                      <p className="-mb-1">{LW12_DATE}</p>
+                    <div>
                       <CountdownComponent
                         date={LW12_LAUNCH_DATE}
                         showCard={false}
-                        className="[&_*]:leading-4"
+                        className="[&_*]:leading-4 text-foreground-lighter"
                         size="large"
                       />
+                    </div>
+                    <div className="flex flex-col md:items-center gap-2">
+                      <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-6 uppercase text-2xl tracking-wider">
+                        <h2 className="text-foreground">launch week s24</h2>
+                        <span className="h-full border-r border-foreground hidden md:inline" />
+                        <p className="text-foreground-light">{LW12_DATE}</p>
+                      </div>
+                      <p className="text-foreground-lighter text-lg">
+                        Join us for a week of new features and find new ways to level up your
+                        development.
+                      </p>
                     </div>
                     <TicketForm />
                   </m.div>
@@ -199,6 +201,7 @@ const TicketingFlow = () => {
           </div>
         </div>
       </SectionContainer>
+      <LW12Background className={cn('opacity-100 transition-opacity', hasTicket && 'opacity-20')} />
     </>
   )
 }
