@@ -20,14 +20,14 @@ import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useImmutableValue } from 'hooks/misc/useImmutableValue'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { Button, Form, IconEdit, IconLoader, IconTrash, Input } from 'ui'
+import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
+import { Button, Form, IconLoader, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
-import { WRAPPERS } from './Wrappers.constants'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
+  getWrapperMetaForWrapper,
   makeValidateRequired,
 } from './Wrappers.utils'
 
@@ -52,7 +52,7 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-  const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
+  const wrapperMeta = getWrapperMetaForWrapper(wrapper)
 
   const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
@@ -228,7 +228,7 @@ const EditWrapper = () => {
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })
-                      return { [option.name]: value[0].decrypted_secret }
+                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
                     } else {
                       return { [option.name]: '' }
                     }
@@ -298,14 +298,16 @@ const EditWrapper = () => {
                   header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
                 >
                   <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options.map((option) => (
-                      <InputField
-                        key={option.name}
-                        option={option}
-                        loading={option.encrypted ? loadingSecrets : false}
-                        error={formErrors[option.name]}
-                      />
-                    ))}
+                    {wrapperMeta.server.options
+                      .filter((option) => !option.hidden)
+                      .map((option) => (
+                        <InputField
+                          key={option.name}
+                          option={option}
+                          loading={option.encrypted ? loadingSecrets : false}
+                          error={formErrors[option.name]}
+                        />
+                      ))}
                   </FormSectionContent>
                 </FormSection>
                 <FormSection
@@ -329,7 +331,6 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index]?.label
                           const target = table?.table ?? table.object
 
                           return (
@@ -353,7 +354,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconEdit />}
+                                  icon={<Edit />}
                                   onClick={() => {
                                     setIsEditingTable(true)
                                     setSelectedTableToEdit({ ...table, tableIndex: i })
@@ -362,7 +363,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconTrash />}
+                                  icon={<Trash />}
                                   onClick={() => {
                                     setWrapperTables((prev) => prev.filter((_, j) => j !== i))
                                   }}
