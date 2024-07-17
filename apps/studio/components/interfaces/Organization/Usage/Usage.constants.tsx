@@ -95,7 +95,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
   },
   {
     key: 'sizeCount',
-    name: 'Size & Counts',
+    name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
       {
