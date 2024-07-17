@@ -492,12 +492,13 @@ class StorageExplorerStore {
   onUploadProgress(toastId?: string) {
     const totalFiles = this.uploadProgresses.length
     const progress =
-      this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles
+      (this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
+      100
     const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast.loading(
       <ToastLoader
-        progress={progress * 100}
+        progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
         description={STORAGE_PROGRESS_INFO_TEXT}
         labelTopOverride={`${!isNaN(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
@@ -666,6 +667,8 @@ class StorageExplorerStore {
         )
       }
 
+      let startingBytes = 0
+
       return () => {
         return new Promise<void>(async (resolve, reject) => {
           const fileSizeInMB = file.size / (1024 * 1024)
@@ -684,6 +687,9 @@ class StorageExplorerStore {
           } else {
             chunkSize = Math.floor(file.size / 50)
           }
+
+          // Max chunk size is 500MB
+          chunkSize = Math.max(chunkSize, 500 * 1024 * 1024)
 
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
@@ -712,26 +718,15 @@ class StorageExplorerStore {
               reject(error)
             },
             onProgress: (bytesSent, bytesTotal) => {
-              const percentage = bytesTotal === 0 ? 0 : bytesSent / bytesTotal
-              const elapsed = (Date.now() - startTime) / 1000 // in seconds
-              const uploadSpeed = bytesSent / elapsed // in bytes per second
-              const remainingBytes = bytesTotal - bytesSent
-              const remainingTime = remainingBytes / uploadSpeed // in seconds
-
-              this.uploadProgresses[index] = {
-                percentage,
-                elapsed,
-                uploadSpeed,
-                remainingBytes,
-                remainingTime,
+              if (startingBytes === 0 && bytesSent > chunkSize) {
+                startingBytes = bytesSent
               }
-              this.onUploadProgress(toastId)
-            },
-            onChunkComplete: (chunkSize, bytesAccepted, bytesTotal) => {
-              const percentage = bytesTotal === 0 ? 0 : bytesAccepted / bytesTotal
+
+              const percentage = bytesTotal === 0 ? 0 : bytesSent / bytesTotal
+              const realBytesSent = bytesSent - startingBytes
               const elapsed = (Date.now() - startTime) / 1000 // in seconds
-              const uploadSpeed = bytesAccepted / elapsed // in bytes per second
-              const remainingBytes = bytesTotal - bytesAccepted
+              const uploadSpeed = realBytesSent / elapsed // in bytes per second
+              const remainingBytes = bytesTotal - realBytesSent
               const remainingTime = remainingBytes / uploadSpeed // in seconds
 
               this.uploadProgresses[index] = {
