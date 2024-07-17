@@ -52,6 +52,7 @@ export const LW11_LAUNCH_DATE_END = '2024-04-21T23:59:59.000-07:00'
 export const LW12_DATE = 'August 12-16 / 7am PT'
 export const LW12_LAUNCH_DATE = '2024-08-12T07:00:00.000-07:00'
 export const LW12_LAUNCH_DATE_END = '2024-08-18T23:59:59.000-07:00'
+export const LW12_TITLE = 'Supabase Launch Week S24'
 export const TWEET_TEXT = '👁️⚡👁️'
 export const TWEET_TEXT_GOLDEN = `👁️⚡👁️`
 export const TWEET_TEXT_PLATINUM = `👁️⚡👁️`

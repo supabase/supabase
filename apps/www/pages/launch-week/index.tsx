@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
-import { SITE_ORIGIN, LW_URL } from '~/lib/constants'
-import supabase from '~/lib/supabaseMisc'
+import { SITE_ORIGIN, LW_URL, LW12_TITLE, LW12_DATE } from '~/lib/constants'
+import supabase from '~/lib/supabase'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -14,7 +14,7 @@ const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/12/Ticket/Ti
 export default function LaunchWeekIndex() {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase GA Week | 15-19 April 2024'
+  const TITLE = `${LW12_TITLE} | ${LW12_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/11/lw11-og-ga.png`
 

@@ -26,7 +26,7 @@ export default function TicketForm() {
       const email = session.user.email
 
       await supabase
-        .from('lw11_tickets')
+        .from('lw12_tickets')
         .insert({
           email,
           name,
@@ -43,7 +43,7 @@ export default function TicketForm() {
             return supabase.auth.signOut()
           }
           const { data } = await supabase
-            .from('lw11_tickets_platinum')
+            .from('lw12_tickets_platinum')
             .select('*')
             .eq('username', username)
             .single()
@@ -67,7 +67,7 @@ export default function TicketForm() {
                 {
                   event: 'UPDATE',
                   schema: 'public',
-                  table: 'lw11_tickets',
+                  table: 'lw12_tickets',
                   filter: `username=eq.${username}`,
                 },
                 (payload: any) => {
@@ -105,7 +105,7 @@ export default function TicketForm() {
     setFormState('loading')
     setTicketState('loading')
 
-    const redirectTo = `${SITE_ORIGIN}/ga-week/${
+    const redirectTo = `${SITE_ORIGIN}/launch-week/${
       userData.username ? '?referral=' + userData.username : ''
     }`
 
@@ -134,7 +134,7 @@ export default function TicketForm() {
     <div className="flex flex-col gap-10 items-start justify-center relative z-20">
       <Button
         size="tiny"
-        type="alternative"
+        type="outline"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
         iconLeft={session && <CheckCircle />}
