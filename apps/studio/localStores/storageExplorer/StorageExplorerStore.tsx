@@ -500,7 +500,7 @@ class StorageExplorerStore {
         progress={progress * 100}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
         description={STORAGE_PROGRESS_INFO_TEXT}
-        labelTopOverride={`${progress.toFixed(2)}% (${this.formatTime(remainingTime)} remaining)`}
+        labelTopOverride={`${!isNaN(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
       />,
       { id: toastId }
     )
@@ -1845,6 +1845,7 @@ class StorageExplorerStore {
       }
     })
 
+    console.log('totalRemainingTime:', totalRemainingTime)
     return totalRemainingTime
   }
 
