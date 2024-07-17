@@ -90,7 +90,7 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgress: number = 0
+  private uploadProgresses: number[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
@@ -480,6 +480,20 @@ class StorageExplorerStore {
     }
   }
 
+  onUploadProgress(toastId?: string) {
+    const totalFiles = this.uploadProgresses.length
+    const progress = this.uploadProgresses.reduce((acc, progress) => acc + progress, 0) / totalFiles
+
+    return toast.loading(
+      <ToastLoader
+        progress={progress * 100}
+        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />,
+      { id: toastId }
+    )
+  }
+
   uploadFiles = async (
     files: FileList | DataTransferItemList,
     columnIndex: number,
@@ -557,7 +571,7 @@ class StorageExplorerStore {
         return file
       })
 
-    this.uploadProgress = 0
+    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill(0)
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
@@ -568,18 +582,10 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const toastId = toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Uploading ${formattedFilesToUpload.length} file${
-          formattedFilesToUpload.length > 1 ? 's' : ''
-        }...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />
-    )
+    const toastId = this.onUploadProgress()
 
     // Upload files in batches
-    const promises = formattedFilesToUpload.map((file) => {
+    const promises = formattedFilesToUpload.map((file, index) => {
       const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
       const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
@@ -641,16 +647,17 @@ class StorageExplorerStore {
               ...fileOptions,
             },
             chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
-            onError: function (error) {
+            onError(error) {
               numberOfFilesUploadedFail += 1
               toast.error(`Failed to upload ${file.name}: ${error.message}`)
               reject(error)
             },
-            // onProgress: function (bytesUploaded, bytesTotal) {
-            //   const percentage = (bytesUploaded / bytesTotal)
-            //   // TODO: update toast progress based on the total progress of all files
-            // },
-            onSuccess: function () {
+            onProgress: (bytesUploaded, bytesTotal) => {
+              const percentage = bytesUploaded / bytesTotal
+              this.uploadProgresses[index] = percentage
+              this.onUploadProgress(toastId)
+            },
+            onSuccess() {
               numberOfFilesUploadedSuccess += 1
               resolve()
             },
@@ -678,16 +685,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader
-            progress={this.uploadProgress * 100}
-            message={`Uploading ${formattedFilesToUpload.length} file${
-              formattedFilesToUpload.length > 1 ? 's' : ''
-            }...`}
-            description={STORAGE_PROGRESS_INFO_TEXT}
-          />,
-          { id: toastId }
-        )
+        this.onUploadProgress(toastId)
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
