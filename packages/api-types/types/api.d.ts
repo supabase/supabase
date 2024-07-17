@@ -151,21 +151,25 @@ export interface paths {
     /** Gets user's integrations */
     get: operations['IntegrationsController_getUserInstallations']
   }
-  '/platform/integrations-directory': {
+  '/platform/integrations-directory-entries': {
     /** Retrieves an integrations directory list */
-    get: operations['IntegrationsDirectoryController_getIntegrationsDirectory']
-    /** Creates integrations directory entry */
-    post: operations['IntegrationsDirectoryController_createIntegrationsDirectoryEntry']
+    get: operations['IntegrationsDirectoryEntriesController_getIntegrationsDirectory']
+  }
+  '/platform/integrations-directory-entries/{slug}': {
+    /** Retrieves integrations directory entry by slug */
+    get: operations['IntegrationsDirectoryEntriesController_getIntegrationsDirectoryEntry']
   }
   '/platform/integrations-directory/{entry_id}': {
-    /** Deletes integrations directory entry */
+    /** Deletes integrations directory entry or its pending draft */
     delete: operations['IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry']
-    /** Updates integrations directory entry */
-    patch: operations['IntegrationsDirectoryController_updateIntegrationsDirectoryEntry']
   }
   '/platform/integrations-directory/{slug}': {
-    /** Retrieves integrations directory entry by slug */
+    /** Retrieves integrations directory entry for a given organization slug */
     get: operations['IntegrationsDirectoryController_getIntegrationsDirectoryEntry']
+    /** Updates integrations directory entry by creating a new pending draft */
+    put: operations['IntegrationsDirectoryController_updateIntegrationsDirectoryEntry']
+    /** Creates integrations directory entry */
+    post: operations['IntegrationsDirectoryController_createIntegrationsDirectoryEntry']
   }
   '/platform/integrations/{slug}': {
     /** Gets integration with the given organization slug */
@@ -2595,7 +2599,6 @@ export interface components {
       project_ref: string
       repository_id: number
     }
-    CreateIntegrationsDirectoryEntryBody: Record<string, never>
     CreateInvitationBody: {
       email: string
       role_id: number
@@ -5719,7 +5722,6 @@ export interface components {
       SMTP_USER?: string
       URI_ALLOW_LIST?: string
     }
-    UpdateIntegrationsDirectoryEntryBody: Record<string, never>
     UpdateMemberBody: {
       role_id: number
     }
@@ -7018,12 +7020,7 @@ export interface operations {
     }
   }
   /** Retrieves an integrations directory list */
-  IntegrationsDirectoryController_getIntegrationsDirectory: {
-    parameters: {
-      query: {
-        organization_id: string
-      }
-    }
+  IntegrationsDirectoryEntriesController_getIntegrationsDirectory: {
     responses: {
       200: {
         content: never
@@ -7034,73 +7031,8 @@ export interface operations {
       }
     }
   }
-  /** Creates integrations directory entry */
-  IntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateIntegrationsDirectoryEntryBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Deletes integrations directory entry */
-  IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        entry_id: string
-      }
-    }
-    responses: {
-      204: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates integrations directory entry */
-  IntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        entry_id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateIntegrationsDirectoryEntryBody']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Retrieves integrations directory entry by slug */
-  IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
+  IntegrationsDirectoryEntriesController_getIntegrationsDirectoryEntry: {
     parameters: {
       path: {
         slug: string
@@ -7111,6 +7043,68 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes integrations directory entry or its pending draft */
+  IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        entry_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+      /** @description Failed to delete integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieves integrations directory entry for a given organization slug */
+  IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates integrations directory entry by creating a new pending draft */
+  IntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates integrations directory entry */
+  IntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create integrations directory entry */
       500: {
         content: never
       }
