@@ -20,8 +20,8 @@ import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useImmutableValue } from 'hooks/misc/useImmutableValue'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { Button, Form, IconEdit, IconLoader, IconTrash, Input } from 'ui'
+import { ArrowLeft, Edit, ExternalLink, Trash } from 'lucide-react'
+import { Button, Form, IconLoader, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import {
@@ -228,7 +228,7 @@ const EditWrapper = () => {
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })
-                      return { [option.name]: value[0].decrypted_secret }
+                      return { [option.name]: value[0]?.decrypted_secret ?? '' }
                     } else {
                       return { [option.name]: '' }
                     }
@@ -331,7 +331,6 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index]?.label
                           const target = table?.table ?? table.object
 
                           return (
@@ -355,7 +354,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconEdit />}
+                                  icon={<Edit />}
                                   onClick={() => {
                                     setIsEditingTable(true)
                                     setSelectedTableToEdit({ ...table, tableIndex: i })
@@ -364,7 +363,7 @@ const EditWrapper = () => {
                                 <Button
                                   type="default"
                                   className="px-1"
-                                  icon={<IconTrash />}
+                                  icon={<Trash />}
                                   onClick={() => {
                                     setWrapperTables((prev) => prev.filter((_, j) => j !== i))
                                   }}
