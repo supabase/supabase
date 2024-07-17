@@ -755,7 +755,7 @@ class StorageExplorerStore {
           })
 
           this.abortUploadCallbacks.push(() => {
-            upload.abort()
+            upload.abort(true)
             reject(new Error('Upload aborted by user'))
           })
 
