@@ -1,5 +1,8 @@
 import db from 'mime-db'
 
+// [Alaister]: This is going to be moved to the server side
+// so can be removed once the server side is ready
+
 export const MIME_TYPES_BY_EXTENSION = Object.fromEntries(
   Object.entries(db)
     .filter(([, { extensions }]) => extensions !== undefined)
