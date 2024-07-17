@@ -3545,6 +3545,17 @@ export interface components {
       metadata: Record<string, never>
       supabase_project_ref: string
     }
+    IntegrationsDirectoryEntryRequestBody: {
+      overview: string
+      slug: string
+    }
+    IntegrationsDirectoryEntryResponse: {
+      approved: boolean
+      id: number
+      overview: string
+      parent_id: number | null
+      slug: string
+    }
     IntegrationVercelProject: {
       framework?: string | null
       id: string
@@ -7067,9 +7078,16 @@ export interface operations {
   }
   /** Retrieves integrations directory entry for a given organization slug */
   IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
+        }
       }
       403: {
         content: never
@@ -7082,9 +7100,21 @@ export interface operations {
   }
   /** Updates integrations directory entry by creating a new pending draft */
   IntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['IntegrationsDirectoryEntryRequestBody']
+      }
+    }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
+        }
       }
       403: {
         content: never
@@ -7097,9 +7127,26 @@ export interface operations {
   }
   /** Creates integrations directory entry */
   IntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['IntegrationsDirectoryEntryRequestBody']
+      }
+    }
     responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
+        }
+      }
       201: {
-        content: never
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
+        }
       }
       403: {
         content: never
