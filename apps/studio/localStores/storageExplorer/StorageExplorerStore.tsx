@@ -711,11 +711,27 @@ class StorageExplorerStore {
               toast.error(`Failed to upload ${file.name}: ${error.message}`)
               reject(error)
             },
-            onProgress: (bytesUploaded, bytesTotal) => {
-              const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
+            onProgress: (bytesSent, bytesTotal) => {
+              const percentage = bytesTotal === 0 ? 0 : bytesSent / bytesTotal
               const elapsed = (Date.now() - startTime) / 1000 // in seconds
-              const uploadSpeed = bytesUploaded / elapsed // in bytes per second
-              const remainingBytes = bytesTotal - bytesUploaded
+              const uploadSpeed = bytesSent / elapsed // in bytes per second
+              const remainingBytes = bytesTotal - bytesSent
+              const remainingTime = remainingBytes / uploadSpeed // in seconds
+
+              this.uploadProgresses[index] = {
+                percentage,
+                elapsed,
+                uploadSpeed,
+                remainingBytes,
+                remainingTime,
+              }
+              this.onUploadProgress(toastId)
+            },
+            onChunkComplete: (chunkSize, bytesAccepted, bytesTotal) => {
+              const percentage = bytesTotal === 0 ? 0 : bytesAccepted / bytesTotal
+              const elapsed = (Date.now() - startTime) / 1000 // in seconds
+              const uploadSpeed = bytesAccepted / elapsed // in bytes per second
+              const remainingBytes = bytesTotal - bytesAccepted
               const remainingTime = remainingBytes / uploadSpeed // in seconds
 
               this.uploadProgresses[index] = {
