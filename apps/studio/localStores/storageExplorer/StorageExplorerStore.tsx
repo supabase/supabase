@@ -104,6 +104,8 @@ class StorageExplorerStore {
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
 
+  private abortUploadCallbacks: (() => void)[] = []
+
   constructor() {
     makeAutoObservable(this, { supabaseClient: false })
 
@@ -683,7 +685,7 @@ class StorageExplorerStore {
           } else if (fileSizeInMB < 1024) {
             chunkSize = Math.floor(file.size / 20)
           } else if (fileSizeInMB < 10 * 1024) {
-            chunkSize = Math.floor(file.size / 20)
+            chunkSize = Math.floor(file.size / 30)
           } else {
             chunkSize = Math.floor(file.size / 50)
           }
@@ -742,6 +744,11 @@ class StorageExplorerStore {
               numberOfFilesUploadedSuccess += 1
               resolve()
             },
+          })
+
+          this.abortUploadCallbacks.push(() => {
+            upload.abort()
+            reject(new Error('Upload aborted by user'))
           })
 
           // Check if there are any previous uploads to continue.
@@ -809,6 +816,11 @@ class StorageExplorerStore {
     console.log(
       `Total time taken for ${formattedFilesToUpload.length} files: ${((t2 as any) - (t1 as any)) / 1000} seconds`
     )
+  }
+
+  abortUploads = () => {
+    this.abortUploadCallbacks.forEach((callback) => callback())
+    this.abortUploadCallbacks = []
   }
 
   moveFiles = async (newPathToFile: string) => {
