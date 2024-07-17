@@ -21,9 +21,9 @@ Since our first platform release, v0.2.1, the feature set of pg_graphql has stea
 
 ## Background
 
-pg_graphql was created to satisfy an extreme set of constraints. Mainly, [Supabase free plan](https://supabase.com/pricing) projects run on servers with 1 GB of memory. On those servers, we squeeze tuned versions of [PostgreSQL](https://github.com/supabase/postgres), [PostgREST](https://postgrest.org/en/stable/), and [GoTrue](https://github.com/supabase/gotrue). Every megabyte consumed by something that isn't PostgreSQL is another chance for an index to fall out of memory, or a large query to fail.
+pg_graphql was created to satisfy an extreme set of constraints. Mainly, [Supabase Free Plan](https://supabase.com/pricing) projects run on servers with 1 GB of memory. On those servers, we squeeze tuned versions of [PostgreSQL](https://github.com/supabase/postgres), [PostgREST](https://postgrest.org/en/stable/), and [GoTrue](https://github.com/supabase/gotrue). Every megabyte consumed by something that isn't PostgreSQL is another chance for an index to fall out of memory, or a large query to fail.
 
-Our philosophy when adding to the stack is to use existing open source tools wherever possible. We surveyed the available GraphQL → SQL options and found some excellent candidates in Hasura and Graphile. Both support the set of features we're interested in, but consume significantly more memory than we could sacrifice on the free plan. Realizing that, we searched for an architecture that could meet our runtime constraints and performance requirements.
+Our philosophy when adding to the stack is to use existing open source tools wherever possible. We surveyed the available GraphQL → SQL options and found some excellent candidates in Hasura and Graphile. Both support the set of features we're interested in, but consume significantly more memory than we could sacrifice on the Free Plan. Realizing that, we searched for an architecture that could meet our runtime constraints and performance requirements.
 
 ## Architecture
 
@@ -62,7 +62,7 @@ Somewhere around the 4,000 line count, things started to bog down. The rough sha
 - SQL functions are “pass by value” (copy) so passing state around can get expensive
 - The query planner tends to stop inlining functions when calls are deeply nested
 
-Combine those two facts with our GraphQL AST being a big ball of JSONB, and the GitHub issues about slow schema introspection on free plan started to trickle in.
+Combine those two facts with our GraphQL AST being a big ball of JSONB, and the GitHub issues about slow schema introspection on Free Plan started to trickle in.
 
 Enter [pgx](https://github.com/tcdi/pgx)…
 
@@ -70,7 +70,7 @@ pgx is a rust framework for building Postgres extensions. It has a very polished
 
 One of rust's main selling points is zero cost abstractions. That means high-level concepts like generics incur no runtime penalty. Transitioning from SQL's expensive abstractions to rust's zero cost abstractions has been hugely satisfying as it enabled refactoring the codebase into a more maintainable state. Development velocity is up. Code quality is up. Performance is WAY up.
 
-As of 1.0, overhead introduced by pg_graphql is sub 300 *micro*seconds per request on free-plan hardware. When executed from SQL we see ~1060 queries per second per connection (no parallelism). If we include the entire Auth + HTTP stack, free plan can handle ~645 requests per second. On larger instance the stack handles upwards of 10k requests / second.
+As of 1.0, overhead introduced by pg_graphql is sub 300 *micro*seconds per request on free Plan hardware. When executed from SQL we see ~1060 queries per second per connection (no parallelism). If we include the entire Auth + HTTP stack, Free Plan can handle ~645 requests per second. On larger instance the stack handles upwards of 10k requests / second.
 
 ```text
 This is ApacheBench, Version 2.3 <$Revision: 1843412 $>

@@ -95,7 +95,7 @@ export const plans: PricingInformation[] = [
         ],
       },
     ],
-    preface: 'Everything in the Free plan, plus:',
+    preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
   },
   {
@@ -122,7 +122,7 @@ export const plans: PricingInformation[] = [
         ],
       },
     ],
-    preface: 'Everything in the Pro plan, plus:',
+    preface: 'Everything in the Pro Plan, plus:',
     cta: 'Get Started',
   },
   {

@@ -207,9 +207,9 @@ const AdvancedAuthSettingsForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {promptTeamsEnterpriseUpgrade && (
                     <UpgradeToPro
-                      primaryText="Upgrade to Teams or Enterprise"
-                      secondaryText="Max Direct Database Connections settings are only available on the Teams plan and up."
-                      buttonText="Upgrade to Teams"
+                      primaryText="Upgrade to Team or Enterprise"
+                      secondaryText="Max Direct Database Connections settings are only available on the Team Plan and up."
+                      buttonText="Upgrade to Team"
                     />
                   )}
 
@@ -228,9 +228,9 @@ const AdvancedAuthSettingsForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {promptTeamsEnterpriseUpgrade && (
                     <UpgradeToPro
-                      primaryText="Upgrade to Teams or Enterprise"
-                      secondaryText="Max Request Duration settings are only available on the Teams plan and up."
-                      buttonText="Upgrade to Teams"
+                      primaryText="Upgrade to Team or Enterprise"
+                      secondaryText="Max Request Duration settings are only available on the Team Plan and up."
+                      buttonText="Upgrade to Team"
                     />
                   )}
 
