@@ -546,6 +546,23 @@ class StorageExplorerStore {
       if (numberOfFilesRejected === filesToUpload.length) return
     }
 
+    const filesWithNonZeroSize = filesWithinUploadLimit.filter((file) => file.size > 0)
+    if (filesWithNonZeroSize.length < filesWithinUploadLimit.length) {
+      const numberOfFilesRejected = filesWithinUploadLimit.length - filesWithNonZeroSize.length
+      toast.error(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
+            {numberOfFilesRejected > 1 ? 'their' : 'its'} size
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
+          </p>
+        </div>,
+        { duration: 8000 }
+      )
+
+      if (numberOfFilesRejected === filesWithinUploadLimit.length) return
+    }
+
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
     const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
@@ -603,14 +620,10 @@ class StorageExplorerStore {
       /**
        * Storage maintains a list of allowed characters, which excludes
        * characters such as the narrow no-break space used in Mac screenshots.
-       * To preempt errors, replace all non-word characters with underscores.
-       * [Joshen] Except backslashes as this will indicate a folder path, and paranthesis
-       * since our UI appends them to make duplicate names unique
-       */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(
-        /[^\w.-\/()]/g,
-        '_'
-      )
+       * [Joshen] Am limiting to just replacing nbsp with a blank space instead of
+       * all non-word characters per before
+       * */
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(/\xA0/g, ' ')
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
