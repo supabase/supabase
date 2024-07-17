@@ -4,6 +4,8 @@ import { useConfig } from '@/src/hooks/use-config'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
+import { useHoverControls } from './side-nav-motion'
+import { motion } from 'framer-motion'
 
 export default function SideNavMenuIcon({ product }: { product: any }) {
   const { org } = useParams()
@@ -29,11 +31,13 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
     overrideHref = `/${selectedOrg?.key}/${selectedProject?.key}/table-editor/${config.tableEditor.activeTabId}`
   }
 
+  const { controls, isHovered } = useHoverControls()
+
   return (
     <Link
       key={product.name}
       href={overrideHref || `/${org}/${selectedProject?.key}${product.href}`}
-      className={cn('relative', 'w-full', 'group/nav-item-anchor', 'flex flex-col items-center')}
+      className={cn('relative', 'w-full', 'group/nav-item-anchor', 'overflow-hidden')}
       aria-current={isActive ? 'page' : undefined}
     >
       <div
@@ -44,7 +48,33 @@ export default function SideNavMenuIcon({ product }: { product: any }) {
           'transition-all'
         )}
       ></div>
-      {product.icon}
+      <div className={cn('flex flex-row items-center')}>
+        <div className={cn('w-[64px]', 'flex justify-center items-center')}>{product.icon}</div>
+        <motion.span
+          animate={controls}
+          initial="rest"
+          variants={{
+            rest: { opacity: 0, x: 48, display: 'none' },
+            hover: { opacity: 100, x: 64, display: 'block' },
+          }}
+          transition={{ ease: 'easeInOut', duration: 0.2, delay: 0.2 }}
+          className={
+            cn(
+              'absolute w-[250px] hidden',
+              'text-sm',
+              'hover:text-foreground',
+              'text-foreground-light'
+            )
+            // 'w-[250px]',
+            // 'hidden',
+            // 'overflow-auto',
+            // isHovered && 'visible opacity-100 block',
+            // 'transition-all'
+          }
+        >
+          {product.label}
+        </motion.span>
+      </div>
       {/* <span className="text-xs mt-1">{product.label}</span> */}
     </Link>
   )

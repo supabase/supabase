@@ -45,7 +45,7 @@ const SideNav = [
     // },
     {
       name: 'table-editor',
-      label: 'Table Editor',
+      label: 'Explorer',
       icon: <Compass strokeWidth={STROKE_WIDTH} className={iconsClasses} size={ICON_SIZE} />,
       href: '/table-editor',
     },
