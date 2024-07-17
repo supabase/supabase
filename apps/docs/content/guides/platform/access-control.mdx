@@ -22,7 +22,7 @@ When you first create an account, a default organization is created for you and 
 
 ## Manage organization members
 
-To invite others to collaborate, visit your organization's team [settings](/dashboard/org/_/team) to send an invite link to another user's email. The invite is valid for 24 hours.
+To invite others to collaborate, visit your organization's team [settings](/dashboard/org/_/team) to send an invite link to another user's email. The invite is valid for 24 hours. For project scoped roles, you may only assign a role to a single project for the user when sending the invite. You can assign roles to multiple projects after the user accepts the invite.
 
 <Admonition type="note">
 
@@ -39,11 +39,11 @@ Each Supabase organization must have at least one owner. If your organization ha
 Otherwise, you'll need to invite a user as **Owner**, and they need to accept the invitation, or promote an existing organization member to **Owner** before you can leave the organization.
 
 
-### Organization Roles vs Project Roles
+### Organization Scoped Roles vs Project Scoped Roles
 
 <Admonition type="note">
 
-Project level roles are only available on the [Enterprise plan](https://supabase.com/pricing)
+Project scoped roles are only available on the [Enterprise plan](https://supabase.com/pricing)
 
 </Admonition>
 
@@ -263,4 +263,4 @@ The table below shows the actions each role can take on the resources belonging 
 [^2]: Invites sent from a SSO account can only be accepted by another SSO account coming from the same identity provider. This is a security measure that prevents accidental invites to accounts not managed by your company's enterprise systems.
 [^3]: Available on the Enterprise Plan.
 [^4]: Read-Only role is able to access secrets.
-[^5]: Only select queries.
+[^5]: Limited to executing SELECT queries.
