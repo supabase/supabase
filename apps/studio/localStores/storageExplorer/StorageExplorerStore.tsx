@@ -770,12 +770,16 @@ class StorageExplorerStore {
             this.abortUploadCallbacks[toastId] = []
           }
           this.abortUploadCallbacks[toastId].push(() => {
-            upload.abort(true)
+            try {
+              upload.abort(true)
+            } catch (error) {
+              // Ignore error
+            }
             reject(new Error('Upload aborted by user'))
           })
 
           // Check if there are any previous uploads to continue.
-          return upload.findPreviousUploads().then(function (previousUploads) {
+          return upload.findPreviousUploads().then((previousUploads) => {
             // Found previous uploads so we select the first one.
             if (previousUploads.length) {
               upload.resumeFromPreviousUpload(previousUploads[0])
