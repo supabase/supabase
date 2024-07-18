@@ -2314,9 +2314,6 @@ export interface components {
       name: string
       version: string
     }
-    AuthorizationsApproveBody: {
-      organization_id: string
-    }
     AutoApiService: {
       app: {
         id?: number
@@ -3896,7 +3893,6 @@ export interface components {
         | 'MONTHLY_ACTIVE_USERS'
         | 'MONTHLY_ACTIVE_SSO_USERS'
         | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
@@ -5912,6 +5908,7 @@ export interface components {
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
+      public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
       target_version: number
@@ -7803,7 +7800,6 @@ export interface operations {
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
           | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_COUNT'
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
@@ -8369,6 +8365,9 @@ export interface operations {
   AuthorizationsController_getAuthorizationRequest: {
     parameters: {
       path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Oauth authorization id */
         id: string
       }
     }
@@ -8378,18 +8377,19 @@ export interface operations {
           'application/json': components['schemas']['GetAuthorizationResponse']
         }
       }
+      403: {
+        content: never
+      }
     }
   }
   /** [Beta] Approve oauth app authorization request */
   AuthorizationsController_approveAuthorizationRequest: {
     parameters: {
       path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Oauth authorization id */
         id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AuthorizationsApproveBody']
       }
     }
     responses: {
@@ -8398,12 +8398,18 @@ export interface operations {
           'application/json': components['schemas']['ApproveAuthorizationResponse']
         }
       }
+      403: {
+        content: never
+      }
     }
   }
   /** [Beta] Decline oauth app authorization request */
   AuthorizationsController_declineAuthorizationRequest: {
     parameters: {
       path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Oauth authorization id */
         id: string
       }
     }
@@ -8412,6 +8418,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DeclineAuthorizationResponse']
         }
+      }
+      403: {
+        content: never
       }
     }
   }
