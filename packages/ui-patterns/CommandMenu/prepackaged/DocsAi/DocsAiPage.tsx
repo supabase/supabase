@@ -87,14 +87,17 @@ const DocsAiPage = () => {
           '[&_[cmdk-input-wrapper]]:border-b-0 [&_[cmdk-input-wrapper]]:border-t [&_[cmdk-input-wrapper]]:border-solid [&_[cmdk-input-wrapper]]:border-bg-control'
       )}
     >
-      {isBelowSm && (
-        <PromptInput
-          submit={submit}
-          messages={messages}
-          isLoading={isLoading}
-          isResponding={isResponding}
-        />
-      )}
+      <CommandHeader>
+        <Breadcrumb />
+        {isBelowSm && (
+          <PromptInput
+            submit={submit}
+            messages={messages}
+            isLoading={isLoading}
+            isResponding={isResponding}
+          />
+        )}
+      </CommandHeader>
       <div className={cn('flex-grow min-h-0 overflow-auto p-4')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {messages.length === 0 && !hasError && <EmptyState handleSubmit={handleSubmit} />}
@@ -171,39 +174,36 @@ function PromptInput({
   const [isImeComposing, setIsImeComposing] = useState(false)
 
   return (
-    <CommandHeader>
-      <Breadcrumb />
-      <CommandInput
-        className={cn(
-          'w-full h-11',
-          'border-none outline-none bg-transparent rounded-none rounded-t-md px-4 py-7',
-          'flex',
-          'text-base text-foreground-light',
-          'focus:ring-0 focus:shadow-none focus:ring-transparent',
-          'focus-visible:ring-0 focus-visible:shadow-none focus-visible:ring-transparent',
-          'placeholder:text-foreground-muted',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          className
-        )}
-        placeholder={
-          isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
-        }
-        value={query}
-        onCompositionStart={() => setIsImeComposing(true)}
-        onCompositionEnd={() => setIsImeComposing(false)}
-        onKeyDown={(e) => {
-          switch (e.key) {
-            case 'Enter':
-              if (!query || isLoading || isResponding || isImeComposing) {
-                return
-              }
-              return handleSubmit(query)
-            default:
+    <CommandInput
+      className={cn(
+        'w-full h-11',
+        'border-none outline-none bg-transparent rounded-none rounded-t-md px-4 py-7',
+        'flex',
+        'text-base text-foreground-light',
+        'focus:ring-0 focus:shadow-none focus:ring-transparent',
+        'focus-visible:ring-0 focus-visible:shadow-none focus-visible:ring-transparent',
+        'placeholder:text-foreground-muted',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        className
+      )}
+      placeholder={
+        isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
+      }
+      value={query}
+      onCompositionStart={() => setIsImeComposing(true)}
+      onCompositionEnd={() => setIsImeComposing(false)}
+      onKeyDown={(e) => {
+        switch (e.key) {
+          case 'Enter':
+            if (!query || isLoading || isResponding || isImeComposing) {
               return
-          }
-        }}
-      />
-    </CommandHeader>
+            }
+            return handleSubmit(query)
+          default:
+            return
+        }
+      }}
+    />
   )
 }
 
