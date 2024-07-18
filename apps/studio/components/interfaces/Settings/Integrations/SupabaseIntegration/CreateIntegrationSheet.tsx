@@ -53,11 +53,7 @@ export const CreateIntegrationSheet = ({
   const [showDeleteDraftDialog, setShowDeleteDraftDialog] = useState(false)
 
   const isDraft = !!integrationEntry?.parent_id || !!integrationEntry?.id
-  console.log(isDraft, integrationEntry)
 
-  {
-    /* TODO(Ivan): Pass the data correctly. It wont revalidate like that, but I just wanted to make it work. */
-  }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
