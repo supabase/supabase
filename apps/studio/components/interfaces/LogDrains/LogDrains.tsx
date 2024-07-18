@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { LOG_DRAIN_SOURCES } from './LogDrains.constants'
 import { useParams } from 'common'
 import CardButton from 'components/ui/CardButton'
+import Panel from 'components/ui/Panel'
 
 export function LogDrains() {
   const { ref } = useParams()
@@ -17,20 +18,23 @@ export function LogDrains() {
     return (
       <div className="grid grid-cols-2 gap-3">
         {LOG_DRAIN_SOURCES.map((src) => (
-          <Link key={src.value} href={`/project/${ref}/settings/log-drains?new=1&src=${src.value}`}>
-            <CardButton
-              title={src.name}
-              description={src.description}
-              icon={src.icon}
-              linkHref={`/project/${ref}/settings/log-drains?new=1&src=${src.value}`}
-            />
-          </Link>
+          <CardButton
+            key={src.value}
+            title={src.name}
+            description={src.description}
+            icon={src.icon}
+            linkHref={`/project/${ref}/settings/log-drains?new=1&src=${src.value}`}
+          />
         ))}
       </div>
     )
   }
 
   return (
-    <>{/* <Panel className="p-3">{logDrains?.map((drain) => <div>{drain.name}</div>)}</Panel> */}</>
+    <>
+      <Panel className="p-3">
+        {logDrains?.map((drain: any) => <pre>{JSON.stringify(drain, null, 2)}</pre>)}
+      </Panel>
+    </>
   )
 }

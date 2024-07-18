@@ -11,10 +11,11 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { CreateLogDrainDestination } from 'components/interfaces/LogDrains/CreateLogDrainDestination'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
+import toast from 'react-hot-toast'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref } = useParams() as { ref: string }
   const open = router.query.new === '1'
   const linksBaseUrl = `/project/${ref}/settings/log-drains`
 

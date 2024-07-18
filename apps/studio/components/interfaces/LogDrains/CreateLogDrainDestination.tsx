@@ -7,24 +7,13 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Input,
   Input_Shadcn_,
   Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Separator,
-  SheetSection,
+  Switch,
 } from 'ui'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from 'ui'
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from 'ui'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -39,16 +28,25 @@ import Link from 'next/link'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
-import { useEffect } from 'react'
 
 const FORM_ID = 'log-drain-destination-form'
 
 type SourceValue = (typeof LOG_DRAIN_SOURCE_VALUES)[number]
 
 const formUnion = z.discriminatedUnion('source', [
-  z.object({ source: z.literal('webhook'), url: z.string().url() }),
-  z.object({ source: z.literal('datadog'), apiKey: z.string(), region: z.string() }),
+  z.object({
+    source: z.literal('webhook'),
+    url: z.string().url(),
+    httpVersion: z.enum(['HTTP1', 'HTTP2']),
+    gzip: z.boolean(),
+  }),
+  z.object({
+    source: z.literal('datadog'),
+    apiKey: z.string(),
+    region: z.string(),
+  }),
   z.object({
     source: z.literal('elasticfilebeat'),
     url: z.string().url(),
@@ -105,7 +103,7 @@ export function CreateLogDrainDestination({
   onOpenChange: (v: boolean) => void
   defaultSource?: 'webhook' | 'datadog' | 'elasticfilebeat'
 }) {
-  const { ref } = useParams()
+  const { ref } = useParams() as { ref: string }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -113,9 +111,18 @@ export function CreateLogDrainDestination({
 
   const source = form.watch('source', defaultSource || 'webhook')
 
+  const { mutate: createLogDrain } = useCreateLogDrainMutation({
+    onSuccess: () => {
+      toast.success('Log drain destination created')
+    },
+  })
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    toast.success('Submit called')
+    createLogDrain({
+      ...values,
+      projectRef: ref,
+      config: {},
+    })
   }
 
   return (
@@ -175,12 +182,22 @@ export function CreateLogDrainDestination({
 
               <div className="p-4 grid gap-4">
                 {source === 'webhook' && (
-                  <LogDrainFormItem
-                    value="url"
-                    label="URL"
-                    formControl={form.control}
-                    placeholder="https://example.com/webhooks/logs"
-                  />
+                  <>
+                    <LogDrainFormItem
+                      value="url"
+                      label="URL"
+                      formControl={form.control}
+                      placeholder="https://example.com/webhooks/logs"
+                    />
+                    <RadioGroupStacked>
+                      <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
+                      <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
+                    </RadioGroupStacked>
+                    <div className="flex items-center space-x-2">
+                      <Switch id="gzip" />
+                      <Label_Shadcn_ htmlFor="gzip">Gzip</Label_Shadcn_>
+                    </div>
+                  </>
                 )}
                 {source === 'datadog' && (
                   <div className="grid gap-4">

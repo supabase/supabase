@@ -1,6 +1,7 @@
 import { Computer, DogIcon, WebhookIcon } from 'lucide-react'
 
 const iconProps = { size: 24, strokeWidth: 1.5, className: 'text-foreground-light' }
+
 export const LOG_DRAIN_SOURCES = [
   {
     value: 'webhook',
@@ -23,6 +24,7 @@ export const LOG_DRAIN_SOURCES = [
 ] as const
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_SOURCES.map((source) => source.value)
+export type LogDrainSource = (typeof LOG_DRAIN_SOURCES)[number]['value']
 
 export const DATADOG_REGIONS = [
   {

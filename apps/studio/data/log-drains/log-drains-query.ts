@@ -19,16 +19,21 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
 
   //   return data;
 
-  return [
-    // {
-    //   config: {},
-    //   id: 12,
-    //   inserted_at: '2021-10-14T14:00:00.000000Z',
-    //   name: 'DataDog',
-    //   token: '1234567890',
-    //   updated_at: '2021-10-14T14:00:00.000000Z',
-    // },
-  ]
+  // return [
+  //   {
+  //       config: {},
+  //       id: 12,
+  //       inserted_at: '2021-10-14T14:00:00.000000Z',
+  //       name: 'DataDog',
+  //       token: '1234567890',
+  //       updated_at: '2021-10-14T14:00:00.000000Z',
+  //     },
+  //   ]
+
+  // return from localstorage for now
+  const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
+
+  return logDrains
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
@@ -39,7 +44,7 @@ export const useLogDrainsQuery = <TData = LogDrainsData>(
   { enabled, ...options }: UseQueryOptions<LogDrainsData, LogDrainsyError, TData> = {}
 ) =>
   useQuery<LogDrainsData, LogDrainsyError, TData>(
-    logDrainsKeys.logDrains(ref),
+    logDrainsKeys.list(ref),
     ({ signal }) => getLogDrains({ ref }, signal),
     {
       enabled: enabled && !!ref,
