@@ -1,16 +1,11 @@
 import type OpenAI from 'openai'
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useCallback, useReducer, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
 
-import { type Message, type MessageAction, MessageRole, MessageStatus } from './utils'
 import { BASE_PATH } from '../shared/constants'
+import type { Message, MessageAction } from './utils'
+import { MessageRole, MessageStatus } from './utils'
 
 const messageReducer = (state: Message[], messageAction: MessageAction) => {
   let current = [...state]
@@ -25,15 +20,22 @@ const messageReducer = (state: Message[], messageAction: MessageAction) => {
     case 'update': {
       const { index, message } = messageAction
       if (current[index]) {
-        Object.assign(current[index], message)
+        current[index] = Object.assign({}, current[index], message)
       }
       break
     }
     case 'append-content': {
-      const { index, content } = messageAction
-      if (current[index]) {
-        current[index].content += content
+      const { index, content, idempotencyKey } = messageAction
+
+      const messageToEdit = current[index]
+      if (!messageToEdit || messageToEdit.idempotencyKey === idempotencyKey) {
+        break
       }
+      messageToEdit.idempotencyKey = idempotencyKey
+
+      current[index] = Object.assign({}, messageToEdit, {
+        content: (messageToEdit.content += content),
+      })
       break
     }
     case 'reset': {
@@ -55,6 +57,7 @@ interface UseAiChatOptions {
 
 const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: UseAiChatOptions) => {
   const eventSourceRef = useRef<SSE>()
+  const messageIdempotencyKey = useRef(0)
 
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -105,8 +108,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
         console.error(err)
       }
 
-      eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: MessageEvent) => {
+      function handleMessage(e: MessageEvent) {
         try {
           setIsLoading?.(false)
 
@@ -144,13 +146,17 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
             dispatchMessage({
               type: 'append-content',
               index: currentMessageIndex,
+              idempotencyKey: messageIdempotencyKey.current++,
               content,
             })
           }
         } catch (err) {
           handleError(err)
         }
-      })
+      }
+
+      eventSource.addEventListener('error', handleError)
+      eventSource.addEventListener('message', handleMessage)
 
       eventSource.stream()
 

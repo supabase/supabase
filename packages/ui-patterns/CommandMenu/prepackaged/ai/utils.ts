@@ -13,6 +13,7 @@ interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
+  idempotencyKey?: number
 }
 
 interface NewMessageAction {
@@ -30,6 +31,7 @@ interface AppendContentAction {
   type: 'append-content'
   index: number
   content: string
+  idempotencyKey: number
 }
 
 interface ResetAction {
