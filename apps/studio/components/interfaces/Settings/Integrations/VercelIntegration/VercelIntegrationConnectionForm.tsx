@@ -191,7 +191,7 @@ const VercelIntegrationConnectionForm = ({
 
           <p className="mt-2 text-sm text-warning-600">
             Note: Changing these settings will also trigger an automatic resync of environment
-            variables.
+            variables. The previous public environment variable prefix will be removed.
           </p>
 
           <FormActions
