@@ -150,8 +150,15 @@ export const CreateIntegrationSheet = ({
                     <AlertTitle_Shadcn_ className="text-sm">Awaiting Approval</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_ className="text-xs">
                       Your entry awaits approval by Supabase team. In the meantime, you can see the
-                      preview at https://supabase.com/integrations/{integrationEntry?.slug}
-                      ?preview_token={integrationEntry?.preview_token}
+                      preview{' '}
+                      <a
+                        className="cursor-pointer"
+                        href={`https://supabase.com/integrations/${integrationEntry?.slug}?preview_token=${integrationEntry?.preview_token}`}
+                        target="_blank"
+                      >
+                        here
+                      </a>
+                      .
                     </AlertDescription_Shadcn_>
                   </div>
                 </Alert_Shadcn_>
@@ -163,9 +170,16 @@ export const CreateIntegrationSheet = ({
                 <div>
                   <AlertTitle_Shadcn_ className="text-sm">Draft View</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="text-xs">
-                    Your entry awaits approval by Supabase team. In the meantime, you can see the
-                    preview at https://supabase.com/integrations/{integrationEntry?.slug}
-                    ?preview_token={integrationEntry?.preview_token}
+                    Your entry updates await approval by Supabase team. In the meantime, you can see
+                    the preview{' '}
+                    <a
+                      className="cursor-pointer"
+                      href={`https://supabase.com/integrations/${integrationEntry?.slug}?preview_token=${integrationEntry?.preview_token}`}
+                      target="_blank"
+                    >
+                      here
+                    </a>
+                    .
                   </AlertDescription_Shadcn_>
                 </div>
               </Alert_Shadcn_>

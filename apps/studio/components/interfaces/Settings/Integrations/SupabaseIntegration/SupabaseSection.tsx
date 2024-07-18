@@ -63,7 +63,7 @@ const SupabaseSection = () => {
                 The logic here handles the following cases:
                 - if there's no entry, Submit draft application for review
                 - if there's no entry and a draft, Edit draft application
-                - if there's an entry and no draft,  Submit draft application for review
+                - if there's an entry and no draft, Submit draft application for review
                 - if there's an entry and a draft, Edit draft application 
               */}
               {!entry && !draftEntry && (
@@ -88,9 +88,16 @@ const SupabaseSection = () => {
                 <div className="prose text-sm">
                   <p>
                     Your entry awaits approval by Supabase team. In the meantime, you can see the
-                    preview at https://supabase.com/integrations/{draftEntry?.slug} (available only
-                    to logged-in organization members). Once you're finished with the draft and want
-                    to submit the draft for review, please contact us via support.
+                    preview{' '}
+                    <a
+                      className="cursor-pointer"
+                      href={`https://supabase.com/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
+                      target="_blank"
+                    >
+                      here
+                    </a>
+                    . Once you're finished with the draft and want to submit the draft for review,
+                    please contact us via support.
                   </p>
                   <Button type="primary" className="w-fit" onClick={() => setVisible(true)}>
                     Edit draft for review
@@ -136,10 +143,17 @@ const SupabaseSection = () => {
                   </div>
                   <div className="prose text-sm">
                     <p>
-                      Your entry awaits approval by Supabase team. In the meantime, you can see the
-                      preview at https://supabase.com/integrations/{draftEntry?.slug} (available
-                      only to logged-in organization members). Once you're finished with the draft
-                      and want to submit the draft for review, please contact us via support.
+                      Your entry updates await approval by Supabase team. In the meantime, you can
+                      see the preview{' '}
+                      <a
+                        className="cursor-pointer"
+                        href={`https://supabase.com/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
+                        target="_blank"
+                      >
+                        here
+                      </a>
+                      . Once you're finished with the draft and want to submit the draft for review,
+                      please contact us via support.
                     </p>
                     <Button type="primary" className="w-fit" onClick={() => setVisible(true)}>
                       Edit draft for review
