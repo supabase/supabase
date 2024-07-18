@@ -151,25 +151,13 @@ export interface paths {
     /** Gets user's integrations */
     get: operations['IntegrationsController_getUserInstallations']
   }
-  '/platform/integrations-directory-entries': {
+  '/platform/integrations-directory': {
     /** Retrieves an integrations directory list */
-    get: operations['IntegrationsDirectoryEntriesController_getIntegrationsDirectory']
-  }
-  '/platform/integrations-directory-entries/{slug}': {
-    /** Retrieves integrations directory entry by slug */
-    get: operations['IntegrationsDirectoryEntriesController_getIntegrationsDirectoryEntry']
-  }
-  '/platform/integrations-directory/{entry_id}': {
-    /** Deletes integrations directory entry or its pending draft */
-    delete: operations['IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry']
+    get: operations['IntegrationsDirectoryController_getIntegrationsDirectory']
   }
   '/platform/integrations-directory/{slug}': {
-    /** Retrieves integrations directory entry for a given organization slug */
+    /** Retrieves integrations directory entry by slug */
     get: operations['IntegrationsDirectoryController_getIntegrationsDirectoryEntry']
-    /** Updates integrations directory entry by creating a new pending draft */
-    put: operations['IntegrationsDirectoryController_updateIntegrationsDirectoryEntry']
-    /** Creates integrations directory entry */
-    post: operations['IntegrationsDirectoryController_createIntegrationsDirectoryEntry']
   }
   '/platform/integrations/{slug}': {
     /** Gets integration with the given organization slug */
@@ -323,6 +311,18 @@ export interface paths {
   '/platform/organizations/{slug}/documents/standard-security-questionnaire': {
     /** Get standard security questionnaire URL */
     get: operations['OrgDocumentsController_getStandardSecurityQuestionnaireUrl']
+  }
+  '/platform/organizations/{slug}/integrations-directory': {
+    /** Retrieves integrations directory entry for a given organization slug */
+    get: operations['OrgIntegrationsDirectoryController_getIntegrationsDirectoryEntry']
+    /** Updates integrations directory entry by creating a new pending draft */
+    put: operations['OrgIntegrationsDirectoryController_updateIntegrationsDirectoryEntry']
+    /** Creates integrations directory entry */
+    post: operations['OrgIntegrationsDirectoryController_createIntegrationsDirectoryEntry']
+  }
+  '/platform/organizations/{slug}/integrations-directory/{entry_id}': {
+    /** Deletes integrations directory entry or its pending draft */
+    delete: operations['OrgIntegrationsDirectoryController_deleteIntegrationsDirectoryEntry']
   }
   '/platform/organizations/{slug}/members': {
     /** Gets organization's members */
@@ -3545,11 +3545,7 @@ export interface components {
       metadata: Record<string, never>
       supabase_project_ref: string
     }
-    IntegrationsDirectoryEntryRequestBody: {
-      overview: string
-      slug: string
-    }
-    IntegrationsDirectoryEntryResponse: {
+    IntegrationsDirectoryEntry: {
       approved: boolean
       id: number
       overview: string
@@ -3914,6 +3910,10 @@ export interface components {
     }
     OrgDocumentUrlResponse: {
       fileUrl: string
+    }
+    OrgIntegrationsDirectoryRequestBody: {
+      overview: string
+      slug: string
     }
     OrgMetricUsage: {
       available_in_plan: boolean
@@ -7031,7 +7031,7 @@ export interface operations {
     }
   }
   /** Retrieves an integrations directory list */
-  IntegrationsDirectoryEntriesController_getIntegrationsDirectory: {
+  IntegrationsDirectoryController_getIntegrationsDirectory: {
     responses: {
       200: {
         content: never
@@ -7043,40 +7043,6 @@ export interface operations {
     }
   }
   /** Retrieves integrations directory entry by slug */
-  IntegrationsDirectoryEntriesController_getIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to retrieve integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Deletes integrations directory entry or its pending draft */
-  IntegrationsDirectoryController_deleteIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        entry_id: string
-      }
-    }
-    responses: {
-      204: {
-        content: never
-      }
-      /** @description Failed to delete integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Retrieves integrations directory entry for a given organization slug */
   IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
     parameters: {
       path: {
@@ -7085,73 +7051,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
-        }
-      }
-      403: {
         content: never
       }
       /** @description Failed to retrieve integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Updates integrations directory entry by creating a new pending draft */
-  IntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['IntegrationsDirectoryEntryRequestBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to update integrations directory entry */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Creates integrations directory entry */
-  IntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['IntegrationsDirectoryEntryRequestBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
-        }
-      }
-      201: {
-        content: {
-          'application/json': components['schemas']['IntegrationsDirectoryEntryResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create integrations directory entry */
       500: {
         content: never
       }
@@ -8055,6 +7957,102 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+    }
+  }
+  /** Retrieves integrations directory entry for a given organization slug */
+  OrgIntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntry'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates integrations directory entry by creating a new pending draft */
+  OrgIntegrationsDirectoryController_updateIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrgIntegrationsDirectoryRequestBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntry']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates integrations directory entry */
+  OrgIntegrationsDirectoryController_createIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OrgIntegrationsDirectoryRequestBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryEntry']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create integrations directory entry */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes integrations directory entry or its pending draft */
+  OrgIntegrationsDirectoryController_deleteIntegrationsDirectoryEntry: {
+    parameters: {
+      path: {
+        entry_id: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+      /** @description Failed to delete integrations directory entry */
+      500: {
+        content: never
       }
     }
   }
