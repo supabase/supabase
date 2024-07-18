@@ -20,11 +20,15 @@ export async function deleteLogDrain({ projectRef, id }: LogDrainDeleteVariables
   // return data
 
   // remove from localstorage for now
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  console.log('deleting log drain', id)
+
   let logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
   logDrains = logDrains.filter((drain: any) => drain.id !== id)
   localStorage.setItem('logDrains', JSON.stringify(logDrains))
 
-  return logDrains
+  return
 }
 
 type LogDrainDeleteData = Awaited<ReturnType<typeof deleteLogDrain>>
