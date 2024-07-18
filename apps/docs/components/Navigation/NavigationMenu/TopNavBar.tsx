@@ -29,7 +29,7 @@ const TopNavBar: FC = () => {
             <HeaderLogo />
             <GlobalNavigationMenu />
           </div>
-          <div className="w-full grow lg:w-auto max-w-7xl flex gap-3 justify-between lg:justify-end items-center h-full">
+          <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
             <div className="lg:hidden">
               <HeaderLogo />
             </div>
