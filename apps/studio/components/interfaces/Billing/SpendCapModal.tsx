@@ -145,12 +145,6 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                 <p className="w-[25%] text-sm">2 Million</p>
                 <p className="w-[25%] text-sm">$2 per Million</p>
               </div>
-
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Function count</p>
-                <p className="w-[25%] text-sm">100 functions</p>
-                <p className="w-[25%] text-sm">$10 per 100 functions</p>
-              </div>
             </div>
           </div>
 
