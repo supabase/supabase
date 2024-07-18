@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { cn } from 'ui'
+import { codeBlock } from 'common-tags'
+import { cn, CodeBlock } from 'ui'
 import { Pencil, X } from 'lucide-react'
 import Tilt from 'vanilla-tilt'
 import { useBreakpoint, useParams } from 'common'
@@ -10,6 +11,7 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketProfile from './TicketProfile'
 import TicketCustomizationForm from './TicketCustomizationForm'
 import TicketNumber from './TicketNumber'
+import { LW12_TITLE } from '../../../../lib/constants'
 
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
@@ -20,6 +22,7 @@ export default function Ticket() {
     bg_image_id: bgImageId = '1',
     secret: hasSecretTicket,
     ticketNumber,
+    username,
   } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
@@ -50,11 +53,18 @@ export default function Ticket() {
         glare: true,
         max: 3,
         gyroscope: true,
-        'max-glare': 0.2,
+        'max-glare': 0.1,
         'full-page-listening': true,
       })
     }
   }, [ticketRef])
+
+  const code = codeBlock`
+await supabase
+  .from('tickets')
+  .eq('username', ${username})
+  .single()
+`
 
   return (
     <div
@@ -63,37 +73,26 @@ export default function Ticket() {
       style={{ transformStyle: 'preserve-3d', transform: 'perspective(1000px)' }}
     >
       <Panel
-        hasShimmer
-        outerClassName="flex relative flex-col w-[360px] h-auto max-h-[680px] rounded-3xl !shadow-xl !p-0"
-        innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[396/613] rounded-xl dark:bg-[#020405] text-left text-sm group/ticket"
+        // hasShimmer
+        outerClassName="flex relative flex-col w-[360px] border h-auto max-h-[680px] rounded-xl !shadow-xl !p-0"
+        innerClassName="flex relative flex-col w-full transition-colors aspect-[396/613] rounded-xl text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"
         style={{ transform: 'translateZ(-10px)' }}
       >
-        <TicketNumber
-          number={ticketNumber}
-          platinum={platinum}
-          secret={hasSecretTicket}
-          className="absolute z-20 top-6 left-6"
-        />
-        <TicketProfile className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden" />
-        <Image
-          src={ticketBg[ticketType].background}
-          alt={`Launch Week X ticket background #${bgImageId}`}
-          placeholder="blur"
-          blurDataURL={fallbackImg}
-          onLoad={() => setImageHasLoaded(true)}
-          loading="eager"
-          fill
-          sizes="100%"
-          className={cn(
-            'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
-            imageHasLoaded && 'opacity-100',
-            isMobile && 'object-left-top'
-          )}
-          priority
-          quality={100}
-        />
+        <div className="w-full bg-alternative p-4 border-b flex flex-col gap-4">
+          <span className="uppercase text-foreground tracking-wider">
+            <strong className="font-medium">Launch Week</strong> 12 Ticket
+          </span>
+          <CodeBlock
+            language="js"
+            hideCopy
+            className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
+          >
+            {code}
+          </CodeBlock>
+        </div>
+        <div className="w-full p-4 flex-grow">asdf</div>
         {/* Edit hover button */}
         {!sharePage && (
           <>
@@ -107,7 +106,6 @@ export default function Ticket() {
           </>
         )}
       </Panel>
-      <div className="absolute top-0 left-auto right-auto mx-auto w-[20%] aspect-square -translate-y-[65%] dark:bg-[#060809] z-40 rounded-b-[100px]" />
       {!sharePage && (
         <TicketCustomizationForm className="absolute inset-0 top-auto z-40 order-last md:order-first" />
       )}

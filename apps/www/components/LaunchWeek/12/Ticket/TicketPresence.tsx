@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import solutions from '~/data/Solutions'
 import { cn } from 'ui'
+import { Dot } from 'lucide-react'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 const TicketPresence = (props: { className?: string }) => {
   const { supabase, ticketState } = useConfData()
@@ -47,28 +47,14 @@ const TicketPresence = (props: { className?: string }) => {
   return (
     <div
       className={cn(
-        'text-foreground-muted text-xs flex items-center transition-opacity',
+        'text-foreground-lighter text-xs flex items-center transition-opacity',
         hasTicket && 'text-sm opacity-80',
         props.className
       )}
     >
-      <svg
-        className="h-5 w-5 stroke-foreground-lighter animate-pulse mr-2"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path
-          stroke="text-foreground"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.5"
-          d={solutions.realtime.icon}
-        />
-      </svg>
+      <Dot className="text-brand animate-pulse" />
       {onlineUsers.length} {isSingular ? 'person is' : 'people are'}{' '}
-      {hasTicket ? 'customizing' : 'generating'} their ticket right now
+      {hasTicket ? 'customizing' : 'generating'} their ticket
     </div>
   )
 }
