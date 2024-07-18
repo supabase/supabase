@@ -62,7 +62,7 @@ const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 10 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
-const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
+const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 class StorageExplorerStore {
   private projectRef: string = ''
@@ -509,7 +509,12 @@ class StorageExplorerStore {
         <div className="flex items-center gap-2">
           <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
           {toastId && (
-            <Button type="default" size="tiny" onClick={() => this.abortUploads(toastId)}>
+            <Button
+              type="default"
+              size="tiny"
+              className="ml-6"
+              onClick={() => this.abortUploads(toastId)}
+            >
               Cancel
             </Button>
           )}
@@ -851,7 +856,7 @@ class StorageExplorerStore {
     this.clearSelectedItems()
 
     const { dismiss } = UiToast({
-      description: 'Please do not close the browser until the move is completed',
+      description: STORAGE_PROGRESS_INFO_TEXT,
       duration: Infinity,
     })
 

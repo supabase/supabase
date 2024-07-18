@@ -26,8 +26,9 @@ export const ToastLoader = ({
         type="horizontal"
         barClass="bg-brand"
         labelBottom={message}
+        labelBottomClass="normal-nums"
         labelTop={labelTopOverride || `${progress.toFixed(2)}%`}
-        labelTopClass="font-mono"
+        labelTopClass="tabular-nums"
       />
       {children}
     </div>
