@@ -352,7 +352,7 @@ const BasicAuthSettingsForm = () => {
                   ) : (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro plan."
+                      secondaryText="Configuring user sessions requires the Pro Plan."
                     />
                   )}
                   <Toggle

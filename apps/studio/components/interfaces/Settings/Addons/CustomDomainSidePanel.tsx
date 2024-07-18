@@ -136,7 +136,7 @@ const CustomDomainSidePanel = () => {
       }
       tooltip={
         isFreePlan
-          ? 'Unable to enable custom domain on a free plan'
+          ? 'Unable to enable custom domain on a Free Plan'
           : !canUpdateCustomDomain
             ? 'You do not have permission to update custom domain'
             : undefined
@@ -314,7 +314,7 @@ const CustomDomainSidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="Custom domains are unavailable on the free plan"
+              title="Custom domains are unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
                   <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>

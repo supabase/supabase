@@ -46,7 +46,7 @@ export const DatabaseReadOnlyAlert = () => {
               {subscription?.plan.id === 'free' ? (
                 <li>
                   <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                    <a className="text underline">Upgrade to the Pro plan</a>
+                    <a className="text underline">Upgrade to the Pro Plan</a>
                   </Link>{' '}
                   to increase your database size limit to 8GB.
                 </li>
