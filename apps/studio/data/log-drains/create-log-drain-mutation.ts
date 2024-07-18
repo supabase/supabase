@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { handleError, patch } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
 import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
@@ -16,9 +16,9 @@ export type LogDrainCreateVariables = {
 
 export async function createLogDrain(data: LogDrainCreateVariables) {
   // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
-  // const { data, error } = await patch('/platform/projects/{ref}/resources/{id}', {
+  // const { data, error } = await post('/platform/projects/{ref}/resources/{id}', {
   //   params: { path: { ref: projectRef, id } },
-  //   body: { updatedParam },
+  //   body: { newLogDrain },
   // })
 
   // if (error) handleError(error)
@@ -26,7 +26,14 @@ export async function createLogDrain(data: LogDrainCreateVariables) {
 
   // store in localstorage for now
   const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
-  logDrains.push(data)
+  logDrains.push({
+    id: Math.floor(Math.random() * 1000000),
+    name: data.name,
+    source: data.source,
+    config: data.config,
+    inserted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  })
   localStorage.setItem('logDrains', JSON.stringify(logDrains))
 
   return logDrains
