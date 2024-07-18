@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
+import { get } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
@@ -9,7 +9,7 @@ type IntegrationsDirectoryVariables = {
   orgSlug: string
 }
 
-export type IntegrationEntry = components['schemas']['IntegrationsDirectoryEntryResponse']
+export type IntegrationEntry = components['schemas']['IntegrationsDirectoryEntry']
 
 export async function getIntegrationsDirectory(
   { orgSlug }: IntegrationsDirectoryVariables,
@@ -19,13 +19,13 @@ export async function getIntegrationsDirectory(
     return
   }
 
-  const { data, error } = await get('/platform/integrations-directory/{slug}', {
+  const { data, error } = await get('/platform/organizations/{slug}/integrations-directory', {
     params: { path: { slug: orgSlug } },
     signal,
   })
 
-  if (error) handleError(error)
-  return data
+  // no handleError here because the API returns 404 error instead of empty array.
+  return error ? null : data
 }
 
 export type IntegrationsDirectoryData = Awaited<ReturnType<typeof getIntegrationsDirectory>>

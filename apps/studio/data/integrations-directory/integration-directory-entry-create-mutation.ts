@@ -1,21 +1,21 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
-import { components } from 'api-types'
 
 type IntegrationDirectoryEntryCreateVariables = {
   orgSlug: string
-  params: components['schemas']['IntegrationsDirectoryEntryRequestBody']
+  params: Pick<components['schemas']['IntegrationsDirectoryEntry'], 'slug' | 'overview'>
 }
 
 export async function createIntegrationDirectoryEntry({
   orgSlug,
   params,
 }: IntegrationDirectoryEntryCreateVariables) {
-  const { data, error } = await post('/platform/integrations-directory/{slug}', {
+  const { data, error } = await post('/platform/organizations/{slug}/integrations-directory', {
     params: { path: { slug: orgSlug } },
     body: params,
   })

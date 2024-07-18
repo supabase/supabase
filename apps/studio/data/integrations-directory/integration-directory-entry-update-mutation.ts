@@ -8,14 +8,14 @@ import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationDirectoryEntryUpdateVariables = {
   orgSlug: string
-  params: components['schemas']['IntegrationsDirectoryEntryRequestBody']
+  params: Pick<components['schemas']['IntegrationsDirectoryEntry'], 'slug' | 'overview'>
 }
 
 export async function updateIntegrationDirectoryEntry({
   orgSlug,
   params,
 }: IntegrationDirectoryEntryUpdateVariables) {
-  const { data, error } = await put('/platform/integrations-directory/{slug}', {
+  const { data, error } = await put('/platform/organizations/{slug}/integrations-directory', {
     params: { path: { slug: orgSlug } },
     body: params,
   })

@@ -13,13 +13,16 @@ type IntegrationDirectoryEntryDeleteVariables = {
 export async function deleteIntegrationDirectoryEntry({
   entryId,
 }: IntegrationDirectoryEntryDeleteVariables) {
-  const { data, error } = await del('/platform/integrations-directory/{entry_id}', {
-    params: {
-      path: {
-        entry_id: String(entryId),
+  const { data, error } = await del(
+    '/platform/organizations/{slug}/integrations-directory/{entry_id}',
+    {
+      params: {
+        path: {
+          entry_id: String(entryId),
+        },
       },
-    },
-  })
+    }
+  )
 
   if (error) handleError(error)
   return data
