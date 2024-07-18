@@ -32,9 +32,11 @@ import {
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormDescription_Shadcn_,
 } from 'ui'
 
-import Link from 'next/link'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -119,12 +121,13 @@ export function CreateLogDrainDestination({
     resolver: zodResolver(formSchema),
     defaultValues: {
       httpVersion: 'HTTP2',
+      gzip: false,
     },
   })
 
   const source = form.watch('source', defaultSource)
 
-  const { mutate: createLogDrain } = useCreateLogDrainMutation({
+  const { mutate: createLogDrain, isLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
       form.reset()
@@ -208,15 +211,18 @@ export function CreateLogDrainDestination({
                       <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
                       <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
                     </RadioGroupStacked>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="gzip"
-                        name="gzip"
-                        checked={form.getValues('gzip')}
-                        onCheckedChange={(v) => form.setValue('gzip', v)}
-                      />
-                      <Label_Shadcn_ htmlFor="gzip">Gzip</Label_Shadcn_>
-                    </div>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="gzip"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex gap-2 p-2 items-center">
+                          <FormControl_Shadcn_>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl_Shadcn_>
+                          <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
                   </>
                 )}
                 {source === 'datadog' && (
@@ -287,7 +293,7 @@ export function CreateLogDrainDestination({
         </SheetSection>
 
         <SheetFooter className="p-4">
-          <Button form={FORM_ID} htmlType="submit" type="primary">
+          <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
             Create destination
           </Button>
         </SheetFooter>
