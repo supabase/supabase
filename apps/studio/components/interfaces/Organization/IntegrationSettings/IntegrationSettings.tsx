@@ -31,6 +31,9 @@ import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnect
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
+// Enable local and staging testing only for now.
+const IS_INTEGRATIONS_DIRECTORY_ENABLED = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
@@ -192,8 +195,8 @@ The GitHub app will watch for changes in your repository such as file changes, b
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
-      <ScaffoldDivider />
-      <SupabaseSection />
+      {IS_INTEGRATIONS_DIRECTORY_ENABLED && <ScaffoldDivider />}
+      {IS_INTEGRATIONS_DIRECTORY_ENABLED && <SupabaseSection />}
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>

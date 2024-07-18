@@ -3550,6 +3550,7 @@ export interface components {
       id: number
       overview: string
       parent_id: number | null
+      preview_token: string
       slug: string
     }
     IntegrationVercelProject: {
