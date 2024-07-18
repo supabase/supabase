@@ -60,8 +60,6 @@ const TOTPFactors = () => {
                         <Button
                           size="tiny"
                           type="default"
-                          // className="px-1"
-                          // icon={<IconTrash />}
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         >
                           Remove

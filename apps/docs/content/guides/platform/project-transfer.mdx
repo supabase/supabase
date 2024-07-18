@@ -6,25 +6,25 @@ description: 'Transfer a project to another organization.'
 
 With the introduction of [Organization-based Billing](/docs/guides/platform/org-based-billing), we’re adding the ability to freely transfer projects between different organizations. Head to your [projects' general settings](https://supabase.com/dashboard/project/_/settings/general) to initiate a project transfer.
 
-<div>
-  <Image
-    alt="Project Transfer: General Settings"
-    src={{
-      light: '/docs/img/guides/platform/project-transfer-overview--light.png',
-      dark: '/docs/img/guides/platform/project-transfer-overview.png',
-    }}
-  />
-</div>
+<Image
+  alt="Project Transfer: General Settings"
+  src={{
+    light: '/docs/img/guides/platform/project-transfer-overview--light.png',
+    dark: '/docs/img/guides/platform/project-transfer-overview.png',
+  }}
+  className="max-w-[600px] !mx-auto border rounded-md"
+  zoomable
+/>
 
-<div>
-  <Image
-    alt="Project Transfer: Confirmation Modal"
-    src={{
-      light: '/docs/img/guides/platform/project-transfer-modal--light.png',
-      dark: '/docs/img/guides/platform/project-transfer-modal.png',
-    }}
-  />
-</div>
+<Image
+  alt="Project Transfer: Confirmation Modal"
+  src={{
+    light: '/docs/img/guides/platform/project-transfer-modal--light.png',
+    dark: '/docs/img/guides/platform/project-transfer-modal.png',
+  }}
+  className="max-w-[600px] !mx-auto"
+  zoomable
+/>
 
 Source organization - the organization the project currently belongs to
 Target organization - the organization you want to move the project to
@@ -51,9 +51,9 @@ Similarly, for other usage metrics such as database size, egress, image transfor
 
 ## Things to watch out for
 
-- Transferring a project might come with a short 1-2 minute downtime if you're moving a project from a paid to a free plan.
-- You could lose access to certain project features depending on the plan of the target organization, i.e. moving a project from a Pro plan to a Free plan.
-- When moving your project to a Free plan, we also ensure you’re not exceeding your two free project limit. In these cases, it is best to upgrade your target organization to Pro plan first.
+- Transferring a project might come with a short 1-2 minute downtime if you're moving a project from a paid to a Free Plan.
+- You could lose access to certain project features depending on the plan of the target organization, i.e. moving a project from a Pro Plan to a Free Plan.
+- When moving your project to a Free Plan, we also ensure you’re not exceeding your two free project limit. In these cases, it is best to upgrade your target organization to Pro Plan first.
 - You could have less rights on the project depending on your role in the target organization, i.e. you were an Owner in the previous organization and only have a Read-Only role in the target organization.
 
 ## Transfer to a different region

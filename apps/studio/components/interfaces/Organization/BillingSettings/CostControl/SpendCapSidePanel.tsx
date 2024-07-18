@@ -10,7 +10,7 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { pricing } from 'shared-data/pricing'
@@ -201,7 +201,7 @@ const SpendCapSidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="Toggling of the spend cap is only available on the Pro plan"
+              title="Toggling of the spend cap is only available on the Pro Plan"
               actions={
                 <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans

@@ -23,7 +23,7 @@ import {
   PRICING_TIER_PRODUCT_IDS,
   PROVIDERS,
 } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import passwordStrength from 'lib/password-strength'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 
 interface ISetupProjectStore {
@@ -235,7 +235,6 @@ const CreateProject = observer(() => {
         dbRegion: dbRegion,
         dbSql: dbSql || '',
         dbPricingTierId: PRICING_TIER_PRODUCT_IDS.FREE,
-        configurationId: _store.configurationId,
         authSiteUrl: _store.selectedVercelProjectUrl,
       })
     } catch (error) {

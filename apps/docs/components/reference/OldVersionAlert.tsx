@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import { ICommonSection } from './Reference.types'
 
@@ -9,13 +10,13 @@ export interface OldVersionAlertProps {
 }
 
 const OldVersionAlert = ({ sections }: OldVersionAlertProps) => {
-  const router = useRouter()
+  const pathname = usePathname()
   const activeRefId = useMenuActiveRefId()
 
   const activeSection = sections.find(({ id }) => id === activeRefId)
 
   // Remove the version number from URL to get the latest
-  const latestVersionUrl = router.asPath
+  const latestVersionUrl = pathname
     .split('/')
     .slice(0, -2)
     .concat(activeSection ? [activeSection.slug] : [])

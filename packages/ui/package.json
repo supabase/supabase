@@ -74,6 +74,7 @@
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^8.0.3",
+    "react-medium-image-zoom": "^5.2.4",
     "react-resizable-panels": "^2.0.13",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
@@ -117,7 +118,7 @@
     "ts-jest": "^29.1.1",
     "tsconfig": "*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.4.3"
+    "typescript": "^5.5.0"
   },
   "peerDependencies": {
     "next": "*",

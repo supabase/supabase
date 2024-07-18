@@ -90,7 +90,7 @@ export const days: AdventDay[] = [
     is_shipped: true,
     links: [
       {
-        url: '/blog/supabase-aquires-oriole',
+        url: '/blog/supabase-acquires-oriole',
         label: 'Blog post',
         target: '_blank',
       },

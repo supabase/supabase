@@ -48,7 +48,7 @@ export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps)
       <div className="flex items-center justify-center gap-x-2">
         <Button asChild type="default" icon={<ExternalLink />}>
           <Link
-            href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occured%20on%20dashboard&message=${encodeURI(message)}`}
+            href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(message)}`}
             target="_blank"
           >
             Report to support

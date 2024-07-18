@@ -43,9 +43,9 @@ const STATUS_TO_LABEL: Record<Status, string> = {
   MIGRATIONS_PASSED: 'Migrations applied successfully',
   FUNCTIONS_DEPLOYED: 'Functions deployed',
   FUNCTIONS_FAILED: 'Functions failed to deploy',
-  PAUSE_FAILED: 'Pause failed',
-  RESTORE_FAILED: 'Restore failed',
   RESTARTING: 'Restarting',
+  RESTORE_FAILED: 'Failed to restore',
+  PAUSE_FAILED: 'Failed to pause',
 }
 
 const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {

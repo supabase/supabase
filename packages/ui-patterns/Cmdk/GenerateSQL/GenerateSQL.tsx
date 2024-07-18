@@ -16,7 +16,7 @@ import { MessageRole, MessageStatus, useAiChat, UseAiChatOptions } from './../Ai
 import { cn } from 'ui/src/lib/utils'
 import { AiIcon, AiIconChat } from '../Command.icons'
 import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
-import { useCommandMenu } from '../CommandMenuProvider'
+import { useCommandMenu } from '../CommandMenuContext'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
 import { generatePrompt } from './GenerateSQL.utils'

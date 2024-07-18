@@ -1,8 +1,7 @@
 import { noop } from 'lodash'
 import { FlaskConical } from 'lucide-react'
 import { Button, IconChevronLeft, IconExternalLink } from 'ui'
-
-import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
+import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface PolicyEditorModalTitleProps {
   view: string

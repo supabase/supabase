@@ -19,6 +19,24 @@ describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
     const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
+    const sql = 'SELECT * FROM countries LIMIT 10;'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query already has a limit and offset', () => {
+    const sql = 'select * from countries limit 10 offset 0;'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query already has a limit and offset (flip order of limit and offset)', () => {
+    const sql = 'select * from countries offset 0 limit 1;'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
   test('Should return false if query already has a limit, even if no value provided for limit', () => {
     const sql = 'select * from countries limit'
     const limit = 100

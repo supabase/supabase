@@ -13,7 +13,7 @@ const addons = [
     price: 'Available on Pro Plan',
     heroImg: <CostControlAnimation className="relative w-full h-full lg:max-w-md" />,
     description:
-      'The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
+      'The Pro Plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
     ctaText: 'Learn about Cost Control',
     ctaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
     ctaTarget: '_blank',

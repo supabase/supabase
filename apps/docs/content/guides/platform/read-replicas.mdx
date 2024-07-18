@@ -10,21 +10,12 @@ Read Replicas are additional databases that are kept in sync with your Primary d
 - **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
 - **Redundancy:** Read Replicas provide data redundancy.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="Map view of all project databases"
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="Map view of all project databases."
-        src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="Map view of all project databases."
+  src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
+  containerClassName="max-w-[700px] !mx-auto"
+  zoomable
+/>
 
 ## About Read Replicas
 
@@ -84,14 +75,6 @@ Read Replicas offer the following features:
 
 ### Dedicated endpoints
 
-<Admonition type="note" label="Known bug in PostgREST schema reloading">
-
-For Read Replicas deployed before May 24, 2024, there is a known bug that results in the [PostgREST schema cache](https://postgrest.org/en/v12/references/schema_cache.html) on Read Replicas not being reloaded correctly on DDL changes. A stale schema cache can result in PostgREST on Read Replicas not knowing about newly created functions, tables, changes to their structure, etc.
-
-A fix for this issue has already been deployed for newer Read Replicas but not fully applied for older ones as it requires a restart of the API service. You can perform a one-time restart of the service by [saving any trivial configuration change](https://supabase.com/dashboard/project/_/settings/api) to your PostgREST configuration (For example, changing the `Max Rows` by 1), which will result in the service being restarted.
-
-</Admonition>
-
 Each Read Replica has its own dedicated database and API endpoints.
 
 - Find the database endpoint on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection Info**
@@ -127,21 +110,12 @@ If you use a [custom domain](/docs/guides/platform/custom-domains), requests wil
 
 In the SQL editor, you can choose if you want to run the query on a particular Read Replica.
 
-<figure className="max-w-[700px] mx-auto">
-
-    <Image
-        className="hidden dark:block"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="SQL editor view."
-        src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
-    />
-
-</figure>
+<Image
+  alt="SQL editor view."
+  src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
+  containerClassName="max-w-[700px]"
+  zoomable
+/>
 
 ### Logging
 
@@ -195,13 +169,13 @@ In this replication method, the Primary continuously buffers WAL changes to a lo
 
 ### File-based log shipping 🤝 streaming replication
 
-<figure className="max-w-[700px] mx-auto">
-  <Image
-    alt="Map view of Primary and Read Replica databases"
-    src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
-  />
-  <figcaption>Map view of Primary and Read Replica databases</figcaption>
-</figure>
+<Image
+  alt="Map view of Primary and Read Replica databases"
+  caption="Map view of Primary and Read Replica databases"
+  src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
+  containerClassName="max-w-[700px] mx-auto"
+  zoomable
+/>
 
 We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
 

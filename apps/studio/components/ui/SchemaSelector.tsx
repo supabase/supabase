@@ -1,8 +1,10 @@
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -45,6 +47,7 @@ const SchemaSelector = ({
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
+  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
 
   const { project } = useProjectContext()
   const {
@@ -152,7 +155,7 @@ const SchemaSelector = ({
                     ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
-                {onSelectCreateSchema !== undefined && (
+                {onSelectCreateSchema !== undefined && canCreateSchemas && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_>

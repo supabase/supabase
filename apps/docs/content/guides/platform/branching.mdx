@@ -24,19 +24,16 @@ Supabase Branching works with Git. You can test changes in a separate, temporary
 
 You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
 
-<figure className="max-w-[700px] mx-auto">
-  <Image
-    className="hidden dark:block"
-    alt="Each branch has a separate Supabase instance."
-    src="/docs/img/guides/platform/branching/github-workflow-without-branching.jpg?v=1"
-  />
-  <Image
-    className="dark:hidden"
-    alt="Each branch has a separate Supabase instance."
-    src="/docs/img/guides/platform/branching/github-workflow-without-branching--light.jpg?v=1"
-  />
-  <figcaption>Each Branch is a separate environment.</figcaption>
-</figure>
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt="Each branch has a separate Supabase instance."
+  caption="Each Branch is a separate environment."
+  src={{
+    dark: '/docs/img/guides/platform/branching/github-workflow-without-branching.jpg?v=1',
+    light: '/docs/img/guides/platform/branching/github-workflow-without-branching--light.jpg?v=1',
+  }}
+/>
 
 ### Branching workflow
 
@@ -58,21 +55,16 @@ The Preview Branch is also seeded with sample data based on `./supabase/seed.sql
 
 Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
 
-<figure className="max-w-[700px] mx-auto">
-    <Image
-        className="hidden dark:block"
-        alt="Each GitHub branch can have its own Supabase preview branch."
-        src="/docs/img/guides/platform/branching/github-workflow.jpg?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="Each GitHub branch can have its own Supabase preview branch."
-        src="/docs/img/guides/platform/branching/github-workflow--light.jpg?v=1"
-    />
-    <figcaption>Each GitHub branch can have its own Supabase preview branch.</figcaption>
-
-</figure>
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt="Each GitHub branch can have its own Supabase preview branch."
+  caption="Each GitHub branch can have its own Supabase preview branch."
+  src={{
+    dark: '/docs/img/guides/platform/branching/github-workflow.jpg?v=1',
+    light: '/docs/img/guides/platform/branching/github-workflow--light.jpg?v=1',
+  }}
+/>
 
 ### Production branch
 
@@ -84,21 +76,16 @@ After connecting your Supabase project to one of the supported [Git providers](#
 
 The Git integration can read files from your Git provider, watching every commit and pull request. Each time a commit is pushed with new migrations in the `./supabase/migrations` directory, the migrations are run on the matching Supabase Preview environment:
 
-<figure className="max-w-[700px] mx-auto">
-    <Image
-        className="hidden dark:block"
-        alt="New migration files trigger migrations on the preview instance."
-        src="/docs/img/guides/platform/branching/github-workflow-commit-migration.jpg?v=1"
-    />
-
-    <Image
-        className="dark:hidden"
-        alt="New migration files trigger migrations on the preview instance."
-        src="/docs/img/guides/platform/branching/github-workflow-commit-migration--light.jpg?v=1"
-    />
-    <figcaption>New migration files trigger migrations on the preview instance.</figcaption>
-
-</figure>
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt="New migration files trigger migrations on the preview instance."
+  caption="New migration files trigger migrations on the preview instance."
+  src={{
+    dark: '/docs/img/guides/platform/branching/github-workflow-commit-migration.jpg?v=1',
+    light: '/docs/img/guides/platform/branching/github-workflow-commit-migration--light.jpg?v=1',
+  }}
+/>
 
 ### Data changes
 
@@ -517,11 +504,13 @@ When you open a pull request on GitHub, the Supabase integration automatically c
 
 A comment is added to your PR with the deployment status of your preview branch. Statuses are shown separately for Database, Services, and APIs.
 
-<figure className="max-w-[700px] mx-auto">
-  <Image src="/docs/img/guides/platform/branching/develop-your-app-open-pull-request-github.jpg?v=1" />
-  {/* prettier-ignore */}
-  <figcaption>Supabase GitHub integration will comment on your PR with the status of your Preview Branch, including whether migrations have successfully run.</figcaption>
-</figure>
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt="GitHub view of the deployment status of your preview branch"
+  caption="Supabase GitHub integration will comment on your PR with the status of your Preview Branch, including whether migrations have successfully run."
+  src="/docs/img/guides/platform/branching/develop-your-app-open-pull-request-github.jpg?v=1"
+/>
 
 Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
 
@@ -529,11 +518,13 @@ Every time a new commit is pushed that changes the migration files in `./supabas
 
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
-<figure className="max-w-[700px] mx-auto">
-  <Image src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1" />
-  {/* prettier-ignore */}
-  <figcaption>Check the "Require status checks to pass before merging" option.</figcaption>
-</figure>
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt='Check the "Require status checks to pass before merging" option.'
+  caption='Check the "Require status checks to pass before merging" option.'
+  src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+/>
 
 ### Disable branching
 

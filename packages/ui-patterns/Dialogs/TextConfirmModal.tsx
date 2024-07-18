@@ -148,7 +148,7 @@ const TextConfirmModal = forwardRef<
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
-                  <FormItem_Shadcn_>
+                  <FormItem_Shadcn_ className="flex flex-col gap-y-1">
                     <FormLabel_Shadcn_ {...label}>
                       Type <span className="text-foreground break-all">{confirmString}</span> to
                       confirm.

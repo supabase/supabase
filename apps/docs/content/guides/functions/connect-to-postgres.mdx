@@ -14,7 +14,7 @@ You can also use other Postgres clients like [Deno Postgres](https://deno.land/x
 The `supabase-js` client is a great option for connecting to your Supabase database since it handles authorization with Row Level Security, and it automatically formats your response as JSON.
 
 ```ts index.ts
-import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (_req) => {
   try {

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Button, IconPlus } from 'ui'
 
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
@@ -10,8 +9,9 @@ import AlertError from 'components/ui/AlertError'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import { Button, IconPlus } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
