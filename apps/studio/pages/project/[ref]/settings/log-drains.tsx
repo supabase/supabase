@@ -12,6 +12,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { Button } from 'ui'
 import { useState } from 'react'
+import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const router = useRouter()
@@ -39,7 +40,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         <CreateLogDrainDestination
           open={open}
           onOpenChange={setOpen}
-          defaultSource={router.query.src}
+          defaultSource={router.query.src as LogDrainSource}
         />
         <LogDrains />
       </ScaffoldContainer>
