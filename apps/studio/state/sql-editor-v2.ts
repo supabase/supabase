@@ -368,7 +368,7 @@ if (typeof window !== 'undefined') {
       const snippet = state.snippets[id]
       const folder = state.folders[id]
 
-      if (snippet) {
+      if (snippet && id !== 'new') {
         debouncedUpdateSnippet(id, snippet.projectRef, {
           id,
           type: 'sql',
