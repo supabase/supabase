@@ -29,7 +29,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     slug: selectedOrganization?.slug,
   })
 
-  const memberIsUser = member.primary_email == profile?.primary_email
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
