@@ -200,17 +200,33 @@ export function CreateLogDrainDestination({
                       formControl={form.control}
                       placeholder="https://example.com/webhooks/log-drain"
                     />
-                    <RadioGroupStacked
-                      value={form.getValues('httpVersion')}
-                      onValueChange={(value: 'HTTP1' | 'HTTP2') => {
-                        form.setValue('httpVersion', value, {
-                          shouldValidate: true,
-                        })
-                      }}
-                    >
-                      <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
-                      <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
-                    </RadioGroupStacked>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="httpVersion"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="space-y-4">
+                          <FormControl_Shadcn_>
+                            <RadioGroupStacked
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormItem_Shadcn_ asChild>
+                                <FormControl_Shadcn_>
+                                  <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
+                                </FormControl_Shadcn_>
+                              </FormItem_Shadcn_>
+                              <FormItem_Shadcn_ asChild>
+                                <FormControl_Shadcn_>
+                                  <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
+                                </FormControl_Shadcn_>
+                              </FormItem_Shadcn_>
+                            </RadioGroupStacked>
+                          </FormControl_Shadcn_>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+
                     <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
