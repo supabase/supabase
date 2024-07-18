@@ -31,9 +31,19 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
   //   ]
 
   // return from localstorage for now
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+
   const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
 
-  return logDrains
+  return logDrains as {
+    config: Record<string, any>
+    id: number
+    source: string
+    inserted_at: string
+    name: string
+    token: string
+    updated_at: string
+  }[]
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
