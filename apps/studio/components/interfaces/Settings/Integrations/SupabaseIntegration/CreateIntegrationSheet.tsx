@@ -4,12 +4,12 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useIntegrationDirectoryEntryCreateMutation } from 'data/integrations-directory/integration-directory-entry-create-mutation'
 import { useIntegrationDirectoryEntryDeleteMutation } from 'data/integrations-directory/integration-directory-entry-delete-mutation'
 import { useIntegrationDirectoryEntryUpdateMutation } from 'data/integrations-directory/integration-directory-entry-update-mutation'
 import { IntegrationEntry } from 'data/integrations-directory/integrations-directory-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useState } from 'react'
 import type { FormSchema } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -29,6 +29,7 @@ import {
   SheetTitle,
   cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
@@ -48,17 +49,21 @@ export const CreateIntegrationSheet = ({
   integrationEntry,
   setVisible,
 }: CreateIntegrationSheetProps) => {
-  const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+  const [showDeleteDraftDialog, setShowDeleteDraftDialog] = useState(false)
 
-  const isEditing = !!integrationEntry?.id
+  const isDraft = !!integrationEntry?.parent_id || !!integrationEntry?.id
+  console.log(isDraft, integrationEntry)
 
   {
     /* TODO(Ivan): Pass the data correctly. It wont revalidate like that, but I just wanted to make it work. */
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: integrationEntry,
+    defaultValues: {
+      slug: integrationEntry?.slug || '',
+      overview: integrationEntry?.overview || '',
+    },
   })
 
   const { mutate: createIntegrationEntry, isLoading: isCreating } =
@@ -66,14 +71,19 @@ export const CreateIntegrationSheet = ({
   const { mutate: updateIntegrationEntry, isLoading: isUpdating } =
     useIntegrationDirectoryEntryUpdateMutation()
   const { mutate: deleteIntegrationEntry, isLoading: isDeleting } =
-    useIntegrationDirectoryEntryDeleteMutation()
+    useIntegrationDirectoryEntryDeleteMutation({
+      onSuccess: () => {
+        if (showDeleteDraftDialog) {
+          toast.success('Successfully discarded draft changes.')
+        }
 
-  const onDelete = (entryId: number) => {
-    deleteIntegrationEntry({ entryId })
-  }
+        setShowDeleteDraftDialog(false)
+        setVisible(false)
+      },
+    })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
-    if (isEditing) {
+    if (isDraft) {
       updateIntegrationEntry(
         {
           orgSlug: organization!.slug,
@@ -110,8 +120,6 @@ export const CreateIntegrationSheet = ({
 
   const isLoading = isCreating || isUpdating || isDeleting
 
-  const integrationSlug = form.watch('slug')
-
   return (
     <>
       <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
@@ -128,7 +136,7 @@ export const CreateIntegrationSheet = ({
             <span className="sr-only">Close</span>
           </SheetClose>
           <SheetTitle className="truncate">
-            {isCreating ? `Add integration` : `Update ${integrationSlug}`}
+            {isDraft ? `Update integration` : `Add integration`}
           </SheetTitle>
         </div>
       </SheetHeader>
@@ -177,7 +185,7 @@ export const CreateIntegrationSheet = ({
                   description="The unique identifier for this integration (will be used in the URL)"
                 >
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} autoFocus />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -201,21 +209,12 @@ export const CreateIntegrationSheet = ({
         </form>
       </Form_Shadcn_>
       <SheetFooter>
-        {/* TODO(Ivan): Add confirmation prompts for both buttons */}
-        {/* TODO(Ivan): Close the sidebar and show a toast after deletion/discarding */}
         {!isCreating && integrationEntry?.id && (
           <div className="flex-1 flex flex-row gap-2">
-            <Button
-              type="danger"
-              onClick={() => onDelete(integrationEntry?.parent_id || integrationEntry?.id)}
-              loading={isLoading}
-            >
-              Delete Entry
-            </Button>
-            {integrationEntry?.parent_id && (
+            {integrationEntry.approved === false && (
               <Button
                 type="danger"
-                onClick={() => onDelete(integrationEntry.id!)}
+                onClick={() => setShowDeleteDraftDialog(true)}
                 loading={isLoading}
               >
                 Discard Draft
@@ -231,6 +230,21 @@ export const CreateIntegrationSheet = ({
           {!integrationEntry?.id ? 'Create' : 'Update'}
         </Button>
       </SheetFooter>
+
+      <ConfirmationModal
+        visible={showDeleteDraftDialog}
+        title="Discard changes"
+        confirmLabel="Discard"
+        loading={isDeleting}
+        onCancel={() => setShowDeleteDraftDialog(false)}
+        onConfirm={() => {
+          deleteIntegrationEntry({ orgSlug: organization!.slug, entryId: integrationEntry?.id! })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to discard the draft changes? This action cannot be undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
