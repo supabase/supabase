@@ -10,28 +10,25 @@ import {
   useRef,
   useState,
 } from 'react'
-
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
 
+import { isBrowser } from 'common'
 import {
   AiIconAnimation,
   Button,
+  cn,
   IconCornerDownLeft,
   IconUser,
   Input,
   markdownComponents,
+  StatusIcon,
 } from 'ui'
+import { AiWarning } from './Command.alerts'
 import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
-
-import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuContext'
-
-import { isBrowser } from 'common'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { StatusIcon } from 'ui'
-import { cn } from 'ui/src/lib/utils'
 
 const questions = [
   'How do I get started with Supabase?',
