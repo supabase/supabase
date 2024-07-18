@@ -156,7 +156,7 @@ export type IntegrationProjectConnection = {
   foreign_project_id: string
   organization_integration_id: string
   env_sync_targets?: string[]
-  public_env_var_prefix: string
+  public_env_var_prefix?: string
   metadata: Imetadata
 }
 
