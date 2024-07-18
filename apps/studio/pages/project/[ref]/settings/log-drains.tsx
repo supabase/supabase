@@ -15,9 +15,8 @@ import { useState } from 'react'
 import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = useParams() as { ref: string }
   const [open, setOpen] = useState(false)
+  const [newDrainSource, setNewDrainSource] = useState<LogDrainSource>('webhook')
 
   return (
     <>
@@ -40,9 +39,14 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         <CreateLogDrainDestination
           open={open}
           onOpenChange={setOpen}
-          defaultSource={router.query.src as LogDrainSource}
+          defaultSource={newDrainSource}
         />
-        <LogDrains />
+        <LogDrains
+          onNewDrainClick={(src) => {
+            setNewDrainSource(src)
+            setOpen(true)
+          }}
+        />
       </ScaffoldContainer>
     </>
   )
