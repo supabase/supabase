@@ -194,7 +194,9 @@ create policy "Users can update own profile."
 
 -- Create a trigger to sync profiles and auth.users
 create function public.handle_new_user()
-returns trigger as $$
+returns trigger
+set search_path = ''
+as $$
 begin
   insert into public.profiles (id, full_name, avatar_url)
   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
