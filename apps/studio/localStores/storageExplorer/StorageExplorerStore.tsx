@@ -1,7 +1,7 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import toast from 'react-hot-toast'
 import * as tus from 'tus-js-client'
 
@@ -1894,11 +1894,12 @@ class StorageExplorerStore {
     let totalRemainingBytes = 0
 
     progresses.forEach((progress) => {
-      if (progress) {
-        totalRemainingBytes += progress.remainingBytes
-        const weight = progress.remainingBytes / totalRemainingBytes
-        totalRemainingTime += weight * progress.remainingTime
+      totalRemainingBytes += progress.remainingBytes
+      if (totalRemainingBytes === 0) {
+        return
       }
+      const weight = progress.remainingBytes / totalRemainingBytes
+      totalRemainingTime += weight * progress.remainingTime
     })
 
     return totalRemainingTime
