@@ -8,7 +8,7 @@ import Panel from 'components/ui/Panel'
 
 export function LogDrains() {
   const { ref } = useParams()
-  const { data: logDrains, isLoading } = useLogDrainsQuery({ ref: undefined })
+  const { data: logDrains, isLoading } = useLogDrainsQuery({ ref })
 
   if (isLoading) {
     return <div></div>

@@ -13,7 +13,15 @@ import {
   RadioGroupStackedItem,
   Switch,
 } from 'ui'
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from 'ui'
+import {
+  Sheet,
+  SheetContent,
+  SheetSection,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from 'ui'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -118,16 +126,17 @@ export function CreateLogDrainDestination({
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    onOpenChange(false)
     createLogDrain({
       ...values,
       projectRef: ref,
       config: {},
     })
+    form.reset()
   }
 
   return (
     <Sheet
-      modal={true}
       open={open}
       onOpenChange={(v) => {
         if (!v) {
@@ -136,134 +145,129 @@ export function CreateLogDrainDestination({
         onOpenChange(v)
       }}
     >
-      <SheetTrigger asChild>
-        <Button type="primary" asChild>
-          <Link href={`/project/${ref}/settings/log-drains?new=1`}>Add destination</Link>
-        </Button>
-      </SheetTrigger>
-      <SheetContent>
-        <Form_Shadcn_ {...form}>
-          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <SheetHeader>
-              <SheetTitle>Add destination</SheetTitle>
-            </SheetHeader>
-            <div className="grid gap-4">
-              <div className="p-4 grid gap-4">
-                <LogDrainFormItem
-                  value="name"
-                  placeholder="My Destination"
-                  label="Name"
-                  formControl={form.control}
-                />
-                <LogDrainFormItem
-                  value="description"
-                  label="Description"
-                  placeholder="Description of the destination"
-                  formControl={form.control}
-                />
-                <RadioGroupStacked
-                  value={source}
-                  onValueChange={(v: SourceValue) => {
-                    form.setValue('source', v)
-                  }}
-                >
-                  {LOG_DRAIN_SOURCES.map((source) => (
-                    <RadioGroupStackedItem
-                      value={source.value}
-                      key={source.value}
-                      id={source.value}
-                      label={source.name}
-                      description={source.description}
-                      className="text-left"
-                    />
-                  ))}
-                </RadioGroupStacked>
-              </div>
+      <SheetContent showClose={false} size="lg">
+        <SheetHeader>
+          <SheetTitle>Add destination</SheetTitle>
+        </SheetHeader>
+        <SheetSection>
+          <Form_Shadcn_ {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="">
+                <div className="space-y-4">
+                  <LogDrainFormItem
+                    value="name"
+                    placeholder="My Destination"
+                    label="Name"
+                    formControl={form.control}
+                  />
+                  <LogDrainFormItem
+                    value="description"
+                    label="Description"
+                    placeholder="Description of the destination"
+                    formControl={form.control}
+                  />
+                  <RadioGroupStacked
+                    value={source}
+                    onValueChange={(v: SourceValue) => form.setValue('source', v)}
+                  >
+                    {LOG_DRAIN_SOURCES.map((source) => (
+                      <RadioGroupStackedItem
+                        value={source.value}
+                        key={source.value}
+                        id={source.value}
+                        label={source.name}
+                        description={source.description}
+                        className="text-left"
+                      />
+                    ))}
+                  </RadioGroupStacked>
+                </div>
 
-              <div className="p-4 grid gap-4">
-                {source === 'webhook' && (
-                  <>
-                    <LogDrainFormItem
-                      value="url"
-                      label="URL"
-                      formControl={form.control}
-                      placeholder="https://example.com/webhooks/logs"
-                    />
-                    <RadioGroupStacked>
-                      <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
-                      <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
-                    </RadioGroupStacked>
-                    <div className="flex items-center space-x-2">
-                      <Switch id="gzip" />
-                      <Label_Shadcn_ htmlFor="gzip">Gzip</Label_Shadcn_>
+                <div className="space-y-4 mt-6">
+                  {source === 'webhook' && (
+                    <>
+                      <LogDrainFormItem
+                        value="url"
+                        label="URL"
+                        formControl={form.control}
+                        placeholder="https://example.com/webhooks/logs"
+                      />
+                      <RadioGroupStacked>
+                        <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
+                        <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
+                      </RadioGroupStacked>
+                      <div className="flex items-center space-x-2">
+                        <Switch id="gzip" />
+                        <Label_Shadcn_ htmlFor="gzip">Gzip</Label_Shadcn_>
+                      </div>
+                    </>
+                  )}
+                  {source === 'datadog' && (
+                    <div className="grid gap-4">
+                      <LogDrainFormItem
+                        value="apiKey"
+                        label="API Key"
+                        formControl={form.control}
+                        description="The API Key obtained from the Datadog dashboard."
+                      />
+                      <FormField_Shadcn_
+                        name="region"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout layout="horizontal" label={'Region'}>
+                            <FormControl_Shadcn_>
+                              <Select_Shadcn_
+                                {...field}
+                                onValueChange={(v) => {
+                                  form.setValue('region', v)
+                                }}
+                              >
+                                <SelectTrigger_Shadcn_ className="col-span-3">
+                                  <SelectValue_Shadcn_ placeholder="Select a region" />
+                                </SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                                    {DATADOG_REGIONS.map((reg) => (
+                                      <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                        {reg.label}
+                                      </SelectItem_Shadcn_>
+                                    ))}
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
                     </div>
-                  </>
-                )}
-                {source === 'datadog' && (
-                  <div className="grid gap-4">
-                    <LogDrainFormItem
-                      value="apiKey"
-                      label="API Key"
-                      formControl={form.control}
-                      description="The API Key obtained from the Datadog dashboard."
-                    />
-                    <FormField_Shadcn_
-                      name="region"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout layout="horizontal" label={'Region'}>
-                          <FormControl_Shadcn_>
-                            <Select_Shadcn_
-                              {...field}
-                              onValueChange={(v) => {
-                                form.setValue('region', v)
-                              }}
-                            >
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
-                                  {DATADOG_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
-                                      {reg.label}
-                                    </SelectItem_Shadcn_>
-                                  ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </div>
-                )}
-                {source === 'elasticfilebeat' && (
-                  <div className="grid gap-4">
-                    <LogDrainFormItem
-                      value="url"
-                      label="URL"
-                      formControl={form.control}
-                      placeholder="https://example.com/webhooks/logs"
-                    />
-                    <LogDrainFormItem
-                      value="username"
-                      label="Username"
-                      formControl={form.control}
-                    />
-                    <LogDrainFormItem
-                      type="password"
-                      value="password"
-                      label="Password"
-                      formControl={form.control}
-                    />
-                  </div>
-                )}
+                  )}
+                  {source === 'elasticfilebeat' && (
+                    <div className="grid gap-4">
+                      <LogDrainFormItem
+                        value="url"
+                        label="URL"
+                        formControl={form.control}
+                        placeholder="https://example.com/webhooks/logs"
+                      />
+                      <LogDrainFormItem
+                        value="username"
+                        label="Username"
+                        formControl={form.control}
+                      />
+                      <LogDrainFormItem
+                        type="password"
+                        value="password"
+                        label="Password"
+                        formControl={form.control}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </form>
-        </Form_Shadcn_>
+            </form>
+          </Form_Shadcn_>
+        </SheetSection>
 
         <SheetFooter className="p-4">
           <Button form={FORM_ID} htmlType="submit" type="primary">

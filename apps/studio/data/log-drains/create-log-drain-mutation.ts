@@ -50,7 +50,7 @@ export const useCreateLogDrainMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await Promise.all([queryClient.invalidateQueries(logDrainsKeys.list(projectRef))])
+        await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },
