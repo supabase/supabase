@@ -1,5 +1,10 @@
 import { useParams } from 'common'
-import { DATADOG_REGIONS, LOG_DRAIN_SOURCE_VALUES, LOG_DRAIN_SOURCES } from './LogDrains.constants'
+import {
+  DATADOG_REGIONS,
+  LOG_DRAIN_SOURCE_VALUES,
+  LOG_DRAIN_SOURCES,
+  LogDrainSource,
+} from './LogDrains.constants'
 
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -77,9 +82,9 @@ function LogDrainFormItem({
   placeholder,
   type,
 }: {
-  value: keyof z.infer<typeof formSchema>
+  value: string
   label: string
-  formControl: Control<z.infer<typeof formSchema>>
+  formControl: any
   placeholder?: string
   description?: string
   type?: string
@@ -106,7 +111,7 @@ export function CreateLogDrainDestination({
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
-  defaultSource?: LogDrainSource
+  defaultSource: LogDrainSource
 }) {
   const { ref } = useParams() as { ref: string }
 
@@ -117,22 +122,23 @@ export function CreateLogDrainDestination({
     },
   })
 
-  const source = form.watch('source', defaultSource || 'webhook')
+  const source = form.watch('source', defaultSource)
 
   const { mutate: createLogDrain } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
+      form.reset()
+      onOpenChange(false)
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    onOpenChange(false)
+    console.log('values', values)
     createLogDrain({
       ...values,
       projectRef: ref,
       config: {},
     })
-    form.reset()
   }
 
   return (
@@ -193,7 +199,7 @@ export function CreateLogDrainDestination({
                     />
                     <RadioGroupStacked
                       value={form.getValues('httpVersion')}
-                      onValueChange={(value) => {
+                      onValueChange={(value: 'HTTP1' | 'HTTP2') => {
                         form.setValue('httpVersion', value, {
                           shouldValidate: true,
                         })
