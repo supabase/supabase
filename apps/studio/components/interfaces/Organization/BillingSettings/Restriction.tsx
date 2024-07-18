@@ -56,7 +56,7 @@ export const Restriction = () => {
             <p>
               Your projects can become unresponsive or enter read-only mode.{' '}
               {subscription.plan.id === 'free'
-                ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+                ? 'Please upgrade to the Pro Plan to ensure that your projects remain available.'
                 : 'Please disable spend cap to ensure that your projects remain available.'}
             </p>
             <div className="flex items-center gap-x-2 mt-3">

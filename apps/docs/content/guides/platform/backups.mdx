@@ -57,7 +57,7 @@ Database backups do not include objects stored via the Storage API, as the datab
 
 ## Daily backups
 
-All Pro and Enterprise plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
+All Pro, Team and Enterprise Plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
 <Admonition type="note">
 
@@ -69,7 +69,7 @@ For security purposes, passwords for custom roles are not stored in daily backup
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
-You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
+You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro Plan projects can access the last 7 days' worth of daily backups. Team Plan projects can access the last 14 days' worth of daily backups, while Enterprise Plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
 
 #### Backup process for large databases
 
@@ -99,7 +99,7 @@ Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter i
 
 <Admonition type="note">
 
-This feature is available to all Enterprise plan projects. Pro and Team plan projects can enable PITR as an add-on.
+Pro, Team and Enterprise Plan projects can enable PITR as an add-on.
 
 Projects interested in PITR will also need to use at least a Small compute add-on, in order to ensure smooth functioning.
 
