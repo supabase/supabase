@@ -14,7 +14,7 @@ export default function TicketActions() {
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${LW_URL}/tickets/${username}?lw=11${
+  const link = `${LW_URL}/tickets/${username}?lw=12${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
@@ -22,7 +22,7 @@ export default function TicketActions() {
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-og?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw12-og?username=${encodeURIComponent(
     username ?? ''
   )}`
   const params = useParams()
@@ -57,7 +57,6 @@ export default function TicketActions() {
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
           .eq('username', username)
-        // window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
         await supabase
           .from(LW_TABLE)
@@ -66,7 +65,6 @@ export default function TicketActions() {
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
           .eq('username', username)
-        // window.open(linkedInUrl, '_blank')
       }
     })
   }

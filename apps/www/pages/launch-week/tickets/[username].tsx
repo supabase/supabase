@@ -35,6 +35,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const DISPLAY_NAME = name || username
+  const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} ticket`
   const DESCRIPTION = ``
   const PAGE_URL = `${LW_URL}/tickets/${username}`
@@ -96,8 +97,8 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
               <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-4 text-foreground text-center md:text-left max-w-sm">
                 <h1 className="text-2xl">{DISPLAY_NAME?.split(' ')[0]}'s Ticket</h1>
                 <span className="text-foreground-lighter mb-2">
-                  Join @{username} for a Special Announcement and create your ticket for a chance to
-                  win swag.
+                  Join {FIRST_NAME} on Supabase Launch Week 12 and create your ticket for a chance
+                  to win supa swag.
                 </span>
                 <Button type="alternative" asChild>
                   <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>

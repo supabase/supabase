@@ -9,7 +9,7 @@ export default function TicketCopy() {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = secret
-  const url = `${LW_URL}/tickets/${username}?lw=11${
+  const url = `${LW_URL}/tickets/${username}?lw=12${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
 

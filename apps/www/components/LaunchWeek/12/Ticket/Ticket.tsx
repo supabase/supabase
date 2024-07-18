@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { codeBlock } from 'common-tags'
 import { cn, CodeBlock } from 'ui'
 import { Pencil, X } from 'lucide-react'
@@ -8,10 +7,7 @@ import { useBreakpoint, useParams } from 'common'
 
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketProfile from './TicketProfile'
 import TicketCustomizationForm from './TicketCustomizationForm'
-import TicketNumber from './TicketNumber'
-import { LW12_TITLE } from '../../../../lib/constants'
 
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
@@ -24,28 +20,21 @@ export default function Ticket() {
     ticketNumber,
     username,
   } = user
-  const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
+  const [responseTime, setResponseTime] = useState<{ start: number; end: number | undefined }>({
+    start: Date.now(),
+    end: undefined,
+  })
   const sharePage = !!params.username
   const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
-
-  const fallbackImg = `/images/launchweek/11/tickets/shape/lw11_ticket_${ticketType}.png`
-
-  const ticketBg = {
-    regular: {
-      background: `/images/launchweek/11/tickets/shape/lw11_ticket_regular.png`,
-    },
-    platinum: {
-      background: `/images/launchweek/11/tickets/shape/lw11_ticket_platinum.png`,
-    },
-    secret: {
-      background: `/images/launchweek/11/tickets/shape/lw11_ticket_purple.png`,
-    },
-  }
 
   function handleCustomizeTicket() {
     setShowCustomizationForm && setShowCustomizationForm(!showCustomizationForm)
   }
+
+  useEffect(() => {
+    user && setResponseTime((prev) => ({ ...prev, end: Date.now() }))
+  }, [user.id])
 
   useEffect(() => {
     if (ticketRef.current && !window.matchMedia('(pointer: coarse)').matches) {
@@ -64,6 +53,24 @@ await supabase
   .from('tickets')
   .eq('username', ${username})
   .single()
+`
+
+  const responseJson = codeBlock`
+{
+  "data": {
+    "username": "${username}",
+    "user_id": ${user.id},
+    "ticket_number": "${ticketNumber}",
+    ${
+      user.metadata &&
+      `"metadata": {
+  ${user.metadata.role && `"role": "${user.metadata?.role}",`}
+  ${user.metadata.company && `"company": "${user.metadata?.company}",`}
+},`
+    }
+  },
+  "error": null
+}
 `
 
   return (
@@ -92,7 +99,25 @@ await supabase
             {code}
           </CodeBlock>
         </div>
-        <div className="w-full p-4 flex-grow">asdf</div>
+        <div className="w-full p-4 flex-grow flex flex-col gap-4">
+          <span className="uppercase text-foreground-lighter tracking-wider text-xs">
+            TICKET RESPONSE
+          </span>
+          {user && (
+            <CodeBlock
+              language="json"
+              hideCopy
+              linesToHighlight={[3, 4, 5, 6, 7, 8, 9]}
+              className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
+            >
+              {responseJson}
+            </CodeBlock>
+          )}
+          <span className="text-foreground-lighter text-xs">
+            {responseTime.end! - responseTime.start}ms{' '}
+            <span className="uppercase">Response time</span>
+          </span>
+        </div>
         {/* Edit hover button */}
         {!sharePage && (
           <>

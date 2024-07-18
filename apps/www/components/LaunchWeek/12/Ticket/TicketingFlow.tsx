@@ -1,6 +1,5 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
@@ -17,7 +16,7 @@ import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
 import LW12Background from '../LW12Background'
 
-const LWGame = dynamic(() => import('./LW11Game'))
+const LWGame = dynamic(() => import('./LW12Game'))
 
 const TicketingFlow = () => {
   const { ticketState, userData, showCustomizationForm } = useConfData()
@@ -36,6 +35,9 @@ const TicketingFlow = () => {
   const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
 
   const winningChances = useWinningChances()
+
+  const DISPLAY_NAME = userData?.name || userData?.username
+  const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
 
   return (
     <>
@@ -135,7 +137,7 @@ const TicketingFlow = () => {
                       ) : winningChances !== 2 ? (
                         <div>
                           {!hasSecretTicket && (
-                            <p className="text-2xl mb-1">@{userData.name}, you're in!</p>
+                            <p className="text-2xl mb-1">{FIRST_NAME}, you're in!</p>
                           )}
                           <p className="text-[#8B9092]">
                             Now share your ticket to have a chance of winning AirPods Max and other
@@ -160,27 +162,6 @@ const TicketingFlow = () => {
                         </span>
                         <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
                       </div>
-                      {/* <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 my-2 md:mb-8 overflow-hidden">
-                        <div className="hidden md:block relative h-full w-full min-h-[140px] md:w-1/3 top-0 -bottom-8 overflow-visible">
-                          <Image
-                            src="/images/launchweek/11/airpods-max-alpha.png"
-                            alt="Supabase AirPod Max prize"
-                            width={300}
-                            height={300}
-                            draggable={false}
-                            className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50 pointer-events-none"
-                          />
-                        </div>
-                        <div className="flex flex-col justify-center md:w-2/3 gap-1 p-3">
-                          <p className="text-sm text-foreground-lighter">5 sets</p>
-                          <p className="">Win AirPods Max</p>
-                          <p className="text-foreground-light text-sm">
-                            Grow your chances of winning limited edition swag by sharing on{' '}
-                            <span className="text-foreground">X</span> and{' '}
-                            <span className="text-foreground">Linkedin</span>.
-                          </p>
-                        </div>
-                      </div> */}
                       {!hasPlatinumTicket && <TicketPresence />}
                     </div>
                   </m.div>

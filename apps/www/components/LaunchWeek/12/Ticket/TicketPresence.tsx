@@ -52,7 +52,7 @@ const TicketPresence = (props: { className?: string }) => {
         props.className
       )}
     >
-      <Dot className="text-brand animate-pulse" />
+      <Dot className="text-brand animate-pulse -ml-2" />
       {onlineUsers.length} {isSingular ? 'person is' : 'people are'}{' '}
       {hasTicket ? 'customizing' : 'generating'} their ticket
     </div>
