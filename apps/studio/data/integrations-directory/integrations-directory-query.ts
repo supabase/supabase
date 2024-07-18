@@ -1,25 +1,18 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationsDirectoryVariables = {
-  orgSlug?: string
-  integrationId?: string
+  orgSlug: string
 }
 
-export type IntegrationEntry = {
-  id: number
-  parent_id: number | null
-  organization_slug: string | null
-  approved: boolean
-  slug: string
-  overview: string
-}
+export type IntegrationEntry = components['schemas']['IntegrationsDirectoryEntryResponse']
 
 export async function getIntegrationsDirectory(
-  { orgSlug, integrationId }: IntegrationsDirectoryVariables,
+  { orgSlug }: IntegrationsDirectoryVariables,
   signal?: AbortSignal
 ) {
   if (!orgSlug) {
@@ -29,11 +22,10 @@ export async function getIntegrationsDirectory(
   const { data, error } = await get('/platform/integrations-directory/{slug}', {
     params: { path: { slug: orgSlug } },
     signal,
-  } as never)
+  })
 
   if (error) handleError(error)
-  // TODO(Ivan): Please fix me
-  return data as IntegrationEntry
+  return data
 }
 
 export type IntegrationsDirectoryData = Awaited<ReturnType<typeof getIntegrationsDirectory>>
@@ -47,7 +39,7 @@ export const useIntegrationsDirectoryQuery = <TData = IntegrationsDirectoryData>
   }: UseQueryOptions<IntegrationsDirectoryData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsDirectoryData, IntegrationsError, TData>(
-    integrationsDirectoryKeys.integrationsDirectoryList(vars.orgSlug, vars.integrationId),
+    integrationsDirectoryKeys.integrationsDirectoryList(vars.orgSlug),
     ({ signal }) => getIntegrationsDirectory(vars, signal),
     { enabled: enabled, ...options }
   )

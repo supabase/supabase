@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
 
 type IntegrationDirectoryEntryDeleteVariables = {
+  orgSlug: string
   entryId: number
 }
 
@@ -48,7 +49,9 @@ export const useIntegrationDirectoryEntryDeleteMutation = ({
   >((vars) => deleteIntegrationDirectoryEntry(vars), {
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationsDirectoryKeys.integrationsDirectoryList()),
+        queryClient.invalidateQueries(
+          integrationsDirectoryKeys.integrationsDirectoryList(variables.orgSlug)
+        ),
       ])
       await onSuccess?.(data, variables, context)
     },

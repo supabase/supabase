@@ -4,10 +4,11 @@ import { toast } from 'react-hot-toast'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationsDirectoryKeys } from './keys'
+import { components } from 'api-types'
 
 type IntegrationDirectoryEntryCreateVariables = {
   orgSlug: string
-  params: Record<string, any>
+  params: components['schemas']['IntegrationsDirectoryEntryRequestBody']
 }
 
 export async function createIntegrationDirectoryEntry({
@@ -15,10 +16,8 @@ export async function createIntegrationDirectoryEntry({
   params,
 }: IntegrationDirectoryEntryCreateVariables) {
   const { data, error } = await post('/platform/integrations-directory/{slug}', {
-    params: {
-      path: { slug: orgSlug },
-    },
-    body: params as any,
+    params: { path: { slug: orgSlug } },
+    body: params,
   })
 
   if (error) handleError(error)
@@ -49,7 +48,9 @@ export const useIntegrationDirectoryEntryCreateMutation = ({
   >((vars) => createIntegrationDirectoryEntry(vars), {
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationsDirectoryKeys.integrationsDirectoryList()),
+        queryClient.invalidateQueries(
+          integrationsDirectoryKeys.integrationsDirectoryList(variables.orgSlug)
+        ),
       ])
       await onSuccess?.(data, variables, context)
     },
