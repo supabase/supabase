@@ -367,7 +367,7 @@ export const InviteMemberButton = () => {
                       account security for your team. This allows company administrators to enforce
                       the use of an identity provider when logging into Supabase.
                     </p>
-                    <p>This is only available for organizations on teams plan or above.</p>
+                    <p>This is only available for organizations on Team Plan or above.</p>
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
@@ -382,7 +382,7 @@ export const InviteMemberButton = () => {
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
                             <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                              Upgrade to Teams
+                              Upgrade to Team
                             </Link>
                           </Button>
                         )}

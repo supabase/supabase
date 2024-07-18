@@ -171,7 +171,7 @@ const PITRSidePanel = () => {
         hasHipaaAddon
           ? 'Unable to change PITR with HIPAA add-on'
           : isFreePlan
-            ? 'Unable to enable point in time recovery on a free plan'
+            ? 'Unable to enable point in time recovery on a Free Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
@@ -311,7 +311,7 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>

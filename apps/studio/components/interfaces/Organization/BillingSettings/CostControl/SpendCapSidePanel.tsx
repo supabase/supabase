@@ -201,7 +201,7 @@ const SpendCapSidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="Toggling of the spend cap is only available on the Pro plan"
+              title="Toggling of the spend cap is only available on the Pro Plan"
               actions={
                 <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans

@@ -669,9 +669,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                       <div className="space-y-4 mb-1">
                         {subscription?.plan.id === 'free' && (
                           <p>
-                            Free plan support is available within the community and officially by
+                            Free Plan support is available within the community and officially by
                             the team on a best efforts basis. For a guaranteed response we recommend
-                            upgrading to the Pro plan. Enhanced SLAs for support are available on
+                            upgrading to the Pro Plan. Enhanced SLAs for support are available on
                             our Enterprise Plan.
                           </p>
                         )}
@@ -680,7 +680,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                           <p>
                             Pro Plan includes email-based support. You can expect an answer within 1
                             business day in most situations for all severities. We recommend
-                            upgrading to the Team plan for prioritized ticketing on all issues and
+                            upgrading to the Team Plan for prioritized ticketing on all issues and
                             prioritized escalation to product engineering teams. Enhanced SLAs for
                             support are available on our Enterprise Plan.
                           </p>
@@ -688,7 +688,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
 
                         {subscription?.plan.id === 'team' && (
                           <p>
-                            Team plan includes email-based support. You get prioritized ticketing on
+                            Team Plan includes email-based support. You get prioritized ticketing on
                             all issues and prioritized escalation to product engineering teams. Low,
                             Normal, and High severity tickets will generally be handled within 1
                             business day, while Urgent issues, we respond within 1 day, 365 days a

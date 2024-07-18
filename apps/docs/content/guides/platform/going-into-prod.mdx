@@ -41,7 +41,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Perform load testing (preferably on a staging env)
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
-- If you are expecting a surge in traffic (for a big launch) and are on a teams or enterprise plan, [contact support](https://supabase.com/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
+- If you are expecting a surge in traffic (for a big launch) and are on a Team or Enterprise Plan, [contact support](https://supabase.com/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
 - If you expect your database size to be > 4 GB, [enable](https://supabase.com/dashboard/project/_/settings/addons?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 - Check and review issues in your database using [Performance Advisor](https://supabase.com/dashboard/project/_/database/performance-advisor).
 
@@ -50,19 +50,19 @@ After developing your project and deciding it's Production Ready, you should run
 - Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Settings > Auth)
   - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
   - The default rate limit for auth emails when using a custom SMTP provider is 30 new users per hour, if doing a major public announcement you will likely require more than this.
-- If your application is on the free plan and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
+- If your application is on the Free Plan and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
   - Upgrade to Pro to guarantee that your project will not be paused for inactivity.
-- Database backups are not available for download on the free plan.
+- Database backups are not available for download on the Free Plan.
   - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g).
-  - Nightly backups for Pro plan projects are available on the Supabase dashboard for up to 7 days.
+  - Nightly backups for Pro Plan projects are available on the Supabase dashboard for up to 7 days.
   - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
-- Upgrading to the Supabase Pro plan will give you [access to our support team](https://supabase.com/dashboard/support/new).
+- Upgrading to the Supabase Pro Plan will give you [access to our support team](https://supabase.com/dashboard/support/new).
 
 ## Rate limiting, resource allocation, & abuse prevention
 
 - Supabase employs a number of safeguards against bursts of incoming traffic to prevent abuse and help maximize stability across the platform
-  - If you're on a teams or enterprise plan and expect high load events, such as production launches, heavy load testing, or prolonged high resource usage, open a ticket via the [support form](https://supabase.help) for help. Provide at least 2 weeks notice.
+  - If you're on a Team or Enterprise Plan and expect high load events, such as production launches, heavy load testing, or prolonged high resource usage, open a ticket via the [support form](https://supabase.help) for help. Provide at least 2 weeks notice.
 
 ### Auth rate limits
 
