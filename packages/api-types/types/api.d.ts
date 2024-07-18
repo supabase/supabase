@@ -7045,6 +7045,9 @@ export interface operations {
   /** Retrieves integrations directory entry by slug */
   IntegrationsDirectoryController_getIntegrationsDirectoryEntry: {
     parameters: {
+      query: {
+        preview_token: string
+      }
       path: {
         slug: string
       }
