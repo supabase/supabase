@@ -623,7 +623,10 @@ class StorageExplorerStore {
        * [Joshen] Am limiting to just replacing nbsp with a blank space instead of
        * all non-word characters per before
        * */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(/\xA0/g, ' ')
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(
+        /\u{202F}/gu,
+        ' '
+      )
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
