@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Check, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
@@ -11,7 +12,6 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { Check, ChevronUp } from 'lucide-react'
 import {
   Alert,
   Alert_Shadcn_,
@@ -20,9 +20,9 @@ import {
   Button,
   Collapsible,
   Form,
-  IconAlertTriangle,
   Input,
 } from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -54,7 +54,9 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       if (provider.title === 'SAML 2.0') {
-        initialValues[key] = (config as any)[key] ?? false
+        const configValue = (config as any)[key]
+        initialValues[key] =
+          configValue || (provider.properties[key].type === 'boolean' ? false : '')
       } else {
         if (isDoubleNegative) {
           initialValues[key] = !(config as any)[key]
@@ -162,15 +164,10 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div
-                className="
-            group border-t
-            border-strong bg-surface-100 py-6 px-6 text-foreground
-            "
-              >
+              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
                 {provider.title === 'Slack (Deprecated)' && (
                   <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
+                    <WarningIcon />
                     <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC)
@@ -195,7 +192,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       properties={provider.properties[x]}
                       formValues={values}
                       disabled={
-                        // TODO (KM): Remove after 10th October when we disable the provider
+                        // TODO (KM): Remove after 10th October 2024 when we disable the provider
                         ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(x) ||
                         !canUpdateConfig
                       }
