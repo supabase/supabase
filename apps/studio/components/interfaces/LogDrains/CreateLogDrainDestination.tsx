@@ -42,6 +42,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -53,6 +54,14 @@ const formUnion = z.discriminatedUnion('source', [
     webhookUrl: z.string().url('Webhook URL is required and must be a valid URL'),
     httpVersion: z.enum(['HTTP1', 'HTTP2']),
     gzip: z.boolean(),
+    customHeaders: z
+      .array(
+        z.object({
+          name: z.string(),
+          value: z.string(),
+        })
+      )
+      .optional(),
   }),
   z.object({
     source: z.literal('datadog'),
@@ -117,15 +126,24 @@ export function CreateLogDrainDestination({
 }) {
   const { ref } = useParams() as { ref: string }
 
+  const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: 'onBlur',
     defaultValues: {
+      customHeaders: [],
       httpVersion: 'HTTP2',
       gzip: false,
     },
   })
 
-  const source = form.watch('source', defaultSource)
+  useEffect(() => {
+    form.setValue('source', defaultSource)
+  }, [defaultSource, form])
+
+  const source = form.watch('source')
+  const customHeaders = form.watch('customHeaders')
 
   const { mutate: createLogDrain, isLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
@@ -144,6 +162,15 @@ export function CreateLogDrainDestination({
     })
   }
 
+  function removeHeader(name: string) {
+    form.setValue('customHeaders', customHeaders?.filter((header) => header.name !== name))
+  }
+
+  function addHeader() {
+    form.setValue('customHeaders', [...(customHeaders || []), newCustomHeader])
+    setNewCustomHeader({ name: '', value: '' })
+  }
+
   return (
     <Sheet
       open={open}
@@ -160,7 +187,18 @@ export function CreateLogDrainDestination({
         </SheetHeader>
         <SheetSection>
           <Form_Shadcn_ {...form}>
-            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              id={FORM_ID}
+              onSubmit={(e) => {
+                e.preventDefault()
+                console.log({
+                  form,
+                  values: form.getValues(),
+                  errors: form.formState.errors,
+                })
+                form.handleSubmit(onSubmit)
+              }}
+            >
               <div className="space-y-4">
                 <LogDrainFormItem
                   value="name"
@@ -204,7 +242,7 @@ export function CreateLogDrainDestination({
                       control={form.control}
                       name="httpVersion"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-4">
+                        <FormItem_Shadcn_>
                           <FormControl_Shadcn_>
                             <RadioGroupStacked
                               onValueChange={field.onChange}
@@ -239,6 +277,45 @@ export function CreateLogDrainDestination({
                         </FormItem_Shadcn_>
                       )}
                     />
+
+                    <div>
+                      {customHeaders?.map((header) => (
+                        <div className="flex items-center font-mono mt-2" key={header.name}>
+                          <div className="w-full px-2">{header.name}</div>
+                          <div className="w-full px-2">{header.value}</div>
+                          <Button
+                            className="justify-self-end"
+                            type="outline"
+                            onClick={() => removeHeader(header.name)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2 items-center">
+                      <Input_Shadcn_
+                        type="text"
+                        placeholder="Header name"
+                        value={newCustomHeader.name}
+                        onChange={(e) =>
+                          setNewCustomHeader({ ...newCustomHeader, name: e.target.value })
+                        }
+                      />
+                      <Input_Shadcn_
+                        type="text"
+                        placeholder="Header value"
+                        value={newCustomHeader.value}
+                        onChange={(e) =>
+                          setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
+                        }
+                      />
+
+                      <Button htmlType="button" type="outline" onClick={addHeader}>
+                        Add
+                      </Button>
+                    </div>
                   </>
                 )}
                 {source === 'datadog' && (
@@ -255,12 +332,7 @@ export function CreateLogDrainDestination({
                       render={({ field }) => (
                         <FormItemLayout layout="horizontal" label={'Region'}>
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_
-                              {...field}
-                              onValueChange={(v) => {
-                                form.setValue('region', v)
-                              }}
-                            >
+                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
                               </SelectTrigger_Shadcn_>

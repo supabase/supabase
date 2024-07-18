@@ -30,7 +30,7 @@ export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrain
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [drainToDelete, setDrainToDelete] = useState<{ id: number } | null>(null)
   const { ref } = useParams()
-  const { data: logDrains, isLoading } = useLogDrainsQuery({ ref })
+  const { data: logDrains, isLoading, refetch } = useLogDrainsQuery({ ref })
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
@@ -123,6 +123,15 @@ export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrain
             <p>Are you sure you want to delete this log drain?</p>
             <p>This action cannot be undone.</p>
           </ConfirmationModal>
+          <button
+            onClick={() => {
+              // delete all from localstorage
+              localStorage.removeItem('logDrains')
+              refetch()
+            }}
+          >
+            delete all
+          </button>
         </Table>
       </Panel>
     </>

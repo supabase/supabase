@@ -20,7 +20,7 @@ export async function deleteLogDrain({ projectRef, id }: LogDrainDeleteVariables
   // return data
 
   // remove from localstorage for now
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  // await new Promise((resolve) => setTimeout(resolve, 1000))
 
   console.log('deleting log drain', id)
 
