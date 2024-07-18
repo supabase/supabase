@@ -95,7 +95,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
   },
   {
     key: 'sizeCount',
-    name: 'Size & Counts',
+    name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
       {
@@ -171,17 +171,6 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/storage',
           },
         ],
-      },
-      {
-        anchor: 'funcCount',
-        key: PricingMetric.FUNCTION_COUNT,
-        attributes: [{ key: PricingMetric.FUNCTION_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Edge Function Count',
-        chartPrefix: 'Max',
-        unit: 'absolute',
-        description:
-          'Number of serverless functions in your project.\nBilling is based on the maximum amount of functions at any point in time throughout your billing period.',
-        chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },
