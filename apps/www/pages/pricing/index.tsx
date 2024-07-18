@@ -22,7 +22,7 @@ export default function IndexPage() {
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
 
   useEffect(() => {
     setTimeout(() => {

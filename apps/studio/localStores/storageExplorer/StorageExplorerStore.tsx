@@ -653,7 +653,10 @@ class StorageExplorerStore {
        * [Joshen] Am limiting to just replacing nbsp with a blank space instead of
        * all non-word characters per before
        * */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(/\xA0/g, ' ')
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(
+        /\u{202F}/gu,
+        ' '
+      )
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
@@ -1014,103 +1017,107 @@ class StorageExplorerStore {
     let progress = 0
     const toastId = toast.loading('Retrieving files from folder...')
 
-    const files = await this.getAllItemsAlongFolder(folder)
+    try {
+      const files = await this.getAllItemsAlongFolder(folder)
 
-    toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-      >
-        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-      </ToastLoader>,
-      { id: toastId }
-    )
+      toast.loading(
+        <ToastLoader
+          progress={0}
+          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+        >
+          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+        </ToastLoader>,
+        { id: toastId }
+      )
 
-    const promises = files.map((file) => {
-      const fileMimeType = file.metadata?.mimetype ?? null
-      return () => {
-        return new Promise<
-          | {
-              name: string
-              prefix: string
-              blob: Blob
+      const promises = files.map((file) => {
+        const fileMimeType = file.metadata?.mimetype ?? null
+        return () => {
+          return new Promise<
+            | {
+                name: string
+                prefix: string
+                blob: Blob
+              }
+            | boolean
+          >(async (resolve) => {
+            try {
+              const data = await downloadBucketObject({
+                projectRef: this.projectRef,
+                bucketId: this.selectedBucket.id,
+                path: `${file.prefix}/${file.name}`,
+              })
+              progress = progress + 1 / files.length
+
+              const blob = await data.blob()
+              resolve({
+                name: file.name,
+                prefix: file.prefix,
+                blob: new Blob([blob], { type: fileMimeType }),
+              })
+            } catch (error) {
+              console.error('Failed to download file', `${file.prefix}/${file.name}`)
+              resolve(false)
             }
-          | boolean
-        >(async (resolve) => {
-          try {
-            const data = await downloadBucketObject({
-              projectRef: this.projectRef,
-              bucketId: this.selectedBucket.id,
-              path: `${file.prefix}/${file.name}`,
-            })
-            progress = progress + 1 / files.length
+          })
+        }
+      })
 
-            const blob = await data.blob()
-            resolve({
-              name: file.name,
-              prefix: file.prefix,
-              blob: new Blob([blob], { type: fileMimeType }),
-            })
-          } catch (error) {
-            console.error('Failed to download file', `${file.prefix}/${file.name}`)
-            resolve(false)
-          }
-        })
+      const batchedPromises = chunk(promises, 10)
+      const downloadedFiles = await batchedPromises.reduce(
+        async (previousPromise, nextBatch) => {
+          const previousResults = await previousPromise
+          const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+          toast.loading(
+            <ToastLoader
+              progress={progress * 100}
+              message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+            >
+              <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+            </ToastLoader>,
+            { id: toastId }
+          )
+          return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+        },
+        Promise.resolve<
+          {
+            name: string
+            prefix: string
+            blob: Blob
+          }[]
+        >([])
+      )
+
+      const zipFileWriter = new BlobWriter('application/zip')
+      const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+      if (downloadedFiles.length === 0) {
+        toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
       }
-    })
 
-    const batchedPromises = chunk(promises, 10)
-    const downloadedFiles = await batchedPromises.reduce(
-      async (previousPromise, nextBatch) => {
-        const previousResults = await previousPromise
-        const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader
-            progress={progress * 100}
-            message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-          >
-            <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          </ToastLoader>,
-          { id: toastId }
-        )
-        return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
-      },
-      Promise.resolve<
-        {
-          name: string
-          prefix: string
-          blob: Blob
-        }[]
-      >([])
-    )
+      downloadedFiles.forEach((file) => {
+        if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+      })
 
-    const zipFileWriter = new BlobWriter('application/zip')
-    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+      const blobURL = URL.createObjectURL(await zipWriter.close())
+      const link = document.createElement('a')
+      link.href = blobURL
+      link.setAttribute('download', `${folder.name}.zip`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode?.removeChild(link)
 
-    if (downloadedFiles.length === 0) {
-      toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
+      toast.success(
+        downloadedFiles.length === files.length
+          ? `Successfully downloaded folder "${folder.name}"`
+          : `Downloaded folder "${folder.name}". However, ${
+              files.length - downloadedFiles.length
+            } files did not download successfully.`,
+        { id: toastId }
+      )
+    } catch (error: any) {
+      toast.error(`Failed to download folder: ${error.message}`, { id: toastId })
     }
-
-    downloadedFiles.forEach((file) => {
-      if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
-    })
-
-    const blobURL = URL.createObjectURL(await zipWriter.close())
-    const link = document.createElement('a')
-    link.href = blobURL
-    link.setAttribute('download', `${folder.name}.zip`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode?.removeChild(link)
-
-    toast.success(
-      downloadedFiles.length === files.length
-        ? `Successfully downloaded folder "${folder.name}"`
-        : `Downloaded folder "${folder.name}". However, ${
-            files.length - downloadedFiles.length
-          } files did not download successfully.`,
-      { id: toastId }
-    )
   }
 
   downloadSelectedFiles = async (files: StorageItemWithColumn[]) => {
@@ -1466,25 +1473,29 @@ class StorageExplorerStore {
   }
 
   deleteFolder = async (folder: StorageItemWithColumn) => {
-    const isDeleteFolder = true
-    const files = await this.getAllItemsAlongFolder(folder)
-    await this.deleteFiles(files as any[], isDeleteFolder)
+    try {
+      const isDeleteFolder = true
+      const files = await this.getAllItemsAlongFolder(folder)
+      await this.deleteFiles(files as any[], isDeleteFolder)
 
-    this.popColumnAtIndex(folder.columnIndex)
-    this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
+      this.popColumnAtIndex(folder.columnIndex)
+      this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
 
-    if (folder.columnIndex > 0) {
-      const parentFolderPrefix = this.openedFolders
-        .slice(0, folder.columnIndex)
-        .map((folder) => folder.name)
-        .join('/')
-      if (parentFolderPrefix.length > 0) await this.validateParentFolderEmpty(parentFolderPrefix)
+      if (folder.columnIndex > 0) {
+        const parentFolderPrefix = this.openedFolders
+          .slice(0, folder.columnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+        if (parentFolderPrefix.length > 0) await this.validateParentFolderEmpty(parentFolderPrefix)
+      }
+
+      await this.refetchAllOpenedFolders()
+      this.clearSelectedItemsToDelete()
+
+      toast.success(`Successfully deleted ${folder.name}`)
+    } catch (error: any) {
+      toast.error(`Failed to delete folder: ${error.message}`)
     }
-
-    await this.refetchAllOpenedFolders()
-    this.clearSelectedItemsToDelete()
-
-    toast.success(`Successfully deleted ${folder.name}`)
   }
 
   renameFolder = async (folder: StorageItemWithColumn, newName: string, columnIndex: number) => {
@@ -1499,56 +1510,57 @@ class StorageExplorerStore {
       </ToastLoader>
     )
 
-    /**
-     * Catch any folder names that contain slash or backslash
-     *
-     * this is because slashes are used to denote
-     * children/parent relationships in bucket
-     *
-     * todo: move this to a util file, as createFolder() uses same logic
-     */
-    if (newName.includes('/') || newName.includes('\\')) {
-      return toast.error(`Folder name cannot contain forward or back slashes.`)
-    }
-
-    this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
-    const files = await this.getAllItemsAlongFolder(folder)
-
-    let progress = 0
-    let hasErrors = false
-
-    // Make this batched promises into a reusable function for storage, i think this will be super helpful
-    const promises = files.map((file) => {
-      const fromPath = `${file.prefix}/${file.name}`
-      const pathSegments = fromPath.split('/')
-      const toPath = pathSegments
-        .slice(0, columnIndex)
-        .concat(newName)
-        .concat(pathSegments.slice(columnIndex + 1))
-        .join('/')
-      return () => {
-        return new Promise<void>(async (resolve) => {
-          progress = progress + 1 / files.length
-          try {
-            await moveStorageObject({
-              projectRef: this.projectRef,
-              bucketId: this.selectedBucket.id,
-              from: fromPath,
-              to: toPath,
-            })
-          } catch (error) {
-            hasErrors = true
-            toast.error(`Failed to move ${fromPath} to the new folder`)
-          }
-          resolve()
-        })
-      }
-    })
-
-    const batchedPromises = chunk(promises, BATCH_SIZE)
-    // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
-    // Just take note, but if it's working fine, then it's okay
     try {
+      /**
+       * Catch any folder names that contain slash or backslash
+       *
+       * this is because slashes are used to denote
+       * children/parent relationships in bucket
+       *
+       * todo: move this to a util file, as createFolder() uses same logic
+       */
+      if (newName.includes('/') || newName.includes('\\')) {
+        return toast.error(`Folder name cannot contain forward or back slashes.`)
+      }
+
+      this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
+      const files = await this.getAllItemsAlongFolder(folder)
+
+      let progress = 0
+      let hasErrors = false
+
+      // Make this batched promises into a reusable function for storage, i think this will be super helpful
+      const promises = files.map((file) => {
+        const fromPath = `${file.prefix}/${file.name}`
+        const pathSegments = fromPath.split('/')
+        const toPath = pathSegments
+          .slice(0, columnIndex)
+          .concat(newName)
+          .concat(pathSegments.slice(columnIndex + 1))
+          .join('/')
+        return () => {
+          return new Promise<void>(async (resolve) => {
+            progress = progress + 1 / files.length
+            try {
+              await moveStorageObject({
+                projectRef: this.projectRef,
+                bucketId: this.selectedBucket.id,
+                from: fromPath,
+                to: toPath,
+              })
+            } catch (error) {
+              hasErrors = true
+              toast.error(`Failed to move ${fromPath} to the new folder`)
+            }
+            resolve()
+          })
+        }
+      })
+
+      const batchedPromises = chunk(promises, BATCH_SIZE)
+      // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
+      // Just take note, but if it's working fine, then it's okay
+
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
@@ -1591,6 +1603,7 @@ class StorageExplorerStore {
   }): Promise<(StorageObject & { prefix: string })[]> => {
     const items: (StorageObject & { prefix: string })[] = []
 
+    let hasError = false
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
 
@@ -1627,7 +1640,14 @@ class StorageExplorerStore {
         if ((data || []).length < options.limit) {
           break
         }
-      } catch (e) {}
+      } catch (e) {
+        hasError = true
+        break
+      }
+    }
+
+    if (hasError) {
+      throw new Error('Failed to retrieve all files within folder')
     }
 
     const subfolders = folderContents?.filter((item) => item.id === null) ?? []

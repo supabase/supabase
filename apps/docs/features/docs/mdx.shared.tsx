@@ -1,4 +1,4 @@
-import { ArrowDown, Check } from 'lucide-react'
+import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
@@ -57,6 +57,7 @@ const components = {
   IconArrowDown: ArrowDown,
   IconCheck: Check,
   IconPanel,
+  IconX: X,
   Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,

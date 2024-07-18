@@ -152,14 +152,14 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
           <Info size={16} />
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
-              ? 'Disk size configuration is not available for projects on the Free plan'
+              ? 'Disk size configuration is not available for projects on the Free Plan'
               : 'Disk size configuration is only available when the spend cap has been disabled'}
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free' ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
-                upgrade to at least the Pro plan.
+                upgrade to at least the Pro Plan.
               </p>
             ) : (
               <p>
