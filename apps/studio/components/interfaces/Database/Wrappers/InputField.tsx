@@ -11,7 +11,7 @@ interface InputFieldProps {
 }
 
 const InputField = ({ option, loading, error }: InputFieldProps) => {
-  const [showHidden, setShowHidden] = useState(!option.hidden)
+  const [showHidden, setShowHidden] = useState(!option.secureEntry)
   if (option.isTextArea) {
     return (
       <div className="text-area-text-sm text-area-resize-none">
@@ -66,14 +66,14 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
         defaultValue={option.defaultValue ?? ''}
         error={error}
         value={loading ? 'Fetching value from Vault...' : undefined}
-        type={!option.hidden || loading ? 'text' : showHidden ? 'text' : 'password'}
+        type={!option.secureEntry || loading ? 'text' : showHidden ? 'text' : 'password'}
         disabled={loading}
         actions={
           loading ? (
             <div className="flex items-center justify-center mr-1">
               <Button disabled type="default" icon={<IconLoader className="animate-spin" />} />
             </div>
-          ) : option.hidden ? (
+          ) : option.secureEntry ? (
             <div className="flex items-center justify-center mr-1">
               <Button
                 type="default"

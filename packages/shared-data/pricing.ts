@@ -547,7 +547,7 @@ export const pricing: Pricing = {
           enterprise: 'Available as paid add-on',
         },
         tooltips: {
-          main: 'Available as a paid add-on on Team plan and above.',
+          main: 'Available as a paid add-on on Team Plan and above.',
         },
         usage_based: false,
       },

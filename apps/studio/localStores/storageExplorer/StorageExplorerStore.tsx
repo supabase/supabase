@@ -3,7 +3,7 @@ import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
-import { toast as UiToast } from 'ui'
+import * as tus from 'tus-js-client'
 
 import {
   STORAGE_ROW_STATUS,
@@ -31,7 +31,9 @@ import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-li
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -75,6 +77,9 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
+  private resumableUploadUrl: string = ''
+  private serviceKey: string = ''
+
   /* Supabase client, will get initialized immediately after constructing the instance */
   supabaseClient: SupabaseClient<any, 'public', any> = null as any as SupabaseClient<
     any,
@@ -86,7 +91,7 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgress: number = 0
+  private uploadProgresses: number[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
@@ -107,6 +112,8 @@ class StorageExplorerStore {
     protocol: string = PROJECT_ENDPOINT_PROTOCOL
   ) {
     this.projectRef = projectRef
+    this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
+    this.serviceKey = serviceKey
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
 
@@ -474,6 +481,20 @@ class StorageExplorerStore {
     }
   }
 
+  onUploadProgress(toastId?: string) {
+    const totalFiles = this.uploadProgresses.length
+    const progress = this.uploadProgresses.reduce((acc, progress) => acc + progress, 0) / totalFiles
+
+    return toast.loading(
+      <ToastLoader
+        progress={progress * 100}
+        message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />,
+      { id: toastId }
+    )
+  }
+
   uploadFiles = async (
     files: FileList | DataTransferItemList,
     columnIndex: number,
@@ -525,6 +546,23 @@ class StorageExplorerStore {
       if (numberOfFilesRejected === filesToUpload.length) return
     }
 
+    const filesWithNonZeroSize = filesWithinUploadLimit.filter((file) => file.size > 0)
+    if (filesWithNonZeroSize.length < filesWithinUploadLimit.length) {
+      const numberOfFilesRejected = filesWithinUploadLimit.length - filesWithNonZeroSize.length
+      toast.error(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
+            {numberOfFilesRejected > 1 ? 'their' : 'its'} size
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
+          </p>
+        </div>,
+        { duration: 8000 }
+      )
+
+      if (numberOfFilesRejected === filesWithinUploadLimit.length) return
+    }
+
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
     const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
@@ -551,7 +589,7 @@ class StorageExplorerStore {
         return file
       })
 
-    this.uploadProgress = 0
+    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill(0)
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
@@ -562,20 +600,16 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const toastId = toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Uploading ${formattedFilesToUpload.length} file${
-          formattedFilesToUpload.length > 1 ? 's' : ''
-        }...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />
-    )
+    const toastId = this.onUploadProgress()
 
     // Upload files in batches
-    const promises = formattedFilesToUpload.map((file) => {
-      const fileOptions = { cacheControl: '3600' }
-      const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
+    const promises = formattedFilesToUpload.map((file, index) => {
+      const extension = file.name.split('.').pop()
+      const metadata = {
+        mimetype: (file.type || lookupMime(extension)) ?? '',
+        size: file.size,
+      } as StorageItemMetadata
+      const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
@@ -586,13 +620,12 @@ class StorageExplorerStore {
       /**
        * Storage maintains a list of allowed characters, which excludes
        * characters such as the narrow no-break space used in Mac screenshots.
-       * To preempt errors, replace all non-word characters with underscores.
-       * [Joshen] Except backslashes as this will indicate a folder path, and paranthesis
-       * since our UI appends them to make duplicate names unique
-       */
-      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replace(
-        /[^\w.-\/()]/g,
-        '_'
+       * [Joshen] Am limiting to just replacing nbsp with a blank space instead of
+       * all non-word characters per before
+       * */
+      const formattedFileName = (unsanitizedFormattedFileName ?? 'unknown').replaceAll(
+        /\u{202F}/gu,
+        ' '
       )
       const formattedPathToFile =
         pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
@@ -620,21 +653,46 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return new Promise<void>(async (resolve) => {
-          const { error } = await this.supabaseClient.storage
-            .from(this.selectedBucket.name)
-            .upload(formattedPathToFile, file, fileOptions)
+        return new Promise<void>(async (resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: this.resumableUploadUrl,
+            retryDelays: [0, 3000, 5000, 10000, 20000],
+            headers: {
+              authorization: `Bearer ${this.serviceKey}`,
+            },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: this.selectedBucket.name,
+              objectName: formattedPathToFile,
+              ...fileOptions,
+            },
+            chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
+            onError(error) {
+              numberOfFilesUploadedFail += 1
+              toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              reject(error)
+            },
+            onProgress: (bytesUploaded, bytesTotal) => {
+              const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
+              this.uploadProgresses[index] = percentage
+              this.onUploadProgress(toastId)
+            },
+            onSuccess() {
+              numberOfFilesUploadedSuccess += 1
+              resolve()
+            },
+          })
 
-          this.uploadProgress = this.uploadProgress + 1 / formattedFilesToUpload.length
+          // Check if there are any previous uploads to continue.
+          return upload.findPreviousUploads().then(function (previousUploads) {
+            // Found previous uploads so we select the first one.
+            if (previousUploads.length) {
+              upload.resumeFromPreviousUpload(previousUploads[0])
+            }
 
-          if (error) {
-            numberOfFilesUploadedFail += 1
-            toast.error(`Failed to upload ${file.name}: ${error.message}`)
-            resolve()
-          } else {
-            numberOfFilesUploadedSuccess += 1
-            resolve()
-          }
+            upload.start()
+          })
         })
       }
     })
@@ -648,16 +706,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader
-            progress={this.uploadProgress * 100}
-            message={`Uploading ${formattedFilesToUpload.length} file${
-              formattedFilesToUpload.length > 1 ? 's' : ''
-            }...`}
-            description={STORAGE_PROGRESS_INFO_TEXT}
-          />,
-          { id: toastId }
-        )
+        this.onUploadProgress(toastId)
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
@@ -879,101 +928,105 @@ class StorageExplorerStore {
     let progress = 0
     const toastId = toast.loading('Retrieving files from folder...')
 
-    const files = await this.getAllItemsAlongFolder(folder)
+    try {
+      const files = await this.getAllItemsAlongFolder(folder)
 
-    toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />,
-      { id: toastId }
-    )
+      toast.loading(
+        <ToastLoader
+          progress={0}
+          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+          description={STORAGE_PROGRESS_INFO_TEXT}
+        />,
+        { id: toastId }
+      )
 
-    const promises = files.map((file) => {
-      const fileMimeType = file.metadata?.mimetype ?? null
-      return () => {
-        return new Promise<
-          | {
-              name: string
-              prefix: string
-              blob: Blob
+      const promises = files.map((file) => {
+        const fileMimeType = file.metadata?.mimetype ?? null
+        return () => {
+          return new Promise<
+            | {
+                name: string
+                prefix: string
+                blob: Blob
+              }
+            | boolean
+          >(async (resolve) => {
+            try {
+              const data = await downloadBucketObject({
+                projectRef: this.projectRef,
+                bucketId: this.selectedBucket.id,
+                path: `${file.prefix}/${file.name}`,
+              })
+              progress = progress + 1 / files.length
+
+              const blob = await data.blob()
+              resolve({
+                name: file.name,
+                prefix: file.prefix,
+                blob: new Blob([blob], { type: fileMimeType }),
+              })
+            } catch (error) {
+              console.error('Failed to download file', `${file.prefix}/${file.name}`)
+              resolve(false)
             }
-          | boolean
-        >(async (resolve) => {
-          try {
-            const data = await downloadBucketObject({
-              projectRef: this.projectRef,
-              bucketId: this.selectedBucket.id,
-              path: `${file.prefix}/${file.name}`,
-            })
-            progress = progress + 1 / files.length
+          })
+        }
+      })
 
-            const blob = await data.blob()
-            resolve({
-              name: file.name,
-              prefix: file.prefix,
-              blob: new Blob([blob], { type: fileMimeType }),
-            })
-          } catch (error) {
-            console.error('Failed to download file', `${file.prefix}/${file.name}`)
-            resolve(false)
-          }
-        })
+      const batchedPromises = chunk(promises, 10)
+      const downloadedFiles = await batchedPromises.reduce(
+        async (previousPromise, nextBatch) => {
+          const previousResults = await previousPromise
+          const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+          toast.loading(
+            <ToastLoader
+              progress={progress * 100}
+              message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+              description={STORAGE_PROGRESS_INFO_TEXT}
+            />,
+            { id: toastId }
+          )
+          return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+        },
+        Promise.resolve<
+          {
+            name: string
+            prefix: string
+            blob: Blob
+          }[]
+        >([])
+      )
+
+      const zipFileWriter = new BlobWriter('application/zip')
+      const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+      if (downloadedFiles.length === 0) {
+        toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
       }
-    })
 
-    const batchedPromises = chunk(promises, 10)
-    const downloadedFiles = await batchedPromises.reduce(
-      async (previousPromise, nextBatch) => {
-        const previousResults = await previousPromise
-        const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader
-            progress={progress * 100}
-            message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-            description={STORAGE_PROGRESS_INFO_TEXT}
-          />,
-          { id: toastId }
-        )
-        return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
-      },
-      Promise.resolve<
-        {
-          name: string
-          prefix: string
-          blob: Blob
-        }[]
-      >([])
-    )
+      downloadedFiles.forEach((file) => {
+        if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+      })
 
-    const zipFileWriter = new BlobWriter('application/zip')
-    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+      const blobURL = URL.createObjectURL(await zipWriter.close())
+      const link = document.createElement('a')
+      link.href = blobURL
+      link.setAttribute('download', `${folder.name}.zip`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode?.removeChild(link)
 
-    if (downloadedFiles.length === 0) {
-      toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
+      toast.success(
+        downloadedFiles.length === files.length
+          ? `Successfully downloaded folder "${folder.name}"`
+          : `Downloaded folder "${folder.name}". However, ${
+              files.length - downloadedFiles.length
+            } files did not download successfully.`,
+        { id: toastId }
+      )
+    } catch (error: any) {
+      toast.error(`Failed to download folder: ${error.message}`, { id: toastId })
     }
-
-    downloadedFiles.forEach((file) => {
-      if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
-    })
-
-    const blobURL = URL.createObjectURL(await zipWriter.close())
-    const link = document.createElement('a')
-    link.href = blobURL
-    link.setAttribute('download', `${folder.name}.zip`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode?.removeChild(link)
-
-    toast.success(
-      downloadedFiles.length === files.length
-        ? `Successfully downloaded folder "${folder.name}"`
-        : `Downloaded folder "${folder.name}". However, ${
-            files.length - downloadedFiles.length
-          } files did not download successfully.`,
-      { id: toastId }
-    )
   }
 
   downloadSelectedFiles = async (files: StorageItemWithColumn[]) => {
@@ -1328,25 +1381,29 @@ class StorageExplorerStore {
   }
 
   deleteFolder = async (folder: StorageItemWithColumn) => {
-    const isDeleteFolder = true
-    const files = await this.getAllItemsAlongFolder(folder)
-    await this.deleteFiles(files as any[], isDeleteFolder)
+    try {
+      const isDeleteFolder = true
+      const files = await this.getAllItemsAlongFolder(folder)
+      await this.deleteFiles(files as any[], isDeleteFolder)
 
-    this.popColumnAtIndex(folder.columnIndex)
-    this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
+      this.popColumnAtIndex(folder.columnIndex)
+      this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
 
-    if (folder.columnIndex > 0) {
-      const parentFolderPrefix = this.openedFolders
-        .slice(0, folder.columnIndex)
-        .map((folder) => folder.name)
-        .join('/')
-      if (parentFolderPrefix.length > 0) await this.validateParentFolderEmpty(parentFolderPrefix)
+      if (folder.columnIndex > 0) {
+        const parentFolderPrefix = this.openedFolders
+          .slice(0, folder.columnIndex)
+          .map((folder) => folder.name)
+          .join('/')
+        if (parentFolderPrefix.length > 0) await this.validateParentFolderEmpty(parentFolderPrefix)
+      }
+
+      await this.refetchAllOpenedFolders()
+      this.clearSelectedItemsToDelete()
+
+      toast.success(`Successfully deleted ${folder.name}`)
+    } catch (error: any) {
+      toast.error(`Failed to delete folder: ${error.message}`)
     }
-
-    await this.refetchAllOpenedFolders()
-    this.clearSelectedItemsToDelete()
-
-    toast.success(`Successfully deleted ${folder.name}`)
   }
 
   renameFolder = async (folder: StorageItemWithColumn, newName: string, columnIndex: number) => {
@@ -1363,56 +1420,57 @@ class StorageExplorerStore {
       />
     )
 
-    /**
-     * Catch any folder names that contain slash or backslash
-     *
-     * this is because slashes are used to denote
-     * children/parent relationships in bucket
-     *
-     * todo: move this to a util file, as createFolder() uses same logic
-     */
-    if (newName.includes('/') || newName.includes('\\')) {
-      return toast.error(`Folder name cannot contain forward or back slashes.`)
-    }
-
-    this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
-    const files = await this.getAllItemsAlongFolder(folder)
-
-    let progress = 0
-    let hasErrors = false
-
-    // Make this batched promises into a reusable function for storage, i think this will be super helpful
-    const promises = files.map((file) => {
-      const fromPath = `${file.prefix}/${file.name}`
-      const pathSegments = fromPath.split('/')
-      const toPath = pathSegments
-        .slice(0, columnIndex)
-        .concat(newName)
-        .concat(pathSegments.slice(columnIndex + 1))
-        .join('/')
-      return () => {
-        return new Promise<void>(async (resolve) => {
-          progress = progress + 1 / files.length
-          try {
-            await moveStorageObject({
-              projectRef: this.projectRef,
-              bucketId: this.selectedBucket.id,
-              from: fromPath,
-              to: toPath,
-            })
-          } catch (error) {
-            hasErrors = true
-            toast.error(`Failed to move ${fromPath} to the new folder`)
-          }
-          resolve()
-        })
-      }
-    })
-
-    const batchedPromises = chunk(promises, BATCH_SIZE)
-    // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
-    // Just take note, but if it's working fine, then it's okay
     try {
+      /**
+       * Catch any folder names that contain slash or backslash
+       *
+       * this is because slashes are used to denote
+       * children/parent relationships in bucket
+       *
+       * todo: move this to a util file, as createFolder() uses same logic
+       */
+      if (newName.includes('/') || newName.includes('\\')) {
+        return toast.error(`Folder name cannot contain forward or back slashes.`)
+      }
+
+      this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
+      const files = await this.getAllItemsAlongFolder(folder)
+
+      let progress = 0
+      let hasErrors = false
+
+      // Make this batched promises into a reusable function for storage, i think this will be super helpful
+      const promises = files.map((file) => {
+        const fromPath = `${file.prefix}/${file.name}`
+        const pathSegments = fromPath.split('/')
+        const toPath = pathSegments
+          .slice(0, columnIndex)
+          .concat(newName)
+          .concat(pathSegments.slice(columnIndex + 1))
+          .join('/')
+        return () => {
+          return new Promise<void>(async (resolve) => {
+            progress = progress + 1 / files.length
+            try {
+              await moveStorageObject({
+                projectRef: this.projectRef,
+                bucketId: this.selectedBucket.id,
+                from: fromPath,
+                to: toPath,
+              })
+            } catch (error) {
+              hasErrors = true
+              toast.error(`Failed to move ${fromPath} to the new folder`)
+            }
+            resolve()
+          })
+        }
+      })
+
+      const batchedPromises = chunk(promises, BATCH_SIZE)
+      // [Joshen] I realised this can be simplified with just a vanilla for loop, no need for reduce
+      // Just take note, but if it's working fine, then it's okay
+
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
@@ -1457,6 +1515,7 @@ class StorageExplorerStore {
   }): Promise<(StorageObject & { prefix: string })[]> => {
     const items: (StorageObject & { prefix: string })[] = []
 
+    let hasError = false
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
 
@@ -1493,7 +1552,14 @@ class StorageExplorerStore {
         if ((data || []).length < options.limit) {
           break
         }
-      } catch (e) {}
+      } catch (e) {
+        hasError = true
+        break
+      }
+    }
+
+    if (hasError) {
+      throw new Error('Failed to retrieve all files within folder')
     }
 
     const subfolders = folderContents?.filter((item) => item.id === null) ?? []

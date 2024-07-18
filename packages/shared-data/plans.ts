@@ -32,7 +32,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Unlimited API requests',
           '50,000 monthly active users',
-          ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
+          ['500 MB database space', 'Shared CPU • 500 MB RAM'],
           '5 GB bandwidth',
           '1 GB file storage',
           'Community support',
@@ -43,7 +43,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Unlimited API requests',
           '50,000 monthly active users',
-          ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
+          ['500 MB database space', 'Shared CPU • 500 MB RAM'],
           '5 GB bandwidth',
           'Community support',
         ],
@@ -95,7 +95,7 @@ export const plans: PricingInformation[] = [
         ],
       },
     ],
-    preface: 'Everything in the Free plan, plus:',
+    preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
   },
   {
@@ -122,7 +122,7 @@ export const plans: PricingInformation[] = [
         ],
       },
     ],
-    preface: 'Everything in the Pro plan, plus:',
+    preface: 'Everything in the Pro Plan, plus:',
     cta: 'Get Started',
   },
   {

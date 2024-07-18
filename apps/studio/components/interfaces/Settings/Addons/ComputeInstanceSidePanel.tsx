@@ -237,7 +237,7 @@ const ComputeInstanceSidePanel = () => {
         }
         tooltip={
           isFreePlan
-            ? 'Unable to update compute instance on a free plan'
+            ? 'Unable to update compute instance on a Free Plan'
             : !canUpdateCompute
               ? 'You do not have permission to update compute instance'
               : undefined
@@ -281,7 +281,7 @@ const ComputeInstanceSidePanel = () => {
                   withIcon
                   className="mb-4"
                   variant="info"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>

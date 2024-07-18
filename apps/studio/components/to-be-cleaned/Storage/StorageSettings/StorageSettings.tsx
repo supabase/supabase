@@ -204,7 +204,7 @@ const StorageSettings = () => {
                 <UpgradeToPro
                   icon={<Clock size={14} className="text-foreground-muted" />}
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 50 GB."
+                  secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
                 />
               </div>
             )}

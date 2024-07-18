@@ -19,6 +19,7 @@ import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -29,6 +30,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Loading,
@@ -59,6 +61,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { Loader2 } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -83,7 +86,10 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -94,6 +100,10 @@ const SQLEditor = () => {
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
+
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -107,7 +117,6 @@ const SQLEditor = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
@@ -115,40 +124,28 @@ const SQLEditor = () => {
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
 
+  // Use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
-  // Used for cleaner framer motion transitions
-  useEffect(() => {
-    setIsFirstRender(false)
-  }, [])
-
-  useEffect(() => {
-    if (isSuccessReadReplicas) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
-    }
-  }, [isSuccessReadReplicas, databases, ref])
-
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
     },
     { enabled: includeSchemaMetadata }
   )
 
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-
   const isDiffOpen = !!sourceSqlDiff
 
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const snippetIsLoading = enableFolders
+    ? !(id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined)
+    : !(id && ref && snap.loaded[ref])
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
 
-  // Use chat id because useChat doesn't have a reset function to clear all messages
-  const [chatId, setChatId] = useState(uuidv4())
   const {
     messages: chatMessages,
     append,
@@ -174,7 +171,10 @@ const SQLEditor = () => {
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
-      if (id) snap.addResult(id, data.result, vars.autoLimit)
+      if (id) {
+        if (enableFolders) snapV2.addResult(id, data.result, vars.autoLimit)
+        else snap.addResult(id, data.result, vars.autoLimit)
+      }
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
@@ -212,21 +212,22 @@ const SQLEditor = () => {
           }
         }
 
-        snap.addResultError(id, error, vars.autoLimit)
+        if (enableFolders) snapV2.addResultError(id, error, vars.autoLimit)
+        else snap.addResultError(id, error, vars.autoLimit)
       }
     },
   })
 
-  const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  /**
-   * Sets the snippet title using AI.
-   */
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title } = await generateSqlTitle({ sql })
-        snap.renameSnippet(id, title)
+        const { title: name } = await generateSqlTitle({ sql })
+
+        if (enableFolders) {
+          snapV2.renameSnippet({ id, name })
+        } else {
+          snap.renameSnippet(id, name)
+        }
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
@@ -238,7 +239,7 @@ const SQLEditor = () => {
     if (isDiffOpen) return
 
     // use the latest state
-    const state = getSqlEditorStateSnapshot()
+    const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
     const snippet = state.snippets[id]
 
     if (editorRef.current && project) {
@@ -272,14 +273,12 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
-  const getImpersonatedRole = useGetImpersonatedRole()
-
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
 
       // use the latest state
-      const state = getSqlEditorStateSnapshot()
+      const state = enableFolders ? getSqlEditorV2StateSnapshot() : getSqlEditorStateSnapshot()
       const snippet = state.snippets[id]
 
       if (editorRef.current !== null && !isExecuting && project !== undefined) {
@@ -399,8 +398,8 @@ const SQLEditor = () => {
 
   const onDebug = useCallback(async () => {
     try {
-      const snippet = snap.snippets[id]
-      const result = snap.results[id]?.[0]
+      const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+      const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
       const { solution, sql } = await debugSql({
         sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
@@ -580,6 +579,18 @@ const SQLEditor = () => {
     }
   }, [selectedDiffType, sourceSqlDiff])
 
+  // Used for cleaner framer motion transitions
+  useEffect(() => {
+    setIsFirstRender(false)
+  }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas, databases, ref])
+
   const defaultSqlDiff = useMemo(() => {
     if (!sourceSqlDiff) {
       return { original: '', modified: '' }
@@ -678,9 +689,7 @@ const SQLEditor = () => {
 
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
-                  <Loading active={true}>
-                    <></>
-                  </Loading>
+                  <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
                 <>
@@ -733,9 +742,7 @@ const SQLEditor = () => {
           <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
-                <Loading active={true}>
-                  <></>
-                </Loading>
+                <Loader2 className="animate-spin text-brand" />
               </div>
             ) : (
               <UtilityPanel

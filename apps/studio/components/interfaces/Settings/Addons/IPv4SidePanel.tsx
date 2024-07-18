@@ -119,7 +119,7 @@ const IPv4SidePanel = () => {
       disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
       tooltip={
         isFreePlan
-          ? 'Unable to enable IPv4 on a free plan'
+          ? 'Unable to enable IPv4 on a Free Plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
             : undefined
@@ -307,7 +307,7 @@ const IPv4SidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="IPv4 add-on is unavailable on the free plan"
+              title="IPv4 add-on is unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
                   <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
