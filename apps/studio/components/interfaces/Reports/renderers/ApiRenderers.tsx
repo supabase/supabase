@@ -1,6 +1,6 @@
 import sumBy from 'lodash/sumBy'
-import { Fragment, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
+import { Fragment, useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -8,20 +8,20 @@ import {
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { ResponseError } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
   Collapsible,
+  WarningIcon,
 } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import AlertError from 'components/ui/AlertError'
-import { ResponseError } from 'types'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
