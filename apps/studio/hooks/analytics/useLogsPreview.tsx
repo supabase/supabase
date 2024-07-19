@@ -24,7 +24,7 @@ import {
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface LogsPreviewHook {
@@ -194,7 +194,7 @@ function useLogsPreview(
     'timestamp'
   )
 
-  const eventChartData = useFillTimeseriesSorted(
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
     normalizedEventChartData,
     'timestamp',
     'count',
@@ -209,7 +209,7 @@ function useLogsPreview(
     logData,
     isLoading: isLoading || isRefetching,
     isLoadingOlder: isFetchingNextPage,
-    error,
+    error: error || eventChartError,
     filters,
     params,
     oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,

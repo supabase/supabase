@@ -16,7 +16,7 @@ import {
   IconHelpCircle,
   IconRefreshCw,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import DNSRecord from './DNSRecord'
 
 export type CustomDomainVerifyProps = {

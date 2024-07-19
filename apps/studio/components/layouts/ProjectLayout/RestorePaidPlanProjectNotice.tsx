@@ -1,6 +1,11 @@
 import { ExternalLink } from 'lucide-react'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 export const RestorePaidPlanProjectNotice = () => {
   return (
@@ -10,7 +15,7 @@ export const RestorePaidPlanProjectNotice = () => {
         Project will count towards compute usage once restored
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        For every hour your instance is active, we will bill you based on the instance size of your
+        For every hour your instance is active, we will bill you based on the compute size of your
         project.
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_ className="mt-3">

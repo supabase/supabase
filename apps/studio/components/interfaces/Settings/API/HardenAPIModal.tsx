@@ -24,8 +24,8 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface HardenAPIModalProps {
   visible: boolean

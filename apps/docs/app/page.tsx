@@ -72,6 +72,11 @@ const products = [
 
 const migrationGuides = [
   {
+    title: 'Auth',
+    icon: '/docs/img/icons/auth0-icon',
+    href: '/guides/resources/migrating-to-supabase/auth0',
+  },
+  {
     title: 'Firebase Auth',
     icon: '/docs/img/icons/firebase-icon',
     href: '/guides/resources/migrating-to-supabase/firebase-auth',

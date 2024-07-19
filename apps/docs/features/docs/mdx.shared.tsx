@@ -26,7 +26,6 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
 } from '~/components/MDX/partials'
-import { Mermaid } from '~/components/Mermaid'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
@@ -62,7 +61,6 @@ const components = {
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,

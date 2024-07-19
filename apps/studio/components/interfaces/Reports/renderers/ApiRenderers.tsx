@@ -1,6 +1,6 @@
 import sumBy from 'lodash/sumBy'
-import { Fragment, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
+import { Fragment, useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -8,13 +8,20 @@ import {
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import { Button, Collapsible } from 'ui'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { ResponseError } from 'types'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Collapsible,
+  WarningIcon,
+} from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import AlertError from 'components/ui/AlertError'
-import { ResponseError } from 'types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -23,7 +30,7 @@ export const NetworkTrafficRenderer = (
     egress: number
   }>
 ) => {
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     ['ingress_mb', 'egress_mb'],
@@ -31,6 +38,7 @@ export const NetworkTrafficRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
+
   const totalIngress = sumBy(props.data, 'ingress_mb')
   const totalEgress = sumBy(props.data, 'egress_mb')
 
@@ -38,11 +46,19 @@ export const NetworkTrafficRenderer = (
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
   }
 
-  if (props.error !== null && props.error !== undefined) {
+  if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
     ) as ResponseError
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
   }
 
   return (
@@ -85,7 +101,7 @@ export const TotalRequestsChartRenderer = (
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     'count',
@@ -94,11 +110,19 @@ export const TotalRequestsChartRenderer = (
     props.params?.iso_timestamp_end
   )
 
-  if (props.error !== null && props.error !== undefined) {
+  if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
     ) as ResponseError
     return <AlertError subject="Failed to retrieve total requests" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
   }
 
   return (
@@ -225,7 +249,7 @@ export const ErrorCountsChartRenderer = (
     return acc + datum.count
   }, 0)
 
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     props.data,
     'timestamp',
     'count',
@@ -234,11 +258,19 @@ export const ErrorCountsChartRenderer = (
     props.params?.iso_timestamp_end
   )
 
-  if (props.error !== null && props.error !== undefined) {
+  if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
     ) as ResponseError
     return <AlertError subject="Failed to retrieve request errors" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
   }
 
   return (
@@ -266,7 +298,7 @@ export const ResponseSpeedChartRenderer = (
     avg: datum.avg,
   }))
 
-  const data = useFillTimeseriesSorted(
+  const { data, error, isError } = useFillTimeseriesSorted(
     transformedData,
     'timestamp',
     'avg',
@@ -277,11 +309,19 @@ export const ResponseSpeedChartRenderer = (
 
   const lastAvg = props.data[props.data.length - 1]?.avg
 
-  if (props.error !== null && props.error !== undefined) {
+  if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
     ) as ResponseError
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
+  } else if (isError) {
+    return (
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{error.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
   }
 
   return (

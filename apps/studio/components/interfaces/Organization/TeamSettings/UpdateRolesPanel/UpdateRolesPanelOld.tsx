@@ -20,9 +20,9 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
+  WarningIcon,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 
 interface UpdateRolesPanelProps {

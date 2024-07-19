@@ -1160,6 +1160,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "sonner-demo": {
+      name: "sonner-demo",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-demo")),
+      source: "",
+      files: ["registry/default/example/sonner-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sonner-types": {
+      name: "sonner-types",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-types")),
+      source: "",
+      files: ["registry/default/example/sonner-types.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sonner-upload": {
+      name: "sonner-upload",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-upload")),
+      source: "",
+      files: ["registry/default/example/sonner-upload.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "switch-demo": {
       name: "switch-demo",
       type: "components:example",

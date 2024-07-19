@@ -70,13 +70,13 @@ const CustomDomainConfig = () => {
           primaryText={
             customDomainsDisabledDueToQuota
               ? 'New custom domains are temporarily disabled'
-              : 'Custom domains are a Pro plan add-on'
+              : 'Custom domains are a Pro Plan add-on'
           }
           secondaryText={
             customDomainsDisabledDueToQuota
               ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
               : plan === 'free'
-                ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'
+                ? 'To configure a custom domain for your project, please upgrade to the Pro Plan with the custom domains add-on selected'
                 : 'To configure a custom domain for your project, please enable the add-on'
           }
           addon="customDomain"
