@@ -2,7 +2,13 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Panel from 'components/ui/Panel'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +19,6 @@ import {
   IconMoreVertical,
   IconTrash,
 } from 'ui'
-
-import Panel from 'components/ui/Panel'
-import { useCheckPermissions } from 'hooks'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -30,6 +33,15 @@ const PolicyRow = ({
 }: PolicyRowProps) => {
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
+  const { project } = useProjectContext()
+  const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  // TODO(km): Simple check for roles that allow authenticated access.
+  // In the future, we'll use splinter to return proper warnings for policies that allow anonymous user access.
+  const appliesToAnonymousUsers =
+    authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED &&
+    (policy.roles.includes('authenticated') || policy.roles.includes('public'))
+
   return (
     <Panel.Content
       className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
@@ -40,6 +52,9 @@ const PolicyRow = ({
         <div className="flex items-center space-x-4">
           <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
           <p className="text-sm text-foreground">{policy.name}</p>
+          {appliesToAnonymousUsers ? (
+            <Badge color="yellow">Applies to anonymous users</Badge>
+          ) : null}
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-foreground-light text-sm">Applied to:</p>
@@ -84,15 +99,15 @@ const PolicyRow = ({
                 icon={<IconMoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-32">
+            <DropdownMenuContent side="bottom" align="end" className="w-40">
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
-                <p>Edit</p>
+                <p>Edit policy</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
                 <IconTrash size={14} />
-                <p>Delete</p>
+                <p>Delete policy</p>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

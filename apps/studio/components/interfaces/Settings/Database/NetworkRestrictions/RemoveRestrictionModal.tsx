@@ -1,9 +1,9 @@
 import { useParams } from 'common'
+import toast from 'react-hot-toast'
 import { Alert, Button, Modal } from 'ui'
 
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { useStore } from 'hooks'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
 interface RemoveRestrictionModalProps {
   visible: boolean
@@ -16,7 +16,6 @@ const RemoveRestrictionModal = ({
   selectedRestriction,
   onClose,
 }: RemoveRestrictionModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
 
   const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
@@ -29,10 +28,7 @@ const RemoveRestrictionModal = ({
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
       onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to remove restriction: ${error.message}`,
-        })
+        toast.error(`Failed to remove restriction: ${error.message}`)
       },
     })
 
@@ -70,31 +66,29 @@ const RemoveRestrictionModal = ({
       onCancel={onClose}
       header="Confirm to remove restriction"
     >
-      <Modal.Content>
-        <div className="py-6 space-y-4">
-          <p className="text-sm text-foreground-light">
-            The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
-            from your list of network restrictions
-            {isRemovingOnlyRestriction
-              ? '.'
-              : ", and no longer have access to your project's database."}
-          </p>
-          {isRemovingOnlyRestriction && (
-            <Alert withIcon variant="warning" title="Database access will no longer be restricted">
-              Removing all network restrictions will default to your database being accessible from
-              all IP addresses.
-            </Alert>
-          )}
-        </div>
+      <Modal.Content className="space-y-4">
+        <p className="text-sm text-foreground-light">
+          The IPv4 address <code className="text-xs">{selectedRestriction}</code> will be removed
+          from your list of network restrictions
+          {isRemovingOnlyRestriction
+            ? '.'
+            : ", and no longer have access to your project's database."}
+        </p>
+        {isRemovingOnlyRestriction && (
+          <Alert withIcon variant="warning" title="Database access will no longer be restricted">
+            Removing all network restrictions will default to your database being accessible from
+            all IP addresses.
+          </Alert>
+        )}
       </Modal.Content>
-      <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
+      <Modal.Content className="flex items-center justify-end space-x-2">
         <Button type="default" disabled={isApplying} onClick={() => onClose()}>
           Cancel
         </Button>
         <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
           Remove restriction
         </Button>
-      </div>
+      </Modal.Content>
     </Modal>
   )
 }

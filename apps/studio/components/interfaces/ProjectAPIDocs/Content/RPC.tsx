@@ -24,7 +24,7 @@ const RPC = ({ language }: ContentProps) => {
   const rpc = functions.find((fn) => fn.name === rpcName)
   const rpcJsonSchema = jsonSchema?.paths[rpc?.path]
 
-  const summary = rpcJsonSchema?.post.summary
+  const summary = rpcJsonSchema?.post?.summary
   const parameters = rpc?.get.parameters ?? []
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const RPC = ({ language }: ContentProps) => {
               <Table.td title={parameter.type}>{parameter.type}</Table.td>
               <Table.td>
                 {parameter.required ? (
-                  <Badge color="amber">Required</Badge>
+                  <Badge variant="warning">Required</Badge>
                 ) : (
                   <p className="text-foreground-light">Optional</p>
                 )}

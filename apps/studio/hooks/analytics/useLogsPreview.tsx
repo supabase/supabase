@@ -1,25 +1,30 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+
 import {
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+  genQueryParams,
+  getDefaultHelper,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
   Count,
   EventChart,
   EventChartData,
   Filters,
-  genChartQuery,
-  genCountQuery,
-  genDefaultQuery,
-  genQueryParams,
-  getDefaultHelper,
   LogData,
   Logs,
   LogsEndpointParams,
-  LogsTableName,
-  PREVIEWER_DATEPICKER_HELPERS,
-} from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
-import { API_URL } from 'lib/constants'
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  genChartQuery,
+  genCountQuery,
+  genDefaultQuery,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get, isResponseOk } from 'lib/common/fetch'
-import dayjs from 'dayjs'
-import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import { API_URL } from 'lib/constants'
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface LogsPreviewHook {
@@ -189,7 +194,7 @@ function useLogsPreview(
     'timestamp'
   )
 
-  const eventChartData = useFillTimeseriesSorted(
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
     normalizedEventChartData,
     'timestamp',
     'count',
@@ -204,7 +209,7 @@ function useLogsPreview(
     logData,
     isLoading: isLoading || isRefetching,
     isLoadingOlder: isFetchingNextPage,
-    error,
+    error: error || eventChartError,
     filters,
     params,
     oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,

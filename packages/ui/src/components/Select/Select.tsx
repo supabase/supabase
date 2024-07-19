@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -38,6 +40,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
 
 export const ColLayout = (props: any) => <div>{props.children}</div>
 
+/**
+ * @deprecated Use ./Select_shadcn_ instead
+ */
 function Select({
   autoComplete,
   autofocus,
@@ -123,6 +128,7 @@ function Select({
         <select
           id={id}
           name={name}
+          data-size={size}
           defaultValue={defaultValue}
           autoComplete={autoComplete}
           autoFocus={autofocus}
@@ -133,12 +139,13 @@ function Select({
           value={value}
           disabled={disabled}
           required={required}
+          // @ts-ignore
           placeholder={placeholder}
           {...props}
         >
           {children}
         </select>
-        {icon && <InputIconContainer icon={icon} />}
+        {icon && <InputIconContainer size={size} icon={icon} />}
         {error && (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
@@ -164,6 +171,9 @@ function Select({
   )
 }
 
+/**
+ * @deprecated Use ./SelectItem_Shadcn_ instead
+ */
 export function Option({ value, children, selected }: OptionProps) {
   return (
     <option value={value} selected={selected}>
@@ -172,6 +182,9 @@ export function Option({ value, children, selected }: OptionProps) {
   )
 }
 
+/**
+ * @deprecated Use ./SelectGroup_Shadcn_ instead
+ */
 export function OptGroup({ label, children }: OptGroupProps) {
   return <optgroup label={label}>{children}</optgroup>
 }

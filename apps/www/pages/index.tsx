@@ -1,6 +1,3 @@
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
-
 import dynamic from 'next/dynamic'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'

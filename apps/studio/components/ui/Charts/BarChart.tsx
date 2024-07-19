@@ -1,14 +1,23 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { useState } from 'react'
-import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis, Legend } from 'recharts'
+import { ComponentProps, useState } from 'react'
+import {
+  Bar,
+  Cell,
+  Legend,
+  BarChart as RechartBarChart,
+  Tooltip,
+  XAxis,
+  Label,
+  YAxis,
+  CartesianGrid,
+} from 'recharts'
+
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import ChartNoData from './NoDataPlaceholder'
-dayjs.extend(utc)
+import NoDataPlaceholder from './NoDataPlaceholder'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -19,6 +28,9 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
+  XAxisProps?: ComponentProps<typeof XAxis>
+  YAxisProps?: ComponentProps<typeof YAxis>
+  showGrid?: boolean
 }
 
 const BarChart = ({
@@ -39,26 +51,61 @@ const BarChart = ({
   onBarClick,
   showLegend = false,
   xAxisIsDate = true,
+  XAxisProps,
+  YAxisProps,
+  showGrid = false,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0)
-    return <ChartNoData message={emptyStateMessage} size={size} className={className} />
+  // Default props
+  const _XAxisProps = XAxisProps || {
+    interval: data.length - 2,
+    angle: 0,
+    tick: false,
+  }
+
+  const _YAxisProps = YAxisProps || {
+    tickFormatter: (value) => numberFormatter(value, valuePrecision),
+    tick: false,
+  }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-  const resolvedHighlightedLabel =
-    (focusDataIndex !== null &&
-      data &&
-      data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
-    highlightedLabel
+
+  function getHeaderLabel() {
+    if (!xAxisIsDate) {
+      if (!focusDataIndex) return highlightedLabel
+      return data[focusDataIndex]?.[xAxisKey]
+    }
+    return (
+      (focusDataIndex !== null &&
+        data &&
+        data[focusDataIndex] !== undefined &&
+        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      highlightedLabel
+    )
+  }
+
+  const resolvedHighlightedLabel = getHeaderLabel()
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
+  if (data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        message={emptyStateMessage}
+        description="It may take up to 24 hours for data to show"
+        size={size}
+        className={className}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
+
   return (
-    <div className={['flex flex-col gap-3', className].join(' ')}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -77,7 +124,7 @@ const BarChart = ({
           margin={{
             top: 0,
             right: 0,
-            left: 0,
+            left: -58, // [Joshen] 120724 Not sure why bar charts have a weird left margin suddenly, but this is a temp fix
             bottom: 0,
           }}
           className="overflow-visible"
@@ -95,15 +142,18 @@ const BarChart = ({
           }}
         >
           {showLegend && <Legend />}
-          <XAxis
-            dataKey={xAxisKey}
-            interval={data.length - 2}
-            angle={0}
-            // hide the tick
-            tick={false}
-            // color the axis
+          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
+          <YAxis
+            {..._YAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={yAxisKey}
+          />
+          <XAxis
+            {..._XAxisProps}
+            axisLine={{ stroke: CHART_COLORS.AXIS }}
+            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={xAxisKey}
           />
           <Tooltip content={() => null} />
           <Bar

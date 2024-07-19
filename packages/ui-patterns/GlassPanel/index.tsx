@@ -1,3 +1,5 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import * as React from 'react'
@@ -56,6 +58,7 @@ export const GlassPanel = ({
           src={logoImage}
           alt={title}
           fill
+          sizes="100%"
           className={cn('object-contain object-left', className)}
         />
       </div>

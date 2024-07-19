@@ -1,38 +1,34 @@
-import { useStore } from 'hooks'
+import * as Sentry from '@sentry/nextjs'
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
+
 import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
-import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 
+const WHITELIST_ERRORS = [
+  'New password should be different from the old password',
+  'Password is known to be weak and easy to guess, please choose a different one',
+]
+
 const ResetPasswordForm = () => {
-  const { ui } = useStore()
   const router = useRouter()
 
   const onResetPassword = async ({ password }: { password: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Saving password...`,
-    })
-
+    const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({ password })
 
     if (!error) {
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Password saved successfully!`,
-      })
+      toast.success('Password saved successfully!', { id: toastId })
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-
       await router.push('/projects')
     } else {
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      toast.error(`Failed to save password: ${error.message}`, { id: toastId })
+      if (!WHITELIST_ERRORS.some((e) => error.message.includes(e))) {
+        Sentry.captureMessage('[CRITICAL] Failed to reset password: ' + error.message)
+      }
     }
   }
 

@@ -24,8 +24,9 @@ const LW8CalloutsSection = () => {
               <Image
                 src="/images/launchweek/8/twitter-spaces-thumb.svg"
                 alt="twitter spaces thumbnail"
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="100%"
+                className="object-cover"
               />
             </div>
           </Link>
@@ -47,8 +48,9 @@ const LW8CalloutsSection = () => {
               <Image
                 src="/images/launchweek/8/lw8-hackathon-thumb.svg"
                 alt="hackathon thumbnail"
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="100%"
+                className="object-cover"
               />
             </div>
           </Link>

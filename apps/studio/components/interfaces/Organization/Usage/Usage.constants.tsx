@@ -82,18 +82,20 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
           { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
           { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
+          { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
+          { key: EgressType.SUPAVISOR, name: 'Supavisor Egress', color: 'red' },
         ],
         name: 'Total Egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (egress) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+          'Contains any outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },
   {
     key: 'sizeCount',
-    name: 'Size & Counts',
+    name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
       {
@@ -104,7 +106,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
         links: [
           {
             name: 'Documentation',
@@ -143,8 +145,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                       When you reach your database size limit, your project can go into read-only
                       mode.{' '}
                       {onFreePlan
-                        ? 'Please upgrade your plan.'
-                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your plans quota.'}
+                        ? 'Please upgrade your Plan.'
+                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
                     </div>
                   </div>
                 </Alert>
@@ -169,17 +171,6 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/storage',
           },
         ],
-      },
-      {
-        anchor: 'funcCount',
-        key: PricingMetric.FUNCTION_COUNT,
-        attributes: [{ key: PricingMetric.FUNCTION_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Edge Function Count',
-        chartPrefix: 'Max',
-        unit: 'absolute',
-        description:
-          'Number of serverless functions in your project.\nBilling is based on the maximum amount of functions at any point in time throughout your billing period.',
-        chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },

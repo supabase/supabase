@@ -1,17 +1,17 @@
 import { StreamingTextResponse } from 'ai'
-import { generateV2 } from 'ai-commands/edge'
+import { chatSql } from 'ai-commands/edge'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
 export const runtime = 'edge'
 
-const openAiKey = process.env.OPENAI_KEY
+const openAiKey = process.env.OPENAI_API_KEY
 
 export default async function handler(req: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
-        error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
       }),
       {
         status: 500,
@@ -48,7 +48,7 @@ async function handlePost(request: NextRequest) {
   const { messages, existingSql, entityDefinitions } = body
 
   try {
-    const stream = await generateV2(openai, messages, existingSql, entityDefinitions)
+    const stream = await chatSql(openai, messages, existingSql, entityDefinitions)
     return new StreamingTextResponse(stream)
   } catch (error) {
     if (error instanceof Error) {

@@ -1,8 +1,7 @@
 import React from 'react'
 import Panel from '~/components/Panel'
-import { Badge, Button, ButtonProps, IconCheck } from 'ui'
+import { Badge, Button, ButtonProps, IconCheck, Image } from 'ui'
 import Link from 'next/link'
-import { ThemeImage } from 'ui-patterns'
 
 export interface CardProps {
   title: string
@@ -14,7 +13,7 @@ export interface CardProps {
     target: HTMLAnchorElement['target']
     type: ButtonProps['type']
   }[]
-  image?: {
+  image: {
     dark: string
     light: string
   }
@@ -54,7 +53,7 @@ const NewFeatureCard = (props: CardProps) => (
     </div>
     {props.image && (
       <div className="hidden sm:flex lg:hidden xl:flex absolute object-bottom inset-0 left-auto items-center h-full aspect-[296/275]">
-        <ThemeImage
+        <Image
           src={props.image}
           alt={`database ${props.title}`}
           width="296"

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Button, IconPlus } from 'ui'
 
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
@@ -10,8 +9,9 @@ import AlertError from 'components/ui/AlertError'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import { Button, IconPlus } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -74,7 +74,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             {isSuccessProjects && (
               <>
                 {(projects?.length ?? 0) === 0 ? (
-                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                  <div className="col-span-4 space-y-4 rounded-lg border border-muted border-dashed p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
                       <p className="text-sm text-foreground-light">

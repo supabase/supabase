@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const { ui } = useStore()
-
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
@@ -17,7 +17,12 @@ const DeleteOrganizationButton = () => {
   const [value, setValue] = useState('')
 
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutateAsync: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation()
+  const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted ${orgName}`)
+      router.push('/projects')
+    },
+  })
 
   const onValidate = (values: any) => {
     const errors: any = {}
@@ -32,22 +37,11 @@ const DeleteOrganizationButton = () => {
 
   const onConfirmDelete = async (values: any) => {
     if (!canDeleteOrganization) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to delete this organization',
-      })
+      return toast.error('You do not have the required permissions to delete this organization')
     }
     if (!orgSlug) return console.error('Org slug is required')
 
-    try {
-      await deleteOrganization({ slug: orgSlug })
-    } finally {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted ${orgName}`,
-      })
-      router.push('/projects')
-    }
+    deleteOrganization({ slug: orgSlug })
   }
 
   return (
@@ -65,7 +59,7 @@ const DeleteOrganizationButton = () => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-foreground">Delete organization</h5>
+            <span>Delete organization</span>
             <span className="text-xs text-foreground-lighter">Are you sure?</span>
           </div>
         }
@@ -77,7 +71,7 @@ const DeleteOrganizationButton = () => {
           validate={onValidate}
         >
           {() => (
-            <div className="space-y-4 py-3">
+            <>
               <Modal.Content>
                 <p className="text-sm text-foreground-lighter">
                   This action <span className="text-foreground">cannot</span> be undone. This will
@@ -113,7 +107,7 @@ const DeleteOrganizationButton = () => {
                   I understand, delete this organization
                 </Button>
               </Modal.Content>
-            </div>
+            </>
           )}
         </Form>
       </Modal>

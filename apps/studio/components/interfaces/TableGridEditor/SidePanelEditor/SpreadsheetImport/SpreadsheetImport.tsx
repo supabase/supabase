@@ -1,10 +1,10 @@
-import Link from 'next/link'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
+import toast from 'react-hot-toast'
 
-import { useStore } from 'hooks'
+import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
@@ -18,7 +18,6 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-import toast from 'react-hot-toast'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
@@ -43,8 +42,6 @@ const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  const { ui } = useStore()
-
   useEffect(() => {
     if (visible && headers.length === 0) {
       resetSpreadsheetImport()
@@ -100,10 +97,7 @@ const SpreadsheetImport = ({
     }
 
     if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      ui.setNotification({
-        category: 'info',
-        message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
-      })
+      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
     } else {
       updateEditorDirty(true)
       setUploadedFile(file)
@@ -112,12 +106,9 @@ const SpreadsheetImport = ({
         onProgressUpdate
       )
       if (errors.length > 0) {
-        ui.setNotification({
-          error: errors,
-          category: 'error',
-          message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
-          duration: 4000,
-        })
+        toast.error(
+          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
+        )
       }
 
       setErrors(errors)
@@ -139,12 +130,9 @@ const SpreadsheetImport = ({
     if (text.length > 0) {
       const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
       if (errors.length > 0) {
-        ui.setNotification({
-          error: errors,
-          category: 'error',
-          message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
-          duration: 4000,
-        })
+        toast.error(
+          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
+        )
       }
       setErrors(errors)
       setSelectedHeaders(headers)
@@ -169,22 +157,15 @@ const SpreadsheetImport = ({
 
   const onConfirm = (resolve: () => void) => {
     if (tab === 'fileUpload' && uploadedFile === undefined) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Please upload a file to import your data with',
-      })
+      toast.error('Please upload a file to import your data with')
       resolve()
     } else if (selectedHeaders.length === 0) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Please select at least one header from your CSV',
-      })
+      toast.error('Please select at least one header from your CSV')
       resolve()
     } else if (!isCompatible) {
-      ui.setNotification({
-        category: 'error',
-        message: 'The data that you are trying to import is incompatible with your table structure',
-      })
+      toast.error(
+        'The data that you are trying to import is incompatible with your table structure'
+      )
       resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })

@@ -33,11 +33,15 @@ export const prettyFormatVariable: Record<Variable, string> = {
   anonKey: 'Anon key',
 }
 
-export function toDisplayNameOrgProject(org: Org, project: Project) {
+type DeepReadonly<T> = {
+  readonly [P in keyof T]: DeepReadonly<T[P]>
+}
+
+export function toDisplayNameOrgProject(org: DeepReadonly<Org>, project: DeepReadonly<Project>) {
   return `${org.name} / ${project.name}`
 }
 
-export function toOrgProjectValue(org: Org, project: Project) {
+export function toOrgProjectValue(org: DeepReadonly<Org>, project: DeepReadonly<Project>) {
   return escapeDoubleQuotes(
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     JSON.stringify([org.id, project.ref, removeDoubleQuotes(toDisplayNameOrgProject(org, project))])
@@ -46,7 +50,7 @@ export function toOrgProjectValue(org: Org, project: Project) {
 
 export function fromOrgProjectValue(
   maybeOrgProject: string
-): [string, string, string] | [null, null, null] {
+): [number, string, string] | [null, null, null] {
   try {
     // not restoring the double quotes on the display name is fine because it's only used for
     // command fuzzy search, not for exact/literal matching
@@ -54,7 +58,7 @@ export function fromOrgProjectValue(
     if (!Array.isArray(data) || data.length !== 3) {
       throw Error("Shape of parsed JSON doesn't match form of org and project value")
     }
-    return data as [string, string, string]
+    return data as [number, string, string]
   } catch {
     return [null, null, null]
   }

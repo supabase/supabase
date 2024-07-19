@@ -35,7 +35,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { XIcon } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
@@ -46,7 +48,6 @@ import {
 } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher

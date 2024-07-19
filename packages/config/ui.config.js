@@ -1,6 +1,5 @@
 const deepMerge = require('deepmerge')
 const forms = require('@tailwindcss/forms')
-const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 const svgToDataUri = require('mini-svg-data-uri')
@@ -166,12 +165,12 @@ const uiConfig = {
           '100%': { transform: 'scale(0.95)', opacity: 0 },
         },
         overlayContentShow: {
-          '0%': { opacity: 0, transform: 'translate(0%, -2%) scale(.96)' },
+          '0%': { opacity: 0, transform: 'translate(0%, -2%) scale(1)' },
           '100%': { opacity: 1, transform: 'translate(0%, 0%) scale(1)' },
         },
         overlayContentHide: {
           '0%': { opacity: 1, transform: 'translate(0%, 0%) scale(1)' },
-          '100%': { opacity: 0, transform: 'translate(0%, -2%) scale(.96)' },
+          '100%': { opacity: 0, transform: 'translate(0%, -2%) scale(1)' },
         },
         dropdownFadeIn: {
           '0%': { transform: 'scale(0.95)', opacity: 0 },
@@ -320,12 +319,12 @@ const uiConfig = {
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-        "[data-state='open'] .accordion-content-animation": {
-          animation: 'slideDown 200ms ease-out',
-        },
-        "[data-state='closed'] .accordion-content-animation": {
-          animation: 'slideUp 200ms ease-in',
-        },
+        // "[data-state='open'] .accordion-content-animation": {
+        //   animation: 'slideDown 200ms ease-out',
+        // }
+        // "[data-state='closed'] .accordion-content-animation": {
+        //   animation: 'slideUp 200ms ease-in',
+        // },
         '.text-code': {
           margin: '0 0.2em',
           padding: '0.2em 0.4em 0.1em',

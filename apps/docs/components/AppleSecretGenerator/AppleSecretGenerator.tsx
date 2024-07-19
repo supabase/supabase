@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Admonition, Button, Input } from 'ui'
+import { Button, Input } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 function base64URL(value: string) {
   return globalThis.btoa(value).replace(/[=]/g, '').replace(/[+]/g, '-').replace(/[\/]/g, '_')

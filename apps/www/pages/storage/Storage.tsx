@@ -1,4 +1,4 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Image } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -16,7 +16,8 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 function StoragePage() {
   // base path for images
@@ -24,7 +25,7 @@ function StoragePage() {
 
   const meta_title = 'Storage | Store any digital content'
   const meta_description =
-    'An open source Object store with unlimited scalability, for any file type.'
+    'An open source S3 Compatible Object Store with unlimited scalability, for any file type.'
 
   return (
     <>
@@ -43,6 +44,7 @@ function StoragePage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.STORAGE} />
         <ProductHeader
           icon={Solutions['storage'].icon}
           title={Solutions['storage'].name}
@@ -53,11 +55,14 @@ function StoragePage() {
             </span>,
           ]}
           subheader={[
-            'An open source Object store with unlimited scalability, for any file type.',
+            <>
+              An open source <b>S3 Compatible</b> Object Store, with unlimited scalability, for any
+              file type.
+            </>,
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <ThemeImage
+            <Image
               src={{
                 light: `${basePath}/images/product/storage/header--light.png`,
                 dark: `${basePath}/images/product/storage/header--dark.png`,
@@ -83,7 +88,6 @@ function StoragePage() {
               </div>
 
               <h4 className="h4">Interoperable</h4>
-
               <p className="p">
                 Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
               </p>
@@ -109,8 +113,11 @@ function StoragePage() {
                   }
                 />
               </div>
-              <h4 className="h4">Dependable</h4>
-              <p className="p">Enterprise-level scalability and durability.</p>
+              <h4 className="h4">Multiple Protocol Support</h4>
+
+              <p className="p">
+                S3, Resumable Uploads and Standard Uploads. Enterprise-level scalability.
+              </p>
             </div>
           </div>
         </SectionContainer>

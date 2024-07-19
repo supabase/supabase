@@ -1,25 +1,21 @@
+import { Eye, EyeOff, RefreshCw, Search, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  IconEye,
-  IconEyeOff,
-  IconRefreshCw,
-  IconSearch,
-  IconTerminal,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import DatePickers from './Logs.DatePickers'
-import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
@@ -67,13 +63,13 @@ const PreviewFilterPanel = ({
   onSelectedDatabaseChange,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
+  const { ref } = useParams()
   const [search, setSearch] = useState('')
-  const { project } = useProjectContext()
+
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
-  const showDatabaseSelector =
-    project?.is_read_replicas_enabled &&
-    ['/project/[ref]/logs/edge-logs', '/project/[ref]/logs/pooler-logs'].includes(router.pathname)
+  const showDatabaseSelector = LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -88,6 +84,7 @@ const PreviewFilterPanel = ({
     <Tooltip_Shadcn_ delayDuration={100}>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
+          title="refresh"
           type="default"
           className="px-1.5"
           icon={
@@ -99,11 +96,11 @@ const PreviewFilterPanel = ({
                       {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </p>
                   </div>
-                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                  <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
                   <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
                 </div>
               )}
-              <IconRefreshCw />
+              <RefreshCw />
             </div>
           }
           loading={isLoading}
@@ -147,7 +144,7 @@ const PreviewFilterPanel = ({
             }}
             icon={
               <div className="text-foreground-lighter">
-                <IconSearch size={14} />
+                <Search size={14} />
               </div>
             }
             value={search}
@@ -205,7 +202,7 @@ const PreviewFilterPanel = ({
           <Button
             type="default"
             onClick={() => onToggleEventChart()}
-            icon={isShowingEventChart ? <IconEye /> : <IconEyeOff />}
+            icon={isShowingEventChart ? <Eye /> : <EyeOff />}
           >
             Chart
           </Button>
@@ -217,7 +214,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
             <TooltipTrigger_Shadcn_ asChild>
-              <Button asChild className="px-1" type="default" icon={<IconTerminal />}>
+              <Button asChild className="px-1" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger_Shadcn_>
@@ -225,7 +222,16 @@ const PreviewFilterPanel = ({
               Open query in Logs Explorer
             </TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
-          <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
+          <DatabaseSelector
+            onSelectId={onSelectedDatabaseChange}
+            additionalOptions={
+              table === LogsTableName.EDGE
+                ? (loadBalancers ?? []).length > 0
+                  ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+                  : []
+                : []
+            }
+          />
         </div>
       ) : (
         <Button asChild type="default" onClick={onExploreClick}>

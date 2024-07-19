@@ -124,6 +124,8 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 >
 <TabPanel id="js" label="JavaScript">
 
+<CreateClientSnippet />
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
@@ -134,6 +136,20 @@ async function signInWithAzure() {
       scopes: 'email',
     },
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
+
+```dart
+Future<void> signInWithAzure() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.azure,
+    scopes: 'email',
+  );
 }
 ```
 
@@ -153,6 +169,8 @@ suspend fun signInWithAzure() {
 </TabPanel>
 </Tabs>
 
+<OAuthPkceFlow />
+
 <Tabs
   scrollable
   size="small"
@@ -171,13 +189,24 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
-    supabase.auth.signOut()
+	supabase.auth.signOut()
 }
 ```
 
@@ -205,6 +234,18 @@ async function signInWithAzure() {
       scopes: 'offline_access',
     },
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+```dart
+Future<void> signInWithAzure() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.azure,
+    scopes: 'offline_access',
+  );
 }
 ```
 

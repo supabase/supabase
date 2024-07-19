@@ -1,4 +1,4 @@
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import authors from 'lib/authors.json'
 import PostTypes from '../../types/post'
@@ -27,7 +27,9 @@ function FeaturedThumb(blog: PostTypes) {
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-            layout="fill"
+            fill
+            sizes="100%"
+            quality={100}
             className="object-cover"
             alt="blog thumbnail"
           />
@@ -54,13 +56,13 @@ function FeaturedThumb(blog: PostTypes) {
                         src={author.author_image_url}
                         alt={`${author.author} avatar`}
                         className="rounded-full object-cover"
-                        layout="fill"
+                        fill
+                        sizes="30px"
                       />
                     </div>
                   )}
                   <div className="flex flex-col">
                     <span className="text-foreground m-0 text-sm">{author.author}</span>
-                    {/* <span className="text-light m-0 text-xs">{author.position}</span> */}
                   </div>
                 </div>
               )

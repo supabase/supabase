@@ -21,7 +21,6 @@ export function TweetCard(props: TweetCard) {
             <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
               <Image
                 src={props.img_url}
-                layout="responsive"
                 width="64"
                 height="64"
                 alt={`${props.handle} twitter image`}
@@ -31,10 +30,7 @@ export function TweetCard(props: TweetCard) {
             <div className="w-6" />
           )}
           <p className="text-foreground text-sm font-medium">{props.handle}</p>
-          <div
-            className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ background: '#000' }}
-          >
+          <div className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black">
             <svg
               className="h-[12px] w-[12px]"
               fill="currentColor"

@@ -81,7 +81,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d={framework.icon} fill="#7E7E7E" />
+              <path d={framework.icon} fill="hsl(var(--foreground-lighter))" />
             </svg>
           </Link>
         ))}

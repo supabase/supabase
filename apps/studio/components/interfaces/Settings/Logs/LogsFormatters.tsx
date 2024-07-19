@@ -8,7 +8,7 @@ import CopyButton from 'components/ui/CopyButton'
 import dayjs from 'dayjs'
 import React from 'react'
 import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -30,20 +30,20 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="grid grid-cols-12 group">
+    <div className="group flex items-center gap-2 flex-wrap relative">
       <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
       <span
         title={value}
-        className="truncate text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+        className="truncate font-mono text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
       >
         {valueRender ?? value}
       </span>
       <CopyButton
         iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1 absolute top-1 right-1"
         type="text"
         title="Copy to clipboard"
       />

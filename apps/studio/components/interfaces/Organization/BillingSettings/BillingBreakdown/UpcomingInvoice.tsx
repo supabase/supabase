@@ -23,7 +23,7 @@ interface TooltipData {
 const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
-    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
+    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
     linkRef:
       'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
   },
@@ -265,7 +265,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
+                  <InvoiceTooltip text="Projected costs at the end of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
                   {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}

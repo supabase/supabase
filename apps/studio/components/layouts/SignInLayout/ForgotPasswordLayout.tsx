@@ -1,6 +1,5 @@
-import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
@@ -60,4 +59,4 @@ const ForgotPasswordLayout = ({
   )
 }
 
-export default observer(ForgotPasswordLayout)
+export default ForgotPasswordLayout

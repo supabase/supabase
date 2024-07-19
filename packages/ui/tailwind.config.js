@@ -17,10 +17,15 @@ module.exports = config({
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
           '100%': { backgroundColor: 'transparent' },
         },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
+        },
       },
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
       colors: {
         border: 'hsl(var(--border-overlay))',

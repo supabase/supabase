@@ -1,20 +1,23 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { withAuth } from 'hooks'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
+import { Button, IconLoader, IconTool } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
+  const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
+
+  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsQuery()
 
   return (
     <div className="relative flex overflow-y-auto overflow-x-hidden">
@@ -83,9 +86,16 @@ const SupportPage = () => {
             ].join(' ')}
           >
             {sentCategory !== undefined ? (
-              <Success sentCategory={sentCategory} />
+              <Success
+                sentCategory={sentCategory}
+                selectedProject={selectedProject}
+                projects={projectsData}
+              />
             ) : (
-              <SupportForm setSentCategory={setSentCategory} />
+              <SupportForm
+                setSentCategory={setSentCategory}
+                setSelectedProject={setSelectedProject}
+              />
             )}
           </div>
         </div>
@@ -94,4 +104,4 @@ const SupportPage = () => {
   )
 }
 
-export default withAuth(observer(SupportPage), { useHighestAAL: false })
+export default withAuth(SupportPage, { useHighestAAL: false })

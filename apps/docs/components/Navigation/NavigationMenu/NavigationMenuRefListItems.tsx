@@ -1,20 +1,19 @@
+'use client'
+
 import * as Accordion from '@radix-ui/react-accordion'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft, IconChevronUp, cn } from 'ui'
-import * as NavItems from './NavigationMenu.constants'
-
+import { ChevronUp } from 'lucide-react'
 import Image from 'next/legacy/image'
-
+import { Fragment, memo } from 'react'
+import { cn } from 'ui'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
+import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
-
-import React, { Fragment } from 'react'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { BASE_PATH } from '~/lib/constants'
+import MenuIconPicker from './MenuIconPicker'
+import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
 
-const HeaderLink = React.memo(function HeaderLink(props: any) {
+const HeaderLink = memo(function HeaderLink(props: any) {
   return (
     <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
@@ -34,7 +33,7 @@ interface FunctionLinkProps {
   onClick?: () => void
 }
 
-const FunctionLink = React.memo(function FunctionLink({
+const FunctionLink = memo(function FunctionLink({
   title,
   id,
   icon,
@@ -44,10 +43,9 @@ const FunctionLink = React.memo(function FunctionLink({
   isSubItem = false,
   onClick = () => {},
 }: FunctionLinkProps) {
-  const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
 
-  const url = `${router.basePath}${basePath}/${slug}`
+  const url = `${BASE_PATH}${basePath}/${slug}`
   const active = activeAccordionItem === id
 
   return (
@@ -61,7 +59,10 @@ const FunctionLink = React.memo(function FunctionLink({
         onClick={(e) => {
           e.preventDefault()
           history.pushState({}, '', url)
-          document.getElementById(slug)?.scrollIntoView()
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          document.getElementById(slug)?.scrollIntoView({
+            behavior: reduceMotion ? 'auto' : 'smooth',
+          })
           onClick()
         }}
         className={cn(
@@ -70,7 +71,7 @@ const FunctionLink = React.memo(function FunctionLink({
           active ? 'text-brand' : 'text-foreground-lighter'
         )}
       >
-        {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
+        {icon && <Image width={16} height={16} alt={icon} src={`${BASE_PATH}${icon}`} />}
         {title}
         {active && !isSubItem && (
           <div
@@ -79,7 +80,7 @@ const FunctionLink = React.memo(function FunctionLink({
           ></div>
         )}
         {isParent && (
-          <IconChevronUp
+          <ChevronUp
             width={16}
             className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
           />
@@ -94,7 +95,7 @@ export interface RenderLinkProps {
   basePath: string
 }
 
-const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderLinkProps) {
+const RenderLink = memo(function RenderLink({ section, basePath }: RenderLinkProps) {
   const activeAccordionItem = useMenuActiveRefId()
 
   if (!('items' in section)) {
@@ -181,22 +182,8 @@ const NavigationMenuRefListItems = ({
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-      <Link
-        href="/"
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-foreground-light hover:text-brand-600 hover:cursor-pointer',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Main Menu</span>
-      </Link>
       <div className="flex items-center gap-3 my-3">
-        <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
+        <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
@@ -223,4 +210,4 @@ const NavigationMenuRefListItems = ({
   )
 }
 
-export default React.memo(NavigationMenuRefListItems)
+export default memo(NavigationMenuRefListItems)

@@ -1,10 +1,11 @@
 import Editor from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
 
+import { useParams } from 'common'
+import Footer from 'components/grid/components/footer/Footer'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
@@ -12,9 +13,7 @@ import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
-import Link from 'next/link'
 import { Button } from 'ui'
-import Footer from 'components/grid/components/footer/Footer'
 
 export interface TableDefinitionProps {
   id?: number
@@ -148,4 +147,4 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   )
 }
 
-export default observer(TableDefinition)
+export default TableDefinition

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { useStore } from 'hooks'
+import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface AddNewSecretModalProps {
@@ -15,7 +15,6 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
-  const { ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const { project } = useProjectContext()
@@ -50,45 +49,30 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     setSubmitting(true)
     let encryptionKeyId = selectedKeyId
 
-    if (selectedKeyId === 'create-new') {
-      const addKeyRes = await addKeyMutation({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        name: values.keyName || undefined,
-      })
-      if (addKeyRes.error) {
-        return ui.setNotification({
-          error: addKeyRes.error,
-          category: 'error',
-          message: `Failed to create new key: ${addKeyRes.error.message}`,
+    try {
+      setSubmitting(true)
+      if (selectedKeyId === 'create-new') {
+        const addKeyRes = await addKeyMutation({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: values.keyName || undefined,
         })
-      } else {
         encryptionKeyId = addKeyRes[0].id
       }
-    }
 
-    const res = await addSecret({
-      projectRef: project.ref,
-      connectionString: project?.connectionString,
-      name: values.name,
-      description: values.description,
-      secret: values.secret,
-      key_id: encryptionKeyId,
-    })
-
-    if (!res.error) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully added new secret ${values.name}`,
+      await addSecret({
+        projectRef: project.ref,
+        connectionString: project?.connectionString,
+        name: values.name,
+        description: values.description,
+        secret: values.secret,
+        key_id: encryptionKeyId,
       })
+      toast.success(`Successfully added new secret ${values.name}`)
       onClose()
-      setSubmitting(false)
-    } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to add secret ${values.name}: ${res.error.message}`,
-      })
+    } catch (error: any) {
+      // [Joshen] No error handler required as they are all handled within the mutations already
+    } finally {
       setSubmitting(false)
     }
   }
@@ -100,7 +84,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       size="medium"
       visible={visible}
       onCancel={onClose}
-      header={<h5 className="text-sm text-foreground">Add new secret</h5>}
+      header="Add new secret"
     >
       <Form
         id="add-new-secret-form"
@@ -111,70 +95,64 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       >
         {({ isSubmitting }: any) => {
           return (
-            <div className="py-4">
-              <Modal.Content>
-                <div className="space-y-4 pb-4">
-                  <Input id="name" label="Name" />
-                  <Input id="description" label="Description" labelOptional="Optional" />
-                  <Input
-                    id="secret"
-                    type={showSecretValue ? 'text' : 'password'}
-                    label="Secret value"
-                    actions={
-                      <div className="mr-1">
-                        <Button
-                          type="default"
-                          icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
-                          onClick={() => setShowSecretValue(!showSecretValue)}
-                        />
-                      </div>
-                    }
-                  />
-                </div>
+            <>
+              <Modal.Content className="space-y-4">
+                <Input id="name" label="Name" />
+                <Input id="description" label="Description" labelOptional="Optional" />
+                <Input
+                  id="secret"
+                  type={showSecretValue ? 'text' : 'password'}
+                  label="Secret value"
+                  actions={
+                    <div className="mr-1">
+                      <Button
+                        type="default"
+                        icon={showSecretValue ? <IconEyeOff /> : <IconEye />}
+                        onClick={() => setShowSecretValue(!showSecretValue)}
+                      />
+                    </div>
+                  }
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="py-4 space-y-4">
-                  <EncryptionKeySelector
-                    id="keyId"
-                    nameId="keyName"
-                    label="Select a key to encrypt your secret with"
-                    labelOptional="Optional"
-                    selectedKeyId={selectedKeyId}
-                    onSelectKey={setSelectedKeyId}
-                  />
-                  <InformationBox
-                    icon={<IconHelpCircle size={18} strokeWidth={2} />}
-                    url="https://github.com/supabase/vault"
-                    urlLabel="Vault documentation"
-                    title="What is a key?"
-                    description={
-                      <div className="space-y-2">
-                        <p>
-                          Keys are used to encrypt data inside your database, and every secret in
-                          the Vault is encrypted with a key.
-                        </p>
-                        <p>
-                          You may create different keys for different purposes, such as one for
-                          encrypting user data, and another for application data.
-                        </p>
-                      </div>
-                    }
-                  />
-                </div>
+              <Modal.Content className="space-y-4">
+                <EncryptionKeySelector
+                  id="keyId"
+                  nameId="keyName"
+                  label="Select a key to encrypt your secret with"
+                  labelOptional="Optional"
+                  selectedKeyId={selectedKeyId}
+                  onSelectKey={setSelectedKeyId}
+                />
+                <InformationBox
+                  icon={<IconHelpCircle size={18} strokeWidth={2} />}
+                  url="https://github.com/supabase/vault"
+                  urlLabel="Vault documentation"
+                  title="What is a key?"
+                  description={
+                    <div className="space-y-2">
+                      <p>
+                        Keys are used to encrypt data inside your database, and every secret in the
+                        Vault is encrypted with a key.
+                      </p>
+                      <p>
+                        You may create different keys for different purposes, such as one for
+                        encrypting user data, and another for application data.
+                      </p>
+                    </div>
+                  }
+                />
               </Modal.Content>
               <Modal.Separator />
-              <Modal.Content>
-                <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={onClose}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                    Add secret
-                  </Button>
-                </div>
+              <Modal.Content className="flex items-center justify-end space-x-2">
+                <Button type="default" disabled={isSubmitting} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  Add secret
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

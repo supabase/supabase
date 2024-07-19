@@ -5,23 +5,6 @@ description: 'Manage the identities associated with your user'
 subtitle: 'Manage the identities associated with your user'
 ---
 
-## The user identity
-
-The user identity represents an authentication method associated to the user. For example, if a user signs in using their email, an email identity will be associated with the user.
-
-The user identity object contains the following attributes:
-
-| Attributes      | Type     | Description                                                                                                                                                                                                                              |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id              | `string` | The provider id returned by the provider. If the provider is an OAuth provider, the id refers to the user's account with the OAuth provider. If the provider is `email` or `phone`, the id is the user's id from the `auth.users` table. |
-| user_id         | `string` | The user's id that the identity is linked to.                                                                                                                                                                                            |
-| identity_data   | `object` | The identity metadata.                                                                                                                                                                                                                   |
-| identity_id     | `string` | The unique id of the identity.                                                                                                                                                                                                           |
-| provider        | `string` | The provider name.                                                                                                                                                                                                                       |
-| created_at      | `string` | The timestamp that the identity was created.                                                                                                                                                                                             |
-| last_sign_in_at | `string` | The timestamp that the identity was last used to sign in.                                                                                                                                                                                |
-| updated_at      | `string` | The timestamp that the identity was last updated.                                                                                                                                                                                        |
-
 ## Identity linking strategies
 
 Currently, Supabase Auth supports 2 strategies to link an identity to a user:
@@ -52,6 +35,24 @@ Supabase Auth allows a user to initiate identity linking with a different email 
 
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/dart/auth-linkidentity):
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/swift/auth-linkidentity):
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
 ```
 
 </TabPanel>
@@ -92,6 +93,39 @@ const googleIdentity = identities.find((identity) => identity.provider === 'goog
 
 // unlink the google identity from the user
 const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+You can use [`getUserIdentities()`](/docs/reference/dart/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/dart/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
+```dart
+// retrieve all identities linked to a user
+final List<UserIdentity> identities = await supabase.auth.getUserIdentities();
+
+// find the google identity linked to the user
+final UserIdentity googleIdentity =
+    identities.singleWhere((identity) => identity.provider == 'google');
+
+// unlink the google identity from the user
+await supabase.auth.unlinkIdentity(googleIdentity);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use [`getUserIdentities()`](/docs/reference/swift/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/swift/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
+```swift
+// retrieve all identities linked to a user
+let identities = try await supabase.auth.userIdentities()
+
+// find the google identity linked to the user
+let googleIdentity = identities.first { $0.provider == .google }
+
+// unlink the google identity from the user
+try await supabase.auth.unlinkIdentity(googleIdentity)
 ```
 
 </TabPanel>

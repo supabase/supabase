@@ -1,14 +1,13 @@
 import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { DocsLayout } from 'components/layouts'
+import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
@@ -111,4 +110,5 @@ const GraphiQLPage: NextPageWithLayout = () => {
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
-export default observer(GraphiQLPage)
+
+export default GraphiQLPage

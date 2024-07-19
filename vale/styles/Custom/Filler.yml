@@ -4,9 +4,6 @@ ignorecase: true
 level: error
 tokens:
   - easily
-  - easy
-  - just
   - please
-  - simple
   - simply
   - that's it

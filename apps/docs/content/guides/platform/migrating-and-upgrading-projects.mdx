@@ -63,6 +63,36 @@ Breaking changes are generally only present in major version upgrades of Postgre
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
 
+#### Time Limits
+
+Starting from 2024-06-24, when a project is paused, users then have a 90-day window to restore the project on the platform from within Supabase Studio.
+
+The 90-day window allows Supabase to introduce platform changes that may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
+
+During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](https://supabase.com/dashboard/projects).
+
+<Image
+  zoomable
+  alt="Project Paused: 90 Days Remaining"
+  src="/docs/img/guides/platform/paused-90-day.png"
+/>
+
+After the 90-day restore window, you can download your project's backup file from the project dashboard. This backup is compatible with [pg_restore](https://www.postgresql.org/docs/current/app-pgrestore.html). You can extract your data from it, or attempt to manually restore the project.
+
+<Image
+  zoomable
+  alt="Project Paused: 90 Days Remaining"
+  src="/docs/img/guides/platform/paused-dl-backup.png"
+/>
+
+If you upgrade to a paid plan while your project is paused, any expired one-click restore options are reenabled. Since the backup was taken outside the backwards compatibility window, it may fail to restore. If you have a problem restoring your backup after upgrading, contact [Support](/support).
+
+<Image
+  zoomable
+  alt="Project Paused: 90 Days Remaining"
+  src="/docs/img/guides/platform/paused-paid-tier.png"
+/>
+
 #### Disk sizing
 
 When upgrading, the Supabase platform will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the upgrade will reduce the disk size to 120GB (1.2x the size of your database).
@@ -200,7 +230,7 @@ supabase db diff --linked --schema auth,storage > changes.sql
 
 ### Enable publication on tables
 
-Replication for Realtime is disabled for all tables in your new project. On the [Replication](https://supabase.com/dashboard/project/_/database/replication) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
+Replication for Realtime is disabled for all tables in your new project. On the [Publications](https://supabase.com/dashboard/project/_/database/publications) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
 
 ### Migrate storage objects
 

@@ -110,9 +110,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Branching',
+        plans: {
+          free: false,
+          pro: '$0.32 per branch, per day',
+          team: '$0.32 per branch, per day',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',
         },
         plans: {
           free: '5 GB included',
@@ -151,6 +161,19 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
+      },
+      {
+        title: 'Anonymous Sign-ins',
+        tooltips: {
+          main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
       },
       {
         title: 'Social OAuth providers',
@@ -294,6 +317,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Content Delivery Network',
+        tooltips: {
+          main: 'Assets in Storage are automatically cached on a CDN. With Smart CDN caching enabled, the CDN cache is automatically re-validated when the underlying asset changes. CDN caching is enabled across all plans and assets in the paid plans are cached via the Smart CDN.',
+        },
+        plans: {
+          free: 'Basic CDN',
+          pro: 'Smart CDN',
+          team: 'Smart CDN',
+          enterprise: 'Smart CDN',
+        },
+        usage_based: false,
+      },
+      {
         title: 'Image Transformations',
         tooltips: {
           main: 'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
@@ -347,16 +383,13 @@ export const pricing: Pricing = {
       },
       {
         title: 'Number of functions',
-        tooltips: {
-          main: 'Billing is based on the maximum amount of functions at any point in time throughout your billing period.',
-        },
         plans: {
           free: '10 included',
-          pro: ['100 included', 'then $10 per additional 100'],
-          team: ['100 included', 'then $10 per additional 100'],
-          enterprise: 'Custom',
+          pro: '500 included',
+          team: '1000 included',
+          enterprise: 'Unlimited',
         },
-        usage_based: true,
+        usage_based: false,
       },
     ],
   },
@@ -511,7 +544,7 @@ export const pricing: Pricing = {
           enterprise: 'Available as paid add-on',
         },
         tooltips: {
-          main: 'Available as a paid add-on on Team plan and above.',
+          main: 'Available as a paid add-on on Team Plan and above.',
         },
         usage_based: false,
       },
@@ -565,19 +598,6 @@ export const pricing: Pricing = {
           pro: '$10 per domain per month per project add on',
           team: '$10 per domain per month per project add on',
           enterprise: '1, additional $10/domain/month',
-        },
-        usage_based: false,
-      },
-      {
-        title: 'Bring your own cloud deployment options',
-        tooltips: {
-          main: 'On-Premises, single tenant, and managed dedicated cloud provider instance options',
-        },
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
         },
         usage_based: false,
       },

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'
 import { useKey } from 'react-use'
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
-import PostTypes from '~/types/post'
+import type PostTypes from '~/types/post'
 import type { BlogView } from '~/pages/blog'
 
 import {
@@ -183,7 +183,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               <DropdownMenuContent side="bottom" align="start">
                 {allCategories.map((category: string) => (
                   <DropdownMenuItem
-                    key="custom-expiry"
+                    key={`item-${category}`}
                     onClick={() => handleSetCategory(category)}
                     className={cn(
                       (category === 'all' && !activeCategory) || category === activeCategory

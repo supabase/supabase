@@ -6,8 +6,11 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
-import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { Code } from 'lucide-react'
 import type { Organization } from 'types'
 import {
   Button,
@@ -19,7 +22,6 @@ import {
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -41,9 +43,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
     // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
     // for storage bucket route since its longer
     const isStorageBucketRoute = 'bucketId' in routerQueries
+    const isSecurityAdvisorRoute = 'preset' in routerQueries
+
     return route
       .split('/')
-      .slice(0, isStorageBucketRoute ? 5 : 4)
+      .slice(0, isStorageBucketRoute || isSecurityAdvisorRoute ? 5 : 4)
       .join('/')
   } else {
     return route
@@ -122,7 +126,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
             type="text"
             className="pr-2"
             iconRight={
-              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
             }
           >
             <div className="flex items-center space-x-2">

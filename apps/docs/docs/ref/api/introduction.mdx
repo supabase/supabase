@@ -5,7 +5,6 @@ hideTitle: true
 ---
 
 <div className="flex items-start gap-6 not-prose" id="introduction">
-  <img src="/docs/img/icons/menu/reference-api.svg" className="w-8 h-8 rounded" />
   <div className="flex flex-col gap-2">
     <h1 className="text-3xl text-foreground m-0">Management API</h1>
   </div>
@@ -16,13 +15,9 @@ hideTitle: true
 
       Manage your Supabase organizations and projects programmatically.
 
-      ## Status
-
-      The Management API is in `beta`. It is usable in it's current state, but it's likely that there will be breaking changes.
-
       ## Authentication
 
-      All API requests require a Supabase Personal token to be included in the Authorization header: `Authorization Bearer <supabase_personal_token`.
+      All API requests require a Supabase Personal token to be included in the Authorization header: `Authorization Bearer <supabase_personal_token>`.
       To generate or manage your API token, visit your [account](https://supabase.com/dashboard/account/tokens) page.
       Your API tokens carry the same privileges as your user account, so be sure to keep it secret.
 
@@ -35,7 +30,11 @@ hideTitle: true
 
       ## Rate limits
 
-      The API is currently subject to our fair-use policy. In the future, are likely to introduce rate limits.
+      The rate limit for Management API is 60 requests per one minute per user, and applies cumulatively across all requests made with your personal access tokens.
+
+      If you exceed this limit, all Management API calls for the next minute will be blocked, resulting in a HTTP 429 response.
+
+      The Management API is subject to our fair-use policy.
       All resources created via the API are subject to the pricing detailed on our [Pricing](https://supabase.com/pricing) pages.
 
     </RefSubLayout.Details>

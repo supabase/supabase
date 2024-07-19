@@ -31,7 +31,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     const projectId = ''
 
     async function uploadFile(bucketName, fileName, file) {
-        const { data: session } = await supabase.auth.session()
+        const { data: { session } } = await supabase.auth.getSession()
 
         return new Promise((resolve, reject) => {
             var upload = new tus.Upload(file, {

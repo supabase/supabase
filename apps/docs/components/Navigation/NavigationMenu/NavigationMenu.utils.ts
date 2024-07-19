@@ -1,6 +1,14 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { ICommonItem } from '~/components/reference/Reference.types'
-import { Json } from '~/types'
+import { usePathname } from 'next/navigation'
+import type { ICommonItem } from '~/components/reference/Reference.types'
+import type { Json } from '~/types'
+import { menuState } from '../../../hooks/useMenuState'
+
+export function getPathWithoutHash(relativePath: string) {
+  return new URL(relativePath, 'http://placeholder').pathname
+}
 
 /**
  * Recursively filter common sections and their sub items based on
@@ -88,4 +96,12 @@ export function useSpec(specFile?: string) {
   }, [specFile])
 
   return spec
+}
+
+export const useCloseMenuOnRouteChange = () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    menuState.setMenuMobileOpen(false)
+  }, [pathname])
 }

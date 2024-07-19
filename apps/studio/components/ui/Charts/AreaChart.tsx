@@ -1,13 +1,12 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
+
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import ChartNoData from './NoDataPlaceholder'
-dayjs.extend(utc)
+import NoDataPlaceholder from './NoDataPlaceholder'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -35,8 +34,6 @@ const AreaChart = ({
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData size={size} className={className} />
-
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
@@ -47,6 +44,18 @@ const AreaChart = ({
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
+
+  if (data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        description="It may take up to 24 hours for data to show"
+        size={size}
+        className={className}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>

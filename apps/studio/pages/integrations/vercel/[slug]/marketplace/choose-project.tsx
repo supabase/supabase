@@ -65,8 +65,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               project.status === PROJECT_STATUS['COMING_UP'] ||
               project.status === PROJECT_STATUS['RESTORING'])
         )
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [organization?.id, supabaseProjectsData]
   )
 
@@ -176,6 +175,7 @@ This Supabase integration manages your environment variables automatically to pr
             }}
             loadingForeignProjects={isLoadingVercelProjectsData}
             loadingSupabaseProjects={isLoadingSupabaseProjectsData}
+            mode="Vercel"
           />
           <Markdown
             content={`

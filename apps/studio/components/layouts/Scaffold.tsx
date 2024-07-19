@@ -2,16 +2,17 @@ import React from 'react'
 import { cn } from 'ui'
 
 const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
-const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
-
+const paddingClasses = 'px-6 lg:px-14 xl:px-24 2xl:px-32'
 const maxWidthClassesColumn = 'min-w-[420px]'
-
-// lg: pt - 8
 
 const ScaffoldHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
-      <header {...props} ref={ref} className={cn('w-full', 'flex-col gap-3', className)}></header>
+      <header
+        {...props}
+        ref={ref}
+        className={cn('w-full', 'flex-col gap-3 py-6', className)}
+      ></header>
     )
   }
 )
@@ -20,18 +21,32 @@ const ScaffoldTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
-  return <h1 ref={ref} {...props} className={cn('text-3xl pt-6 pb-4', className)} />
+  return <h1 ref={ref} {...props} className={cn('text-2xl', className)} />
 })
 
-const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn(maxWidthClasses, paddingClasses, className)} />
-  }
-)
+const ScaffoldDescription = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
+  return <span ref={ref} {...props} className={cn('text-sm text-foreground-light', className)} />
+})
+
+const ScaffoldContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { bottomPadding?: boolean }
+>(({ className, bottomPadding, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      {...props}
+      className={cn(maxWidthClasses, paddingClasses, bottomPadding && 'pb-16', className)}
+    />
+  )
+})
 
 const ScaffoldDivider = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn('w-full h-px bg-muted', className)} />
+    return <div ref={ref} {...props} className={cn('w-full h-px bg-border', className)} />
   }
 )
 
@@ -123,6 +138,7 @@ const ScaffoldContainerLegacy = React.forwardRef<
 
 ScaffoldHeader.displayName = 'ScaffoldHeader'
 ScaffoldTitle.displayName = 'ScaffoldTitle'
+ScaffoldDescription.displayName = 'ScaffoldDescription'
 ScaffoldContainer.displayName = 'ScaffoldContainer'
 ScaffoldDivider.displayName = 'ScaffoldDivider'
 ScaffoldSection.displayName = 'ScaffoldSection'
@@ -137,6 +153,7 @@ ScaffoldContainerLegacy.displayName = 'ScaffoldContainerLegacy'
 export {
   ScaffoldHeader,
   ScaffoldTitle,
+  ScaffoldDescription,
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldSection,

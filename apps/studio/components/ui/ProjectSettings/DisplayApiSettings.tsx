@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Button, IconAlertCircle, IconBookOpen, IconLoader, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 
 const DisplayApiSettings = () => {
   const { ref: projectRef } = useParams()
@@ -47,7 +48,7 @@ const DisplayApiSettings = () => {
             You can use the keys below in the Supabase client libraries.
             <br />
             <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
-              <Button icon={<IconBookOpen />} type="default" className="mt-4">
+              <Button icon={<BookOpen />} type="default" className="mt-4">
                 Client Docs
               </Button>
             </a>
@@ -57,14 +58,14 @@ const DisplayApiSettings = () => {
     >
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
@@ -72,7 +73,7 @@ const DisplayApiSettings = () => {
           </p>
         </div>
       ) : (
-        apiKeys.map((x: any, i: number) => (
+        apiKeys.map((x, i: number) => (
           <Panel.Content
             key={x.api_key}
             className={
@@ -88,7 +89,7 @@ const DisplayApiSettings = () => {
               // @ts-ignore
               label={
                 <>
-                  {x.tags?.split(',').map((x: any, i: number) => (
+                  {x.tags?.split(',').map((x, i: number) => (
                     <code key={`${x}${i}`} className="text-xs text-code">
                       {x}
                     </code>
@@ -110,7 +111,7 @@ const DisplayApiSettings = () => {
                     ? 'JWT secret update failed, new API key may have issues'
                     : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                       ? 'Updating JWT secret...'
-                      : x.api_key
+                      : x?.api_key ?? 'You need additional permissions to view API keys'
               }
               onChange={() => {}}
               descriptionText={

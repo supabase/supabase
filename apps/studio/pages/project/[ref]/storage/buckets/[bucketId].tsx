@@ -1,10 +1,9 @@
 import { useParams } from 'common'
 import { find } from 'lodash'
-import { observer } from 'mobx-react-lite'
 
-import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
@@ -40,4 +39,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
 
-export default observer(PageLayout)
+export default PageLayout

@@ -2,19 +2,27 @@ import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
+import Link from 'next/link'
 import { NavMenu, NavMenuItem } from 'ui'
-import { AccountLayout } from './'
+import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
+import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
-import Link from 'next/link'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const currentPath = useCurrentPath()
   const { slug } = useParams()
 
-  const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
+  const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const isNotOrgWithPartnerBilling = !(subscription?.billing_via_partner ?? true)
+  const invoicesEnabled = invoicesEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
@@ -69,14 +77,14 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       title={selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
-      <ScaffoldHeader>
+      <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
-        </ScaffoldContainer>
-        <ScaffoldContainer>
+          <ScaffoldTitle className="pb-3">
+            {selectedOrganization?.name ?? 'Organization'} settings
+          </ScaffoldTitle>
           <NavMenu className="border-none" aria-label="Organization menu navigation">
             {filteredNavMenuItems.map((item) => (
-              <NavMenuItem key={item.label} active={item.href === router.asPath}>
+              <NavMenuItem key={item.label} active={currentPath === item.href}>
                 <Link href={item.href}>{item.label}</Link>
               </NavMenuItem>
             ))}

@@ -1,10 +1,9 @@
 import { memo } from 'react'
-import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
-  Home = 'home',
   GettingStarted = 'gettingstarted',
   Database = 'database',
   Api = 'api',
@@ -24,6 +23,7 @@ enum MenuId {
   RefDartV1 = 'reference_dart_v1',
   RefDartV2 = 'reference_dart_v2',
   RefCSharpV0 = 'reference_csharp_v0',
+  RefCSharpV1 = 'reference_csharp_v1',
   RefPythonV2 = 'reference_python_v2',
   RefSwiftV1 = 'reference_swift_v1',
   RefSwiftV2 = 'reference_swift_v2',
@@ -43,10 +43,6 @@ interface BaseMenu {
   type: string
 }
 
-interface HomeMenu extends BaseMenu {
-  type: 'home'
-}
-
 interface GuideMenu extends BaseMenu {
   type: 'guide'
 }
@@ -58,13 +54,9 @@ interface ReferenceMenu extends BaseMenu {
   specFile?: string
 }
 
-type Menu = HomeMenu | GuideMenu | ReferenceMenu
+type Menu = GuideMenu | ReferenceMenu
 
 const menus: Menu[] = [
-  {
-    id: MenuId.Home,
-    type: 'home',
-  },
   {
     id: MenuId.GettingStarted,
     type: 'guide',
@@ -154,6 +146,13 @@ const menus: Menu[] = [
     commonSectionsFile: 'common-client-libs-sections.json',
     specFile: 'supabase_csharp_v0.yml',
     type: 'reference',
+    path: '/reference/csharp/v0',
+  },
+  {
+    id: MenuId.RefCSharpV1,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_csharp_v1.yml',
+    type: 'reference',
     path: '/reference/csharp',
   },
   {
@@ -235,15 +234,15 @@ const menus: Menu[] = [
   },
 ]
 
-function getMenuById(id: MenuId) {
-  return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
+export function getMenuById(id: MenuId) {
+  return menus.find((menu) => menu.id === id)
 }
 
-function getMenuElement(menu: Menu) {
+function getMenuElement(menu: Menu | undefined) {
+  if (!menu) throw Error('No menu found for this menuId')
+
   const menuType = menu.type
   switch (menuType) {
-    case 'home':
-      return <NavigationMenuHome />
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
     case 'reference':
@@ -256,13 +255,15 @@ function getMenuElement(menu: Menu) {
         />
       )
     default:
-      throw new Error(`Unknown menu type '${menuType}'`)
+      return null
   }
 }
 
 const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
   const level = menuId
   const menu = getMenuById(level)
+
+  useCloseMenuOnRouteChange()
 
   return getMenuElement(menu)
 }

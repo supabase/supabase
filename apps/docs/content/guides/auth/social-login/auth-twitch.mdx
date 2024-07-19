@@ -70,6 +70,8 @@ Setting up Twitch logins for your application consists of 3 parts:
 >
 <TabPanel id="js" label="JavaScript">
 
+<CreateClientSnippet />
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
 
 ```js
@@ -77,6 +79,17 @@ async function signInWithTwitch() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitch',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `twitch` as the `provider`:
+
+```dart
+Future<void> signInWithTwitch() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.twitch);
 }
 ```
 
@@ -93,6 +106,8 @@ suspend fun signInWithTwitch() {
 
 </TabPanel>
 </Tabs>
+
+<OAuthPkceFlow />
 
 <Tabs
   scrollable
@@ -112,9 +127,20 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -127,7 +153,7 @@ suspend fun signOut() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Twitch Account](https://twitch.tv)
 - [Twitch Developer Console](https://dev.twitch.tv/console)

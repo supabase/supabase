@@ -87,6 +87,7 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
+  | 'warehouse'
 
 export type Mode = 'simple' | 'custom'
 
@@ -136,4 +137,10 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
+}
+
+export interface WarehouseCollection {
+  name: string
+  id: number
+  token: string
 }

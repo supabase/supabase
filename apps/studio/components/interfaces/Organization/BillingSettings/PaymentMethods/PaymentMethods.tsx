@@ -1,24 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-
 import { useParams } from 'common'
+import Link from 'next/link'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import Link from 'next/link'
 import {
   Alert,
   Badge,
@@ -34,10 +37,8 @@ import {
 } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const PaymentMethods = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
@@ -67,7 +68,7 @@ const PaymentMethods = () => {
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-2 top-12">
-            <p className="text-base m-0">Payment methods</p>
+            <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
               After adding a payment method, make sure to mark it as active to use it for billing.
               You can remove unused cards.
@@ -138,15 +139,18 @@ const PaymentMethods = () => {
                   >
                     <FormSection>
                       <FormSectionContent fullWidth loading={false}>
-                        {(paymentMethods?.length ?? 0) === 0 ? (
+                        {(paymentMethods?.data?.length ?? 0) === 0 ? (
                           <div className="flex items-center space-x-2 opacity-50">
                             <IconCreditCard />
                             <p className="text-sm">No payment methods</p>
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {paymentMethods?.map((paymentMethod) => {
-                              const isActive = subscription?.payment_method_id === paymentMethod.id
+                            {paymentMethods?.data?.map((paymentMethod) => {
+                              const isActive = paymentMethod.is_default
+
+                              if (!paymentMethod.card) return null
+
                               return (
                                 <div
                                   key={paymentMethod.id}
@@ -161,39 +165,33 @@ const PaymentMethods = () => {
                                       width="32"
                                     />
                                     <p className="prose text-sm font-mono">
-                                      **** **** **** {paymentMethod.card.last4}
+                                      **** **** **** {paymentMethod.card!.last4}
                                     </p>
                                     <p className="text-sm tabular-nums">
                                       Expires: {paymentMethod.card.exp_month}/
                                       {paymentMethod.card.exp_year}
                                     </p>
                                   </div>
-                                  {isActive && <Badge color="green">Active</Badge>}
+                                  {isActive && <Badge variant="brand">Active</Badge>}
                                   {canUpdatePaymentMethods && !isActive ? (
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>
-                                        <Button
-                                          type="outline"
-                                          className="hover:border-gray-500 px-1"
-                                        >
+                                        <Button type="outline" className="hover:border-muted px-1">
                                           <IconMoreHorizontal />
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
-                                        {subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card' && (
-                                            <>
-                                              <DropdownMenuItem
-                                                key="make-default"
-                                                onClick={() =>
-                                                  setSelectedMethodForUse(paymentMethod)
-                                                }
-                                              >
-                                                <p>Use this card</p>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuSeparator />
-                                            </>
-                                          )}
+                                        {subscription?.payment_method_type === 'card' && (
+                                          <>
+                                            <DropdownMenuItem
+                                              key="make-default"
+                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
+                                            >
+                                              <p>Use this card</p>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                          </>
+                                        )}
                                         <DropdownMenuItem
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}
@@ -224,10 +222,7 @@ const PaymentMethods = () => {
         onCancel={() => setShowAddPaymentMethodModal(false)}
         onConfirm={async () => {
           setShowAddPaymentMethodModal(false)
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully added new payment method',
-          })
+          toast.success('Successfully added new payment method')
           await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
       />

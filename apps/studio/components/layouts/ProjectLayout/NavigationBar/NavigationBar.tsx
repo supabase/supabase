@@ -1,12 +1,20 @@
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { MouseEvent, useState } from 'react'
+import { useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -22,14 +30,8 @@ import {
   Theme,
   cn,
   themes,
-  useCommandMenu,
 } from 'ui'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -39,7 +41,6 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
-import { useSignOut } from 'lib/auth'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -80,6 +81,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -111,6 +113,7 @@ const NavigationBar = () => {
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[40px]"
+              onClick={onCloseNavigationIconLink}
             >
               <img
                 alt="Supabase"
@@ -161,6 +164,18 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
               )
             } else {
               return (
@@ -333,17 +348,21 @@ const NavigationBar = () => {
                     ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onSelect={async () => {
-                    await signOut()
-                    await router.push('/sign-in')
-                  }}
-                >
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+              {IS_PLATFORM && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      onSelect={async () => {
+                        await signOut()
+                        await router.push('/sign-in')
+                      }}
+                    >
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </ul>

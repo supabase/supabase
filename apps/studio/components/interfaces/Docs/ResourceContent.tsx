@@ -1,51 +1,63 @@
-import { useParams } from 'common'
-import { IconTable } from 'ui'
+import { Table2 } from 'lucide-react'
 
+import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+
+interface ResourceContentProps {
+  apiEndpoint: string
+  resourceId: string
+  resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+  refreshDocs: () => void
+}
 
 const ResourceContent = ({
-  autoApiService,
+  apiEndpoint,
   resourceId,
   resources,
-  definitions,
-  paths,
   selectedLang,
   showApiKey,
   refreshDocs,
-}: any) => {
+}: ResourceContentProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
+  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { paths, definitions } = jsonSchema || {}
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
-      : autoApiService.endpoint
-
-  if (!paths || !definitions) return null
+      : apiEndpoint
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
-  const resourcePaths = paths[`/${resourceId}`]
-  const resourceDefinition = definitions[resourceId]
+  const resourcePaths = paths?.[`/${resourceId}`]
+  const resourceDefinition = definitions?.[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition?.description || null
-  const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
-  const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
+  const description = resourceDefinition?.description || ''
+
+  const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
+  const properties = Object.entries(resourceDefinition?.properties ?? []).map(([id, val]: any) => ({
     ...val,
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
 
+  if (!paths || !definitions) return null
+
   return (
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 p-2 rounded-lg">
-          <IconTable size="small" />
+          <Table2 size={18} />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>
       </h2>

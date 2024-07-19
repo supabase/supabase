@@ -1,25 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import toast from 'react-hot-toast'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import {
-  useCheckPermissions,
-  useFlag,
-  useProjectByRef,
-  useSelectedOrganization,
-  useStore,
-} from 'hooks'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -32,12 +26,12 @@ import {
   IconAlertCircle,
   IconBarChart2,
   Input,
+  WarningIcon,
 } from 'ui'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -63,24 +57,27 @@ const General = () => {
     },
   })
 
-  const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
+  const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
-    try {
-      const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
-      resetForm({ values: { name }, initialValues: { name } })
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-    } catch (error) {}
+
+    updateProject(
+      { ref: project.ref, name: values.name.trim() },
+      {
+        onSuccess: ({ name }) => {
+          resetForm({ values: { name }, initialValues: { name } })
+          toast.success('Successfully saved settings')
+        },
+      }
+    )
   }
 
   return (
     <div>
-      <FormHeader title="Project Settings" description="" />
-
       {isBranch && (
         <Alert_Shadcn_ variant="default" className="mb-6">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             You are currently on a preview branch of your project
           </AlertTitle_Shadcn_>

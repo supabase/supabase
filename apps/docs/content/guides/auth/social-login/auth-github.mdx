@@ -14,35 +14,18 @@ Setting up GitHub logins for your application consists of 3 parts:
 - Add your GitHub OAuth keys to your [Supabase Project](https://supabase.com/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
-## Access your GitHub account
-
-- Go to [github.com](https://github.com).
-- Click on `Sign In` at the top right to log in.
-
-![GitHub Developer Portal.](/docs/img/guides/auth-github/github-portal.png)
-
-## Create a GitHub OAuth app
-
-Go to the [GitHub Developer Settings](https://github.com/settings/developers) page:
-
-- Click on your profile photo at the top right
-- Click Settings near the bottom of the menu
-- In the left sidebar, click `Developer settings` (near the bottom)
-- In the left sidebar, click `OAuth Apps`
-
 ## Find your callback URL
 
 <SocialProviderSetup provider="GitHub" />
 
 ## Register a new OAuth application on GitHub
 
-- Navigate to `Settings`/`Developer settings`/`OAuth Apps`
+- Navigate to the [OAuth apps page](https://github.com/settings/developers)
 - Click `Register a new application`. If you've created an app before, click `New OAuth App` here.
 - In `Application name`, type the name of your app.
 - In `Homepage URL`, type the full URL to your app's website.
 - In `Authorization callback URL`, type the callback URL of your app.
-- Enter the URL in the `Valid OAuth Redirect URIs` box.
-- Click `Save Changes` at the bottom right.
+- Leave `Enable Device Flow` unchecked.
 - Click `Register Application`.
 
 Copy your new OAuth credentials
@@ -66,6 +49,8 @@ Copy your new OAuth credentials
 >
 <TabPanel id="js" label="JavaScript">
 
+<CreateClientSnippet />
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `github` as the `provider`:
 
 ```js
@@ -73,6 +58,17 @@ async function signInWithGithub() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `github` as the `provider`:
+
+```dart
+Future<void> signInWithGithub() async {
+  await supabase.auth.signInWithOAuth(OAuthProvider.github);
 }
 ```
 
@@ -89,6 +85,8 @@ suspend fun signInWithGithub() {
 
 </TabPanel>
 </Tabs>
+
+<OAuthPkceFlow />
 
 <Tabs
   scrollable
@@ -108,9 +106,20 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -123,6 +132,6 @@ suspend fun signOut() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [GitHub Developer Settings](https://github.com/settings/developers)

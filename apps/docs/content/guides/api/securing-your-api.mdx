@@ -45,7 +45,7 @@ alter table
 </TabPanel>
 </Tabs>
 
-With RLS enabled, you can create Policies that allow or disallow users to access and update data. We provide a detailed guide for creating Row Level Security Policies in our [Authorization documentation](/docs/guides/auth/row-level-security).
+With RLS enabled, you can create Policies that allow or disallow users to access and update data. We provide a detailed guide for creating Row Level Security Policies in our [Authorization documentation](/docs/guides/database/postgres/row-level-security).
 
 <Admonition type="danger">
 
@@ -72,6 +72,10 @@ The expected value for `useconfig` should be:
 ```javascript
 ;['session_preload_libraries=supautils, safeupdate']
 ```
+
+## Disable the API or restrict to custom schema
+
+If you don't use the Data API, or if you don't want to expose the `public` schema, you can either disable it entirely or change the automatically exposed schema to one of your choice. See **[Hardening the Data API](/docs/guides/database/hardening-data-api)** for instructions.
 
 ## Enforce additional rules on each request
 
@@ -195,7 +199,7 @@ Read more about [PostgREST's pre-request function](https://postgrest.org/en/stab
 >
 <TabPanel id="rate-limit-per-ip" label="Rate limit per IP">
 
-You can only rate-limit `POST`, `PUT`, `PATCH` and `DELETE` requests. This is because `GET` and `HEAD` requests run in read-only mode, and will be served by [Read Replicas](/guides/platform/read-replicas) which do not support writing to the database.
+You can only rate-limit `POST`, `PUT`, `PATCH` and `DELETE` requests. This is because `GET` and `HEAD` requests run in read-only mode, and will be served by [Read Replicas](/docs/guides/platform/read-replicas) which do not support writing to the database.
 
 Outline:
 
@@ -265,7 +269,7 @@ alter role authenticator
 notify pgrst, 'reload config';
 ```
 
-To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/guides/database/extensions/pg_cron) job to clean them up.
+To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/docs/guides/database/extensions/pg_cron) job to clean them up.
 
 </TabPanel>
 

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
@@ -22,7 +22,8 @@ export async function getGitHubConnections(
     },
     signal,
   })
-  if (error) throw new Error((error as ResponseError).message)
+
+  if (error) handleError(error)
   return data.connections
 }
 
@@ -41,6 +42,6 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
   return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
     integrationKeys.githubConnectionsList(organizationId),
     ({ signal }) => getGitHubConnections({ organizationId }, signal),
-    { enabled, ...options }
+    { enabled: enabled && typeof organizationId !== 'undefined', ...options }
   )
 }

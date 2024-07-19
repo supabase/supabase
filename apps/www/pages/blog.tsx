@@ -5,7 +5,7 @@ import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
 
-import PostTypes from '~/types/post'
+import type PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogGridItem from '~/components/Blog/BlogGridItem'
 import BlogListItem from '~/components/Blog/BlogListItem'

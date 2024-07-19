@@ -1,9 +1,11 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
@@ -30,6 +32,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     await signOut()
     await router.push('/sign-in')
   }
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push('/project/default')
+    }
+  }, [router])
 
   const organizationsLinks = (organizations ?? [])
     .map((organization) => ({

@@ -1,16 +1,16 @@
-import { Pagination } from './pagination'
-import useTable from 'hooks/misc/useTable'
 import { useParams } from 'common'
+import { GridFooter } from 'components/ui/GridFooter'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useUrlState } from 'hooks'
+import useTable from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import RefreshButton from '../header/RefreshButton'
+import { Pagination } from './pagination'
 
 export interface FooterProps {
-  isLoading?: boolean
   isRefetching?: boolean
 }
 
-const Footer = ({ isLoading, isRefetching }: FooterProps) => {
+const Footer = ({ isRefetching }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: selectedTable } = useTable(id)
@@ -26,10 +26,10 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="flex min-h-9 overflow-hidden items-center px-2 w-full border-t">
-      {selectedView === 'data' && <Pagination isLoading={isLoading} />}
+    <GridFooter>
+      {selectedView === 'data' && <Pagination />}
 
-      <div className="ml-auto flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-x-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
         )}
@@ -38,11 +38,11 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
           width={75}
           options={['definition', 'data']}
           activeOption={selectedView}
-          borderOverride="border-gray-500"
+          borderOverride="border"
           onClickOption={setSelectedView}
         />
       </div>
-    </div>
+    </GridFooter>
   )
 }
 

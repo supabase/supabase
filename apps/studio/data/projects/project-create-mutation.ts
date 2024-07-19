@@ -1,11 +1,17 @@
+import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+
+const WHITELIST_ERRORS = [
+  'The following organization members have reached their maximum limits for the number of active free projects',
+  'db_pass must be longer than or equal to 4 characters',
+]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -17,10 +23,11 @@ export type ProjectCreateVariables = {
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
-  configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
   dbInstanceSize?: DbInstanceSize
+  dataApiExposedSchemas?: string[]
+  dataApiUseApiSchema?: boolean
 }
 
 export async function createProject({
@@ -30,10 +37,11 @@ export async function createProject({
   dbRegion,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
-  configurationId,
   authSiteUrl,
   customSupabaseRequest,
   dbInstanceSize,
+  dataApiExposedSchemas,
+  dataApiUseApiSchema,
 }: ProjectCreateVariables) {
   const body: components['schemas']['CreateProjectBody'] = {
     cloud_provider: cloudProvider,
@@ -43,18 +51,19 @@ export async function createProject({
     db_region: dbRegion,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
-    vercel_configuration_id: configurationId,
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
     desired_instance_size: dbInstanceSize,
+    data_api_exposed_schemas: dataApiExposedSchemas,
+    data_api_use_api_schema: dataApiUseApiSchema,
   }
 
   const { data, error } = await post(`/platform/projects`, {
     body,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -82,6 +91,9 @@ export const useProjectCreateMutation = ({
           toast.error(`Failed to create new project: ${data.message}`)
         } else {
           onError(data, variables, context)
+        }
+        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
         }
       },
       ...options,

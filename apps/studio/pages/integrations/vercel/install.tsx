@@ -1,19 +1,8 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
-
-import { useParams } from 'common'
-import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
-import { Markdown } from 'components/interfaces/Markdown'
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
-import Link from 'next/link'
-import type { NextPageWithLayout, Organization } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,7 +11,17 @@ import {
   IconAlertTriangle,
   IconInfo,
 } from 'ui'
+
+import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
+import { Markdown } from 'components/interfaces/Markdown'
+import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
+import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+import type { NextPageWithLayout, Organization } from 'types'
 
 /**
  * Variations of the Vercel integration flow.
@@ -36,7 +35,6 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const { code, configurationId, teamId, source, externalId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
@@ -139,22 +137,19 @@ const VercelIntegration: NextPageWithLayout = () => {
     const isIntegrationInstalled = orgSlug ? installed[orgSlug] : false
 
     if (!orgSlug) {
-      return ui.setNotification({ category: 'error', message: 'Please select an organization' })
+      return toast.error('Please select an organization')
     }
 
     if (!code) {
-      return ui.setNotification({ category: 'error', message: 'Vercel code missing' })
+      return toast.error('Vercel code missing')
     }
 
     if (!configurationId) {
-      return ui.setNotification({ category: 'error', message: 'Vercel Configuration ID missing' })
+      return toast.error('Vercel Configuration ID missing')
     }
 
     if (!source) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Vercel Configuration source missing',
-      })
+      return toast.error('Vercel Configuration source missing')
     }
 
     /**

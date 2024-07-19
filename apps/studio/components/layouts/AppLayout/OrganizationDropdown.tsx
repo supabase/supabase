@@ -5,7 +5,8 @@ import { useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -60,7 +61,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
             >
               <div className="flex items-center space-x-2">
                 <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
+                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
           </div>

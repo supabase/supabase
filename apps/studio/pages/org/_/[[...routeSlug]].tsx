@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { Button, IconPlus } from 'ui'
 
@@ -67,7 +67,7 @@ const GenericOrganizationPage: NextPage = () => {
               <ShimmeringCard />
             </ul>
           ) : organizations?.length === 0 ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+            <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
               <div className="space-y-1">
                 <p>You are not part of any organizations yet</p>
                 <p className="text-sm text-foreground-light">

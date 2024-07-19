@@ -102,7 +102,7 @@ create policy "Enforce MFA for all end users."
   on table_name
   as restrictive
   to authenticated
-  using ( auth.jwt()->>'aal' = 'aal2' );
+  using ( (select auth.jwt()->>'aal') = 'aal2' );
 ```
 
 _Enforce MFA for all end users_
@@ -120,7 +120,7 @@ create policy "Allow access on table only if user has gone through MFA"
             else array['aal1', 'aal2']
           end as aal
         from auth.mfa_factors
-        where auth.uid() = user_id and status = 'verified'
+        where (select auth.uid()) = user_id and status = 'verified'
     ));
 ```
 

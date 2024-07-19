@@ -1,12 +1,12 @@
+import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
+import toast from 'react-hot-toast'
 
-import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
-import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import type { ResponseError } from 'types'
 
@@ -27,7 +27,6 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
-  const { ui } = useStore()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -42,10 +41,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       )
     },
     onError() {
-      ui.setNotification({
-        category: 'error',
-        message: 'Failed to create your profile. Please refresh to try again.',
-      })
+      toast.error('Failed to create your profile. Please refresh to try again.')
     },
   })
 

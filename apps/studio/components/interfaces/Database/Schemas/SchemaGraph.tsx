@@ -1,6 +1,7 @@
 import dagre from '@dagrejs/dagre'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
@@ -12,12 +13,10 @@ import ReactFlow, {
   ReactFlowProvider,
   useReactFlow,
 } from 'reactflow'
+import 'reactflow/dist/style.css'
 
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTheme } from 'next-themes'
-import 'reactflow/dist/style.css'
 import { IconLoader } from 'ui'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui-patterns/SchemaTableNode'
 import SchemaGraphLegend from './SchemaGraphLegend'
@@ -306,4 +305,4 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
   )
 }
 
-export default observer(SchemaGraph)
+export default SchemaGraph

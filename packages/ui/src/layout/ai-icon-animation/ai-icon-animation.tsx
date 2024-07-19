@@ -1,8 +1,10 @@
+'use client'
+
 // make a function that returns a component
 
-import { useState, useEffect } from 'react'
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
-import { cn } from 'ui'
+import styles from './ai-icon-animation-style.module.css'
+import { useEffect, useState } from 'react'
+import { cn } from '../../lib/utils/cn'
 
 interface Props {
   loading?: boolean
@@ -55,8 +57,8 @@ const AiIconAnimation = ({ loading = false, className, allowHoverEffect = false 
             loading
               ? styles[`ai-icon__grid__square--step-${step}`]
               : isAnimating
-              ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
-              : styles[`ai-icon__grid__square--static`]
+                ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
+                : styles[`ai-icon__grid__square--static`]
           )}
         ></div>
         <div
@@ -65,8 +67,8 @@ const AiIconAnimation = ({ loading = false, className, allowHoverEffect = false 
             loading
               ? styles[`ai-icon__grid__square--step-${step}`]
               : isAnimating
-              ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
-              : styles[`ai-icon__grid__square--static`]
+                ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
+                : styles[`ai-icon__grid__square--static`]
           )}
         ></div>
         <div
@@ -75,8 +77,8 @@ const AiIconAnimation = ({ loading = false, className, allowHoverEffect = false 
             loading
               ? styles[`ai-icon__grid__square--step-${step}`]
               : isAnimating
-              ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
-              : styles[`ai-icon__grid__square--static`]
+                ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
+                : styles[`ai-icon__grid__square--static`]
           )}
         ></div>
         <div
@@ -85,8 +87,8 @@ const AiIconAnimation = ({ loading = false, className, allowHoverEffect = false 
             loading
               ? styles[`ai-icon__grid__square--step-${step}`]
               : isAnimating
-              ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
-              : styles[`ai-icon__grid__square--static`]
+                ? styles[`ai-icon__grid__square--exiting--step-${exitStep}`]
+                : styles[`ai-icon__grid__square--static`]
           )}
         ></div>
       </div>

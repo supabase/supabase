@@ -3,13 +3,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ToastLoader } from 'components/ui/ToastLoader'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
@@ -17,14 +17,16 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
-import { useStore, useUrlState } from 'hooks'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
-import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
+import RowEditor from './RowEditor/RowEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -37,8 +39,9 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
+import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
-import type { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -59,7 +62,6 @@ const SidePanelEditor = ({
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
-  const { ui } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
@@ -176,6 +178,8 @@ const SidePanelEditor = ({
     if (payload !== undefined && configuration !== undefined) {
       try {
         await saveRow(payload, isNewRecord, configuration, () => {})
+      } catch (error) {
+        // [Joshen] No error handler required as error is handled within saveRow
       } finally {
         resolve()
       }
@@ -234,7 +238,7 @@ const SidePanelEditor = ({
         })
 
     if (response?.error) {
-      ui.setNotification({ category: 'error', message: response.error.message })
+      toast.error(response.error.message)
     } else {
       if (
         !isNewRecord &&
@@ -246,11 +250,8 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [
             'table-definition',
@@ -260,6 +261,11 @@ const SidePanelEditor = ({
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
+
+      await queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      )
+
       setIsEdited(false)
       snap.closeSidePanel()
     }
@@ -351,7 +357,6 @@ const SidePanelEditor = ({
         })
       }
     } catch (error: any) {
-      console.log({ error })
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }
   }
@@ -495,10 +500,9 @@ const SidePanelEditor = ({
     }
 
     const { file, rowCount, selectedHeaders, resolve } = importContent
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-    })
+    const toastId = toast.loading(
+      `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
+    )
 
     if (file && rowCount > 0) {
       // CSV file upload
@@ -509,12 +513,13 @@ const SidePanelEditor = ({
         selectedTable,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {
@@ -530,14 +535,15 @@ const SidePanelEditor = ({
         importContent.rows,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-              selectedTable.name
-            }`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                selectedTable.name
+              }`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {
@@ -551,10 +557,8 @@ const SidePanelEditor = ({
         sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
       ),
     ])
-    ui.setNotification({
+    toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
-      category: 'success',
-      message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
     })
     resolve()
     snap.closeSidePanel()
@@ -611,7 +615,7 @@ const SidePanelEditor = ({
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
+        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.value) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         readOnly={!editable}
@@ -620,6 +624,8 @@ const SidePanelEditor = ({
       />
       <TextEditor
         visible={snap.sidePanel?.type === 'cell'}
+        column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
+        row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
         closePanel={onClosePanel}
         onSaveField={onSaveColumnValue}
       />
@@ -643,21 +649,19 @@ const SidePanelEditor = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => setIsClosingPanel(false)}
-        onSelectConfirm={() => {
+        title="Discard changes"
+        confirmLabel="Discard"
+        onCancel={() => setIsClosingPanel(false)}
+        onConfirm={() => {
           setIsClosingPanel(false)
           setIsEdited(false)
           snap.closeSidePanel()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+          lost.
+        </p>
       </ConfirmationModal>
     </>
   )

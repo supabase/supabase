@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -11,6 +11,8 @@ export type OrganizationJoinTokenValidationVariables = {
 
 export type TokenInfo = components['schemas']['InviteResponse'] | undefined
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function validateTokenInformation(
   { slug, token }: OrganizationJoinTokenValidationVariables,
   signal?: AbortSignal
@@ -20,7 +22,7 @@ export async function validateTokenInformation(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

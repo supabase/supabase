@@ -1,4 +1,4 @@
-import { LogData } from 'components/interfaces/Settings/Logs'
+import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 
 export const logDataFixture = (attrs: Partial<LogData>): LogData => ({
   id: `some-uuid-${new Date().getTime()}`,

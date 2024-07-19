@@ -1,6 +1,4 @@
-import { observer } from 'mobx-react-lite'
-
-import { AuthLayout } from 'components/layouts'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Authentication: NextPageWithLayout = () => {
@@ -9,4 +7,4 @@ const Authentication: NextPageWithLayout = () => {
 
 Authentication.getLayout = (page) => <AuthLayout title="Authentication">{page}</AuthLayout>
 
-export default observer(Authentication)
+export default Authentication

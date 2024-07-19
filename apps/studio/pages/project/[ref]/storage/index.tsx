@@ -1,6 +1,4 @@
-import { observer } from 'mobx-react-lite'
-
-import { StorageLayout } from 'components/layouts'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
@@ -9,4 +7,4 @@ const Storage: NextPageWithLayout = () => {
 
 Storage.getLayout = (page) => <StorageLayout title="Storage">{page}</StorageLayout>
 
-export default observer(Storage)
+export default Storage

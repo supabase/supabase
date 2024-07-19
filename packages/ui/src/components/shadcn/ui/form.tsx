@@ -1,3 +1,5 @@
+'use client'
+
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
@@ -8,6 +10,7 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  useWatch,
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
@@ -66,17 +69,20 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const id = React.useId()
+const FormItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { asChild?: boolean }
+>(({ asChild, ...props }, ref) => {
+  const id = React.useId()
 
-    return (
-      <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn('space-y-2', className)} {...props} />
-      </FormItemContext.Provider>
-    )
-  }
-)
+  const Comp = asChild ? Slot : 'div'
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <Comp ref={ref} {...props} />
+    </FormItemContext.Provider>
+  )
+})
 FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
@@ -91,7 +97,7 @@ const FormLabel = React.forwardRef<
       className={cn(
         'text-foreground-light',
         'transition-colors',
-        error && 'text-destructive',
+        error && '!text-destructive',
         className,
         'leading-normal'
       )}
@@ -170,4 +176,5 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  useWatch,
 }
