@@ -106,7 +106,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
         links: [
           {
             name: 'Documentation',
@@ -145,8 +145,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                       When you reach your database size limit, your project can go into read-only
                       mode.{' '}
                       {onFreePlan
-                        ? 'Please upgrade your plan.'
-                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your plans quota.'}
+                        ? 'Please upgrade your Plan.'
+                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
                     </div>
                   </div>
                 </Alert>

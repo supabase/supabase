@@ -325,7 +325,7 @@ const Wizard: NextPageWithLayout = () => {
       (prev, acc) => prev + monthlyInstancePrice(acc.infra_compute_size),
       0
     ) +
-    // selected instance size
+    // selected compute size
     monthlyInstancePrice(instanceSize) -
     // compute credits
     10
@@ -365,7 +365,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
-      // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
+      // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
@@ -636,7 +636,7 @@ const Wizard: NextPageWithLayout = () => {
                                 onValueChange={(value) => field.onChange(value)}
                               >
                                 <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                  <SelectValue_Shadcn_ placeholder="Select an instance size" />
+                                  <SelectValue_Shadcn_ placeholder="Select a compute size" />
                                 </SelectTrigger_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
@@ -802,7 +802,7 @@ const Wizard: NextPageWithLayout = () => {
                                     Compute is charged usage-based whenever your billing cycle
                                     resets. Given compute charges are hourly, your invoice will
                                     contain "Compute Hours" for each hour a project ran on a
-                                    specific instance size.
+                                    specific compute size.
                                   </p>
                                   {monthlyComputeCosts > 0 && (
                                     <p>
@@ -1057,7 +1057,7 @@ const Wizard: NextPageWithLayout = () => {
 
 /**
  * When launching new projects, they only get assigned a compute size once successfully launched,
- * this might assume wrong instance size, but only for projects being rapidly launched after one another on non-default compute sizes.
+ * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
  *
  * Needs to be in the API in the future [kevin]
  */

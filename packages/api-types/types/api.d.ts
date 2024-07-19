@@ -2978,7 +2978,7 @@ export interface components {
       id: string
     }
     /**
-     * @description Desired instance size, will use default size if not defined. Paid plans only.
+     * @description Desired compute size, will use default size if not defined. Paid plans only.
      * @enum {string}
      */
     DesiredInstanceSize:
