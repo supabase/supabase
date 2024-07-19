@@ -23,7 +23,7 @@ interface TooltipData {
 const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
-    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
+    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
     linkRef:
       'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
   },

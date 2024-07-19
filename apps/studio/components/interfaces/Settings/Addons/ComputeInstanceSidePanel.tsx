@@ -424,9 +424,9 @@ const ComputeInstanceSidePanel = () => {
                   Unable to downgrade as project has active read replicas
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The minimum compute instance size for using read replicas is the Small Compute.
-                  You need to remove all read replicas before downgrading Compute as it requires at
-                  least a Small compute instance.
+                  The minimum compute size for using read replicas is the Small Compute. You need to
+                  remove all read replicas before downgrading Compute as it requires at least a
+                  Small compute instance.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
                   <Button asChild type="default">
@@ -444,8 +444,8 @@ const ComputeInstanceSidePanel = () => {
                 <WarningIcon />
                 <AlertTitle_Shadcn_>Disable PITR before downgrading</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  You currently have PITR enabled. The minimum compute instance size for using PITR
-                  is the Small Compute.
+                  You currently have PITR enabled. The minimum compute size for using PITR is the
+                  Small Compute.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_>
                   You need to disable PITR before downgrading Compute as it requires at least a
