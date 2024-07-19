@@ -45,6 +45,7 @@ export default function Ticket() {
   const code = codeBlock`
 await supabase
   .from('tickets')
+  .select('*')
   .eq('username', ${username})
   .single()
 `
@@ -59,7 +60,6 @@ await supabase
   "data": {
     "name": "${user.name}",
     "username": "${username}",
-    "user_id": ${user.id},
     "ticket_number": "${ticketNumber}",
   ${HAS_ROLE && `  "role": "${user.role}",\n`}${HAS_COMPANY && `  "company": "${user.company}",\n`}${HAS_LOCATION && `  "location": "${user.location}",\n`}},
   "error": null
@@ -107,7 +107,7 @@ await supabase
           </CodeBlock>
         </div>
         <div className="w-full p-4 flex-grow flex flex-col gap-4">
-          <span className="uppercase text-foreground-lighter tracking-wider text-xs">
+          <span className="uppercase text-foreground-light tracking-wider text-xs">
             TICKET RESPONSE
           </span>
           {user && (

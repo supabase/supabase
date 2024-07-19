@@ -25,21 +25,22 @@ export function CountdownWidget({
 
   const showItem = (item: string | undefined) => item !== undefined && item !== '0'
 
+  console.log(days, hours, minutes, seconds)
   return (
     <div className={cn('flex gap-1 items-center', className)}>
-      {days !== undefined && days !== '0' ? (
+      {days !== undefined && days != '0' ? (
         <>
           <CountdownStep value={days} unit="d" showCard={showCard} size={size} />
           <Colon />
         </>
       ) : null}
-      {hours !== undefined ? (
+      {hours !== undefined && hours != '0' ? (
         <>
           <CountdownStep value={hours} unit="h" showCard={showCard} size={size} />
           <Colon />
         </>
       ) : null}
-      {minutes !== undefined ? (
+      {minutes !== undefined && minutes != '0' ? (
         <>
           <CountdownStep value={minutes} unit="m" showCard={showCard} size={size} />
           {seconds !== undefined && <Colon />}

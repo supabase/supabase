@@ -182,7 +182,12 @@ const TicketingFlow = () => {
           </div>
         </div>
       </SectionContainer>
-      <LW12Background className={cn('opacity-100 transition-opacity', hasTicket && 'opacity-20')} />
+      <LW12Background
+        className={cn(
+          'opacity-100 dark:opacity-40 transition-opacity',
+          hasTicket && 'opacity-50 dark:opacity-20'
+        )}
+      />
     </>
   )
 }

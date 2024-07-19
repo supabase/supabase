@@ -45,8 +45,6 @@ const Nav = (props: Props) => {
   const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page
   const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
-  console.log('showLaunchWeekNavMode', showLaunchWeekNavMode)
-
   React.useEffect(() => {
     if (open) {
       // Prevent scrolling on mount
