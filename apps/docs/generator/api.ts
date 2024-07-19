@@ -1,6 +1,6 @@
 import template from './templates/ApiTemplate'
 import { slugify, toArrayWithKey, toTitle, writeToDisk } from './helpers'
-import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
+import type { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 import * as fs from 'fs'
 import * as ejs from 'ejs'
 
