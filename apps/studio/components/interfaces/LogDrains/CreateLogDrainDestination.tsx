@@ -14,7 +14,6 @@ import {
   FormField_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Switch,
@@ -24,7 +23,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -34,7 +32,7 @@ import {
   SelectValue_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  FormDescription_Shadcn_,
+  Label_Shadcn_,
 } from 'ui'
 
 import { z } from 'zod'
@@ -43,6 +41,7 @@ import { useForm } from 'react-hook-form'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
+import { TrashIcon } from 'lucide-react'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -130,7 +129,6 @@ export function CreateLogDrainDestination({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    mode: 'onBlur',
     defaultValues: {
       customHeaders: [],
       httpVersion: 'HTTP2',
@@ -167,6 +165,18 @@ export function CreateLogDrainDestination({
   }
 
   function addHeader() {
+    if (form.getValues('customHeaders')?.length === 20) {
+      toast.error('You can only have 20 custom headers')
+      return
+    }
+    if (customHeaders?.find((header) => header.name === newCustomHeader.name)) {
+      toast.error('Header name already exists')
+      return
+    }
+    if (!newCustomHeader.name || !newCustomHeader.value) {
+      toast.error('Header name and value are required')
+      return
+    }
     form.setValue('customHeaders', [...(customHeaders || []), newCustomHeader])
     setNewCustomHeader({ name: '', value: '' })
   }
@@ -181,7 +191,7 @@ export function CreateLogDrainDestination({
         onOpenChange(v)
       }}
     >
-      <SheetContent showClose={false} size="lg">
+      <SheetContent tabIndex={undefined} showClose={false} size="lg" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
@@ -196,7 +206,7 @@ export function CreateLogDrainDestination({
                   values: form.getValues(),
                   errors: form.formState.errors,
                 })
-                form.handleSubmit(onSubmit)
+                form.handleSubmit(onSubmit)(e)
               }}
             >
               <div className="space-y-4">
@@ -279,23 +289,30 @@ export function CreateLogDrainDestination({
                     />
 
                     <div>
+                      <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                       {customHeaders?.map((header) => (
-                        <div className="flex items-center font-mono mt-2" key={header.name}>
-                          <div className="w-full px-2">{header.name}</div>
-                          <div className="w-full px-2">{header.value}</div>
+                        <div
+                          className="flex items-center font-mono mt-2 border-b p-1 group"
+                          key={header.name}
+                        >
+                          <div className="w-full px-1">{header.name}</div>
+                          <div className="w-full px-1 truncate" title={header.value}>
+                            {header.value}
+                          </div>
                           <Button
-                            className="justify-self-end"
-                            type="outline"
+                            className="justify-self-end opacity-0 group-hover:opacity-100"
+                            type="text"
+                            title="Remove"
+                            icon={<TrashIcon />}
                             onClick={() => removeHeader(header.name)}
-                          >
-                            Remove
-                          </Button>
+                          ></Button>
                         </div>
                       ))}
                     </div>
 
                     <div className="flex gap-2 items-center">
                       <Input_Shadcn_
+                        size={'tiny'}
                         type="text"
                         placeholder="Header name"
                         value={newCustomHeader.name}
@@ -304,6 +321,7 @@ export function CreateLogDrainDestination({
                         }
                       />
                       <Input_Shadcn_
+                        size={'tiny'}
                         type="text"
                         placeholder="Header value"
                         value={newCustomHeader.value}
