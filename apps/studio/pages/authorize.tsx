@@ -25,12 +25,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const {
-    data: requester,
-    isLoading,
-    isError,
-    error,
-  } = useApiAuthorizationQuery({ id: auth_id, slug: selectedOrgSlug })
+  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
@@ -78,7 +73,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   if (isLoading) {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
-        <div className="w-[500px] px-8 py-6 space-y-2">
+        <div className="px-8 py-6 space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
@@ -90,7 +85,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   if (auth_id === undefined) {
     return (
       <FormPanel header={<p>Authorization for API access</p>}>
-        <div className="w-[500px] px-8 py-6">
+        <div className="px-8 py-6">
           <Alert withIcon variant="warning" title="Missing authorization ID">
             Please provide a valid authorization ID in the URL
           </Alert>
@@ -102,7 +97,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   if (isError) {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
-        <div className="w-[500px] px-8 py-6">
+        <div className="px-8 py-6">
           <Alert
             withIcon
             variant="warning"
@@ -123,7 +118,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
     return (
       <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
-        <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
+        <div className="w-full px-8 py-6 space-y-8">
           <Alert withIcon variant="success" title="This authorization request has been approved">
             <p>
               {requester.name} has read and write access to the organization "
