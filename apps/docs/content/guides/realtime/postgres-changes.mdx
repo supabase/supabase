@@ -126,7 +126,7 @@ In this example we'll set up a database table, secure it with Row Level Security
       ```js
         import { createClient } from '@supabase/supabase-js'
 
-        const client = createClient(
+        const supabase = createClient(
           'https://<project>.supabase.co',
           '<your-anon-key>'
         )
@@ -152,7 +152,7 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        const channelA = client
+        const channelA = supabase
           .channel('schema-db-changes')
           .on(
             'postgres_changes',
@@ -209,7 +209,7 @@ Subscribe to specific schema events using the `schema` parameter:
 
 {/* prettier-ignore */}
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -296,7 +296,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `INSERT`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -377,7 +377,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `UPDATE`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -458,7 +458,7 @@ The channel name can be any string except 'realtime'.
 Use the `event` parameter to listen only to database `DELETE`s:
 
 ```js
-const changes = client
+const changes = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',
@@ -539,7 +539,7 @@ Subscribe to specific table events using the `table` parameter:
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const changes = client
+const changes = supabase
   .channel('table-db-changes')
   .on(
     'postgres_changes',
@@ -710,7 +710,7 @@ Use the `filter` parameter for granular changes:
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const changes = client
+const changes = supabase
   .channel('table-filter-changes')
   .on(
     'postgres_changes',
