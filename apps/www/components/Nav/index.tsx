@@ -45,6 +45,8 @@ const Nav = (props: Props) => {
   const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page
   const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
+  console.log('showLaunchWeekNavMode', showLaunchWeekNavMode)
+
   React.useEffect(() => {
     if (open) {
       // Prevent scrolling on mount
@@ -71,18 +73,18 @@ const Nav = (props: Props) => {
         className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
-        <div
+        {/* <div
           className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
             isGAWeekSection && 'dark:!bg-alternative'
           )}
-        />
+        /> */}
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
+            showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50',
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
         >

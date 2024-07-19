@@ -13,6 +13,9 @@ export type UserData = {
   golden?: boolean
   referrals?: number
   bg_image_id?: number
+  role?: string
+  company?: string
+  location?: string
   metadata?: {
     role?: string
     company?: string
@@ -20,6 +23,7 @@ export type UserData = {
     hasSecretTicket?: boolean
     hasSharedSecret?: boolean
     hideAvatar?: boolean
+    hideMetadata?: boolean
   }
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string

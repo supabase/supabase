@@ -86,7 +86,7 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="bg-alternative overflow-hidden h-screen !min-h-fit !max-h-[calc(100vh-60px)]">
+        <DefaultLayout className="bg-alternative -mt-[60px] pt-[60px] yolo overflow-hidden h-screen !min-h-fit !max-h-[calc(100vh-60px)]">
           <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>

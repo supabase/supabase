@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { codeBlock } from 'common-tags'
 import { cn, CodeBlock } from 'ui'
+import { range } from 'lodash'
 import { Pencil, X } from 'lucide-react'
 import Tilt from 'vanilla-tilt'
-import { useBreakpoint, useParams } from 'common'
+import { useParams } from 'common'
 
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -12,17 +13,10 @@ import TicketCustomizationForm from './TicketCustomizationForm'
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
-  const isMobile = useBreakpoint()
-  const {
-    platinum = false,
-    bg_image_id: bgImageId = '1',
-    secret: hasSecretTicket,
-    ticketNumber,
-    username,
-  } = user
+  const { platinum = false, secret: hasSecretTicket, ticketNumber, username } = user
   const params = useParams()
   const [responseTime, setResponseTime] = useState<{ start: number; end: number | undefined }>({
-    start: Date.now(),
+    start: performance.now(),
     end: undefined,
   })
   const sharePage = !!params.username
@@ -33,7 +27,7 @@ export default function Ticket() {
   }
 
   useEffect(() => {
-    user && setResponseTime((prev) => ({ ...prev, end: Date.now() }))
+    user && setResponseTime((prev) => ({ ...prev, end: performance.now() }))
   }, [user.id])
 
   useEffect(() => {
@@ -55,23 +49,37 @@ await supabase
   .single()
 `
 
+  const HAS_ROLE = user.role
+  const HAS_COMPANY = user.company
+  const HAS_LOCATION = user.location
+
+  // Keep following indentation for proper json layout with conditionals
   const responseJson = codeBlock`
 {
   "data": {
+    "name": "${user.name}",
     "username": "${username}",
     "user_id": ${user.id},
     "ticket_number": "${ticketNumber}",
-    ${
-      user.metadata &&
-      `"metadata": {
-  ${user.metadata.role && `"role": "${user.metadata?.role}",`}
-  ${user.metadata.company && `"company": "${user.metadata?.company}",`}
-},`
-    }
-  },
+  ${HAS_ROLE && `  "role": "${user.role}",\n`}${HAS_COMPANY && `  "company": "${user.company}",\n`}${HAS_LOCATION && `  "location": "${user.location}",\n`}},
   "error": null
 }
 `
+
+  function getLinesToHighlight() {
+    let arr: any[] = range(0, 4)
+    const STARTING_LINE = 3
+
+    if (HAS_ROLE) arr.push(null)
+    if (HAS_COMPANY) arr.push(null)
+    if (HAS_LOCATION) arr.push(null)
+
+    return arr.map((_, i) => i + STARTING_LINE)
+  }
+
+  const LINES_TO_HIGHLIGHT = getLinesToHighlight()
+
+  const resTime = (responseTime.end! - responseTime.start).toFixed()
 
   return (
     <div
@@ -80,7 +88,6 @@ await supabase
       style={{ transformStyle: 'preserve-3d', transform: 'perspective(1000px)' }}
     >
       <Panel
-        // hasShimmer
         outerClassName="flex relative flex-col w-[360px] border h-auto max-h-[680px] rounded-xl !shadow-xl !p-0"
         innerClassName="flex relative flex-col w-full transition-colors aspect-[396/613] rounded-xl text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
@@ -107,15 +114,14 @@ await supabase
             <CodeBlock
               language="json"
               hideCopy
-              linesToHighlight={[3, 4, 5, 6, 7, 8, 9]}
+              linesToHighlight={LINES_TO_HIGHLIGHT}
               className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
             >
               {responseJson}
             </CodeBlock>
           )}
           <span className="text-foreground-lighter text-xs">
-            {responseTime.end! - responseTime.start}ms{' '}
-            <span className="uppercase">Response time</span>
+            {resTime}ms <span className="uppercase">Response time</span>
           </span>
         </div>
         {/* Edit hover button */}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Input, cn } from 'ui'
+import { Button, Input, cn } from 'ui'
 import { Check } from 'lucide-react'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint, useDebounce } from 'common'
@@ -14,9 +14,9 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
     setShowCustomizationForm,
   } = useConfData()
   const defaultFormValues = {
-    role: user.metadata?.role,
-    company: user.metadata?.company,
-    hideAvatar: !!user.metadata?.hideAvatar,
+    role: user.role,
+    company: user.company,
+    location: user.location,
   }
   const [formData, setFormData] = useState(defaultFormValues)
   const [formState, setFormState] = useState<'idle' | 'saved' | 'saving' | 'error'>('idle')
@@ -32,12 +32,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
   const handleFormSubmit = async () => {
     setFormState('saving')
-    const payload = {
-      metadata: {
-        ...user.metadata,
-        ...formData,
-      },
-    }
+    const payload = formData
 
     if (supabase) {
       await supabase
@@ -125,23 +120,39 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
           />
         }
       />
-      <Checkbox
-        name="hideAVatar"
-        label="Hide avatar"
-        checked={formData.hideAvatar}
+      <Input
+        size="small"
+        type="text"
+        placeholder="location (optional)"
+        value={formData.location}
+        maxLength={25}
         onChange={(event) => {
-          handleInputChange('hideAvatar', event.target.checked)
+          handleInputChange('location', event.target.value)
         }}
+        onFocus={() =>
+          !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
+        }
+        inputClassName={cn(IS_SAVING && 'text-foreground-lighter')}
+        icon={
+          <Check
+            strokeWidth={2}
+            className={cn(
+              'w-3',
+              !!formData.location ? 'text-brand' : 'text-foreground-lighter',
+              IS_SAVING && 'text-background-surface-300'
+            )}
+          />
+        }
       />
-      <div className="flex items-center justify-center md:justify-between gap-2 mt-2">
-        <div className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+      <div className="flex flex-col lg:flex-row items-center justify-center md:justify-between gap-2 mt-2">
+        <div className="inline opacity-0 animate-fade-in text-xs text-foreground-light">
           {IS_SAVED && (
-            <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+            <span className="inline opacity-0 animate-fade-in text-xs text-foreground-light">
               Saved
             </span>
           )}
           {HAS_ERROR && (
-            <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+            <span className="inline opacity-0 animate-fade-in text-xs text-foreground-light">
               Something went wrong
             </span>
           )}

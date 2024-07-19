@@ -95,7 +95,9 @@ const TicketingFlow = () => {
                     </div>
                     <div className="flex flex-col md:items-center gap-2">
                       <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-6 uppercase text-2xl tracking-wider">
-                        <h2 className="text-foreground">launch week s24</h2>
+                        <h2 className="text-foreground">
+                          <strong className="font-medium">Launch Week</strong> 12
+                        </h2>
                         <span className="h-full border-r border-foreground hidden md:inline" />
                         <p className="text-foreground-light">{LW12_DATE}</p>
                       </div>
@@ -115,7 +117,7 @@ const TicketingFlow = () => {
                     exit={exit}
                     className="w-full flex-1 min-h-[400px] h-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left"
                   >
-                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center">
+                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center">
                       <TicketContainer />
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
@@ -130,8 +132,7 @@ const TicketingFlow = () => {
                             <p className="text-2xl mb-1">Thanks for sharing!</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Join on April 15-19 to celebrate a major milestone with us and explore
-                            all the features that come with it.
+                            Join on {LW12_DATE} to find out what we shipped.
                           </p>
                         </div>
                       ) : winningChances !== 2 ? (
@@ -140,13 +141,12 @@ const TicketingFlow = () => {
                             <p className="text-2xl mb-1">{FIRST_NAME}, you're in!</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Now share your ticket to have a chance of winning AirPods Max and other
-                            limited swag.
+                            Now share your ticket to have a chance of winning limited swag.
                           </p>
                         </div>
                       ) : (
                         <div>
-                          <p className="text-2xl mb-1">@{userData.username}, almost there!</p>
+                          <p className="text-2xl mb-1">{FIRST_NAME}, almost there!</p>
                           <p className="text-[#8B9092]">
                             Keep sharing to max out your chances of winning AirPods Max and other
                             limited swag.
