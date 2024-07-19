@@ -155,6 +155,11 @@ const nextConfig = {
       },
     ]
   },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
 }
 
 const configExport = () => {
