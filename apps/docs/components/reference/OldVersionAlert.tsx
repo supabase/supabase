@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
-import { ICommonSection } from './Reference.types'
+import type { ICommonSection } from './Reference.types'
 
 export interface OldVersionAlertProps {
   sections: ICommonSection[]
