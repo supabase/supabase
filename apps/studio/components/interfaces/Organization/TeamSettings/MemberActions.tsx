@@ -20,7 +20,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -33,6 +33,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -50,7 +51,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
@@ -124,7 +125,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId, skipInvalidation: true },
         {
@@ -169,7 +170,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId },
         { onSuccess: () => toast.success('Successfully revoked the invitation.') }
