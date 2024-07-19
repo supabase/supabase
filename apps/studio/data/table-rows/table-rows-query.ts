@@ -73,6 +73,15 @@ export const fetchAllTableRows = async ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
+  /**
+   * [Joshen] JFYI 190724 We've commented the default sort logic out below and in getTableRowsSqlQuery
+   * as the default sort causes resource issues in particular for very large tables (e.g 200M rows)
+   * The long term fix here should be to only apply default sort if table has < 50k rows
+   * - this is the same threshold that we do for retrieving the exact count on the table (ref table-rows-count-query)
+   * - we can check the estimate row count when we get the table details via pg-meta under the live_rows_estimate property
+   * - i.e the larger the table, the less hand holding the table editor does (which i think is fair from a scalability pov)
+   */
+
   // If sorts is empty, use the primary key as the default sort
   // if (sorts.length === 0) {
   //   const primaryKey = getDefaultOrderByColumn(table)
