@@ -21,7 +21,7 @@ import {
   useGetPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -57,7 +57,7 @@ export const InviteMemberButton = () => {
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -139,7 +139,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -237,7 +237,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' && (
+              {isOptedIntoProjectLevelPermissions && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
