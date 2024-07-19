@@ -25,12 +25,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const {
-    data: requester,
-    isLoading,
-    isError,
-    error,
-  } = useApiAuthorizationQuery({ id: auth_id, slug: selectedOrgSlug })
+  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
