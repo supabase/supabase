@@ -546,10 +546,6 @@ export const auth = {
       ],
     },
     {
-      name: 'Migrations',
-      items: [{ name: 'Migrate from Auth0', url: '/guides/auth/migrations/auth0' }],
-    },
-    {
       name: 'Concepts',
       items: [
         { name: 'Users', url: '/guides/auth/users' },
@@ -1894,6 +1890,10 @@ export const resources: NavMenuConstant = {
       name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
+        {
+          name: 'Auth0',
+          url: '/guides/resources/migrating-to-supabase/auth0',
+        },
         {
           name: 'Firebase Auth',
           url: '/guides/resources/migrating-to-supabase/firebase-auth',
