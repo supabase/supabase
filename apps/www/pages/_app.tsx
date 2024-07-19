@@ -9,7 +9,7 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { PortalToast, themes } from 'ui'
+import { SonnerToaster, themes } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -125,7 +125,7 @@ export default function App({ Component, pageProps }: AppProps) {
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
             <CommandMenuProvider site="website">
-              <PortalToast />
+              <SonnerToaster position="top-right" />
               <Component {...pageProps} />
             </CommandMenuProvider>
           </ThemeProvider>
