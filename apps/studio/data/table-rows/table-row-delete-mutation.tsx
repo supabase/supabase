@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, toast as UiToast } from 'ui'
 
 import { Query } from 'components/grid/query/Query'

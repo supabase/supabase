@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'

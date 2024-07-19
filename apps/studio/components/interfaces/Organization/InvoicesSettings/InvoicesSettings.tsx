@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'

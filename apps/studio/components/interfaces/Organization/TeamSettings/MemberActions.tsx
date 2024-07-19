@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -33,7 +33,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface MemberActionsProps {
   member: OrganizationMember

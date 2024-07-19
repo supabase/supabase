@@ -83,7 +83,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
+  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>

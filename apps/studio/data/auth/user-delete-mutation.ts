@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
-import type { User } from './users-query'
 import { authKeys } from './keys'
+import type { User } from './users-query'
 
 export type UserDeleteVariables = {
   projectRef: string

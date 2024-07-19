@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams, useTelemetryProps } from 'common'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
@@ -25,20 +25,14 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import { Loader2 } from 'lucide-react'
 import { format } from 'sql-formatter'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import {
-  AiIconAnimation,
-  Loading,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  cn,
-} from 'ui'
+import { AiIconAnimation, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -61,7 +55,6 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { Loader2 } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })

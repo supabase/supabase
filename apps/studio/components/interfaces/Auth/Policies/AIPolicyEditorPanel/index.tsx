@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,

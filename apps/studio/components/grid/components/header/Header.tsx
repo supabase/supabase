@@ -5,7 +5,7 @@ import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, Download, FileText, Trash, X } from 'lucide-react'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'

@@ -1,8 +1,8 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
-import { makeAutoObservable, toJS } from 'mobx'
-import toast from 'react-hot-toast'
+import { makeAutoObservable } from 'mobx'
+import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 
 import {
@@ -493,7 +493,7 @@ class StorageExplorerStore {
     }
   }
 
-  onUploadProgress(toastId?: string) {
+  onUploadProgress(toastId?: string | number) {
     const totalFiles = this.uploadProgresses.length
     const progress =
       (this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
@@ -848,7 +848,7 @@ class StorageExplorerStore {
     )
   }
 
-  abortUploads = (toastId: string) => {
+  abortUploads = (toastId: string | number) => {
     this.abortUploadCallbacks[toastId].forEach((callback) => callback())
     this.abortUploadCallbacks[toastId] = []
   }

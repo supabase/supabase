@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { organizationKeys } from './keys'
+import { components } from 'api-types'
+import { handleError, patch } from 'data/fetchers'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import type { ResponseError } from 'types'
-import { handleError, patch } from 'data/fetchers'
-import { components } from 'api-types'
+import { organizationKeys } from './keys'
 
 export type OrganizationMemberAssignRoleVariables = {
   slug: string

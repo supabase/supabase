@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export { default as uuidv4 } from './uuid'
 

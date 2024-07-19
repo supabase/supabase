@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'

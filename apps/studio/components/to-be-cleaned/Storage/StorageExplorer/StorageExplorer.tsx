@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'

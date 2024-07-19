@@ -5,7 +5,7 @@ import { isEqual } from 'lodash'
 import { Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import CSVButton from 'components/ui/CSVButton'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'

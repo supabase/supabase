@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { boolean, number, object } from 'yup'
 
 import { useParams } from 'common'
@@ -23,8 +23,8 @@ import {
   Form,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 
 const schema = object({
   JWT_EXP: number()

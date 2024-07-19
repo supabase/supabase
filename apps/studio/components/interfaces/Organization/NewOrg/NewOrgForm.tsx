@@ -3,7 +3,7 @@ import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'

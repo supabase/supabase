@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { Info } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { number, object } from 'yup'
 
 import { useParams } from 'common'
@@ -24,8 +24,8 @@ import {
   Form,
   InputNumber,
   Modal,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean

@@ -3,7 +3,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -25,13 +25,14 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CriticalIcon,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
   SidePanel,
+  WarningIcon,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'

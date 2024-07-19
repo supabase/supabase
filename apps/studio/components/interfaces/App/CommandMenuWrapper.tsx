@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { codeBlock } from 'common-tags'
 import { PropsWithChildren, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

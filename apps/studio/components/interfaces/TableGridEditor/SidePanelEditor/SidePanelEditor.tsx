@@ -2,7 +2,7 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ToastLoader } from 'components/ui/ToastLoader'
