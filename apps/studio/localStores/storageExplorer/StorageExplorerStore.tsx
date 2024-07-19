@@ -1,7 +1,7 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import toast from 'react-hot-toast'
 import * as tus from 'tus-js-client'
 
@@ -33,9 +33,17 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { toast as UiToast } from 'ui'
+import { Button, toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
+
+type UploadProgress = {
+  percentage: number
+  elapsed: number
+  uploadSpeed: number
+  remainingBytes: number
+  remainingTime: number
+}
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -54,7 +62,7 @@ const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 10 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
-const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
+const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 class StorageExplorerStore {
   private projectRef: string = ''
@@ -91,10 +99,14 @@ class StorageExplorerStore {
   private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
-  private uploadProgresses: number[] = []
+  private uploadProgresses: UploadProgress[] = []
 
   /* Controllers to abort API calls */
   private abortController: AbortController | null = null
+
+  private abortUploadCallbacks: {
+    [key: string]: (() => void)[]
+  } = {}
 
   constructor() {
     makeAutoObservable(this, { supabaseClient: false })
@@ -483,14 +495,31 @@ class StorageExplorerStore {
 
   onUploadProgress(toastId?: string) {
     const totalFiles = this.uploadProgresses.length
-    const progress = this.uploadProgresses.reduce((acc, progress) => acc + progress, 0) / totalFiles
+    const progress =
+      (this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
+      100
+    const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast.loading(
       <ToastLoader
-        progress={progress * 100}
+        progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />,
+        labelTopOverride={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
+      >
+        <div className="flex items-center gap-2">
+          <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+          {toastId && (
+            <Button
+              type="default"
+              size="tiny"
+              className="ml-6"
+              onClick={() => this.abortUploads(toastId)}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+      </ToastLoader>,
       { id: toastId }
     )
   }
@@ -589,7 +618,13 @@ class StorageExplorerStore {
         return file
       })
 
-    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill(0)
+    this.uploadProgresses = new Array(formattedFilesToUpload.length).fill({
+      percentage: 0,
+      elapsed: 0,
+      uploadSpeed: 0,
+      remainingBytes: 0,
+      remainingTime: 0,
+    })
     const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
@@ -652,13 +687,38 @@ class StorageExplorerStore {
         )
       }
 
+      let startingBytes = 0
+
       return () => {
         return new Promise<void>(async (resolve, reject) => {
+          const fileSizeInMB = file.size / (1024 * 1024)
+          const startTime = Date.now()
+
+          let chunkSize: number
+
+          if (fileSizeInMB < 30) {
+            chunkSize = 6 * 1024 * 1024
+          } else if (fileSizeInMB < 100) {
+            chunkSize = Math.floor(file.size / 8)
+          } else if (fileSizeInMB < 500) {
+            chunkSize = Math.floor(file.size / 10)
+          } else if (fileSizeInMB < 1024) {
+            chunkSize = Math.floor(file.size / 20)
+          } else if (fileSizeInMB < 10 * 1024) {
+            chunkSize = Math.floor(file.size / 30)
+          } else {
+            chunkSize = Math.floor(file.size / 50)
+          }
+
+          // Max chunk size is 500MB
+          chunkSize = Math.min(chunkSize, 500 * 1024 * 1024)
+
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
-            retryDelays: [0, 3000, 5000, 10000, 20000],
+            retryDelays: [0, 200, 500, 1500, 3000, 5000],
             headers: {
               authorization: `Bearer ${this.serviceKey}`,
+              'x-source': 'supabase-dashboard',
             },
             uploadDataDuringCreation: true,
             removeFingerprintOnSuccess: true,
@@ -667,15 +727,37 @@ class StorageExplorerStore {
               objectName: formattedPathToFile,
               ...fileOptions,
             },
-            chunkSize: 6 * 1024 * 1024, // NOTE: it must be set to 6MB
+            chunkSize,
+            onShouldRetry(error) {
+              const status = error.originalResponse ? error.originalResponse.getStatus() : 0
+              const doNotRetryStatuses = [400, 403, 404, 409, 429]
+
+              return !doNotRetryStatuses.includes(status)
+            },
             onError(error) {
               numberOfFilesUploadedFail += 1
               toast.error(`Failed to upload ${file.name}: ${error.message}`)
               reject(error)
             },
-            onProgress: (bytesUploaded, bytesTotal) => {
-              const percentage = bytesTotal === 0 ? 0 : bytesUploaded / bytesTotal
-              this.uploadProgresses[index] = percentage
+            onProgress: (bytesSent, bytesTotal) => {
+              if (startingBytes === 0 && bytesSent > chunkSize) {
+                startingBytes = bytesSent
+              }
+
+              const percentage = bytesTotal === 0 ? 0 : bytesSent / bytesTotal
+              const realBytesSent = bytesSent - startingBytes
+              const elapsed = (Date.now() - startTime) / 1000 // in seconds
+              const uploadSpeed = realBytesSent / elapsed // in bytes per second
+              const remainingBytes = bytesTotal - realBytesSent
+              const remainingTime = remainingBytes / uploadSpeed // in seconds
+
+              this.uploadProgresses[index] = {
+                percentage,
+                elapsed,
+                uploadSpeed,
+                remainingBytes,
+                remainingTime,
+              }
               this.onUploadProgress(toastId)
             },
             onSuccess() {
@@ -684,8 +766,20 @@ class StorageExplorerStore {
             },
           })
 
+          if (!Array.isArray(this.abortUploadCallbacks[toastId])) {
+            this.abortUploadCallbacks[toastId] = []
+          }
+          this.abortUploadCallbacks[toastId].push(() => {
+            try {
+              upload.abort(true)
+            } catch (error) {
+              // Ignore error
+            }
+            reject(new Error('Upload aborted by user'))
+          })
+
           // Check if there are any previous uploads to continue.
-          return upload.findPreviousUploads().then(function (previousUploads) {
+          return upload.findPreviousUploads().then((previousUploads) => {
             // Found previous uploads so we select the first one.
             if (previousUploads.length) {
               upload.resumeFromPreviousUpload(previousUploads[0])
@@ -719,7 +813,10 @@ class StorageExplorerStore {
 
       await this.refetchAllOpenedFolders()
 
-      if (numberOfFilesToUpload === 0) {
+      if (
+        numberOfFilesToUpload === 0 ||
+        (numberOfFilesUploadedSuccess === 0 && numberOfFilesUploadedFail === 0)
+      ) {
         toast.dismiss(toastId)
       } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
         toast.error(
@@ -751,6 +848,11 @@ class StorageExplorerStore {
     )
   }
 
+  abortUploads = (toastId: string) => {
+    this.abortUploadCallbacks[toastId].forEach((callback) => callback())
+    this.abortUploadCallbacks[toastId] = []
+  }
+
   moveFiles = async (newPathToFile: string) => {
     const newPaths = compact(newPathToFile.split('/'))
     const formattedNewPathToFile = newPaths.join('/')
@@ -758,7 +860,7 @@ class StorageExplorerStore {
     this.clearSelectedItems()
 
     const { dismiss } = UiToast({
-      description: 'Please do not close the browser until the move is completed',
+      description: STORAGE_PROGRESS_INFO_TEXT,
       duration: Infinity,
     })
 
@@ -867,11 +969,9 @@ class StorageExplorerStore {
     this.clearSelectedItems()
 
     const toastId = toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Deleting ${prefixes.length} file(s)...`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />
+      <ToastLoader progress={0} message={`Deleting ${prefixes.length} file(s)...`}>
+        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+      </ToastLoader>
     )
 
     // batch BATCH_SIZE prefixes per request
@@ -889,11 +989,9 @@ class StorageExplorerStore {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
       toast.loading(
-        <ToastLoader
-          progress={progress * 100}
-          message={`Deleting ${prefixes.length} file(s)...`}
-          description={STORAGE_PROGRESS_INFO_TEXT}
-        />,
+        <ToastLoader progress={progress * 100} message={`Deleting ${prefixes.length} file(s)...`}>
+          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+        </ToastLoader>,
         { id: toastId }
       )
     }, Promise.resolve())
@@ -935,8 +1033,9 @@ class StorageExplorerStore {
         <ToastLoader
           progress={0}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-          description={STORAGE_PROGRESS_INFO_TEXT}
-        />,
+        >
+          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+        </ToastLoader>,
         { id: toastId }
       )
 
@@ -982,8 +1081,9 @@ class StorageExplorerStore {
             <ToastLoader
               progress={progress * 100}
               message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-              description={STORAGE_PROGRESS_INFO_TEXT}
-            />,
+            >
+              <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+            </ToastLoader>,
             { id: toastId }
           )
           return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
@@ -1070,8 +1170,9 @@ class StorageExplorerStore {
         <ToastLoader
           progress={progress * 100}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-          description={STORAGE_PROGRESS_INFO_TEXT}
-        />,
+        >
+          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+        </ToastLoader>,
         { id: toastId }
       )
       return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
@@ -1413,11 +1514,9 @@ class StorageExplorerStore {
     }
 
     const toastId = toast.loading(
-      <ToastLoader
-        progress={0}
-        message={`Renaming folder to ${newName}`}
-        description={STORAGE_PROGRESS_INFO_TEXT}
-      />
+      <ToastLoader progress={0} message={`Renaming folder to ${newName}`}>
+        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+      </ToastLoader>
     )
 
     try {
@@ -1475,11 +1574,9 @@ class StorageExplorerStore {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
         toast.loading(
-          <ToastLoader
-            progress={progress * 100}
-            message={`Renaming folder to ${newName}`}
-            description={STORAGE_PROGRESS_INFO_TEXT}
-          />,
+          <ToastLoader progress={progress * 100} message={`Renaming folder to ${newName}`}>
+            <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
+          </ToastLoader>,
           { id: toastId }
         )
       }, Promise.resolve())
@@ -1799,6 +1896,36 @@ class StorageExplorerStore {
       // Select items within the range
       this.setSelectedItems(uniqBy(this.selectedItems.concat(rangeToSelect), 'id'))
     }
+  }
+
+  private calculateTotalRemainingTime(progresses: UploadProgress[]) {
+    let totalRemainingTime = 0
+    let totalRemainingBytes = 0
+
+    progresses.forEach((progress) => {
+      totalRemainingBytes += progress.remainingBytes
+      if (totalRemainingBytes === 0) {
+        return
+      }
+      const weight = progress.remainingBytes / totalRemainingBytes
+      totalRemainingTime += weight * progress.remainingTime
+    })
+
+    return totalRemainingTime
+  }
+
+  private formatTime(seconds: number) {
+    const days = Math.floor(seconds / (24 * 3600))
+    seconds %= 24 * 3600
+    const hours = Math.floor(seconds / 3600)
+    seconds %= 3600
+    const minutes = Math.floor(seconds / 60)
+    seconds = Math.floor(seconds % 60)
+
+    if (days > 0) return `${days}d `
+    if (hours > 0) return `${hours}h `
+    if (minutes > 0) return `${minutes}m `
+    return `${seconds}s`
   }
 }
 
