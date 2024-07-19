@@ -19,8 +19,8 @@ import {
   Input,
   Listbox,
   Modal,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface EnableExtensionModalProps {
   visible: boolean

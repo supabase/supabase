@@ -6,7 +6,6 @@ import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
@@ -25,7 +24,14 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible

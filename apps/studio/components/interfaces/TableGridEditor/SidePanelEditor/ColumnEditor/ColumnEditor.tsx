@@ -28,8 +28,8 @@ import {
   Input,
   SidePanel,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'

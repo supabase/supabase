@@ -38,9 +38,9 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  WarningIcon,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {

@@ -21,7 +21,7 @@ import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
 import { generatePrompt } from './GenerateSQL.utils'
 import { ExcludeSchemaAlert, IncludeSchemaAlert, AiWarning } from '../Command.alerts'
-import { StatusIcon } from '../../Icons/StatusIcons'
+import { StatusIcon } from 'ui'
 
 const GenerateSQL = () => {
   const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
