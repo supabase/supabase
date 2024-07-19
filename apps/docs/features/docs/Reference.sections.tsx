@@ -1,13 +1,16 @@
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-
 import { Fragment } from 'react'
 
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
-import { RefSubLayout } from '~/features/docs/Reference.ui'
+import { FnParameterDetails, RefSubLayout } from '~/features/docs/Reference.ui'
 import { StickyHeader } from './Reference.ui.client'
-import { genClientSdkSectionTree, getSpecFnsCached } from '~/features/docs/Reference.utils'
+import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import {
+  genClientSdkSectionTree,
+  getSpecFnsCached,
+  normalizeMarkdown,
+} from '~/features/docs/Reference.utils'
 
 interface ClientLibRefSectionsProps {
   libPath: string
@@ -137,11 +140,39 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
     types = await getTypeSpec(fn['$ref'] as string)
   }
 
+  const fullDescription = [
+    types?.comment?.shortText,
+    'description' in fn && (fn.description as string),
+    'notes' in fn && (fn.notes as string),
+  ]
+    .filter(Boolean)
+    .map(normalizeMarkdown)
+    .join('\n\n')
+
   return (
-    <RefSubLayout.Section {...section}>
-      <StickyHeader {...section} link={link} scrollSpyHeader />
-      <pre>{JSON.stringify(fn, null, 2)}</pre>
-      <pre>{JSON.stringify(types, null, 2)}</pre>
+    <RefSubLayout.Section columns="double" {...section}>
+      <StickyHeader {...section} link={link} scrollSpyHeader className="col-[1_/_-1]" />
+      <div className="overflow-hidden flex flex-col gap-8">
+        <div className="prose break-words text-sm">
+          <MDXRemoteRefs source={fullDescription} />
+        </div>
+        <FnParameterDetails
+          parameters={
+            'overwriteParams' in fn
+              ? (fn.overwriteParams as Array<object>).map((overwrittenParams) => ({
+                  ...overwrittenParams,
+                  __overwritten: true,
+                }))
+              : types?.params
+          }
+          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          className="max-w-[80ch]"
+        />
+        <pre className="text-sm">{JSON.stringify(fn, null, 2)}</pre>
+      </div>
+      <div className="overflow-hidden">
+        <pre className="text-sm">{JSON.stringify(types, null, 2)}</pre>
+      </div>
     </RefSubLayout.Section>
   )
 }

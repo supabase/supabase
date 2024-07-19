@@ -1,6 +1,11 @@
 import { isPlainObject } from 'lodash'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+import { mdxjs } from 'micromark-extension-mdxjs'
 import { readFile } from 'node:fs/promises'
 import { basename, extname, join } from 'node:path'
+import { visit } from 'unist-util-visit'
 import { parse } from 'yaml'
 
 import { deepFilterRec } from '~/features/helpers.fn'
@@ -80,5 +85,22 @@ const getSpecFnsCached = cache_fullProcess_withDevCacheBust(
   }
 )
 
-export { getSpecFnsCached, genClientSdkSectionTree }
+function normalizeMarkdown(markdown: string): string {
+  const mdxTree = fromMarkdown(markdown, {
+    extensions: [mdxjs()],
+    mdastExtensions: [mdxFromMarkdown()],
+  })
+
+  visit(mdxTree, 'text', (node) => {
+    node.value = node.value.replace(/\n/g, ' ')
+  })
+
+  const content = toMarkdown(mdxTree, {
+    extensions: [mdxToMarkdown()],
+  })
+
+  return content
+}
+
+export { normalizeMarkdown, getSpecFnsCached, genClientSdkSectionTree }
 export type { AbbrevCommonClientLibSection }

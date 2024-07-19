@@ -12,6 +12,7 @@ interface StickyHeaderProps {
    */
   link?: string
   monoFont?: boolean
+  className?: string
   /**
    * Whether the header updates the URL on scroll
    */
@@ -27,13 +28,14 @@ function StickyHeader({
   slug,
   link,
   monoFont = false,
+  className,
   scrollSpyHeader = false,
   crawlerPage = false,
 }: StickyHeaderProps) {
   const { ref } = useInView({
     threshold: 1,
     rootMargin: '0% 0% -50% 0%',
-    onChange: (inView, entry) => {
+    onChange: (inView) => {
       if (inView && scrollSpyHeader) {
         window.history.replaceState(null, '', link)
       }
@@ -53,7 +55,8 @@ function StickyHeader({
             'text-2xl font-medium text-foreground',
             'mt-0',
             'scroll-mt-[calc(33px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
-            monoFont && 'font-mono'
+            monoFont && 'font-mono',
+            className
           )}
         >
           {title}

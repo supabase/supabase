@@ -39,8 +39,8 @@ function ClientSdkReferencePage({
       }
     >
       <LayoutMainContent>
-        <article>
-          <ClientLibHeader menuData={menuData} className="mb-8" />
+        <article className="@container/article">
+          <ClientLibHeader menuData={menuData} className="mt-4 mb-8" />
           <ClientLibIntroduction libPath={libPath} excludeName={libId} />
           <ClientLibRefSections
             libPath={libPath}

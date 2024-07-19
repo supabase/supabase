@@ -203,7 +203,7 @@ const menus: Menu[] = [
   },
 ]
 
-export function getMenuById(id: MenuId) {
+function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id)
 }
 
