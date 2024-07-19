@@ -281,6 +281,8 @@ limit 12
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Most frequently called queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
