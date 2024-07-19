@@ -3,7 +3,6 @@ import { stat } from 'node:fs/promises'
 
 import type { OrPromise } from '~/features/helpers.types'
 import { IS_DEV } from '~/lib/constants'
-import type { OrPromise } from '~/features/helpers.types'
 
 /**
  * Caches a function for the length of the server process.

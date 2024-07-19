@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
-import { FnParameterDetails, RefSubLayout } from '~/features/docs/Reference.ui'
+import { FnParameterDetails, RefSubLayout, ReturnTypeDetails } from '~/features/docs/Reference.ui'
 import { StickyHeader } from './Reference.ui.client'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import {
@@ -168,9 +168,10 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
           altParameters={types?.altSignatures?.map(({ params }) => params)}
           className="max-w-[80ch]"
         />
+        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
         <pre className="text-sm">{JSON.stringify(fn, null, 2)}</pre>
       </div>
-      <div className="overflow-hidden">
+      <div className="overflow-auto">
         <pre className="text-sm">{JSON.stringify(types, null, 2)}</pre>
       </div>
     </RefSubLayout.Section>

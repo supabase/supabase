@@ -2373,8 +2373,32 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "options",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "type": "union",
+                        "subTypes": [
+                          {
+                            "name": "data",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "object"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "A custom data object to store the user's metadata. This maps to the \`auth.users.raw_user_meta_data\` column.",
+                              "text": "The \`data\` should be a JSON object that includes user-specific info, such as their first and last name.\\n"
+                            }
+                          },
+                          {
+                            "name": "redirectTo",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "The URL which will be appended to the email link generated."
+                            }
+                          }
+                        ]
                       },
                       "isOptional": true
                     },
@@ -2410,8 +2434,32 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "options",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "type": "union",
+                        "subTypes": [
+                          {
+                            "name": "data",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "object"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "A custom data object to store the user's metadata. This maps to the \`auth.users.raw_user_meta_data\` column.",
+                              "text": "The \`data\` should be a JSON object that includes user-specific info, such as their first and last name.\\n"
+                            }
+                          },
+                          {
+                            "name": "redirectTo",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "The URL which will be appended to the email link generated."
+                            }
+                          }
+                        ]
                       },
                       "isOptional": true
                     },
@@ -2449,8 +2497,15 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "options",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "name": "redirectTo",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        },
+                        "isOptional": true,
+                        "comment": {
+                          "shortText": "The URL which will be appended to the email link generated."
+                        }
                       },
                       "isOptional": true
                     },
@@ -2489,8 +2544,15 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "options",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "name": "redirectTo",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        },
+                        "isOptional": true,
+                        "comment": {
+                          "shortText": "The URL which will be appended to the email link generated."
+                        }
                       },
                       "isOptional": true
                     },
@@ -27195,8 +27257,11 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "name": "name",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
                       }
                     },
                     {
@@ -27991,8 +28056,11 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "data",
                       "type": {
-                        "type": "nameOnly",
-                        "name": "Pick"
+                        "name": "name",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
+                        }
                       }
                     },
                     {

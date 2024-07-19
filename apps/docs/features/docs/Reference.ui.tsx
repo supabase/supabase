@@ -124,38 +124,8 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
     'subContent' in paramOrType
       ? (paramOrType.subContent as Array<SubContent>)
       : isFromTypespec(paramOrType)
-        ? paramOrType.type?.type === 'object'
-          ? paramOrType.type.properties
-          : paramOrType.type?.type === 'function'
-            ? [
-                ...(paramOrType.type.params.length === 0
-                  ? []
-                  : [
-                      {
-                        name: 'Parameters',
-                        type: 'callback parameters',
-                        isOptional: 'NA',
-                        params: paramOrType.type.params.map((param) => ({
-                          ...param,
-                          isOptional: 'NA',
-                        })),
-                      },
-                    ]),
-                { name: 'Return', type: paramOrType.type.ret.type, isOptional: 'NA' },
-              ]
-            : // @ts-ignore -- Faking these to take advantage of recursion
-              paramOrType.type === 'callback parameters'
-              ? // @ts-ignore -- Faking these to take advantage of recursion
-                paramOrType.params
-              : paramOrType.type?.type === 'union'
-                ? paramOrType.type.subTypes.map((subType, index) => ({
-                    name: `union option ${index + 1}`,
-                    type: { ...subType },
-                    isOptional: 'NA',
-                  }))
-                : undefined
+        ? getSubDetails(paramOrType)
         : undefined
-  subContent?.sort((a, b) => (a.isOptional === true ? 1 : 0) - (b.isOptional === true ? 1 : 0))
 
   return (
     <>
@@ -183,6 +153,30 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
       )}
       {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
     </>
+  )
+}
+
+export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret'] }) {
+  // These custom names that aren't defined aren't particularly meaningful, so
+  // just don't display them.
+  const isNameOnlyType = returnType.type.type === 'nameOnly'
+  if (isNameOnlyType) return
+
+  const subContent = getSubDetails(returnType)
+
+  return (
+    <div>
+      <h3 className="mb-3 text-base text-foreground">Return Type</h3>
+      <div className="border-t border-b py-5 flex flex-col gap-3">
+        <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
+        {returnType.comment?.shortText && (
+          <div className="prose text-sm">
+            <MDXRemoteBase source={normalizeMarkdown(returnType.comment?.shortText)} />
+          </div>
+        )}
+        {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+      </div>
+    </div>
   )
 }
 
@@ -320,6 +314,80 @@ function getTypeName(parameter: object): string {
 
 function nameOrDefault(node: object, fallback: string) {
   return 'name' in node && node.name !== TYPESPEC_NODE_ANONYMOUS ? (node.name as string) : fallback
+}
+
+function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']) {
+  let subDetails: Array<any>
+
+  switch (parentType.type?.type) {
+    case 'object':
+      subDetails = parentType.type.properties
+      break
+    case 'function':
+      subDetails = [
+        ...(parentType.type.params.length === 0
+          ? []
+          : [
+              {
+                name: 'Parameters',
+                type: 'callback parameters',
+                isOptional: 'NA',
+                params: parentType.type.params.map((param) => ({
+                  ...param,
+                  isOptional: 'NA',
+                })),
+              },
+            ]),
+        { name: 'Return', type: parentType.type.ret.type, isOptional: 'NA' },
+      ]
+      break
+    // @ts-ignore -- Adding these fake types to take advantage of existing recursion
+    case 'callback parameters':
+      // @ts-ignore -- Adding these fake types to take advantage of existing recursion
+      subDetails = parentType.params
+      break
+    case 'union':
+      subDetails = parentType.type.subTypes.map((subType, index) => ({
+        name: `union option ${index + 1}`,
+        type: { ...subType },
+        isOptional: 'NA',
+      }))
+      break
+    case 'promise':
+      if (parentType.type.awaited.type === 'union') {
+        subDetails = parentType.type.awaited.subTypes.map((subType, index) => ({
+          name: `union option ${index + 1}`,
+          type: { ...subType },
+          isOptional: 'NA',
+        }))
+      } else if (parentType.type.awaited.type === 'object') {
+        subDetails = parentType.type.awaited.properties.map((property) => ({
+          ...property,
+          isOptional: 'NA',
+        }))
+      } else if (parentType.type.awaited.type === 'array') {
+        subDetails = [
+          { name: 'array element', type: parentType.type.awaited.elemType, isOptional: 'NA' },
+        ]
+      }
+      break
+    case 'array':
+      if (parentType.type.elemType.type === 'union') {
+        subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
+          name: `union option ${index + 1}`,
+          type: { ...subType },
+          isOptional: 'NA',
+        }))
+      }
+      if (parentType.type.elemType.type === 'object') {
+        subDetails = parentType.type.elemType.properties
+      }
+      break
+  }
+
+  subDetails?.sort((a, b) => (a.isOptional === true ? 1 : 0) - (b.isOptional === true ? 1 : 0))
+
+  return subDetails
 }
 
 function mergeAlternateParameters(

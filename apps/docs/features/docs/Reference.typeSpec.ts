@@ -61,6 +61,7 @@ export interface FunctionParameterType {
 
 interface ReturnType {
   type: TypeDetails | undefined
+  comment?: Comment
 }
 
 export type TypeDetails = IntrinsicType | LiteralType | CustomType
@@ -463,6 +464,10 @@ function parseReferenceType(type: any, map: Map<number, any>) {
     return parseExtractType(type, map)
   }
 
+  if (type.package === 'typescript' && type.qualifiedName === 'Pick') {
+    return parsePickType(type, map)
+  }
+
   if (type.package && type.qualifiedName) {
     return {
       type: 'nameOnly',
@@ -544,6 +549,38 @@ function parsePromiseType(type: any, map: Map<number, any>): PromiseType {
 function parseExtractType(type: any, map: Map<number, any>): CustomUnionType {
   const extractedUnion = parseUnionType(type.typeArguments[1], map)
   return extractedUnion
+}
+
+function parsePickType(type: any, map: Map<number, any>) {
+  if (type.typeArguments[0].type === 'reference') {
+    const dereferencedNode = map.get(type.typeArguments[0].id)
+    if (!dereferencedNode) return undefined
+    const dereferencedType = parseType(dereferencedNode, map)
+    if (!dereferencedType?.properties) return undefined
+
+    switch (type.typeArguments[1].type) {
+      case 'literal':
+        return dereferencedType.properties.find(
+          (property) => property.name === type.typeArguments[1].value
+        )
+      case 'union':
+      default:
+        console.log('properties:', dereferencedType.properties)
+        console.log('pick', type.typeArguments[1].types)
+
+        const subTypes = dereferencedType.properties.filter((property) =>
+          type.typeArguments[1].types.some((type) => type.value === property.name)
+        )
+        if (subTypes.length === 0) return undefined
+
+        return {
+          type: 'union',
+          subTypes,
+        }
+    }
+  }
+
+  return undefined
 }
 
 function parseReflectionType(type: any, map: Map<number, any>) {
