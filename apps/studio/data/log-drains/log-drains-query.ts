@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { logDrainsKeys } from './keys'
 import { ResponseError } from 'types'
+import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export type LogDrainsVariables = {
   ref?: string
@@ -38,7 +39,7 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
   return logDrains as {
     config: Record<string, any>
     id: number
-    source: string
+    source: LogDrainSource
     inserted_at: string
     name: string
     token: string
@@ -47,6 +48,7 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
+export type LogDrainData = LogDrainsData[number]
 export type LogDrainsyError = ResponseError
 
 export const useLogDrainsQuery = <TData = LogDrainsData>(

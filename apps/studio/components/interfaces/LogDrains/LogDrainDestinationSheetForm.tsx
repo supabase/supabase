@@ -38,10 +38,11 @@ import {
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
+import { LogDrainData } from 'data/log-drains/log-drains-query'
+import Panel from 'components/ui/Panel'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -114,16 +115,21 @@ function LogDrainFormItem({
   )
 }
 
-export function CreateLogDrainDestination({
+export function LogDrainDestinationSheetForm({
   open,
   onOpenChange,
-  defaultSource,
+  defaultValues,
+  onSubmit,
+  isLoading,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
-  defaultSource: LogDrainSource
+  defaultValues?: Partial<LogDrainData>
+  isLoading?: boolean
+  onSubmit: (values: z.infer<typeof formSchema>) => void
 }) {
   const { ref } = useParams() as { ref: string }
+  const defaultSource = defaultValues?.source || 'webhook'
 
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
 
@@ -133,6 +139,7 @@ export function CreateLogDrainDestination({
       customHeaders: [],
       httpVersion: 'HTTP2',
       gzip: false,
+      ...defaultValues,
     },
   })
 
@@ -142,23 +149,6 @@ export function CreateLogDrainDestination({
 
   const source = form.watch('source')
   const customHeaders = form.watch('customHeaders')
-
-  const { mutate: createLogDrain, isLoading } = useCreateLogDrainMutation({
-    onSuccess: () => {
-      toast.success('Log drain destination created')
-      form.reset()
-      onOpenChange(false)
-    },
-  })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('values', values)
-    createLogDrain({
-      ...values,
-      projectRef: ref,
-      config: {},
-    })
-  }
 
   function removeHeader(name: string) {
     form.setValue('customHeaders', customHeaders?.filter((header) => header.name !== name))
@@ -185,9 +175,7 @@ export function CreateLogDrainDestination({
     <Sheet
       open={open}
       onOpenChange={(v) => {
-        if (!v) {
-          form.reset()
-        }
+        form.reset()
         onOpenChange(v)
       }}
     >
@@ -292,7 +280,7 @@ export function CreateLogDrainDestination({
                       <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                       {customHeaders?.map((header) => (
                         <div
-                          className="flex items-center font-mono mt-2 border-b p-1 group"
+                          className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
                           key={header.name}
                         >
                           <div className="w-full px-1">{header.name}</div>
@@ -308,31 +296,6 @@ export function CreateLogDrainDestination({
                           ></Button>
                         </div>
                       ))}
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <Input_Shadcn_
-                        size={'tiny'}
-                        type="text"
-                        placeholder="Header name"
-                        value={newCustomHeader.name}
-                        onChange={(e) =>
-                          setNewCustomHeader({ ...newCustomHeader, name: e.target.value })
-                        }
-                      />
-                      <Input_Shadcn_
-                        size={'tiny'}
-                        type="text"
-                        placeholder="Header value"
-                        value={newCustomHeader.value}
-                        onChange={(e) =>
-                          setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
-                        }
-                      />
-
-                      <Button htmlType="button" type="outline" onClick={addHeader}>
-                        Add
-                      </Button>
                     </div>
                   </>
                 )}
@@ -392,15 +355,43 @@ export function CreateLogDrainDestination({
                   </div>
                 )}
               </div>
-
-              <FormMessage_Shadcn_ />
             </form>
           </Form_Shadcn_>
+          {source === 'webhook' && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                console.log('test')
+                addHeader()
+              }}
+              className="flex gap-2 mt-2 items-center"
+            >
+              <Input_Shadcn_
+                size={'tiny'}
+                type="text"
+                placeholder="Header name"
+                value={newCustomHeader.name}
+                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
+              />
+              <Input_Shadcn_
+                size={'tiny'}
+                type="text"
+                placeholder="Header value"
+                value={newCustomHeader.value}
+                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, value: e.target.value })}
+              />
+
+              <Button htmlType="submit" type="outline">
+                Add
+              </Button>
+            </form>
+          )}
         </SheetSection>
 
         <SheetFooter className="p-4">
           <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-            Create destination
+            Save destination
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -6,51 +6,54 @@ import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
 import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
 
-export type LogDrainCreateVariables = {
+export type LogDrainUpdateVariables = {
   projectRef: string
+  id: number
   name: string
   description?: string
   source: LogDrainSource
 }
 
-export async function createLogDrain(data: LogDrainCreateVariables) {
+export async function updateLogDrain(data: LogDrainUpdateVariables) {
   // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
   // const { data, error } = await post('/platform/projects/{ref}/resources/{id}', {
   //   params: { path: { ref: projectRef, id } },
-  //   body: { newLogDrain },
+  //   body: { updatedLogDrain },
   // })
 
   // if (error) handleError(error)
   // return data
 
-  // store in localstorage for now
+  // update in localstorage for now
   const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
-  logDrains.push({
-    id: Math.floor(Math.random() * 1000000),
-    name: data.name,
-    source: data.source,
-    inserted_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  })
-  localStorage.setItem('logDrains', JSON.stringify(logDrains))
+  const index = logDrains.findIndex((drain: any) => drain.id === data.id)
+  if (index !== -1) {
+    logDrains[index] = {
+      ...logDrains[index],
+      name: data.name,
+      source: data.source,
+      updated_at: new Date().toISOString(),
+    }
+    localStorage.setItem('logDrains', JSON.stringify(logDrains))
+  }
 
   return logDrains
 }
 
-type LogDrainCreateData = Awaited<ReturnType<typeof createLogDrain>>
+type LogDrainUpdateData = Awaited<ReturnType<typeof updateLogDrain>>
 
-export const useCreateLogDrainMutation = ({
+export const useUpdateLogDrainMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LogDrainCreateData, ResponseError, LogDrainCreateVariables>,
+  UseMutationOptions<LogDrainUpdateData, ResponseError, LogDrainUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainCreateData, ResponseError, LogDrainCreateVariables>(
-    (vars) => createLogDrain(vars),
+  return useMutation<LogDrainUpdateData, ResponseError, LogDrainUpdateVariables>(
+    (vars) => updateLogDrain(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables

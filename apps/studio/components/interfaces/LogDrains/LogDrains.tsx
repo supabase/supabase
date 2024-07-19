@@ -1,4 +1,4 @@
-import { useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { LogDrainData, LogDrainsData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import Link from 'next/link'
 import { LOG_DRAIN_SOURCES, LogDrainSource } from './LogDrains.constants'
@@ -7,6 +7,7 @@ import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import {
+  Accordion,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -21,20 +22,26 @@ import {
   TableRow,
 } from 'ui'
 import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
-import { MoreHorizontal, TrashIcon } from 'lucide-react'
+import { MoreHorizontal, Pen, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 
-export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrainSource) => void }) {
+export function LogDrains({
+  onNewDrainClick,
+  onUpdateDrainClick,
+}: {
+  onNewDrainClick: (src: LogDrainSource) => void
+  onUpdateDrainClick: (drain: LogDrainData) => void
+}) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [drainToDelete, setDrainToDelete] = useState<{ id: number } | null>(null)
+  const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
   const { data: logDrains, isLoading, refetch } = useLogDrainsQuery({ ref })
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
-      setDrainToDelete(null)
+      setSelectedLogDrain(null)
     },
   })
 
@@ -72,7 +79,7 @@ export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrain
             <TableRow>
               <TableHead className="w-[100px]">Name</TableHead>
               <TableHead>Source</TableHead>
-              <TableHead>Inserted At</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
@@ -96,7 +103,15 @@ export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrain
                     <DropdownMenuContent className="max-w-[140px]" align="end">
                       <DropdownMenuItem
                         onClick={() => {
-                          setDrainToDelete({ id: drain.id })
+                          onUpdateDrainClick(drain)
+                        }}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Update
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedLogDrain(drain)
                           setIsDeleteModalOpen(true)
                         }}
                       >
@@ -114,24 +129,20 @@ export function LogDrains({ onNewDrainClick }: { onNewDrainClick: (src: LogDrain
             title="Delete Log Drain"
             visible={isDeleteModalOpen}
             onConfirm={() => {
-              if (drainToDelete && drainToDelete.id && ref) {
-                deleteLogDrain({ id: drainToDelete.id, projectRef: ref })
+              if (selectedLogDrain && selectedLogDrain.id && ref) {
+                deleteLogDrain({ id: selectedLogDrain.id, projectRef: ref })
               }
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <p>Are you sure you want to delete this log drain?</p>
-            <p>This action cannot be undone.</p>
+            <div className="text-foreground-light">
+              <p>
+                Are you sure you want to delete{' '}
+                <span className="text-foreground">{selectedLogDrain?.name}</span>?
+              </p>
+              <p>This action cannot be undone.</p>
+            </div>
           </ConfirmationModal>
-          <button
-            onClick={() => {
-              // delete all from localstorage
-              localStorage.removeItem('logDrains')
-              refetch()
-            }}
-          >
-            delete all
-          </button>
         </Table>
       </Panel>
     </>

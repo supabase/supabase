@@ -7,16 +7,51 @@ import {
 } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
-import { CreateLogDrainDestination } from 'components/interfaces/LogDrains/CreateLogDrainDestination'
-import { useRouter } from 'next/router'
-import { useParams } from 'common'
+import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { Button } from 'ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LogDrainData } from 'data/log-drains/log-drains-query'
+import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
+import toast from 'react-hot-toast'
+import {
+  LogDrainUpdateVariables,
+  useUpdateLogDrainMutation,
+} from 'data/log-drains/update-log-drain-mutation'
+import { useParams } from 'common'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false)
-  const [newDrainSource, setNewDrainSource] = useState<LogDrainSource>('webhook')
+  const { ref } = useParams() as { ref: string }
+  const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
+  const [mode, setMode] = useState<'create' | 'update'>('create')
+
+  const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
+    onSuccess: () => {
+      toast.success('Log drain destination created')
+      setOpen(false)
+    },
+  })
+
+  const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
+    onSuccess: () => {
+      toast.success('Log drain destination updated')
+      setOpen(false)
+    },
+  })
+
+  const isLoading = createLoading || updateLoading
+
+  function handleUpdateClick(drain: LogDrainData) {
+    setSelectedLogDrain(drain)
+    setMode('update')
+    setOpen(true)
+  }
+
+  function handleNewClick(src: LogDrainSource) {
+    setSelectedLogDrain({ source: src })
+    setOpen(true)
+  }
 
   return (
     <>
@@ -36,17 +71,36 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
-        <CreateLogDrainDestination
+        <LogDrainDestinationSheetForm
           open={open}
-          onOpenChange={setOpen}
-          defaultSource={newDrainSource}
-        />
-        <LogDrains
-          onNewDrainClick={(src) => {
-            setNewDrainSource(src)
-            setOpen(true)
+          onOpenChange={(v) => {
+            if (!v) {
+              setSelectedLogDrain(null)
+            }
+            setOpen(v)
+          }}
+          defaultValues={selectedLogDrain || {}}
+          isLoading={isLoading}
+          onSubmit={(values) => {
+            const logDrainValues = {
+              ...values,
+              id: selectedLogDrain?.id,
+              projectRef: ref,
+            }
+
+            console.log(logDrainValues)
+            if (mode === 'create') {
+              createLogDrain(logDrainValues)
+            } else {
+              if (logDrainValues.id && typeof logDrainValues.id === 'number') {
+                updateLogDrain(logDrainValues as LogDrainUpdateVariables)
+              } else {
+                throw new Error('Log drain ID is required')
+              }
+            }
           }}
         />
+        <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
       </ScaffoldContainer>
     </>
   )
