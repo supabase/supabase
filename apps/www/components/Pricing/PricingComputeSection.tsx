@@ -36,7 +36,7 @@ const PricingComputeSection = () => {
               </h3>
             </div>
             <p className="text-foreground-lighter text-[13px]">
-              Paid plans include $10/month in compute credits. Additional compute power is available
+              Paid Plans include $10/month in compute credits. Additional compute power is available
               if you need extra performance when scaling up Supabase.
             </p>
           </div>
@@ -76,7 +76,7 @@ const PricingComputeSection = () => {
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Compute instances are billed hourly and you can scale up or down at any time. Paid
-                  plans come with $10/month in compute credits to cover one Micro instance or offset
+                  Plans come with $10/month in compute credits to cover one Micro instance or offset
                   the cost of any other instance.
                 </p>
                 <p className="text-[13px] text-foreground-lighter">

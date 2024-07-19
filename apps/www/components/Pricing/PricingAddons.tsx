@@ -49,7 +49,7 @@ const PricingAddons: FC = () => {
       <div className="text-center">
         <h2 className="text-foreground text-3xl">Fine-tune your project</h2>
         <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
-          Go beyond your plan limits and level up your Supabase experience
+          Go beyond your Plan limits and level up your Supabase experience
         </p>
       </div>
       <div className="grid lg:grid-cols-2 gap-4 mb-16 mx-auto max-w-6xl">
