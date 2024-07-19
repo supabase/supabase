@@ -38,7 +38,7 @@ export const NetworkTrafficRenderer = (
     props.params?.iso_timestamp_start,
     props.params?.iso_timestamp_end
   )
-  console.log({ data, error, isError })
+
   const totalIngress = sumBy(props.data, 'ingress_mb')
   const totalEgress = sumBy(props.data, 'egress_mb')
 
