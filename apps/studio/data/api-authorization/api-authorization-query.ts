@@ -25,7 +25,6 @@ export async function getApiAuthorizationDetails(
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  // @ts-ignore API codegen issue
   const { data, error } = await get('/platform/oauth/authorizations/{id}', {
     params: { path: { id } },
     signal,
