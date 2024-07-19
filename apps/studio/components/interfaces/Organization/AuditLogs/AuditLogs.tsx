@@ -69,7 +69,7 @@ const AuditLogs = () => {
       {
         enabled: canReadAuditLogs,
         retry(_failureCount, error) {
-          if (error.message.endsWith('upgrade to team or Enterprise Plan to access audit logs.')) {
+          if (error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.')) {
             return false
           }
           return true
@@ -144,7 +144,7 @@ const AuditLogs = () => {
           )}
 
           {isError ? (
-            error.message.endsWith('upgrade to team or Enterprise Plan to access audit logs.') ? (
+            error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
               <Alert_Shadcn_
                 variant="default"
                 title="Organization Audit Logs are not available on Free or Pro plans"
