@@ -3545,13 +3545,37 @@ export interface components {
       metadata: Record<string, never>
       supabase_project_ref: string
     }
+    /** @enum {string} */
+    IntegrationsDirectoryCategory:
+      | 'api'
+      | 'auth'
+      | 'caching'
+      | 'data'
+      | 'devtools'
+      | 'fdw'
+      | 'lowcode'
+      | 'messaging'
+      | 'storage'
     IntegrationsDirectoryEntry: {
       approved: boolean
+      call_to_action_link: string | null
+      category: components['schemas']['IntegrationsDirectoryCategory']
+      description: string
+      developer: string
+      docs: string
+      featured: boolean
       id: number
+      images: string[]
+      inserted_at: string
+      logo: string
+      organization_slug: string | null
       overview: string
       parent_id: number | null
       preview_token: string
       slug: string
+      title: string
+      video: string | null
+      website: string
     }
     IntegrationVercelProject: {
       framework?: string | null
@@ -3913,8 +3937,18 @@ export interface components {
       fileUrl: string
     }
     OrgIntegrationsDirectoryRequestBody: {
+      call_to_action_link?: string
+      category: components['schemas']['IntegrationsDirectoryCategory']
+      description: string
+      developer: string
+      docs: string
+      images: string[]
+      logo: string
       overview: string
       slug: string
+      title: string
+      video?: string
+      website: string
     }
     OrgMetricUsage: {
       available_in_plan: boolean

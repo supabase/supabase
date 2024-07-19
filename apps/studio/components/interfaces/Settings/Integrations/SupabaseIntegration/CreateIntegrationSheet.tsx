@@ -41,8 +41,28 @@ interface CreateIntegrationSheetProps {
 }
 
 const FormSchema = z.object({
-  slug: z.string(),
+  call_to_action_link: z.string().optional(),
+  category: z.enum([
+    'api',
+    'auth',
+    'caching',
+    'data',
+    'devtools',
+    'fdw',
+    'lowcode',
+    'messaging',
+    'storage',
+  ]),
+  description: z.string(),
+  developer: z.string(),
+  docs: z.string(),
+  images: z.array(z.string()),
+  logo: z.string(),
   overview: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  video: z.string().optional(),
+  website: z.string(),
 })
 
 export const CreateIntegrationSheet = ({
@@ -57,8 +77,18 @@ export const CreateIntegrationSheet = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      slug: integrationEntry?.slug || '',
-      overview: integrationEntry?.overview || '',
+      call_to_action_link: integrationEntry?.call_to_action_link ?? '',
+      category: integrationEntry?.category ?? 'api',
+      description: integrationEntry?.description ?? '',
+      developer: integrationEntry?.developer ?? '',
+      docs: integrationEntry?.docs ?? '',
+      images: integrationEntry?.images ?? [],
+      logo: integrationEntry?.logo ?? '',
+      overview: integrationEntry?.overview ?? '',
+      slug: integrationEntry?.slug ?? '',
+      title: integrationEntry?.title ?? '',
+      video: integrationEntry?.video ?? '',
+      website: integrationEntry?.website ?? '',
     },
   })
 
@@ -84,8 +114,18 @@ export const CreateIntegrationSheet = ({
         {
           orgSlug: organization!.slug,
           params: {
-            slug: data.slug,
+            call_to_action_link: data.call_to_action_link,
+            category: data.category,
+            description: data.description,
+            developer: data.developer,
+            docs: data.docs,
+            images: data.images,
+            logo: data.logo,
             overview: data.overview,
+            slug: data.slug,
+            title: data.title,
+            video: data.video,
+            website: data.website,
           },
         },
         {
@@ -100,8 +140,18 @@ export const CreateIntegrationSheet = ({
         {
           orgSlug: organization!.slug,
           params: {
-            slug: data.slug,
+            call_to_action_link: data.call_to_action_link,
+            category: data.category,
+            description: data.description,
+            developer: data.developer,
+            docs: data.docs,
+            images: data.images,
+            logo: data.logo,
             overview: data.overview,
+            slug: data.slug,
+            title: data.title,
+            video: data.video,
+            website: data.website,
           },
         },
         {
@@ -201,13 +251,154 @@ export const CreateIntegrationSheet = ({
               )}
             />
             <FormField_Shadcn_
+              key="title"
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Title"
+                  description="A title of this integration (will be used in the search)"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="developer"
+              control={form.control}
+              name="developer"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Developer"
+                  description="A name of the company/developer for this integration"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="category"
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Category"
+                  description="CHANGE ME TO BE A DROPDOWN WITH ENUM VALUES"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="logo"
+              control={form.control}
+              name="logo"
+              render={({ field }) => (
+                <FormItemLayout label="Logo" description="CHANGE ME TO BE AN UPLOAD FIELD">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="images"
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Images"
+                  description="CHANGE ME TO BE A MULTI-FILE UPLOAD FIELD"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="website"
+              control={form.control}
+              name="website"
+              render={({ field }) => (
+                <FormItemLayout label="Website" description="A link to your website">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="docs"
+              control={form.control}
+              name="docs"
+              render={({ field }) => (
+                <FormItemLayout label="Docs" description="A link to docs for this integration">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="video"
+              control={form.control}
+              name="video"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Video"
+                  description="(optional) A link to the introduction video for this integration"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="call_to_action_link"
+              control={form.control}
+              name="call_to_action_link"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Call to Action"
+                  description="(optional) A link to the call to action displayed at the very bottom of the page"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="description"
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Description"
+                  description="Short description for your integration. Will be shown on the directory page."
+                >
+                  <FormControl_Shadcn_>
+                    <ExpandingTextArea {...field} className="min-h-24" />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
               key="overview"
               control={form.control}
               name="overview"
               render={({ field }) => (
                 <FormItemLayout
                   label="Overview"
-                  description="Description for your integration. Will be shown on your page."
+                  description="Extended description for your integration. Will be shown on your page."
                 >
                   <FormControl_Shadcn_>
                     <ExpandingTextArea {...field} className="min-h-24" />
