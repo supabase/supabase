@@ -1,4 +1,4 @@
-import { ICommonSection } from '~/components/reference/Reference.types'
+import type { ICommonSection } from '~/components/reference/Reference.types'
 
 async function handleRefGetStaticPaths(sections: ICommonSection[]) {
   // In preview environments, don't generate static pages (faster builds)

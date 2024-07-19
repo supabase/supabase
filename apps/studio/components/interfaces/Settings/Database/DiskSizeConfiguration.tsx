@@ -25,7 +25,7 @@ import {
   InputNumber,
   Modal,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean

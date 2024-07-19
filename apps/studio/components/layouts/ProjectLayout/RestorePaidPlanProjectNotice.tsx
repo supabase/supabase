@@ -1,6 +1,11 @@
 import { ExternalLink } from 'lucide-react'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 export const RestorePaidPlanProjectNotice = () => {
   return (

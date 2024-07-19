@@ -17,11 +17,11 @@ import {
   IconShield,
   IconTool,
   IconUsers,
+  InfoIcon,
   Listbox,
   Loading,
   Modal,
 } from 'ui'
-import { InfoIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
