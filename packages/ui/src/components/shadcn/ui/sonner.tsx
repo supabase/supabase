@@ -2,13 +2,14 @@
 
 import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
+
 import { cn } from '../../../lib/utils'
-import { buttonVariants } from './../../Button'
+import { buttonVariants } from '../../Button'
 import { StatusIcon } from './../../StatusIcon'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
-const SonnerToaster = ({ ...props }: ToasterProps) => {
+const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme()
 
   return (
@@ -19,7 +20,10 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
         info: <StatusIcon variant="default" />,
       }}
       theme={theme as ToasterProps['theme']}
-      className="toaster group"
+      // pointer-events-auto is needed to fix the toast when above radix modals
+      className="toaster group pointer-events-auto"
+      // fontFamily: 'inherit' is needed to use the same font as the rest of the app
+      style={{ fontFamily: 'inherit' }}
       toastOptions={{
         unstyled: true,
         classNames: {
@@ -48,8 +52,21 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
             'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:!border-warning-500',
           error:
             'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
+          closeButton: cn(
+            // unset all styles set from sonner
+            'absolute right-2 top-2 rounded-md text-foreground/50 opacity-0 transition-opacity',
+            'hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100',
+            'group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400',
+            'group-[.destructive]:focus:ring-offset-red-600',
+            'left-auto transform-none bg-transparent border-0 border-transparent hover:!bg-transparent hover:border-transparent'
+          ),
+          content: 'grow',
+          //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay
         },
+        closeButton: true,
+        ...toastOptions,
       }}
+      cn={cn}
       {...props}
     />
   )
