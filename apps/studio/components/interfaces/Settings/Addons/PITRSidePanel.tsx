@@ -32,7 +32,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'

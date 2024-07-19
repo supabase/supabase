@@ -12,8 +12,8 @@ import {
   Button,
   Modal,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()

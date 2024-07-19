@@ -24,18 +24,19 @@ import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
+  CriticalIcon,
   IconExternalLink,
   IconInfo,
   Modal,
   Radio,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
