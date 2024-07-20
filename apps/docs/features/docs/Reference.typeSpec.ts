@@ -565,9 +565,6 @@ function parsePickType(type: any, map: Map<number, any>) {
         )
       case 'union':
       default:
-        console.log('properties:', dereferencedType.properties)
-        console.log('pick', type.typeArguments[1].types)
-
         const subTypes = dereferencedType.properties.filter((property) =>
           type.typeArguments[1].types.some((type) => type.value === property.name)
         )

@@ -5,14 +5,15 @@ const LIB_PATH = 'javascript'
 const LIB_VERSION = 'v2'
 const SPEC_FILE = 'supabase_js_v2'
 
-function JsReferenceV2() {
+function JsReferenceV2({ params: { slug } }: { params: { slug?: Array<string> } }) {
   return (
     <ClientSdkReferencePage
       libId={LIB_ID}
       libPath={LIB_PATH}
       libVersion={LIB_VERSION}
       specFile={SPEC_FILE}
-	  useTypeSpec
+      initialSelectedSection={slug}
+      useTypeSpec
     />
   )
 }

@@ -1,15 +1,83 @@
 'use client'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
+import { debounce, initial } from 'lodash'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { createContext, useContext, useMemo, useState, type MouseEvent } from 'react'
+import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 import { cn } from 'ui'
 
 import { BASE_PATH } from '~/lib/constants'
-import type { AbbrevCommonClientLibSection } from './Reference.navigation'
+import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.navigation'
+import { isElementInViewport } from '~/features/ui/helpers.dom'
+
+export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
+
+export function ReferenceContentScrollHandler({
+  initialSelectedSection,
+  children,
+}: PropsWithChildren<{
+  initialSelectedSection: Array<string> | undefined
+}>) {
+  const [initiallyScrolled, setInitiallyScrolled] = useState(false)
+
+  useEffect(
+    () => {
+      if (initialSelectedSection) {
+        const section = document.getElementById(initialSelectedSection[0])
+        section?.scrollIntoView()
+      }
+      setInitiallyScrolled(true)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [] // We only want this to happen on mount.
+  )
+
+  return (
+    <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>
+      {children}
+    </ReferenceContentInitiallyScrolledContext.Provider>
+  )
+}
+
+export function ReferenceNavigationScrollHandler({
+  children,
+  ...rest
+}: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
+  const ref = useRef<HTMLDivElement>()
+  const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
+
+  const scrollActiveIntoView = useCallback(() => {
+    const currentLink = ref.current?.querySelector('[aria-current=page]') as HTMLElement
+    if (currentLink && !isElementInViewport(currentLink)) {
+      currentLink.scrollIntoView({
+        block: 'center',
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (initialScrollHappened) {
+      scrollActiveIntoView()
+    }
+  }, [initialScrollHappened, scrollActiveIntoView])
+
+  useEffect(() => {
+    const debouncedScrollActiveIntoView = debounce(scrollActiveIntoView, 150)
+
+    window.addEventListener('scrollend', debouncedScrollActiveIntoView)
+    return () => window.removeEventListener('scrollend', debouncedScrollActiveIntoView)
+  }, [scrollActiveIntoView])
+
+  return (
+    <div ref={ref} {...rest}>
+      {children}
+    </div>
+  )
+}
 
 function deriveHref(basePath: string, section: AbbrevCommonClientLibSection) {
   return 'slug' in section ? `${basePath}/${section.slug}` : ''
@@ -25,7 +93,7 @@ function getLinkStyles(isActive: boolean, className?: string) {
   )
 }
 
-function RefLink({
+export function RefLink({
   basePath,
   section,
   skipChildren = false,
@@ -38,14 +106,15 @@ function RefLink({
   className?: string
   onClick?: (evt: MouseEvent) => void
 }) {
+  const ref = useRef<HTMLAnchorElement>()
+
   const pathname = usePathname()
+  const href = deriveHref(basePath, section)
+  const isActive = pathname === href
 
   if (!('title' in section)) return null
 
   const isCompoundSection = !skipChildren && 'items' in section && section.items.length > 0
-
-  const href = deriveHref(basePath, section)
-  const isActive = pathname === href
 
   return (
     <>
@@ -53,7 +122,9 @@ function RefLink({
         <CompoundRefLink basePath={basePath} section={section} />
       ) : (
         <Link
+          ref={ref}
           href={href}
+          aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}
           onClick={(evt: MouseEvent) => {
             /*
@@ -96,7 +167,13 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientL
   const isActive = isParentActive || isChildActive
 
   const setOpen = (open: boolean) => {
+    // Disable closing if the section is active, to prevent the currently active
+    // link disappearing
     if (open || !isActive) _setOpen(open)
+  }
+
+  if (isActive && !open) {
+    setOpen(true)
   }
 
   return { open, setOpen }
@@ -141,5 +218,3 @@ function CompoundRefLink({
     </Collapsible.Root>
   )
 }
-
-export { RefLink }

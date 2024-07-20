@@ -15,8 +15,12 @@ import {
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
-import { FnParameterDetails, RefSubLayout, ReturnTypeDetails } from '~/features/docs/Reference.ui'
-import { StickyHeader } from '~/features/docs/Reference.ui.client'
+import {
+  FnParameterDetails,
+  RefSubLayout,
+  ReturnTypeDetails,
+  StickyHeader,
+} from '~/features/docs/Reference.ui'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import {
   genClientSdkSectionTree,
@@ -44,17 +48,19 @@ async function ClientLibRefSections({
 
   return (
     <div className="flex flex-col my-16 gap-16">
-      {flattenedSections.map((section, idx) => (
-        <Fragment key={`${section.id}-${idx}`}>
-          <SectionDivider />
-          <SectionSwitch
-            libPath={libPath}
-            section={section}
-            specFile={specFile}
-            useTypeSpec={useTypeSpec}
-          />
-        </Fragment>
-      ))}
+      {flattenedSections
+        .filter((section) => section.type !== 'category')
+        .map((section, idx) => (
+          <Fragment key={`${section.id}-${idx}`}>
+            <SectionDivider />
+            <SectionSwitch
+              libPath={libPath}
+              section={section}
+              specFile={specFile}
+              useTypeSpec={useTypeSpec}
+            />
+          </Fragment>
+        ))}
     </div>
   )
 }
@@ -107,8 +113,6 @@ function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitc
           useTypeSpec={useTypeSpec}
         />
       )
-    case 'category':
-      return null
     default:
       console.error(`Unhandled type in reference sections: ${section.type}`)
       return null
@@ -127,8 +131,8 @@ async function MarkdownSection({ libPath, link, section }: MarkdownSectionProps)
   )
 
   return (
-    <RefSubLayout.EducationSection {...section}>
-      <StickyHeader {...section} link={link} scrollSpyHeader />
+    <RefSubLayout.EducationSection link={link} {...section}>
+      <StickyHeader {...section} />
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -162,8 +166,8 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
     .join('\n\n')
 
   return (
-    <RefSubLayout.Section columns="double" {...section}>
-      <StickyHeader {...section} link={link} scrollSpyHeader className="col-[1_/_-1]" />
+    <RefSubLayout.Section columns="double" link={link} {...section}>
+      <StickyHeader {...section} className="col-[1_/_-1]" />
       <div className="overflow-hidden flex flex-col gap-8">
         <div className="prose break-words text-sm">
           <MDXRemoteRefs source={fullDescription} />

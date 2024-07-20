@@ -1,70 +1,49 @@
 'use client'
 
+import type { HTMLAttributes, PropsWithChildren } from 'react'
+import { useContext } from 'react'
 import { useInView } from 'react-intersection-observer'
 
 import { cn } from 'ui'
 
-interface StickyHeaderProps {
-  title?: string
-  slug?: string
-  /**
-   * The URL that leads directly to this section
-   */
-  link?: string
-  monoFont?: boolean
-  className?: string
-  /**
-   * Whether the header updates the URL on scroll
-   */
-  scrollSpyHeader?: boolean
-  /**
-   * Whether the user-agent is a search-engine crawler
-   */
-  crawlerPage?: boolean
-}
+import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 
-function StickyHeader({
-  title,
-  slug,
+/**
+ * Wrap a reference section with client-side functionality:
+ *
+ * - Intersection observer to auto-update the URL when the user scrolls the page
+ * - An ID to scroll to programmatically. This is on the entire section rather
+ *   than the heading to avoid problems with scroll-to position when the heading
+ *   is sticky.
+ */
+export function ReferenceSectionWrapper({
+  id,
   link,
-  monoFont = false,
+  children,
   className,
-  scrollSpyHeader = false,
-  crawlerPage = false,
-}: StickyHeaderProps) {
+  ...rest
+}: PropsWithChildren<{ id: string; link: string; className?: string }> &
+  HTMLAttributes<HTMLElement>) {
+  const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
+
   const { ref } = useInView({
-    threshold: 1,
-    rootMargin: '0% 0% -50% 0%',
+    threshold: 0,
+    rootMargin: '-10% 0% -50% 0%',
     onChange: (inView) => {
-      if (inView && scrollSpyHeader) {
+      if (inView && initialScrollHappened) {
         window.history.replaceState(null, '', link)
       }
     },
   })
 
   return (
-    <>
-      {crawlerPage ? (
-        <h1>{title}</h1>
-      ) : (
-        <h2
-          ref={ref}
-          id={slug}
-          className={cn(
-            'max-w-xl',
-            'text-2xl font-medium text-foreground',
-            'mt-0',
-            'scroll-mt-[calc(33px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
-            monoFont && 'font-mono',
-            className
-          )}
-        >
-          {title}
-        </h2>
-      )}
-    </>
+    <section
+      ref={ref}
+      id={id}
+      className={cn('scroll-mt-[calc(var(--header-height)+1rem)]', className)}
+      {...rest}
+    >
+      {children}
+    </section>
   )
 }
-
-export { StickyHeader }
-export type { StickyHeaderProps }

@@ -7,33 +7,34 @@ import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Sha
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type {
   CustomTypePropertyType,
-  CustomUnionType,
   FunctionParameterType,
   MethodTypes,
   TypeDetails,
 } from '~/features/docs/Reference.typeSpec'
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
+import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 
-type SectionProps = PropsWithChildren & {
-  id: string
+interface SectionProps extends PropsWithChildren {
+  link: string
+  slug?: string
   columns?: 'single' | 'double'
 }
 
-function Section({ id, columns = 'single', children }: SectionProps) {
+function Section({ slug, link, columns = 'single', children, ...props }: SectionProps) {
   const singleColumn = columns === 'single'
 
   return (
-    <section>
-      <div
-        className={cn(
-          'grid grid-cols-[1fr] gap-x-16 gap-y-8',
-          singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr,1fr]'
-        )}
-      >
-        {children}
-      </div>
-    </section>
+    <ReferenceSectionWrapper
+      id={slug}
+      link={link}
+      className={cn(
+        'grid grid-cols-[1fr] gap-x-16 gap-y-8',
+        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr,1fr]'
+      )}
+    >
+      {children}
+    </ReferenceSectionWrapper>
   )
 }
 
@@ -53,8 +54,12 @@ function Examples({ children }: PropsWithChildren) {
   return <div className="w-full min-w-full sticky top-32">{children}</div>
 }
 
-function EducationSection({ children, ...props }: PropsWithChildren) {
-  return <section className={'prose max-w-none'}>{children}</section>
+function EducationSection({ children, slug, ...props }: SectionProps) {
+  return (
+    <ReferenceSectionWrapper id={slug} className={'prose max-w-none'} {...props}>
+      {children}
+    </ReferenceSectionWrapper>
+  )
 }
 
 interface EducationRowProps extends PropsWithChildren {
@@ -71,6 +76,53 @@ export const RefSubLayout = {
   EducationRow,
   Details,
   Examples,
+}
+
+interface StickyHeaderProps {
+  title?: string
+  slug?: string
+  monoFont?: boolean
+  className?: string
+  /**
+   * Whether the user-agent is a search-engine crawler
+   */
+  crawlerPage?: boolean
+}
+
+export function StickyHeader({
+  title,
+  monoFont = false,
+  className,
+  crawlerPage = false,
+}: StickyHeaderProps) {
+  return (
+    <>
+      {crawlerPage ? (
+        <h1>{title}</h1>
+      ) : (
+        <h2
+          tabIndex={-1} // For programmatic focus on auto-scroll to section
+          className={cn(
+            'sticky top-0 z-10',
+            'w-full',
+            // Enough padding to cover the background when stuck to the top,
+            // then readjust with negative margin to prevent it looking too
+            // spaced-out in regular position
+            'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
+            // Same for bottom
+            'pb-8 -mb-4',
+            'bg-gradient-to-b from-background from-85% to-transparent to-100%',
+            'text-2xl font-medium text-foreground',
+            'scroll-mt-[calc(var(--header-height)+1rem)]',
+            monoFont && 'font-mono',
+            className
+          )}
+        >
+          {title}
+        </h2>
+      )}
+    </>
+  )
 }
 
 export function FnParameterDetails({

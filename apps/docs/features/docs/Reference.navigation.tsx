@@ -5,7 +5,10 @@ import { cn } from 'ui'
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
 import { REFERENCES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { RefLink } from '~/features/docs/Reference.navigation.client'
+import {
+  RefLink,
+  ReferenceNavigationScrollHandler,
+} from '~/features/docs/Reference.navigation.client'
 import {
   genClientSdkSectionTree,
   type AbbrevCommonClientLibSection,
@@ -37,7 +40,7 @@ async function ClientSdkNavigation({
   const basePath = `/reference/${libPath}${isMostRecentVersion ? '' : `/${version}`}`
 
   return (
-    <div className="w-full flex flex-col pt-3 pb-5 gap-3">
+    <ReferenceNavigationScrollHandler className="w-full flex flex-col pt-3 pb-5 gap-3">
       <div className="flex items-center gap-3">
         {'icon' in menuData && <MenuIconPicker icon={menuData.icon} width={21} height={21} />}
         <span className="text-base text-brand-600">{name}</span>
@@ -58,7 +61,7 @@ async function ClientSdkNavigation({
           </Fragment>
         ))}
       </ul>
-    </div>
+    </ReferenceNavigationScrollHandler>
   )
 }
 
