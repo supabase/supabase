@@ -88,15 +88,15 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
                   </DrawerTrigger>
                   <DrawerContent showHandle={false}>
                     <div className="grid gap-1 px-4">
-                      {breadcrumbs
-                        .slice(1, -2)
-                        .map((crumb) =>
-                          crumb.url ? (
-                            <Link href={`/docs${crumb.url}`}>{crumb.title || crumb.name}</Link>
-                          ) : (
-                            crumb.title || crumb.name
-                          )
-                        )}
+                      {breadcrumbs.slice(1, -2).map((crumb, i) =>
+                        crumb.url ? (
+                          <Link href={`/docs${crumb.url}`} key={`link-${crum.url}-${i}`}>
+                            {crumb.title || crumb.name}
+                          </Link>
+                        ) : (
+                          crumb.title || crumb.name
+                        )
+                      )}
                     </div>
                     <DrawerFooter className="pt-4">
                       <DrawerClose asChild>
@@ -111,7 +111,7 @@ const Breadcrumbs = ({ className }: { className?: string }) => {
           </>
         )}
         {appendedBreadcrumbs?.map((crumb, i) => (
-          <Fragment key={crumb.url}>
+          <Fragment key={crumb.url + i}>
             <BreadcrumbItem
               className={cn(
                 'flex items-center overflow-hidden',

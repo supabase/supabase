@@ -42,7 +42,19 @@ export interface SqlToRestProps {
 }
 
 export default function SqlToRest({
-  defaultValue,
+  defaultValue = `select
+  title,
+  description
+from
+  books
+where
+  description ilike '%cheese%'
+order by
+  title desc
+limit
+  5
+offset
+  10`,
   defaultBaseUrl = 'http://localhost:54321/rest/v1',
 }: SqlToRestProps) {
   const monaco = useMonaco()

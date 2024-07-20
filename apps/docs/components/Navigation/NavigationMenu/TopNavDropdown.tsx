@@ -71,25 +71,23 @@ const TopNavDropdown = () => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-64">
-        {menu.map((menuSection, sectionIdx) => (
-          <>
-            {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
-            {menuSection.map((sectionItem, itemIdx) => (
-              <Link
-                key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                href={sectionItem.href}
-                {...sectionItem.otherProps}
-              >
-                <DropdownMenuItem className="space-x-2" onClick={() => {}}>
-                  {sectionItem.icon && (
-                    <MenuIconPicker icon={sectionItem.icon} className="text-foreground-lighter" />
-                  )}
-                  <p>{sectionItem.label}</p>
-                </DropdownMenuItem>
-              </Link>
-            ))}
-          </>
-        ))}
+        {menu.map((menuSection, sectionIdx) => [
+          sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />,
+          ...menuSection.map((sectionItem, itemIdx) => (
+            <Link
+              key={`topnav-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
+              href={sectionItem.href}
+              {...sectionItem.otherProps}
+            >
+              <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                {sectionItem.icon && (
+                  <MenuIconPicker icon={sectionItem.icon} className="text-foreground-lighter" />
+                )}
+                <p>{sectionItem.label}</p>
+              </DropdownMenuItem>
+            </Link>
+          )),
+        ])}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
