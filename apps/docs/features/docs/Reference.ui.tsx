@@ -1,10 +1,11 @@
 import { isEqual } from 'lodash'
-import { XCircle } from 'lucide-react'
+import { ChevronRight, XCircle } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 
 import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, cn } from 'ui'
 
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type {
   CustomTypePropertyType,
   FunctionParameterType,
@@ -122,6 +123,43 @@ export function StickyHeader({
         </h2>
       )}
     </>
+  )
+}
+
+export function CollapsibleDetails({ title, content }: { title: string; content: string }) {
+  return (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_
+        className={cn(
+          'group',
+          'w-full h-8',
+          'border bg-surface-100 rounded',
+          'px-5',
+          'flex items-center gap-3',
+          'text-xs text-foreground-light',
+          'data-[state=open]:bg-surface-200',
+          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
+          'transition-safe-all ease-out'
+        )}
+      >
+        <ChevronRight
+          size={12}
+          className="group-data-[state=open]:rotate-90 transition-transform"
+        />
+        {title}
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_
+        className={cn(
+          'border border-default bg-surface-100 rounded-b',
+          'px-5 py-2',
+          'prose max-w-none text-sm',
+          'transition',
+          'data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up'
+        )}
+      >
+        <MDXRemoteRefs source={content} />
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
 }
 

@@ -29,7 +29,11 @@ export function ReferenceSectionWrapper({
     threshold: 0,
     rootMargin: '-10% 0% -50% 0%',
     onChange: (inView) => {
-      if (inView && initialScrollHappened) {
+      if (
+        inView &&
+        initialScrollHappened &&
+        window.scrollY > 0 /* Don't update on first navigation to introduction */
+      ) {
         window.history.replaceState(null, '', link)
       }
     },

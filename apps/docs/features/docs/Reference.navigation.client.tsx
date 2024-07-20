@@ -110,7 +110,8 @@ export function RefLink({
 
   const pathname = usePathname()
   const href = deriveHref(basePath, section)
-  const isActive = pathname === href
+  const isActive =
+    pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
 
   if (!('title' in section)) return null
 

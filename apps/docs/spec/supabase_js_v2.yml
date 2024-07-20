@@ -1785,6 +1785,7 @@ functions:
           const { session, user } = data
           ```
         response: |
+          ```json
           {
             "data": {
               "user": {
@@ -1883,6 +1884,7 @@ functions:
             },
             "error": null
           }
+          ```
       - id: refresh-session-using-a-passed-in-session
         name: Refresh session using a refresh token
         isSpotlight: false

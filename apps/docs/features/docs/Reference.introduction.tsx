@@ -1,5 +1,6 @@
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
+import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 
 function hasIntro(sections: typeof commonClientLibSections, excludeName: string) {
@@ -25,9 +26,13 @@ async function ClientLibIntroduction({ libPath, excludeName }: ClientLibIntroduc
   const content = await getRefMarkdown(`${libPath}/introduction`)
 
   return (
-    <section className="prose">
+    <ReferenceSectionWrapper
+      id="introduction"
+      link={`/docs/reference/${libPath}/introduction`}
+      className="prose"
+    >
       <MDXRemoteBase source={content} />
-    </section>
+    </ReferenceSectionWrapper>
   )
 }
 

@@ -16,6 +16,7 @@ import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
 import {
+  CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
   ReturnTypeDetails,
@@ -197,42 +198,22 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
             {'examples' in fn &&
               Array.isArray(fn.examples) &&
               fn.examples.map((example) => (
-                <TabsContent_Shadcn_ value={example.id}>
+                <TabsContent_Shadcn_ key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
-                  {example.description && (
-                    <Collapsible_Shadcn_>
-                      <CollapsibleTrigger_Shadcn_
-                        className={cn(
-                          'group',
-                          'w-full h-8',
-                          'border bg-surface-100 rounded',
-                          'px-5',
-                          'flex items-center gap-3',
-                          'text-xs text-foreground-light',
-                          'data-[state=open]:bg-surface-200',
-                          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
-                          'transition-safe-all ease-out'
-                        )}
-                      >
-                        <ChevronRight
-                          size={12}
-                          className="group-data-[state=open]:rotate-90 transition-transform"
-                        />
-                        Notes
-                      </CollapsibleTrigger_Shadcn_>
-                      <CollapsibleContent_Shadcn_
-                        className={cn(
-                          'border border-default bg-surface-100 rounded-b',
-                          'px-5 py-2',
-                          'prose max-w-none text-sm',
-                          'transition',
-                          'data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up'
-                        )}
-                      >
-                        <MDXRemoteRefs source={example.description} />
-                      </CollapsibleContent_Shadcn_>
-                    </Collapsible_Shadcn_>
-                  )}
+                  <div className="flex flex-col gap-2">
+                    {!!example.data?.sql && (
+                      <CollapsibleDetails title="Data source" content={example.data.sql} />
+                    )}
+                    {!!example.response && (
+                      <CollapsibleDetails title="Response" content={example.response} />
+                    )}
+                    {!!example.description && (
+                      <CollapsibleDetails
+                        title="Notes"
+                        content={normalizeMarkdown(example.description)}
+                      />
+                    )}
+                  </div>
                 </TabsContent_Shadcn_>
               ))}
           </Tabs_Shadcn_>
