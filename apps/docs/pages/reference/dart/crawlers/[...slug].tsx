@@ -1,5 +1,4 @@
 import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
-import typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json'
 import spec from '~/spec/supabase_dart_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
@@ -29,7 +28,6 @@ export default function DartReference(props) {
         menuId={MenuId.RefDartV2}
         sections={filteredSection}
         spec={spec}
-        typeSpec={typeSpec}
         pageProps={props}
         type="client-lib"
       />

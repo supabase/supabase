@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals'
 import { codeBlock } from 'common-tags'
-import type OpenAI from 'openai'
+import OpenAI from 'openai'
 
 const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })

@@ -48,7 +48,6 @@
     "jsrsasign": "^11.0.0",
     "katex": "^0.16.10",
     "lodash": "^4.17.21",
-    "markdown-toc": "^1.2.0",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.2.0",
     "mdast-util-mdx": "^2.0.0",

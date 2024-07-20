@@ -22,7 +22,8 @@ export default function KotlinReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+  const a = await handleRefStaticProps(sections, libraryPath)
+  return a
 }
 
 export async function getStaticPaths() {
