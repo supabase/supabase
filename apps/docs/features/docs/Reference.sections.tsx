@@ -1,10 +1,22 @@
+import { ChevronRight } from 'lucide-react'
 import { Fragment } from 'react'
+
+import {
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent_Shadcn_,
+} from 'ui'
 
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
 import { FnParameterDetails, RefSubLayout, ReturnTypeDetails } from '~/features/docs/Reference.ui'
-import { StickyHeader } from './Reference.ui.client'
+import { StickyHeader } from '~/features/docs/Reference.ui.client'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import {
   genClientSdkSectionTree,
@@ -172,7 +184,70 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
         <pre className="text-sm">{JSON.stringify(fn, null, 2)}</pre>
       </div>
       <div className="overflow-auto">
-        <pre className="text-sm">{JSON.stringify(types, null, 2)}</pre>
+        {'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0 && (
+          <Tabs_Shadcn_ defaultValue={fn.examples[0].id}>
+            <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+              {fn.examples.map((example) => (
+                <TabsTrigger_Shadcn_
+                  key={example.id}
+                  value={example.id}
+                  className={cn(
+                    'px-2.5 py-1 rounded-full',
+                    'border-0 bg-surface-200 hover:bg-surface-300',
+                    'text-xs text-foreground-lighter',
+                    // Undoing styles from primitive component
+                    'data-[state=active]:border-0 data-[state=active]:shadow-0',
+                    'data-[state=active]:bg-foreground data-[state=active]:text-background',
+                    'transition'
+                  )}
+                >
+                  {example.name}
+                </TabsTrigger_Shadcn_>
+              ))}
+            </TabsList_Shadcn_>
+            {'examples' in fn &&
+              Array.isArray(fn.examples) &&
+              fn.examples.map((example) => (
+                <TabsContent_Shadcn_ value={example.id}>
+                  <MDXRemoteRefs source={example.code} />
+                  {example.description && (
+                    <Collapsible_Shadcn_>
+                      <CollapsibleTrigger_Shadcn_
+                        className={cn(
+                          'group',
+                          'w-full h-8',
+                          'border bg-surface-100 rounded',
+                          'px-5',
+                          'flex items-center gap-3',
+                          'text-xs text-foreground-light',
+                          'data-[state=open]:bg-surface-200',
+                          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
+                          'transition-safe-all ease-out'
+                        )}
+                      >
+                        <ChevronRight
+                          size={12}
+                          className="group-data-[state=open]:rotate-90 transition-transform"
+                        />
+                        Notes
+                      </CollapsibleTrigger_Shadcn_>
+                      <CollapsibleContent_Shadcn_
+                        className={cn(
+                          'border border-default bg-surface-100 rounded-b',
+                          'px-5 py-2',
+                          'prose max-w-none text-sm',
+                          'transition',
+                          'data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up'
+                        )}
+                      >
+                        <MDXRemoteRefs source={example.description} />
+                      </CollapsibleContent_Shadcn_>
+                    </Collapsible_Shadcn_>
+                  )}
+                </TabsContent_Shadcn_>
+              ))}
+          </Tabs_Shadcn_>
+        )}
       </div>
     </RefSubLayout.Section>
   )
