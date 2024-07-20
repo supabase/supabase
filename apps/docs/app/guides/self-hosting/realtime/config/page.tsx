@@ -26,35 +26,33 @@ const RealtimeConfigPage = async () => {
       <MDXRemoteGuides source={descriptionMdx} />
 
       <div>
-        {specRealtimeV0.info.tags.map(
-          (tag: ReturnType<typeof getRealtimeConfigV0>['info']['tags']) => {
-            return (
-              <>
-                <h2 className="text-foreground">{tag.title}</h2>
-                <p className="text-foreground-lighter">{tag.description}</p>
-                <div className="not-prose">
-                  <h5 className="text-base text-foreground mb-3">Parameters</h5>
-                  <ul>
-                    {specRealtimeV0.parameters
-                      .filter((param: ReturnType<typeof getRealtimeConfigV0>['parameters']) =>
-                        param.tags.includes(tag.id)
+        {specRealtimeV0.info.tags.map((tag: ReturnType<typeof specRealtimeV0>['info']['tags']) => {
+          return (
+            <>
+              <h2 className="text-foreground">{tag.title}</h2>
+              <p className="text-foreground-lighter">{tag.description}</p>
+              <div className="not-prose">
+                <h5 className="text-base text-foreground mb-3">Parameters</h5>
+                <ul>
+                  {specRealtimeV0.parameters
+                    .filter((param: ReturnType<typeof specRealtimeV0>['parameters']) =>
+                      param.tags.includes(tag.id)
+                    )
+                    .map((param: ReturnType<typeof specRealtimeV0>['parameters']) => {
+                      return (
+                        <Param
+                          name={param.title}
+                          type={param.type}
+                          description={param.description}
+                          required={param.required}
+                        />
                       )
-                      .map((param: ReturnType<typeof getRealtimeConfigV0>['parameters']) => {
-                        return (
-                          <Param
-                            name={param.title}
-                            type={param.type}
-                            description={param.description}
-                            required={param.required}
-                          />
-                        )
-                      })}
-                  </ul>
-                </div>
-              </>
-            )
-          }
-        )}
+                    })}
+                </ul>
+              </div>
+            </>
+          )
+        })}
       </div>
     </GuideTemplate>
   )

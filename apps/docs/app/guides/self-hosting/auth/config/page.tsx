@@ -26,7 +26,7 @@ const AuthConfigPage = async () => {
       <MDXRemoteGuides source={descriptionMdx} />
 
       <div>
-        {specAuthV1.info.tags.map((tag: ReturnType<typeof getAuthConfigV1>['info']['tags']) => {
+        {specAuthV1.info.tags.map((tag: ReturnType<typeof specAuthV1>['info']['tags']) => {
           return (
             <>
               <h2 className="text-foreground">{tag.title}</h2>
@@ -35,10 +35,10 @@ const AuthConfigPage = async () => {
                 <h5 className="text-base text-foreground mb-3">Parameters</h5>
                 <ul>
                   {specAuthV1.parameters
-                    .filter((param: ReturnType<typeof getAuthConfigV1>['parameters']) =>
+                    .filter((param: ReturnType<typeof specAuthV1>['parameters']) =>
                       param.tags.includes(tag.id)
                     )
-                    .map((param: ReturnType<typeof getAuthConfigV1>['parameters']) => {
+                    .map((param: ReturnType<typeof specAuthV1>['parameters']) => {
                       return (
                         <Param
                           name={param.title}

@@ -27,7 +27,7 @@ const AnalyticsConfigPage = async () => {
 
       <div>
         {specAnalyticsV0.info.tags.map(
-          (tag: ReturnType<typeof getAnalyticsConfigV0>['info']['tags']) => {
+          (tag: ReturnType<typeof specAnalyticsV0>['info']['tags']) => {
             return (
               <>
                 <h2 className="text-foreground">{tag.title}</h2>
@@ -36,10 +36,10 @@ const AnalyticsConfigPage = async () => {
                   <h5 className="text-base text-foreground mb-3">Parameters</h5>
                   <ul>
                     {specAnalyticsV0.parameters
-                      .filter((param: ReturnType<typeof getAnalyticsConfigV0>['parameters']) =>
+                      .filter((param: ReturnType<typeof specAnalyticsV0>['parameters']) =>
                         param.tags.includes(tag.id)
                       )
-                      .map((param: ReturnType<typeof getAnalyticsConfigV0>['parameters']) => {
+                      .map((param: ReturnType<typeof specAnalyticsV0>['parameters']) => {
                         return (
                           <Param
                             name={param.title}
