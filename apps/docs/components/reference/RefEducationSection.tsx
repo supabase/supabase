@@ -13,10 +13,10 @@ const MDX_GLOBAL_CONFIG = {
 const RefEducationSection = (props) => {
   const Component = useMemo(
     () =>
-      props.markdownContent.content
-        ? getMDXComponent(props.markdownContent.content, MDX_GLOBAL_CONFIG)
+      props.markdownContent?.content
+        ? getMDXComponent(props.markdownContent?.content, MDX_GLOBAL_CONFIG)
         : '',
-    [props.markdownContent.content]
+    [props.markdownContent?.content]
   )
 
   // gracefully reject pages we can't render
