@@ -3,16 +3,16 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { readFile } from 'node:fs/promises'
-import { basename, extname, join } from 'node:path'
+import { basename, extname } from 'node:path'
 import { visit } from 'unist-util-visit'
-import { parse } from 'yaml'
 
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { SPEC_DIRECTORY } from '~/lib/docs'
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
+
+import specJsV2 from '~/spec/supabase_js_v2.yml' assert { type: 'yml' }
 
 interface AbbrevCommonClientLibSection {
   id: string
@@ -27,7 +27,7 @@ interface AbbrevCommonClientLibSection {
 }
 
 async function genClientSdkSectionTree(specFile: string, excludeName: string) {
-  const spec = await getSpecCached(specFile)
+  const spec = getSpec(specFile)
 
   const fns = parseFnsList(spec)
   const validSections = deepFilterRec(
@@ -43,21 +43,12 @@ async function genClientSdkSectionTree(specFile: string, excludeName: string) {
   return validSections
 }
 
-async function _getSpec(specFile: string, { ext = 'yml' }: { ext?: string } = {}) {
-  const specFullPath = join(SPEC_DIRECTORY, `${specFile}.${ext}`)
-  const rawSpec = await readFile(specFullPath, 'utf-8')
-  return ext === 'yml' ? parse(rawSpec) : rawSpec
-}
-const getSpecCached = cache_fullProcess_withDevCacheBust(
-  _getSpec,
-  SPEC_DIRECTORY,
-  (filename: string) => {
-    const ext = extname(filename).substring(1)
-    return ext === 'yml'
-      ? JSON.stringify([basename(filename)])
-      : JSON.stringify([basename(filename), { ext }])
+function getSpec(specFile) {
+  switch (specFile) {
+    case 'supabase_js_v2':
+      return specJsV2
   }
-)
+}
 
 function parseFnsList(rawSpec: Json): Array<{ id: unknown }> {
   if (isPlainObject(rawSpec) && 'functions' in (rawSpec as object)) {
@@ -70,8 +61,8 @@ function parseFnsList(rawSpec: Json): Array<{ id: unknown }> {
   return []
 }
 
-async function _getSpecFns(specFile: string, opts: Parameters<typeof getSpecCached>[1] = {}) {
-  const spec = await getSpecCached(specFile, opts)
+async function _getSpecFns(specFile: string) {
+  const spec = await getSpec(specFile)
   return parseFnsList(spec)
 }
 const getSpecFnsCached = cache_fullProcess_withDevCacheBust(
@@ -85,7 +76,9 @@ const getSpecFnsCached = cache_fullProcess_withDevCacheBust(
   }
 )
 
-function normalizeMarkdown(markdown: string): string {
+function normalizeMarkdown(markdownUnescaped: string): string {
+  const markdown = markdownUnescaped.replaceAll(/(?<!\\)\{/g, '{').replaceAll(/(?<!\\)\}/g, '}')
+
   const mdxTree = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],

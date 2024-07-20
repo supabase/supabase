@@ -185,7 +185,6 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
           className="max-w-[80ch]"
         />
         {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
-        <pre className="text-sm">{JSON.stringify(fn, null, 2)}</pre>
       </div>
       <div className="overflow-auto">
         {'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0 && (
