@@ -33,9 +33,8 @@ export async function ClientSdkReferencePage({
 }: ClientSdkReferenceProps) {
   const validSlugs = await generateReferenceStaticParams(specFile, libId)()
   if (
-    !validSlugs.some(
-      (params) => params === undefined || params.slug.join('/') === initialSelectedSection.join('/')
-    )
+    initialSelectedSection &&
+    !validSlugs.some((params) => params.slug.join('/') === initialSelectedSection.join('/'))
   ) {
     redirect('/reference/javascript')
   }
@@ -79,7 +78,7 @@ export function generateReferenceStaticParams(specFile: string, excludeName: str
     const sectionTree = await genClientSdkSectionTree(specFile, excludeName)
     const flattenedSections = flattenCommonClientLibSections(sectionTree)
 
-    const sections: Array<undefined | { slug: Array<string> }> = [undefined].concat(
+    const sections: Array<{ slug: Array<string> }> = [{ slug: [] }].concat(
       flattenedSections
         .filter((section) => section.type !== 'category' && !!section.slug)
         .map((section) => ({
