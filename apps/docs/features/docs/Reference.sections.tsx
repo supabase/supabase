@@ -23,6 +23,7 @@ import {
 } from '~/features/docs/Reference.ui'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import {
+  flattenCommonClientLibSections,
   genClientSdkSectionTree,
   getSpecFnsCached,
   normalizeMarkdown,
@@ -42,7 +43,7 @@ async function ClientLibRefSections({
   useTypeSpec,
 }: ClientLibRefSectionsProps) {
   const sectionTree = await genClientSdkSectionTree(specFile, excludeName)
-  const flattenedSections = flattenSections(sectionTree)
+  const flattenedSections = flattenCommonClientLibSections(sectionTree)
 
   trimIntro(flattenedSections)
 
@@ -63,21 +64,6 @@ async function ClientLibRefSections({
         ))}
     </div>
   )
-}
-
-function flattenSections(tree: Array<AbbrevCommonClientLibSection>) {
-  return tree.reduce((acc, elem) => {
-    if ('items' in elem) {
-      const prunedElem = { ...elem }
-      delete prunedElem.items
-      acc.push(prunedElem)
-      acc.push(...flattenSections(elem.items))
-    } else {
-      acc.push(elem)
-    }
-
-    return acc
-  }, [] as Array<AbbrevCommonClientLibSection>)
 }
 
 function trimIntro(sections: Array<AbbrevCommonClientLibSection>) {

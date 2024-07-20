@@ -21,7 +21,6 @@ export function ReferenceSectionWrapper({
   link,
   children,
   className,
-  ...rest
 }: PropsWithChildren<{ id: string; link: string; className?: string }> &
   HTMLAttributes<HTMLElement>) {
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
@@ -41,7 +40,6 @@ export function ReferenceSectionWrapper({
       ref={ref}
       id={id}
       className={cn('scroll-mt-[calc(var(--header-height)+1rem)]', className)}
-      {...rest}
     >
       {children}
     </section>

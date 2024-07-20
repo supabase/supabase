@@ -63,11 +63,6 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  experimental: {
-    outputFileTracingIncludes: {
-      '/reference/**': ['./docs/ref/**/*'],
-    },
-  },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
   /**
    * The SQL to REST API translator relies on libpg-query, which packages a
