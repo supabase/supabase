@@ -1,11 +1,26 @@
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { MDXRemote } from 'next-mdx-remote'
 import components from '~/components'
+import { getMDXComponent } from 'mdx-bundler/client'
+import { MDXProvider, useMDXComponents } from '@mdx-js/react'
+import { useMemo } from 'react'
+const MDX_GLOBAL_CONFIG = {
+  MdxJsReact: {
+    useMDXComponents,
+  },
+}
 
 const RefEducationSection = (props) => {
+  const Component = useMemo(
+    () =>
+      props.markdownContent.content
+        ? getMDXComponent(props.markdownContent.content, MDX_GLOBAL_CONFIG)
+        : '',
+    [props.markdownContent.content]
+  )
+
   // gracefully reject pages we can't render
   if (!props.markdownContent) {
-    //console.log(props.item.id)
     return <div></div>
   }
 
@@ -19,7 +34,9 @@ const RefEducationSection = (props) => {
       scrollSpyHeader={true}
       icon={props.markdownContent.meta.icon}
     >
-      <MDXRemote {...props.markdownContent.content} components={components} />
+      <MDXProvider components={components}>
+        <Component />
+      </MDXProvider>
     </RefSubLayout.EducationSection>
   )
 }

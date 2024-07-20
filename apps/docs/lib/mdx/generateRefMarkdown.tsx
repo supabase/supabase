@@ -3,9 +3,11 @@ import fs from 'fs'
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
-import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
 import type { ICommonMarkdown } from '~/components/reference/Reference.types'
+import { bundleMDX } from 'mdx-bundler'
+import { serialize } from 'next-mdx-remote/serialize'
+import { getMDXComponent } from 'mdx-bundler/client'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
   let markdownContent = []
@@ -34,8 +36,6 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
 
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
 
-      const { data, content } = matter(fileContents)
-
       const codeHikeOptions: CodeHikeConfig = {
         theme: codeHikeTheme,
         lineNumbers: true,
@@ -44,22 +44,34 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
         autoImport: false,
       }
 
+      const { data, content } = matter(fileContents)
+      const globals = {
+        '@mdx-js/react': {
+          varName: 'MdxJsReact',
+          namedExports: ['useMDXComponents'],
+          defaultExport: false,
+        },
+      }
+
+      const { code } = await bundleMDX({
+        source: content,
+        globals,
+        mdxOptions(options) {
+          return {
+            ...options,
+            useDynamicImport: true,
+            remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+            providerImportSource: '@mdx-js/react',
+          }
+        },
+      })
+
       markdownContent.push({
         id: section.id,
         title: section.title,
         meta: data,
         // introPage: introPages.includes(x),
-        content: content
-          ? await serialize(content ?? '', {
-              // MDX's available options, see the MDX docs for more info.
-              // https://mdxjs.com/packages/mdx/#compilefile-options
-              mdxOptions: {
-                useDynamicImport: true,
-                remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
-              },
-              // Indicates whether or not to parse the frontmatter from the mdx source
-            })
-          : null,
+        content: code,
       })
     })
   )
