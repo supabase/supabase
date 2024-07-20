@@ -1,28 +1,27 @@
-import { useParams } from 'common/hooks'
+import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ElementRef, forwardRef, useState } from 'react'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
+
+import { useParams } from 'common'
+import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import {
   Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
 } from 'ui'
-
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import type { Commands } from './Functions.types'
 
-interface TerminalInstructionsProps
-  extends React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
+interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean
   removeBorder?: boolean
 }
 
 const TerminalInstructions = forwardRef<
-  React.ElementRef<typeof Collapsible_Shadcn_>,
+  ElementRef<typeof Collapsible_Shadcn_>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
   const router = useRouter()
@@ -35,7 +34,7 @@ const TerminalInstructions = forwardRef<
 
   const apiService = settings?.autoApiService
   const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
-  const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
+  const endpoint = settings?.autoApiService.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`

@@ -1,4 +1,4 @@
-import { type paths } from '~/types/api'
+import type { paths } from 'api-types'
 import createClient from 'openapi-fetch'
 import { v4 as uuidv4 } from 'uuid'
 import { API_URL } from '../constants'

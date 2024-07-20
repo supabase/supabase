@@ -26,8 +26,8 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import BackupsEmpty from '../BackupsEmpty'
 import BackupsStorageAlert from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'

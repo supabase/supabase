@@ -65,18 +65,18 @@ We only count compute hours for instances that are active. Paused projects do no
 
 ### Compute pricing
 
-| Instance Size | Hourly Price | Estimated Monthly Price |
-| ------------- | ------------ | ----------------------- |
-| Micro         | $0.01344     | ~$10                    |
-| Small         | $0.0206      | ~$15                    |
-| Medium        | $0.0822      | ~$60                    |
-| Large         | $0.1517      | ~$110                   |
-| XL            | $0.2877      | ~$210                   |
-| 2XL           | $0.562       | ~$410                   |
-| 4XL           | $1.32        | ~$960                   |
-| 8XL           | $2.562       | ~$1870                  |
-| 12XL          | $3.836       | ~$2800                  |
-| 16XL          | $5.12        | ~$3730                  |
+| Compute Size | Hourly Price | Estimated Monthly Price |
+| ------------ | ------------ | ----------------------- |
+| Micro        | $0.01344     | ~$10                    |
+| Small        | $0.0206      | ~$15                    |
+| Medium       | $0.0822      | ~$60                    |
+| Large        | $0.1517      | ~$110                   |
+| XL           | $0.2877      | ~$210                   |
+| 2XL          | $0.562       | ~$410                   |
+| 4XL          | $1.32        | ~$960                   |
+| 8XL          | $2.562       | ~$1870                  |
+| 12XL         | $3.836       | ~$2800                  |
+| 16XL         | $5.12        | ~$3730                  |
 
 ### Free Plan
 
@@ -98,7 +98,7 @@ Additionally, Compute Credits are given to you not only for the first month but 
 
 In case of deploying additional [Read Replicas](/docs/guides/platform/read-replicas), each replica is a dedicated database that adds additional compute runtime hours.
 
-Each replica incurs one compute hour on the given instance size. An example:
+Each replica incurs one compute hour on the given compute size. An example:
 
 A primary database on XL compute and two read replicas on XL compute would incur ~2.190 XL compute hours (3x 730h) and cost ~$630/month.
 

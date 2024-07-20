@@ -6,7 +6,6 @@ import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
@@ -25,7 +24,14 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -63,7 +69,7 @@ const AuditLogs = () => {
       {
         enabled: canReadAuditLogs,
         retry(_failureCount, error) {
-          if (error.message.endsWith('upgrade to team or Enterprise Plan to access audit logs.')) {
+          if (error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.')) {
             return false
           }
           return true
@@ -138,7 +144,7 @@ const AuditLogs = () => {
           )}
 
           {isError ? (
-            error.message.endsWith('upgrade to team or Enterprise Plan to access audit logs.') ? (
+            error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
               <Alert_Shadcn_
                 variant="default"
                 title="Organization Audit Logs are not available on Free or Pro plans"

@@ -32,7 +32,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -290,8 +290,8 @@ const PITRSidePanel = () => {
               <WarningIcon />
               <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute instance size for using
-                read replicas is the Small Compute. You need to remove all read replicas before
+                You currently have active read replicas. The minimum compute size for using read
+                replicas is the Small Compute. You need to remove all read replicas before
                 downgrading Compute as it requires at least a Small compute instance.
               </AlertDescription_Shadcn_>
               <AlertDescription_Shadcn_ className="mt-2">

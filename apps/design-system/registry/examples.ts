@@ -713,12 +713,24 @@ export const examples: Registry = [
     registryDependencies: ['slider'],
     files: ['example/slider-demo.tsx'],
   },
-  // {
-  //   name: 'sonner-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['sonner'],
-  //   files: ['example/sonner-demo.tsx'],
-  // },
+  {
+    name: 'sonner-demo',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-demo.tsx'],
+  },
+  {
+    name: 'sonner-types',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-types.tsx'],
+  },
+  {
+    name: 'sonner-upload',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-upload.tsx'],
+  },
   {
     name: 'switch-demo',
     type: 'components:example',

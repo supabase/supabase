@@ -234,6 +234,10 @@ export interface paths {
     /** Get an aggregated data of interest across all notifications for the user */
     get: operations['NotificationsController_getNotificationsSummary']
   }
+  '/platform/oauth/authorizations/{id}': {
+    /** [Beta] Get oauth app authorization request */
+    get: operations['OAuthAuthorizationsController_getAuthorizationRequest']
+  }
   '/platform/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
@@ -265,7 +269,7 @@ export interface paths {
     get: operations['OrgInvoicesController_getUpcomingInvoice']
   }
   '/platform/organizations/{slug}/billing/plans': {
-    /** Gets subscription plans */
+    /** Gets subscription Plans */
     get: operations['OrgPlansController_getAvailablePlans']
   }
   '/platform/organizations/{slug}/billing/subscription': {
@@ -386,12 +390,10 @@ export interface paths {
     post: operations['OAuthAppsController_revokeAuthorizedOAuthApp']
   }
   '/platform/organizations/{slug}/oauth/authorizations/{id}': {
-    /** [Beta] Get oauth app authorization request */
-    get: operations['AuthorizationsController_getAuthorizationRequest']
     /** [Beta] Approve oauth app authorization request */
-    post: operations['AuthorizationsController_approveAuthorizationRequest']
+    post: operations['OrganizationOAuthAuthorizationsController_approveAuthorizationRequest']
     /** [Beta] Decline oauth app authorization request */
-    delete: operations['AuthorizationsController_declineAuthorizationRequest']
+    delete: operations['OrganizationOAuthAuthorizationsController_declineAuthorizationRequest']
   }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
@@ -2067,6 +2069,16 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
+    AccessControlPermission: {
+      actions: string[] | null
+      condition: Record<string, never>
+      organization_id: number | null
+      organization_slug: string
+      project_ids: number[] | null
+      project_refs: string[] | null
+      resources: string[] | null
+      restrictive: boolean | null
+    }
     AccessToken: {
       created_at: string
       id: number
@@ -2313,9 +2325,6 @@ export interface components {
       description: string
       name: string
       version: string
-    }
-    AuthorizationsApproveBody: {
-      organization_id: string
     }
     AutoApiService: {
       app: {
@@ -2654,7 +2663,8 @@ export interface components {
       db_sql?: string
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
       name: string
-      org_id: number
+      org_id?: number
+      organization_slug?: string
     }
     CreateProjectResponse: {
       anon_key: string
@@ -2663,17 +2673,18 @@ export interface components {
       endpoint: string
       id: number
       infra_compute_size?: components['schemas']['DbInstanceSize']
-      inserted_at: string
+      inserted_at: string | null
       is_branch_enabled: boolean
-      is_physical_backups_enabled: boolean
+      is_physical_backups_enabled: boolean | null
       name: string
       organization_id: number
+      organization_slug: string
       preview_branch_refs: string[]
       ref: string
       region: string
       service_key: string
       status: string
-      subscription_id: string
+      subscription_id: string | null
     }
     CreateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
@@ -2978,7 +2989,7 @@ export interface components {
       id: string
     }
     /**
-     * @description Desired instance size, will use default size if not defined. Paid plans only.
+     * @description Desired instance size, will use default size if not defined. Paid Plans only.
      * @enum {string}
      */
     DesiredInstanceSize:
@@ -3108,13 +3119,25 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    GetAuthorizationResponse: {
+    GetMetricsBody: {
+      /** @enum {string} */
+      interval: '1d' | '3d' | '7d'
+      /** @enum {string} */
+      metric: 'user_queries'
+      project_refs: string[]
+      region: string
+    }
+    GetMetricsResponse: {
+      metrics: components['schemas']['ProjectMetric'][]
+    }
+    GetOAuthAuthorizationResponse: {
       approved_at?: string
       approved_organization_slug?: string
       domain: string
       expires_at: string
       icon?: string
       name: string
+      organization_slug?: string
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -3140,17 +3163,6 @@ export interface components {
         | 'storage:write'
       )[]
       website: string
-    }
-    GetMetricsBody: {
-      /** @enum {string} */
-      interval: '1d' | '3d' | '7d'
-      /** @enum {string} */
-      metric: 'user_queries'
-      project_refs: string[]
-      region: string
-    }
-    GetMetricsResponse: {
-      metrics: components['schemas']['ProjectMetric'][]
     }
     GetObjectsBody: {
       options: components['schemas']['StorageObjectSearchOptions']
@@ -3687,6 +3699,7 @@ export interface components {
     }
     Member: {
       gotrue_id: string
+      is_sso_user: boolean | null
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -3896,7 +3909,6 @@ export interface components {
         | 'MONTHLY_ACTIVE_USERS'
         | 'MONTHLY_ACTIVE_SSO_USERS'
         | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
@@ -3977,39 +3989,6 @@ export interface components {
     PaymentsResponse: {
       data: components['schemas']['Payment'][]
       defaultPaymentMethodId: string | null
-    }
-    Permission: {
-      actions: (
-        | 'analytics:Read'
-        | 'analytics:Write'
-        | 'auth:Execute'
-        | 'billing:Read'
-        | 'billing:Write'
-        | 'write:Create'
-        | 'write:Delete'
-        | 'functions:Read'
-        | 'functions:Write'
-        | 'infra:Execute'
-        | 'read:Read'
-        | 'sql:Read:Select'
-        | 'sql:Write:Delete'
-        | 'sql:Write:Insert'
-        | 'sql:Write:Update'
-        | 'storage:Admin:Read'
-        | 'storage:Admin:Write'
-        | 'tenant:Sql:Admin:Read'
-        | 'tenant:Sql:Admin:Write'
-        | 'tenant:Sql:CreateTable'
-        | 'tenant:Sql:Write:Delete'
-        | 'tenant:Sql:Write:Insert'
-        | 'tenant:Sql:Query'
-        | 'tenant:Sql:Read:Select'
-        | 'tenant:Sql:Write:Update'
-        | 'write:Update'
-      )[]
-      condition: unknown
-      organization_id: number
-      resources: string[]
     }
     PgbouncerConfigResponse: {
       connectionString: string
@@ -4385,16 +4364,17 @@ export interface components {
       disk_volume_size_gb?: number
       id: number
       infra_compute_size?: components['schemas']['DbInstanceSize']
-      inserted_at: string
+      inserted_at: string | null
       is_branch_enabled: boolean
-      is_physical_backups_enabled: boolean
+      is_physical_backups_enabled: boolean | null
       name: string
       organization_id: number
+      organization_slug: string
       preview_branch_refs: string[]
       ref: string
       region: string
       status: string
-      subscription_id: string
+      subscription_id: string | null
     }
     ProjectIntegrationConnection: {
       added_by: {
@@ -4614,7 +4594,7 @@ export interface components {
        */
       costs: number
       /**
-       * @description In case of a usage item, the free usage included in the customers plan
+       * @description In case of a usage item, the free usage included in the customers Plan
        * @example 100
        */
       freeUnitsInPlan?: number
@@ -4642,10 +4622,10 @@ export interface components {
       usageTotal?: number
     }
     ResourceBillingResponse: {
-      /** @description Whether the user is exceeding the included quotas in the plan - only relevant for users on usage-capped plans. */
+      /** @description Whether the user is exceeding the included quotas in the Plan - only relevant for users on usage-capped Plans. */
       exceedsPlanLimits: boolean
       items: components['schemas']['ResourceBillingItem'][]
-      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
+      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped Plans. */
       overusageAllowed: boolean
     }
     ResourceProvisioningConfigResponse: {
@@ -4853,7 +4833,7 @@ export interface components {
       variant: components['schemas']['ProjectAddonVariantResponse']
     }
     /**
-     * @description Organization subscription plan
+     * @description Organization subscription Plan
      * @enum {string}
      */
     SelfServePlanId: 'free' | 'pro' | 'team'
@@ -5140,7 +5120,7 @@ export interface components {
       /** @description Slug of your organization */
       organization_id: string
       /**
-       * @description Subscription plan
+       * @description Subscription Plan
        * @example free
        * @enum {string}
        */
@@ -6079,7 +6059,7 @@ export interface components {
       organization_id: string
       /**
        * @deprecated
-       * @description Subscription plan is now set on organization level and is ignored in this request
+       * @description Subscription Plan is now set on organization level and is ignored in this request
        * @example free
        * @enum {string}
        */
@@ -7420,6 +7400,22 @@ export interface operations {
       }
     }
   }
+  /** [Beta] Get oauth app authorization request */
+  OAuthAuthorizationsController_getAuthorizationRequest: {
+    parameters: {
+      path: {
+        /** @description Oauth authorization id */
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetOAuthAuthorizationResponse']
+        }
+      }
+    }
+  }
   /** Gets user's organizations */
   OrganizationsController_getOrganizations: {
     responses: {
@@ -7627,7 +7623,7 @@ export interface operations {
       }
     }
   }
-  /** Gets subscription plans */
+  /** Gets subscription Plans */
   OrgPlansController_getAvailablePlans: {
     parameters: {
       path: {
@@ -7644,7 +7640,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to get subscription plans */
+      /** @description Failed to get subscription Plans */
       500: {
         content: never
       }
@@ -7803,7 +7799,6 @@ export interface operations {
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
           | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_COUNT'
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
@@ -8365,31 +8360,14 @@ export interface operations {
       }
     }
   }
-  /** [Beta] Get oauth app authorization request */
-  AuthorizationsController_getAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetAuthorizationResponse']
-        }
-      }
-    }
-  }
   /** [Beta] Approve oauth app authorization request */
-  AuthorizationsController_approveAuthorizationRequest: {
+  OrganizationOAuthAuthorizationsController_approveAuthorizationRequest: {
     parameters: {
       path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Oauth authorization id */
         id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AuthorizationsApproveBody']
       }
     }
     responses: {
@@ -8398,12 +8376,18 @@ export interface operations {
           'application/json': components['schemas']['ApproveAuthorizationResponse']
         }
       }
+      403: {
+        content: never
+      }
     }
   }
   /** [Beta] Decline oauth app authorization request */
-  AuthorizationsController_declineAuthorizationRequest: {
+  OrganizationOAuthAuthorizationsController_declineAuthorizationRequest: {
     parameters: {
       path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Oauth authorization id */
         id: string
       }
     }
@@ -8412,6 +8396,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['DeclineAuthorizationResponse']
         }
+      }
+      403: {
+        content: never
       }
     }
   }
@@ -10432,7 +10419,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['Permission'][]
+          'application/json': components['schemas']['AccessControlPermission'][]
         }
       }
       /** @description Failed to retrieve permissions */
