@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import { formatSql } from '../../test/util'
 import { debugSql, titleSql } from './functions'
 

@@ -1,5 +1,5 @@
 import { getEncoding } from 'js-tiktoken'
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 
 export const tokenizer = getEncoding('cl100k_base')
 

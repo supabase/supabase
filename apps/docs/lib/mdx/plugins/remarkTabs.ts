@@ -1,6 +1,6 @@
-import { Content, Paragraph, Parent } from 'mdast'
-import { MdxJsxFlowElement } from 'mdast-util-mdx'
-import { Node } from 'unist'
+import type { Content, Paragraph, Parent } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
 /**
