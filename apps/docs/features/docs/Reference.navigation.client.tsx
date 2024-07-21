@@ -17,24 +17,28 @@ import { isElementInViewport } from '~/features/ui/helpers.dom'
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
 
 export function ReferenceContentScrollHandler({
-  initialSelectedSection,
+  libPath,
   children,
 }: PropsWithChildren<{
-  initialSelectedSection: Array<string> | undefined
+  libPath: string
 }>) {
+  const checkedPathnameOnLoad = useRef(false)
   const [initiallyScrolled, setInitiallyScrolled] = useState(false)
 
-  useEffect(
-    () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (!checkedPathnameOnLoad.current) {
+      const initialSelectedSection = pathname.replace(`/reference/${libPath}/`, '')
       if (initialSelectedSection) {
-        const section = document.getElementById(initialSelectedSection[0])
+        const section = document.getElementById(initialSelectedSection)
         section?.scrollIntoView()
       }
+
+      checkedPathnameOnLoad.current = true
       setInitiallyScrolled(true)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [] // We only want this to happen on mount.
-  )
+    }
+  }, [libPath, pathname])
 
   return (
     <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>

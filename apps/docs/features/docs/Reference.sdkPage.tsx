@@ -19,7 +19,6 @@ interface ClientSdkReferenceProps {
   libPath: string
   libVersion: string
   specFile: string
-  initialSelectedSection: Array<string> | undefined
   useTypeSpec?: boolean
 }
 
@@ -28,21 +27,12 @@ export async function ClientSdkReferencePage({
   libPath,
   libVersion,
   specFile,
-  initialSelectedSection,
   useTypeSpec = false,
 }: ClientSdkReferenceProps) {
-  const validSlugs = await generateReferenceStaticParams(specFile, libId)()
-  if (
-    initialSelectedSection &&
-    !validSlugs.some((params) => params.slug.join('/') === initialSelectedSection.join('/'))
-  ) {
-    redirect('/reference/javascript')
-  }
-
   const menuData = NavItems[libId]
 
   return (
-    <ReferenceContentScrollHandler initialSelectedSection={initialSelectedSection}>
+    <ReferenceContentScrollHandler libPath={libPath}>
       <SidebarSkeleton
         menuId={MenuId.RefJavaScriptV2}
         NavigationMenu={
@@ -87,5 +77,21 @@ export function generateReferenceStaticParams(specFile: string, excludeName: str
     )
 
     return sections
+  }
+}
+
+export async function redirectNonexistentReferenceSection(
+  slug: Array<string> | undefined,
+  specFile,
+  excludeName
+) {
+  const initialSelectedSection = slug?.[0]
+
+  const validSlugs = await generateReferenceStaticParams(specFile, excludeName)()
+  if (
+    initialSelectedSection &&
+    !validSlugs.some((params) => params.slug[0] === initialSelectedSection)
+  ) {
+    redirect('/reference/javascript')
   }
 }
