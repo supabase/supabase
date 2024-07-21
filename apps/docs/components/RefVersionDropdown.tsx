@@ -1,6 +1,8 @@
 'use client'
 
+import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+
 import {
   Badge,
   DropdownMenu,
@@ -8,34 +10,34 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  IconChevronDown,
 } from 'ui'
+
 import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 
 const RevVersionDropdown = ({
   library,
   currentVersion,
+  isLatestVersion,
 }: {
   library: string
   currentVersion: string
+  isLatestVersion: boolean
 }) => {
   const { push } = useRouter()
 
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
 
-  const onSelectVersion = (version: string) => {
-    const isMigratedVersion = libraryMeta?.__MIGRATED_VERSIONS?.includes(version) ?? false
-
-    if (version === versions[0]) {
-      push(`/reference/${library}${isMigratedVersion ? '' : '/start'}`)
-    } else {
-      push(`/reference/${library}/${version}${isMigratedVersion ? '' : '/start'}`)
-    }
-  }
-
   if (!versions || versions.length === 0) {
     return <></>
+  }
+
+  const onSelectVersion = (version: string) => {
+    if (version === versions[0]) {
+      push(`/reference/${library}`)
+    } else {
+      push(`/reference/${library}/${version}`)
+    }
   }
 
   return (
@@ -54,11 +56,10 @@ const RevVersionDropdown = ({
           flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
           "
         >
-          {/* <span>version</span> */}
           <span className="text-foreground text-sm group-hover:text-foreground transition">
             {currentVersion}.0
           </span>
-          <IconChevronDown size={14} strokeWidth={2} />
+          <ChevronDown size={14} strokeWidth={2} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">

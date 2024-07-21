@@ -1,18 +1,9 @@
-import { ChevronRight } from 'lucide-react'
 import { Fragment } from 'react'
 
-import {
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  CollapsibleContent_Shadcn_,
-} from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
 import {
@@ -30,40 +21,70 @@ import {
   normalizeMarkdown,
 } from '~/features/docs/Reference.utils'
 
-interface ClientLibRefSectionsProps {
+type ClientLibRefSectionsProps = {
   libPath: string
+  version: string
+  isLatestVersion: boolean
   specFile: string
   excludeName: string
   useTypeSpec: boolean
-}
+} & (
+  | { isCrawlerPage?: false; requestedSection?: undefined }
+  | { isCrawlerPage: true; requestedSection: string }
+)
 
 async function ClientLibRefSections({
   libPath,
+  version,
+  isLatestVersion,
   specFile,
   excludeName,
   useTypeSpec,
+  isCrawlerPage = false,
+  requestedSection,
 }: ClientLibRefSectionsProps) {
   const sectionTree = await genClientSdkSectionTree(specFile, excludeName)
   const flattenedSections = flattenCommonClientLibSections(sectionTree)
 
-  trimIntro(flattenedSections)
+  let requestedSectionMeta: AbbrevCommonClientLibSection
+  if (isCrawlerPage) {
+    requestedSectionMeta = flattenedSections.find((section) => section.slug === requestedSection)
+  } else {
+    trimIntro(flattenedSections)
+  }
 
   return (
-    <div className="flex flex-col my-16 gap-16">
-      {flattenedSections
-        .filter((section) => section.type !== 'category')
-        .map((section, idx) => (
-          <Fragment key={`${section.id}-${idx}`}>
-            <SectionDivider />
-            <SectionSwitch
-              libPath={libPath}
-              section={section}
-              specFile={specFile}
-              useTypeSpec={useTypeSpec}
-            />
-          </Fragment>
-        ))}
-    </div>
+    <MDXProviderReference>
+      <div className="flex flex-col my-16 gap-16">
+        {isCrawlerPage
+          ? !!requestedSectionMeta && (
+              <SectionSwitch
+                libPath={libPath}
+                version={version}
+                isLatestVersion={isLatestVersion}
+                section={requestedSectionMeta}
+                specFile={specFile}
+                useTypeSpec={useTypeSpec}
+                isCrawlerPage
+              />
+            )
+          : flattenedSections
+              .filter((section) => section.type !== 'category')
+              .map((section, idx) => (
+                <Fragment key={`${section.id}-${idx}`}>
+                  <SectionDivider />
+                  <SectionSwitch
+                    libPath={libPath}
+                    version={version}
+                    isLatestVersion={isLatestVersion}
+                    section={section}
+                    specFile={specFile}
+                    useTypeSpec={useTypeSpec}
+                  />
+                </Fragment>
+              ))}
+      </div>
+    </MDXProviderReference>
   )
 }
 
@@ -80,17 +101,37 @@ function SectionDivider() {
 
 interface SectionSwitchProps {
   libPath: string
+  version: string
+  isLatestVersion: boolean
   section: AbbrevCommonClientLibSection
   specFile: string
   useTypeSpec: boolean
+  isCrawlerPage?: boolean
 }
 
-function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitchProps) {
-  const sectionLink = `/docs/reference/${libPath}/${section.slug}`
+function SectionSwitch({
+  libPath,
+  section,
+  version,
+  isLatestVersion,
+  specFile,
+  useTypeSpec,
+  isCrawlerPage,
+}: SectionSwitchProps) {
+  const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
 
   switch (section.type) {
     case 'markdown':
-      return <MarkdownSection libPath={libPath} link={sectionLink} section={section} />
+      return (
+        <MarkdownSection
+          libPath={libPath}
+          version={version}
+          isLatestVersion={isLatestVersion}
+          link={sectionLink}
+          section={section}
+          isCrawlerPage={isCrawlerPage}
+        />
+      )
     case 'function':
       return (
         <FunctionSection
@@ -98,6 +139,7 @@ function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitc
           section={section}
           specFile={specFile}
           useTypeSpec={useTypeSpec}
+          isCrawlerPage={isCrawlerPage}
         />
       )
     default:
@@ -108,18 +150,30 @@ function SectionSwitch({ libPath, section, specFile, useTypeSpec }: SectionSwitc
 
 interface MarkdownSectionProps {
   libPath: string
+  version: string
+  isLatestVersion: boolean
   link: string
   section: AbbrevCommonClientLibSection
+  isCrawlerPage?: boolean
 }
 
-async function MarkdownSection({ libPath, link, section }: MarkdownSectionProps) {
+async function MarkdownSection({
+  libPath,
+  version,
+  isLatestVersion,
+  link,
+  section,
+  isCrawlerPage = false,
+}: MarkdownSectionProps) {
   const content = await getRefMarkdown(
-    section.meta?.shared ? `shared/${section.id}` : `${libPath}/${section.id}`
+    section.meta?.shared
+      ? `shared/${section.id}`
+      : `${libPath}/${isLatestVersion ? '' : `${version}/`}${section.id}`
   )
 
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
-      <StickyHeader {...section} />
+      <StickyHeader {...section} isCrawlerPage={isCrawlerPage} />
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -130,9 +184,16 @@ interface FunctionSectionProps {
   section: AbbrevCommonClientLibSection
   specFile: string
   useTypeSpec: boolean
+  isCrawlerPage?: boolean
 }
 
-async function FunctionSection({ link, section, specFile, useTypeSpec }: FunctionSectionProps) {
+async function FunctionSection({
+  link,
+  section,
+  specFile,
+  useTypeSpec,
+  isCrawlerPage = false,
+}: FunctionSectionProps) {
   const fns = await getSpecFnsCached(specFile)
 
   const fn = fns.find((fn) => fn.id === section.id)
@@ -154,7 +215,7 @@ async function FunctionSection({ link, section, specFile, useTypeSpec }: Functio
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} isCrawlerPage={isCrawlerPage} className="col-[1_/_-1]" />
       <div className="overflow-hidden flex flex-col gap-8">
         <div className="prose break-words text-sm">
           <MDXRemoteRefs source={fullDescription} />

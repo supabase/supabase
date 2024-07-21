@@ -22,7 +22,7 @@ interface SectionProps extends PropsWithChildren {
   columns?: 'single' | 'double'
 }
 
-function Section({ slug, link, columns = 'single', children, ...props }: SectionProps) {
+function Section({ slug, link, columns = 'single', children }: SectionProps) {
   const singleColumn = columns === 'single'
 
   return (
@@ -87,19 +87,19 @@ interface StickyHeaderProps {
   /**
    * Whether the user-agent is a search-engine crawler
    */
-  crawlerPage?: boolean
+  isCrawlerPage?: boolean
 }
 
 export function StickyHeader({
   title,
   monoFont = false,
   className,
-  crawlerPage = false,
+  isCrawlerPage = false,
 }: StickyHeaderProps) {
   return (
     <>
-      {crawlerPage ? (
-        <h1>{title}</h1>
+      {isCrawlerPage ? (
+        <h1 className={cn('text-2xl font-medium text-foreground', className)}>{title}</h1>
       ) : (
         <h2
           tabIndex={-1} // For programmatic focus on auto-scroll to section

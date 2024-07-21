@@ -16,14 +16,16 @@ export function middleware(request: NextRequest) {
   if (isbot(request.headers.get('user-agent'))) {
     for (const lib of specs) {
       if (request.url.includes(`reference/${lib}`)) {
-        const requestSlug = request.url.split('/').pop()
+        const requestSlug = request.url.split(`reference/${lib}`)[1]
 
-        return NextResponse.rewrite(
-          new URL(
-            `/docs/reference/${lib}/${version ? version + '/' : ''}crawlers/${requestSlug}`,
-            request.url
-          ).toString()
-        )
+        if (requestSlug) {
+          return NextResponse.rewrite(
+            new URL(
+              `/docs/reference/${lib}/${version ? version + '/' : ''}crawlers/${requestSlug.substring(1)}`,
+              request.url
+            ).toString()
+          )
+        }
       }
     }
   } else {

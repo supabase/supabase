@@ -12,7 +12,7 @@ const SPEC_FILE = 'supabase_js_v2'
 export default async function JsReferenceV2({
   params: { slug },
 }: {
-  params: { slug?: Array<string> }
+  params: { slug: Array<string> }
 }) {
   await redirectNonexistentReferenceSection(slug, SPEC_FILE, LIB_ID)
 
@@ -23,6 +23,8 @@ export default async function JsReferenceV2({
       libVersion={LIB_VERSION}
       specFile={SPEC_FILE}
       useTypeSpec
+      isCrawlerPage
+      requestedSection={slug[0]}
     />
   )
 }

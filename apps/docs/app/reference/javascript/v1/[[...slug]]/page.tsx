@@ -4,12 +4,12 @@ import {
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.sdkPage'
 
-const LIB_ID = 'reference_javascript_v2'
+const LIB_ID = 'reference_javascript_v1'
 const LIB_PATH = 'javascript'
-const LIB_VERSION = 'v2'
-const SPEC_FILE = 'supabase_js_v2'
+const LIB_VERSION = 'v1'
+const SPEC_FILE = 'supabase_js_v1'
 
-export default async function JsReferenceV2({
+export default async function JsReferenceV1({
   params: { slug },
 }: {
   params: { slug?: Array<string> }
