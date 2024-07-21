@@ -1,7 +1,7 @@
 import { type Metadata } from 'next'
 import { type PropsWithChildren } from 'react'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
-import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 const metadata: Metadata = {
   title: 'Not found',
@@ -11,9 +11,9 @@ const metadata: Metadata = {
 }
 
 const NotFoundLayout = ({ children }: PropsWithChildren) => (
-  <MainSkeleton>
+  <SidebarSkeleton>
     <LayoutMainContent>{children}</LayoutMainContent>
-  </MainSkeleton>
+  </SidebarSkeleton>
 )
 
 export default NotFoundLayout
