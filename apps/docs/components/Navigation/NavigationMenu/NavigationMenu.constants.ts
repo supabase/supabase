@@ -192,15 +192,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'status',
             href: 'https://status.supabase.com/',
           },
-          ...(IS_DEV
-            ? [
-                {
-                  label: 'Contributing',
-                  icon: 'contributing',
-                  href: '/contributing' as `/${string}`,
-                },
-              ]
-            : []),
+          {
+            label: 'Contributing',
+            icon: 'contributing',
+            href: '/contributing' as `/${string}`,
+          },
         ],
       ],
     },
