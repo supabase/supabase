@@ -5,7 +5,41 @@ import toast from 'react-hot-toast'
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  Select_Shadcn_,
+  Switch,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  Checkbox_Shadcn_,
+} from 'ui'
+import { useState } from 'react'
+import { isVisible } from '@testing-library/user-event/dist/utils'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -17,25 +51,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
 
-  const handleToggle = () => setVisible(!visible)
   const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    const emailValidateRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/
-
-    if (values.email.length === 0) {
-      errors.email = 'Please enter a valid email'
-    } else if (!emailValidateRegex.test(values.email)) {
-      errors.email = `${values.email} is an invalid email`
-    }
-
-    if (!values.password?.trim()) {
-      errors.password = 'Please enter a password'
-    }
-
-    return errors
-  }
 
   const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
     async onSuccess(res) {
@@ -52,75 +68,111 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
   }
 
+  const FormSchema = z.object({
+    email: z.string().min(1, 'Email is required').email('Must be a valid email address'),
+    password: z.string().min(1, 'Password is required'),
+    autoConfirmUser: z.boolean(),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { email: '', password: '', autoConfirmUser: true },
+  })
+
   return (
-    <Modal
-      hideFooter
-      size="small"
-      key="create-user-modal"
-      visible={visible}
-      header="Create a new user"
-      onCancel={handleToggle}
-      loading={true}
-    >
-      <Form
-        validateOnBlur={false}
-        initialValues={{ email: '', password: '', autoConfirmUser: true }}
-        validate={validate}
-        onSubmit={onCreateUser}
-      >
-        {() => (
-          <Loading active={isLoading}>
-            <Modal.Content className="space-y-4">
-              <Input
-                id="email"
-                autoComplete="off"
-                label="User Email"
-                icon={<IconMail />}
-                type="email"
-                name="email"
-                placeholder="user@example.com"
-                disabled={isCreatingUser || isLoading}
-              />
+    <Dialog open={visible} onOpenChange={setVisible}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Create a new user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form_Shadcn_ {...form}>
+          <form
+            id="create-user"
+            className="flex flex-col gap-y-4 p-6"
+            onSubmit={form.handleSubmit(onCreateUser)}
+          >
+            <FormField_Shadcn_
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                  <FormLabel_Shadcn_>Email address</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      autoFocus
+                      {...field}
+                      autoComplete="off"
+                      type="email"
+                      name="email"
+                      placeholder="user@example.com"
+                      disabled={isCreatingUser || isLoading}
+                    />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
 
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                label="User Password"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                icon={<IconLock />}
-                disabled={isCreatingUser || isLoading}
-                autoComplete="new-password"
-              />
+            <FormField_Shadcn_
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                  <FormLabel_Shadcn_>User Password</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      autoFocus
+                      {...field}
+                      autoComplete="new-password"
+                      type="password"
+                      name="password"
+                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                      disabled={isCreatingUser || isLoading}
+                    ></Input_Shadcn_>
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
 
-              <Checkbox
-                value="true"
-                id="autoConfirmUser"
-                name="autoConfirmUser"
-                label="Auto Confirm User?"
-                size="medium"
-                disabled={isCreatingUser || isLoading}
-              />
+            <FormField_Shadcn_
+              name="autoConfirmUser"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex items-center gap-x-2">
+                  <FormControl_Shadcn_>
+                    <Checkbox_Shadcn_
+                      checked={field.value}
+                      onCheckedChange={(value) => field.onChange(value)}
+                    />
+                  </FormControl_Shadcn_>
+                  <FormLabel_Shadcn_>Auto Confirm User?</FormLabel_Shadcn_>
+                </FormItem_Shadcn_>
+              )}
+            />
+
+            <FormLabel_Shadcn_>
               <p className="text-sm text-foreground-lighter">
                 A confirmation email will not be sent when creating a user via this form.
               </p>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <Button
-                block
-                size="small"
-                htmlType="submit"
-                loading={isCreatingUser}
-                disabled={!canCreateUsers || isCreatingUser || isLoading}
-              >
-                Create user
-              </Button>
-            </Modal.Content>
-          </Loading>
-        )}
-      </Form>
-    </Modal>
+            </FormLabel_Shadcn_>
+
+            <Button
+              block
+              size="small"
+              htmlType="submit"
+              loading={isCreatingUser}
+              disabled={!canCreateUsers || isCreatingUser || isLoading}
+            >
+              Create user
+            </Button>
+          </form>
+        </Form_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }
 
