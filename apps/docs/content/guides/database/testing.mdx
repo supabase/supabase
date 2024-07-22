@@ -12,7 +12,7 @@ To ensure that queries return the expected data, RLS policies are correctly appl
 
 # Testing through the Supabase client
 
-A good starting point are the tests written for the Supabase client itself. For example, [here](https://github.com/supabase/tests/tree/main/integration) are the tests for the Supabase JS client written with TypeScript and Jest.
+A good starting point are the tests written for the Supabase client itself. For example, [here](https://github.com/supabase/supabase/tree/master/tests/features/javascript) are the tests for the Supabase JS client written with TypeScript and Jest.
 
 Keep in mind that the tests (which you'll likely integrate into your CI) need to run with the same DB setup that you're running locally. That means you need to make all changes to the database exclusively through migrations (not manually).
 
