@@ -1,5 +1,6 @@
 import {
   ClientSdkReferencePage,
+  generateReferenceMetadata,
   generateReferenceStaticParams,
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.sdkPage'
@@ -30,3 +31,4 @@ export default async function JsReferenceV2({
 }
 
 export const generateStaticParams = generateReferenceStaticParams(SPEC_FILE, LIB_ID)
+export const generateMetadata = generateReferenceMetadata('javascript')

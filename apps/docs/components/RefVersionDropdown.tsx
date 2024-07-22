@@ -17,7 +17,6 @@ import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants
 const RevVersionDropdown = ({
   library,
   currentVersion,
-  isLatestVersion,
 }: {
   library: string
   currentVersion: string
@@ -28,7 +27,7 @@ const RevVersionDropdown = ({
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
 
-  if (!versions || versions.length === 0) {
+  if (!versions || versions.length <= 1) {
     return <></>
   }
 

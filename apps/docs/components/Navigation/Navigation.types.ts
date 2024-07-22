@@ -18,14 +18,7 @@ export interface References {
     name: string
     library?: string
     versions: string[]
-    icon: string
-    currentVersion?: string
-    /**
-     * [Charis] 2024-07-04
-     * A temporary marker to identify which references have been migrated to
-     * the new App Router layout.
-     */
-    __MIGRATED_VERSIONS?: string[]
+    icon?: string
   }
 }
 

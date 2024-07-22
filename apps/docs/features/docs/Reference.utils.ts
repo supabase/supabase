@@ -34,7 +34,7 @@ async function genClientSdkSectionTree(specFile: string, excludeName: string) {
     commonClientLibSections as Array<AbbrevCommonClientLibSection>,
     'items',
     (section) =>
-      section.type === 'markdown'
+      section.type === 'markdown' || section.type === 'category'
         ? !('excludes' in section && section.excludes.includes(excludeName))
         : section.type === 'function'
           ? fns.some(({ id }) => section.id === id)

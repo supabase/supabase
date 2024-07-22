@@ -227,7 +227,9 @@ async function FunctionSection({
                   ...overwrittenParams,
                   __overwritten: true,
                 }))
-              : types?.params
+              : 'params' in fn
+                ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
+                : types?.params
           }
           altParameters={types?.altSignatures?.map(({ params }) => params)}
           className="max-w-[80ch]"

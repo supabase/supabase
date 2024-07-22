@@ -33,7 +33,7 @@ async function getRefMarkdownInternal(relPath: string) {
 const getRefMarkdown = cache_fullProcess_withDevCacheBust(
   getRefMarkdownInternal,
   REF_DOCS_DIRECTORY,
-  (filename: string) => filename.replace(/\.mdx$/, '')
+  (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '')])
 )
 
 interface MDXRemoteRefsProps {

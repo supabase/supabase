@@ -189,7 +189,7 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientL
     setOpen(true)
   }
 
-  return { open, setOpen }
+  return { open, setOpen, isActive }
 }
 
 function CompoundRefLink({
@@ -201,18 +201,27 @@ function CompoundRefLink({
   section: AbbrevCommonClientLibSection
   isCrawlerPage?: boolean
 }) {
-  const { open, setOpen } = useCompoundRefLinkActive(basePath, section)
+  const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen}>
-      <Collapsible.Trigger asChild>
+      <Collapsible.Trigger asChild disabled={isActive}>
         <button
-          className={cn('cursor-pointer', 'w-full', 'flex items-center justify-between gap-2')}
+          className={cn(
+            'group',
+            'cursor-pointer',
+            'w-full',
+            'flex items-center justify-between gap-2'
+          )}
         >
           <span className={getLinkStyles(false)}>{section.title}</span>
           <ChevronUp
             width={16}
-            className={cn('data-open-parent:rotate-0 data-closed-parent:rotate-90', 'transition')}
+            className={cn(
+              'group-disabled:cursor-not-allowed group-disabled:opacity-10',
+              'data-open-parent:rotate-0 data-closed-parent:rotate-90',
+              'transition'
+            )}
           />
         </button>
       </Collapsible.Trigger>

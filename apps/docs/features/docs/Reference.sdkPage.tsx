@@ -1,3 +1,4 @@
+import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
@@ -7,12 +8,17 @@ import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Referenc
 import { ClientSdkNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
 import { ClientLibRefSections } from '~/features/docs/Reference.sections'
+import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import {
   flattenCommonClientLibSections,
   genClientSdkSectionTree,
 } from '~/features/docs/Reference.utils'
+import { pluckPromise } from '~/features/helpers.fn'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { BASE_PATH } from '~/lib/constants'
+import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 
 type ClientSdkReferenceProps = {
   libId: string
@@ -108,6 +114,53 @@ export function generateReferenceStaticParams(specFile: string, excludeName: str
     )
 
     return sections
+  }
+}
+
+export function generateReferenceMetadata(libPath: string, versionIfNotLatest?: string) {
+  return async function generateMetadataForLibraryFunction(
+    {
+      params,
+    }: {
+      params: { slug?: Array<string> }
+    },
+    parent: ResolvingMetadata
+  ): Promise<Metadata> {
+    const [parentAlternates, parentOg] = await Promise.all([
+      pluckPromise(parent, 'alternates'),
+      pluckPromise(parent, 'openGraph'),
+    ])
+    const flattenedSections = flattenCommonClientLibSections(
+      commonClientLibSections as Array<AbbrevCommonClientLibSection>
+    )
+
+    const displayName = NavItems.REFERENCES[libPath].name
+    const sectionTitle =
+      params.slug?.length > 0
+        ? flattenedSections.find((section) => section.slug === params.slug[0])?.title
+        : undefined
+    const url = `${BASE_PATH}/reference/${libPath}/${versionIfNotLatest ? `${versionIfNotLatest}/` : ''}${params.slug?.[0] ?? ''}`
+
+    return {
+      title: `${displayName} API Reference | Supabase Docs`,
+      description: `API reference for the ${displayName} Supabase SDK`,
+      ...(params.slug?.length > 0
+        ? {
+            alternates: {
+              ...parentAlternates,
+              canonical: url,
+            },
+          }
+        : {}),
+      openGraph: {
+        ...parentOg,
+        url,
+        images: generateOpenGraphImageMeta({
+          type: 'API Reference',
+          title: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
+        }),
+      },
+    }
   }
 }
 

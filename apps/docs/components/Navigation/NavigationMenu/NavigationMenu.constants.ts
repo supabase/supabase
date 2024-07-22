@@ -100,38 +100,38 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           {
             label: 'JavaScript',
             icon: 'reference-javascript',
-            href: '/reference/javascript/introduction',
+            href: '/reference/javascript',
             level: 'reference_javascript',
           },
           {
             label: 'Flutter',
             icon: 'reference-dart',
-            href: '/reference/dart/introduction',
+            href: '/reference/dart',
             level: 'reference_dart',
           },
           {
             label: 'Swift',
             icon: 'reference-swift',
-            href: '/reference/swift/introduction',
+            href: '/reference/swift',
             level: 'reference_swift',
           },
           {
             label: 'Python',
             icon: 'reference-python',
-            href: '/reference/python/introduction',
+            href: '/reference/python',
             level: 'reference_python',
           },
           {
             label: 'C#',
             icon: 'reference-csharp',
-            href: '/reference/csharp/introduction',
+            href: '/reference/csharp',
             level: 'reference_csharp',
             community: true,
           },
           {
             label: 'Kotlin',
             icon: 'reference-kotlin',
-            href: '/reference/kotlin/introduction',
+            href: '/reference/kotlin',
             level: 'reference_kotlin',
             community: true,
           },
@@ -204,41 +204,39 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
 
 export const REFERENCES: References = {
   javascript: {
-    name: 'supabase-js',
+    name: 'JavaScript',
     library: 'supabase-js',
     versions: ['v2', 'v1'],
-    icon: '/img/libraries/javascript-icon',
-    __MIGRATED_VERSIONS: ['v2'],
   },
   dart: {
     name: 'Flutter',
     library: 'supabase-dart',
     versions: ['v2', 'v1'],
-    icon: '/docs/img/libraries/flutter-icon.svg',
   },
   csharp: {
     name: 'C#',
     library: 'supabase-csharp',
     versions: ['v1', 'v0'],
-    icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
     versions: ['v2', 'v1'],
-    icon: '/docs/img/libraries/swift-icon.svg',
   },
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
     versions: ['v2', 'v1'],
-    icon: '/docs/img/libraries/kotlin-icon.svg',
+  },
+  python: {
+    name: 'Python',
+    library: 'supabase-py',
+    versions: ['v2'],
   },
   cli: {
     name: 'CLI',
     library: undefined,
     versions: [],
-    icon: '/docs/img/icons/cli-icon.svg',
   },
   api: {
     name: 'API',
