@@ -1,19 +1,17 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Lock, Mail } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import {
-  IconLock,
-  IconMail,
   Button,
+  Checkbox_Shadcn_,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -26,13 +24,18 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Checkbox_Shadcn_,
 } from 'ui'
 
 export type CreateUserModalProps = {
   visible: boolean
   setVisible: (visible: boolean) => void
 }
+
+const CreateUserFormSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email address'),
+  password: z.string().min(1, 'Password is required'),
+  autoConfirmUser: z.boolean(),
+})
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
@@ -59,16 +62,8 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     form.reset({ email: '', password: '', autoConfirmUser: true })
   }
 
-  const FormSchema = z.object({
-    email: z.string().min(1, 'Email is required').email('Must be a valid email address'),
-    password: z.string().min(1, 'Password is required'),
-    autoConfirmUser: z.boolean(),
-  })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof CreateUserFormSchema>>({
+    resolver: zodResolver(CreateUserFormSchema),
     defaultValues: { email: '', password: '', autoConfirmUser: true },
   })
 
@@ -89,11 +84,15 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
               name="email"
               control={form.control}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                <FormItem_Shadcn_ className="flex flex-col gap-1">
                   <FormLabel_Shadcn_>Email address</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <div className="items-center">
-                      <IconMail className="relative left-2 top-9 transform -translate-y-1/2" />
+                    <div className="items-center relative">
+                      <Mail
+                        size={18}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2"
+                        strokeWidth={1.5}
+                      />
                       <Input_Shadcn_
                         autoFocus
                         {...field}
@@ -115,11 +114,15 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
               name="password"
               control={form.control}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                <FormItem_Shadcn_ className="flex flex-col gap-1">
                   <FormLabel_Shadcn_>User Password</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <div className="items-center">
-                      <IconLock className="relative left-2 top-9 transform -translate-y-1/2" />
+                    <div className="items-center relative">
+                      <Lock
+                        size={18}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2"
+                        strokeWidth={1.5}
+                      />
                       <Input_Shadcn_
                         autoFocus
                         {...field}
