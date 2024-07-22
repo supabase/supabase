@@ -17,8 +17,8 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AWS_REGIONS_KEYS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
+import { type AWS_REGIONS_KEYS } from 'shared-data'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Button,

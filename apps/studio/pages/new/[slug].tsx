@@ -38,7 +38,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
-  CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
@@ -46,6 +45,7 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
+import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Admonition,
@@ -415,7 +415,7 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (defaultRegionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
+      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
     }
   }, [defaultRegionError])
 
@@ -568,7 +568,9 @@ const Wizard: NextPageWithLayout = () => {
                                   field.onChange(value)
                                   form.setValue(
                                     'dbRegion',
-                                    value === 'FLY' ? FLY_REGIONS_DEFAULT : AWS_REGIONS_DEFAULT
+                                    value === 'FLY'
+                                      ? FLY_REGIONS_DEFAULT.displayName
+                                      : AWS_REGIONS_DEFAULT.displayName
                                   )
                                 }}
                                 defaultValue={field.value}

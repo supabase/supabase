@@ -1721,6 +1721,7 @@ export const platform: NavMenuConstant = {
       name: 'Platform Management',
       url: undefined,
       items: [
+        { name: 'Regions', url: '/guides/platform/regions' },
         { name: 'Access Control', url: '/guides/platform/access-control' },
         {
           name: 'Custom Postgres Config',

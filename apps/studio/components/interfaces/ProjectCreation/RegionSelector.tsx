@@ -1,7 +1,8 @@
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { PROVIDERS } from 'lib/constants'
 import {
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -11,6 +12,7 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { CloudProvider } from 'shared-data'
 import { getAvailableRegions } from './ProjectCreation.utils'
 
 interface RegionSelectorProps {
@@ -19,7 +21,7 @@ interface RegionSelectorProps {
   form: UseFormReturn<any>
 }
 
-export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorProps) => {
+export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
   const router = useRouter()
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
@@ -55,7 +57,7 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
         <SelectContent_Shadcn_>
           <SelectGroup_Shadcn_>
             {Object.keys(availableRegions).map((option: string, i) => {
-              const label = Object.values(availableRegions)[i] as string
+              const label = Object.values(availableRegions)[i].displayName as string
               return (
                 <SelectItem_Shadcn_ key={option} value={label}>
                   <div className="flex items-center gap-3">

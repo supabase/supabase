@@ -18,9 +18,10 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
+import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
+import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
 
@@ -60,7 +61,7 @@ const CreateProject = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const snapshot = useIntegrationInstallationSnapshot()
 
@@ -68,25 +69,18 @@ const CreateProject = () => {
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
 
-  const {
-    slug,
-    configurationId,
-    next,
-    currentProjectId: foreignProjectId,
-    externalId,
-  } = useParams()
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
-  const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
-  const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
+  const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
    * array of integrations installed
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
+  const { data: integrationData } = useIntegrationsQuery()
 
   /**
    * the vercel integration installed for organization chosen
@@ -102,11 +96,6 @@ const CreateProject = () => {
     },
     { enabled: organizationIntegration !== undefined }
   )
-
-  const canSubmit =
-    projectName != '' &&
-    passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != undefined
 
   function onProjectNameChange(e: ChangeEvent<HTMLInputElement>) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -278,7 +267,7 @@ const CreateProject = () => {
             descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i]
+              const label = Object.values(AWS_REGIONS)[i].displayName
               return (
                 <Listbox.Option
                   key={option}

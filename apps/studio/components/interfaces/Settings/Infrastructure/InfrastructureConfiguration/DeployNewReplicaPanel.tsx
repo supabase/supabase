@@ -12,7 +12,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,7 +24,7 @@ import {
   SidePanel,
 } from 'ui'
 import { WarningIcon } from 'ui'
-import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
+import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -123,7 +125,7 @@ const DeployNewReplicaPanel = ({
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
-    const regionKey = AWS_REGIONS_VALUES[selectedRegion]
+    const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS].code
     if (!projectRef) return console.error('Project is required')
     if (!regionKey) return toast.error('Unable to deploy replica: Unsupported region selected')
 

@@ -18,7 +18,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Badge,
   Button,
@@ -139,9 +140,8 @@ const MapView = ({
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)
