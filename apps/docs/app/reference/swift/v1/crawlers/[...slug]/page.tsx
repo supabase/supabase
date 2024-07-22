@@ -29,5 +29,7 @@ export default async function SwiftReferenceV1({
   )
 }
 
-export const generateStaticParams = generateReferenceStaticParams(SPEC_FILE, LIB_ID)
+export const generateStaticParams = generateReferenceStaticParams(SPEC_FILE, LIB_ID, {
+  generateIndexPage: false,
+})
 export const generateMetadata = generateReferenceMetadata('swift', 'v1')

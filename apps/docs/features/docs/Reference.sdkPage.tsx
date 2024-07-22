@@ -100,12 +100,18 @@ export async function ClientSdkReferencePage({
   )
 }
 
-export function generateReferenceStaticParams(specFile: string, excludeName: string) {
+export function generateReferenceStaticParams(
+  specFile: string,
+  excludeName: string,
+  { generateIndexPage = true }: { generateIndexPage?: boolean } = {}
+) {
   return async function generateStaticParamsForClientSdk() {
     const sectionTree = await genClientSdkSectionTree(specFile, excludeName)
     const flattenedSections = flattenCommonClientLibSections(sectionTree)
 
-    const sections: Array<{ slug: Array<string> }> = [{ slug: [] }].concat(
+    const sections: Array<{ slug: Array<string> }> = (
+      generateIndexPage ? [{ slug: [] }] : []
+    ).concat(
       flattenedSections
         .filter((section) => section.type !== 'category' && !!section.slug)
         .map((section) => ({

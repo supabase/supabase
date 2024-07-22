@@ -30,5 +30,7 @@ export default async function JsReferenceV1({
   )
 }
 
-export const generateStaticParams = generateReferenceStaticParams(SPEC_FILE, LIB_ID)
+export const generateStaticParams = generateReferenceStaticParams(SPEC_FILE, LIB_ID, {
+  generateIndexPage: false,
+})
 export const generateMetadata = generateReferenceMetadata('javascript', 'v1')
