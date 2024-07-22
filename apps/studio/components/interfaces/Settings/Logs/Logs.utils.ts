@@ -466,7 +466,7 @@ export const fillTimeseries = (
   // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
   if (diff > 10000) {
     throw new Error(
-      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+      'The selected date range will render more than 10,000 data points within the charts, which will degrade browser performance. Please select a smaller date range.'
     )
   }
 

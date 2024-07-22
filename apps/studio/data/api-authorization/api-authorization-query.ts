@@ -2,12 +2,10 @@ import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
 import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
   id?: string
-  slug?: string
 }
 
 export type ApiAuthorizationResponse = {
@@ -22,15 +20,13 @@ export type ApiAuthorizationResponse = {
 }
 
 export async function getApiAuthorizationDetails(
-  { id, slug }: ApiAuthorizationVariables,
+  { id }: ApiAuthorizationVariables,
   signal?: AbortSignal
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const { data, error } = await get('/platform/organizations/{slug}/oauth/authorizations/{id}', {
-    // @ts-ignore [Joshen] Endpoint doesnt need slug in the path params, but the endpoint path requires slug
-    // it's a little weird, will need API to decide if they wanna shift this route outside of the {slug} endpoint
-    params: { path: { slug, id } },
+  const { data, error } = await get('/platform/oauth/authorizations/{id}', {
+    params: { path: { id } },
     signal,
   })
 
@@ -42,12 +38,12 @@ export type ResourceData = Awaited<ReturnType<typeof getApiAuthorizationDetails>
 export type ResourceError = { errorEventId: string; message: string }
 
 export const useApiAuthorizationQuery = <TData = ResourceData>(
-  { id, slug }: ApiAuthorizationVariables,
+  { id }: ApiAuthorizationVariables,
   { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
   useQuery<ResourceData, ResourceError, TData>(
     resourceKeys.resource(id),
-    ({ signal }) => getApiAuthorizationDetails({ id, slug }, signal),
+    ({ signal }) => getApiAuthorizationDetails({ id }, signal),
     {
       enabled: enabled && typeof id !== 'undefined',
       ...options,

@@ -551,8 +551,9 @@ alter table public.messages
 
 -- inserts a row into public.users and assigns roles
 create function public.handle_new_user()
-returns trigger as
-$$
+returns trigger
+set search_path = ''
+as $$
   declare is_admin boolean;
   begin
     insert into public.users (id, username)
@@ -676,8 +677,9 @@ create policy "Can update own user data." on users
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
 */
 create function public.handle_new_user()
-returns trigger as
-$$
+returns trigger
+set search_path = ''
+as $$
   begin
     insert into public.users (id, full_name, avatar_url)
     values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
@@ -846,7 +848,9 @@ create policy "Users can update own profile." on profiles
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
 -- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_user()
-returns trigger as $$
+returns trigger
+set search_path = ''
+as $$
 begin
   insert into public.profiles (id, full_name, avatar_url)
   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
@@ -1289,12 +1293,12 @@ create extension "supabase-dbdev";
     type: 'template',
     title: 'Large objects',
     description: 'List large objects (tables/indexes) in your database.',
-    sql: `SELECT 
+    sql: `SELECT
     SCHEMA_NAME,
     relname,
     table_size
   FROM
-    (SELECT 
+    (SELECT
       pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
       relname,
       pg_relation_size(pg_catalog.pg_class.oid) AS table_size
@@ -1378,7 +1382,7 @@ revoke execute
 revoke all
   on table public.mfa_failed_verification_attempts
   from authenticated, anon, public;
-  
+
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {
@@ -1450,7 +1454,7 @@ revoke execute
 revoke all
   on table public.password_failed_verification_attempts
   from authenticated, anon, public;
-  
+
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {

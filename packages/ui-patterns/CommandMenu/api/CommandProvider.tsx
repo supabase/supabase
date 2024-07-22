@@ -1,12 +1,15 @@
-import { useConstant } from 'common'
-import { useEffect, type PropsWithChildren } from 'react'
+'use client'
 
-import { useToggleCommandMenu } from './hooks/viewHooks'
+import { useConstant } from 'common'
+import { type PropsWithChildren, useEffect, useMemo, useCallback } from 'react'
+
 import { CommandContext } from '../internal/Context'
 import { initCommandsState } from '../internal/state/commandsState'
 import { initPagesState } from '../internal/state/pagesState'
 import { initQueryState } from '../internal/state/queryState'
 import { initViewState } from '../internal/state/viewState'
+import { useCrossCompatRouter } from './hooks/useCrossCompatRouter'
+import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const combinedState = useConstant(() => ({
@@ -19,12 +22,15 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   return <CommandContext.Provider value={combinedState}>{children}</CommandContext.Provider>
 }
 
-const CommandShortcut = () => {
+// This is a component not a hook so it can access the wrapping context.
+const CommandShortcut = ({ openKey }: { openKey: string }) => {
   const toggleOpen = useToggleCommandMenu()
 
   useEffect(() => {
     const handleKeydown = (evt: KeyboardEvent) => {
-      if (evt.key === 'k' && evt.metaKey) {
+      if (openKey === '') return
+
+      if (evt.key === openKey && evt.metaKey) {
         evt.preventDefault()
         toggleOpen()
       }
@@ -38,9 +44,37 @@ const CommandShortcut = () => {
   return null
 }
 
-const CommandProvider = ({ children }: PropsWithChildren) => (
+// This is a component not a hook so it can access the wrapping context.
+function CloseOnNavigation() {
+  const setIsOpen = useSetCommandMenuOpen()
+  const router = useCrossCompatRouter()
+
+  const completeNavigation = useCallback(() => {
+    setIsOpen(false)
+  }, [setIsOpen])
+
+  useEffect(() => {
+    router.events.onRouteChangeComplete(completeNavigation)
+    return () => router.events.offRouteChangeComplete(completeNavigation)
+  }, [router])
+
+  return null
+}
+
+interface CommandProviderProps extends PropsWithChildren {
+  /**
+   * The keyboard shortcut that opens the command menu when used in
+   * combination with the meta key.
+   *
+   * Defaults to `k`. Pass an empty string to disable the keyboard shortcut.
+   */
+  openKey?: string
+}
+
+const CommandProvider = ({ children, openKey }: CommandProviderProps) => (
   <CommandProviderInternal>
-    <CommandShortcut />
+    <CommandShortcut openKey={openKey ?? 'k'} />
+    <CloseOnNavigation />
     {children}
   </CommandProviderInternal>
 )

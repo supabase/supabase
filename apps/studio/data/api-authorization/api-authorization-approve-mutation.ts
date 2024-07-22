@@ -21,7 +21,6 @@ export async function approveApiAuthorization({ id, slug }: ApiAuthorizationAppr
     // @ts-ignore [Joshen] Endpoint doesnt need slug in the path params, but the endpoint path requires slug
     // it's a little weird, will need API to decide if they wanna shift this route outside of the {slug} endpoint
     params: { path: { slug, id }, query: { skip_browser_redirect: true } },
-    body: { organization_id: slug },
   })
 
   if (error) handleError(error)

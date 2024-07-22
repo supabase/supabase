@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests",
+    "test": "vitest",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",
@@ -54,8 +54,6 @@
     "mdast-util-mdx": "^2.0.0",
     "mdast-util-to-markdown": "^1.5.0",
     "mdast-util-to-string": "^3.1.1",
-    "mdx-mermaid": "^2.0.0",
-    "mermaid": "^10.0.2",
     "micromark-extension-mdxjs": "^1.0.0",
     "next": "^14.2.3",
     "next-mdx-remote": "^4.4.1",
@@ -97,13 +95,14 @@
     "dotenv": "^16.0.3",
     "ejs": "^3.1.10",
     "globby": "^13.2.2",
-    "jest-environment-jsdom": "^29.7.0",
     "nextjs-node-loader": "^1.1.5",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.1.3",
     "simple-git": "^3.24.0",
     "tsconfig": "*",
     "tsx": "^4.6.2",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^2.0.2"
   }
 }

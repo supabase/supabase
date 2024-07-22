@@ -467,7 +467,7 @@ const PlanUpdateSidePanel = () => {
                     {subscription?.plan?.id === 'free' && (
                       <p className="text-sm mt-2">
                         Mixing paid and non-paid projects in a single organization is not possible.
-                        If you want projects to be on the free plan, use self-serve project
+                        If you want projects to be on the Free Plan, use self-serve project
                         transfers.
                       </p>
                     )}

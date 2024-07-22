@@ -44,6 +44,8 @@ import { Icons } from '@/components/icons'
 import { ThemeSettings } from '@/components/theme-settings'
 import { CodeFragment } from '@/components/code-fragment'
 import { Admonition } from 'ui-patterns/admonition'
+import { SonnerExpandConfig } from './sonner-expand-config'
+import { SonnerPositionConfig } from './sonner-expand-position'
 
 const components = {
   Accordion,
@@ -273,6 +275,8 @@ const components = {
   ThemeSettings,
   CodeFragment,
   Admonition,
+  SonnerExpandConfig,
+  SonnerPositionConfig,
 }
 
 interface MdxProps {

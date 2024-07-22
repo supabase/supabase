@@ -281,6 +281,8 @@ limit 12
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Most frequently called queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -306,6 +308,8 @@ select
         queryType: 'db',
         sql: (_, where, orderBy) => `
 -- Most time consuming queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -322,6 +326,8 @@ select
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Slowest queries by max execution time
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,

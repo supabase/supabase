@@ -75,7 +75,7 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 ### Paid plan behavior
 
-Projects on the Pro plan and above have auto-scaling Disk Storage.
+Projects on the Pro Plan and above have auto-scaling Disk Storage.
 
 Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
@@ -101,13 +101,13 @@ Disks don't automatically downsize during normal operation. They _will_ automati
 
 </Admonition>
 
-The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
+The maximum Disk Storage Size for the Pro/Team Plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise Plan.
 
-### Free plan behavior
+### Free Plan behavior
 
 Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
 
-- [Upgrade to the Pro plan](https://supabase.com/dashboard/org/_/billing) to increase the limit to 8GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale and expand beyond the 8GB database size limit.
+- [Upgrade to the Pro Plan](https://supabase.com/dashboard/org/_/billing) to increase the limit to 8GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale and expand beyond the 8GB database size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode

@@ -1,8 +1,10 @@
+'use client'
+
 import { useLayoutEffect, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
-import { type DialogSize } from '../../internal/state/viewState'
+import { type DialogSize, type ITouchHandlers } from '../../internal/state/viewState'
 
 const useCommandMenuInitiated = () => {
   const { viewState } = useCommandContext()
@@ -10,7 +12,7 @@ const useCommandMenuInitiated = () => {
   return initiated
 }
 
-const useCommandMenuVisible = () => {
+const useCommandMenuOpen = () => {
   const { viewState } = useCommandContext()
   const { open } = useSnapshot(viewState)
   return open
@@ -26,18 +28,6 @@ const useToggleCommandMenu = () => {
   const { viewState } = useCommandContext()
   const { toggleOpen } = useSnapshot(viewState)
   return toggleOpen
-}
-
-const useIsCommandNavigating = () => {
-  const { viewState } = useCommandContext()
-  const { isNavigating } = useSnapshot(viewState)
-  return isNavigating
-}
-
-const useSetIsCommandNavigating = () => {
-  const { viewState } = useCommandContext()
-  const { setIsNavigating } = useSnapshot(viewState)
-  return setIsNavigating
 }
 
 const useCommandMenuSize = () => {
@@ -58,13 +48,27 @@ const useSetCommandMenuSize = (newSize: DialogSize) => {
   }, [setSize])
 }
 
+const useSetupCommandMenuTouchEvents = () => {
+  const { viewState } = useCommandContext()
+  const { setTouchHandlers } = useSnapshot(viewState)
+
+  return setTouchHandlers
+}
+
+const useCommandMenuTouchGestures = () => {
+  const { viewState } = useCommandContext()
+  const { touchHandlers } = useSnapshot(viewState)
+
+  return touchHandlers
+}
+
 export {
   useCommandMenuInitiated,
-  useCommandMenuVisible,
+  useCommandMenuOpen,
   useSetCommandMenuOpen,
   useToggleCommandMenu,
-  useIsCommandNavigating,
-  useSetIsCommandNavigating,
   useCommandMenuSize,
   useSetCommandMenuSize,
+  useSetupCommandMenuTouchEvents,
+  useCommandMenuTouchGestures,
 }

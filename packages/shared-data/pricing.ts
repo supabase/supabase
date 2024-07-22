@@ -383,16 +383,13 @@ export const pricing: Pricing = {
       },
       {
         title: 'Number of functions',
-        tooltips: {
-          main: 'Billing is based on the maximum amount of functions at any point in time throughout your billing period.',
-        },
         plans: {
           free: '10 included',
-          pro: ['100 included', 'then $10 per additional 100'],
-          team: ['100 included', 'then $10 per additional 100'],
-          enterprise: 'Custom',
+          pro: '500 included',
+          team: '1000 included',
+          enterprise: 'Unlimited',
         },
-        usage_based: true,
+        usage_based: false,
       },
     ],
   },
@@ -547,7 +544,7 @@ export const pricing: Pricing = {
           enterprise: 'Available as paid add-on',
         },
         tooltips: {
-          main: 'Available as a paid add-on on Team plan and above.',
+          main: 'Available as a paid add-on on Team Plan and above.',
         },
         usage_based: false,
       },
@@ -601,19 +598,6 @@ export const pricing: Pricing = {
           pro: '$10 per domain per month per project add on',
           team: '$10 per domain per month per project add on',
           enterprise: '1, additional $10/domain/month',
-        },
-        usage_based: false,
-      },
-      {
-        title: 'Bring your own cloud deployment options',
-        tooltips: {
-          main: 'On-Premises, single tenant, and managed dedicated cloud provider instance options',
-        },
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
         },
         usage_based: false,
       },
