@@ -80,7 +80,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
         <Form_Shadcn_ {...form}>
           <form
             id="create-user"
-            className="flex flex-col gap-y-4 p-6"
+            className="flex flex-col gap-y-4 p-4"
             onSubmit={form.handleSubmit(onCreateUser)}
           >
             <FormField_Shadcn_
