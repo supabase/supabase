@@ -15,31 +15,17 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   FormControl_Shadcn_,
-  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  Select_Shadcn_,
-  Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   Checkbox_Shadcn_,
 } from 'ui'
-import { useState } from 'react'
-import { isVisible } from '@testing-library/user-event/dist/utils'
 
 export type CreateUserModalProps = {
   visible: boolean
