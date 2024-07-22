@@ -3161,6 +3161,9 @@ export interface components {
       )[]
       website: string
     }
+    GetIntegrationsDirectoryResponse: {
+      entries: components['schemas']['IntegrationsDirectoryReadonlyEntry'][]
+    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3572,6 +3575,22 @@ export interface components {
       overview: string
       parent_id: number | null
       preview_token: string
+      slug: string
+      title: string
+      video: string | null
+      website: string
+    }
+    IntegrationsDirectoryReadonlyEntry: {
+      approved: boolean
+      call_to_action_link: string | null
+      category: components['schemas']['IntegrationsDirectoryCategory']
+      description: string
+      developer: string
+      docs: string
+      featured: boolean
+      images: string[]
+      logo: string
+      overview: string
       slug: string
       title: string
       video: string | null
@@ -7069,7 +7088,9 @@ export interface operations {
   IntegrationsDirectoryController_getIntegrationsDirectory: {
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['GetIntegrationsDirectoryResponse']
+        }
       }
       /** @description Failed to retrieve integrations directory list */
       500: {
@@ -7089,7 +7110,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['IntegrationsDirectoryReadonlyEntry']
+        }
       }
       /** @description Failed to retrieve integrations directory entry */
       500: {
