@@ -1,7 +1,7 @@
 'use client'
 
 import { type PropsWithChildren, useEffect, useState } from 'react'
-import { BUILD_PREVIEW_HTML, IS_PREVIEW, SKIP_BUILD_STATIC_GENERATION } from '~/lib/constants'
+import { BUILD_PREVIEW_HTML, IS_PREVIEW } from '~/lib/constants'
 
 /**
  * Preview builds don't need to be statically generated to optimize performance.
