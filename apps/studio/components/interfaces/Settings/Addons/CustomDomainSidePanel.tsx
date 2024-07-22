@@ -14,7 +14,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -94,18 +93,6 @@ const CustomDomainSidePanel = () => {
       } else {
         setSelectedOption('cd_none')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Custom domains',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -186,22 +173,7 @@ const CustomDomainSidePanel = () => {
               type="large-cards"
               size="tiny"
               id="custom-domain"
-              onChange={(event: any) => {
-                setSelectedOption(event.target.value)
-                Telemetry.sendActivity(
-                  {
-                    activity: 'Option Selected',
-                    source: 'Dashboard',
-                    data: {
-                      title: 'Custom domains',
-                      section: 'Add ons',
-                      option: event.target.label,
-                    },
-                    projectRef,
-                  },
-                  router
-                )
-              }}
+              onChange={(event: any) => setSelectedOption(event.target.value)}
             >
               <Radio
                 name="custom-domain"

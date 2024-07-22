@@ -23,7 +23,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
@@ -113,18 +112,6 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change Subscription Plan',
-            section: 'Subscription plan',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -245,23 +232,7 @@ const PlanUpdateSidePanel = () => {
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
-                        onClick={() => {
-                          setSelectedTier(plan.id as any)
-                          Telemetry.sendActivity(
-                            {
-                              activity: 'Popup Viewed',
-                              source: 'Dashboard',
-                              data: {
-                                title: isDowngradeOption
-                                  ? 'Downgrade'
-                                  : 'Upgrade' + ' to ' + plan.name,
-                                section: 'Subscription plan',
-                              },
-                              ...(slug && { orgSlug: slug }),
-                            },
-                            router
-                          )
-                        }}
+                        onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
                             side: 'bottom',

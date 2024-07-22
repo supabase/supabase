@@ -76,45 +76,6 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
 }
 
 /**
- * @deprecated use sendEvent instead.
- */
-const sendActivity = (
-  event: {
-    activity: string
-    source: string
-    projectRef?: string
-    orgSlug?: string
-    data?: object
-  },
-  router: NextRouter
-) => {
-  if (!IS_PLATFORM) return
-
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  if (consent !== 'true') return
-
-  const { activity, source, projectRef, orgSlug, data } = event
-
-  const properties = {
-    activity,
-    source,
-    page: {
-      path: router.route,
-      location: router.asPath,
-      referrer: document?.referrer || '',
-      title: document?.title || '',
-    },
-    ...(data && { data }),
-    ...(projectRef && { projectRef }),
-    ...(orgSlug && { orgSlug }),
-  }
-  return post(`${API_URL}/telemetry/activity`, properties)
-}
-
-/**
  * Generates a unique identifier for an anonymous user based on their gotrue id.
  */
 export const getAnonId = async (id: string) => {
@@ -129,7 +90,6 @@ export const getAnonId = async (id: string) => {
 const Telemetry = {
   sendEvent,
   sendIdentify,
-  sendActivity,
 }
 
 export default Telemetry
