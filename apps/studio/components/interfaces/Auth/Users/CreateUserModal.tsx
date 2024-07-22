@@ -86,7 +86,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   return (
     <Dialog open={visible} onOpenChange={setVisible}>
-      <DialogContent size="medium">
+      <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Create a new user</DialogTitle>
         </DialogHeader>
