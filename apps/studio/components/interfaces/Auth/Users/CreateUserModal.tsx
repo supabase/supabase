@@ -11,6 +11,8 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import {
+  IconLock,
+  IconMail,
   Button,
   Dialog,
   DialogContent,
@@ -80,7 +82,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
         <Form_Shadcn_ {...form}>
           <form
             id="create-user"
-            className="flex flex-col gap-y-4 p-4"
+            className="flex flex-col gap-y-4 p-6"
             onSubmit={form.handleSubmit(onCreateUser)}
           >
             <FormField_Shadcn_
@@ -90,15 +92,19 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                   <FormLabel_Shadcn_>Email address</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      autoFocus
-                      {...field}
-                      autoComplete="off"
-                      type="email"
-                      name="email"
-                      placeholder="user@example.com"
-                      disabled={isCreatingUser || isLoading}
-                    />
+                    <div className="items-center">
+                      <IconMail className="relative left-2 top-9 transform -translate-y-1/2" />
+                      <Input_Shadcn_
+                        autoFocus
+                        {...field}
+                        autoComplete="off"
+                        type="email"
+                        name="email"
+                        placeholder="user@example.com"
+                        disabled={isCreatingUser || isLoading}
+                        className="pl-8"
+                      />
+                    </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
@@ -112,15 +118,19 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                 <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                   <FormLabel_Shadcn_>User Password</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      autoFocus
-                      {...field}
-                      autoComplete="new-password"
-                      type="password"
-                      name="password"
-                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                      disabled={isCreatingUser || isLoading}
-                    ></Input_Shadcn_>
+                    <div className="items-center">
+                      <IconLock className="relative left-2 top-9 transform -translate-y-1/2" />
+                      <Input_Shadcn_
+                        autoFocus
+                        {...field}
+                        autoComplete="new-password"
+                        type="password"
+                        name="password"
+                        placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                        disabled={isCreatingUser || isLoading}
+                        className="pl-8"
+                      ></Input_Shadcn_>
+                    </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
