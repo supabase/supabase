@@ -881,10 +881,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/postgis',
         },
         {
-          name: 'pg-safeupdate: Required Where Clauses',
-          url: '/guides/database/extensions/pg-safeupdate',
-        },
-        {
           name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
