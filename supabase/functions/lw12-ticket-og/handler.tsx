@@ -23,25 +23,25 @@ const LW_MATERIALIZED_VIEW = 'lw11_tickets_platinum'
 
 const STYLING_CONGIF = {
   regular: {
-    BACKGROUND: '#f1f1f1',
-    FOREGROUND: '#11181C',
-    FOREGROUND_LIGHT: '#6c7277',
+    BACKGROUND: '#060809',
+    FOREGROUND: '#F8F9FA',
+    FOREGROUND_LIGHT: '#8B9092',
     TICKET_BORDER: '#292929',
-    TICKET_FOREGROUND: '#F8F9FA',
+    TICKET_FOREGROUND: '#11181C',
     TICKET_BACKGROUND: '#1F1F1F',
-    TICKET_BACKGROUND_CODE: '#171717',
+    TICKET_BACKGROUND_CODE: '#141414',
     TICKET_FOREGROUND_LIGHT: '#888888',
-    BORDER: '#4e4e4e',
+    BORDER: '#adadad',
     CODE_LINE_NUMBER: '#4D4D4D',
-    CODE_BASE: '#FFF',
+    CODE_BASE: '#ddd',
     CODE_HIGHLIGHT: '#292929',
-    CODE_FUNCTION: '#7DD8C7',
-    CODE_VARIABLE: '#FFF',
-    CODE_METHOD: '#ADDB67',
-    CODE_EXPRESSION: '#C792EA',
-    CODE_STRING: '#ECC48D',
-    CODE_NUMBER: '#FF628C',
-    CODE_NULL: '#FFEB95',
+    CODE_FUNCTION: '#ddd',
+    CODE_VARIABLE: '#ddd',
+    CODE_METHOD: '#ddd',
+    CODE_EXPRESSION: '#FFF',
+    CODE_STRING: '#3ECF8E',
+    CODE_NUMBER: '#3ECF8E',
+    CODE_NULL: '#569cd6',
   },
   platinum: {
     BACKGROUND: '#060809',
@@ -54,36 +54,36 @@ const STYLING_CONGIF = {
     TICKET_FOREGROUND_LIGHT: '#888888',
     BORDER: '#adadad',
     CODE_LINE_NUMBER: '#4D4D4D',
-    CODE_BASE: '#FFF',
+    CODE_BASE: '#ddd',
     CODE_HIGHLIGHT: '#292929',
-    CODE_FUNCTION: '#7DD8C7',
-    CODE_VARIABLE: '#FFF',
-    CODE_METHOD: '#ADDB67',
-    CODE_EXPRESSION: '#C792EA',
-    CODE_STRING: '#ECC48D',
-    CODE_NUMBER: '#FF628C',
-    CODE_NULL: '#FFEB95',
+    CODE_FUNCTION: '#ddd',
+    CODE_VARIABLE: '#ddd',
+    CODE_METHOD: '#ddd',
+    CODE_EXPRESSION: '#FFF',
+    CODE_STRING: '#3ECF8E',
+    CODE_NUMBER: '#3ECF8E',
+    CODE_NULL: '#569cd6',
   },
   secret: {
     BACKGROUND: '#060809',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
     TICKET_BORDER: '#292929',
-    TICKET_FOREGROUND: '#F8F9FA',
+    TICKET_FOREGROUND: '#11181C',
     TICKET_BACKGROUND: '#1F1F1F',
-    TICKET_BACKGROUND_CODE: '#171717',
+    TICKET_BACKGROUND_CODE: '#141414',
     TICKET_FOREGROUND_LIGHT: '#888888',
-    BORDER: '#959595',
+    BORDER: '#adadad',
     CODE_LINE_NUMBER: '#4D4D4D',
-    CODE_BASE: '#FFF',
+    CODE_BASE: '#ddd',
     CODE_HIGHLIGHT: '#292929',
-    CODE_FUNCTION: '#7DD8C7',
-    CODE_VARIABLE: '#FFF',
-    CODE_METHOD: '#ADDB67',
-    CODE_EXPRESSION: '#C792EA',
-    CODE_STRING: '#ECC48D',
-    CODE_NUMBER: '#FF628C',
-    CODE_NULL: '#FFEB95',
+    CODE_FUNCTION: '#ddd',
+    CODE_VARIABLE: '#ddd',
+    CODE_METHOD: '#ddd',
+    CODE_EXPRESSION: '#FFF',
+    CODE_STRING: '#3ECF8E',
+    CODE_NUMBER: '#3ECF8E',
+    CODE_NULL: '#569cd6',
   },
 }
 
@@ -256,7 +256,9 @@ export async function handler(req: Request) {
                     <span>.</span>
                     <span style={{ color: STYLING_CONGIF[ticketType].CODE_METHOD }}>from</span>
                     <span>&#40;</span>
-                    <span style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>'tickets'</span>
+                    <span style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
+                      'lw12_tickets_view'
+                    </span>
                     <span>&#41;</span>
                   </span>
                   <span tw="pl-4">
@@ -320,10 +322,7 @@ export async function handler(req: Request) {
                   <div tw="flex">
                     <span style={lineNumberStyle}>2</span>
                     <span>
-                      <span
-                        tw="ml-6 mr-2"
-                        style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
-                      >
+                      <span tw="ml-6 mr-2" style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}>
                         "data":
                       </span>
                       <span>&#123;</span>
@@ -338,7 +337,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "name"
                         </span>
@@ -354,7 +353,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "username"
                         </span>
@@ -370,7 +369,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "ticketNumber"
                         </span>
@@ -386,7 +385,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "role"
                         </span>
@@ -402,7 +401,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "company"
                         </span>
@@ -418,7 +417,7 @@ export async function handler(req: Request) {
                       <span>
                         <span
                           tw="ml-12 mr-2"
-                          style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}
+                          style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
                           "location"
                         </span>
@@ -437,7 +436,7 @@ export async function handler(req: Request) {
                   <div tw="flex">
                     <span style={lineNumberStyle}>11</span>
                     <span>
-                      <span tw="ml-6" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
+                      <span tw="ml-6" style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}>
                         "error"
                       </span>
                       <span>:</span>

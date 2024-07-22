@@ -44,7 +44,7 @@ export default function Ticket() {
 
   const code = codeBlock`
 await supabase
-  .from('tickets')
+  .from('lw12_tickets_view')
   .select('*')
   .eq('username', ${username})
   .single()
