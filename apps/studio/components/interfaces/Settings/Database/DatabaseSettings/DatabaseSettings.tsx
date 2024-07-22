@@ -139,6 +139,7 @@ const DatabaseSettings = () => {
                   <UsePoolerCheckbox
                     id="connection-params"
                     checked={snap.usePoolerConnection}
+                    ipv4AddonAdded={!!ipv4Addon}
                     poolingMode={poolingMode}
                     onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}
