@@ -1,16 +1,16 @@
 import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
-import { type GetStaticPaths, type GetStaticProps } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
+import { GetServerSideProps } from 'next'
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
@@ -20,8 +20,10 @@ import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { API_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { IntegrationsDirectoryEntry } from '.'
 import Error404 from '../../404'
 
 /**
@@ -48,7 +50,7 @@ function Partner({
   partner,
   overview,
 }: {
-  partner: Partner
+  partner: IntegrationsDirectoryEntry
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
@@ -214,7 +216,7 @@ function Partner({
   )
 }
 
-const PartnerDetails = ({ partner }: { partner: Partner }) => {
+const PartnerDetails = ({ partner }: { partner: IntegrationsDirectoryEntry }) => {
   const videoThumbnail = partner.video
     ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
     : undefined
@@ -238,7 +240,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
         )}
 
         <div className="text-foreground divide-y">
-          {partner.type === 'technology' && (
+          {partner.developer && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
               <span className="text-foreground">{partner.developer}</span>
@@ -267,7 +269,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             </a>
           </div>
 
-          {partner.type === 'technology' && partner.docs && (
+          {partner.docs && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Documentation</span>
               <a
@@ -292,40 +294,30 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
   )
 }
 
-// This function gets called at build time
-export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase
-    .from('partners')
-    .select('slug')
-    .eq('approved', true)
-    .eq('type', 'technology')
-
-  const paths: {
-    params: { slug: string }
-    locale?: string | undefined
-  }[] =
-    slugs?.map(({ slug }) => ({
-      params: {
-        slug,
-      },
-    })) ?? []
-
-  return {
-    paths,
-    fallback: 'blocking',
-  }
-}
-
 // This also gets called at build time
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  let { data: partner } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('slug', params!.slug as string)
-    .single()
+export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+  let result: IntegrationsDirectoryEntry | null = null
 
-  if (!partner) {
+  const url = `${API_URL}/integrations-directory/${params!.slug}${query.preview_token ? `?preview_token=${query.preview_token}` : ''}`
+
+  console.log(url)
+  const response = await fetch(url)
+  const entry = (await response.json()) as IntegrationsDirectoryEntry
+
+  if (!entry || response.status !== 200) {
+    let { data: partner } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('approved', true)
+      .eq('slug', params!.slug as string)
+      .single()
+
+    result = partner as IntegrationsDirectoryEntry
+  } else {
+    result = entry
+  }
+
+  if (!result) {
     return {
       notFound: true,
     }
@@ -340,7 +332,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
+  const overview = await serialize(result.overview, {
     mdxOptions: {
       useDynamicImport: true,
       remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
@@ -348,8 +340,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   })
 
   return {
-    props: { partner, overview },
-    revalidate: 1800, // 30 minutes
+    props: { partner: result, overview },
   }
 }
 

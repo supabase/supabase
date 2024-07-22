@@ -1,17 +1,37 @@
+import { components } from 'api-types'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { IconLoader, IconSearch, Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
+import { API_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
+export type IntegrationsDirectoryEntry = components['schemas']['IntegrationsDirectoryReadonlyEntry']
+
+export const IntegrationCategory = {
+  api: 'API',
+  auth: 'Auth',
+  caching: 'Caching / Offline-First',
+  data: 'Data Platform',
+  devtools: 'DevTools',
+  fdw: 'Foreign Data Wrapper',
+  lowcode: 'Low-Code',
+  messaging: 'Messaging',
+  storage: 'Storage',
+} as const
+
 export async function getStaticProps() {
+  const response = await fetch(`${API_URL}/integrations-directory`)
+  const value = (await response.json()) as components['schemas']['GetIntegrationsDirectoryResponse']
+  const entries = value.entries
+
   const { data: partners } = await supabase
     .from('partners')
     .select('*')
@@ -20,12 +40,31 @@ export async function getStaticProps() {
     .order('category')
     .order('title')
 
+  // Merge the two lists of partners. Integration directory data takes precedence.
+  partners?.forEach((partner) => {
+    const found = entries.find((entry) => entry.title === partner.title)
+    if (!found) {
+      const category = Object.entries(IntegrationCategory).find(([k, v]) => v === partner.category)
+      const keyCategory = (category ? category[0] : 'api') as keyof typeof IntegrationCategory
+
+      const toInsert = {
+        ...partner,
+        approved: true,
+        category: keyCategory,
+        docs: partner.docs ?? '',
+        featured: partner.featured ?? false,
+        images: partner.images ?? [],
+      }
+
+      entries.push(toInsert)
+    }
+  })
+
   return {
     props: {
-      partners,
+      partners: entries,
     },
-    // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
-    revalidate: 1800, // 30 minutes
+    revalidate: false,
   }
 }
 
@@ -48,43 +87,43 @@ function IntegrationPartnersPage(props: Props) {
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
 
-  useEffect(() => {
-    const searchPartners = async () => {
-      setIsSearching(true)
+  // useEffect(() => {
+  //   const searchPartners = async () => {
+  //     setIsSearching(true)
 
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
+  //     let query = supabase
+  //       .from('partners')
+  //       .select('*')
+  //       .eq('approved', true)
+  //       .order('category')
+  //       .order('title')
 
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
+  //     if (search.trim()) {
+  //       query = query.textSearch('tsv', `${search.trim()}`, {
+  //         type: 'websearch',
+  //         config: 'english',
+  //       })
+  //     }
 
-      const { data: partners } = await query
+  //     const { data: partners } = await query
 
-      return partners
-    }
+  //     return partners
+  //   }
 
-    if (search.trim() === '') {
-      setIsSearching(false)
-      setPartners(initialPartners)
-      return
-    }
+  //   if (search.trim() === '') {
+  //     setIsSearching(false)
+  //     setPartners(initialPartners)
+  //     return
+  //   }
 
-    searchPartners().then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+  //   searchPartners().then((partners) => {
+  //     if (partners) {
+  //       setPartners(partners)
+  //     }
 
-      setIsSearching(false)
-    })
-  }, [debouncedSearchTerm, router])
+  //     setIsSearching(false)
+  //   })
+  // }, [debouncedSearchTerm, router])
 
   return (
     <>
@@ -139,7 +178,7 @@ function IntegrationPartnersPage(props: Props) {
                         onClick={() => router.push(`#${category.toLowerCase()}`)}
                         className="text-foreground-light block text-base"
                       >
-                        {category}
+                        {IntegrationCategory[category]}
                       </button>
                     ))}
                   </div>

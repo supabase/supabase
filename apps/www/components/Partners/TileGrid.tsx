@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { IntegrationCategory } from '~/pages/partners/integrations'
 import type { Partner } from '~/types/partners'
 
 export default function TileGrid({
@@ -67,7 +68,11 @@ export default function TileGrid({
       ) : null}
       {Object.keys(partnersByCategory).map((category) => (
         <div key={category} id={category.toLowerCase()} className="space-y-8">
-          {!hideCategories && <h2 className="h2">{category}</h2>}
+          {!hideCategories && (
+            <h2 className="h2">
+              {IntegrationCategory[category as keyof typeof IntegrationCategory]}
+            </h2>
+          )}
           <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {partnersByCategory[category].map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
