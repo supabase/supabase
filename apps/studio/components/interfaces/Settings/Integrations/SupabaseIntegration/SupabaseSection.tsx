@@ -91,7 +91,7 @@ const SupabaseSection = () => {
                     preview{' '}
                     <a
                       className="cursor-pointer"
-                      href={`https://supabase.com/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
+                      href={`https://supabase.com/partners/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
                       target="_blank"
                     >
                       here
@@ -110,10 +110,10 @@ const SupabaseSection = () => {
                     Your integration entry is live at{' '}
                     <a
                       className="cursor-pointer"
-                      href={`https://supabase.com/integrations/${entry.slug}`}
+                      href={`https://supabase.com/partners/integrations/${entry.slug}`}
                       target="_blank"
                     >
-                      https://supabase.com/integrations/{entry.slug}
+                      https://supabase.com/partners/integrations/{entry.slug}
                     </a>
                     . If you want to remove your integration from our directory,{' '}
                     <a className="cursor-pointer" onClick={() => setShowDeleteEntryDialog(true)}>
@@ -131,10 +131,10 @@ const SupabaseSection = () => {
                     Your integration entry is live at{' '}
                     <a
                       className="cursor-pointer"
-                      href={`https://supabase.com/integrations/${entry.slug}`}
+                      href={`https://supabase.com/partners/integrations/${entry.slug}`}
                       target="_blank"
                     >
-                      https://supabase.com/integrations/{entry.slug}
+                      https://supabase.com/partners/integrations/{entry.slug}
                     </a>
                     . If you want to remove your integration from our directory,{' '}
                     <a className="cursor-pointer" onClick={() => setShowDeleteEntryDialog(true)}>
@@ -147,7 +147,7 @@ const SupabaseSection = () => {
                       see the preview{' '}
                       <a
                         className="cursor-pointer"
-                        href={`https://supabase.com/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
+                        href={`https://supabase.com/partners/integrations/${draftEntry?.slug}?preview_token=${draftEntry?.preview_token}`}
                         target="_blank"
                       >
                         here

@@ -188,7 +188,11 @@ export const CreateIntegrationSheet = ({
       </SheetHeader>
       <Separator />
       <Form_Shadcn_ {...form}>
-        <form id={FORM_ID} className="w-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          id={FORM_ID}
+          className="w-full flex-1 overflow-auto"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <Separator />
           <SheetSection className="space-y-4">
             {integrationEntry?.id &&
