@@ -66,6 +66,9 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     }
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
     createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
+
+    //react-hook-form does not reset field values even after submit. Reset Field data so data does not persist
+    form.reset({ email: '', password: '', autoConfirmUser: true })
   }
 
   const FormSchema = z.object({
