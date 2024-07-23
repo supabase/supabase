@@ -1,6 +1,7 @@
 import { memo } from 'react'
 
 import NavigationMenuGuideList from './NavigationMenuGuideList'
+import NavigationMenuRefList from './NavigationMenuRefList'
 import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
@@ -50,6 +51,7 @@ interface GuideMenu extends BaseMenu {
 interface ReferenceMenu extends BaseMenu {
   type: 'reference'
   path: string
+  commonSectionsFile?: string
 }
 
 type Menu = GuideMenu | ReferenceMenu
@@ -170,36 +172,43 @@ const menus: Menu[] = [
     id: MenuId.RefCli,
     type: 'reference',
     path: '/reference/cli',
+    commonSectionsFile: 'common-cli-sections.json',
   },
   {
     id: MenuId.RefApi,
     type: 'reference',
     path: '/reference/api',
+    commonSectionsFile: 'common-api-sections.json',
   },
   {
     id: MenuId.SelfHostingAuth,
     type: 'reference',
     path: '/reference/self-hosting-auth',
+    commonSectionsFile: 'common-self-hosting-auth-sections.json',
   },
   {
     id: MenuId.SelfHostingStorage,
     type: 'reference',
     path: '/reference/self-hosting-storage',
+    commonSectionsFile: 'common-self-hosting-storage-sections.json',
   },
   {
     id: MenuId.SelfHostingRealtime,
     type: 'reference',
     path: '/reference/self-hosting-realtime',
+    commonSectionsFile: 'common-self-hosting-realtime-sections.json',
   },
   {
     id: MenuId.SelfHostingAnalytics,
     type: 'reference',
     path: '/reference/self-hosting-analytics',
+    commonSectionsFile: 'common-self-hosting-analytics-sections.json',
   },
   {
     id: MenuId.SelfHostingFunctions,
     type: 'reference',
     path: '/reference/self-hosting-functions',
+    commonSectionsFile: 'common-self-hosting-functions-sections.json',
   },
 ]
 
@@ -208,12 +217,18 @@ function getMenuById(id: MenuId) {
 }
 
 function getMenuElement(menu: Menu | undefined) {
-  if (!menu) throw Error('No menu found for this menuId')
-
-  const menuType = menu.type
+  const menuType = menu?.type
   switch (menuType) {
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} />
+    case 'reference':
+      return (
+        <NavigationMenuRefList
+          id={menu.id}
+          basePath={menu.path}
+          commonSectionsFile={menu.commonSectionsFile}
+        />
+      )
     default:
       return null
   }
