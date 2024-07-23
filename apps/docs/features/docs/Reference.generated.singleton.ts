@@ -88,3 +88,20 @@ export async function getFlattenedSections(sdkId: string, version: string) {
 
   return flatSections.get(key)
 }
+
+const sectionsBySlug = new Map<string, Map<string, AbbrevCommonClientLibSection>>()
+
+export async function getSectionsBySlug(sdkId: string, version: string) {
+  const key = `${sdkId}.${version}`
+  if (!sectionsBySlug.has(key)) {
+    const data = await readFile(
+      join(dirname(fileURLToPath(import.meta.url)), `./generated/${sdkId}.${version}.bySlug.json`),
+      'utf-8'
+    )
+    const asObject = JSON.parse(data)
+
+    sectionsBySlug.set(key, new Map(Object.entries(asObject)))
+  }
+
+  return sectionsBySlug.get(key)
+}

@@ -1,4 +1,4 @@
-import { isPlainObject } from 'lodash'
+import { keyBy, isPlainObject } from 'lodash'
 import { dirname, join } from 'node:path'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -107,7 +107,18 @@ async function writeReferenceSections() {
           JSON.stringify(flattened)
         )
 
-        return [pendingFnListWrite, pendingSectionTreeWrite, pendingFlattenedWrite]
+        const sectionsBySlug = keyBy(flattened, (section) => section.slug)
+        const pendingSlugDictionaryWrite = writeFile(
+          join(GENERATED_DIRECTORY, `${sdkId}.${version}.bySlug.json`),
+          JSON.stringify(sectionsBySlug)
+        )
+
+        return [
+          pendingFnListWrite,
+          pendingSectionTreeWrite,
+          pendingFlattenedWrite,
+          pendingSlugDictionaryWrite,
+        ]
       })
   )
 }

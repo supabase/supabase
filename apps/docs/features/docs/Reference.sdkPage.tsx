@@ -1,7 +1,7 @@
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { REFERENCES } from '~/content/navigation.references'
-import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
+import { getSectionsBySlug } from '~/features/docs/Reference.generated.singleton'
 import { ClientLibHeader } from '~/features/docs/Reference.header'
 import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Reference.introduction'
 import { ClientSdkNavigation } from '~/features/docs/Reference.navigation'
@@ -31,8 +31,8 @@ export async function ClientSdkReferencePage({
   const menuData = NavItems[libraryMeta.meta[libVersion].libId]
 
   if (isCrawlerPage) {
-    const sections = await getFlattenedSections(sdkId, libVersion)
-    const section = sections.find((section) => section.slug === requestedSection)
+    const sections = await getSectionsBySlug(sdkId, libVersion)
+    const section = sections.get(requestedSection)
     if (!section) return null
 
     return <SectionSwitch sdkId={sdkId} version={libVersion} section={section} isCrawlerPage />

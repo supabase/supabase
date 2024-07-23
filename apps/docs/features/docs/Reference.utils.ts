@@ -9,7 +9,7 @@ import { visit } from 'unist-util-visit'
 import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH, SKIP_BUILD_STATIC_GENERATION } from '~/lib/constants'
+import { BASE_PATH } from '~/lib/constants'
 
 export interface AbbrevCommonClientLibSection {
   id: string
@@ -68,21 +68,6 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
 }
 
 export async function generateReferenceStaticParams() {
-  const crawlerPages = SKIP_BUILD_STATIC_GENERATION
-    ? []
-    : clientSdkIds
-        .flatMap((sdkId) =>
-          REFERENCES[sdkId].versions.map((version) => ({
-            sdkId,
-            version,
-            specFile: REFERENCES[sdkId].meta[version].specFile,
-            excludeName: REFERENCES[sdkId].meta[version].excludeName,
-          }))
-        )
-        .map(async ({ sdkId, version, specFile, excludeName }) => {
-          return generateStaticParamsForSdkVersion(sdkId, version)
-        })
-
   const nonCrawlerPages = clientSdkIds
     .flatMap((sdkId) =>
       REFERENCES[sdkId].versions.map((version) => ({
@@ -94,7 +79,7 @@ export async function generateReferenceStaticParams() {
       slug: [sdkId, version === REFERENCES[sdkId].versions[0] ? null : version].filter(Boolean),
     }))
 
-  return nonCrawlerPages.concat((await Promise.all(crawlerPages)).flat())
+  return nonCrawlerPages
 }
 
 export async function generateReferenceMetadata(

@@ -24,11 +24,10 @@ export function middleware(request: NextRequest) {
       }
 
       if (slug.length > 0) {
-        const rewritePath = [REFERENCE_PATH, lib, version, 'crawlers', ...slug]
-          .filter(Boolean)
-          .join('/')
+        const rewriteUrl = new URL(url)
+        rewriteUrl.pathname = (BASE_PATH ?? '/') + '/api/crawlers'
 
-        return NextResponse.rewrite(new URL(rewritePath, request.url))
+        return NextResponse.rewrite(rewriteUrl)
       }
     }
   } else {
