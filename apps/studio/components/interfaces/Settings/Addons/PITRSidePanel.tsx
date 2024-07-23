@@ -18,7 +18,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -126,18 +125,6 @@ const PITRSidePanel = () => {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Point in Time Recovery',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -230,19 +217,6 @@ const PITRSidePanel = () => {
                       } else {
                         setSelectedOption('pitr_7')
                       }
-                      Telemetry.sendActivity(
-                        {
-                          activity: 'Option Selected',
-                          source: 'Dashboard',
-                          data: {
-                            title: 'Point in Time Recovery',
-                            section: 'Add ons',
-                            option: option.name,
-                          },
-                          projectRef,
-                        },
-                        router
-                      )
                     }}
                   >
                     <img
