@@ -10,7 +10,7 @@ let typeSpec: Array<ModuleTypes>
 async function _typeSpecSingleton() {
   if (!typeSpec) {
     const rawJson = await readFile(
-      join(dirname(fileURLToPath(import.meta.url)), './generated/typeSpec.json'),
+      join(process.cwd(), 'features/docs', './generated/typeSpec.json'),
       'utf-8'
     )
     typeSpec = JSON.parse(rawJson, (key, value) => {
@@ -41,10 +41,7 @@ export async function getFunctionsList(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!functionsList.has(key)) {
     const data = await readFile(
-      join(
-        dirname(fileURLToPath(import.meta.url)),
-        `./generated/${sdkId}.${version}.functions.json`
-      ),
+      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.functions.json`),
       'utf-8'
     )
 
@@ -60,10 +57,7 @@ export async function getReferenceSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!referenceSections.has(key)) {
     const data = await readFile(
-      join(
-        dirname(fileURLToPath(import.meta.url)),
-        `./generated/${sdkId}.${version}.sections.json`
-      ),
+      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.sections.json`),
       'utf-8'
     )
 
@@ -79,7 +73,7 @@ export async function getFlattenedSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!flatSections.has(key)) {
     const data = await readFile(
-      join(dirname(fileURLToPath(import.meta.url)), `./generated/${sdkId}.${version}.flat.json`),
+      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.flat.json`),
       'utf-8'
     )
 
@@ -95,7 +89,7 @@ export async function getSectionsBySlug(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
   if (!sectionsBySlug.has(key)) {
     const data = await readFile(
-      join(dirname(fileURLToPath(import.meta.url)), `./generated/${sdkId}.${version}.bySlug.json`),
+      join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.bySlug.json`),
       'utf-8'
     )
     const asObject = JSON.parse(data)

@@ -53,6 +53,8 @@ export async function GET(request: Request) {
   }
 
   const html = htmlShell(
+    lib,
+    isVersion ? version : null,
     libraryNav(sectionsWithUrl) + (await sectionDetails(lib, isVersion ? version : null, section))
   )
   const response = new Response(html)
@@ -61,8 +63,8 @@ export async function GET(request: Request) {
   return response
 }
 
-function htmlShell(body: string) {
-  return '<!doctype html><html><body>' + body + '</body></html>'
+function htmlShell(lib: string, version: string | null, body: string) {
+  return '<!doctype html><html>' + '<head>' + '</head>' + '<body>' + body + '</body></html>'
 }
 
 function libraryNav(sections: Array<AbbrevCommonClientLibSection & { url: URL }>) {
