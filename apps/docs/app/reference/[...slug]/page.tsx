@@ -33,6 +33,7 @@ export default async function ReferencePage({
 
     return (
       <ClientSdkReferencePage
+        sdkId={sdkId}
         libId={sdkData.meta[version].libId}
         libPath={sdkData.libPath}
         libVersion={maybeVersion ?? latestVersion}
@@ -43,7 +44,8 @@ export default async function ReferencePage({
       />
     )
   } else {
-    return <h1>UNIMPLEMENTED</h1>
+    // Unimplemented -- eventually API and CLI
+    redirect(notFoundLink(slug.join('/')))
   }
 }
 

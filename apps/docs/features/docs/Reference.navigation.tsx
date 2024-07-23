@@ -4,37 +4,33 @@ import { cn } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
+import { getReferenceSections } from '~/features/docs/Reference.generated.singleton'
 import {
   RefLink,
   ReferenceNavigationScrollHandler,
 } from '~/features/docs/Reference.navigation.client'
-import {
-  genClientSdkSectionTree,
-  type AbbrevCommonClientLibSection,
-} from '~/features/docs/Reference.utils'
+import { type AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 
 interface ClientSdkNavigationProps {
+  sdkId: string
   name: string
   menuData: { icon?: string }
   libPath: string
   version: string
-  specFile: string
-  excludeName: string
   isLatestVersion: boolean
   isCrawlerPage?: boolean
 }
 
 async function ClientSdkNavigation({
+  sdkId,
   name,
   menuData,
   libPath,
   version,
-  specFile,
-  excludeName,
   isLatestVersion,
   isCrawlerPage = false,
 }: ClientSdkNavigationProps) {
-  const navSections = await genClientSdkSectionTree(specFile, excludeName)
+  const navSections = await getReferenceSections(sdkId, version)
 
   const basePath = `/reference/${libPath}${isLatestVersion ? '' : `/${version}`}`
 

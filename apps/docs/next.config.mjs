@@ -64,6 +64,7 @@ const nextConfig = {
     },
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
+  staticPageGenerationTimeout: 300,
   /**
    * The SQL to REST API translator relies on libpg-query, which packages a
    * native Node.js module that wraps the Postgres query parser.

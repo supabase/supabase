@@ -5,7 +5,11 @@ import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import { getTypeSpec } from '~/features/docs/Reference.typeSpec.singleton'
+import {
+  getFlattenedSections,
+  getFunctionsList,
+  getTypeSpec,
+} from '~/features/docs/Reference.generated.singleton'
 import {
   CollapsibleDetails,
   FnParameterDetails,
@@ -14,19 +18,14 @@ import {
   StickyHeader,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
-import {
-  flattenCommonClientLibSections,
-  genClientSdkSectionTree,
-  getSpecFnsCached,
-  normalizeMarkdown,
-} from '~/features/docs/Reference.utils'
+import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 
 type ClientLibRefSectionsProps = {
+  sdkId: string
   libPath: string
   version: string
   isLatestVersion: boolean
   specFile: string
-  excludeName: string
   useTypeSpec: boolean
 } & (
   | { isCrawlerPage?: false; requestedSection?: undefined }
@@ -34,17 +33,16 @@ type ClientLibRefSectionsProps = {
 )
 
 async function ClientLibRefSections({
+  sdkId,
   libPath,
   version,
   isLatestVersion,
   specFile,
-  excludeName,
   useTypeSpec,
   isCrawlerPage = false,
   requestedSection,
 }: ClientLibRefSectionsProps) {
-  const sectionTree = await genClientSdkSectionTree(specFile, excludeName)
-  const flattenedSections = flattenCommonClientLibSections(sectionTree)
+  const flattenedSections = await getFlattenedSections(sdkId, version)
 
   let requestedSectionMeta: AbbrevCommonClientLibSection
   if (isCrawlerPage) {
@@ -59,6 +57,7 @@ async function ClientLibRefSections({
         {isCrawlerPage
           ? !!requestedSectionMeta && (
               <SectionSwitch
+                sdkId={sdkId}
                 libPath={libPath}
                 version={version}
                 isLatestVersion={isLatestVersion}
@@ -74,6 +73,7 @@ async function ClientLibRefSections({
                 <Fragment key={`${section.id}-${idx}`}>
                   <SectionDivider />
                   <SectionSwitch
+                    sdkId={sdkId}
                     libPath={libPath}
                     version={version}
                     isLatestVersion={isLatestVersion}
@@ -100,6 +100,7 @@ function SectionDivider() {
 }
 
 interface SectionSwitchProps {
+  sdkId: string
   libPath: string
   version: string
   isLatestVersion: boolean
@@ -110,6 +111,7 @@ interface SectionSwitchProps {
 }
 
 function SectionSwitch({
+  sdkId,
   libPath,
   section,
   version,
@@ -135,9 +137,10 @@ function SectionSwitch({
     case 'function':
       return (
         <FunctionSection
+          sdkId={sdkId}
+          version={version}
           link={sectionLink}
           section={section}
-          specFile={specFile}
           useTypeSpec={useTypeSpec}
           isCrawlerPage={isCrawlerPage}
         />
@@ -180,21 +183,23 @@ async function MarkdownSection({
 }
 
 interface FunctionSectionProps {
+  sdkId: string
+  version: string
   link: string
   section: AbbrevCommonClientLibSection
-  specFile: string
   useTypeSpec: boolean
   isCrawlerPage?: boolean
 }
 
 async function FunctionSection({
+  sdkId,
+  version,
   link,
   section,
-  specFile,
   useTypeSpec,
   isCrawlerPage = false,
 }: FunctionSectionProps) {
-  const fns = await getSpecFnsCached(specFile)
+  const fns = await getFunctionsList(sdkId, version)
 
   const fn = fns.find((fn) => fn.id === section.id)
   if (!fn) return null

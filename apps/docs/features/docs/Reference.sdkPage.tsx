@@ -10,6 +10,7 @@ import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 type ClientSdkReferenceProps = {
+  sdkId: string
   libId: string
   libPath: string
   libVersion: string
@@ -21,6 +22,7 @@ type ClientSdkReferenceProps = {
 )
 
 export async function ClientSdkReferencePage({
+  sdkId,
   libId,
   libPath,
   libVersion,
@@ -41,12 +43,11 @@ export async function ClientSdkReferencePage({
         menuId={MenuId.RefJavaScriptV2}
         NavigationMenu={
           <ClientSdkNavigation
+            sdkId={sdkId}
             name={menuData.title}
             menuData={menuData}
             libPath={libPath}
             version={libVersion}
-            specFile={specFile}
-            excludeName={libId}
             isLatestVersion={isLatestVersion}
             isCrawlerPage={isCrawlerPage}
           />
@@ -72,11 +73,11 @@ export async function ClientSdkReferencePage({
               </>
             )}
             <ClientLibRefSections
+              sdkId={sdkId}
               libPath={libPath}
               version={libVersion}
               isLatestVersion={isLatestVersion}
               specFile={specFile}
-              excludeName={libId}
               useTypeSpec={useTypeSpec}
               {...(isCrawlerPage
                 ? { isCrawlerPage: true, requestedSection }

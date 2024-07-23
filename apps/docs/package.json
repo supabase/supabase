@@ -18,7 +18,7 @@
     "embeddings:refresh": "npm run embeddings -- --refresh",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "npm run last-changed -- --reset",
-    "codegen:references": "tsx features/docs/Reference.typeSpec.script.ts",
+    "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
