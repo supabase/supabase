@@ -1,7 +1,9 @@
 import { load } from 'cheerio'
 import { expect, it, describe } from 'vitest'
 
-const REFERENCE_DOCS_URL = 'https://supabase.com/docs/reference'
+// const REFERENCE_DOCS_URL = 'https://supabase.com/docs/reference'
+// For dev testing: comment out above and uncomment below
+const REFERENCE_DOCS_URL = 'http://localhost:3001/docs/reference'
 
 describe('prod smoke test: crawler pages return correct data', () => {
   /**
@@ -10,7 +12,7 @@ describe('prod smoke test: crawler pages return correct data', () => {
    * as a different `h1` is served to non-bots.
    */
 
-  it('metadata: title, description, canonical', async () => {
+  it('metadata: title, description, canonical, image', async () => {
     const result = await fetch(REFERENCE_DOCS_URL + '/javascript/rangelte')
     const text = await result.text()
 
@@ -25,6 +27,12 @@ describe('prod smoke test: crawler pages return correct data', () => {
 
     const canonical = $('link[rel="canonical"]')
     expect(canonical.attr('href')).toBe('https://supabase.com/docs/reference/javascript/rangelte')
+
+    const ogImage = $('meta[name="og:image"]')
+    expect(ogImage.attr('content')).toBe('https://supabase.com/docs/img/supabase-og-image.png')
+
+    const twitterImage = $('meta[name="twitter:image"]')
+    expect(twitterImage.attr('content')).toBe('https://supabase.com/docs/img/supabase-og-image.png')
   })
 
   it('markdown pages', async () => {

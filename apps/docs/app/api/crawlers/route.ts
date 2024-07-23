@@ -16,6 +16,7 @@ import { getRefMarkdown } from '../../../features/docs/Reference.mdx'
 import type { MethodTypes } from '../../../features/docs/Reference.typeSpec'
 import type { AbbrevCommonClientLibSection } from '../../../features/docs/Reference.utils'
 import { notFoundLink } from '../../../features/recommendations/NotFound.utils'
+import { generateOpenGraphImageMeta } from '../../../features/seo/openGraph'
 import { BASE_PATH } from '../../../lib/constants'
 
 export async function GET(request: Request) {
@@ -80,6 +81,8 @@ function htmlShell(
     '<head>' +
     `<title>${title} | Supabase Docs</title>` +
     `<meta name="description" content="Supabase API reference for ${libraryName}${section.title ? ': ' + section.title : ''}">` +
+    `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
+    `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
     (version ? '/' + version : '') +
     (slug ? '/' + slug : '') +

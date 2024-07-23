@@ -13,7 +13,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
-    "test:smoke": "vitest -t \"prod smoke test\"",
+    "test:smoke": "npm run codegen:references && vitest -t \"prod smoke test\"",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
     "embeddings:refresh": "npm run embeddings -- --refresh",

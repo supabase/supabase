@@ -104,6 +104,11 @@ export async function generateReferenceMetadata(
         : undefined
     const url = [BASE_PATH, 'reference', sdkId, maybeVersion, slug[0]].filter(Boolean).join('/')
 
+    const images = generateOpenGraphImageMeta({
+      type: 'API Reference',
+      title: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
+    })
+
     return {
       title: `${displayName} API Reference | Supabase Docs`,
       description: `API reference for the ${displayName} Supabase SDK`,
@@ -118,10 +123,7 @@ export async function generateReferenceMetadata(
       openGraph: {
         ...parentOg,
         url,
-        images: generateOpenGraphImageMeta({
-          type: 'API Reference',
-          title: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
-        }),
+        images,
       },
     }
   } else {

@@ -30,8 +30,8 @@ type ClientLibRefSectionsProps = {
 )
 
 async function ClientLibRefSections({ sdkId, version }: ClientLibRefSectionsProps) {
-  const flattenedSections = await getFlattenedSections(sdkId, version)
-  trimIntro(flattenedSections)
+  let flattenedSections = await getFlattenedSections(sdkId, version)
+  flattenedSections = trimIntro(flattenedSections)
 
   return (
     <MDXProviderReference>
@@ -52,8 +52,9 @@ async function ClientLibRefSections({ sdkId, version }: ClientLibRefSectionsProp
 function trimIntro(sections: Array<AbbrevCommonClientLibSection>) {
   const hasIntro = sections[0]?.type === 'markdown' && sections[0]?.slug === 'introduction'
   if (hasIntro) {
-    sections.shift()
+    return sections.slice(1)
   }
+  return sections
 }
 
 function SectionDivider() {
