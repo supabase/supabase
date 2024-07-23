@@ -1,7 +1,7 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { getAuthConfigV1 } from '~/lib/mdx/getConfig'
+import specAuthV1 from '~/spec/gotrue_v1_config.yaml' assert { type: 'yml' }
 
 const meta = {
   title: 'Auth Self-hosting Config',
@@ -14,8 +14,7 @@ const generateMetadata = genGuideMeta(() => ({
 }))
 
 const AuthConfigPage = async () => {
-  const spec = getAuthConfigV1()
-  const descriptionMdx = spec.info.description
+  const descriptionMdx = specAuthV1.info.description
 
   return (
     <GuideTemplate
@@ -27,7 +26,7 @@ const AuthConfigPage = async () => {
       <MDXRemoteGuides source={descriptionMdx} />
 
       <div>
-        {spec.info.tags.map((tag: ReturnType<typeof getAuthConfigV1>['info']['tags']) => {
+        {specAuthV1.info.tags.map((tag: ReturnType<typeof specAuthV1>['info']['tags']) => {
           return (
             <>
               <h2 className="text-foreground">{tag.title}</h2>
@@ -35,11 +34,11 @@ const AuthConfigPage = async () => {
               <div className="not-prose">
                 <h5 className="text-base text-foreground mb-3">Parameters</h5>
                 <ul>
-                  {spec.parameters
-                    .filter((param: ReturnType<typeof getAuthConfigV1>['parameters']) =>
+                  {specAuthV1.parameters
+                    .filter((param: ReturnType<typeof specAuthV1>['parameters']) =>
                       param.tags.includes(tag.id)
                     )
-                    .map((param: ReturnType<typeof getAuthConfigV1>['parameters']) => {
+                    .map((param: ReturnType<typeof specAuthV1>['parameters']) => {
                       return (
                         <Param
                           name={param.title}
