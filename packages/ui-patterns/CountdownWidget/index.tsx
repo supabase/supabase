@@ -23,9 +23,6 @@ export function CountdownWidget({
   const isLarge = size === 'large'
   const Colon = () => <span className={cn('text-xs mx-px', isLarge && 'text-lg')}>:</span>
 
-  const showItem = (item: string | undefined) => item !== undefined && item !== '0'
-
-  console.log(days, hours, minutes, seconds)
   return (
     <div className={cn('flex gap-1 items-center', className)}>
       {days !== undefined && days != '0' ? (

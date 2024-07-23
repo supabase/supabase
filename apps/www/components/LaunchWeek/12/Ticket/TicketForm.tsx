@@ -26,7 +26,7 @@ export default function TicketForm() {
       const email = session.user.email
 
       await supabase
-        .from('lw11_tickets')
+        .from('lw12_tickets')
         .insert({
           email,
           name,
@@ -43,7 +43,7 @@ export default function TicketForm() {
             return supabase.auth.signOut()
           }
           const { data } = await supabase
-            .from('lw11_tickets_platinum')
+            .from('lw12_tickets_view')
             .select('*')
             .eq('username', username)
             .single()
@@ -67,7 +67,7 @@ export default function TicketForm() {
                 {
                   event: 'UPDATE',
                   schema: 'public',
-                  table: 'lw11_tickets',
+                  table: 'lw12_tickets',
                   filter: `username=eq.${username}`,
                 },
                 (payload: any) => {
