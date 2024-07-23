@@ -43,7 +43,6 @@ export const ThirdPartyAuthForm = () => {
     useState<ThirdPartyAuthIntegration>()
 
   const { mutate: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  // TODO: check if these permissions cover third party auth as well
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   if (!thirdPartyAuthEnabled) {
