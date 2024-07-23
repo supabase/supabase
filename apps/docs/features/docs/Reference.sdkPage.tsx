@@ -1,11 +1,12 @@
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { REFERENCES } from '~/content/navigation.references'
+import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { ClientLibHeader } from '~/features/docs/Reference.header'
 import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Reference.introduction'
 import { ClientSdkNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
-import { ClientLibRefSections } from '~/features/docs/Reference.sections'
+import { ClientLibRefSections, SectionSwitch } from '~/features/docs/Reference.sections'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
@@ -17,15 +18,7 @@ type ClientSdkReferenceProps = {
   | { isCrawlerPage: true; requestedSection: string }
 )
 
-const _clientSdkComponentCache = new Map<string, any>()
-export async function ClientSdkReferencePage(props) {
-  const key = JSON.stringify(props)
-  if (!_clientSdkComponentCache.has(key)) {
-    _clientSdkComponentCache.set(key, ClientSdkReferencePageUncached(props))
-  }
-  return _clientSdkComponentCache.get(key)
-}
-async function ClientSdkReferencePageUncached({
+export async function ClientSdkReferencePage({
   sdkId,
   libVersion,
   isCrawlerPage = false,
@@ -36,6 +29,14 @@ async function ClientSdkReferencePageUncached({
   const isLatestVersion = libVersion === versions[0]
 
   const menuData = NavItems[libraryMeta.meta[libVersion].libId]
+
+  if (isCrawlerPage) {
+    const sections = await getFlattenedSections(sdkId, libVersion)
+    const section = sections.find((section) => section.slug === requestedSection)
+    if (!section) return null
+
+    return <SectionSwitch sdkId={sdkId} version={libVersion} section={section} isCrawlerPage />
+  }
 
   return (
     <ReferenceContentScrollHandler libPath={libraryMeta.libPath}>
@@ -72,17 +73,7 @@ async function ClientSdkReferencePageUncached({
                 />
               </>
             )}
-            <ClientLibRefSections
-              sdkId={sdkId}
-              libPath={libraryMeta.libPath}
-              version={libVersion}
-              isLatestVersion={isLatestVersion}
-              specFile={libraryMeta.meta[libVersion].specFile}
-              useTypeSpec={libraryMeta.typeSpec}
-              {...(isCrawlerPage
-                ? { isCrawlerPage: true, requestedSection }
-                : { isCrawlerPage: false })}
-            />
+            <ClientLibRefSections sdkId={sdkId} version={libVersion} />
           </article>
         </LayoutMainContent>
       </SidebarSkeleton>

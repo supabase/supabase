@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
+import { REFERENCES } from '~/content/navigation.references'
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
@@ -22,67 +23,27 @@ import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 
 type ClientLibRefSectionsProps = {
   sdkId: string
-  libPath: string
   version: string
-  isLatestVersion: boolean
-  specFile: string
-  useTypeSpec: boolean
 } & (
   | { isCrawlerPage?: false; requestedSection?: undefined }
   | { isCrawlerPage: true; requestedSection: string }
 )
 
-async function ClientLibRefSections({
-  sdkId,
-  libPath,
-  version,
-  isLatestVersion,
-  specFile,
-  useTypeSpec,
-  isCrawlerPage = false,
-  requestedSection,
-}: ClientLibRefSectionsProps) {
+async function ClientLibRefSections({ sdkId, version }: ClientLibRefSectionsProps) {
   const flattenedSections = await getFlattenedSections(sdkId, version)
-
-  let requestedSectionMeta: AbbrevCommonClientLibSection
-  if (isCrawlerPage) {
-    requestedSectionMeta = flattenedSections.find((section) => section.slug === requestedSection)
-  } else {
-    trimIntro(flattenedSections)
-  }
+  trimIntro(flattenedSections)
 
   return (
     <MDXProviderReference>
       <div className="flex flex-col my-16 gap-16">
-        {isCrawlerPage
-          ? !!requestedSectionMeta && (
-              <SectionSwitch
-                sdkId={sdkId}
-                libPath={libPath}
-                version={version}
-                isLatestVersion={isLatestVersion}
-                section={requestedSectionMeta}
-                specFile={specFile}
-                useTypeSpec={useTypeSpec}
-                isCrawlerPage
-              />
-            )
-          : flattenedSections
-              .filter((section) => section.type !== 'category')
-              .map((section, idx) => (
-                <Fragment key={`${section.id}-${idx}`}>
-                  <SectionDivider />
-                  <SectionSwitch
-                    sdkId={sdkId}
-                    libPath={libPath}
-                    version={version}
-                    isLatestVersion={isLatestVersion}
-                    section={section}
-                    specFile={specFile}
-                    useTypeSpec={useTypeSpec}
-                  />
-                </Fragment>
-              ))}
+        {flattenedSections
+          .filter((section) => section.type !== 'category')
+          .map((section, idx) => (
+            <Fragment key={`${section.id}-${idx}`}>
+              <SectionDivider />
+              <SectionSwitch sdkId={sdkId} version={version} section={section} />
+            </Fragment>
+          ))}
       </div>
     </MDXProviderReference>
   )
@@ -99,27 +60,17 @@ function SectionDivider() {
   return <hr />
 }
 
-interface SectionSwitchProps {
+type SectionSwitchProps = {
   sdkId: string
-  libPath: string
   version: string
-  isLatestVersion: boolean
   section: AbbrevCommonClientLibSection
-  specFile: string
-  useTypeSpec: boolean
   isCrawlerPage?: boolean
 }
 
-function SectionSwitch({
-  sdkId,
-  libPath,
-  section,
-  version,
-  isLatestVersion,
-  specFile,
-  useTypeSpec,
-  isCrawlerPage,
-}: SectionSwitchProps) {
+export function SectionSwitch({ sdkId, version, section, isCrawlerPage }: SectionSwitchProps) {
+  const libPath = REFERENCES[sdkId].libPath
+  const isLatestVersion = version === REFERENCES[sdkId].versions[0]
+
   const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
 
   switch (section.type) {
@@ -141,7 +92,7 @@ function SectionSwitch({
           version={version}
           link={sectionLink}
           section={section}
-          useTypeSpec={useTypeSpec}
+          useTypeSpec={REFERENCES[sdkId].typeSpec}
           isCrawlerPage={isCrawlerPage}
         />
       )
