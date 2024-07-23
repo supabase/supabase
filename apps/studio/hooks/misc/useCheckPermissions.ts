@@ -8,6 +8,7 @@ import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 import { useSelectedProject } from './useSelectedProject'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -31,7 +32,7 @@ function doPermissionConditionCheck(permissions: Permission[], data?: object) {
 
 export function doPermissionsCheck(
   permissions: Permission[] | undefined,
-  action: string,
+  action: PermissionAction,
   resource: string,
   data?: object,
   organizationId?: number,
@@ -110,7 +111,7 @@ export function useGetProjectPermissions(
 }
 
 export function useCheckPermissions(
-  action: string,
+  action: PermissionAction,
   resource: string,
   data?: object,
   // [Joshen] Pass the variables if you want to avoid hooks in this
@@ -126,7 +127,7 @@ export function useCheckPermissions(
 }
 
 export function useCheckProjectPermissions(
-  action: string,
+  action: PermissionAction,
   resource: string,
   data?: object,
   overrides?: {
