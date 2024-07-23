@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "predev": "npm run codegen:references",
     "dev": "next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
+    "prebuild": "npm run codegen:references",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
@@ -16,6 +18,7 @@
     "embeddings:refresh": "npm run embeddings -- --refresh",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "npm run last-changed -- --reset",
+    "codegen:references": "tsx features/docs/Reference.typeSpec.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },

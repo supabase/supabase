@@ -5,7 +5,7 @@ import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import { getTypeSpec } from '~/features/docs/Reference.typeSpec'
+import { getTypeSpec } from '~/features/docs/Reference.typeSpec.singleton'
 import {
   CollapsibleDetails,
   FnParameterDetails,

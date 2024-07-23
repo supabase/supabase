@@ -8,8 +8,8 @@
 
 import { join } from 'node:path'
 
-import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-import { SPEC_DIRECTORY } from '~/lib/docs'
+// import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
+// import { SPEC_DIRECTORY } from '~/lib/docs'
 import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' assert { type: 'json' }
 
 // [Charis] 2024-07-10
@@ -26,7 +26,7 @@ export const TYPESPEC_NODE_ANONYMOUS = Symbol('anonymous')
  * Definitions for the methods and types defined in each Supabase JS client
  * library.
  */
-interface ModuleTypes {
+export interface ModuleTypes {
   name: string
   methods: Map<string, MethodTypes>
 }
@@ -167,7 +167,7 @@ export interface CustomTypePropertyType {
  *
  * @param ref The method identifier, in the form `@supabase/supabase-js.index.SupabaseClient.constructor`.
  */
-export async function getTypeSpec(ref: string) {
+/* export async function getTypeSpec(ref: string) {
   const modules = await parseTypeSpec()
 
   const delimiter = ref.indexOf('.')
@@ -181,7 +181,7 @@ const parseTypeSpec = cache_fullProcess_withDevCacheBust(
   __parseTypeSpec,
   join(SPEC_DIRECTORY, 'enrichments/tsdoc_v2/combined.json'),
   () => JSON.stringify([])
-)
+) */
 
 /**
  * @private

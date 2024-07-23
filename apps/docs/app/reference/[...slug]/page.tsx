@@ -1,13 +1,13 @@
 import { redirect } from 'next/navigation'
 
 import { REFERENCES } from '~/content/navigation.references'
+import { ClientSdkReferencePage } from '~/features/docs/Reference.sdkPage'
 import {
-  ClientSdkReferencePage,
   generateReferenceMetadata,
   generateReferenceStaticParams,
   parseReferencePath,
   redirectNonexistentReferenceSection,
-} from '~/features/docs/Reference.sdkPage'
+} from '~/features/docs/Reference.utils'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 
 export default async function ReferencePage({
