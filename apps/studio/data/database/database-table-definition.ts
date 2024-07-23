@@ -206,7 +206,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
             WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');      		  
             
             --Issue#19 put double-quotes around SQL keyword column names
-            SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
+            SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = in_table AND catcode = 'R';
             
             IF bInheritance THEN
               -- inheritance-based
