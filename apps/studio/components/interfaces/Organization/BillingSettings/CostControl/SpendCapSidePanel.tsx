@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -12,7 +11,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel, cn } from 'ui'
@@ -38,7 +36,6 @@ const SPEND_CAP_OPTIONS: {
 ]
 
 const SpendCapSidePanel = () => {
-  const router = useRouter()
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
 
@@ -75,18 +72,6 @@ const SpendCapSidePanel = () => {
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Spend cap',
-            section: 'Cost Control',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
@@ -221,22 +206,7 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={cn('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => {
-                      !isFreePlan && setSelectedOption(option.value)
-                      Telemetry.sendActivity(
-                        {
-                          activity: 'Option Selected',
-                          source: 'Dashboard',
-                          data: {
-                            title: 'Spend cap',
-                            section: 'Cost Control',
-                            option: option.name,
-                          },
-                          ...(slug && { orgSlug: slug }),
-                        },
-                        router
-                      )
-                    }}
+                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
                   >
                     <Image
                       alt="Spend Cap"
