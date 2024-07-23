@@ -1,4 +1,4 @@
-import { TsDoc } from '../../generator/legacy/definitions'
+import type { TsDoc } from '../../generator/legacy/definitions'
 
 import { values, mapValues } from 'lodash'
 import type { OpenAPIV3 } from 'openapi-types'
