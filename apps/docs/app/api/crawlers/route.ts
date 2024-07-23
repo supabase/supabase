@@ -55,6 +55,8 @@ export async function GET(request: Request) {
   const html = htmlShell(
     lib,
     isVersion ? version : null,
+    slug,
+    section,
     libraryNav(sectionsWithUrl) + (await sectionDetails(lib, isVersion ? version : null, section))
   )
   const response = new Response(html)
@@ -63,8 +65,30 @@ export async function GET(request: Request) {
   return response
 }
 
-function htmlShell(lib: string, version: string | null, body: string) {
-  return '<!doctype html><html>' + '<head>' + '</head>' + '<body>' + body + '</body></html>'
+function htmlShell(
+  lib: string,
+  version: string | null,
+  slug: string,
+  section: AbbrevCommonClientLibSection,
+  body: string
+) {
+  const libraryName = REFERENCES[lib].name
+  let title = libraryName + ': ' + section.title ?? ''
+
+  return (
+    '<!doctype html><html>' +
+    '<head>' +
+    `<title>${title} | Supabase Docs</title>` +
+    `<meta name="description" content="Supabase API reference for ${libraryName}${section.title ? ': ' + section.title : ''}">` +
+    `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
+    (version ? '/' + version : '') +
+    (slug ? '/' + slug : '') +
+    `">` +
+    '</head>' +
+    '<body>' +
+    body +
+    '</body></html>'
+  )
 }
 
 function libraryNav(sections: Array<AbbrevCommonClientLibSection & { url: URL }>) {
@@ -152,7 +176,7 @@ function mdxToHtml(markdownUnescaped: string): string {
 }
 
 function parametersToHtml(fn: any, types: MethodTypes | undefined) {
-  let result = '<h2>Parameters</h2>'
+  let result = '<h2 id="parameters">Parameters</h2>'
 
   if ('overwriteParams' in fn || 'params' in fn) {
     const params = fn.overwriteParams ?? fn.params
@@ -197,7 +221,7 @@ function parametersToHtml(fn: any, types: MethodTypes | undefined) {
 function examplesToHtml(fn: any) {
   if (!fn.examples || fn.examples.length === 0) return ''
 
-  let result = '<h2>Examples</h2>'
+  let result = '<h2 id="examples">Examples</h2>'
 
   result += fn.examples
     .map((example) => `<h3>${example.name ?? ''}</h3>` + mdxToHtml(example.code ?? ''))
