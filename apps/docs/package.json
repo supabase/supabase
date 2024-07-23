@@ -100,6 +100,7 @@
     "ejs": "^3.1.10",
     "globby": "^13.2.2",
     "nextjs-node-loader": "^1.1.5",
+    "node-mocks-http": "^1.15.0",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.1.3",
     "simple-git": "^3.24.0",
