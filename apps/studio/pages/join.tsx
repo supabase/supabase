@@ -1,18 +1,21 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useParams } from 'common'
 import { OrganizationInvite } from 'components/interfaces/OrganizationInvite/OrganizationInvite'
 import { OrganizationInviteOld } from 'components/interfaces/OrganizationInvite/OrganizationInviteOld'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const JoinOrganizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const isProjectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const { slug } = useParams()
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   // [Joshen] Can remove this once API changes are deployed to production
-  if (!isProjectLevelPermissionsEnabled) {
+  // To double check whether existing invite flow works with the new endpoints
+  if (!isOptedIntoProjectLevelPermissions) {
     return <OrganizationInviteOld />
   }
 

@@ -154,7 +154,6 @@ const CreateProject = () => {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
     if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
 
     snapshot.setLoading(true)
@@ -172,7 +171,6 @@ const CreateProject = () => {
       dbPass,
       dbRegion,
       dbSql,
-      configurationId,
     })
   }
   const isInstallingRef = useRef(false)

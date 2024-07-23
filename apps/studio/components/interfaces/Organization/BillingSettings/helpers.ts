@@ -7,7 +7,6 @@ const pricingMetricBytes = [
 ]
 
 export const formatUsage = (pricingMetric: PricingMetric, usage: number) => {
-  console.log({ pricingMetric, usage })
   if (pricingMetricBytes.includes(pricingMetric)) {
     return +(usage / 1e9).toFixed(2).toLocaleString()
   } else {

@@ -12,7 +12,7 @@ const GuidesLayout = ({ children }: PropsWithChildren) => {
   return <Layout menuId={menuId}>{children}</Layout>
 }
 
-const getMenuId = (pathname: string | null) => {
+export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
   switch (true) {

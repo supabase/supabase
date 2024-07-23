@@ -1,7 +1,7 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { getStorageConfigV0 } from '~/lib/mdx/getConfig'
+import specStorageV0 from '~/spec/storage_v0_config.yaml' assert { type: 'yml' }
 
 const meta = {
   title: 'Storage Self-hosting Config',
@@ -14,8 +14,7 @@ const generateMetadata = genGuideMeta(() => ({
 }))
 
 const StorageConfigPage = async () => {
-  const spec = getStorageConfigV0()
-  const descriptionMdx = spec.info.description
+  const descriptionMdx = specStorageV0.info.description
 
   return (
     <GuideTemplate
@@ -27,7 +26,7 @@ const StorageConfigPage = async () => {
       <MDXRemoteGuides source={descriptionMdx} />
 
       <div>
-        {spec.info.tags.map((tag: ReturnType<typeof getStorageConfigV0>['info']['tags']) => {
+        {specStorageV0.info.tags.map((tag: ReturnType<typeof specStorageV0>['info']['tags']) => {
           return (
             <>
               <h2 className="text-foreground">{tag.title}</h2>
@@ -35,11 +34,11 @@ const StorageConfigPage = async () => {
               <div className="not-prose">
                 <h5 className="text-base text-foreground mb-3">Parameters</h5>
                 <ul>
-                  {spec.parameters
-                    .filter((param: ReturnType<typeof getStorageConfigV0>['parameters']) =>
+                  {specStorageV0.parameters
+                    .filter((param: ReturnType<typeof specStorageV0>['parameters']) =>
                       param.tags.includes(tag.id)
                     )
-                    .map((param: ReturnType<typeof getStorageConfigV0>['parameters']) => {
+                    .map((param: ReturnType<typeof specStorageV0>['parameters']) => {
                       return (
                         <Param
                           name={param.title}

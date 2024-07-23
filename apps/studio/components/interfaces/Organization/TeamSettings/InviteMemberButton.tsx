@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isNil } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
-import Link from 'next/link'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
@@ -15,13 +17,12 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import {
   doPermissionsCheck,
-  useGetPermissions,
   useCheckPermissions,
+  useGetPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-import { isNil } from 'lodash'
 import {
   Button,
   Dialog,
@@ -50,14 +51,13 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import InformationBox from 'components/ui/InformationBox'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -66,6 +66,9 @@ export const InviteMemberButton = () => {
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
+  )
+  const orgProjects = (projects ?? []).filter(
+    (project) => project.organization_id === organization?.id
   )
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -136,7 +139,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -195,7 +198,7 @@ export const InviteMemberButton = () => {
 
   useEffect(() => {
     if (!applyToOrg) {
-      const firstProject = projects?.[0]
+      const firstProject = orgProjects?.[0]
       if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
     } else {
       form.setValue('projectRef', '')
@@ -234,7 +237,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && (
+              {isOptedIntoProjectLevelPermissions && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -306,13 +309,13 @@ export const InviteMemberButton = () => {
                           value={field.value}
                           onValueChange={(value) => form.setValue('projectRef', value)}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
-                            {(projects ?? []).find((project) => project.ref === field.value)
-                              ?.name ?? 'Unknown'}
+                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize text-left truncate max-w-[470px]">
+                            {orgProjects.find((project) => project.ref === field.value)?.name ??
+                              'Unknown'}
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
                             <SelectGroup_Shadcn_>
-                              {(projects ?? []).map((project) => {
+                              {orgProjects.map((project) => {
                                 return (
                                   <SelectItem_Shadcn_
                                     key={project.id}
@@ -364,7 +367,7 @@ export const InviteMemberButton = () => {
                       account security for your team. This allows company administrators to enforce
                       the use of an identity provider when logging into Supabase.
                     </p>
-                    <p>This is only available for organizations on teams plan or above.</p>
+                    <p>This is only available for organizations on Team Plan or above.</p>
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
@@ -379,7 +382,7 @@ export const InviteMemberButton = () => {
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
                             <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                              Upgrade to Teams
+                              Upgrade to Team
                             </Link>
                           </Button>
                         )}

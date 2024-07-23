@@ -47,7 +47,6 @@ interface Props {
   isLoading?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
-  // TODO: move all common params to a context to avoid prop drilling
   queryType?: QueryType
   projectRef: string
   params: LogSelectionProps['params']
@@ -57,6 +56,7 @@ interface Props {
   maxHeight?: string
   className?: string
   collectionName?: string // Used for warehouse queries
+  warehouseError?: string
   emptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean

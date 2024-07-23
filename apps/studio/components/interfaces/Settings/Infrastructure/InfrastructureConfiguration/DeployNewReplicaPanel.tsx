@@ -21,7 +21,7 @@ import {
   Listbox,
   SidePanel,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
@@ -108,7 +108,7 @@ const DeployNewReplicaPanel = ({
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT
   ) ?? ['ap-southeast-1']
-  // Will be following the primary's instance size for the time being
+  // Will be following the primary's compute size for the time being
   const defaultCompute =
     addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
       .identifier ?? 'ci_micro'

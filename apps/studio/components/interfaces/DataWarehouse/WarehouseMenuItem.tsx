@@ -81,13 +81,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
     resolver: zodResolver(UpdateFormSchema),
   })
 
-  const DeleteFormSchema = z.object({
-    confirm: z.boolean(),
-  })
-
-  const deleteForm = useForm<z.infer<typeof DeleteFormSchema>>({
-    resolver: zodResolver(DeleteFormSchema),
-  })
+  const deleteForm = useForm()
 
   return (
     <>
@@ -117,7 +111,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             onClick={(e) => {
               e.stopPropagation()
             }}
-            align="end"
+            align="start"
             className="w-44 *:space-x-2"
           >
             <Tooltip_Shadcn_>
@@ -188,7 +182,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 render={({ field }) => (
                   <FormItemLayout label="Collection name">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input_Shadcn_ defaultValue={item.name} type="text" {...field} />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -227,28 +221,11 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               deleteCollection.mutate({ projectRef, collectionToken: item.token })
             })}
           >
-            <div className="p-3 space-y-4">
+            <div className="p-3 px-6 space-y-4">
               <p className="text-sm text-foreground-light">
                 Are you sure you want to delete the selected collection?
                 <br /> This action cannot be undone.
               </p>
-              <div className="flex items-center my-2">
-                <FormField_Shadcn_
-                  control={deleteForm.control}
-                  name="confirm"
-                  render={({ field }) => (
-                    <FormItemLayout>
-                      <FormControl_Shadcn_>
-                        <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
-                      <FormLabel_Shadcn_ className="p-2">
-                        Yes, I want to delete <span className="font-medium">{item.name}</span>.
-                      </FormLabel_Shadcn_>
-                      <FormMessage />
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
             </div>
 
             <div className="flex gap-2 justify-end p-3 border-t">
@@ -262,8 +239,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={isLoading}>
-                Delete
+              <Button type="danger" htmlType="submit" loading={isLoading}>
+                Yes, delete
               </Button>
             </div>
           </form>

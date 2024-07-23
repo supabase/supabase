@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import type { ResponseError } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 export interface AlertErrorProps {
   projectRef?: string

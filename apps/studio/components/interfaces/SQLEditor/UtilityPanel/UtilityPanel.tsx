@@ -10,6 +10,9 @@ import { ChartConfig } from './ChartConfig'
 import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Snippet } from 'data/content/sql-folders-query'
 
 export type UtilityPanelProps = {
   id: string
@@ -43,11 +46,14 @@ const UtilityPanel = ({
 }: UtilityPanelProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const snippet = snap.snippets[id]?.snippet
   const queryKeys = contentKeys.list(ref)
-  const result = snap.results[id]?.[0]
+  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -70,7 +76,8 @@ const UtilityPanel = ({
         },
       }
 
-      snap.updateSnippet(id, newSnippet)
+      if (enableFolders) snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
+      else snap.updateSnippet(id, newSnippet)
     },
     onError: async (err, newContent, context) => {
       toast.error(`Failed to update chart. Please try again.`)

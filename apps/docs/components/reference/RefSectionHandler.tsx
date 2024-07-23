@@ -10,7 +10,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
 import OldVersionAlert from './OldVersionAlert'
-import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
+import type { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
 import MgmtApiOperationSection from '~/components/reference/MgmtApiOperationSection'
 

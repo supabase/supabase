@@ -1,4 +1,4 @@
-import { ArrowDown, Check } from 'lucide-react'
+import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
@@ -14,6 +14,7 @@ import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
 import {
   AuthRateLimits,
+  CreateClientSnippet,
   DatabaseSetup,
   GetSessionWarning,
   HuggingFaceDeployment,
@@ -25,7 +26,6 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
 } from '~/components/MDX/partials'
-import { Mermaid } from '~/components/Mermaid'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
@@ -47,6 +47,7 @@ const components = {
   ButtonCard,
   CH,
   CostWarning,
+  CreateClientSnippet,
   DatabaseSetup,
   Extensions,
   GetSessionWarning,
@@ -55,11 +56,11 @@ const components = {
   IconArrowDown: ArrowDown,
   IconCheck: Check,
   IconPanel,
+  IconX: X,
   Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,

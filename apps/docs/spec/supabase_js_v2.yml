@@ -1823,14 +1823,12 @@ functions:
     title: 'setSession()'
     $ref: '@supabase/auth-js.GoTrueClient.setSession'
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
-      - The refresh token can only be used once to obtain a new session.
-      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - This method sets the session using an `access_token` and `refresh_token`.
+      - If successful, a `SIGNED_IN` event is emitted.
     examples:
-      - id: refresh-the-session
-        name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+      - id: set-the-session
+        name: Set the session
+        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
