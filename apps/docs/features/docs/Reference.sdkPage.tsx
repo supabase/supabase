@@ -11,34 +11,34 @@ import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 type ClientSdkReferenceProps = {
   sdkId: string
-  libId: string
-  libPath: string
   libVersion: string
-  specFile: string
-  useTypeSpec?: boolean
 } & (
   | { isCrawlerPage?: false; requestedSection?: string }
   | { isCrawlerPage: true; requestedSection: string }
 )
 
-export async function ClientSdkReferencePage({
+const _clientSdkComponentCache = new Map<string, any>()
+export async function ClientSdkReferencePage(props) {
+  const key = JSON.stringify(props)
+  if (!_clientSdkComponentCache.has(key)) {
+    _clientSdkComponentCache.set(key, ClientSdkReferencePageUncached(props))
+  }
+  return _clientSdkComponentCache.get(key)
+}
+async function ClientSdkReferencePageUncached({
   sdkId,
-  libId,
-  libPath,
   libVersion,
-  specFile,
-  useTypeSpec = false,
   isCrawlerPage = false,
   requestedSection,
 }: ClientSdkReferenceProps) {
-  const libraryMeta = REFERENCES[libPath]
+  const libraryMeta = REFERENCES[sdkId]
   const versions = libraryMeta?.versions ?? []
   const isLatestVersion = libVersion === versions[0]
 
-  const menuData = NavItems[libId]
+  const menuData = NavItems[libraryMeta.meta[libVersion].libId]
 
   return (
-    <ReferenceContentScrollHandler libPath={libPath}>
+    <ReferenceContentScrollHandler libPath={libraryMeta.libPath}>
       <SidebarSkeleton
         menuId={MenuId.RefJavaScriptV2}
         NavigationMenu={
@@ -46,7 +46,7 @@ export async function ClientSdkReferencePage({
             sdkId={sdkId}
             name={menuData.title}
             menuData={menuData}
-            libPath={libPath}
+            libPath={libraryMeta.libPath}
             version={libVersion}
             isLatestVersion={isLatestVersion}
             isCrawlerPage={isCrawlerPage}
@@ -56,7 +56,7 @@ export async function ClientSdkReferencePage({
         <LayoutMainContent>
           {!isLatestVersion && (
             <OldVersionAlert
-              libPath={libPath}
+              libPath={libraryMeta.libPath}
               className="z-10 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"
             />
           )}
@@ -65,8 +65,8 @@ export async function ClientSdkReferencePage({
               <>
                 <ClientLibHeader menuData={menuData} className="mt-4 mb-8" />
                 <ClientLibIntroduction
-                  libPath={libPath}
-                  excludeName={libId}
+                  libPath={libraryMeta.libPath}
+                  excludeName={libraryMeta.meta[libVersion].libId}
                   version={libVersion}
                   isLatestVersion={isLatestVersion}
                 />
@@ -74,11 +74,11 @@ export async function ClientSdkReferencePage({
             )}
             <ClientLibRefSections
               sdkId={sdkId}
-              libPath={libPath}
+              libPath={libraryMeta.libPath}
               version={libVersion}
               isLatestVersion={isLatestVersion}
-              specFile={specFile}
-              useTypeSpec={useTypeSpec}
+              specFile={libraryMeta.meta[libVersion].specFile}
+              useTypeSpec={libraryMeta.typeSpec}
               {...(isCrawlerPage
                 ? { isCrawlerPage: true, requestedSection }
                 : { isCrawlerPage: false })}

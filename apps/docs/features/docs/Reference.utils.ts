@@ -9,7 +9,7 @@ import { visit } from 'unist-util-visit'
 import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH, SKIP_SSG_CRAWLER_PAGES } from '~/lib/constants'
+import { BASE_PATH, SKIP_BUILD_STATIC_GENERATION } from '~/lib/constants'
 
 export interface AbbrevCommonClientLibSection {
   id: string
@@ -68,7 +68,7 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
 }
 
 export async function generateReferenceStaticParams() {
-  const crawlerPages = SKIP_SSG_CRAWLER_PAGES
+  const crawlerPages = SKIP_BUILD_STATIC_GENERATION
     ? []
     : clientSdkIds
         .flatMap((sdkId) =>
