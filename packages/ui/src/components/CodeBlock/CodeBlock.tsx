@@ -37,6 +37,7 @@ export interface CodeBlockProps {
     | 'curl'
     | 'http'
   linesToHighlight?: number[]
+  highlightBorder?: boolean
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
@@ -49,6 +50,7 @@ export const CodeBlock = ({
   title,
   language,
   linesToHighlight = [],
+  highlightBorder,
   className,
   value,
   children,
@@ -131,7 +133,11 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
+                  style: {
+                    display: 'block',
+                    backgroundColor: 'hsl(var(--background-selection))',
+                    borderLeft: highlightBorder ? '1px solid hsl(var(--foreground-default))' : null,
+                  },
                 }
               }
               return {}

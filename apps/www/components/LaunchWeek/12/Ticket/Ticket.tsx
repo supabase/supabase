@@ -1,6 +1,6 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { codeBlock } from 'common-tags'
-import { cn, CodeBlock } from 'ui'
+import { CodeBlock } from 'ui'
 import { range } from 'lodash'
 import { Pencil, X } from 'lucide-react'
 import Tilt from 'vanilla-tilt'
@@ -67,7 +67,7 @@ await supabase
 `
 
   function getLinesToHighlight() {
-    let arr: any[] = range(0, 4)
+    let arr: any[] = range(0, 3)
     const STARTING_LINE = 3
 
     if (HAS_ROLE) arr.push(null)
@@ -106,8 +106,8 @@ await supabase
             {code}
           </CodeBlock>
         </div>
-        <div className="w-full p-4 flex-grow flex flex-col gap-4">
-          <span className="uppercase text-foreground-light tracking-wider text-xs">
+        <div className="w-full py-4 flex-grow flex flex-col gap-4">
+          <span className="px-4 uppercase text-foreground-light tracking-wider text-xs">
             TICKET RESPONSE
           </span>
           {user && (
@@ -115,12 +115,13 @@ await supabase
               language="json"
               hideCopy
               linesToHighlight={LINES_TO_HIGHLIGHT}
-              className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
+              highlightBorder
+              className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2 [&>code>span]:!pl-4"
             >
               {responseJson}
             </CodeBlock>
           )}
-          <span className="text-foreground-lighter text-xs">
+          <span className="px-4 text-foreground-lighter text-xs">
             {resTime}ms <span className="uppercase">Response time</span>
           </span>
         </div>
