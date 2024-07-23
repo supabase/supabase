@@ -152,9 +152,7 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
         className={cn(
           'border border-default bg-surface-100 rounded-b',
           'px-5 py-2',
-          'prose max-w-none text-sm',
-          'transition',
-          'data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up'
+          'prose max-w-none text-sm'
         )}
       >
         <MDXRemoteRefs source={content} />
