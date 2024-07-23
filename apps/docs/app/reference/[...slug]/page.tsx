@@ -34,7 +34,7 @@ export default async function ReferencePage({
     return (
       <ClientSdkReferencePage
         sdkId={sdkId}
-        libVersion={maybeVersion ?? latestVersion}
+        libVersion={version}
         isCrawlerPage={!!maybeCrawlers}
         requestedSection={path[0]}
       />

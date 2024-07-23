@@ -24,10 +24,7 @@ import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 type ClientLibRefSectionsProps = {
   sdkId: string
   version: string
-} & (
-  | { isCrawlerPage?: false; requestedSection?: undefined }
-  | { isCrawlerPage: true; requestedSection: string }
-)
+}
 
 async function ClientLibRefSections({ sdkId, version }: ClientLibRefSectionsProps) {
   let flattenedSections = await getFlattenedSections(sdkId, version)
@@ -68,7 +65,7 @@ type SectionSwitchProps = {
   isCrawlerPage?: boolean
 }
 
-export function SectionSwitch({ sdkId, version, section, isCrawlerPage }: SectionSwitchProps) {
+export function SectionSwitch({ sdkId, version, section }: SectionSwitchProps) {
   const libPath = REFERENCES[sdkId].libPath
   const isLatestVersion = version === REFERENCES[sdkId].versions[0]
 
@@ -83,7 +80,6 @@ export function SectionSwitch({ sdkId, version, section, isCrawlerPage }: Sectio
           isLatestVersion={isLatestVersion}
           link={sectionLink}
           section={section}
-          isCrawlerPage={isCrawlerPage}
         />
       )
     case 'function':
@@ -94,7 +90,6 @@ export function SectionSwitch({ sdkId, version, section, isCrawlerPage }: Sectio
           link={sectionLink}
           section={section}
           useTypeSpec={REFERENCES[sdkId].typeSpec}
-          isCrawlerPage={isCrawlerPage}
         />
       )
     default:
@@ -109,7 +104,6 @@ interface MarkdownSectionProps {
   isLatestVersion: boolean
   link: string
   section: AbbrevCommonClientLibSection
-  isCrawlerPage?: boolean
 }
 
 async function MarkdownSection({
@@ -118,7 +112,6 @@ async function MarkdownSection({
   isLatestVersion,
   link,
   section,
-  isCrawlerPage = false,
 }: MarkdownSectionProps) {
   const content = await getRefMarkdown(
     section.meta?.shared
@@ -128,7 +121,7 @@ async function MarkdownSection({
 
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
-      <StickyHeader {...section} isCrawlerPage={isCrawlerPage} />
+      <StickyHeader {...section} />
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -140,7 +133,6 @@ interface FunctionSectionProps {
   link: string
   section: AbbrevCommonClientLibSection
   useTypeSpec: boolean
-  isCrawlerPage?: boolean
 }
 
 async function FunctionSection({
@@ -149,7 +141,6 @@ async function FunctionSection({
   link,
   section,
   useTypeSpec,
-  isCrawlerPage = false,
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
@@ -172,7 +163,7 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} isCrawlerPage={isCrawlerPage} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-[1_/_-1]" />
       <div className="overflow-hidden flex flex-col gap-8">
         <div className="prose break-words text-sm">
           <MDXRemoteRefs source={fullDescription} />

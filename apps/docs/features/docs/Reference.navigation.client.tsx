@@ -18,9 +18,13 @@ export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(f
 
 export function ReferenceContentScrollHandler({
   libPath,
+  version,
+  isLatestVersion,
   children,
 }: PropsWithChildren<{
   libPath: string
+  version: string
+  isLatestVersion: boolean
 }>) {
   const checkedPathnameOnLoad = useRef(false)
   const [initiallyScrolled, setInitiallyScrolled] = useState(false)
@@ -29,7 +33,10 @@ export function ReferenceContentScrollHandler({
 
   useEffect(() => {
     if (!checkedPathnameOnLoad.current) {
-      const initialSelectedSection = pathname.replace(`/reference/${libPath}/`, '')
+      const initialSelectedSection = pathname.replace(
+        `/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}`,
+        ''
+      )
       if (initialSelectedSection) {
         const section = document.getElementById(initialSelectedSection)
         section?.scrollIntoView()
@@ -38,7 +45,7 @@ export function ReferenceContentScrollHandler({
       checkedPathnameOnLoad.current = true
       setInitiallyScrolled(true)
     }
-  }, [libPath, pathname])
+  }, [pathname, libPath, version, isLatestVersion])
 
   return (
     <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>
@@ -103,14 +110,12 @@ export function RefLink({
   skipChildren = false,
   className,
   onClick,
-  isCrawlerPage = false,
 }: {
   basePath: string
   section: AbbrevCommonClientLibSection
   skipChildren?: boolean
   className?: string
   onClick?: (evt: MouseEvent) => void
-  isCrawlerPage?: boolean
 }) {
   const ref = useRef<HTMLAnchorElement>()
 
@@ -126,36 +131,30 @@ export function RefLink({
   return (
     <>
       {isCompoundSection ? (
-        <CompoundRefLink basePath={basePath} section={section} isCrawlerPage={isCrawlerPage} />
+        <CompoundRefLink basePath={basePath} section={section} />
       ) : (
         <Link
           ref={ref}
           href={href}
           aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}
-          onClick={
-            isCrawlerPage
-              ? onClick
-              : (evt: MouseEvent) => {
-                  /*
-                   * We don't actually want to navigate or rerender anything since
-                   * links are all to sections on the same page.
-                   */
-                  evt.preventDefault()
-                  history.pushState({}, '', `${BASE_PATH}${href}`)
+          onClick={(evt: MouseEvent) => {
+            /*
+             * We don't actually want to navigate or rerender anything since
+             * links are all to sections on the same page.
+             */
+            evt.preventDefault()
+            history.pushState({}, '', `${BASE_PATH}${href}`)
 
-                  if ('slug' in section) {
-                    const reduceMotion = window.matchMedia(
-                      '(prefers-reduced-motion: reduce)'
-                    ).matches
-                    document.getElementById(section.slug)?.scrollIntoView({
-                      behavior: reduceMotion ? 'auto' : 'smooth',
-                    })
-                  }
+            if ('slug' in section) {
+              const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+              document.getElementById(section.slug)?.scrollIntoView({
+                behavior: reduceMotion ? 'auto' : 'smooth',
+              })
+            }
 
-                  onClick?.(evt)
-                }
-          }
+            onClick?.(evt)
+          }}
         >
           {section.title}
         </Link>
@@ -195,11 +194,9 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevCommonClientL
 function CompoundRefLink({
   basePath,
   section,
-  isCrawlerPage = false,
 }: {
   basePath: string
   section: AbbrevCommonClientLibSection
-  isCrawlerPage?: boolean
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 
@@ -229,16 +226,11 @@ function CompoundRefLink({
         className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
       >
         <ul className="space-y-2">
-          <RefLink
-            basePath={basePath}
-            section={section}
-            skipChildren
-            isCrawlerPage={isCrawlerPage}
-          />
+          <RefLink basePath={basePath} section={section} skipChildren />
           {section.items.map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
-                <RefLink basePath={basePath} section={item} isCrawlerPage={isCrawlerPage} />
+                <RefLink basePath={basePath} section={item} />
               </li>
             )
           })}

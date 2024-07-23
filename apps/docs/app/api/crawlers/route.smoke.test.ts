@@ -1,9 +1,9 @@
 import { load } from 'cheerio'
-import { expect, it, describe } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-// const REFERENCE_DOCS_URL = 'https://supabase.com/docs/reference'
+const REFERENCE_DOCS_URL = 'https://supabase.com/docs/reference'
 // For dev testing: comment out above and uncomment below
-const REFERENCE_DOCS_URL = 'http://localhost:3001/docs/reference'
+// const REFERENCE_DOCS_URL = 'http://localhost:3001/docs/reference'
 
 describe('prod smoke test: crawler pages return correct data', () => {
   /**

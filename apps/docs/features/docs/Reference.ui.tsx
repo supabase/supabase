@@ -84,45 +84,30 @@ interface StickyHeaderProps {
   slug?: string
   monoFont?: boolean
   className?: string
-  /**
-   * Whether the user-agent is a search-engine crawler
-   */
-  isCrawlerPage?: boolean
 }
 
-export function StickyHeader({
-  title,
-  monoFont = false,
-  className,
-  isCrawlerPage = false,
-}: StickyHeaderProps) {
+export function StickyHeader({ title, monoFont = false, className }: StickyHeaderProps) {
   return (
-    <>
-      {isCrawlerPage ? (
-        <h1 className={cn('text-2xl font-medium text-foreground', className)}>{title}</h1>
-      ) : (
-        <h2
-          tabIndex={-1} // For programmatic focus on auto-scroll to section
-          className={cn(
-            'sticky top-0 z-10',
-            'w-full',
-            // Enough padding to cover the background when stuck to the top,
-            // then readjust with negative margin to prevent it looking too
-            // spaced-out in regular position
-            'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
-            // Same for bottom
-            'pb-8 -mb-4',
-            'bg-gradient-to-b from-background from-85% to-transparent to-100%',
-            'text-2xl font-medium text-foreground',
-            'scroll-mt-[calc(var(--header-height)+1rem)]',
-            monoFont && 'font-mono',
-            className
-          )}
-        >
-          {title}
-        </h2>
+    <h2
+      tabIndex={-1} // For programmatic focus on auto-scroll to section
+      className={cn(
+        'sticky top-0 z-10',
+        'w-full',
+        // Enough padding to cover the background when stuck to the top,
+        // then readjust with negative margin to prevent it looking too
+        // spaced-out in regular position
+        'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
+        // Same for bottom
+        'pb-8 -mb-4',
+        'bg-gradient-to-b from-background from-85% to-transparent to-100%',
+        'text-2xl font-medium text-foreground',
+        'scroll-mt-[calc(var(--header-height)+1rem)]',
+        monoFont && 'font-mono',
+        className
       )}
-    </>
+    >
+      {title}
+    </h2>
   )
 }
 

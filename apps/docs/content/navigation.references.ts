@@ -6,6 +6,7 @@ export const REFERENCES = {
     libPath: 'javascript',
     versions: ['v2', 'v1'],
     typeSpec: true,
+    icon: 'reference-javascript',
     meta: {
       v2: {
         libId: 'reference_javascript_v2',
@@ -23,6 +24,7 @@ export const REFERENCES = {
     library: 'supabase-dart',
     libPath: 'dart',
     versions: ['v2', 'v1'],
+    icon: 'reference-dart',
     meta: {
       v2: {
         libId: 'reference_dart_v2',
@@ -40,6 +42,7 @@ export const REFERENCES = {
     library: 'supabase-csharp',
     libPath: 'csharp',
     versions: ['v1', 'v0'],
+    icon: 'reference-csharp',
     meta: {
       v1: {
         libId: 'reference_csharp_v1',
@@ -57,6 +60,7 @@ export const REFERENCES = {
     library: 'supabase-swift',
     libPath: 'swift',
     versions: ['v2', 'v1'],
+    icon: 'reference-swift',
     meta: {
       v2: {
         libId: 'reference_swift_v2',
@@ -74,6 +78,7 @@ export const REFERENCES = {
     library: 'supabase-kt',
     libPath: 'kotlin',
     versions: ['v2', 'v1'],
+    icon: 'reference-kotlin',
     meta: {
       v2: {
         libId: 'reference_kotlin_v2',
@@ -91,6 +96,7 @@ export const REFERENCES = {
     library: 'supabase-py',
     libPath: 'python',
     versions: ['v2'],
+    icon: 'reference-python',
     meta: {
       v2: {
         libId: 'reference_python_v2',
@@ -102,12 +108,13 @@ export const REFERENCES = {
     type: 'cli',
     name: 'CLI',
     versions: [],
+    icon: 'reference-cli',
   },
   api: {
     type: 'api',
     name: 'API',
     versions: [],
-    icon: '/docs/img/icons/api-icon.svg',
+    icon: 'reference-api',
   },
 } as const
 

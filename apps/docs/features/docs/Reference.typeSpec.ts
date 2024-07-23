@@ -6,10 +6,6 @@
  * access to a function's type definition, given its name and module.
  */
 
-import { join } from 'node:path'
-
-// import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-// import { SPEC_DIRECTORY } from '~/lib/docs'
 import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' assert { type: 'json' }
 
 // [Charis] 2024-07-10
@@ -159,35 +155,7 @@ export interface CustomTypePropertyType {
   type: TypeDetails | undefined
 }
 
-// The following is the API of this module, and the only externally exposed
-// piece. Given a reference to a function (method), return its type definition.
-
-/**
- * Get the type definition for a function (a method).
- *
- * @param ref The method identifier, in the form `@supabase/supabase-js.index.SupabaseClient.constructor`.
- */
-/* export async function getTypeSpec(ref: string) {
-  const modules = await parseTypeSpec()
-
-  const delimiter = ref.indexOf('.')
-  const refMod = ref.substring(0, delimiter)
-
-  const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(ref)
-}
-
-const parseTypeSpec = cache_fullProcess_withDevCacheBust(
-  __parseTypeSpec,
-  join(SPEC_DIRECTORY, 'enrichments/tsdoc_v2/combined.json'),
-  () => JSON.stringify([])
-) */
-
-/**
- * @private
- * Exposed for testing purposes only, PRIVATE DO NOT USE externally.
- */
-export function __parseTypeSpec() {
+export function parseTypeSpec() {
   const modules = (typeSpec.children ?? []).map(parseMod)
   return modules as Array<ModuleTypes>
 }

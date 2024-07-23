@@ -18,28 +18,19 @@ type ClientSdkReferenceProps = {
   | { isCrawlerPage: true; requestedSection: string }
 )
 
-export async function ClientSdkReferencePage({
-  sdkId,
-  libVersion,
-  isCrawlerPage = false,
-  requestedSection,
-}: ClientSdkReferenceProps) {
+export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkReferenceProps) {
   const libraryMeta = REFERENCES[sdkId]
   const versions = libraryMeta?.versions ?? []
   const isLatestVersion = libVersion === versions[0]
 
   const menuData = NavItems[libraryMeta.meta[libVersion].libId]
 
-  if (isCrawlerPage) {
-    const sections = await getSectionsBySlug(sdkId, libVersion)
-    const section = sections.get(requestedSection)
-    if (!section) return null
-
-    return <SectionSwitch sdkId={sdkId} version={libVersion} section={section} isCrawlerPage />
-  }
-
   return (
-    <ReferenceContentScrollHandler libPath={libraryMeta.libPath}>
+    <ReferenceContentScrollHandler
+      libPath={libraryMeta.libPath}
+      version={libVersion}
+      isLatestVersion={isLatestVersion}
+    >
       <SidebarSkeleton
         menuId={MenuId.RefJavaScriptV2}
         NavigationMenu={
@@ -50,7 +41,6 @@ export async function ClientSdkReferencePage({
             libPath={libraryMeta.libPath}
             version={libVersion}
             isLatestVersion={isLatestVersion}
-            isCrawlerPage={isCrawlerPage}
           />
         }
       >
@@ -62,17 +52,13 @@ export async function ClientSdkReferencePage({
             />
           )}
           <article className="@container/article">
-            {!isCrawlerPage && (
-              <>
-                <ClientLibHeader menuData={menuData} className="mt-4 mb-8" />
-                <ClientLibIntroduction
-                  libPath={libraryMeta.libPath}
-                  excludeName={libraryMeta.meta[libVersion].libId}
-                  version={libVersion}
-                  isLatestVersion={isLatestVersion}
-                />
-              </>
-            )}
+            <ClientLibHeader menuData={menuData} className="mt-4 mb-8" />
+            <ClientLibIntroduction
+              libPath={libraryMeta.libPath}
+              excludeName={libraryMeta.meta[libVersion].libId}
+              version={libVersion}
+              isLatestVersion={isLatestVersion}
+            />
             <ClientLibRefSections sdkId={sdkId} version={libVersion} />
           </article>
         </LayoutMainContent>

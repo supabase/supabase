@@ -42,6 +42,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
             rel="noreferrer noopener"
             className="hover:text-brand focus-visible:text-brand transition-colors"
           >
+            <span className="sr-only">View on GitHub</span>
             <Github size={18} />
           </Link>
         </span>

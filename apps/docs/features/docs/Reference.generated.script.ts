@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
 
 import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
-import { __parseTypeSpec } from '~/features/docs/Reference.typeSpec'
+import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
@@ -62,7 +62,7 @@ export function flattenCommonClientLibSections(tree: Array<AbbrevCommonClientLib
 }
 
 async function writeTypes() {
-  const types = await __parseTypeSpec()
+  const types = await parseTypeSpec()
 
   await writeFile(
     join(GENERATED_DIRECTORY, 'typeSpec.json'),

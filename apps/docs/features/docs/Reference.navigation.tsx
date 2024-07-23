@@ -18,7 +18,6 @@ interface ClientSdkNavigationProps {
   libPath: string
   version: string
   isLatestVersion: boolean
-  isCrawlerPage?: boolean
 }
 
 async function ClientSdkNavigation({
@@ -28,7 +27,6 @@ async function ClientSdkNavigation({
   libPath,
   version,
   isLatestVersion,
-  isCrawlerPage = false,
 }: ClientSdkNavigationProps) {
   const navSections = await getReferenceSections(sdkId, version)
 
@@ -39,22 +37,18 @@ async function ClientSdkNavigation({
       <div className="flex items-center gap-3">
         {'icon' in menuData && <MenuIconPicker icon={menuData.icon} width={21} height={21} />}
         <span className="text-base text-brand-600">{name}</span>
-        <RefVersionDropdown
-          library={libPath}
-          currentVersion={version}
-          isLatestVersion={isLatestVersion}
-        />
+        <RefVersionDropdown library={libPath} currentVersion={version} />
       </div>
       <ul className="flex flex-col gap-2">
         {navSections.map((section) => (
           <Fragment key={section.id}>
             {section.type === 'category' ? (
               <li>
-                <RefCategory basePath={basePath} section={section} isCrawlerPage={isCrawlerPage} />
+                <RefCategory basePath={basePath} section={section} />
               </li>
             ) : (
               <li className={topLvlRefNavItemStyles}>
-                <RefLink basePath={basePath} section={section} isCrawlerPage={isCrawlerPage} />
+                <RefLink basePath={basePath} section={section} />
               </li>
             )}
           </Fragment>
@@ -69,11 +63,9 @@ const topLvlRefNavItemStyles = 'leading-5'
 function RefCategory({
   basePath,
   section,
-  isCrawlerPage = false,
 }: {
   basePath: string
   section: AbbrevCommonClientLibSection
-  isCrawlerPage?: boolean
 }) {
   if (!('items' in section && section.items.length > 0)) return null
 
@@ -84,7 +76,7 @@ function RefCategory({
       <ul className="space-y-2">
         {section.items.map((item) => (
           <li key={item.id} className={topLvlRefNavItemStyles}>
-            <RefLink basePath={basePath} section={item} isCrawlerPage={isCrawlerPage} />
+            <RefLink basePath={basePath} section={item} />
           </li>
         ))}
       </ul>

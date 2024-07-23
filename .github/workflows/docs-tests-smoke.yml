@@ -1,3 +1,5 @@
+# Smoke tests against the docs production site, run daily
+
 name: Docs Production Smoke Tests
 
 on:
@@ -30,4 +32,4 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm prefix="apps/docs" run test:smoke
+        run: npm --prefix="apps/docs" run test:smoke

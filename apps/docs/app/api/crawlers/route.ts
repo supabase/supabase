@@ -1,7 +1,7 @@
 import { toHtml } from 'hast-util-to-html'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toHast } from 'mdast-util-to-hast'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
+import { toHast } from 'mdast-util-to-hast'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'

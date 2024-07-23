@@ -20,7 +20,6 @@ const RevVersionDropdown = ({
 }: {
   library: string
   currentVersion: string
-  isLatestVersion: boolean
 }) => {
   const { push } = useRouter()
 

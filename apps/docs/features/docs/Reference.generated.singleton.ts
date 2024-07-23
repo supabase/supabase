@@ -1,6 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
