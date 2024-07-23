@@ -27,7 +27,7 @@ import {
 } from './ThirdPartyAuthForm.utils'
 
 export const ThirdPartyAuthForm = () => {
-  const thirdPartyAuthEnabled = useFlag('thirdPartyAuth') || false
+  const thirdPartyAuthEnabled = useFlag('thirdPartyAuth')
   const { ref: projectRef } = useParams()
   const {
     data: integrationsData,
@@ -146,7 +146,7 @@ export const ThirdPartyAuthForm = () => {
             tpaId: selectedIntegrationForDeletion.id,
           })
           const type = getIntegrationType(selectedIntegrationForDeletion)
-          toast.success(`A ${getIntegrationTypeLabel(type)} has been deleted.`)
+          toast.success(`Successfully deleted ${getIntegrationTypeLabel(type)}.`)
           setSelectedIntegrationForDeletion(undefined)
           setSelectedIntegration(undefined)
         }}

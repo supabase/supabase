@@ -40,8 +40,8 @@ const AuthSettings: NextPageWithLayout = () => {
           <>
             <BasicAuthSettingsForm />
             <SmtpForm />
-            <ThirdPartyAuthForm />
             <AdvancedAuthSettingsForm />
+            <ThirdPartyAuthForm />
           </>
         )}
       </ScaffoldContainer>

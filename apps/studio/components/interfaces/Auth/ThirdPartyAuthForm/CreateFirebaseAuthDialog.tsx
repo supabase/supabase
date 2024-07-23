@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
+import { AlertTriangle, Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
 import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -141,10 +143,17 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 )}
               />
 
-              <InformationBox
-                title="Note: This connection requires a Row Level Security (RLS) policy"
-                description="You will need to manually insert the policy after creating this 3rd party Auth connection."
-              />
+              <Alert_Shadcn_ variant="warning">
+                <AlertTriangle strokeWidth={2} />
+                <AlertTitle_Shadcn_>
+                  This connection requires a Row Level Security (RLS) policy
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  You will need to manually add a RLS policy after creating this Firebase
+                  connection. Otherwise, the Supabase project will be accessible to anyone with a
+                  valid Firebase JWT token.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             </form>
           </Form_Shadcn_>
         </DialogSection>
@@ -161,7 +170,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
-            {isCreating ? 'Create' : 'Update'}
+            {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>
       </DialogContent>

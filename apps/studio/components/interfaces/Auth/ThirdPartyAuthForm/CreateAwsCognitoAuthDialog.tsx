@@ -133,8 +133,8 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
             />
             <Separator /> */}
               <p className="text-sm text-foreground-light">
-                This will enable a JWT token from Auth0 project to access data from this Supabase
-                project.
+                This will enable a JWT token from AWS Cognito project to access data from this
+                Supabase project.
               </p>
               <FormField_Shadcn_
                 key="awsCognitoUserPoolId"
@@ -183,7 +183,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
-            {isCreating ? 'Create' : 'Update'}
+            {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>
       </DialogContent>

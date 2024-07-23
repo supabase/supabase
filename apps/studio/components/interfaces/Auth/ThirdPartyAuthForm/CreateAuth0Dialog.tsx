@@ -38,7 +38,7 @@ const FormSchema = z.object({
     .string()
     .trim()
     .min(1)
-    .regex(/^[A-Za-z0-9-.]+$/, 'The project ID contains invalid characters.'), // Only allow alphanumeric characters and hyphens.
+    .regex(/^[A-Za-z0-9-.]+$/, 'Project IDs should only have alphanumeric characters and hyphens.'), // Only allow alphanumeric characters and hyphens.
 })
 
 export const CreateAuth0IntegrationDialog = ({
@@ -121,8 +121,8 @@ export const CreateAuth0IntegrationDialog = ({
             />
             <Separator /> */}
               <p className="text-sm text-foreground-light">
-                This will enable a JWT token from Auth0 project to access data from this Supabase
-                project.
+                This will enable a JWT token from your Auth0 project to access data from this
+                Supabase project.
               </p>
               <FormField_Shadcn_
                 key="auth0DomainName"
@@ -173,7 +173,7 @@ export const CreateAuth0IntegrationDialog = ({
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
-            {isCreating ? 'Create' : 'Update'}
+            {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>
       </DialogContent>

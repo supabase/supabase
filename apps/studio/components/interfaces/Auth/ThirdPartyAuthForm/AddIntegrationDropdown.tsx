@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react'
-import Image from 'next/legacy/image'
+import Image from 'next/image'
 
 import {
   Button,
@@ -27,18 +27,18 @@ export const AddIntegrationDropdown = ({
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1} />}>
+        <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1} />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="" align="end">
+      <DropdownMenuContent align="end">
         {Providers.map((type) => {
           const name = getIntegrationTypeLabel(type)
           return (
             <DropdownMenuItem
               key={name}
               onClick={() => onSelectIntegrationType(type)}
-              className="flex items-center space-x-2 p-2"
+              className="flex items-center gap-x-2 p-2"
             >
               <Image
                 src={getIntegrationTypeIcon(type)}

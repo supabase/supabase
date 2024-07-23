@@ -51,29 +51,31 @@ export const AddRLSPolicyForFirebaseDialog = ({
       <DialogHeader padding={'small'}>
         <DialogTitle>Add RLS policy</DialogTitle>
         <DialogDescription>
-          By adding a Row Level Security (RLS) policy, you can expose specific tables to be
-          accessible with Firebase JWT keys. Failing to do so can open up your project to security
-          issues.
+          We recommend adding a Row Level Security (RLS) policy for your Firebase JWT keys to
+          explicitly specify which tables can be accessed via the Data APIs in order to prevent
+          accidental exposure of data.
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
-      <DialogSection className="space-y-4" padding={'small'}>
+      <DialogSection padding={'small'}>
         <SQLCodeBlock projectRef={projectRef!}>{[description]}</SQLCodeBlock>
       </DialogSection>
       <DialogFooter padding={'small'}>
         <Button
           type="default"
           onClick={() => handleCopy(description)}
-          icon={copied ? <Check size={16} className="text-brand-600" /> : null}
+          icon={copied ? <Check className="text-brand-600" /> : null}
         >
           {copied ? <p>Copied</p> : <p>Copy code</p>}
         </Button>
-        <Link
-          href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(description)}`}
-          passHref
-        >
-          <Button type="primary">Open in SQL Editor</Button>
-        </Link>
+        <Button type="primary">
+          <Link
+            href={`/project/${projectRef}/sql/new?content=${encodeURIComponent(description)}`}
+            passHref
+          >
+            Open in SQL Editor
+          </Link>
+        </Button>
       </DialogFooter>
     </>
   )

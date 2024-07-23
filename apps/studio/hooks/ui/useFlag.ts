@@ -4,7 +4,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useContext } from 'react'
 
-export function useFlag<T = any>(name: string) {
+export function useFlag<T = boolean>(name: string) {
   const store: any = useContext(FlagContext)
 
   const isObjectEmpty = (objectName: Object) => {
