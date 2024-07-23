@@ -4,7 +4,6 @@ import { cn } from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
-import { REFERENCES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import {
   RefLink,
   ReferenceNavigationScrollHandler,

@@ -1,5 +1,4 @@
-import { IS_DEV } from '~/lib/constants'
-import type { GlobalMenuItems, NavMenuConstant, References } from '../Navigation.types'
+import type { GlobalMenuItems, NavMenuConstant } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -201,50 +200,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
     },
   ],
 ]
-
-export const REFERENCES: References = {
-  javascript: {
-    name: 'JavaScript',
-    library: 'supabase-js',
-    versions: ['v2', 'v1'],
-  },
-  dart: {
-    name: 'Flutter',
-    library: 'supabase-dart',
-    versions: ['v2', 'v1'],
-  },
-  csharp: {
-    name: 'C#',
-    library: 'supabase-csharp',
-    versions: ['v1', 'v0'],
-  },
-  swift: {
-    name: 'Swift',
-    library: 'supabase-swift',
-    versions: ['v2', 'v1'],
-  },
-  kotlin: {
-    name: 'Kotlin',
-    library: 'supabase-kt',
-    versions: ['v2', 'v1'],
-  },
-  python: {
-    name: 'Python',
-    library: 'supabase-py',
-    versions: ['v2'],
-  },
-  cli: {
-    name: 'CLI',
-    library: undefined,
-    versions: [],
-  },
-  api: {
-    name: 'API',
-    library: undefined,
-    versions: [],
-    icon: '/docs/img/icons/api-icon.svg',
-  },
-}
 
 export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',

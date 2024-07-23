@@ -1,36 +1,45 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { isbot } from 'isbot'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+
+import { clientSdkIds } from '~/content/navigation.references'
+import { BASE_PATH } from '~/lib/constants'
+
+const REFERENCE_PATH = `${BASE_PATH ?? ''} + '/'}reference`
 
 export function middleware(request: NextRequest) {
-  const specs = ['javascript', 'dart', 'csharp']
+  const url = new URL(request.url)
 
-  let version = ''
-  if (request.url.includes('/v1/')) {
-    version = 'v1'
-  }
-  if (request.url.includes('/v0/')) {
-    version = 'v0'
+  if (!url.pathname.startsWith(REFERENCE_PATH)) {
+    return NextResponse.next()
   }
 
   if (isbot(request.headers.get('user-agent'))) {
-    for (const lib of specs) {
-      if (request.url.includes(`reference/${lib}`)) {
-        const requestSlug = request.url.split(`reference/${lib}`)[1]
+    let [, lib, maybeVersion, ...slug] = url.pathname.replace(REFERENCE_PATH, '').split('/')
 
-        if (requestSlug) {
-          return NextResponse.rewrite(
-            new URL(
-              `/docs/reference/${lib}/${version ? version + '/' : ''}crawlers/${requestSlug.substring(1)}`,
-              request.url
-            ).toString()
-          )
-        }
+    if (clientSdkIds.includes(lib)) {
+      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      if (!version) {
+        slug = [maybeVersion, ...slug]
+      }
+
+      if (slug.length > 0) {
+        const rewritePath = [REFERENCE_PATH, lib, version, 'crawlers', ...slug]
+          .filter(Boolean)
+          .join('/')
+
+        return NextResponse.rewrite(new URL(rewritePath, request.url))
       }
     }
   } else {
-    return NextResponse.next()
+    const [, lib, ...slug] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+    if (clientSdkIds.includes(lib)) {
+      const rewritePath = [REFERENCE_PATH, lib, ...slug].join('/')
+      return NextResponse.rewrite(new URL(rewritePath, request.url))
+    }
   }
+
+  return NextResponse.next()
 }
 
 export const config = {

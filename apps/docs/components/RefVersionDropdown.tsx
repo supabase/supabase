@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
+import { REFERENCES } from '~/content/navigation.references'
 
 const RevVersionDropdown = ({
   library,
