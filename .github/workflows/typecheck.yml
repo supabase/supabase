@@ -1,4 +1,4 @@
-name: Check code with TypeScript
+name: Check code with TypeScript & Lint
 
 on:
   pull_request:
@@ -30,3 +30,6 @@ jobs:
 
       - name: Run TypeScript type check
         run: npx turbo run typecheck
+
+      - name: Run Lint
+        run: npx turbo run lint
