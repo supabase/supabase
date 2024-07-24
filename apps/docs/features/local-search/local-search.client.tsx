@@ -1,7 +1,9 @@
 'use client'
 
 import type { PropsWithChildren } from 'react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+
+import { MAIN_THREAD_MESSAGE, WORKER_MESSAGE } from './local-search.worker.messages'
 
 const SearchWorkerContext = createContext<Worker>(undefined)
 
@@ -12,30 +14,33 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
     const worker = new Worker(new URL('./local-search.worker.js', import.meta.url), {
       type: 'module',
     })
-    setWorker(worker)
-    setTimeout(() => {
-      worker.postMessage({
-        type: 'INIT',
-        payload: {
-          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        },
-      })
+    worker.onerror = (errorEvent) => {
+      console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent}`)
+    }
+
+    worker.postMessage({
+      type: MAIN_THREAD_MESSAGE.INIT,
+      payload: {
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
     })
 
-    function alertWorkerMessages(event) {
-      if (event.data.type === 'CHECKPOINT') {
+    setWorker(worker)
+
+    function logWorkerMessage(event) {
+      if (event.data.type === WORKER_MESSAGE.CHECKPOINT) {
         console.log(
           `WORKER EVENT: ${event.data.type}\n\n${JSON.stringify(event.data.payload ?? {}, null, 2)}`
         )
-      } else if (event.data.type === 'ERROR') {
+      } else if (event.data.type === WORKER_MESSAGE.ERROR) {
         console.error(`WORKER ERROR:\n\n${JSON.stringify(event.data.payload ?? {}, null, 2)}`)
       }
     }
 
-    worker.addEventListener('message', alertWorkerMessages)
+    worker.addEventListener('message', logWorkerMessage)
     return () => {
-      worker.removeEventListener('message', alertWorkerMessages)
+      worker.removeEventListener('message', logWorkerMessage)
       worker.terminate()
     }
   }, [])
@@ -53,9 +58,8 @@ export function useLocalSearch() {
         console.error('Search ran before worker was initiated')
       }
 
-      console.log('POSTING SEARCH MESSAGE:', query)
       worker.postMessage({
-        type: 'SEARCH',
+        type: MAIN_THREAD_MESSAGE.SEARCH,
         payload: { query },
       })
     },
@@ -66,7 +70,7 @@ export function useLocalSearch() {
     if (!worker) return
 
     function handleSearchResults(event) {
-      if (event.data.type !== 'SEARCH_RESULTS') return
+      if (event.data.type !== WORKER_MESSAGE.SEARCH_RESULTS) return
       const searchResults = JSON.parse(event.data.payload.matches)[0].rows
       setSearchResults(searchResults)
     }

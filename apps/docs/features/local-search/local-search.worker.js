@@ -2,6 +2,13 @@ import { PGlite } from '@electric-sql/pglite'
 import { createClient } from '@supabase/supabase-js'
 import { pipeline } from '@xenova/transformers'
 
+import {
+  MAIN_THREAD_MESSAGE,
+  WORKER_MESSAGE,
+  checkpoint,
+  postError,
+} from './local-search.worker.messages'
+
 /**
  * @typedef {import('@xenova/transformers').Tensor} Tensor
  */
@@ -23,31 +30,14 @@ let extractor
 
 self.addEventListener('message', async (event) => {
   switch (event.data.type) {
-    case 'INIT':
+    case MAIN_THREAD_MESSAGE.INIT:
       const { supabaseUrl, supabaseAnonKey } = event.data.payload
       return initDb(supabaseUrl, supabaseAnonKey)
-    case 'SEARCH':
+    case MAIN_THREAD_MESSAGE.SEARCH:
       const { query } = event.data.payload
       return handleSearch(query)
   }
 })
-
-function checkpoint(payload) {
-  self.postMessage({
-    type: 'CHECKPOINT',
-    payload,
-  })
-}
-
-function postError(error, customPayload) {
-  self.postMessage({
-    type: 'error',
-    payload: {
-      ...customPayload,
-      message: error.message,
-    },
-  })
-}
 
 async function initDb(supabaseUrl, supabaseAnonKey) {
   db = new PGlite({
@@ -80,16 +70,10 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
     .from('page')
     .select('id,path,meta,type,source')
   if (pagesError) {
-    return self.postMessage({
-      type: 'ERROR',
-      payload: pagesError.message,
-    })
+    return postError(pagesError)
   }
   if (!pages) {
-    return self.postMessage({
-      type: 'ERROR',
-      payload: 'missing pages',
-    })
+    return postError({ message: 'missing pages' })
   }
   try {
     await Promise.all(
@@ -107,7 +91,7 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
         ) values (
           ${page.id},
           '${page.path}',
-          '${JSON.stringify(page.meta)}',
+          '${JSON.stringify(page.meta)?.replaceAll(`'`, `''`) ?? null}',
           '${page.type}',
           '${page.source}'
         )`
@@ -119,23 +103,17 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
       })
     )
   } catch (error) {
-    return self.postMessage({ type: 'ERROR', payload: error.message })
+    return postError(error)
   }
 
   const { data: pageSections, error: pageSectionsError } = await supabase
     .from('page_section')
     .select('id,page_id,slug,heading,rag_ignore,hf_embedding')
   if (pageSectionsError) {
-    return self.postMessage({
-      type: 'ERROR',
-      payload: pageSectionsError.message,
-    })
+    return postError(pageSectionsError)
   }
   if (!pageSections) {
-    return self.postMessage({
-      type: 'ERROR',
-      payload: 'missing page sections',
-    })
+    return postError({ message: 'missing page sections' })
   }
   try {
     await Promise.all(
@@ -162,21 +140,12 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
         try {
           await db.exec(sqlStatement)
         } catch (error) {
-          self.postMessage({
-            type: 'ERROR',
-            payload: {
-              message: error.message,
-              sql: sqlStatement,
-            },
-          })
+          postError(error, { sql: sqlStatement })
         }
       })
     )
   } catch (error) {
-    self.postMessage({
-      type: 'ERROR',
-      payload: error.message,
-    })
+    postError(error)
   }
 
   dbReady = true
@@ -199,10 +168,15 @@ async function getExtractor() {
 }
 
 async function handleSearch(query) {
-  self.postMessage({
-    type: 'RECEIVED SEARCH QUERY',
-    payload: query,
+  checkpoint({
+    status: 'RECEIVED_SEARCH_QUERY',
   })
+
+  if (!dbReady) {
+    checkpoint({
+      status: 'DB_NOT_READY',
+    })
+  }
 
   try {
     const extractor = await getExtractor()
@@ -244,16 +218,13 @@ async function handleSearch(query) {
     `)
 
     self.postMessage({
-      type: 'SEARCH_RESULTS',
+      type: WORKER_MESSAGE.SEARCH_RESULTS,
       payload: {
         matches: JSON.stringify(data),
         feature: JSON.stringify(featureArray),
       },
     })
   } catch (error) {
-    self.postMessage({
-      type: 'ERROR',
-      payload: error.message,
-    })
+    postError(error)
   }
 }
