@@ -99,9 +99,10 @@ export function useGetProjectPermissions(
     enabled: projectRefOverride === undefined && enabled,
   })
 
-  const project = projectRefOverride === undefined || projectResult?.parent_project_ref ?
-    projectResult :
-    { ref: projectRefOverride, parent_project_ref: undefined }
+  const project =
+    projectRefOverride === undefined || projectResult?.parent_project_ref
+      ? projectResult
+      : { ref: projectRefOverride, parent_project_ref: undefined }
   const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
 
   return {
@@ -138,7 +139,7 @@ export function useCheckProjectPermissions(
   }
 ) {
   const isLoggedIn = useIsLoggedIn()
-  const {  organizationSlug, projectRef, permissions } = overrides ?? {}
+  const { organizationSlug, projectRef, permissions } = overrides ?? {}
 
   const {
     permissions: allPermissions,
