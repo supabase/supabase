@@ -50,7 +50,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
           closeButton: cn(
             // unset all styles set from sonner
-            'relative order-last transform-none',
+            'relative order-last transform-none rounded-md',
             // make it similar to the existing react toast
             'text-foreground/50 opacity-0 transition-opacity -mr-4 bg-transparent border-0 hover:!bg-transparent hover:border-transparent',
             'hover:text-foreground group-hover:opacity-100',
