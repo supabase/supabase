@@ -49,9 +49,11 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
 function Partner({
   partner,
   overview,
+  isPreview,
 }: {
   partner: IntegrationsDirectoryEntry
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+  isPreview: boolean
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
   const isNarrow = useBreakpoint('lg')
@@ -66,7 +68,7 @@ function Partner({
         openGraph={{
           title: `${partner.title} | Works With Supabase`,
           description: partner.description,
-          url: `https://supabase.com/partners/integrations/${partner.slug}`,
+          url: `${process.env.NEXT_PUBLIC_URL}/partners/integrations/${partner.slug}`,
           images: [
             {
               url: partner.images ? partner.images[0] : partner.logo,
@@ -181,6 +183,14 @@ function Partner({
               {isNarrow && <PartnerDetails partner={partner} />}
 
               <div className="lg:col-span-5 overflow-hidden">
+                {isPreview && (
+                  <div className="bg-surface-200 w-full p-4 mb-12 rounded-2xl border border-warning border-opacity-70">
+                    <p className="text-sm">
+                      This is a preview page managed by the partner and has been not approved by
+                      Supabase team.
+                    </p>
+                  </div>
+                )}
                 <h2
                   className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
@@ -195,15 +205,16 @@ function Partner({
 
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
-            {partner.call_to_action_link && (
+            {/* TODO(Kamil): This has changed to be a mandatory field. Remove this guard once we move all the data. */}
+            {partner.docs && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
+                  <a href={partner.docs} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">
-                      Add integration
+                      See the docs
                     </Button>
                   </a>
                 </div>
@@ -240,6 +251,7 @@ const PartnerDetails = ({ partner }: { partner: IntegrationsDirectoryEntry }) =>
         )}
 
         <div className="text-foreground divide-y">
+          {/* TODO(Kamil): This has changed to be a mandatory field. Remove this guard once we move all the data. */}
           {partner.developer && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
@@ -294,13 +306,10 @@ const PartnerDetails = ({ partner }: { partner: IntegrationsDirectoryEntry }) =>
   )
 }
 
-// This also gets called at build time
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   let result: IntegrationsDirectoryEntry | null = null
 
   const url = `${API_URL}/integrations-directory/${params!.slug}${query.preview_token ? `?preview_token=${query.preview_token}` : ''}`
-
-  console.log(url)
   const response = await fetch(url)
   const entry = (await response.json()) as IntegrationsDirectoryEntry
 
@@ -323,6 +332,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
     }
   }
 
+  // Once entry is approved, there is no point in keeping preview token in the url.
+  if (result.approved && query.preview_token) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `${process.env.NEXT_PUBLIC_URL}/partners/integrations/${params!.slug}`,
+      },
+    }
+  }
+
   const codeHikeOptions: CodeHikeConfig = {
     theme: codeHikeTheme,
     lineNumbers: true,
@@ -340,7 +359,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   })
 
   return {
-    props: { partner: result, overview },
+    props: { partner: result, overview, isPreview: !!query.preview_token },
   }
 }
 

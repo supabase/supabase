@@ -65,7 +65,6 @@ export const IntegrationCategory = {
 } as const
 
 const FormSchema = z.object({
-  call_to_action_link: z.string().optional(),
   category: z.enum([
     'api',
     'auth',
@@ -80,7 +79,6 @@ const FormSchema = z.object({
   description: z.string(),
   developer: z.string(),
   docs: z.string(),
-  images: z.array(z.string()),
   logo: z.string().nullable(),
   overview: z.string(),
   slug: z.string(),
@@ -101,12 +99,10 @@ export const CreateIntegrationSheet = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      call_to_action_link: integrationEntry?.call_to_action_link ?? '',
       category: integrationEntry?.category ?? 'api',
       description: integrationEntry?.description ?? '',
       developer: integrationEntry?.developer ?? '',
       docs: integrationEntry?.docs ?? '',
-      images: integrationEntry?.images ?? [],
       logo: integrationEntry?.logo ?? null,
       overview: integrationEntry?.overview ?? '',
       slug: integrationEntry?.slug ?? '',
@@ -138,12 +134,10 @@ export const CreateIntegrationSheet = ({
         {
           orgSlug: organization!.slug,
           params: {
-            call_to_action_link: data.call_to_action_link,
             category: data.category,
             description: data.description,
             developer: data.developer,
             docs: data.docs,
-            images: data.images,
             logo: data.logo,
             overview: data.overview,
             slug: data.slug,
@@ -164,12 +158,10 @@ export const CreateIntegrationSheet = ({
         {
           orgSlug: organization!.slug,
           params: {
-            call_to_action_link: data.call_to_action_link,
             category: data.category,
             description: data.description,
             developer: data.developer,
             docs: data.docs,
-            images: data.images,
             logo: data.logo,
             overview: data.overview,
             slug: data.slug,
@@ -335,7 +327,12 @@ export const CreateIntegrationSheet = ({
               render={({ field }) => (
                 <FormItemLayout label="Category">
                   <FormControl_Shadcn_>
-                    <Select_Shadcn_>
+                    <Select_Shadcn_
+                      value={field.value}
+                      onValueChange={(value) =>
+                        form.setValue('category', value as keyof typeof IntegrationCategory)
+                      }
+                    >
                       <SelectTrigger_Shadcn_>
                         <SelectValue_Shadcn_ placeholder="Pick a category" />
                       </SelectTrigger_Shadcn_>
@@ -383,22 +380,7 @@ export const CreateIntegrationSheet = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Video"
-                  description="(optional) A link to the introduction video for this integration"
-                >
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              key="call_to_action_link"
-              control={form.control}
-              name="call_to_action_link"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Call to Action"
-                  description="(optional) A link to the call to action displayed at the very bottom of the page"
+                  description="(optional) A YouTube ID for the introduction video for this integration"
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} />
@@ -412,7 +394,25 @@ export const CreateIntegrationSheet = ({
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItemLayout label="Description">
+                <FormItemLayout
+                  label="Description"
+                  description="Short description for your integration. Will be shown on the directory page page."
+                >
+                  <FormControl_Shadcn_>
+                    <ExpandingTextArea {...field} className="min-h-24" />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              key="overview"
+              control={form.control}
+              name="overview"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Overview"
+                  description="Extended description for your integration. Will be shown on your page."
+                >
                   <FormControl_Shadcn_>
                     <Tabs_Shadcn_ defaultValue="write" className="w-full">
                       <TabsList_Shadcn_ className="grid w-full grid-cols-2">
@@ -430,21 +430,6 @@ export const CreateIntegrationSheet = ({
                         <Markdown content={field.value} />
                       </TabsContent_Shadcn_>
                     </Tabs_Shadcn_>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            <FormField_Shadcn_
-              key="overview"
-              control={form.control}
-              name="overview"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Overview"
-                  description="Extended description for your integration. Will be shown on your page."
-                >
-                  <FormControl_Shadcn_>
-                    <ExpandingTextArea {...field} className="min-h-24" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
