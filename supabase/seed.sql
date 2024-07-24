@@ -1,0 +1,7 @@
+-- insert into meetups
+--   (location, edition, date, is_published)
+-- values
+--   ('New York', 'lw12', now(), true),
+--   ('London', 'lw12', now(), true),
+--   ('Singapore', 'lw12', now(), true),
+--   ('Melbourne', 'lw11', now(), true);

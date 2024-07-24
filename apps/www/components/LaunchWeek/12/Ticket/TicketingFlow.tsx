@@ -102,8 +102,7 @@ const TicketingFlow = () => {
                         <p className="text-foreground-light">{LW12_DATE}</p>
                       </div>
                       <p className="text-foreground-lighter text-lg">
-                        Join us for a week of new features and find new ways to level up your
-                        development.
+                        Join us for a week of exciting new features.
                       </p>
                     </div>
                     <TicketForm />

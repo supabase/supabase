@@ -18,8 +18,8 @@ const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBu
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 // const BUCKET_FOLDER_VERSION = 'v1'
 
-const LW_TABLE = 'lw11_tickets'
-const LW_MATERIALIZED_VIEW = 'lw11_tickets_platinum'
+const LW_TABLE = 'lw12_tickets'
+const LW_MATERIALIZED_VIEW = 'lw12_tickets_view'
 
 const STYLING_CONGIF = {
   regular: {
@@ -98,40 +98,48 @@ export async function handler(req: Request) {
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('MISC_USE_URL') ?? '',
+      Deno.env.get('LIVE_SUPABASE_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('MISC_USE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('LIVE_SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Track social shares
     if (userAgent?.toLocaleLowerCase().includes('twitter')) {
       await supabaseAdminClient
         .from(LW_TABLE)
-        .update({ sharedOnTwitter: 'now' })
+        .update({ shared_on_twitter: 'now' })
         .eq('username', username)
-        .is('sharedOnTwitter', null)
+        .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
-        .update({ sharedOnLinkedIn: 'now' })
+        .update({ shared_on_linkedin: 'now' })
         .eq('username', username)
-        .is('sharedOnLinkedIn', null)
+        .is('shared_on_linkedin', null)
     }
 
     // Get ticket data
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, ticketNumber, sharedOnTwitter, sharedOnLinkedIn, metadata, secret, role, company, location'
+        'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, metadata, secret, role, company, location'
       )
       .eq('username', username)
       .maybeSingle()
 
     if (error) console.log('fetch error', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
-    const { name, ticketNumber, metadata, secret } = user
 
-    const platinum = (!!user?.sharedOnTwitter && !!user?.sharedOnLinkedIn) ?? false
+    const {
+      name,
+      ticket_number: ticketNumber,
+      metadata,
+      secret,
+      shared_on_twitter: sharedOnTwitter,
+      shared_on_linkedin: sharedOnLinkedIn,
+    } = user
+
+    const platinum = (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum)
       return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
 

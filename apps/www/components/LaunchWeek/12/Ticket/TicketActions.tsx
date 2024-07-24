@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
 import { useBreakpoint } from 'common'
-import dayjs from 'dayjs'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
@@ -79,7 +79,7 @@ export default function TicketActions() {
       <div className="flex w-full gap-2">
         <Button
           onClick={() => handleShare('twitter')}
-          type={userData.sharedOnTwitter ? 'secondary' : 'default'}
+          type={userData.shared_on_twitter ? 'secondary' : 'default'}
           icon={<IconTwitterX className="text-light w-3 h-3" />}
           size={isTablet ? 'tiny' : 'tiny'}
           block
@@ -91,7 +91,7 @@ export default function TicketActions() {
         </Button>
         <Button
           onClick={() => handleShare('linkedin')}
-          type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
+          type={userData.shared_on_linkedin ? 'secondary' : 'default'}
           icon={<IconLinkedinSolid className="text-light w-3 h-3" />}
           size={isTablet ? 'tiny' : 'tiny'}
           block

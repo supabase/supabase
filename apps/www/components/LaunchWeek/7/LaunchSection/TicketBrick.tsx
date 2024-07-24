@@ -11,7 +11,7 @@ interface Props {
 export function TicketBrick({ user }: Props) {
   const [isLoading, setLoading] = useState(true)
 
-  const golden = user.sharedOnLinkedIn && user.sharedOnTwitter
+  const golden = user.shared_on_linkedin && user.shared_on_twitter
 
   // reg_bg_57.png
   const baseImagePath = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw7/tickets_bg/`

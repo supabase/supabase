@@ -13,7 +13,7 @@ import TicketCustomizationForm from './TicketCustomizationForm'
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
-  const { platinum = false, secret: hasSecretTicket, ticketNumber, username } = user
+  const { platinum = false, secret: hasSecretTicket, ticket_number: ticketNumber, username } = user
   const params = useParams()
   const [responseTime, setResponseTime] = useState<{ start: number; end: number | undefined }>({
     start: performance.now(),

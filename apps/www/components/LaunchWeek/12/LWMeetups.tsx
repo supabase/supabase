@@ -7,16 +7,15 @@ import { ArrowRight } from 'lucide-react'
 
 export interface Meetup {
   id?: any
-  title: string
-  isLive: boolean
+  location: string
+  is_live: boolean
   link: string
   display_info: string
-  start_at: string
+  date: string
 }
 
 function addHours(date: Date, hours: number) {
   const dateCopy = new Date(date)
-
   dateCopy.setHours(dateCopy.getHours() + hours)
 
   return dateCopy
@@ -30,34 +29,28 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
     SupabaseClient['channel']
   > | null>(null)
   const [activeMeetup, setActiveMeetup] = useState<Meetup>(meets[0])
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   useEffect(() => {
     // Listen to realtime changes
     if (supabase && !realtimeChannel) {
       const channel = supabase
-        .channel('lw11_meetups')
+        .channel('meetups')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'lw11_meetups',
+            table: 'meetups',
             filter: undefined,
           },
           async () => {
             const { data: newMeets } = await supabase
-              .from('lw11_meetups')
+              .from('meetups')
               .select('*')
-              .neq('isPublished', false)
+              .eq('edition', 'lw12')
+              .neq('is_published', false)
 
-            setMeets(
-              newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
-            )
+            setMeets(newMeets?.sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1))!)
           }
         )
         .subscribe(async (status) => {
@@ -78,25 +71,22 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
     setActiveMeetup(meetup)
   }
 
-  if (!isMounted) return null
-
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-foreground-lighter">
       <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
-          Join our live community-driven meetups to celebrate GA Week with the community, listen to
+          Join our live community-driven meetups to Launch Week 12 with the community, listen to
           tech talks and grab some swag.
         </p>
-        {/* <TextLink label="Read more about meetups" hasChevron url="" /> */}
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
           meets
-            ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
+            ?.sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1))
             .map((meetup: Meetup, i: number) => {
-              const startAt = new Date(meetup.start_at)
-              const endAt = addHours(new Date(meetup.start_at), 3)
+              const startAt = new Date(meetup.date)
+              const endAt = addHours(new Date(meetup.date), 3)
               const after = now > startAt
               const before3H = now < endAt
               const liveNow = after && before3H
@@ -111,14 +101,14 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     className={cn(
                       'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
                       'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup.id && '!text-foreground',
+                      meetup.id === activeMeetup?.id && '!text-foreground',
                       liveNow && 'text-foreground-light'
                     )}
                   >
                     {liveNow && (
                       <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
                     )}
-                    <span>{meetup.title}</span>
+                    <span>{meetup.location}</span>
                     {i !== meets.length - 1 && ', '}
                   </button>
                   <Link
@@ -131,14 +121,14 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     className={cn(
                       'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
                       'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup.id && '!text-foreground',
+                      meetup.id === activeMeetup?.id && '!text-foreground',
                       liveNow && 'text-foreground-light'
                     )}
                   >
                     {liveNow && (
                       <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
                     )}
-                    <span>{meetup.title}</span>
+                    <span>{meetup.location}</span>
                     {i !== meets.length - 1 && ', '}
                   </Link>
                 </>
@@ -146,7 +136,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
             })}
       </div>
       <Link
-        href={activeMeetup.link ?? '#'}
+        href={activeMeetup?.link ?? '#'}
         target="_blank"
         className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1 inline-flex flex-wrap items-center gap-1"
       >
