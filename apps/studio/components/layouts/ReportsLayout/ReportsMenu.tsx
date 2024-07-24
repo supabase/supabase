@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
+import { Edit2, MoreHorizontal, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -26,9 +26,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Menu,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Tooltip } from '@ui/components/shadcn/ui/tooltip'
+import { Alert } from '@ui/components/shadcn/ui/alert'
+
+const ReportDropdownMenuItem = ({
+  icon,
+  label,
+  onClick,
+  disabled,
+  tooltipMessage,
+  showTooltip,
+}: {
+  icon: React.ReactNode
+  label: string
+  onClick: () => void
+  disabled?: boolean
+  tooltipMessage?: string
+  showTooltip?: boolean
+}) => {
+  return (
+    <Tooltip>
+      <TooltipTrigger_Shadcn_>
+        <DropdownMenuItem disabled={disabled} onClick={onClick} className="flex items-center gap-2">
+          {icon}
+          {label}
+        </DropdownMenuItem>
+      </TooltipTrigger_Shadcn_>
+      {showTooltip && <TooltipContent_Shadcn_>{tooltipMessage}</TooltipContent_Shadcn_>}
+    </Tooltip>
+  )
+}
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -176,39 +208,41 @@ const ReportsMenu = () => {
                 >
                   <div>{item.name}</div>
 
-                  {canUpdateCustomReport && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button
-                          type="text"
-                          className="px-1 opacity-50 hover:opacity-100"
-                          icon={<ChevronDown size={12} strokeWidth={2} />}
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-52 *:space-x-2">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            if (!item.id) return
-                            setSelectedReportToUpdate(item.report)
-                          }}
-                        >
-                          <Edit2 size={12} />
-                          <div>Rename</div>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={async () => {
-                            if (!item.id) return
-                            setSelectedReportToDelete(item.report)
-                            setDeleteModalOpen(true)
-                          }}
-                        >
-                          <Trash size={12} />
-                          <div>Delete</div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button
+                        type="text"
+                        className="pl-1 pr-0 opacity-50 hover:opacity-100"
+                        icon={<MoreHorizontal size={12} strokeWidth={2} />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-52 *:space-x-2">
+                      <ReportDropdownMenuItem
+                        disabled={!canUpdateCustomReport}
+                        onClick={() => {
+                          if (!item.id) return
+                          setSelectedReportToUpdate(item.report)
+                        }}
+                        tooltipMessage={'You need additional permissions to update custom reports'}
+                        showTooltip={!canUpdateCustomReport}
+                        icon={<Edit2 size={12} />}
+                        label="Rename"
+                      />
+                      <DropdownMenuSeparator />
+                      <ReportDropdownMenuItem
+                        icon={<Trash size={12} />}
+                        label="Delete"
+                        disabled={!canUpdateCustomReport}
+                        onClick={async () => {
+                          if (!item.id) return
+                          setSelectedReportToDelete(item.report)
+                          setDeleteModalOpen(true)
+                        }}
+                        tooltipMessage={'You need additional permissions to delete custom reports'}
+                        showTooltip={!canUpdateCustomReport}
+                      />
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </Link>
               ))}
             </div>
