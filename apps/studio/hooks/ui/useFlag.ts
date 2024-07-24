@@ -19,7 +19,7 @@ export function useFlag<T = boolean>(name: string) {
 }
 
 export const useIsOptedIntoProjectLevelPermissions = (slug: string) => {
-  const orgsOptedIn = useFlag('projectLevelPermissionsOptIn')
+  const orgsOptedIn = useFlag('projectLevelPermissionsOptIn') as string | undefined
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
