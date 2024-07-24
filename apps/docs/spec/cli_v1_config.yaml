@@ -446,7 +446,7 @@ parameters:
   - id: 'auth.email.smtp.host'
     title: 'auth.email.smtp.host'
     tags: ['auth']
-    required: true
+    required: false
     default: 'inbucket'
     description: |
       Hostname or IP address of the SMTP server.
@@ -454,7 +454,7 @@ parameters:
   - id: 'auth.email.smtp.port'
     title: 'auth.email.smtp.port'
     tags: ['auth']
-    required: true
+    required: false
     default: 2500
     description: |
       Port number of the SMTP server.
@@ -463,7 +463,6 @@ parameters:
     title: 'auth.email.smtp.user'
     tags: ['auth']
     required: false
-    default: 'None'
     description: |
       Username for authenticating with the SMTP server.
 
@@ -471,14 +470,13 @@ parameters:
     title: 'auth.email.smtp.pass'
     tags: ['auth']
     required: false
-    default: 'None'
     description: |
       Password for authenticating with the SMTP server.
 
   - id: 'auth.email.smtp.admin_email'
     title: 'auth.email.smtp.admin_email'
     tags: ['auth']
-    required: true
+    required: false
     default: 'admin@email.com'
     description: |
       Email used as the sender for emails sent from the application.
@@ -487,7 +485,6 @@ parameters:
     title: 'auth.email.smtp.sender_name'
     tags: ['auth']
     required: false
-    default: 'None'
     description: |
       Display name used as the sender for emails sent from the application.
 
