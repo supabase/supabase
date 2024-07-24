@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
@@ -74,9 +74,11 @@ const Pagination = () => {
   const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
+  const hasAnySelectedRows = useMemo(() => state.selectedRows.size >= 1, [state.selectedRows])
+
   const onPreviousPage = () => {
     if (page > 1) {
-      if (state.selectedRows.size >= 1) {
+      if (hasAnySelectedRows) {
         setIsConfirmPreviousModalOpen(true)
       } else {
         goToPreviousPage()
@@ -94,7 +96,7 @@ const Pagination = () => {
 
   const onNextPage = () => {
     if (page < maxPages) {
-      if (state.selectedRows.size >= 1) {
+      if (hasAnySelectedRows) {
         setIsConfirmNextModalOpen(true)
       } else {
         goToNextPage()
