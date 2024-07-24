@@ -20,9 +20,9 @@ import { useTheme } from 'next-themes'
 const LW12TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/12/Ticket/TicketContainer')
 )
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
-)
+// const LaunchWeekPrizeSection = dynamic(
+//   () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
+// )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
