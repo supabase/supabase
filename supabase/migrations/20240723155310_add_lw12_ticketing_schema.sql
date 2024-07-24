@@ -51,44 +51,48 @@ to authenticated
 with check ((id = auth.uid()));
 
 -- public view without sensible data
-create or replace view "public"."lw12_tickets_view" as
-  WITH lw12_referrals AS (
+create or replace view
+  public.lw12_tickets_view with (security_invoker=on) as
+with
+  lw12_referrals as (
     select
-      referred_by,
+      lw12_tickets_1.referred_by,
       count(*) as referrals
     from
-      lw12_tickets
+      lw12_tickets lw12_tickets_1
     where
-      referred_by is not null
+      lw12_tickets_1.referred_by is not null
     group by
-      referred_by
-    )
-  SELECT lw12_tickets.id,
-    lw12_tickets.name,
-    lw12_tickets.username,
-    lw12_tickets.ticket_number,
-    lw12_tickets.created_at,
-    lw12_tickets.shared_on_twitter,
-    lw12_tickets.shared_on_linkedin,
-    lw12_tickets.metadata,
-    lw12_tickets.role,
-    lw12_tickets.company,
-    lw12_tickets.location,
-      case
-        when lw12_referrals.referrals is null then 0
-        else lw12_referrals.referrals
-      end as referrals,
-      CASE
-        WHEN ((lw12_tickets.shared_on_twitter IS NOT NULL) AND (lw12_tickets.shared_on_linkedin IS NOT NULL)) THEN true
-        ELSE false
-      END AS platinum,
-      CASE
-        WHEN (lw12_tickets.game_won_at IS NOT NULL) THEN true
-        ELSE false
-      END AS secret
-    from
-      lw12_tickets
-      left outer join lw12_referrals on lw12_tickets.username = lw12_referrals.referred_by;
+      lw12_tickets_1.referred_by
+  )
+select
+  lw12_tickets.id,
+  lw12_tickets.name,
+  lw12_tickets.username,
+  lw12_tickets.ticket_number,
+  lw12_tickets.created_at,
+  lw12_tickets.shared_on_twitter,
+  lw12_tickets.shared_on_linkedin,
+  lw12_tickets.metadata,
+  lw12_tickets.role,
+  lw12_tickets.company,
+  lw12_tickets.location,
+  case
+    when lw12_referrals.referrals is null then 0::bigint
+    else lw12_referrals.referrals
+  end as referrals,
+  case
+    when lw12_tickets.shared_on_twitter is not null
+    and lw12_tickets.shared_on_linkedin is not null then true
+    else false
+  end as platinum,
+  case
+    when lw12_tickets.game_won_at is not null then true
+    else false
+  end as secret
+from
+  lw12_tickets
+  left join lw12_referrals on lw12_tickets.username = lw12_referrals.referred_by;
 
 -- Create meetups table
 create table
