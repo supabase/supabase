@@ -86,7 +86,7 @@ export const InviteMemberButton = () => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles,
     permissions ?? []
   )
@@ -99,7 +99,7 @@ export const InviteMemberButton = () => {
         PermissionAction.CREATE,
         'user_invites',
         { resource: { role_id } },
-        organization?.id
+        organization?.slug
       )
     )
 

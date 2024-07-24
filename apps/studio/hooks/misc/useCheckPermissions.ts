@@ -99,8 +99,10 @@ export function useGetProjectPermissions(
     enabled: projectRefOverride === undefined && enabled,
   })
 
-  const project = projectRefOverride === undefined ? projectResult : { ref: projectRefOverride }
-  const projectRef = project?.ref
+  const project = projectRefOverride === undefined || projectResult?.parent_project_ref ?
+    projectResult :
+    { ref: projectRefOverride, parent_project_ref: undefined }
+  const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
 
   return {
     permissions,
