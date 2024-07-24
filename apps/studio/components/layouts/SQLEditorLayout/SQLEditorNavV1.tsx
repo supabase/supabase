@@ -170,7 +170,7 @@ export const SQLEditorNavV1 = ({
                 placeholder="Search queries..."
                 onChange={(e) => setSearchText(e.target.value.trim())}
                 value={searchText}
-                aria-labelledby="Search queries"
+                aria-label="Search queries"
               />
             </InnerSideBarFilters>
           )}

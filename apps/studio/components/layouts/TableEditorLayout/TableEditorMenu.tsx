@@ -161,7 +161,7 @@ const TableEditorMenu = () => {
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
               name="search-tables"
-              aria-labelledby="Search tables"
+              aria-label="Search tables"
               onChange={(e) => {
                 setSearchText(e.target.value.trim())
               }}

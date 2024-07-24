@@ -106,12 +106,14 @@ const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWitho
 
 const InnerSideBarFilterSearchInput = forwardRef<
   HTMLInputElement,
-  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & { 'aria-labelledby': string; name: string }
+  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & { 'aria-label': string; name: string }
 >(({ children, ...props }, ref) => {
   return (
     <label htmlFor={props.name} className="relative w-full">
-      <span className="sr-only">{props['aria-labelledby']}</span>
+      <span className="sr-only" id={`${props.name}-aria-label`}>{props['aria-label']}</span>
       <Input_Shadcn_
+        id={props.name}
+        aria-labelledby={`${props.name}-aria-label`}
         ref={ref}
         type="text"
         className={cn(
