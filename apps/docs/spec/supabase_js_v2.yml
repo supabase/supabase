@@ -193,25 +193,13 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Create a single supabase client for interacting with your database
-          const supabase = createClient(supabase_url, anon_key, {
-            auth: {
-              detectSessionInUrl: false
-            }
-          })          ```
-      - id: server-side-with-auth
-        name: Server-side with auth
-        code: |
-          ```js
-          import { createClient } from '@supabase/supabase-js'
-
-          // Create a single supabase client for interacting with your database
-          const supabase = createClient(supabase_url, anon_key, {
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
             auth: {
               autoRefreshToken: false,
               persistSession: false,
               detectSessionInUrl: false
             }
-          })
+          })          
           ```
         description: |
           By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
