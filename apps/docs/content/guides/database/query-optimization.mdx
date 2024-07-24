@@ -32,8 +32,8 @@ where
   a.sign_up_date > '2023-01-01'
   and b.status = 'shipped'
 order by
-  b.date_of_purchase;
-limit 10
+  b.date_of_purchase
+limit 10;
 ```
 
 In this query, there are several parts that indexes could likely help in optimizing the performance:
