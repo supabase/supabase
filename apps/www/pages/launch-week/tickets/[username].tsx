@@ -109,9 +109,9 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             </SectionContainer>
             <LW12Background className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
           </div>
-          <SectionContainer className="!pt-4 !pb-0">
+          {/* <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />
-          </SectionContainer>
+          </SectionContainer> */}
           <CTABanner className="!bg-alternative border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
