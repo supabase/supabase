@@ -1722,7 +1722,6 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
-        { name: 'Access Control', url: '/guides/platform/access-control' },
         {
           name: 'Custom Postgres Config',
           url: '/guides/platform/custom-postgres-config',
@@ -1750,9 +1749,16 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/network-restrictions',
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
-        { name: 'Permissions', url: '/guides/platform/permissions' },
-        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
         { name: 'Branching', url: '/guides/platform/branching' },
+      ],
+    },
+    {
+      name: 'Security',
+      url: undefined,
+      items: [
+        { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Platform-required Permissions', url: '/guides/platform/permissions' },
       ],
     },
     {
