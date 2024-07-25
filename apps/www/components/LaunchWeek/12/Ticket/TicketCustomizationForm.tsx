@@ -36,8 +36,9 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
     if (supabase) {
       await supabase
-        .from('lw12_tickets')
+        .from('tickets')
         .update(payload)
+        .eq('launch_week', 'lw12')
         .eq('username', user.username)
         .then((res) => {
           if (res.error) return setFormState('error')

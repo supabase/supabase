@@ -19,76 +19,86 @@ export default function TicketForm() {
   const router = useRouter()
 
   // Triggered on session
-  async function fetchUser() {
+  async function fetchOrCreateUser() {
     if (supabase && session?.user && !userData.id) {
       const username = session.user.user_metadata.user_name
       const name = session.user.user_metadata.full_name
       const email = session.user.email
+      const userId = session.user.id
 
-      await supabase
-        .from('lw12_tickets')
-        .insert({
-          email,
-          name,
-          username,
-          referred_by: router.query?.referral ?? null,
-        })
-        .eq('email', email)
-        .select()
-        .single()
-        .then(async ({ error }: any) => {
-          // If error because of duplicate email, ignore and proceed, otherwise sign out.
-          if (error && error?.code !== '23505') {
-            setFormState('error')
-            return supabase.auth.signOut()
+      if (!userData.id) {
+        await supabase
+          .from('tickets')
+          .insert({
+            user_id: userId,
+            launch_week: 'lw12',
+            email,
+            name,
+            username,
+            referred_by: router.query?.referral ?? null,
+          })
+          .eq('email', email)
+          .select()
+          .single()
+          .then(({ error }: any) => fetchUser({ error, username }))
+      }
+    }
+  }
+
+  const fetchUser = async ({ error, username }: any) => {
+    if (!supabase) return
+
+    // If error because of duplicate email, ignore and proceed, otherwise sign out.
+    if (error && error?.code !== '23505') {
+      setFormState('error')
+      return supabase.auth.signOut()
+    }
+
+    const { data } = await supabase
+      .from('tickets_view')
+      .select('*')
+      .eq('launch_week', 'lw12')
+      .eq('username', username)
+      .single()
+
+    if (data) setUserData(data)
+
+    setFormState('default')
+
+    // Prefetch GitHub avatar
+    new Image().src = `https://github.com/${username}.png`
+
+    // Prefetch the twitter share URL to eagerly generate the page
+    fetch(`/launch-week/tickets/${username}`).catch((_) => {})
+
+    if (!realtimeChannel) {
+      const channel = supabase
+        .channel('changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tickets',
+            filter: `username=eq.${username}`,
+          },
+          (payload: any) => {
+            const platinum = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
+            const secret = !!payload.new.gameWonAt
+            setUserData({
+              ...payload.new,
+              platinum,
+              secret,
+            })
           }
-          const { data } = await supabase
-            .from('lw12_tickets_view')
-            .select('*')
-            .eq('username', username)
-            .single()
-          if (data) {
-            setUserData(data)
-          }
-
-          setFormState('default')
-
-          // Prefetch GitHub avatar
-          new Image().src = `https://github.com/${username}.png`
-
-          // Prefetch the twitter share URL to eagerly generate the page
-          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
-
-          if (!realtimeChannel) {
-            const channel = supabase
-              .channel('changes')
-              .on(
-                'postgres_changes',
-                {
-                  event: 'UPDATE',
-                  schema: 'public',
-                  table: 'lw12_tickets',
-                  filter: `username=eq.${username}`,
-                },
-                (payload: any) => {
-                  const platinum = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
-                  const secret = !!payload.new.gameWonAt
-                  setUserData({
-                    ...payload.new,
-                    platinum,
-                    secret,
-                  })
-                }
-              )
-              .subscribe()
-            setRealtimeChannel(channel)
-          }
-        })
+        )
+        .subscribe()
+      setRealtimeChannel(channel)
     }
   }
 
   useEffect(() => {
-    fetchUser()
+    fetchOrCreateUser()
 
     return () => {
       // Cleanup realtime subscription on unmount

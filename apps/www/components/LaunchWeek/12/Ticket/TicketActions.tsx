@@ -27,7 +27,7 @@ export default function TicketActions() {
   )}`
   const params = useParams()
   const sharePage = !!params.username
-  const LW_TABLE = 'lw12_tickets'
+  const TICKETS_TABLE = 'tickets'
 
   useEffect(() => {
     setImgReady(false)
@@ -51,19 +51,21 @@ export default function TicketActions() {
     setTimeout(async () => {
       if (social === 'twitter') {
         await supabase
-          .from(LW_TABLE)
+          .from(TICKETS_TABLE)
           .update({
             shared_on_twitter: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
+          .eq('launch_week', 'lw12')
           .eq('username', username)
       } else if (social === 'linkedin') {
         await supabase
-          .from(LW_TABLE)
+          .from(TICKETS_TABLE)
           .update({
             shared_on_linkedin: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
+          .eq('launch_week', 'lw12')
           .eq('username', username)
       }
     })

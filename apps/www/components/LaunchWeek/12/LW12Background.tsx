@@ -18,8 +18,16 @@ const LW12Background = ({ className }: Props) => {
 
   return (
     <div className={cn('absolute inset-0 w-full h-full flex flex-col', className)}>
-      {rows?.map((row, i) => <Row key={`row-${i}`} {...row} />)}
-      <div className="absolute inset-0 bg-gradient-to-t border from-background-alternative to-transparent" />
+      {/* {rows?.map((row, i) => <Row key={`row-${i}`} {...row} />)} */}
+      {/* <div className="absolute inset-0 bg-gradient-to-t border from-background-alternative to-transparent" /> */}
+      <img
+        src="/images/launchweek/12/bg-light.svg"
+        className="dark:hidden block absolute inset-0 w-full h-full object-cover"
+      />
+      <img
+        src="/images/launchweek/12/bg-dark.svg"
+        className="dark:block hidden absolute inset-0 w-full h-full object-cover"
+      />
     </div>
   )
 }

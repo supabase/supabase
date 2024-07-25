@@ -21,7 +21,7 @@ function addHours(date: Date, hours: number) {
   return dateCopy
 }
 
-const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
+const LWMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   const { supabase } = useConfData()
   const now = new Date(Date.now())
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
@@ -149,4 +149,4 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   )
 }
 
-export default LW11Meetups
+export default LWMeetups

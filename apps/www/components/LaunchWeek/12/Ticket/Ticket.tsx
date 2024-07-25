@@ -44,8 +44,9 @@ export default function Ticket() {
 
   const code = codeBlock`
 await supabase
-  .from('lw12_tickets_view')
+  .from('tickets_view')
   .select('*')
+  .eq('launch_week', 'lw12')
   .eq('username', ${username})
   .single()
 `
@@ -57,12 +58,12 @@ await supabase
   // Keep following indentation for proper json layout with conditionals
   const responseJson = codeBlock`
 {
-  "data": {
-    "name": "${user.name}",
-    "username": "${username}",
-    "ticket_number": "${ticketNumber}",
-  ${HAS_ROLE && `  "role": "${user.role}",\n`}${HAS_COMPANY && `  "company": "${user.company}",\n`}${HAS_LOCATION && `  "location": "${user.location}",\n`}},
-  "error": null
+  data: {
+    name: "${user.name}",
+    username: "${username}",
+    ticket_number: "${ticketNumber}",
+  ${HAS_ROLE && `  role: "${user.role}",\n`}${HAS_COMPANY && `  company: "${user.company}",\n`}${HAS_LOCATION && `  location: "${user.location}",\n`}},
+  error: null
 }
 `
 

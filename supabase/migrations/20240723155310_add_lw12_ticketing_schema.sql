@@ -1,10 +1,31 @@
+create extension if not exists "uuid-ossp";
+
+create table public.launch_weeks (
+  id text not null primary key, -- 'lw12', 'lw13', etc
+  created_at timestamp with time zone not null default timezone ('utc'::text, now()),
+  start_date timestamp with time zone null,
+  end_date timestamp with time zone null
+);
+
+alter table public.launch_weeks enable row level security;
+
+create policy "Allow public read access"
+on "public"."launch_weeks"
+as PERMISSIVE
+for select
+using ( true );
+
+insert into public.launch_weeks (id) values ('lw12');
+
 create table
-  public.lw12_tickets (
-    id uuid not null default auth.uid (),
+  public.tickets (
+    id uuid not null default uuid_generate_v4(),
+    created_at timestamp with time zone not null default timezone('utc'::text, now()),
+    launch_week text not null references public.launch_weeks (id),
+    user_id uuid not null references auth.users (id),
     email text null,
     name text null,
     username text null,
-    created_at timestamp with time zone not null default timezone ('utc'::text, now()),
     referred_by text null,
     shared_on_twitter timestamp with time zone null,
     shared_on_linkedin timestamp with time zone null,
@@ -14,96 +35,98 @@ create table
     role text null,
     company text null,
     location text null,
-    constraint lw12_tickets_pkey primary key (id),
-    constraint lw12_tickets_email_key unique (email),
-    constraint lw12_tickets_ticket_numberInt_key unique ("ticket_number"),
-    constraint lw12_tickets_username_key unique (username),
-    constraint public_lw12_tickets_id_fkey foreign key (id) references auth.users (id)
+    constraint tickets_pkey primary key (id),
+    constraint tickets_email_key unique (email, launch_week),
+    constraint tickets_ticket_number_key unique (ticket_number, launch_week),
+    constraint tickets_username_key unique (username, launch_week),
+    constraint public_tickets_id_fkey foreign key (user_id) references auth.users (id)
   );
 
-alter table public.lw12_tickets enable row level security;
-alter publication supabase_realtime add table public.lw12_tickets;
+alter table public.tickets enable row level security;
+alter publication supabase_realtime add table public.tickets;
 
-GRANT UPDATE (role) ON TABLE public.lw12_tickets TO authenticated;
-GRANT UPDATE (company) ON TABLE public.lw12_tickets TO authenticated;
-GRANT UPDATE (location) ON TABLE public.lw12_tickets TO authenticated;
+GRANT UPDATE (role) ON TABLE public.tickets TO authenticated;
+GRANT UPDATE (company) ON TABLE public.tickets TO authenticated;
+GRANT UPDATE (location) ON TABLE public.tickets TO authenticated;
 
 create policy "Allow user to select own ticket"
-on "public"."lw12_tickets"
+on public.tickets
 as PERMISSIVE
 for SELECT
 to authenticated
-using (id = auth.uid());
+using (user_id = auth.uid());
 
 create policy "Allow authenticated user to update its own ticket"
-on "public"."lw12_tickets"
+on public.tickets
 as permissive
 for update
 to authenticated
-using ((id = auth.uid()))
-with check ((id = auth.uid()));
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
 
-create policy "Enable insert for authenticated users only"
-on "public"."lw12_tickets"
+create policy "Allow insert for authenticated users only"
+on public.tickets
 as permissive
 for insert
 to authenticated
-with check ((id = auth.uid()));
+with check (user_id = auth.uid());
 
 -- public view without sensible data
 create or replace view
-  public.lw12_tickets_view with (security_invoker=on) as
+  public.tickets_view with (security_invoker=on) as
 with
   lw12_referrals as (
     select
-      lw12_tickets_1.referred_by,
+      tickets_1.referred_by,
       count(*) as referrals
     from
-      lw12_tickets lw12_tickets_1
+      tickets tickets_1
     where
-      lw12_tickets_1.referred_by is not null
+      tickets_1.referred_by is not null
     group by
-      lw12_tickets_1.referred_by
+      tickets_1.referred_by
   )
 select
-  lw12_tickets.id,
-  lw12_tickets.name,
-  lw12_tickets.username,
-  lw12_tickets.ticket_number,
-  lw12_tickets.created_at,
-  lw12_tickets.shared_on_twitter,
-  lw12_tickets.shared_on_linkedin,
-  lw12_tickets.metadata,
-  lw12_tickets.role,
-  lw12_tickets.company,
-  lw12_tickets.location,
+  tickets.id,
+  tickets.name,
+  tickets.username,
+  tickets.ticket_number,
+  tickets.created_at,
+  tickets.launch_week,
+  tickets.shared_on_twitter,
+  tickets.shared_on_linkedin,
+  tickets.metadata,
+  tickets.role,
+  tickets.company,
+  tickets.location,
   case
     when lw12_referrals.referrals is null then 0::bigint
     else lw12_referrals.referrals
   end as referrals,
   case
-    when lw12_tickets.shared_on_twitter is not null
-    and lw12_tickets.shared_on_linkedin is not null then true
+    when tickets.shared_on_twitter is not null
+    and tickets.shared_on_linkedin is not null then true
     else false
   end as platinum,
   case
-    when lw12_tickets.game_won_at is not null then true
+    when tickets.game_won_at is not null then true
     else false
   end as secret
 from
-  lw12_tickets
-  left join lw12_referrals on lw12_tickets.username = lw12_referrals.referred_by;
+  tickets
+  left join lw12_referrals on tickets.username = lw12_referrals.referred_by;
 
 -- Create meetups table
 create table
   public.meetups (
-    id bigint generated by default as identity,
-    created_at timestamp with time zone null default now(),
-    location text null,
-    date timestamp with time zone null,
+    id uuid not null default uuid_generate_v4(),
+    created_at timestamp with time zone not null default now(),
+    launch_week text not null references public.launch_weeks (id),
+    title text null,
+    country text null,
+    start_at timestamp with time zone null,
     link text null,
     display_info text null,
-    edition text null,
     is_live boolean not null default false,
     is_published boolean not null default false,
     constraint meetups_pkey primary key (id)

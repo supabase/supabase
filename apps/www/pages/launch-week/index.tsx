@@ -27,7 +27,7 @@ export default function LaunchWeekIndex() {
     ticket_number: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
     name: query.name?.toString(),
     username: query.username?.toString(),
-    golden: !!query.golden,
+    platinum: !!query.platinum,
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)

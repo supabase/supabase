@@ -121,6 +121,12 @@ const TicketingFlow = () => {
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
                       {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
+                      <div className="flex flex-col">
+                        {/* <span className="font-mono text-foreground-lighter text-xs leading-3">
+                          Starts in:
+                        </span> */}
+                        <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
+                      </div>
                       {hasPlatinumTicket ? (
                         <div>
                           {hasSecretTicket && !metadata?.hasSharedSecret ? (
@@ -155,12 +161,6 @@ const TicketingFlow = () => {
                       <div className="w-full my-3">
                         <TicketActions />
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-mono text-foreground-lighter text-xs leading-3">
-                          Starts in:
-                        </span>
-                        <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
-                      </div>
                       {!hasPlatinumTicket && <TicketPresence />}
                     </div>
                   </m.div>
@@ -182,10 +182,7 @@ const TicketingFlow = () => {
         </div>
       </SectionContainer>
       <LW12Background
-        className={cn(
-          'opacity-100 dark:opacity-40 transition-opacity',
-          hasTicket && 'opacity-50 dark:opacity-20'
-        )}
+        className={cn('opacity-100 transition-opacity', hasTicket && 'opacity-80 dark:opacity-60')}
       />
     </>
   )
