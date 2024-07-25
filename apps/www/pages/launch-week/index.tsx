@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, LW_URL, LW12_TITLE, LW12_DATE } from '~/lib/constants'
-import supabase from '~/lib/supabaseMisc'
+import supabase from '~/lib/supabase'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'

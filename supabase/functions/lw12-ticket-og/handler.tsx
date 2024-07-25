@@ -8,12 +8,11 @@ const corsHeaders = {
 }
 
 const STORAGE_URL =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/launch-week/lw12'
-const FONTS_STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/fonts'
+  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12'
 
 // Load custom font
-const FONT_URL = `${FONTS_STORAGE_URL}/CircularStd-Book.otf`
-const MONO_FONT_URL = `${FONTS_STORAGE_URL}/SourceCodePro-Regular.ttf`
+const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
+const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 // const BUCKET_FOLDER_VERSION = 'v1'
@@ -98,7 +97,7 @@ export async function handler(req: Request) {
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('LIVE_SUPABASE_URL') ?? '',
+      Deno.env.get('LIVE_SUPABASE_URL') ?? 'http://host.docker.internal:54321',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('LIVE_SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
@@ -184,7 +183,8 @@ export async function handler(req: Request) {
     }
 
     const lineNumberStyle = {
-      width: 24,
+      paddingLeft: 24,
+      width: 46,
       color: STYLING_CONGIF[ticketType].CODE_LINE_NUMBER,
     }
 
@@ -305,10 +305,10 @@ export async function handler(req: Request) {
                   background: STYLING_CONGIF[ticketType].TICKET_BACKGROUND,
                   borderTop: `1px solid ${STYLING_CONGIF[ticketType].TICKET_BORDER}`,
                 }}
-                tw="p-6 flex flex-col flex-grow w-full"
+                tw="py-6 flex flex-col flex-grow w-full"
               >
                 <div
-                  tw="flex mb-4 uppercase"
+                  tw="flex px-6 mb-4 uppercase"
                   style={{
                     lineHeight: '100%',
                     fontSize: 14,
@@ -338,7 +338,10 @@ export async function handler(req: Request) {
                   </div>
                   <div
                     tw="flex flex-col w-full"
-                    style={{ background: STYLING_CONGIF[ticketType].CODE_HIGHLIGHT }}
+                    style={{
+                      background: STYLING_CONGIF[ticketType].CODE_HIGHLIGHT,
+                      borderLeft: `1px solid ${STYLING_CONGIF[ticketType].CODE_BASE}`,
+                    }}
                   >
                     <div tw="flex">
                       <span style={lineNumberStyle}>3</span>
@@ -379,7 +382,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "ticketNumber"
+                          "ticket_number"
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -565,9 +568,10 @@ export async function handler(req: Request) {
       }
     )
 
-    // Remove. Use only for local testing.
+    // [Note] Uncomment only for local testing
     // return await generatedTicketImage
-    // // Upload image to storage.
+
+    // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(`launch-week/lw12/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {

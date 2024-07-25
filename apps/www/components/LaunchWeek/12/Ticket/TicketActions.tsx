@@ -22,7 +22,7 @@ export default function TicketActions() {
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw12-og?username=${encodeURIComponent(
+  const downloadUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-og?username=${encodeURIComponent(
     username ?? ''
   )}`
   const params = useParams()
