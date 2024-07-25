@@ -24,8 +24,8 @@ import {
   Button,
   Form,
   Input,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'

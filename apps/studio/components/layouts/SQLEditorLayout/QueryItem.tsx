@@ -18,8 +18,8 @@ import {
   HoverCard_Shadcn_,
   cn,
 } from 'ui'
-import { InnerSideMenuItem } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { InnerSideMenuItem } from 'ui-patterns/InnerSideMenu'
 import { QueryItemActions } from './QueryItemActions'
 
 export interface QueryItemProps {

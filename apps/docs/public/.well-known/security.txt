@@ -1,4 +1,4 @@
-Contact: security@supabase.io
+Contact: https://hackerone.com/ca63b563-9661-4ac3-8d23-7581582ef451/embedded_submissions/new
 Canonical: https://supabase.com/.well-known/security.txt
 
 

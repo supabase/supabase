@@ -13,7 +13,6 @@ import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -85,18 +84,6 @@ const IPv4SidePanel = () => {
       } else {
         setSelectedOption('ipv4_none')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'IPv4',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -161,22 +148,7 @@ const IPv4SidePanel = () => {
               type="large-cards"
               size="tiny"
               id="ipv4"
-              onChange={(event: any) => {
-                setSelectedOption(event.target.value)
-                Telemetry.sendActivity(
-                  {
-                    activity: 'Option Selected',
-                    source: 'Dashboard',
-                    data: {
-                      title: 'IPv4',
-                      section: 'Add ons',
-                      option: event.target.label,
-                    },
-                    projectRef,
-                  },
-                  router
-                )
-              }}
+              onChange={(event: any) => setSelectedOption(event.target.value)}
             >
               <Radio
                 name="ipv4"

@@ -70,7 +70,7 @@ export const plans: PricingInformation[] = [
     priceLabel: 'From',
     warning: '$10 in compute credits included',
     priceMonthly: 25,
-    description: 'For production applications with the option to scale.',
+    description: 'For production applications with the power to scale.',
     features: [
       {
         partners: [],
@@ -107,14 +107,14 @@ export const plans: PricingInformation[] = [
     priceLabel: 'From',
     warning: '$10 in compute credits included',
     priceMonthly: 599,
-    description: 'Collaborate with different permissions and access patterns.',
+    description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
       {
         partners: [],
         features: [
           'SOC2',
           'HIPAA available as paid add-on',
-          'Read only and Billing member roles',
+          'Read-only and Billing member roles',
           'SSO for Supabase Dashboard',
           'Priority email support & SLAs',
           'Daily backups stored for 14 days',
@@ -129,7 +129,7 @@ export const plans: PricingInformation[] = [
     id: 'tier_enterprise',
     name: 'Enterprise',
     href: 'https://forms.supabase.com/enterprise',
-    description: 'For large-scale applications managing serious workloads.',
+    description: 'For large-scale applications running Internet scale workloads.',
     features: [
       {
         partners: [],

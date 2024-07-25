@@ -6,7 +6,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 export const Restriction = () => {
   const org = useSelectedOrganization()

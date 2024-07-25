@@ -546,10 +546,6 @@ export const auth = {
       ],
     },
     {
-      name: 'Migrations',
-      items: [{ name: 'Migrate from Auth0', url: '/guides/auth/migrations/auth0' }],
-    },
-    {
       name: 'Concepts',
       items: [
         { name: 'Users', url: '/guides/auth/users' },
@@ -883,10 +879,6 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
-        },
-        {
-          name: 'pg-safeupdate: Required Where Clauses',
-          url: '/guides/database/extensions/pg-safeupdate',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1729,6 +1721,7 @@ export const platform: NavMenuConstant = {
       name: 'Platform Management',
       url: undefined,
       items: [
+        { name: 'Regions', url: '/guides/platform/regions' },
         { name: 'Access Control', url: '/guides/platform/access-control' },
         {
           name: 'Custom Postgres Config',
@@ -1894,6 +1887,10 @@ export const resources: NavMenuConstant = {
       name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
+        {
+          name: 'Auth0',
+          url: '/guides/resources/migrating-to-supabase/auth0',
+        },
         {
           name: 'Firebase Auth',
           url: '/guides/resources/migrating-to-supabase/firebase-auth',

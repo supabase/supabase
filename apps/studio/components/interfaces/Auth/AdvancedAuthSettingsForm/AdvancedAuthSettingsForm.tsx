@@ -24,7 +24,7 @@ import {
   InputNumber,
   Toggle,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 
 const schema = object({
   JWT_EXP: number()

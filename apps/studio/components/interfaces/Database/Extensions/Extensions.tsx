@@ -1,16 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
+import { AlertCircle, ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { Button, Input } from 'ui'
 import ExtensionCard from './ExtensionCard'
 import ExtensionCardSkeleton from './ExtensionCardSkeleton'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
@@ -61,17 +62,17 @@ const Extensions = () => {
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
             className="w-64"
-            icon={<IconSearch size="tiny" />}
+            icon={<Search size={14} />}
           />
           {isPermissionsLoaded && !canUpdateExtensions ? (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                icon={<AlertCircle className="text-foreground-light" size={18} strokeWidth={2} />}
                 title="You need additional permissions to update database extensions"
               />
             </div>
           ) : (
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/database/extensions"
                 target="_blank"

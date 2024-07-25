@@ -28,7 +28,7 @@ import {
   InputNumber,
   Toggle,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.

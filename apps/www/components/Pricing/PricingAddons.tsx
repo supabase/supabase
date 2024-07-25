@@ -13,7 +13,7 @@ const addons = [
     price: 'Available on Pro Plan',
     heroImg: <CostControlAnimation className="relative w-full h-full lg:max-w-md" />,
     description:
-      'The Pro Plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
+      "The Pro Plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plan's included quota, simply switch off the spend cap to pay for additional resources.",
     ctaText: 'Learn about Cost Control',
     ctaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
     ctaTarget: '_blank',
@@ -36,7 +36,7 @@ const addons = [
     heroImg: 'pitr-on',
     icon: 'pitr-upgrade',
     price: 'Starts from $100/month',
-    description: 'Roll back to any specific point in time up to seconds in granularity.',
+    description: 'Roll back to any specific point in time, down to the second.',
     ctaText: 'Documentation',
     ctaLink: 'https://supabase.com/docs/guides/platform/backups',
     ctaTarget: '_blank',
@@ -49,7 +49,7 @@ const PricingAddons: FC = () => {
       <div className="text-center">
         <h2 className="text-foreground text-3xl">Fine-tune your project</h2>
         <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
-          Go beyond your plan limits and level up your Supabase experience
+          Go beyond your Plan limits and level up your Supabase experience
         </p>
       </div>
       <div className="grid lg:grid-cols-2 gap-4 mb-16 mx-auto max-w-6xl">

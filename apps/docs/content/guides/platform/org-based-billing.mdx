@@ -44,7 +44,7 @@ It is not possible to mix different plans inside a single organization. You cann
 | Storage Size               | 1GB                      | 100GB included, then $0.021 per GB          | Custom     |
 | Monthly Active Users       | 50,000 MAU               | 100,000 MAU included, then $0.00325 per MAU | Custom     |
 | Function Invocations       | 500K                     | 2 million included, then $2 per million     | Custom     |
-| Function Count             | 10                       | 100 included, then $10 per 100              | Custom     |
+| Function Count             | 25                       | 500/1000                                    | Unlimited  |
 | Storage Images Transformed | Unavailable on Free Plan | 100 included, then $5 per 1000              | Custom     |
 | Realtime Message Count     | 2 million                | 5 million included, then $2.5 per million   | Custom     |
 | Realtime Peak Connections  | 200                      | 500 included, then $10 per 1000             | Custom     |
@@ -65,18 +65,18 @@ We only count compute hours for instances that are active. Paused projects do no
 
 ### Compute pricing
 
-| Instance Size | Hourly Price | Estimated Monthly Price |
-| ------------- | ------------ | ----------------------- |
-| Micro         | $0.01344     | ~$10                    |
-| Small         | $0.0206      | ~$15                    |
-| Medium        | $0.0822      | ~$60                    |
-| Large         | $0.1517      | ~$110                   |
-| XL            | $0.2877      | ~$210                   |
-| 2XL           | $0.562       | ~$410                   |
-| 4XL           | $1.32        | ~$960                   |
-| 8XL           | $2.562       | ~$1870                  |
-| 12XL          | $3.836       | ~$2800                  |
-| 16XL          | $5.12        | ~$3730                  |
+| Compute Size | Hourly Price | Estimated Monthly Price |
+| ------------ | ------------ | ----------------------- |
+| Micro        | $0.01344     | ~$10                    |
+| Small        | $0.0206      | ~$15                    |
+| Medium       | $0.0822      | ~$60                    |
+| Large        | $0.1517      | ~$110                   |
+| XL           | $0.2877      | ~$210                   |
+| 2XL          | $0.562       | ~$410                   |
+| 4XL          | $1.32        | ~$960                   |
+| 8XL          | $2.562       | ~$1870                  |
+| 12XL         | $3.836       | ~$2800                  |
+| 16XL         | $5.12        | ~$3730                  |
 
 ### Free Plan
 
@@ -98,7 +98,7 @@ Additionally, Compute Credits are given to you not only for the first month but 
 
 In case of deploying additional [Read Replicas](/docs/guides/platform/read-replicas), each replica is a dedicated database that adds additional compute runtime hours.
 
-Each replica incurs one compute hour on the given instance size. An example:
+Each replica incurs one compute hour on the given compute size. An example:
 
 A primary database on XL compute and two read replicas on XL compute would incur ~2.190 XL compute hours (3x 730h) and cost ~$630/month.
 
@@ -146,7 +146,7 @@ Here are the quotas for the Free Plan:
 | Storage Space             | 1GB                           |
 | Monthly Active Users      | 50,000 MAU                    |
 | Edge Function Invocations | 500K                          |
-| Edge Function Count       | 10                            |
+| Edge Function Count       | 25                            |
 | Realtime Message Count    | 2 million                     |
 | Realtime Peak Connections | 200                           |
 | Max of 2 free projects\*  |
@@ -177,7 +177,7 @@ Here's the quota for your entire organization:
 | Storage Size               | 100GB included, then $0.021 per GB        |
 | Monthly Active Users       | 100K MAU included, then $0.00325 per MAU  |
 | Function Invocations       | 2 million included, then $2 per million   |
-| Function Count             | 100 included, then $10 per 100            |
+| Function Count             | 500 included                              |
 | Storage Images Transformed | 100 included, then $5 per 1000            |
 | Realtime Message Count     | 5 million included, then $2.5 per million |
 | Realtime Peak Connections  | 500 included, then $10 per 1000           |

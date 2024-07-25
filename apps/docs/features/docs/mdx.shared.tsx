@@ -26,10 +26,10 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
 } from '~/components/MDX/partials'
-import { Mermaid } from '~/components/Mermaid'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
+import { RegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
@@ -62,7 +62,6 @@ const components = {
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,
@@ -70,6 +69,7 @@ const components = {
   ProjectSetup,
   QuickstartIntro,
   RealtimeLimitsEstimator,
+  RegionsList,
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,

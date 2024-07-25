@@ -15,7 +15,7 @@ import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import {
   DefaultSessionModeNotice,
   IPv4AddonDirectConnectionNotice,
@@ -139,6 +139,7 @@ const DatabaseSettings = () => {
                   <UsePoolerCheckbox
                     id="connection-params"
                     checked={snap.usePoolerConnection}
+                    ipv4AddonAdded={!!ipv4Addon}
                     poolingMode={poolingMode}
                     onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}

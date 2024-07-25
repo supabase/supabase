@@ -22,7 +22,7 @@ export default function IndexPage() {
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
+    'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
 
   useEffect(() => {
     setTimeout(() => {
@@ -76,7 +76,7 @@ export default function IndexPage() {
               <br className="block lg:hidden" /> designed to scale
             </h1>
             <p className="p text-lg leading-5">
-              Start building for free, collaborate with a team, then scale to millions of users.
+              Start building for free, collaborate with your team, then scale to billions of users
             </p>
           </div>
         </div>
@@ -85,10 +85,6 @@ export default function IndexPage() {
       <PricingPlans />
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
-        <p className="text-foreground-lighter">
-          We will only bill extra for resources consumed
-          <br className="hidden md:block" /> exceeding the inclusive quota limits in your paid plan
-        </p>
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
             <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
