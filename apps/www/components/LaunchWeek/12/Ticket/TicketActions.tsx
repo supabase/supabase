@@ -53,7 +53,7 @@ export default function TicketActions() {
         await supabase
           .from(LW_TABLE)
           .update({
-            sharedOnTwitter: 'now',
+            shared_on_twitter: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
           .eq('username', username)
@@ -61,7 +61,7 @@ export default function TicketActions() {
         await supabase
           .from(LW_TABLE)
           .update({
-            sharedOnLinkedIn: 'now',
+            shared_on_linkedin: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
           .eq('username', username)
