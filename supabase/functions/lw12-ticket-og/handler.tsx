@@ -17,8 +17,8 @@ const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBu
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 // const BUCKET_FOLDER_VERSION = 'v1'
 
-const LW_TABLE = 'lw12_tickets'
-const LW_MATERIALIZED_VIEW = 'lw12_tickets_view'
+const LW_TABLE = 'tickets'
+const LW_MATERIALIZED_VIEW = 'tickets_view'
 
 const STYLING_CONGIF = {
   regular: {
@@ -107,12 +107,14 @@ export async function handler(req: Request) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_twitter: 'now' })
+        .eq('launch_week', 'lw12')
         .eq('username', username)
         .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_linkedin: 'now' })
+        .eq('launch_week', 'lw12')
         .eq('username', username)
         .is('shared_on_linkedin', null)
     }
@@ -123,6 +125,7 @@ export async function handler(req: Request) {
       .select(
         'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, metadata, secret, role, company, location'
       )
+      .eq('launch_week', 'lw12')
       .eq('username', username)
       .maybeSingle()
 
@@ -264,9 +267,7 @@ export async function handler(req: Request) {
                     <span>.</span>
                     <span style={{ color: STYLING_CONGIF[ticketType].CODE_METHOD }}>from</span>
                     <span>&#40;</span>
-                    <span style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
-                      'lw12_tickets_view'
-                    </span>
+                    <span style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>'tickets'</span>
                     <span>&#41;</span>
                   </span>
                   <span tw="pl-4">
@@ -331,7 +332,7 @@ export async function handler(req: Request) {
                     <span style={lineNumberStyle}>2</span>
                     <span>
                       <span tw="ml-6 mr-2" style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}>
-                        "data":
+                        data:
                       </span>
                       <span>&#123;</span>
                     </span>
@@ -350,7 +351,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "name"
+                          name
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -366,7 +367,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "username"
+                          username
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -382,7 +383,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "ticket_number"
+                          ticket_number
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -398,7 +399,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "role"
+                          role
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -414,7 +415,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "company"
+                          company
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -430,7 +431,7 @@ export async function handler(req: Request) {
                           tw="ml-12 mr-2"
                           style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}
                         >
-                          "location"
+                          location
                         </span>
                         <span>:</span>
                         <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_STRING }}>
@@ -448,7 +449,7 @@ export async function handler(req: Request) {
                     <span style={lineNumberStyle}>11</span>
                     <span>
                       <span tw="ml-6" style={{ color: STYLING_CONGIF[ticketType].CODE_BASE }}>
-                        "error"
+                        error
                       </span>
                       <span>:</span>
                       <span tw="ml-2" style={{ color: STYLING_CONGIF[ticketType].CODE_NULL }}>

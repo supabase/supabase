@@ -6,6 +6,10 @@ import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
 import { useBreakpoint } from 'common'
+import LabelBadge from '../LabelBadge'
+import LaunchWeekPrizeCard from '../LaunchWeekPrizeCard'
+import NextImage from 'next/image'
+import TicketCopy from './TicketCopy'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
@@ -72,38 +76,76 @@ export default function TicketActions() {
   }
 
   return (
-    <div
-      className={cn(
-        'w-full gap-3 flex flex-col md:flex-row items-center',
-        sharePage ? 'justify-center' : 'justify-between'
-      )}
-    >
-      <div className="flex w-full gap-2">
-        <Button
-          onClick={() => handleShare('twitter')}
-          type={userData.shared_on_twitter ? 'secondary' : 'default'}
-          icon={<IconTwitterX className="text-light w-3 h-3" />}
-          size={isTablet ? 'tiny' : 'tiny'}
-          block
-          asChild
-        >
-          <Link href={tweetUrl} target="_blank">
-            Share on X
-          </Link>
-        </Button>
-        <Button
-          onClick={() => handleShare('linkedin')}
-          type={userData.shared_on_linkedin ? 'secondary' : 'default'}
-          icon={<IconLinkedinSolid className="text-light w-3 h-3" />}
-          size={isTablet ? 'tiny' : 'tiny'}
-          block
-          asChild
-        >
-          <Link href={linkedInUrl} target="_blank">
-            Share on Linkedin
-          </Link>
-        </Button>
-      </div>
-    </div>
+    <LaunchWeekPrizeCard
+      className="col-span-full md:col-span-2"
+      contentClassName="flex flex-col justify-between"
+      content={
+        <div className="w-full h-auto flex flex-col lg:flex-row rounded-lg overflow-hidden">
+          <div className="relative flex items-center justify-center h-auto w-full lg:w-2/5 object-center border-b lg:border-none border-muted overflow-hidden">
+            <NextImage
+              src="/images/launchweek/12/lw12-backpack.png"
+              alt="Supabase LW12 Wandrd backpack"
+              draggable={false}
+              width={300}
+              height={300}
+              className="hidden lg:block object-cover lg:object-top w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
+            />
+            <NextImage
+              src="/images/launchweek/12/lw12-backpack-crop.png"
+              alt="Supabase LW12 Wandrd backpack"
+              draggable={false}
+              width={300}
+              height={300}
+              className="lg:hidden object-cover lg:object-top mx-auto inset-x-0 w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
+            />
+          </div>
+          <div className="flex flex-col gap-4 w-full lg:w-3/5 p-4 lg:p-8 lg:pl-0">
+            {/* <LabelBadge text="5 sets" /> */}
+            <p className="text-foreground text-sm">
+              Boost your chances of winning Supabase LW12 Wandrd backpack and other awards.
+            </p>
+            <div
+              className={cn(
+                'w-full gap-2 flex flex-col items-center',
+                sharePage ? 'justify-center' : 'justify-between'
+              )}
+            >
+              <div className="flex flex-col w-full gap-2">
+                <Button type="secondary" size="tiny" block disabled className="opacity-100">
+                  Ticket claimed
+                </Button>
+                <Button
+                  onClick={() => handleShare('twitter')}
+                  type={userData.shared_on_twitter ? 'secondary' : 'default'}
+                  // icon={<IconTwitterX className="text-light w-3 h-3" />}
+                  size="tiny"
+                  block
+                  asChild
+                >
+                  <Link href={tweetUrl} target="_blank">
+                    Share on X
+                  </Link>
+                </Button>
+                <Button
+                  onClick={() => handleShare('linkedin')}
+                  type={userData.shared_on_linkedin ? 'secondary' : 'default'}
+                  // icon={<IconLinkedinSolid className="text-light w-3 h-3" />}
+                  size="tiny"
+                  block
+                  asChild
+                >
+                  <Link href={linkedInUrl} target="_blank">
+                    Share on Linkedin
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row gap-2 items-center justify-center w-full">
+              <TicketCopy />
+            </div>
+          </div>
+        </div>
+      }
+    />
   )
 }

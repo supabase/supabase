@@ -9,6 +9,9 @@ export default function TicketCopy() {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = secret
+  const displayUrl = `.../launch-week/tickets/${username}?lw=12${
+    hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
+  }`
   const url = `${LW_URL}/tickets/${username}?lw=12${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
@@ -32,7 +35,7 @@ export default function TicketCopy() {
         <div className="w-4 min-w-4 flex-shrink-0">
           {copied ? <Check size={14} strokeWidth={1.5} /> : <Copy size={14} strokeWidth={1.5} />}
         </div>
-        <span className="truncate">{url}</span>
+        <span className="truncate">{displayUrl}</span>
       </button>
     </div>
   )
