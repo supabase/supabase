@@ -105,7 +105,8 @@ export default function TicketForm() {
     setFormState('loading')
     setTicketState('loading')
 
-    const redirectTo = `${SITE_ORIGIN}/launch-week/${
+    // const redirectTo = `${SITE_ORIGIN}/launch-week/${
+    const redirectTo = `https://zone-www-dot-com-git-feat-whale-init-supabase.vercel.app/launch-week/${
       userData.username ? '?referral=' + userData.username : ''
     }`
 
