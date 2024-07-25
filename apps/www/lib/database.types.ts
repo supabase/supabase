@@ -291,7 +291,7 @@ export type Database = {
           },
         ]
       }
-      lw12_tickets_view: {
+      tickets_view: {
         Row: {
           created_at: string | null
           platinum: boolean | null

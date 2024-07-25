@@ -9,6 +9,7 @@ import { useParams } from 'common'
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketCustomizationForm from './TicketCustomizationForm'
+import { themes as ticketThemes } from './ticketThemes'
 
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
@@ -20,7 +21,8 @@ export default function Ticket() {
     end: undefined,
   })
   const sharePage = !!params.username
-  // const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
+  const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
+  const TICKET_THEME = ticketThemes[ticketType]
 
   function handleCustomizeTicket() {
     setShowCustomizationForm && setShowCustomizationForm(!showCustomizationForm)
@@ -44,7 +46,7 @@ export default function Ticket() {
 
   const code = codeBlock`
 await supabase
-  .from('tickets_view')
+  .from('tickets')
   .select('*')
   .eq('launch_week', 'lw12')
   .eq('username', ${username})
@@ -94,35 +96,55 @@ await supabase
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"
         style={{ transform: 'translateZ(-10px)' }}
+        innerStyle={{ background: TICKET_THEME.TICKET_BACKGROUND }}
       >
-        <div className="w-full bg-alternative p-4 border-b flex flex-col gap-4">
-          <span className="uppercase text-foreground tracking-wider">
+        <div
+          className="w-full p-4 border-b flex flex-col gap-4"
+          style={{
+            color: TICKET_THEME.TICKET_BACKGROUND_CODE,
+            borderColor: TICKET_THEME.TICKET_BORDER,
+            backgroundColor: TICKET_THEME.TICKET_BACKGROUND_CODE,
+          }}
+        >
+          <span
+            className="uppercase tracking-wider"
+            style={{ color: TICKET_THEME.TICKET_FOREGROUND }}
+          >
             <strong className="font-medium">Launch Week</strong> 12 Ticket
           </span>
           <CodeBlock
             language="js"
             hideCopy
+            theme={TICKET_THEME.CODE_THEME}
             className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
           >
             {code}
           </CodeBlock>
         </div>
         <div className="w-full py-4 flex-grow flex flex-col gap-4">
-          <span className="px-4 uppercase text-foreground-light tracking-wider text-xs">
+          <span
+            className="px-4 uppercase tracking-wider text-xs"
+            style={{ color: TICKET_THEME.TICKET_FOREGROUND_LIGHT }}
+          >
             TICKET RESPONSE
           </span>
           {user && (
             <CodeBlock
               language="json"
               hideCopy
+              theme={TICKET_THEME.CODE_THEME}
               linesToHighlight={LINES_TO_HIGHLIGHT}
+              highlightStyle={{
+                backgroundColor: TICKET_THEME.CODE_HIGHLIGHT_BACKGROUND,
+                borderColor: TICKET_THEME.CODE_HIGHLIGHT_BORDER,
+              }}
               highlightBorder
               className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2 [&>code>span]:!pl-4"
             >
               {responseJson}
             </CodeBlock>
           )}
-          <span className="px-4 text-foreground-lighter text-xs">
+          <span className="px-4 text-xs" style={{ color: TICKET_THEME.TICKET_FOREGROUND_LIGHT }}>
             {resTime}ms <span className="uppercase">Response time</span>
           </span>
         </div>

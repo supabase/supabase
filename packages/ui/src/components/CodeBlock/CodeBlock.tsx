@@ -38,10 +38,12 @@ export interface CodeBlockProps {
     | 'http'
   linesToHighlight?: number[]
   highlightBorder?: boolean
+  highlightStyle?: { backgroundColor?: string; borderColor?: string }
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
   value?: string
+  theme?: any
   children?: string
   renderer?: SyntaxHighlighterProps['renderer']
 }
@@ -51,8 +53,10 @@ export const CodeBlock = ({
   language,
   linesToHighlight = [],
   highlightBorder,
+  highlightStyle,
   className,
   value,
+  theme,
   children,
   hideCopy = false,
   hideLineNumbers = false,
@@ -60,7 +64,7 @@ export const CodeBlock = ({
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
-  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
+  const monokaiTheme = theme ?? monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -135,9 +139,14 @@ export const CodeBlock = ({
                 return {
                   style: {
                     display: 'block',
-                    backgroundColor: 'hsl(var(--background-selection))',
-                    borderLeft: highlightBorder ? '1px solid hsl(var(--foreground-default))' : null,
+                    backgroundColor: highlightStyle?.backgroundColor
+                      ? highlightStyle?.backgroundColor
+                      : 'hsl(var(--background-selection))',
+                    borderLeft: highlightBorder
+                      ? `1px solid ${highlightStyle?.borderColor ? highlightStyle?.borderColor : 'hsl(var(--foreground-default)'})`
+                      : null,
                   },
+                  class: 'hljs-line-highlight',
                 }
               }
               return {}
