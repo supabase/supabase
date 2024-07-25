@@ -1,0 +1,172 @@
+# Configuring timeouts:
+
+### Limitations and considerations
+
+1. The Supabase API and Dashboard imposes a request timeout after `60s`. If you would like to execute transactions for longer, you would have to use connections through Supavisor or the direct connection string
+
+## There are 4 ways to change the timeout within Postgres:
+
+### Session Level: This persists for the duration of the session (connection)
+
+You would set it by running the following command:
+
+```sql
+SET statement_timeout = '10min';
+```
+
+Because this applies to sessions only, it can only be used with connections through Supavisor in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
+
+This is most often used for single, long running, administrative tasks, such as creating an HSNW index. Once the setting is implemented, you can view it by executing:
+
+```sql
+SHOW statement_timeout;
+```
+
+> [full guide on changing session timeouts](https://github.com/orgs/supabase/discussions/21133)
+
+### Function Level: This is set for a specific function or procedure
+
+> Only honored by the Database REST API from the Supabase client libraries
+
+```sql
+CREATE OR REPLACE FUNCTION myfunc()
+RETURNS void as $$
+ SELECT pg_sleep(3); -- simulating some long-running process
+$$
+LANGUAGE SQL
+SET statement_timeout TO '4s'; -- <----------- set custom timeout
+```
+
+This is mostly for reoccurring functions that need a special exemption for runtimes.
+
+### Global Level: Sets the global timeout for all queries
+
+> This can only be changed directly for on Supabase Postgres `v15.1.1.78` and greater. If you are unsure what version you have, you can check the [Infrastructure Settings](https://supabase.com/dashboard/project/_/settings/infrastructure)
+
+```sql
+ALTER DATABASE postgres SET statement_timeout TO '4s';
+```
+
+```sql
+-- check if changes went through
+show statement_timeout;
+```
+
+### Role Level: Sets the timeout for a specific role (has a higher precedence than the global timeout)
+
+Unlike global settings, it cannot be checked with:
+
+```sql
+SHOW statement_timeout;
+```
+
+Instead, you can check it with the following query:
+
+```sql
+select
+  rolname,
+  rolconfig
+from pg_roles
+where
+  rolname in (
+    'anon',
+    'authenticated',
+    'postgres',
+    'service_role'
+    -- ,<ANY CUSTOM ROLES>
+  );
+```
+
+The default timeouts for the roles are:
+
+- anon: 3s
+- authenticated: 8s
+- service_role: none (capped by API to be 60s)
+- postgres: none (capped by default global timeout to be 2min)
+
+You can change a role's timeout with the following query
+
+```sql
+alter role example_role set statement_timeout = '10min'; -- could also use seconds '10s'
+```
+
+Although not necessary, if you are uncertain if a timeout has been applied, you can run a quick test:
+
+```sql
+-- test timeout
+CREATE OR REPLACE FUNCTION myfunc()
+RETURNS void as $$
+ SELECT pg_sleep(601); -- simulating some long-running process
+$$
+LANGUAGE SQL;
+```
+
+# Identifying Timeouts in the Logs
+
+Change time range in log explorer:
+
+<img width="895" alt="Screenshot 2024-06-30 at 1 47 20 PM" src="https://gist.github.com/assets/91111415/d319b727-7b0d-4db9-bf5b-a488756a9107">
+
+#### Server/Role Mapping
+
+API servers have assigned database users for connecting to the database:
+
+| Role                       | API/Tool                                                                  |
+| -------------------------- | ------------------------------------------------------------------------- |
+| supabase_admin             | Used by Supabase to configure projects and for monitoring                 |
+| authenticator              | PostgREST                                                                 |
+| supabase_auth_admin        | Auth                                                                      |
+| supabase_storage_admin     | Storage                                                                   |
+| supabase_realtime_admin    | Realtime                                                                  |
+| supabase_replication_admin | Synchronizes Read Replicas                                                |
+| postgres                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
+| Custom roles               | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
+
+Filter by the `parsed.user_name` field to only retrieve logs made by specific users:
+
+```sql
+-- find events based on role/server
+... query
+where
+  -- find events from the relevant role
+  parsed.user_name = '<ROLE>'
+```
+
+### Use this query to find all Database timeouts and duration events in the [Query Explorer](https://supabase.com/dashboard/project/_/logs/explorer):
+
+> duration events occur when a query executes for 10+s, but is still successful. Timeout events are when a query is concludes before completing because of timeout restrictions.
+
+```sql
+select
+  cast(postgres_logs.timestamp as datetime) as timestamp,
+  event_message,
+  parsed.error_severity,
+  parsed.user_name,
+  parsed.query,
+  parsed.detail,
+  parsed.hint,
+  parsed.sql_state_code,
+  parsed.backend_type
+from
+  postgres_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.parsed) as parsed
+where
+  regexp_contains(event_message, 'duration|statement timeout')
+  -- (OPTIONAL) MODIFY OR REMOVE
+  and parsed.user_name = 'authenticator' -- <--------CHANGE
+order by timestamp desc
+limit 100;
+```
+
+# Identifying Slow Queries in the Dashboard
+
+> This will not work for queries that fail from timeouts
+
+Go to the [Query Performance page](https://supabase.com/dashboard/project/_/database/query-performance?preset=slowest_execution) and filter by relevant role and query speeds:
+
+Other useful links:
+
+- [How to Interpret and Explore the Postgres Logs](https://github.com/orgs/supabase/discussions/26224)
+- [How to Interpret and Explore the Database API Logs](https://github.com/orgs/supabase/discussions/22849)
+- [How to filter the Log Explorer](https://github.com/orgs/supabase/discussions/22640)
