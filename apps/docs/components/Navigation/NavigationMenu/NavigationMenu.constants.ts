@@ -792,6 +792,17 @@ export const database: NavMenuConstant = {
           name: 'Database Advisors',
           url: '/guides/database/database-advisors',
         },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Timeouts',
+          url: '/guides/database/postgres/timeouts',
+        },
         {
           name: 'Debugging and monitoring',
           url: '/guides/database/inspect',
@@ -800,8 +811,7 @@ export const database: NavMenuConstant = {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
         },
-        { name: 'Testing your database', url: '/guides/database/testing' },
-      ],
+      ]
     },
     {
       name: 'Extensions',
