@@ -2,6 +2,7 @@
 import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
 import os from 'node:os'
+import { fileURLToPath } from 'node:url'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
@@ -64,7 +65,7 @@ const nextConfig = {
     },
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  webpack: (config, { webpack }) => {
+  webpack: (config, { defaultLoaders, webpack }) => {
     /**
      * The SQL to REST API translator relies on libpg-query, which packages a
      * native Node.js module that wraps the Postgres query parser.
@@ -85,6 +86,19 @@ const nextConfig = {
           },
         },
       ],
+    })
+    /**
+     * The search web worker imports @electric-sql/pglite. This is
+     * automatically bundled by Webpack but not transpiled, so it must be
+     * explicitly transpiled to avoid an error.
+     *
+     * Credit to https://github.com/vercel/next.js/issues/65361#issuecomment-2106302238
+     */
+    config.module.rules.push({
+      test: /\.+(js|jsx|mjs|ts|tsx)$/,
+      use: defaultLoaders.babel,
+      include: fileURLToPath(import.meta.resolve('@electric-sql/pglite')),
+      type: 'javascript/auto',
     })
     /**
      * Ignore node-specific modules used by transformers.js
