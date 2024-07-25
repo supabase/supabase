@@ -11,7 +11,6 @@ export default function TestSearchPage() {
   const { searchResults, handleDocsSearchDebounced } = useDocsSearch()
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    console.log('CHANGE:', event.currentTarget.value)
     handleDocsSearchDebounced(event.currentTarget.value)
   }
 

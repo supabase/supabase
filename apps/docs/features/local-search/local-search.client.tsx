@@ -1,21 +1,28 @@
 'use client'
 
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import type { PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 import { MAIN_THREAD_MESSAGE, WORKER_MESSAGE } from './local-search.worker.messages'
 
-const SearchWorkerContext = createContext<Worker>(undefined)
+interface WorkerContext {
+  worker: Worker
+  dbReady: boolean
+}
+
+const SearchWorkerContext = createContext<WorkerContext>(undefined)
 
 export function SearchWorkerProvider({ children }: PropsWithChildren) {
   const [worker, setWorker] = useState<Worker>()
+  const [dbReady, setDbReady] = useState(false)
 
   useEffect(() => {
     const worker = new Worker(new URL('./local-search.worker.js', import.meta.url), {
       type: 'module',
     })
     worker.onerror = (errorEvent) => {
-      console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent}`)
+      console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent.message}`)
     }
 
     worker.postMessage({
@@ -30,6 +37,9 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
 
     function logWorkerMessage(event) {
       if (event.data.type === WORKER_MESSAGE.CHECKPOINT) {
+        if (event.data.payload?.status === 'DB_READY') {
+          setDbReady(true)
+        }
         console.log(
           `WORKER EVENT: ${event.data.type}\n\n${JSON.stringify(event.data.payload ?? {}, null, 2)}`
         )
@@ -45,11 +55,14 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  return <SearchWorkerContext.Provider value={worker}>{children}</SearchWorkerContext.Provider>
+  const api = useMemo(() => ({ worker, dbReady }), [worker, dbReady])
+
+  return <SearchWorkerContext.Provider value={api}>{children}</SearchWorkerContext.Provider>
 }
 
 export function useLocalSearch() {
-  const worker = useContext(SearchWorkerContext)
+  const supabase = useSupabaseClient()
+  const { worker, dbReady } = useContext(SearchWorkerContext)
   const [searchResults, setSearchResults] = useState<Array<any>>([])
 
   const search = useCallback(
@@ -58,12 +71,23 @@ export function useLocalSearch() {
         console.error('Search ran before worker was initiated')
       }
 
-      worker.postMessage({
-        type: MAIN_THREAD_MESSAGE.SEARCH,
-        payload: { query },
+      if (dbReady) {
+        return worker.postMessage({
+          type: MAIN_THREAD_MESSAGE.SEARCH,
+          payload: { query },
+        })
+      }
+
+      // Fall back to regular FTS
+      supabase.rpc('docs_search_fts', { query }).then(({ data, error }) => {
+        if (error) {
+          return console.error(error)
+        }
+
+        setSearchResults(data)
       })
     },
-    [worker]
+    [worker, dbReady, supabase]
   )
 
   useEffect(() => {
@@ -71,7 +95,7 @@ export function useLocalSearch() {
 
     function handleSearchResults(event) {
       if (event.data.type !== WORKER_MESSAGE.SEARCH_RESULTS) return
-      const searchResults = JSON.parse(event.data.payload.matches)[0].rows
+      const searchResults = JSON.parse(event.data.payload.matches)
       setSearchResults(searchResults)
     }
 
