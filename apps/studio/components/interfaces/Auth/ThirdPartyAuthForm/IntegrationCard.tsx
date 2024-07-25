@@ -17,7 +17,7 @@ import {
 interface IntegrationCardProps {
   integration: ThirdPartyAuthIntegration
   canUpdateConfig: boolean
-  onSelect: () => void
+  onDelete: () => void
 }
 
 export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
@@ -132,7 +132,7 @@ export const IntegrationTypeContent = ({
 export const IntegrationCard = ({
   integration,
   canUpdateConfig,
-  onSelect,
+  onDelete,
 }: IntegrationCardProps) => {
   const { ref: projectRef } = useParams()
   let type = getIntegrationType(integration)
@@ -157,7 +157,7 @@ export const IntegrationCard = ({
           <div>
             {/* TODO: this should be a configure integration where it would show the sheet and the user can disable or delete the integration
               but there's no "edit integration" endpoing for now. */}
-            <Button type="danger" disabled={!canUpdateConfig} onClick={() => onSelect()}>
+            <Button type="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
               Delete integration
             </Button>
           </div>

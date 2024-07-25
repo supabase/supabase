@@ -42,7 +42,7 @@ export const ThirdPartyAuthForm = () => {
   const [selectedIntegrationForDeletion, setSelectedIntegrationForDeletion] =
     useState<ThirdPartyAuthIntegration>()
 
-  const { mutate: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
+  const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   if (!thirdPartyAuthEnabled) {
@@ -101,7 +101,7 @@ export const ThirdPartyAuthForm = () => {
                   key={integration.id}
                   integration={integration}
                   canUpdateConfig={canUpdateConfig}
-                  onSelect={() => {
+                  onDelete={() => {
                     setSelectedIntegrationForDeletion(integration)
                   }}
                 />
@@ -140,14 +140,19 @@ export const ThirdPartyAuthForm = () => {
           if (!selectedIntegrationForDeletion) {
             return
           }
-          await deleteIntegration({
-            projectRef: projectRef!,
-            tpaId: selectedIntegrationForDeletion.id,
-          })
           const type = getIntegrationType(selectedIntegrationForDeletion)
-          toast.success(`Successfully deleted ${getIntegrationTypeLabel(type)}.`)
-          setSelectedIntegrationForDeletion(undefined)
-          setSelectedIntegration(undefined)
+          try {
+            await deleteIntegration({
+              projectRef: projectRef!,
+              tpaId: selectedIntegrationForDeletion.id,
+            })
+            toast.success(`Successfully deleted ${getIntegrationTypeLabel(type)}.`)
+            setSelectedIntegrationForDeletion(undefined)
+            setSelectedIntegration(undefined)
+          } catch (error) {
+            toast.error(`Failed to delete ${getIntegrationTypeLabel(type)}.`)
+            console.error(error)
+          }
         }}
       >
         <p className="py-4 text-sm text-foreground-light">
