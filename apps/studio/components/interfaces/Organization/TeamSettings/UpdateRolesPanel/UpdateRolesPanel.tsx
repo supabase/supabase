@@ -68,7 +68,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
