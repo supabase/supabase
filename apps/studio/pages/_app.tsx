@@ -16,6 +16,7 @@ import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
+import 'styles/reports-v2.scss'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
