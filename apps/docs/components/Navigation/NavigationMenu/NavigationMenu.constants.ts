@@ -1328,6 +1328,14 @@ export const realtime: NavMenuConstant = {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
         },
+        {
+          name: 'Using Realtime Presence with Flutter',
+          url: '/guides/realtime/realtime-user-presence',
+        },
+        {
+          name: 'Listening to Postgres Changes with Flutter',
+          url: '/guides/realtime/realtime-listening-flutter',
+        },
       ],
     },
     {
