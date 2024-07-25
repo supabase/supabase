@@ -40,6 +40,8 @@ self.addEventListener('message', async (event) => {
 })
 
 async function initDb(supabaseUrl, supabaseAnonKey) {
+  // Dynamic import to prevent this being included in Edge Functions bundle
+  const { PGlite } = await import('@electric-sql/pglite')
   db = new PGlite({
     extensions: {
       vector: new URL(
