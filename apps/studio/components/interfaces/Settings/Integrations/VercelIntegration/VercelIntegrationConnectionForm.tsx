@@ -189,10 +189,14 @@ const VercelIntegrationConnectionForm = ({
             />
           </div>
 
-          <p className="mt-2 text-sm text-warning-600">
-            Note: Changing these settings will also trigger an automatic resync of environment
-            variables. The previous public environment variable prefix will be removed.
-          </p>
+          {form.formState.isDirty ? (
+            <p className="mt-2 text-sm text-warning-600">
+              Note: Changing these settings will <strong>not</strong> trigger a resync of
+              environment variables.
+            </p>
+          ) : (
+            <div className="mt-2 h-5 w-full" />
+          )}
 
           <FormActions
             form={VERCEL_CONNECTION_FORM_ID}
