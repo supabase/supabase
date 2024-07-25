@@ -1,3 +1,3 @@
-import { NodeViewProps } from "@tiptap/react";
+import { NodeViewProps } from '@tiptap/react'
 
-export type TiptapNodeViewProps<T> = NodeViewProps & { node: { attrs: T } };
+export type TiptapNodeViewProps<T> = NodeViewProps & { node: { attrs: T } }
