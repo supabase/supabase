@@ -179,8 +179,37 @@ const VercelIntegrationConnectionForm = ({
                     />
                   </FormControl_Shadcn_>
                   <FormDescription_Shadcn_ className="col-start-5 col-span-8 text-xs">
-                    e.g. <code>NEXT_PUBLIC_</code>, <code>VITE_PUBLIC_</code>, <code>PUBLIC_</code>,
-                    etc.
+                    e.g.{' '}
+                    <code
+                      className="cursor-pointer"
+                      role="button"
+                      onClick={() => {
+                        field.onChange('NEXT_PUBLIC_')
+                      }}
+                    >
+                      NEXT_PUBLIC_
+                    </code>
+                    ,{' '}
+                    <code
+                      className="cursor-pointer"
+                      role="button"
+                      onClick={() => {
+                        field.onChange('VITE_PUBLIC_')
+                      }}
+                    >
+                      VITE_PUBLIC_
+                    </code>
+                    ,{' '}
+                    <code
+                      className="cursor-pointer"
+                      role="button"
+                      onClick={() => {
+                        field.onChange('PUBLIC_')
+                      }}
+                    >
+                      PUBLIC_
+                    </code>
+                    , etc.
                   </FormDescription_Shadcn_>
 
                   <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
