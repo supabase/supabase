@@ -27,7 +27,7 @@ export default function TicketActions() {
   )}`
   const params = useParams()
   const sharePage = !!params.username
-  const LW_TABLE = 'lw11_tickets'
+  const LW_TABLE = 'lw12_tickets'
 
   useEffect(() => {
     setImgReady(false)
