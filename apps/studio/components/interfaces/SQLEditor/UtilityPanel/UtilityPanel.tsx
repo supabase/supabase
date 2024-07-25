@@ -99,7 +99,7 @@ const UtilityPanel = ({
   const chartConfig = getChartConfig()
 
   function onConfigChange(config: ChartConfig) {
-    if (!ref || !snippet.id) return
+    if (!ref || !snippet?.id) return
 
     upsertContent({
       projectRef: ref,

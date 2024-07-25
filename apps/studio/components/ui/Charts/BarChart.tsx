@@ -121,12 +121,6 @@ const BarChart = ({
       <Container>
         <RechartBarChart
           data={data}
-          margin={{
-            top: 0,
-            right: 0,
-            left: -58, // [Joshen] 120724 Not sure why bar charts have a weird left margin suddenly, but this is a temp fix
-            bottom: 0,
-          }}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
