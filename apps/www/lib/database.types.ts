@@ -304,6 +304,9 @@ export type Database = {
           ticket_number: number | null
           username: string | null
           secret: boolean | null
+          role: string | null
+          company: string | null
+          location: string | null
         }
         Relationships: [
           {

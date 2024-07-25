@@ -19,17 +19,15 @@ export default function LaunchWeekIndex() {
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/12/lw12-og.png`
 
   const ticketNumber = query.ticketNumber?.toString()
-  const bgImageId = query.bgImageId?.toString()
   const [session, setSession] = useState<Session | null>(null)
   const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
 
   const defaultUserData = {
     id: query.id?.toString(),
-    ticketNumber: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
+    ticket_number: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
     name: query.name?.toString(),
     username: query.username?.toString(),
     golden: !!query.golden,
-    bgImageId: bgImageId ? parseInt(bgImageId, 10) : undefined,
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)

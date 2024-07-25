@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import dayjs from 'dayjs'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Error from 'next/error'
-import { useTheme } from 'next-themes'
 import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL, LW_URL } from '~/lib/constants'
@@ -39,20 +38,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
-  const { resolvedTheme, setTheme } = useTheme()
-
-  const isDark = resolvedTheme?.includes('dark')
-  const isDarkTheme = resolvedTheme === 'dark'
-
-  useEffect(() => {
-    isDarkTheme && setTheme('deep-dark')
-  }, [isDarkTheme])
-
-  useEffect(() => {
-    return () => {
-      isDark && setTheme('dark')
-    }
-  }, [])
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
@@ -130,7 +115,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (username) {
     const { data } = await supabaseAdmin!
       .from('lw12_tickets_view')
-      .select('name, username, ticket_number, metadata, platinum, secret')
+      .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
       .eq('username', username)
       .single()
 
