@@ -20,7 +20,7 @@ export default function Ticket() {
     end: undefined,
   })
   const sharePage = !!params.username
-  const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
+  // const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
   function handleCustomizeTicket() {
     setShowCustomizationForm && setShowCustomizationForm(!showCustomizationForm)
