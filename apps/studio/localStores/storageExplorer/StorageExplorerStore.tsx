@@ -19,7 +19,6 @@ import {
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { ToastLoader } from 'components/ui/ToastLoader'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
@@ -33,7 +32,7 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { Button, toast as UiToast } from 'ui'
+import { Button, ToastProgress } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -498,15 +497,13 @@ class StorageExplorerStore {
       100
     const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
-    return toast.loading(
-      <ToastLoader
+    return toast(
+      <ToastProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        labelTopOverride={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
-      >
-        <div className="flex items-center gap-2">
-          <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          {toastId && (
+        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
+        action={
+          toastId && (
             <Button
               type="default"
               size="tiny"
@@ -515,10 +512,10 @@ class StorageExplorerStore {
             >
               Cancel
             </Button>
-          )}
-        </div>
-      </ToastLoader>,
-      { id: toastId }
+          )
+        }
+      />,
+      { id: toastId, closeButton: false }
     )
   }
 
@@ -965,10 +962,9 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
-    const toastId = toast.loading(
-      <ToastLoader progress={0} message={`Deleting ${prefixes.length} file(s)...`}>
-        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-      </ToastLoader>
+    const toastId = toast(
+      <ToastProgress progress={0} message={`Deleting ${prefixes.length} file(s)...`} />,
+      { closeButton: false }
     )
 
     // batch BATCH_SIZE prefixes per request
@@ -985,11 +981,12 @@ class StorageExplorerStore {
     await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader progress={progress * 100} message={`Deleting ${prefixes.length} file(s)...`}>
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+      toast(
+        <ToastProgress
+          progress={progress * 100}
+          message={`Deleting ${prefixes.length} file(s)...`}
+        />,
+        { id: toastId, closeButton: false }
       )
     }, Promise.resolve())
 
@@ -1030,14 +1027,12 @@ class StorageExplorerStore {
     try {
       const files = await this.getAllItemsAlongFolder(folder)
 
-      toast.loading(
-        <ToastLoader
+      toast(
+        <ToastProgress
           progress={0}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        >
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+        />,
+        { id: toastId, closeButton: false }
       )
 
       const promises = files.map((file) => {
@@ -1078,14 +1073,12 @@ class StorageExplorerStore {
         async (previousPromise, nextBatch) => {
           const previousResults = await previousPromise
           const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-          toast.loading(
-            <ToastLoader
+          toast(
+            <ToastProgress
               progress={progress * 100}
               message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-            >
-              <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-            </ToastLoader>,
-            { id: toastId }
+            />,
+            { id: toastId, closeButton: false }
           )
           return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
         },
@@ -1167,14 +1160,12 @@ class StorageExplorerStore {
     const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader
+      toast(
+        <ToastProgress
           progress={progress * 100}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        >
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+        />,
+        { id: toastId, closeButton: false }
       )
       return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
     }, Promise.resolve<{ name: string; blob: Blob }[]>([]))
@@ -1514,10 +1505,9 @@ class StorageExplorerStore {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     }
 
-    const toastId = toast.loading(
-      <ToastLoader progress={0} message={`Renaming folder to ${newName}`}>
-        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-      </ToastLoader>
+    const toastId = toast(
+      <ToastProgress progress={0} message={`Renaming folder to ${newName}`} />,
+      { closeButton: false }
     )
 
     try {
@@ -1574,18 +1564,22 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader progress={progress * 100} message={`Renaming folder to ${newName}`}>
-            <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          </ToastLoader>,
-          { id: toastId }
+        toast(
+          <ToastProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
+          { id: toastId, closeButton: false }
         )
       }, Promise.resolve())
 
       if (!hasErrors) {
-        toast.success(`Successfully renamed folder to ${newName}`, { id: toastId })
+        toast.success(`Successfully renamed folder to ${newName}`, {
+          id: toastId,
+          closeButton: true,
+        })
       } else {
-        toast.error(`Renamed folder to ${newName} with some errors`, { id: toastId })
+        toast.error(`Renamed folder to ${newName} with some errors`, {
+          id: toastId,
+          closeButton: true,
+        })
       }
       await this.refetchAllOpenedFolders()
 
