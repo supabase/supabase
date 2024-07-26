@@ -6,6 +6,8 @@ import {
   BarChart,
   Code,
   Database,
+  FileJsonIcon,
+  FormInputIcon,
   Heading1,
   Heading2,
   Heading3,
@@ -66,6 +68,27 @@ export const SlashCommand = Extension.create({
 const iconClassNames = 'h-3.5 w-3.5 text-zinc-500'
 
 const DEFAULT_SLASH_COMMANDS: SlashCommandItem[] = [
+  {
+    title: 'Input',
+    searchTerms: ['input'],
+    icon: <FormInputIcon className={iconClassNames} />,
+    command: ({ editor, range }: CommandProps) => {
+      editor.chain().focus().deleteRange(range).insertContent('<supa-input name="" />').run()
+    },
+  },
+  {
+    title: 'JSON',
+    searchTerms: ['sql', 'json'],
+    icon: <FileJsonIcon className={iconClassNames} />,
+    command: ({ editor, range }: CommandProps) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent("<supa-block type='json' sql='SELECT * FROM customers'></sql-table><p></p>")
+        .run()
+    },
+  },
   {
     title: 'SQL Table',
     searchTerms: ['sql', 'table'],

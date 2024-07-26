@@ -2,6 +2,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { SupaBlock } from './supa-block'
+import { SupaInput } from './supa-input'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 import { SlashCommand, getSlashCommandSuggestions } from './slash-commands'
 import { TrailingNode } from './trailing-node'
@@ -12,6 +13,7 @@ export function SupaEditor() {
     extensions: [
       StarterKit,
       SupaBlock,
+      SupaInput,
       GlobalDragHandle,
       SlashCommand.configure({
         suggestion: getSlashCommandSuggestions([]),

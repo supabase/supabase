@@ -3,34 +3,57 @@ import { Node } from '@tiptap/core'
 import { ReactNodeViewRenderer, NodeViewProps } from '@tiptap/react'
 import { useState } from 'react'
 import { NodeViewWrapper, mergeAttributes } from '@tiptap/react'
-import { TiptapNodeViewProps } from './shared'
+import { BlockType, TiptapNodeViewProps } from './shared'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import BarChart from 'components/ui/Charts/BarChart'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Button, cn } from 'ui'
+import { Button, Input_Shadcn_, cn } from 'ui'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { RefreshCwIcon, Trash2Icon } from 'lucide-react'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
-function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: 'table' | 'chart' }>) {
+function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: BlockType }>) {
   const {
     node: {
       attrs: { sql, type },
     },
   } = props
 
+  const router = useRouter()
   const { project } = useProjectContext()
 
   const [innerSQL, setInnerSQL] = useState(sql)
   const [source, onSourceChange] = useState<'postgres' | 'logs'>('postgres')
   const [mode, setMode] = useState<'edit' | 'view'>('edit')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [inputLabel, setInputLabel] = useState('')
 
   const { mutate: runQuery, isLoading, data } = useExecuteSqlMutation()
 
   function execute(sql: string) {
+    // Check if the SQL has any variables (starting with $)
+    const variables = sql.match(/\$\w+/g)
+    const values = variables?.map((variable) => router.query[variable.substring(1)] as string)
+
+    if (variables && !values?.every((value) => value)) {
+      toast.error('Please provide all necessary variables')
+      return
+    }
+
+    if (variables) {
+      // Replace the variables with the values from the URL
+      variables.forEach((variable) => {
+        sql = sql.replace(variable, router.query[variable.substring(1)] as string)
+      })
+    }
+
+    console.log(sql)
+
     if (project) {
       runQuery({ sql, projectRef: project.ref, connectionString: project.connectionString })
     }
@@ -83,6 +106,7 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: 'tabl
                       yAxisKey={columns[1]?.key || ''}
                     />
                   )}
+                  {type === 'json' && <pre>{JSON.stringify(data?.result, null, 2)}</pre>}
                 </>
               )}
             </div>
