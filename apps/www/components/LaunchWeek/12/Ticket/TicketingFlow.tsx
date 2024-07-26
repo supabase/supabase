@@ -27,7 +27,6 @@ const TicketingFlow = () => {
   const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
-  const metadata = userData?.metadata
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -126,7 +125,7 @@ const TicketingFlow = () => {
                       </div>
                       {hasPlatinumTicket ? (
                         <div>
-                          {hasSecretTicket && !metadata?.hasSharedSecret ? (
+                          {hasSecretTicket ? (
                             <p className="text-2xl mb-1">
                               Share the secret ticket to beat the odds
                             </p>
