@@ -306,9 +306,7 @@ class StorageExplorerStore {
     if (formattedName === null) return
 
     if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-      return UiToast({
-        variant: 'destructive',
-        description: 'Folder name contains invalid special characters',
+      return toast.error('Folder name contains invalid special characters', {
         duration: 6000,
       })
     }
@@ -441,7 +439,7 @@ class StorageExplorerStore {
 
   // https://stackoverflow.com/a/53058574
   private getFilesDataTransferItems = async (items: DataTransferItemList) => {
-    const { dismiss } = UiToast({ description: 'Retrieving items to upload...' })
+    const toastId = toast('Retrieving items to upload...')
     const files: (File & { path: string })[] = []
     const queue: FileSystemEntry[] = []
     for (const item of items) {
@@ -464,7 +462,7 @@ class StorageExplorerStore {
         queue.push(...(await this.readAllDirectoryEntries(dirEntry.createReader())))
       }
     }
-    dismiss()
+    toast.dismiss(toastId)
     return files
   }
 
@@ -859,8 +857,7 @@ class StorageExplorerStore {
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
 
-    const { dismiss } = UiToast({
-      description: STORAGE_PROGRESS_INFO_TEXT,
+    const toastId = toast(STORAGE_PROGRESS_INFO_TEXT, {
       duration: Infinity,
     })
 
@@ -890,16 +887,16 @@ class StorageExplorerStore {
     )
 
     if (numberOfFilesMovedFail === this.selectedItemsToMove.length) {
-      UiToast({ variant: 'destructive', description: 'Failed to move files' })
+      toast.error('Failed to move files')
     } else {
-      UiToast({
-        description: `Successfully moved ${
+      toast(
+        `Successfully moved ${
           this.selectedItemsToMove.length - numberOfFilesMovedFail
-        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`,
-      })
+        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+      )
     }
 
-    dismiss()
+    toast.dismiss(toastId)
 
     // Clear file preview cache if moved files exist in cache
     const idsOfItemsToMove = this.selectedItemsToMove.map((item) => item.id)
@@ -1014,7 +1011,11 @@ class StorageExplorerStore {
       await Promise.all(
         parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
       )
-      toast.success(`Successfully deleted ${prefixes.length} file(s)`, { id: toastId })
+
+      toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+        id: toastId,
+        closeButton: true,
+      })
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
     } else {
@@ -1122,7 +1123,7 @@ class StorageExplorerStore {
           : `Downloaded folder "${folder.name}". However, ${
               files.length - downloadedFiles.length
             } files did not download successfully.`,
-        { id: toastId }
+        { id: toastId, closeButton: true }
       )
     } catch (error: any) {
       toast.error(`Failed to download folder: ${error.message}`, { id: toastId })
@@ -1595,7 +1596,10 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e: any) {
-      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, {
+        id: toastId,
+        closeButton: true,
+      })
     }
   }
 
