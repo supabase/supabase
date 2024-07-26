@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 import { Button } from '../../../components/Button/Button'
 import { cn } from '../../../lib/utils/cn'
 import announcement from '../data/Announcement.json'
+import Countdown from './Countdown'
 
-export function LW11CountdownBanner() {
+export function LW12CountdownBanner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  const isLaunchWeekPage = pathname === '/ga-week'
+  const isLaunchWeekPage = pathname === '/launch-week'
   const isLaunchWeekSection =
-    (pathname?.includes('/launch-week') || pathname?.includes('/ga-week')) ?? false
+    (pathname?.includes('/launch-week') || pathname?.includes('/launch-week')) ?? false
 
   if (isLaunchWeekPage || isHomePage) return null
 
@@ -25,8 +26,11 @@ export function LW11CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
+          <div className="hidden sm:block">
+            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
+          </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href="https://supabase.com/ga-week">Learn more</Link>
+            <Link href="https://supabase.com/launch-week">{announcement.cta}</Link>
           </Button>
         </div>
       </div>
@@ -34,4 +38,4 @@ export function LW11CountdownBanner() {
   )
 }
 
-export default LW11CountdownBanner
+export default LW12CountdownBanner
