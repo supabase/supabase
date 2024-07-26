@@ -91,7 +91,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
     {/* prettier-ignore */}
     ```js
     // Join a room/topic. Can be anything except for 'realtime'.
-    const channelA = supabaseA.channel('room-1')
+    const channelA = supabase.channel('room-1')
 
     // Simple function to log any messages we receive
     function messageReceived(payload) {
@@ -112,7 +112,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
   <TabPanel id="dart" label="Dart">
 
     ```dart
-    final channelA = supabaseA.channel('room-1');
+    final channelA = supabase.channel('room-1');
 
     // Simple function to log any messages we receive
     void messageReceived(payload) {
@@ -130,7 +130,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
   <TabPanel id="swift" label="Swift">
 
     ```swift
-    let channelA = await supabaseA.channel("room-1")
+    let channelA = await supabase.channel("room-1")
 
     // Listen for broadcast messages
     let broadcastStream = await channelA.broadcast(event: "test")
@@ -146,7 +146,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
   <TabPanel id="kotlin" label="Kotlin">
 
     ```kotlin
-    val channelA = supabaseA.channel("room-1")
+    val channelA = supabase.channel("room-1")
 
     //Listen for broadcast messages
     val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
@@ -177,7 +177,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
     {/* prettier-ignore */}
     ```js
     // Join a room/topic. Can be anything except for 'realtime'.
-    const channelB = supabaseB.channel('room-1')
+    const channelB = supabase.channel('room-1')
 
     channelB.subscribe((status) => {
       // Wait for successful connection
@@ -201,7 +201,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
 
     ```dart
     // Join a room/topic. Can be anything except for 'realtime'.
-    final channelB = supabaseB.channel('room-1');
+    final channelB = supabase.channel('room-1');
 
     channelB.subscribe((status, error) {
       // Wait for successful connection
@@ -223,7 +223,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
     We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
 
     ```swift
-    let channelB = await supabaseB.channel("room-1")
+    let channelB = await supabase.channel("room-1")
 
     await channelB.subscribe()
 
@@ -239,7 +239,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
     We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
 
     ```kotlin
-    val channelB = supabaseB.channel("room-1")
+    val channelB = supabase.channel("room-1")
 
     channelB.subscribe(blockUntilSubscribed = true) //You can also use the channelA.status flow instead, but this parameter will block the coroutine until the status is joined.
 
