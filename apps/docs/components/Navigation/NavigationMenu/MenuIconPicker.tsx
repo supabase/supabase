@@ -28,7 +28,6 @@ import {
   IconMenuDevCli,
   IconGitHub,
   IconSupport,
-  IconTerraform,
   IconTroubleshooting,
   IconBranching,
 } from './MenuIcons'
@@ -89,6 +88,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconGitHub width={width} height={height} className={className} />
     case 'support':
       return <IconSupport width={width} height={height} className={className} />
+    case 'contributing':
+      return <IconTroubleshooting width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }

@@ -1,3 +1,4 @@
+import { IS_DEV } from '~/lib/constants'
 import type { GlobalMenuItems, NavMenuConstant, References } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
@@ -190,6 +191,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Status',
             icon: 'status',
             href: 'https://status.supabase.com/',
+          },
+          {
+            label: 'Contributing',
+            icon: 'contributing',
+            href: '/contributing' as `/${string}`,
           },
         ],
       ],
