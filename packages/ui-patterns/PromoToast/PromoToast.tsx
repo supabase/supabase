@@ -44,7 +44,7 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <p className="relative z-10 text-foreground flex flex-col text-2xl w-full leading-7">
+      <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
         Launch Week 12
       </p>
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
@@ -54,7 +54,7 @@ const PromoToast = () => {
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
             Claim your ticket
           </Link>
         </Button>
