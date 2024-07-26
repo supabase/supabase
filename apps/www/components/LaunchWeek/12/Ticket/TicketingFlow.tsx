@@ -121,7 +121,6 @@ const TicketingFlow = () => {
                       <TicketContainer />
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
-                      {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
                       <div className="flex flex-col">
                         <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
                       </div>
@@ -129,13 +128,13 @@ const TicketingFlow = () => {
                         <div>
                           {hasSecretTicket && !metadata?.hasSharedSecret ? (
                             <p className="text-2xl mb-1">
-                              Share again to boost your chance of winning!
+                              Share the secret ticket to beat the odds
                             </p>
                           ) : (
-                            <p className="text-2xl mb-1">Thanks for sharing!</p>
+                            <p className="text-2xl mb-1">Thanks for sharing</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Join on {LW12_DATE} to find out what we shipped.
+                            Follow through Launch Week 12 to find out if you're a lucky winner.
                           </p>
                         </div>
                       ) : winningChances !== 2 ? (
@@ -144,15 +143,14 @@ const TicketingFlow = () => {
                             <p className="text-2xl mb-1">{FIRST_NAME}, you're in!</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Now share your ticket to have a chance of winning limited swag.
+                            Now share your ticket to get a chance of winning limited swag.
                           </p>
                         </div>
                       ) : (
                         <div>
                           <p className="text-2xl mb-1">{FIRST_NAME}, almost there!</p>
                           <p className="text-[#8B9092]">
-                            Keep sharing to max out your chances of winning AirPods Max and other
-                            limited swag.
+                            Keep sharing to max out your chances of winning.
                           </p>
                         </div>
                       )}

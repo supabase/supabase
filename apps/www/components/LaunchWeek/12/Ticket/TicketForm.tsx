@@ -83,8 +83,8 @@ export default function TicketForm() {
             filter: `username=eq.${username}`,
           },
           (payload: any) => {
-            const platinum = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
-            const secret = !!payload.new.gameWonAt
+            const platinum = !!payload.new.shared_on_twitter && !!payload.new.shared_on_linkedin
+            const secret = !!payload.new.game_won_at
             setUserData({
               ...payload.new,
               platinum,

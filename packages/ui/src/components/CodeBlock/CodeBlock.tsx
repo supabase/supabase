@@ -38,7 +38,11 @@ export interface CodeBlockProps {
     | 'http'
   linesToHighlight?: number[]
   highlightBorder?: boolean
-  highlightStyle?: { backgroundColor?: string; borderColor?: string }
+  styleConfig?: {
+    lineNumber?: string
+    highlightBackgroundColor?: string
+    highlightBorderColor?: string
+  }
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
@@ -53,7 +57,7 @@ export const CodeBlock = ({
   language,
   linesToHighlight = [],
   highlightBorder,
-  highlightStyle,
+  styleConfig,
   className,
   value,
   theme,
@@ -139,11 +143,11 @@ export const CodeBlock = ({
                 return {
                   style: {
                     display: 'block',
-                    backgroundColor: highlightStyle?.backgroundColor
-                      ? highlightStyle?.backgroundColor
+                    backgroundColor: styleConfig?.highlightBackgroundColor
+                      ? styleConfig?.highlightBackgroundColor
                       : 'hsl(var(--background-selection))',
                     borderLeft: highlightBorder
-                      ? `1px solid ${highlightStyle?.borderColor ? highlightStyle?.borderColor : 'hsl(var(--foreground-default)'})`
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
                       : null,
                   },
                   class: 'hljs-line-highlight',
@@ -159,7 +163,7 @@ export const CodeBlock = ({
               paddingLeft: '4px',
               paddingRight: '4px',
               marginRight: '12px',
-              color: '#828282',
+              color: styleConfig?.lineNumber ?? '#828282',
               textAlign: 'center',
               fontSize: large ? 14 : 12,
               paddingTop: '4px',

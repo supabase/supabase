@@ -7,7 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const STORAGE_URL = `${Deno.env.get('LIVE_SUPABASE_URL') ?? 'https://xguihxuzqibwxjnimxev.supabase.co'}/storage/v1/object/public/images/launch-week/lw12`
+// const STORAGE_URL = `${Deno.env.get('LIVE_SUPABASE_URL') ?? 'https://xguihxuzqibwxjnimxev.supabase.co'}/storage/v1/object/public/images/launch-week/lw12`
+const STORAGE_URL = `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12`
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
@@ -45,43 +46,43 @@ const STYLING_CONGIF = {
     BACKGROUND: '#060809',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
-    TICKET_BORDER: '#292929',
-    TICKET_FOREGROUND: '#11181C',
-    TICKET_BACKGROUND: '#1F1F1F',
-    TICKET_BACKGROUND_CODE: '#141414',
-    TICKET_FOREGROUND_LIGHT: '#888888',
-    BORDER: '#adadad',
-    CODE_LINE_NUMBER: '#4D4D4D',
-    CODE_BASE: '#ddd',
-    CODE_HIGHLIGHT: '#292929',
-    CODE_FUNCTION: '#ddd',
-    CODE_VARIABLE: '#ddd',
-    CODE_METHOD: '#ddd',
-    CODE_EXPRESSION: '#FFF',
-    CODE_STRING: '#3ECF8E',
-    CODE_NUMBER: '#3ECF8E',
-    CODE_NULL: '#569cd6',
+    TICKET_BORDER: '#B2B2B2',
+    TICKET_BACKGROUND: '#FFFFFF',
+    TICKET_BACKGROUND_CODE: '#F8F9FA',
+    TICKET_FOREGROUND: '#171717',
+    TICKET_FOREGROUND_LIGHT: '#707070',
+    BORDER: '#B2B2B2',
+    CODE_LINE_NUMBER: '#707070',
+    CODE_BASE: '#171717',
+    CODE_HIGHLIGHT: '#E6E6E6',
+    CODE_FUNCTION: '#171717',
+    CODE_VARIABLE: '#171717',
+    CODE_METHOD: '#171717',
+    CODE_EXPRESSION: '#171717',
+    CODE_STRING: '#00bb68',
+    CODE_NUMBER: '#00bb68',
+    CODE_NULL: '#171717',
   },
   secret: {
-    BACKGROUND: '#060809',
-    FOREGROUND: '#F8F9FA',
-    FOREGROUND_LIGHT: '#8B9092',
-    TICKET_BORDER: '#292929',
-    TICKET_FOREGROUND: '#11181C',
-    TICKET_BACKGROUND: '#1F1F1F',
-    TICKET_BACKGROUND_CODE: '#141414',
-    TICKET_FOREGROUND_LIGHT: '#888888',
-    BORDER: '#adadad',
-    CODE_LINE_NUMBER: '#4D4D4D',
-    CODE_BASE: '#ddd',
-    CODE_HIGHLIGHT: '#292929',
-    CODE_FUNCTION: '#ddd',
-    CODE_VARIABLE: '#ddd',
-    CODE_METHOD: '#ddd',
-    CODE_EXPRESSION: '#FFF',
-    CODE_STRING: '#3ECF8E',
-    CODE_NUMBER: '#3ECF8E',
-    CODE_NULL: '#569cd6',
+    BACKGROUND: '#0F2BE6',
+    FOREGROUND: '#EDEDED',
+    FOREGROUND_LIGHT: '#EDEDED',
+    TICKET_BORDER: '#3059F2',
+    TICKET_BACKGROUND: '#0F2BE6',
+    TICKET_BACKGROUND_CODE: '#0000B4',
+    TICKET_FOREGROUND: '#EDEDED',
+    TICKET_FOREGROUND_LIGHT: '#EDEDED',
+    BORDER: '#3059F2',
+    CODE_LINE_NUMBER: '#5F7BF6',
+    CODE_BASE: '#EDEDED',
+    CODE_HIGHLIGHT: '#3059F2',
+    CODE_FUNCTION: '#EDEDED',
+    CODE_VARIABLE: '#EDEDED',
+    CODE_METHOD: '#EDEDED',
+    CODE_EXPRESSION: '#EDEDED',
+    CODE_STRING: '#48FF1A',
+    CODE_NUMBER: '#48FF1A',
+    CODE_NULL: '#EDEDED',
   },
 }
 
@@ -122,7 +123,7 @@ export async function handler(req: Request) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, metadata, secret, role, company, location'
+        'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
       )
       .eq('launch_week', 'lw12')
       .eq('username', username)
@@ -134,13 +135,13 @@ export async function handler(req: Request) {
     const {
       name,
       ticket_number: ticketNumber,
-      metadata,
       secret,
+      platinum: isPlatinum,
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
     } = user
 
-    const platinum = (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
+    const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum)
       return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
 
@@ -149,10 +150,6 @@ export async function handler(req: Request) {
 
     const fontData = await font
     const monoFontData = await mono_font
-    const numDigits = `${Number(ticketNumber)}`.length
-    const HAS_ROLE = !!metadata?.role
-    const HAS_COMPANY = !!metadata?.company
-    const HAS_LOCATION = !!metadata?.location
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
     const OG_PADDING_X = 60
@@ -166,17 +163,19 @@ export async function handler(req: Request) {
     const LOGO_RATIO = 436 / 449
     const DISPLAY_NAME = name || username
     const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
-    const BACKGROUND_GRID = `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`
 
     const BACKGROUND = {
       regular: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`,
       },
       platinum: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`,
       },
       secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon-white.png`,
+        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-light.png`,
       },
     }
 
@@ -215,11 +214,11 @@ export async function handler(req: Request) {
                 bottom: '-1px',
                 right: '-1px',
                 zIndex: '0',
-                opacity: 0.5,
+                opacity: ticketType === 'secret' ? 0.2 : 0.5,
                 background: STYLING_CONGIF[ticketType].BACKGROUND,
                 backgroundSize: 'cover',
               }}
-              src={BACKGROUND_GRID}
+              src={BACKGROUND[ticketType].BACKGROUND_GRID}
             />
             {/* Ticket  */}
             <div
@@ -235,7 +234,9 @@ export async function handler(req: Request) {
                 borderRadius: '20px',
                 fontSize: 18,
                 background: STYLING_CONGIF[ticketType].TICKET_BACKGROUND_CODE,
+                color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND,
                 border: `1px solid ${STYLING_CONGIF[ticketType].TICKET_BORDER}`,
+                boxShadow: '0px 0px 45px rgba(0, 0, 0, 0.15)',
               }}
               tw="flex flex-col overflow-hidden"
             >
@@ -576,7 +577,7 @@ export async function handler(req: Request) {
     )
 
     // [Note] Uncomment only for local testing
-    // return await generatedTicketImage
+    return await generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage

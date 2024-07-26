@@ -89,8 +89,8 @@ export default function LaunchWeekIndex() {
             bg-alternative
             -mt-[60px] pt-[60px]
             overflow-hidden
-            h-screen !min-h-fit
-            !max-h-[calc(100vh-60px)]
+            xl:h-screen !min-h-fit
+            xl:!max-h-[calc(100vh-60px)]
             "
         >
           <TicketingFlow />

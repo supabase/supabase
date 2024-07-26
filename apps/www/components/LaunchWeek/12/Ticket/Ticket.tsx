@@ -116,6 +116,9 @@ await supabase
             language="js"
             hideCopy
             theme={TICKET_THEME.CODE_THEME}
+            styleConfig={{
+              lineNumber: TICKET_THEME.CODE_LINE_NUMBER,
+            }}
             className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2"
           >
             {code}
@@ -134,9 +137,10 @@ await supabase
               hideCopy
               theme={TICKET_THEME.CODE_THEME}
               linesToHighlight={LINES_TO_HIGHLIGHT}
-              highlightStyle={{
-                backgroundColor: TICKET_THEME.CODE_HIGHLIGHT_BACKGROUND,
-                borderColor: TICKET_THEME.CODE_HIGHLIGHT_BORDER,
+              styleConfig={{
+                lineNumber: TICKET_THEME.CODE_LINE_NUMBER,
+                highlightBackgroundColor: TICKET_THEME.CODE_HIGHLIGHT_BACKGROUND,
+                highlightBorderColor: TICKET_THEME.CODE_HIGHLIGHT_BORDER,
               }}
               highlightBorder
               className="not-prose !p-0 !bg-transparent border-none [&>code>span>span]:!leading-3 [&>code>span>span]:!min-w-2 [&>code>span]:!pl-4"

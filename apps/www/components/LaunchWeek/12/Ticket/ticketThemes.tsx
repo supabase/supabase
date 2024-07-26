@@ -7,6 +7,7 @@ export const themes = {
     TICKET_BACKGROUND_CODE: '#171717',
     CODE_HIGHLIGHT_BACKGROUND: '#292929',
     CODE_HIGHLIGHT_BORDER: '#F8F9FA',
+    CODE_LINE_NUMBER: '#F8F9FA',
     CODE_THEME: {
       hljs: {
         display: 'block',
@@ -122,12 +123,13 @@ export const themes = {
   },
   platinum: {
     TICKET_BORDER: '#B2B2B2',
-    TICKET_FOREGROUND: '#171717',
-    TICKET_FOREGROUND_LIGHT: '#707070',
     TICKET_BACKGROUND: '#FFFFFF',
     TICKET_BACKGROUND_CODE: '#F8F9FA',
+    TICKET_FOREGROUND: '#171717',
+    TICKET_FOREGROUND_LIGHT: '#707070',
     CODE_HIGHLIGHT_BACKGROUND: '#E6E6E6',
     CODE_HIGHLIGHT_BORDER: '#707070',
+    CODE_LINE_NUMBER: '#707070',
     CODE_THEME: {
       hljs: {
         display: 'block',
@@ -241,13 +243,14 @@ export const themes = {
     },
   },
   secret: {
-    TICKET_BORDER: '#292929',
-    TICKET_FOREGROUND: '#11181C',
-    TICKET_FOREGROUND_LIGHT: '#888888',
-    TICKET_BACKGROUND: '#1F1F1F',
-    TICKET_BACKGROUND_CODE: '#141414',
-    CODE_HIGHLIGHT_BACKGROUND: '#141414',
-    CODE_HIGHLIGHT_BORDER: '#141414',
+    TICKET_BORDER: '#3059F2',
+    TICKET_FOREGROUND: '#EDEDED',
+    TICKET_FOREGROUND_LIGHT: '#EDEDED',
+    TICKET_BACKGROUND: '#0F2BE6',
+    TICKET_BACKGROUND_CODE: '#0000B4',
+    CODE_HIGHLIGHT_BACKGROUND: '#3059F2',
+    CODE_HIGHLIGHT_BORDER: '#73B2FA',
+    CODE_LINE_NUMBER: '#5F7BF6',
     CODE_THEME: {
       hljs: {
         display: 'block',
@@ -255,25 +258,25 @@ export const themes = {
         color: '#ddd',
       },
       'hljs-tag': {
-        color: '#569cd6',
+        color: '#EDEDED',
       },
       'hljs-keyword': {
-        color: '#569cd6',
+        color: '#EDEDED',
         fontWeight: 'normal',
       },
       'hljs-selector-tag': {
-        color: '#569cd6',
+        color: '#EDEDED',
         fontWeight: 'normal',
       },
       'hljs-literal': {
-        color: '#569cd6',
+        color: '#EDEDED',
         fontWeight: 'normal',
       },
       'hljs-strong': {
-        color: '#569cd6',
+        color: '#EDEDED',
       },
       'hljs-name': {
-        color: '#569cd6',
+        color: '#EDEDED',
       },
 
       'hljs-code': {
@@ -295,64 +298,64 @@ export const themes = {
         color: '#bf79db',
       },
       'hljs-string': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-bullet': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-subst': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-title': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
         fontWeight: 'normal',
       },
       'hljs-section': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
         fontWeight: 'normal',
       },
       'hljs-emphasis': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-type': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
         fontWeight: 'normal',
       },
       'hljs-built_in': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-builtin-name': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-selector-attr': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-selector-pseudo': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-addition': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-variable': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-template-tag': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-template-variable': {
-        color: '#3ECF8E',
+        color: '#48FF1A',
       },
       'hljs-comment': {
-        color: '#999',
+        color: '#5F7BF6',
       },
       'hljs-quote': {
-        color: '#75715e',
+        color: '#5F7BF6',
       },
       'hljs-deletion': {
-        color: '#75715e',
+        color: '#5F7BF6',
       },
       'hljs-meta': {
-        color: '#75715e',
+        color: '#5F7BF6',
       },
       'hljs-doctag': {
         fontWeight: 'normal',

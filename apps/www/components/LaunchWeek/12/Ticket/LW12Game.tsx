@@ -22,7 +22,7 @@ interface Props {
 
 const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user } = useConfData()
-  const phrase = process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'its_just_postgres'
+  const phrase = process.env.NEXT_PUBLIC_LW_GAME_WORD ?? 'its_just_postgres'
   const inputRef = useRef(null)
   const winningPhrase = phrase?.split('_').map((word) => word.split(''))
   const phraseLength = phrase?.replaceAll('_', '').split('').length
@@ -72,15 +72,16 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     if (supabase) {
       if (user.id) {
         await supabase
-          .from('lw11_tickets')
-          .update({ gameWonAt: new Date() })
+          .from('tickets')
+          .update({ game_won_at: new Date() })
+          .eq('launch_week', 'lw12')
           .eq('username', user.username)
           .then((res) => {
             if (res.error) return console.log('error', res.error)
             setIsGameMode(false)
           })
       } else {
-        localStorage.setItem('lw11_secret', 'true')
+        localStorage.setItem('lw12_secret', 'true')
 
         handleGithubSignIn()
       }
