@@ -142,7 +142,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: { onViewOngoingQueries: 
                     placeholder="Search queries..."
                     aria-labelledby="Search queries"
                     value={searchText}
-                    onChange={(e) => setSearchText(e.target.value.trim())}
+                    onChange={(e) => setSearchText(e.target.value)}
                   >
                     <InnerSideBarFilterSortDropdown
                       value={snapV2.order}
