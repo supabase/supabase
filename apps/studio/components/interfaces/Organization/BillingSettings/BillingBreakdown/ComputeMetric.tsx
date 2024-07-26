@@ -70,7 +70,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                           <tr key={`${usageMeta.metric}_${allocation.ref}`}>
                             <td>{allocation.name}</td>
                             <td className="text-right">
-                              {formatUsage(usageMeta.metric as PricingMetric, allocation.usage)}
+                              {formatUsage(usageMeta.metric as PricingMetric, allocation)}
                             </td>
                           </tr>
                         ))}
@@ -80,10 +80,9 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                         <tr>
                           <td className="py-2 border-t text-left">Total (Hours)</td>
                           <td className="py-2 border-t text-right">
-                            {formatUsage(
-                              usageMeta.metric as PricingMetric,
-                              usageMeta.usage_original
-                            )}
+                            {formatUsage(usageMeta.metric as PricingMetric, {
+                              usage: usageMeta.usage_original,
+                            })}
                           </td>
                         </tr>
                       </tfoot>
