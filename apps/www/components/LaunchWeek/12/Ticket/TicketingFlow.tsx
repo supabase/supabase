@@ -138,6 +138,9 @@ const TicketingFlow = () => {
                         </div>
                       ) : winningChances !== 2 ? (
                         <div>
+                          {hasSecretTicket && (
+                            <p className="text-2xl mb-1">You found a secret ticket</p>
+                          )}
                           {!hasSecretTicket && (
                             <p className="text-2xl mb-1">{FIRST_NAME}, you're in!</p>
                           )}
