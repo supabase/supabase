@@ -5,11 +5,11 @@ import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Error from 'next/error'
-import { Session } from '@supabase/supabase-js'
+import { createClient, Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL, LW_URL } from '~/lib/constants'
 import supabase from '~/lib/supabase'
-import supabaseAdmin from '~/lib/supabaseAdmin'
+import { Database } from '~/lib/database.types'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -103,9 +103,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   let user
 
-  console.log('[username].tsx process.env =========')
-  console.log(process.env)
-  console.log('=========')
+  const supabaseAdmin = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
+  )
 
   fetch(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-ticket-og?username=${encodeURIComponent(
