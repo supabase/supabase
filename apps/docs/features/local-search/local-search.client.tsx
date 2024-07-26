@@ -8,14 +8,14 @@ import { MAIN_THREAD_MESSAGE, WORKER_MESSAGE } from './local-search.worker.messa
 
 interface WorkerContext {
   worker: Worker
-  dbReady: boolean
+  ready: boolean
 }
 
 const SearchWorkerContext = createContext<WorkerContext>(undefined)
 
 export function SearchWorkerProvider({ children }: PropsWithChildren) {
   const [worker, setWorker] = useState<Worker>()
-  const [dbReady, setDbReady] = useState(false)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const worker = new Worker(new URL('./local-search.worker.js', import.meta.url), {
@@ -37,8 +37,8 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
 
     function logWorkerMessage(event) {
       if (event.data.type === WORKER_MESSAGE.CHECKPOINT) {
-        if (event.data.payload?.status === 'DB_READY') {
-          setDbReady(true)
+        if (event.data.payload?.status === 'READY') {
+          setReady(true)
         }
         console.log(
           `WORKER EVENT: ${event.data.type}\n\n${JSON.stringify(event.data.payload ?? {}, null, 2)}`
@@ -55,14 +55,14 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  const api = useMemo(() => ({ worker, dbReady }), [worker, dbReady])
+  const api = useMemo(() => ({ worker, ready }), [worker, ready])
 
   return <SearchWorkerContext.Provider value={api}>{children}</SearchWorkerContext.Provider>
 }
 
 export function useLocalSearch() {
   const supabase = useSupabaseClient()
-  const { worker, dbReady } = useContext(SearchWorkerContext)
+  const { worker, ready } = useContext(SearchWorkerContext)
   const [searchResults, setSearchResults] = useState<Array<any>>([])
 
   const search = useCallback(
@@ -71,7 +71,7 @@ export function useLocalSearch() {
         console.error('Search ran before worker was initiated')
       }
 
-      if (dbReady) {
+      if (ready) {
         return worker.postMessage({
           type: MAIN_THREAD_MESSAGE.SEARCH,
           payload: { query },
@@ -87,7 +87,7 @@ export function useLocalSearch() {
         setSearchResults(data)
       })
     },
-    [worker, dbReady, supabase]
+    [worker, ready, supabase]
   )
 
   useEffect(() => {

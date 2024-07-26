@@ -28,22 +28,21 @@ import {
  * @type {PGlite}
  */
 let db
-let dbReady = false
-
 const getExtractor = setupSingletonExtractor()
+let ready = false
 
 self.addEventListener('message', async (event) => {
   switch (event.data.type) {
     case MAIN_THREAD_MESSAGE.INIT:
       const { supabaseUrl, supabaseAnonKey } = event.data.payload
-      return initDb(supabaseUrl, supabaseAnonKey)
+      return init(supabaseUrl, supabaseAnonKey)
     case MAIN_THREAD_MESSAGE.SEARCH:
       const { query } = event.data.payload
       return handleSearch(query)
   }
 })
 
-async function initDb(supabaseUrl, supabaseAnonKey) {
+async function init(supabaseUrl, supabaseAnonKey) {
   db = new PGlite({
     extensions: {
       vector: new URL(
@@ -57,11 +56,16 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
   await db.exec(CREATE_PAGE_SECTION_TABLE)
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey)
-  await Promise.all([(copyPages(supabase, db), copyPageSections(supabase, db))])
+  const eagerPipelineInitiation = getExtractor()
+  await Promise.all([
+    copyPages(supabase, db),
+    copyPageSections(supabase, db),
+    eagerPipelineInitiation,
+  ])
 
-  dbReady = true
+  ready = true
   checkpoint({
-    status: 'DB_READY',
+    status: 'READY',
   })
 }
 
@@ -71,7 +75,7 @@ async function initDb(supabaseUrl, supabaseAnonKey) {
  * @returns {void}
  */
 async function handleSearch(query) {
-  if (!dbReady) {
+  if (!ready) {
     return postError(
       {
         message: 'DB_NOT_READY',
