@@ -32,9 +32,8 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const DISPLAY_NAME = name || username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
-  const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} ticket`
-  const DESCRIPTION = `Join ${FIRST_NAME} on Supabase Launch Week 12 and claim your ticket for a chance
-                  to win supa swag.`
+  const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} LW12 ticket`
+  const DESCRIPTION = `Claim your Supabase Launch Week 12 ticket for a chance to win supa swag and join the week of announcements.`
   const PAGE_URL = `${LW_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
@@ -127,7 +126,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
-  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
+  const ogImageUrl = `https://deulbcctwgmwupazcfmd.supabase.co/storage/v1/object/public/images/launch-week/lw12/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {
