@@ -15,6 +15,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW12Background from '~/components/LaunchWeek/12/LW12Background'
+import { isBrowser } from 'common'
 
 const LW12TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/12/Ticket/TicketContainer')
@@ -110,7 +111,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   )
 
   // fetch a specific user
-  if (username) {
+  if (username && !isBrowser) {
     const { data } = await supabaseAdmin!
       .from('tickets_view')
       .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
