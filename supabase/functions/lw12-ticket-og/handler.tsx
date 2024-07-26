@@ -7,8 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// const STORAGE_URL = `${Deno.env.get('LIVE_SUPABASE_URL') ?? 'https://xguihxuzqibwxjnimxev.supabase.co'}/storage/v1/object/public/images/launch-week/lw12`
-const STORAGE_URL = `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12`
+const STORAGE_URL = `${Deno.env.get('LIVE_SUPABASE_URL') ?? 'https://xguihxuzqibwxjnimxev.supabase.co'}/storage/v1/object/public/images/launch-week/lw12`
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
