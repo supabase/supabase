@@ -7,7 +7,7 @@ import WrapperRow from './WrapperRow'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import WrappersDisabledState from './WrappersDisabledState'
-import WrappersDropdown from './WrappersDropdown'
+import WrappersEmptyState from './WrappersEmptyState'
 
 const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
   const { project } = useProjectContext()
@@ -26,15 +26,7 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
       {isEnabled ? (
         <div>
           {wrappers.length === 0 ? (
-            <div
-              className={[
-                'border rounded border-default px-20 py-16',
-                'flex flex-col items-center justify-center gap-y-4',
-              ].join(' ')}
-            >
-              <p className="text-foreground-light text-sm">No wrappers created yet</p>
-              <WrappersDropdown align="center" buttonText="Create a new wrapper" />
-            </div>
+            <WrappersEmptyState />
           ) : (
             <>
               {WRAPPERS.map((wrapper, i) => {
