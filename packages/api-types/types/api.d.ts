@@ -3137,7 +3137,6 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
-      organization_slug?: string
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
@@ -3912,6 +3911,7 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
+        | 'DISK_GB_HOURS'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -5892,6 +5892,7 @@ export interface components {
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
+      public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
       target_version: number
@@ -6029,7 +6030,7 @@ export interface components {
       inserted_at: string
       is_physical_backup: boolean
       /** @enum {string} */
-      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED'
+      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
     }
     V1BackupsResponse: {
       backups: components['schemas']['V1Backup'][]
@@ -7802,6 +7803,7 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_GB_HOURS'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'
