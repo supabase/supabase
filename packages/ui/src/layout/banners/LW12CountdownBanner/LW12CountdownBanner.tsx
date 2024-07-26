@@ -10,7 +10,8 @@ import Countdown from './Countdown'
 export function LW12CountdownBanner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  const isLaunchWeekPage = pathname === '/launch-week'
+  const isLaunchWeekPage =
+    pathname === '/launch-week' || pathname?.includes('/launch-week/tickets/')
   const isLaunchWeekSection =
     (pathname?.includes('/launch-week') || pathname?.includes('/launch-week')) ?? false
 

@@ -102,7 +102,8 @@ const TicketingFlow = () => {
                         <p className="text-foreground-light">{LW12_DATE}</p>
                       </div>
                       <p className="text-foreground-lighter text-lg">
-                        Join us for a week of many exciting new features.
+                        Join us for a week of new features and find new ways to level up your
+                        development.
                       </p>
                     </div>
                     <TicketForm />
@@ -122,9 +123,6 @@ const TicketingFlow = () => {
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
                       {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
                       <div className="flex flex-col">
-                        {/* <span className="font-mono text-foreground-lighter text-xs leading-3">
-                          Starts in:
-                        </span> */}
                         <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
                       </div>
                       {hasPlatinumTicket ? (

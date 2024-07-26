@@ -47,7 +47,7 @@ const LWMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
             const { data: newMeets } = await supabase
               .from('meetups')
               .select('*')
-              .eq('edition', 'lw12')
+              .eq('launch_week', 'lw12')
               .neq('is_published', false)
 
             setMeets(newMeets?.sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1))!)
