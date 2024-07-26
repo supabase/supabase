@@ -151,12 +151,9 @@ export async function handler(req: Request) {
     const fontData = await font
     const monoFontData = await mono_font
     const numDigits = `${Number(ticketNumber)}`.length
-    const prefix = `0000000`.slice(numDigits)
     const HAS_ROLE = !!metadata?.role
     const HAS_COMPANY = !!metadata?.company
     const HAS_LOCATION = !!metadata?.location
-    const HAS_AVATAR = !metadata?.hideAvatar
-    const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY && !HAS_LOCATION
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
     const OG_PADDING_X = 60
@@ -166,12 +163,11 @@ export async function handler(req: Request) {
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
     const TICKET_POS_LEFT = 540
-    const TICKET_PADDING_X = 40
-    const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 40
     const LOGO_RATIO = 436 / 449
     const DISPLAY_NAME = name || username
     const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
+    const BACKGROUND_GRID = `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`
 
     const BACKGROUND = {
       regular: {
@@ -209,6 +205,23 @@ export async function handler(req: Request) {
               justifyContent: 'space-between',
             }}
           >
+            {/* Background  */}
+            <img
+              width="1202"
+              height="632"
+              style={{
+                position: 'absolute',
+                top: '-1px',
+                left: '-1px',
+                bottom: '-1px',
+                right: '-1px',
+                zIndex: '0',
+                opacity: 0.5,
+                background: STYLING_CONGIF[ticketType].BACKGROUND,
+                backgroundSize: 'cover',
+              }}
+              src={BACKGROUND_GRID}
+            />
             {/* Ticket  */}
             <div
               style={{
@@ -461,12 +474,6 @@ export async function handler(req: Request) {
                     <span style={lineNumberStyle}>12</span>
                     <span tw="ml-2">&#125;</span>
                   </div>
-                  {/* <div
-                    tw="flex mt-8"
-                    style={{ color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT }}
-                  >
-                    71ms RESPONSE TIME
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -570,7 +577,7 @@ export async function handler(req: Request) {
     )
 
     // [Note] Uncomment only for local testing
-    // return await generatedTicketImage
+    return await generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
