@@ -32,13 +32,14 @@ interface SQLEditorNavV1Props {
 }
 
 export const SQLEditorNavV1 = ({
-  searchText,
+  searchText: _searchText,
   selectedQueries,
   handleNewQuery,
   setSearchText,
   setSelectedQueries,
   setShowDeleteModal,
 }: SQLEditorNavV1Props) => {
+  const searchText = _searchText.trim()
   const router = useRouter()
   const { ref, id: activeId } = useParams()
   const enableFolders = useFlag('sqlFolderOrganization')
@@ -168,14 +169,15 @@ export const SQLEditorNavV1 = ({
               <InnerSideBarFilterSearchInput
                 name="search-queries"
                 placeholder="Search queries..."
-                onChange={(e) => setSearchText(e.target.value.trim())}
-                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                value={_searchText}
                 aria-labelledby="Search queries"
               />
             </InnerSideBarFilters>
           )}
 
           {searchText.length > 0 &&
+            personalSnippets.length === 0 &&
             filteredProjectSnippets.length === 0 &&
             filteredFavoriteSnippets.length === 0 &&
             filteredProjectSnippets.length === 0 && (
