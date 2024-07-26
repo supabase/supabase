@@ -1,22 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import dayjs from 'dayjs'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
-import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { Button, cn } from 'ui'
 import { useParams } from '~/hooks/useParams'
-import { useBreakpoint } from 'common'
-import LabelBadge from '../LabelBadge'
 import LaunchWeekPrizeCard from '../LaunchWeekPrizeCard'
-import NextImage from 'next/image'
 import TicketCopy from './TicketCopy'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
   const { platinum, username, metadata, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
-  const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${LW_URL}/tickets/${username}?lw=12${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''

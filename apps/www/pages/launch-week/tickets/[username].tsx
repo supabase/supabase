@@ -33,7 +33,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const DISPLAY_NAME = name || username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} LW12 ticket`
-  const DESCRIPTION = `Claim your Supabase Launch Week 12 ticket for a chance to win supa swag and join the week of announcements.`
+  const DESCRIPTION = `Claim your Supabase Launch Week 12 ticket for a chance to win supa swag.`
   const PAGE_URL = `${LW_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
