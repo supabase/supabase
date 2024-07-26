@@ -8,8 +8,8 @@ import Error from 'next/error'
 import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL, LW_URL } from '~/lib/constants'
-import supabase from '~/lib/supabase'
-import supabaseAdmin from '~/lib/supabaseAdmin'
+import supabase from '~/lib/supabaseMisc'
+import supabaseAdminClient from '~/lib/supabaseAdmin'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -110,8 +110,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   )
 
   // fetch a specific user
-  if (username && supabaseAdmin) {
-    const { data } = await supabaseAdmin
+  if (username) {
+    const { data } = await supabaseAdminClient!
       .from('tickets_view')
       .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
       .eq('launch_week', 'lw12')
