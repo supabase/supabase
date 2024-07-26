@@ -68,6 +68,7 @@ const BarChart = ({
   const _YAxisProps = YAxisProps || {
     tickFormatter: (value) => numberFormatter(value, valuePrecision),
     tick: false,
+    width: 0,
   }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
