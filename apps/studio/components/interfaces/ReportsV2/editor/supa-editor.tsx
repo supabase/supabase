@@ -8,6 +8,9 @@ import { SlashCommand, getSlashCommandSuggestions } from './slash-commands'
 import { TrailingNode } from './trailing-node'
 import Placeholder from '@tiptap/extension-placeholder'
 
+// to get local storage in SSR
+const ls = typeof window !== 'undefined' ? window.localStorage : null
+
 export function SupaEditor() {
   const editor = useEditor({
     extensions: [
@@ -30,8 +33,10 @@ export function SupaEditor() {
       }
       return true
     },
-    content:
-      '<h1>Welcome to Supabase Reports v2</h1><p>Try typing a slash <code>/</code> in a new line.</p>',
+    content: JSON.parse(ls?.getItem('editorContent') || '{}'),
+    onUpdate: ({ editor }) => {
+      ls?.setItem('editorContent', JSON.stringify(editor.getJSON()))
+    },
     editorProps: {
       handleDOMEvents: {
         keydown: (view, event) => {
