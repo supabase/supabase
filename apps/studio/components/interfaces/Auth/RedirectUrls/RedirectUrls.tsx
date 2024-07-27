@@ -21,8 +21,8 @@ import {
   Form,
   Input,
   Modal,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 import ValueContainer from './ValueContainer'

@@ -9,7 +9,7 @@ export default function CommandMenuShortcuts() {
   const { setPages, pages, currentPage } = useCommandMenu()
 
   return (
-    <div className="flex w-full gap-2 px-4 pt-4 justify-items-start flex-row items-center justify-between">
+    <div className="flex w-full gap-2 px-4 pt-4 pb-2 justify-items-start flex-row items-center justify-between">
       <div className="flex gap-2 flex-row items-center">
         <CommandShortcut onClick={() => setPages([])}>
           <div className="flex items-center gap-2">

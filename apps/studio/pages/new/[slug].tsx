@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
@@ -9,7 +10,6 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
@@ -38,7 +38,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
-  CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
@@ -46,6 +45,7 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
+import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Admonition,
@@ -287,6 +287,7 @@ const Wizard: NextPageWithLayout = () => {
         .min(1, 'Password is required.'),
       instanceSize: z.string(),
       dataApi: z.boolean(),
+      useApiSchema: z.boolean(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -311,6 +312,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: defaultRegion || undefined,
       instanceSize: sizes[0],
       dataApi: true,
+      useApiSchema: false,
     },
   })
 
@@ -323,7 +325,7 @@ const Wizard: NextPageWithLayout = () => {
       (prev, acc) => prev + monthlyInstancePrice(acc.infra_compute_size),
       0
     ) +
-    // selected instance size
+    // selected compute size
     monthlyInstancePrice(instanceSize) -
     // compute credits
     10
@@ -344,8 +346,16 @@ const Wizard: NextPageWithLayout = () => {
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const { cloudProvider, projectName, dbPass, dbRegion, postgresVersion, instanceSize, dataApi } =
-      values
+    const {
+      cloudProvider,
+      projectName,
+      dbPass,
+      dbRegion,
+      postgresVersion,
+      instanceSize,
+      dataApi,
+      useApiSchema,
+    } = values
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -355,10 +365,11 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
-      // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
+      // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
+      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -404,7 +415,7 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (defaultRegionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region)
+      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
     }
   }, [defaultRegionError])
 
@@ -422,7 +433,7 @@ const Wizard: NextPageWithLayout = () => {
             <div key="panel-title">
               <h3>Create a new project</h3>
               <p className="text-sm text-foreground-lighter">
-                Your project will have its own dedicated instance and full postgres database.
+                Your project will have its own dedicated instance and full Postgres database.
                 <br />
                 An API will be set up so you can easily interact with your new database.
                 <br />
@@ -557,7 +568,9 @@ const Wizard: NextPageWithLayout = () => {
                                   field.onChange(value)
                                   form.setValue(
                                     'dbRegion',
-                                    value === 'FLY' ? FLY_REGIONS_DEFAULT : AWS_REGIONS_DEFAULT
+                                    value === 'FLY'
+                                      ? FLY_REGIONS_DEFAULT.displayName
+                                      : AWS_REGIONS_DEFAULT.displayName
                                   )
                                 }}
                                 defaultValue={field.value}
@@ -625,7 +638,7 @@ const Wizard: NextPageWithLayout = () => {
                                 onValueChange={(value) => field.onChange(value)}
                               >
                                 <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                  <SelectValue_Shadcn_ placeholder="Select an instance size" />
+                                  <SelectValue_Shadcn_ placeholder="Select a compute size" />
                                 </SelectTrigger_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
@@ -671,138 +684,8 @@ const Wizard: NextPageWithLayout = () => {
                             </FormItemLayout>
                           )}
                         />
-                      </Panel.Content>
-                    )}
-
-                    <Panel.Content>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="dbPass"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Database Password"
-                            layout="horizontal"
-                            description={
-                              <>
-                                <PasswordStrengthBar
-                                  passwordStrengthScore={form.getValues('dbPassStrength')}
-                                  password={field.value}
-                                  passwordStrengthMessage={passwordStrengthMessage}
-                                  generateStrongPassword={generateStrongPassword}
-                                />
-                              </>
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input
-                                copy={field.value.length > 0}
-                                type="password"
-                                placeholder="Type in a strong password"
-                                {...field}
-                                autoComplete="off"
-                                onChange={async (event) => {
-                                  field.onChange(event)
-                                  form.trigger('dbPassStrength')
-                                  const value = event.target.value
-                                  if (event.target.value === '') {
-                                    await form.setValue('dbPassStrength', 0)
-                                    await form.trigger('dbPass')
-                                  } else {
-                                    await delayedCheckPasswordStrength(value)
-                                  }
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </Panel.Content>
-
-                    <Panel.Content>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="dbRegion"
-                        render={({ field }) => (
-                          <RegionSelector
-                            field={field}
-                            form={form}
-                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                          />
-                        )}
-                      />
-                    </Panel.Content>
-
-                    <Panel.Content>
-                      <Collapsible_Shadcn_>
-                        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
-                          Advanced options
-                          <ChevronRight
-                            size={16}
-                            strokeWidth={1}
-                            className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
-                          />
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="dataApi"
-                            render={({ field }) => (
-                              <>
-                                <FormItemLayout
-                                  label="What connections do you plan to use?"
-                                  description="This setting can be changed after the project is created"
-                                  layout="horizontal"
-                                >
-                                  <FormControl_Shadcn_>
-                                    <RadioGroupStacked
-                                      // Due to radio group not supporting boolean values
-                                      // value is converted to boolean
-                                      onValueChange={(value) => field.onChange(value === 'true')}
-                                      defaultValue={field.value.toString()}
-                                    >
-                                      <FormItem_Shadcn_ asChild>
-                                        <FormControl_Shadcn_>
-                                          <RadioGroupStackedItem
-                                            value={'true'}
-                                            label="Data API + Connection String"
-                                            description="For connecting from the browser, mobile and server."
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItem_Shadcn_>
-                                      <FormItem_Shadcn_ asChild>
-                                        <FormControl_Shadcn_>
-                                          <RadioGroupStackedItem
-                                            label="Only Connection String"
-                                            value="false"
-                                            description="For connecting via server."
-                                            className={cn(
-                                              !form.getValues('dataApi') && '!rounded-b-none'
-                                            )}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItem_Shadcn_>
-                                    </RadioGroupStacked>
-                                  </FormControl_Shadcn_>
-                                  {!form.getValues('dataApi') && (
-                                    <Admonition
-                                      className="rounded-t-none"
-                                      type={'warning'}
-                                      title="Data API will effectively be disabled"
-                                    >
-                                      PostgREST which powers the Data API will have no schemas
-                                      available to it.
-                                    </Admonition>
-                                  )}
-                                </FormItemLayout>
-                              </>
-                            )}
-                          />
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
-                    </Panel.Content>
-                    {orgSubscription && orgSubscription.plan.id !== 'free' && (
-                      <Panel.Content>
                         <FormItemLayout
+                          className="pt-4"
                           label={
                             <div className="space-y-4">
                               <span>Compute Billing</span>
@@ -852,7 +735,9 @@ const Wizard: NextPageWithLayout = () => {
                                   <TableBody className="[&_td]:py-2">
                                     {organizationProjects.map((project) => (
                                       <TableRow key={project.ref} className="text-foreground-light">
-                                        <TableCell className="w-[170px]">{project.name}</TableCell>
+                                        <TableCell className="w-[170px] truncate">
+                                          {project.name}
+                                        </TableCell>
                                         <TableCell className="text-center">
                                           {instanceLabel(project.infra_compute_size)}
                                         </TableCell>
@@ -919,7 +804,7 @@ const Wizard: NextPageWithLayout = () => {
                                     Compute is charged usage-based whenever your billing cycle
                                     resets. Given compute charges are hourly, your invoice will
                                     contain "Compute Hours" for each hour a project ran on a
-                                    specific instance size.
+                                    specific compute size.
                                   </p>
                                   {monthlyComputeCosts > 0 && (
                                     <p>
@@ -957,6 +842,201 @@ const Wizard: NextPageWithLayout = () => {
                         </FormItemLayout>
                       </Panel.Content>
                     )}
+
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="dbPass"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Database Password"
+                            layout="horizontal"
+                            description={
+                              <PasswordStrengthBar
+                                passwordStrengthScore={form.getValues('dbPassStrength')}
+                                password={field.value}
+                                passwordStrengthMessage={passwordStrengthMessage}
+                                generateStrongPassword={generateStrongPassword}
+                              />
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Input
+                                copy={field.value.length > 0}
+                                type="password"
+                                placeholder="Type in a strong password"
+                                {...field}
+                                autoComplete="off"
+                                onChange={async (event) => {
+                                  field.onChange(event)
+                                  form.trigger('dbPassStrength')
+                                  const value = event.target.value
+                                  if (event.target.value === '') {
+                                    await form.setValue('dbPassStrength', 0)
+                                    await form.trigger('dbPass')
+                                  } else {
+                                    await delayedCheckPasswordStrength(value)
+                                  }
+                                }}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </Panel.Content>
+
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="dbRegion"
+                        render={({ field }) => (
+                          <RegionSelector
+                            field={field}
+                            form={form}
+                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                          />
+                        )}
+                      />
+                    </Panel.Content>
+
+                    <Panel.Content>
+                      <Collapsible_Shadcn_>
+                        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+                          Security options
+                          <ChevronRight
+                            size={16}
+                            strokeWidth={1}
+                            className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+                          />
+                        </CollapsibleTrigger_Shadcn_>
+                        <CollapsibleContent_Shadcn_
+                          className={cn(
+                            'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                          )}
+                        >
+                          <FormField_Shadcn_
+                            name="dataApi"
+                            control={form.control}
+                            render={({ field }) => (
+                              <>
+                                <FormItemLayout
+                                  layout="horizontal"
+                                  label="What connections do you plan to use?"
+                                >
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStacked
+                                      // Due to radio group not supporting boolean values
+                                      // value is converted to boolean
+                                      onValueChange={(value) => field.onChange(value === 'true')}
+                                      defaultValue={field.value.toString()}
+                                    >
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            value="true"
+                                            className="[&>div>div>p]:text-left"
+                                            label="Data API + Connection String"
+                                            description="Connect to Postgres via autogenerated HTTP APIs or the Postgres protocol"
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                      <FormItem_Shadcn_ asChild>
+                                        <FormControl_Shadcn_>
+                                          <RadioGroupStackedItem
+                                            label="Only Connection String"
+                                            value="false"
+                                            description="Use Postgres without the autogenerated APIs"
+                                            className={cn(
+                                              !form.getValues('dataApi') && '!rounded-b-none'
+                                            )}
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItem_Shadcn_>
+                                    </RadioGroupStacked>
+                                  </FormControl_Shadcn_>
+                                  {!form.getValues('dataApi') && (
+                                    <Admonition
+                                      className="rounded-t-none"
+                                      type="warning"
+                                      title="Data API will effectively be disabled"
+                                    >
+                                      PostgREST which powers the Data API will have no schemas
+                                      available to it.
+                                    </Admonition>
+                                  )}
+                                </FormItemLayout>
+                              </>
+                            )}
+                          />
+
+                          {form.getValues('dataApi') && (
+                            <FormField_Shadcn_
+                              name="useApiSchema"
+                              control={form.control}
+                              render={({ field }) => (
+                                <>
+                                  <FormItemLayout
+                                    className="mt-6"
+                                    layout="horizontal"
+                                    label="Data API Configuration"
+                                  >
+                                    <FormControl_Shadcn_>
+                                      <RadioGroupStacked
+                                        defaultValue={field.value.toString()}
+                                        onValueChange={(value) => field.onChange(value === 'true')}
+                                      >
+                                        <FormItem_Shadcn_ asChild>
+                                          <FormControl_Shadcn_>
+                                            <RadioGroupStackedItem
+                                              value="false"
+                                              // @ts-ignore
+                                              label={
+                                                <>
+                                                  Use public schema for Data API
+                                                  <Badge color="scale" className="ml-2">
+                                                    Default
+                                                  </Badge>
+                                                </>
+                                              }
+                                              // @ts-ignore
+                                              description={
+                                                <>
+                                                  Query all tables in the{' '}
+                                                  <code className="text-xs">public</code> schema
+                                                </>
+                                              }
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItem_Shadcn_>
+                                        <FormItem_Shadcn_ asChild>
+                                          <FormControl_Shadcn_>
+                                            <RadioGroupStackedItem
+                                              value="true"
+                                              label="Use dedicated API schema for Data API"
+                                              // @ts-ignore
+                                              description={
+                                                <>
+                                                  Query allowlisted tables in a dedicated{' '}
+                                                  <code className="text-xs">api</code> schema
+                                                </>
+                                              }
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItem_Shadcn_>
+                                      </RadioGroupStacked>
+                                    </FormControl_Shadcn_>
+                                  </FormItemLayout>
+                                </>
+                              )}
+                            />
+                          )}
+                          <p className="text-xs text-foreground-lighter text-right mt-3">
+                            These settings can be changed after the project is created via the
+                            project's settings
+                          </p>
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
+                    </Panel.Content>
                   </>
                 )}
 
@@ -979,7 +1059,7 @@ const Wizard: NextPageWithLayout = () => {
 
 /**
  * When launching new projects, they only get assigned a compute size once successfully launched,
- * this might assume wrong instance size, but only for projects being rapidly launched after one another on non-default compute sizes.
+ * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
  *
  * Needs to be in the API in the future [kevin]
  */

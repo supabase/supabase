@@ -15,12 +15,12 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  ExpandingTextArea,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
-  Input_Shadcn_,
   cn,
 } from 'ui'
 import { AiIcon } from 'ui-patterns/Cmdk'
@@ -86,6 +86,8 @@ export const AiAssistantPanel = ({
     }
   }, [loading])
 
+  const formRef = useRef<HTMLFormElement>(null)
+
   return (
     <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
       <div
@@ -150,6 +152,7 @@ export const AiAssistantPanel = ({
 
       <Form_Shadcn_ {...form}>
         <form
+          ref={formRef}
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
@@ -168,18 +171,23 @@ export const AiAssistantPanel = ({
             control={form.control}
             name="chat"
             render={({ field }) => (
-              <FormItem_Shadcn_>
+              <FormItem_Shadcn_ asChild>
                 <FormControl_Shadcn_>
                   <div className="relative">
                     <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <Input_Shadcn_
+                    <ExpandingTextArea
                       {...field}
                       autoComplete="off"
                       disabled={loading}
                       autoFocus
-                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
-                        loading ? 'pr-10' : ''
-                      }`}
+                      spellCheck={false}
+                      className="pl-12 text-sm rounded-[18px] max-h-96"
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                          event.preventDefault()
+                          formRef?.current?.requestSubmit()
+                        }
+                      }}
                       placeholder="Ask a question about your SQL query"
                     />
                     {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}

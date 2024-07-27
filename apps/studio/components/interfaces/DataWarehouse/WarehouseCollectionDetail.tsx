@@ -95,9 +95,7 @@ export const WarehouseCollectionDetail = () => {
             <h2 className="p-3">{collection?.name}</h2>
             <div className="flex items-center gap-2">
               <Button asChild type={'text'}>
-                <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
-                  Access tokens
-                </Link>
+                <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
               </Button>
 
               <TestCollectionDialog

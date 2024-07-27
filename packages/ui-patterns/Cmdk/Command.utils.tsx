@@ -1,5 +1,5 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
+import { Command as CommandPrimitive } from 'cmdk'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { cn } from 'ui/src/lib/utils'
@@ -10,6 +10,7 @@ import { Dialog, DialogContent } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuContext'
+import { useBreakpoint } from 'common'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -59,52 +60,62 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   setIsOpen: (open: boolean) => void
 }
 
-export const CommandDialog = ({
-  children,
-  onKeyDown,
-  page,
-  setIsOpen,
-  ...props
-}: CommandDialogProps) => {
-  const [animateBounce, setAnimateBounce] = React.useState(false)
+type CommandPrimitiveDialogElement = React.ElementRef<typeof CommandPrimitive.Dialog>
 
-  React.useEffect(() => {
-    setAnimateBounce(true)
-    setTimeout(() => setAnimateBounce(false), 126)
-  }, [page])
+export const CommandDialog = React.forwardRef<CommandPrimitiveDialogElement, CommandDialogProps>(
+  ({ children, onKeyDown, page, setIsOpen, ...props }: CommandDialogProps, ref) => {
+    const isOpen = props.visible || props.open
+    const isMobile = useBreakpoint()
 
-  return (
-    <Dialog {...props} open={props.visible || props.open}>
-      <DialogContent
-        onInteractOutside={(e) => {
-          // Only hide menu when clicking outside, not focusing outside
-          // Prevents Firefox dropdown issue that immediately closes menu after opening
-          if (e.type === 'dismissableLayer.pointerDownOutside') {
-            setIsOpen(!open)
-          }
-        }}
-        hideClose
-        size={'xlarge'}
-        className={cn('place-self-start mx-auto top-20')}
-      >
-        <ErrorBoundary FallbackComponent={CommandError}>
-          <Command
-            className={[
-              '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-              '[&_[cmdk-item]_svg]:h-5',
-              '[&_[cmdk-item]_svg]:w-5',
-              '[&_[cmdk-input-wrapper]_svg]:h-5',
-              '[&_[cmdk-input-wrapper]_svg]:w-5',
-              '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
-            ].join(' ')}
-          >
-            {children}
-          </Command>
-        </ErrorBoundary>
-      </DialogContent>
-    </Dialog>
-  )
-}
+    return (
+      <Dialog {...props} open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent
+          ref={ref}
+          forceMount
+          onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
+          onInteractOutside={(e) => {
+            // Only hide menu when clicking outside, not focusing outside
+            // Prevents Firefox dropdown issue that immediately closes menu after opening
+            if (e.type === 'dismissableLayer.pointerDownOutside') {
+              setIsOpen(!open)
+            }
+          }}
+          hideClose
+          size="xlarge"
+          dialogOverlayProps={{
+            className: cn('overflow-hidden flex data-closed:delay-100'),
+          }}
+          className={cn(
+            'relative my-0 mx-auto rounded-t-lg overflow-y-scroll',
+            'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
+            'place-self-start md:place-self-auto',
+            isOpen && '!animate-in !slide-in-from-bottom !duration-300',
+            'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
+            'md:data-[state=open]:!animate-in md:data-[state=closed]:!animate-out',
+            'md:data-[state=closed]:!zoom-out-95 md:data-[state=open]:!zoom-in-95',
+            'md:data-[state=closed]:!slide-out-to-left-[0%] md:data-[state=closed]:!slide-out-to-top-[0%]',
+            'md:data-[state=open]:!slide-in-from-left-[0%] md:data-[state=open]:!slide-in-from-top-[0%]'
+          )}
+        >
+          <ErrorBoundary FallbackComponent={CommandError}>
+            <Command
+              className={cn(
+                '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+                '[&_[cmdk-item]_svg]:h-5',
+                '[&_[cmdk-item]_svg]:w-5',
+                '[&_[cmdk-input-wrapper]_svg]:h-5',
+                '[&_[cmdk-input-wrapper]_svg]:w-5',
+                '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
+              )}
+            >
+              {children}
+            </Command>
+          </ErrorBoundary>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+)
 
 CommandDialog.displayName = 'CommandDialog'
 
@@ -121,11 +132,10 @@ export const CommandInput = React.forwardRef<
     <div className="flex flex-col items-center" cmdk-input-wrapper="">
       <CommandPrimitive.Input
         value={value}
-        autoFocus
         onValueChange={onValueChange}
         ref={ref}
         className={cn(
-          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
+          'flex h-11 w-full rounded-md bg-transparent px-4 py-7 outline-none',
           'focus:shadow-none focus:ring-transparent',
           'text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className
@@ -418,12 +428,12 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
  *
  * @returns An input ref for the input to focus
  */
-export function useAutoInputFocus() {
+export function useAutoInputFocus(isEnabled: boolean = true) {
   const [input, setInput] = React.useState<HTMLInputElement>()
 
   // Use a callback-style ref to access the element when it mounts
   const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
-    if (inputElement) {
+    if (isEnabled && inputElement) {
       setInput(inputElement)
 
       // We need to delay the focus until the end of the call stack
@@ -442,7 +452,7 @@ export function useAutoInputFocus() {
       }
     }
 
-    window.addEventListener('keydown', onKeyDown)
+    isEnabled && window.addEventListener('keydown', onKeyDown)
 
     return () => {
       window.removeEventListener('keydown', onKeyDown)

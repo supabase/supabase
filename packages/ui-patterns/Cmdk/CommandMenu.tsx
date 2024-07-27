@@ -38,6 +38,8 @@ import GenerateSQL from './GenerateSQL'
 import SearchableStudioItems from './SearchableStudioItems'
 import ThemeOptions from './ThemeOptions'
 import sharedItems from './utils/shared-nav-items.json'
+import useDragToClose from 'common/hooks/useDragToClose'
+import { DialogHeader } from 'ui'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -86,12 +88,22 @@ const CommandMenu = () => {
     currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
     currentPage === COMMAND_ROUTES.AI ||
     currentPage === COMMAND_ROUTES.GENERATE_SQL
-      ? 'min(600px, 60vh)'
-      : '425px'
+      ? 'min(600px, 70vh)'
+      : 'auto'
+
+  const {
+    ref: dialogRef,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useDragToClose({
+    onClose: () => setIsOpen(!open),
+  })
 
   return (
     <>
       <CommandDialog
+        ref={dialogRef}
         setIsOpen={setIsOpen}
         page={currentPage}
         visible={isOpen}
@@ -99,15 +111,23 @@ const CommandMenu = () => {
           setIsOpen(!isOpen)
         }}
       >
-        {pages.length > 0 && <CommandMenuShortcuts />}
-        {showCommandInput && (
-          <CommandInput
-            ref={commandInputRef}
-            placeholder="Type a command or search..."
-            value={search}
-            onValueChange={handleInputChange}
-          />
-        )}
+        <DialogHeader
+          className="p-0 gap-0"
+          // Close dialog by dragging the header down
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {pages.length > 0 && <CommandMenuShortcuts />}
+          {showCommandInput && (
+            <CommandInput
+              ref={commandInputRef}
+              placeholder="Type a command or search..."
+              value={search}
+              onValueChange={handleInputChange}
+            />
+          )}
+        </DialogHeader>
         <CommandList
           style={{
             maxHeight: commandListMaxHeight,
@@ -118,7 +138,7 @@ const CommandMenu = () => {
                 ? commandListMaxHeight
                 : 'auto',
           }}
-          className="my-2"
+          className="pb-20 md:pb-0"
         >
           {!currentPage && (
             <>

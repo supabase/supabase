@@ -8,6 +8,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { Trash2 } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -19,7 +20,6 @@ import {
   IconClipboard,
   IconDownload,
   IconLoader,
-  IconTrash2,
   IconX,
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
@@ -266,7 +266,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   type="outline"
                   disabled={!canUpdateFiles}
                   size="tiny"
-                  icon={<IconTrash2 size={16} strokeWidth={2} />}
+                  icon={<Trash2 strokeWidth={2} />}
                   onClick={() => setSelectedItemsToDelete([file])}
                 >
                   Delete file

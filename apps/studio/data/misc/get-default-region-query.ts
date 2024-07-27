@@ -8,7 +8,8 @@ import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { AWS_REGIONS, CloudProvider, FLY_REGIONS } from 'lib/constants'
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 const RESTRICTED_POOL = ['WEST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
 
@@ -50,8 +51,8 @@ export async function getDefaultRegionOption({
     const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
 
     return cloudProvider === 'AWS'
-      ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS]
-      : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS]
+      ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
+      : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS].displayName
   } catch (error) {
     throw error
   }

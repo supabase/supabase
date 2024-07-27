@@ -1,21 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isNil } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import {
+  doPermissionsCheck,
+  useCheckPermissions,
+  useGetPermissions,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-import { isNil } from 'lodash'
 import {
   Button,
   Dialog,
@@ -50,7 +57,7 @@ export const InviteMemberButton = () => {
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -60,6 +67,18 @@ export const InviteMemberButton = () => {
   const orgScopedRoles = (allRoles?.org_scoped_roles ?? []).sort(
     (a, b) => b.base_role_id - a.base_role_id
   )
+  const orgProjects = (projects ?? []).filter(
+    (project) => project.organization_id === organization?.id
+  )
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: canReadSubscriptions }
+  )
+  const currentPlan = subscription?.plan
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
@@ -67,7 +86,7 @@ export const InviteMemberButton = () => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles,
     permissions ?? []
   )
@@ -80,7 +99,7 @@ export const InviteMemberButton = () => {
         PermissionAction.CREATE,
         'user_invites',
         { resource: { role_id } },
-        organization?.id
+        organization?.slug
       )
     )
 
@@ -120,7 +139,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -179,7 +198,7 @@ export const InviteMemberButton = () => {
 
   useEffect(() => {
     if (!applyToOrg) {
-      const firstProject = projects?.[0]
+      const firstProject = orgProjects?.[0]
       if (firstProject !== undefined) form.setValue('projectRef', firstProject.ref)
     } else {
       form.setValue('projectRef', '')
@@ -218,7 +237,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && (
+              {isOptedIntoProjectLevelPermissions && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -290,13 +309,13 @@ export const InviteMemberButton = () => {
                           value={field.value}
                           onValueChange={(value) => form.setValue('projectRef', value)}
                         >
-                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
-                            {(projects ?? []).find((project) => project.ref === field.value)
-                              ?.name ?? 'Unknown'}
+                          <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize text-left truncate max-w-[470px]">
+                            {orgProjects.find((project) => project.ref === field.value)?.name ??
+                              'Unknown'}
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
                             <SelectGroup_Shadcn_>
-                              {(projects ?? []).map((project) => {
+                              {orgProjects.map((project) => {
                                 return (
                                   <SelectItem_Shadcn_
                                     key={project.id}
@@ -336,6 +355,40 @@ export const InviteMemberButton = () => {
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
                 )}
+              />
+              <InformationBox
+                defaultVisibility={false}
+                title="Single Sign-on (SSO) login option available"
+                hideCollapse={false}
+                description={
+                  <div className="space-y-4 mb-1">
+                    <p>
+                      Supabase offers single sign-on (SSO) as a login option to provide additional
+                      account security for your team. This allows company administrators to enforce
+                      the use of an identity provider when logging into Supabase.
+                    </p>
+                    <p>This is only available for organizations on Team Plan or above.</p>
+                    <div className="flex items-center space-x-2">
+                      <Button asChild type="default">
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/sso"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Learn more
+                        </Link>
+                      </Button>
+                      {isSuccessSubscription &&
+                        (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                          <Button asChild type="default">
+                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                              Upgrade to Team
+                            </Link>
+                          </Button>
+                        )}
+                    </div>
+                  </div>
+                }
               />
             </DialogSection>
             <DialogSectionSeparator />

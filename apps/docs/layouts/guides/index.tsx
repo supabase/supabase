@@ -7,7 +7,7 @@ import { type FC } from 'react'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
-import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 interface Props {
   meta?: {
@@ -33,11 +33,9 @@ const Layout: FC<Props> = (props) => {
   const menuId = props.menuId
 
   return (
-    <>
-      <MainSkeleton menuId={menuId}>
-        <LayoutMainContent className="pb-0">{props.children}</LayoutMainContent>
-      </MainSkeleton>
-    </>
+    <SidebarSkeleton menuId={menuId}>
+      <LayoutMainContent className="pb-0">{props.children}</LayoutMainContent>
+    </SidebarSkeleton>
   )
 }
 

@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
 import {
   Check,
   Columns,
@@ -27,7 +27,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
@@ -76,14 +75,6 @@ const TableList = ({
   const [filterString, setFilterString] = useState<string>('')
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
 
   const {
     data: tables,
@@ -183,18 +174,17 @@ const TableList = ({
     (publication) => publication.name === 'supabase_realtime'
   )
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const isLocked = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName || '')
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
   const isLoading =
     isLoadingTables || isLoadingViews || isLoadingMaterializedViews || isLoadingForeignTables
   const isSuccess =
-    (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews || isSuccessForeignTables
+    isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)

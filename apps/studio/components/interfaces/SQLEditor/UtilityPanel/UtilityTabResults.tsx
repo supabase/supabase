@@ -8,6 +8,8 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button } from 'ui'
 import Results from './Results'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -25,11 +27,14 @@ const UtilityTabResults = ({
   onDebug,
 }: UtilityTabResultsProps) => {
   const { ref } = useParams()
-  const snap = useSqlEditorStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const organization = useSelectedOrganization()
 
-  const result = snap.results[id]?.[0]
+  const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
+
+  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI

@@ -18,7 +18,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Badge,
   Button,
