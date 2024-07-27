@@ -1,19 +1,17 @@
 'use client'
 import { Node } from '@tiptap/core'
-import { ReactNodeViewRenderer, NodeViewProps } from '@tiptap/react'
-import { useState } from 'react'
+import { ReactNodeViewRenderer } from '@tiptap/react'
+import { useEffect, useState } from 'react'
 import { NodeViewWrapper, mergeAttributes } from '@tiptap/react'
 import { BlockType, TiptapNodeViewProps } from './shared'
-import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import DataGrid from 'react-data-grid'
 import BarChart from 'components/ui/Charts/BarChart'
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Button, Input_Shadcn_, cn } from 'ui'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { RefreshCwIcon, Trash2Icon } from 'lucide-react'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
@@ -31,31 +29,37 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
   const [source, onSourceChange] = useState<'postgres' | 'logs'>('postgres')
   const [mode, setMode] = useState<'edit' | 'view'>('edit')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [inputLabel, setInputLabel] = useState('')
 
   const { mutate: runQuery, isLoading, data } = useExecuteSqlMutation()
 
+  useEffect(() => {
+    console.log('executing', router.query)
+    execute(sql)
+  }, [router.query])
+
   function execute(sql: string) {
-    // Check if the SQL has any variables (starting with $)
-    const variables = sql.match(/\$\w+/g)
-    const values = variables?.map((variable) => router.query[variable.substring(1)] as string)
+    // Variables in SQL will be wrapped in double brackets
+    // Example: SElECT * from {{table name}}
 
-    if (variables && !values?.every((value) => value)) {
-      toast.error('Please provide all necessary variables')
-      return
-    }
+    const variablesInSQL = sql
+      .match(/{{[^}]+}}/g)
+      ?.map((match) => match.replaceAll('{{', '').replaceAll('}}', ''))
 
-    if (variables) {
-      // Replace the variables with the values from the URL
-      variables.forEach((variable) => {
-        sql = sql.replace(variable, router.query[variable.substring(1)] as string)
-      })
-    }
+    const varsWithValue: Record<string, string> = {}
+    variablesInSQL?.forEach((variable) => {
+      const value = router.query[variable]
+      if (!value) {
+        return
+      }
+      varsWithValue[variable] = value as string
+    })
 
-    console.log(sql)
+    const newSQL = Object.keys(varsWithValue).reduce((acc, key) => {
+      return acc.replace(`{{${key}}}`, varsWithValue[key])
+    }, sql)
 
     if (project) {
-      runQuery({ sql, projectRef: project.ref, connectionString: project.connectionString })
+      runQuery({ sql: newSQL, projectRef: project.ref, connectionString: project.connectionString })
     }
   }
 
@@ -69,7 +73,7 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
         onClick={(e) => {
           e.stopPropagation()
         }}
-        className="flex flex-col mt-8 group h-96"
+        className="flex flex-col mt-8 group h-96 select-none"
       >
         <>
           {isLoading ? (
@@ -81,7 +85,10 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
               {mode === 'edit' && (
                 <CodeEditor
                   value={innerSQL}
-                  onInputChange={(v) => setInnerSQL(v || '')}
+                  onInputChange={(v) => {
+                    setInnerSQL(v || '')
+                    props.updateAttributes({ sql: v || '' })
+                  }}
                   className="flex-1"
                   id="sql-block"
                   language="pgsql"
@@ -90,8 +97,9 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
               {mode === 'view' && (
                 <>
                   {type === 'table' && (
-                    <div className="overflow-auto">
+                    <div className="overflow-auto shadow-sm">
                       <DataGrid
+                        headerRowHeight={24}
                         className="border-none"
                         columns={columns}
                         rows={data?.result || []}

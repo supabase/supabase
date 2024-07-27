@@ -12,7 +12,7 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Button, Input_Shadcn_, cn } from 'ui'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { RefreshCwIcon, Trash2Icon } from 'lucide-react'
+import { PencilIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { useRouter } from 'next/router'
 
@@ -28,47 +28,72 @@ function SupaInputComponent(props: TiptapNodeViewProps<{ name: string }>) {
 
   const router = useRouter()
   const [inputName, setInputName] = useState(name)
-  const [mode, setMode] = useState<'edit' | 'view'>('edit')
+  const [inputValue, setInputValue] = useState(router.query[inputName] || '')
+  const defaultMode = inputName.length ? 'view' : 'edit'
+  const [mode, setMode] = useState<'edit' | 'view'>(defaultMode)
 
   return (
     <NodeViewWrapper>
-      {mode === 'edit' ? (
-        <div
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-          className="flex flex-col mt-8 group gap-4"
-        >
-          <Label>Input Name</Label>
-          <p>This will be used to reference this input in your SQL queries.</p>
-          <Input_Shadcn_ value={inputName} onChange={(e) => setInputName(e.target.value)} />
-          <Button
-            onClick={() => {
-              props.updateAttributes({ name: inputName })
-              setMode('view')
+      <div className="border border-border rounded-md px-6 py-4 shadow-sm selection:border-brand-300">
+        {mode === 'edit' ? (
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
             }}
+            className="max-w-xs"
           >
-            Save
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <Label>{inputName}</Label>
-          <Input_Shadcn_
-            value={router.query[inputName]}
-            onChange={(e) => {
-              // Update URL param
+            <Label className="font-medium">Input Name</Label>
+            <Input_Shadcn_
+              className="mt-2"
+              placeholder="Search"
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
+            />
+            <div className="my-2 text-xs text-foreground-lighter">
+              This will be used to reference this input in your SQL queries.
+            </div>
+            <Button
+              className=""
+              onClick={() => {
+                props.updateAttributes({ name: inputName })
+                setMode('view')
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
               router.push({
                 ...router,
                 query: {
                   ...router.query,
-                  [inputName]: e.target.value,
+                  [inputName]: inputValue,
                 },
               })
             }}
-          />
-        </div>
-      )}
+          >
+            <Label>{inputName}</Label>
+            <Input_Shadcn_ value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+            <div className="flex justify-between mt-2 items-center">
+              <div className="text-xs text-foreground-lighter">
+                Reference this input in your SQL queries like this:{' '}
+                <code>
+                  SELECT * FROM <span className="text-brand">{`'{{${inputName}}}'`}</span>
+                </code>
+              </div>
+              <div className="flex gap-2">
+                <Button type="text" htmlType="button" onClick={() => setMode('edit')}>
+                  Edit
+                </Button>
+                <Button htmlType="submit">Submit</Button>
+              </div>
+            </div>
+          </form>
+        )}
+      </div>
     </NodeViewWrapper>
   )
 }
