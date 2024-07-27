@@ -306,9 +306,17 @@
   color: #333 !important;
 }
 
-::selection {
+::selection:not(.ProseMirror *) {
   background-color: #6ee7b7;
   color: #333 !important;
+}
+
+.ProseMirror-selectednode {
+  .node-supa-input,
+  .node-supa-block {
+    outline: 1px solid theme('borderColor.brand.DEFAULT');
+    outline-offset: 2px;
+  }
 }
 
 .has-hidden-children {
