@@ -6,8 +6,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/ssr": "^0.4.1",
+    "@supabase/supabase-js": "^2.44.4",
     "autoprefixer": "10.4.17",
     "geist": "^1.2.1",
     "next": "latest",
