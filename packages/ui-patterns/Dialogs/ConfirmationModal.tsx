@@ -73,7 +73,6 @@ const ConfirmationModal = forwardRef<
       e.stopPropagation()
       setLoading(true)
       onConfirm()
-      onCancel()
     }
 
     return (

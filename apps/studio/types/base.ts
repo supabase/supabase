@@ -78,10 +78,10 @@ export interface Role {
 export interface Permission {
   actions: PermissionAction[]
   condition: jsonLogic.RulesLogic
-  organization_id: number
+  organization_slug: string
   resources: string[]
   restrictive?: boolean
-  project_ids?: number[]
+  project_refs: string[]
 }
 
 export interface ResponseFailure {

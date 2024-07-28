@@ -1,6 +1,7 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import specRealtimeV0 from '~/spec/realtime_v0_config.yaml' assert { type: 'yml' }
 
 const meta = {
@@ -23,7 +24,7 @@ const RealtimeConfigPage = async () => {
         'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/realtime/config.tsx'
       )}
     >
-      <MDXRemoteGuides source={descriptionMdx} />
+      <MDXRemoteBase source={descriptionMdx} />
 
       <div>
         {specRealtimeV0.info.tags.map((tag: ReturnType<typeof specRealtimeV0>['info']['tags']) => {

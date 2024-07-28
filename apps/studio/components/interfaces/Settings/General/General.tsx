@@ -37,7 +37,7 @@ const General = () => {
 
   // Also doubles up as a feature flag to enable display of the related alert,
   // another dedicated flag would be redundant.
-  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl') as string
 
   const v2MaintenanceWindow = project?.v2MaintenanceWindow
   const v2MaintenanceDate = v2MaintenanceWindow?.start

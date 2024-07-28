@@ -4,7 +4,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useContext } from 'react'
 
-export function useFlag<T = any>(name: string) {
+export function useFlag<T = boolean>(name: string) {
   const store: any = useContext(FlagContext)
 
   const isObjectEmpty = (objectName: Object) => {
@@ -19,7 +19,7 @@ export function useFlag<T = any>(name: string) {
 }
 
 export const useIsOptedIntoProjectLevelPermissions = (slug: string) => {
-  const orgsOptedIn = useFlag('projectLevelPermissionsOptIn')
+  const orgsOptedIn = useFlag('projectLevelPermissionsOptIn') as string | undefined
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'

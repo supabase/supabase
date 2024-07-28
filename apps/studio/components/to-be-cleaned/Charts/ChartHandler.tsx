@@ -167,6 +167,9 @@ const ChartHandler = ({
       </div>
       {chartStyle === 'bar' ? (
         <BarChart
+          YAxisProps={{
+            width: 1,
+          }}
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}

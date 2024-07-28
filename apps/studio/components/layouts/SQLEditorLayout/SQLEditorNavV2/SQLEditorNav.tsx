@@ -49,7 +49,8 @@ interface SQLEditorNavProps {
   searchText: string
 }
 
-export const SQLEditorNav = ({ searchText }: SQLEditorNavProps) => {
+export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => {
+  const searchText = _searchText.trim()
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()

@@ -11,7 +11,7 @@ import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
 import OldVersionAlert from './OldVersionAlert'
 import type { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
-import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { SidebarSkeleton, TopNavSkeleton } from '~/layouts/MainSkeleton'
 import MgmtApiOperationSection from '~/components/reference/MgmtApiOperationSection'
 
 interface RefSectionHandlerProps {
@@ -80,66 +80,68 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href={`https://supabase.com${router.basePath}${path}`} />
       </Head>
-      <MainSkeleton menuId={props.menuId}>
-        {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
-        <RefSubLayout>
-          {props.sections.map((section, i) => {
-            const sectionType = section.type
-            switch (sectionType) {
-              case 'markdown':
-                const markdownData = props.pageProps.docs.find((doc) => doc.id === section.id)
+      <TopNavSkeleton>
+        <SidebarSkeleton menuId={props.menuId}>
+          {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
+          <RefSubLayout>
+            {props.sections.map((section, i) => {
+              const sectionType = section.type
+              switch (sectionType) {
+                case 'markdown':
+                  const markdownData = props.pageProps.docs.find((doc) => doc.id === section.id)
 
-                return (
-                  <RefEducationSection
-                    key={section.id + i}
-                    item={section}
-                    markdownContent={markdownData}
-                  />
-                )
-              case 'function':
-                return (
-                  <RefFunctionSection
-                    key={section.id + i}
-                    funcData={section}
-                    commonFuncData={section}
-                    spec={props.spec}
-                    typeSpec={props.typeSpec}
-                  />
-                )
-              case 'cli-command':
-                return (
-                  <CliCommandSection
-                    key={section.id + i}
-                    funcData={section}
-                    commonFuncData={section}
-                  />
-                )
-              case 'operation':
-                if (props.type === 'mgmt-api') {
                   return (
-                    <MgmtApiOperationSection
+                    <RefEducationSection
+                      key={section.id + i}
+                      item={section}
+                      markdownContent={markdownData}
+                    />
+                  )
+                case 'function':
+                  return (
+                    <RefFunctionSection
                       key={section.id + i}
                       funcData={section}
                       commonFuncData={section}
                       spec={props.spec}
+                      typeSpec={props.typeSpec}
                     />
                   )
-                } else {
+                case 'cli-command':
                   return (
-                    <ApiOperationSection
+                    <CliCommandSection
                       key={section.id + i}
                       funcData={section}
                       commonFuncData={section}
-                      spec={props.spec}
                     />
                   )
-                }
-              default:
-                throw new Error(`Unknown common section type '${sectionType}'`)
-            }
-          })}
-        </RefSubLayout>
-      </MainSkeleton>
+                case 'operation':
+                  if (props.type === 'mgmt-api') {
+                    return (
+                      <MgmtApiOperationSection
+                        key={section.id + i}
+                        funcData={section}
+                        commonFuncData={section}
+                        spec={props.spec}
+                      />
+                    )
+                  } else {
+                    return (
+                      <ApiOperationSection
+                        key={section.id + i}
+                        funcData={section}
+                        commonFuncData={section}
+                        spec={props.spec}
+                      />
+                    )
+                  }
+                default:
+                  throw new Error(`Unknown common section type '${sectionType}'`)
+              }
+            })}
+          </RefSubLayout>
+        </SidebarSkeleton>
+      </TopNavSkeleton>
     </>
   )
 }

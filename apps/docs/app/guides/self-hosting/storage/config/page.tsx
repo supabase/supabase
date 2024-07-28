@@ -1,6 +1,7 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import specStorageV0 from '~/spec/storage_v0_config.yaml' assert { type: 'yml' }
 
 const meta = {
@@ -23,7 +24,7 @@ const StorageConfigPage = async () => {
         'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/storage/config.tsx'
       )}
     >
-      <MDXRemoteGuides source={descriptionMdx} />
+      <MDXRemoteBase source={descriptionMdx} />
 
       <div>
         {specStorageV0.info.tags.map((tag: ReturnType<typeof specStorageV0>['info']['tags']) => {
