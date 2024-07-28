@@ -33,13 +33,12 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
   const { mutate: runQuery, isLoading, data } = useExecuteSqlMutation()
 
   useEffect(() => {
-    console.log('executing', router.query)
     execute(sql)
   }, [router.query])
 
   function execute(sql: string) {
     // Variables in SQL will be wrapped in double brackets
-    // Example: SElECT * from {{table name}}
+    // Example: SElECT * from '{{table name}}'
 
     const variablesInSQL = sql
       .match(/{{[^}]+}}/g)
@@ -75,144 +74,142 @@ function SQLTableComponent(props: TiptapNodeViewProps<{ sql: string; type: Block
         }}
         className="flex flex-col mt-8 group h-96 select-none"
       >
-        <>
-          {isLoading ? (
-            <div className="flex-1 p-4 flex-flex-col border rounded-lg overflow-hidden">
-              <GenericSkeletonLoader />
-            </div>
-          ) : (
-            <div className="flex-1 flex-flex-col border rounded-lg overflow-hidden">
-              {mode === 'edit' && (
-                <CodeEditor
-                  value={innerSQL}
-                  onInputChange={(v) => {
-                    setInnerSQL(v || '')
-                    props.updateAttributes({ sql: v || '' })
-                  }}
-                  className="flex-1"
-                  id="sql-block"
-                  language="pgsql"
-                />
-              )}
-              {mode === 'view' && (
-                <>
-                  {type === 'table' && (
-                    <div className="overflow-auto shadow-sm">
-                      <DataGrid
-                        headerRowHeight={24}
-                        className="border-none"
-                        columns={columns}
-                        rows={data?.result || []}
-                      />
-                    </div>
-                  )}
-                  {type === 'chart' && (
-                    <BarChart
-                      className="px-8 py-2"
-                      data={data?.result}
-                      xAxisKey={columns[0]?.key || ''}
-                      yAxisKey={columns[1]?.key || ''}
-                    />
-                  )}
-                  {type === 'json' && <pre>{JSON.stringify(data?.result, null, 2)}</pre>}
-                </>
-              )}
-            </div>
-          )}
-
-          {/** ACTIONS */}
-          <div
-            className={cn(
-              'flex gap-1 justify-end mt-1.5 group-hover:opacity-100 opacity-0 transition-all group-focus-within:opacity-100',
-              {
-                'opacity-100': mode === 'edit',
-                'opacity-50 pointer-events-none': isLoading,
-              }
-            )}
-          >
+        {isLoading ? (
+          <div className="flex-1 p-4 flex-flex-col border rounded-lg overflow-hidden">
+            <GenericSkeletonLoader />
+          </div>
+        ) : (
+          <div className="flex-1 flex-flex-col border rounded-lg overflow-hidden">
             {mode === 'edit' && (
-              <>
-                <Button
-                  type="text"
-                  size="tiny"
-                  className=""
-                  onClick={() => {
-                    setMode('view')
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="primary"
-                  size="tiny"
-                  className=""
-                  onClick={() => {
-                    setMode('view')
-                    execute(innerSQL)
-                  }}
-                >
-                  Save
-                </Button>
-              </>
+              <CodeEditor
+                value={innerSQL}
+                onInputChange={(v) => {
+                  setInnerSQL(v || '')
+                  props.updateAttributes({ sql: v || '' })
+                }}
+                className="flex-1"
+                id="sql-block"
+                language="pgsql"
+              />
             )}
             {mode === 'view' && (
-              <>
-                {showDeleteConfirm ? (
-                  <div className="flex items-center text-xs text-foreground">
-                    Are you sure?
-                    <Button
-                      type="text"
-                      size="tiny"
-                      className="ml-2"
-                      onClick={() => setShowDeleteConfirm(false)}
-                    >
-                      No
-                    </Button>
-                    <Button
-                      type="text"
-                      size="tiny"
-                      className=""
-                      onClick={() => {
-                        props.deleteNode()
-                      }}
-                    >
-                      Yes
-                    </Button>
+              <div>
+                {type === 'table' && (
+                  <div className="overflow-auto shadow-sm">
+                    <DataGrid
+                      headerRowHeight={24}
+                      className="border-none"
+                      columns={columns}
+                      rows={data?.result || []}
+                    />
                   </div>
-                ) : (
+                )}
+                {type === 'chart' && (
+                  <BarChart
+                    className="px-8 py-2"
+                    data={data?.result}
+                    xAxisKey={columns[0]?.key || ''}
+                    yAxisKey={columns[1]?.key || ''}
+                  />
+                )}
+                {type === 'json' && <pre>{JSON.stringify(data?.result, null, 2)}</pre>}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/** ACTIONS */}
+        <div
+          className={cn(
+            'flex gap-1 justify-end mt-1.5 group-hover:opacity-100 opacity-0 transition-all group-focus-within:opacity-100',
+            {
+              'opacity-100': mode === 'edit',
+              'opacity-50 pointer-events-none': isLoading,
+            }
+          )}
+        >
+          {mode === 'edit' && (
+            <>
+              <Button
+                type="text"
+                size="tiny"
+                className=""
+                onClick={() => {
+                  setMode('view')
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                size="tiny"
+                className=""
+                onClick={() => {
+                  setMode('view')
+                  execute(innerSQL)
+                }}
+              >
+                Save
+              </Button>
+            </>
+          )}
+          {mode === 'view' && (
+            <>
+              {showDeleteConfirm ? (
+                <div className="flex items-center text-xs text-foreground">
+                  Are you sure?
+                  <Button
+                    type="text"
+                    size="tiny"
+                    className="ml-2"
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    No
+                  </Button>
                   <Button
                     type="text"
                     size="tiny"
                     className=""
-                    onClick={() => setShowDeleteConfirm(true)}
-                    icon={<Trash2Icon className="w-4 h-4" />}
+                    onClick={() => {
+                      props.deleteNode()
+                    }}
                   >
-                    Delete
+                    Yes
                   </Button>
-                )}
+                </div>
+              ) : (
                 <Button
                   type="text"
-                  onClick={() => {
-                    execute(sql)
-                  }}
-                  icon={<RefreshCwIcon className="w-4 h-4" />}
-                >
-                  Refresh
-                </Button>
-                <Button
-                  type="primary"
                   size="tiny"
                   className=""
-                  onClick={() => {
-                    setMode('edit')
-                  }}
+                  onClick={() => setShowDeleteConfirm(true)}
+                  icon={<Trash2Icon className="w-4 h-4" />}
                 >
-                  Edit block
+                  Delete
                 </Button>
-              </>
-            )}
-          </div>
-        </>
+              )}
+              <Button
+                type="text"
+                onClick={() => {
+                  execute(sql)
+                }}
+                icon={<RefreshCwIcon className="w-4 h-4" />}
+              >
+                Refresh
+              </Button>
+              <Button
+                type="primary"
+                size="tiny"
+                className=""
+                onClick={() => {
+                  setMode('edit')
+                }}
+              >
+                Edit block
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </NodeViewWrapper>
   )
