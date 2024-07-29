@@ -27,6 +27,8 @@ export const IntegrationCategory = {
   storage: 'Storage',
 } as const
 
+type IntegrationCategoryCode = keyof typeof IntegrationCategory
+
 export async function getStaticProps() {
   const response = await fetch(`${API_URL}/integrations-directory`)
   const value = (await response.json()) as components['schemas']['GetIntegrationsDirectoryResponse']
@@ -76,7 +78,9 @@ function IntegrationPartnersPage(props: Props) {
   const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const allCategories = Array.from(
+    new Set(initialPartners?.map((p) => p.category))
+  ) as IntegrationCategoryCode[]
 
   const router = useRouter()
 
