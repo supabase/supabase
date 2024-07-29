@@ -1,6 +1,7 @@
 'use client'
 
 import AuthRateLimits from './auth_rate_limits.mdx'
+import CreateClientSnippet from './create_client_snippet.mdx'
 import DatabaseSetup from './database_setup.mdx'
 import GetSessionWarning from './get_session_warning.mdx'
 import HuggingFaceDeployment from './ai/quickstart_hf_deployment.mdx'
@@ -14,6 +15,7 @@ import SocialProviderSetup from './social_provider_setup.mdx'
 
 export {
   AuthRateLimits,
+  CreateClientSnippet,
   DatabaseSetup,
   GetSessionWarning,
   HuggingFaceDeployment,

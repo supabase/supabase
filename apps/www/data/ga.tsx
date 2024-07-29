@@ -67,7 +67,7 @@ We're committed to our licenses - all of our public repos have OSI-compliant lic
 
 Self-hosting is easier than ever. You can get started in [less than 5 minutes](https://www.youtube.com/watch?v=FqiQKRKsfZE) on a hosted VPS.
 
-We're committed to our free plan - we know the importance of this for testing hobby projects and prototyping. Almost all of the largest databases on Supabase today started on the free plan, a clear indication that our free plan is important for building an enduring platform.
+We're committed to our Free Plan - we know the importance of this for testing hobby projects and prototyping. Almost all of the largest databases on Supabase today started on the Free Plan, a clear indication that our Free Plan is important for building an enduring platform.
 `,
   },
   communityStats: {

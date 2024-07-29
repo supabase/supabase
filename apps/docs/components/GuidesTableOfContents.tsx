@@ -88,6 +88,7 @@ const GuidesTableOfContents = ({
       const headings = Array.from(
         document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
       )
+
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
@@ -99,7 +100,7 @@ const GuidesTableOfContents = ({
 
           return { text, link, level } as Partial<TOCHeader>
         })
-        .filter((x): x is TOCHeader => !!x.text && !!x.link && !!x.level)
+        .filter((x): x is TOCHeader => !!x && !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 

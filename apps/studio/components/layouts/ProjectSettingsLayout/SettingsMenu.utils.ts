@@ -12,6 +12,7 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
+    warehouse?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -20,6 +21,7 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const warehouseEnabled = features?.warehouse ?? false
 
   return [
     {
@@ -105,6 +107,16 @@ export const generateSettingsMenu = (
                 name: 'Edge Functions',
                 key: 'functions',
                 url: `/project/${ref}/settings/functions`,
+                items: [],
+              },
+            ]
+          : []),
+        ...(IS_PLATFORM && warehouseEnabled
+          ? [
+              {
+                name: 'Warehouse',
+                key: 'warehouse',
+                url: `/project/${ref}/settings/warehouse`,
                 items: [],
               },
             ]

@@ -162,7 +162,7 @@ describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (ke
       const option = await screen.findByText('Last 3 days')
       fireEvent.click(option)
     })
-    // only free plan will show modal
+    // only Free Plan will show modal
     if (key === 'free') {
       await screen.findByText('Log retention') // assert modal title is present
     } else {

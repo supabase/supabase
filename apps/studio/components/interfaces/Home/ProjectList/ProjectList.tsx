@@ -14,7 +14,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Plus } from 'lucide-react'
 import type { Organization, ResponseError } from 'types'
@@ -91,7 +91,9 @@ const ProjectList = ({
         <div className="space-y-1">
           {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
           <p className="text-sm text-foreground">
-            No projects found with status as {filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'}
+            {filterStatus.length === 0
+              ? `No projects found`
+              : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
           </p>
           <p className="text-sm text-foreground-light">
             Your search for projects with the specified status did not return any results
@@ -180,9 +182,13 @@ const OrganizationProjects = ({
           )
         })
       : sortedProjects
+
+  // [Joshen] Just a UI thing, but we take all projects other than paused as "active"
   const filteredProjectsByStatus =
     filterStatus !== undefined
-      ? filteredProjects.filter((project) => filterStatus.includes(project.status))
+      ? filterStatus.includes(PROJECT_STATUS.ACTIVE_HEALTHY)
+        ? filteredProjects
+        : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })

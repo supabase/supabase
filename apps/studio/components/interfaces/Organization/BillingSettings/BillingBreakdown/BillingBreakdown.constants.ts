@@ -84,12 +84,4 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     category: 'Edge Functions',
     unitName: 'invocation',
   },
-  {
-    key: PricingMetric.FUNCTION_COUNT,
-    name: 'Edge Function Count',
-    units: 'absolute',
-    anchor: 'funcCount',
-    category: 'Edge Functions',
-    unitName: 'function',
-  },
 ]

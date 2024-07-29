@@ -59,18 +59,18 @@ const RadioGroupStackedItem = React.forwardRef<
       <div className="flex gap-3 w-full px-[21px] py-3">
         {showIndicator && (
           <div
-            className="
-                aspect-square h-4 w-4 
-                rounded-full border group-data-[state=checked]:border-foreground-muted
-                group-focus:border-foreground-muted
-                group-hover:border-foreground-muted
-                ring-offset-background 
-                group-focus:outline-none 
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 
-                group-disabled:cursor-not-allowed group-disabled:opacity-50
-                flex items-center justify-center
-                transition
-          "
+            className={cn(
+              'aspect-square h-4 w-4 min-w-4 min-h-4',
+              'rounded-full border group-data-[state=checked]:border-foreground-muted',
+              'group-focus:border-foreground-muted',
+              'group-hover:border-foreground-muted',
+              'ring-offset-background',
+              'group-focus:outline-none',
+              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              'group-disabled:cursor-not-allowed group-disabled:opacity-50',
+              'flex items-center justify-center',
+              'transition'
+            )}
           >
             <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
               <Circle className="h-2.5 w-2.5 fill-current text-current" />

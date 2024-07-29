@@ -1,63 +1,15 @@
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { ExternalLink } from 'lucide-react'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { MDXRemote } from 'next-mdx-remote/rsc'
-import { type ComponentProps, type ReactNode } from 'react'
-import remarkGfm from 'remark-gfm'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
+import { type ReactNode } from 'react'
+
 import { cn } from 'ui'
+
+import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { components } from '~/features/docs/mdx.shared'
+import { MDXProviderGuides } from '~/features/docs/GuidesMdx.client'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
-import { MDXProviderGuides } from './GuidesMdx.client'
-
-const codeHikeOptions: CodeHikeConfig = {
-  theme: codeHikeTheme,
-  lineNumbers: true,
-  showCopyButton: true,
-  skipLanguages: [],
-  autoImport: false,
-}
-
-const mdxOptions: SerializeOptions = {
-  mdxOptions: {
-    useDynamicImport: true,
-    remarkPlugins: [
-      [remarkMath, { singleDollarTextMath: false }],
-      remarkGfm,
-      [remarkCodeHike, codeHikeOptions],
-    ],
-    rehypePlugins: [rehypeKatex as any],
-  },
-}
-
-const MDXRemoteGuides = ({ options = {}, ...props }: ComponentProps<typeof MDXRemote>) => {
-  const { mdxOptions: { remarkPlugins, rehypePlugins, ...otherMdxOptions } = {}, ...otherOptions } =
-    options
-  const {
-    mdxOptions: {
-      remarkPlugins: originalRemarkPlugins,
-      rehypePlugins: originalRehypePlugins,
-      ...originalMdxOptions
-    } = {},
-  } = mdxOptions
-
-  const finalOptions = {
-    ...mdxOptions,
-    ...otherOptions,
-    mdxOptions: {
-      ...originalMdxOptions,
-      ...otherMdxOptions,
-      remarkPlugins: [...(originalRemarkPlugins ?? []), ...(remarkPlugins ?? [])],
-      rehypePlugins: [...(originalRehypePlugins ?? []), ...(rehypePlugins ?? [])],
-    },
-  } as SerializeOptions
-
-  return <MDXRemote components={components} options={finalOptions} {...props} />
-}
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -120,6 +72,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
         )}
       >
+        <Breadcrumbs className="mb-2" />
         <article
           // Used to get headings for the table of contents
           id="sb-docs-guide-main-article"
@@ -131,7 +84,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           )}
           <hr className="not-prose border-t-0 border-b my-8" />
           <MDXProviderGuides>
-            {content && <MDXRemoteGuides source={content} options={mdxOptions} />}
+            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
           </MDXProviderGuides>
           {children}
           <footer className="mt-16 not-prose">
@@ -163,11 +116,11 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             /**
              * --header-height: height of nav
              * 1px: height of nav border
-             * 4rem: content padding
+             * 2rem: content padding
              */
-            'top-[calc(var(--header-height)+1px+4rem)]',
-            // 5rem accounts for 4rem of top padding + 1rem of extra breathing room
-            'max-h-[calc(100vh-var(--header-height)-5rem)]'
+            'top-[calc(var(--header-height)+1px+2rem)]',
+            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-3rem)]'
           )}
         />
       )}
@@ -175,4 +128,4 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
   )
 }
 
-export { GuideTemplate, MDXRemoteGuides, newEditLink }
+export { GuideTemplate, newEditLink }
