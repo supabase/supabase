@@ -276,24 +276,11 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   As a completely remote and asynchronous team, we focus on these five traits to
                   keep our team effective:
                 </p>
-                <div className="grid pt-10 gap-8 grid-cols-2 md:grid-cols-3 lg:gap-12 lg:grid-cols-5">
+                <div className="grid pt-10 gap-8 grid-cols-2 md:grid-cols-3 lg:gap-16 lg:grid-cols-5">
                   {career.humanPowered.map(
                     (human: { icon: string; title: string; text: string }, i: number) => {
                       return (
                         <div key={i} className="flex flex-col gap-3">
-                          <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg flex items-center">
-                            <div className="relative w-full h-full mx-auto">
-                              <Image
-                                src={`/images/career/icons/${human.icon}${
-                                  resolvedTheme?.includes('dark') ? '-light' : '-dark'
-                                }.svg`}
-                                className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
-                                alt={`${human.icon} icon`}
-                                layout="fill"
-                                objectFit="fill"
-                              />
-                            </div>
-                          </div>
                           <div>
                             <h2 className="text-base">{human.title}</h2>
                             <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
@@ -306,18 +293,6 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               </SectionContainer>
 
               <SectionContainer className="!pb-0">
-                <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
-                  <div className="relative w-full h-full mx-auto">
-                    <Image
-                      src={`/images/career/icons/open_source${
-                        resolvedTheme?.includes('dark') ? '-dark' : '-light'
-                      }.svg`}
-                      alt="open source icon"
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                </div>
                 <div className="text-center">
                   <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
                     1,000 + Contributors building Supabase
@@ -406,18 +381,6 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
           </SectionContainer>
 
           <SectionContainer>
-            <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
-              <div className="relative w-full h-full mx-auto">
-                <Image
-                  src={`/images/career/icons/jobs${
-                    resolvedTheme?.includes('dark') ? '-dark' : '-light'
-                  }.svg`}
-                  alt="jobs icon"
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-            </div>
             <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
               <p className="text-xs sm:text-sm lg:text-base text-foreground-light pt-3">
