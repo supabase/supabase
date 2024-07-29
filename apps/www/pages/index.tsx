@@ -1,3 +1,7 @@
+// Import Swiper styles if swiper used on page
+import 'swiper/swiper.min.css'
+
+import supabase from '../lib/supabase'
 import dynamic from 'next/dynamic'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
@@ -7,12 +11,18 @@ const Products = dynamic(() => import('~/components/Products/index'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
+const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
+const Integrations = dynamic(() => import('~/components/Sections/Integrations'))
+const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
+const Products = dynamic(() => import('~/components/Products/index'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
-const Index = () => {
+type Props = { integrations: any[] }
+
+const Index = ({ integrations }: Props) => {
   return (
     <Layout>
       <Hero />
@@ -21,6 +31,7 @@ const Index = () => {
       <BuiltExamples />
       <MadeForDevelopers />
       <AdminAccess />
+      <Integrations {...content.integrations} integrations={integrations} />
       <CustomerStories />
       <CTABanner />
       <ReactTooltip
@@ -33,6 +44,19 @@ const Index = () => {
       />
     </Layout>
   )
+}
+
+export async function getStaticProps() {
+  const { data: integrations } = await supabase
+    .from('partners')
+    .select('*')
+    .in('slug', content.integrations.featuredIntegrations)
+
+  return {
+    props: {
+      integrations,
+    },
+  }
 }
 
 export default Index
