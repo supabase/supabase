@@ -24,12 +24,12 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CriticalIcon,
   Form,
   Input,
   Modal,
   Toggle,
 } from 'ui'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 

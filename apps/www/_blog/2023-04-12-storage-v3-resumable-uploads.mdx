@@ -27,7 +27,7 @@ Resumable uploads divides the file into chunks before uploading them, emitting p
   />
 </video>
 
-With this release, users on the Pro plan or higher can now upload files as large as 50GB! This substantial upgrade from the previous limit of 5GB offers even more flexibility for your file uploads.
+With this release, users on the Pro Plan or higher can now upload files as large as 50GB! This substantial upgrade from the previous limit of 5GB offers even more flexibility for your file uploads.
 
 To build this feature, we implemented Postgres Advisory locks which solved some gnarly concurrency problems. We can now handle edge-cases, like two clients uploading to the same location. We’ll deep dive into how we implemented Advisory locks later in the post.
 

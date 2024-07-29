@@ -225,6 +225,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 id="connection-string"
                 checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
+                ipv4AddonAdded={!!ipv4Addon}
                 onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />

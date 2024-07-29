@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -15,20 +15,9 @@ import { Content, useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Menu,
-  cn,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ReportMenuItem } from './ReportMenuItem'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -38,10 +27,6 @@ const ReportsMenu = () => {
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
   const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
-  const canUpdateCustomReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -164,52 +149,19 @@ const ReportsMenu = () => {
               <Menu.Group
                 title={<span className="uppercase font-mono">Your custom reports</span>}
               />
-              {reportMenuItems.map((item, idx) => (
-                <Link
-                  className={cn(
-                    'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                    'flex items-center justify-between rounded-md group relative',
-                    item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:bg-surface-200'
-                  )}
-                  key={item.key + '-menukey'}
-                  href={item.url}
-                >
-                  <div>{item.name}</div>
-
-                  {canUpdateCustomReport && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button
-                          type="text"
-                          className="px-1 opacity-50 hover:opacity-100"
-                          icon={<ChevronDown size={12} strokeWidth={2} />}
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-52 *:space-x-2">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            if (!item.id) return
-                            setSelectedReportToUpdate(item.report)
-                          }}
-                        >
-                          <Edit2 size={12} />
-                          <div>Rename</div>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={async () => {
-                            if (!item.id) return
-                            setSelectedReportToDelete(item.report)
-                            setDeleteModalOpen(true)
-                          }}
-                        >
-                          <Trash size={12} />
-                          <div>Delete</div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </Link>
+              {reportMenuItems.map((item) => (
+                <ReportMenuItem
+                  key={item.id}
+                  item={item}
+                  pageKey={pageKey}
+                  onSelectEdit={() => {
+                    setSelectedReportToUpdate(item.report)
+                  }}
+                  onSelectDelete={() => {
+                    setSelectedReportToDelete(item.report)
+                    setDeleteModalOpen(true)
+                  }}
+                />
               ))}
             </div>
           ) : null}

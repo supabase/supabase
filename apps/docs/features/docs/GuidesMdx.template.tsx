@@ -1,64 +1,15 @@
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { ExternalLink } from 'lucide-react'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { MDXRemote } from 'next-mdx-remote/rsc'
-import { type ComponentProps, type ReactNode } from 'react'
-import remarkGfm from 'remark-gfm'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
+import { type ReactNode } from 'react'
+
 import { cn } from 'ui'
+
+import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { components } from '~/features/docs/mdx.shared'
+import { MDXProviderGuides } from '~/features/docs/GuidesMdx.client'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
-import { MDXProviderGuides } from './GuidesMdx.client'
-import Breadcrumbs from '~/components/Breadcrumbs'
-
-const codeHikeOptions: CodeHikeConfig = {
-  theme: codeHikeTheme,
-  lineNumbers: true,
-  showCopyButton: true,
-  skipLanguages: [],
-  autoImport: false,
-}
-
-const mdxOptions: SerializeOptions = {
-  mdxOptions: {
-    useDynamicImport: true,
-    remarkPlugins: [
-      [remarkMath, { singleDollarTextMath: false }],
-      remarkGfm,
-      [remarkCodeHike, codeHikeOptions],
-    ],
-    rehypePlugins: [rehypeKatex as any],
-  },
-}
-
-const MDXRemoteGuides = ({ options = {}, ...props }: ComponentProps<typeof MDXRemote>) => {
-  const { mdxOptions: { remarkPlugins, rehypePlugins, ...otherMdxOptions } = {}, ...otherOptions } =
-    options
-  const {
-    mdxOptions: {
-      remarkPlugins: originalRemarkPlugins,
-      rehypePlugins: originalRehypePlugins,
-      ...originalMdxOptions
-    } = {},
-  } = mdxOptions
-
-  const finalOptions = {
-    ...mdxOptions,
-    ...otherOptions,
-    mdxOptions: {
-      ...originalMdxOptions,
-      ...otherMdxOptions,
-      remarkPlugins: [...(originalRemarkPlugins ?? []), ...(remarkPlugins ?? [])],
-      rehypePlugins: [...(originalRehypePlugins ?? []), ...(rehypePlugins ?? [])],
-    },
-  } as SerializeOptions
-
-  return <MDXRemote components={components} options={finalOptions} {...props} />
-}
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -133,7 +84,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           )}
           <hr className="not-prose border-t-0 border-b my-8" />
           <MDXProviderGuides>
-            {content && <MDXRemoteGuides source={content} options={mdxOptions} />}
+            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
           </MDXProviderGuides>
           {children}
           <footer className="mt-16 not-prose">
@@ -177,4 +128,4 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
   )
 }
 
-export { GuideTemplate, MDXRemoteGuides, newEditLink }
+export { GuideTemplate, newEditLink }
