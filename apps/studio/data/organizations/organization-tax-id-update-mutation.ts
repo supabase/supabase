@@ -7,7 +7,7 @@ import { put, del, handleError } from 'data/fetchers'
 
 export type OrganizationTaxIdUpdateVariables = {
   slug: string
-  taxId: { type: string; value: string } | null
+  taxId: { type: string; value: string; country?: string } | null
 }
 
 export async function updateOrganizationTaxId({ slug, taxId }: OrganizationTaxIdUpdateVariables) {
@@ -22,7 +22,7 @@ export async function updateOrganizationTaxId({ slug, taxId }: OrganizationTaxId
           slug,
         },
       },
-      body: { type: taxId.type, value: taxId.value },
+      body: { type: taxId.type, value: taxId.value, country: taxId.country },
     })
 
     if (error) handleError(error)

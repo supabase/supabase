@@ -1,6 +1,7 @@
-import { useParams } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
+import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
@@ -11,6 +12,14 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Badge,
   Button,
@@ -20,12 +29,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
-
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
-import { MoreVertical } from 'lucide-react'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 
@@ -51,6 +58,7 @@ const MapView = ({
     y: number
     region: { key: string; country?: string; name?: string }
   }>()
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -310,12 +318,22 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-x-2"
-                              onClick={() => onSelectDropReplica(database)}
-                            >
-                              Drop replica
-                            </DropdownMenuItem>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild>
+                                <DropdownMenuItem
+                                  className="gap-x-2 !pointer-events-auto"
+                                  disabled={!canManageReplicas}
+                                  onClick={() => onSelectDropReplica(database)}
+                                >
+                                  Drop replica
+                                </DropdownMenuItem>
+                              </TooltipTrigger_Shadcn_>
+                              {!canManageReplicas && (
+                                <TooltipContent_Shadcn_ side="left">
+                                  You need additional permissions to drop replicas
+                                </TooltipContent_Shadcn_>
+                              )}
+                            </Tooltip_Shadcn_>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
@@ -331,9 +349,19 @@ const MapView = ({
               databasesInSelectedRegion.length > 0 ? 'border-t' : ''
             }`}
           >
-            <Button type="default" onClick={() => onSelectDeployNewReplica(selectedRegion.key)}>
+            <ButtonTooltip
+              type="default"
+              disabled={!canManageReplicas}
+              onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to deploy replicas',
+                },
+              }}
+            >
               Deploy new replica here
-            </Button>
+            </ButtonTooltip>
             <Button
               type="default"
               onClick={() => {

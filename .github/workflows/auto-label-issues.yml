@@ -5,61 +5,41 @@ on:
 jobs:
   check-external:
     runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.is-member.outputs.result }}
+    permissions:
+      issues: write
     steps:
-    - name: Get deps
-      run: |
-        sudo apt-get update && sudo apt-get install -y jq
-    - name: Get org members
-      id: is-member
-      env:
-        GH_ORG: supabase
-        GH_USER: ${{ github.event.issue.user.login }}
-        GH_TOKEN: ${{ secrets.SB_ORG_MEMBERSHIP_PAT }}
-      run: |
-        gh api /orgs/supabase/members/$GH_USER
-    - if: failure()
-      name: is-member
-      run: |
-        echo "User is not a member of Supabase org"
-        echo "result=false" >> "$GITHUB_OUTPUT"
-    - if: success()
-      run: |
-        echo "User is a member of Supabase org"
-        echo "result=true" >> "$GITHUB_OUTPUT"
-    - name: Label contributor
-      id: label-contributor
-      if:  ${{ steps.is-member.outputs.result == 'false' }}
+    - name: Check if organization member
+      id: is-org-member
+      uses: JamesSingleton/is-organization-member@1.0.0
+      with:
+        organization: ${{ github.repository_owner }}
+        username: ${{ github.event.issue.user.login }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: label-member
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USERNAME: ${{ github.event.issue.user.login }}
         GH_REPO: ${{ github.repository }}
         NUMBER: ${{ github.event.issue.number }}
-        LABELS: external-issue
       run: |
-        echo "applying external label"
-        gh issue edit $NUMBER --add-label $LABELS
-    - name: Label internal
-      id: label-internal
-      if:  ${{ steps.is-member.outputs.result == 'true' }}
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USERNAME: ${{ github.event.issue.user.login }}
-        GH_REPO: ${{ github.repository }}
-        NUMBER: ${{ github.event.issue.number }}
-        LABELS: internal-issue
-      run: |
-        echo "applying internal label"
-        gh issue edit $NUMBER --add-label $LABELS
+        if [ ${{ steps.is-org-member.outputs.result }} != "true" ]; then
+          echo "User is outside of organization, labeling external"
+          gh issue edit "$NUMBER" --add-label "external-issue"
+        else
+          echo "User is within the organization, labeling internal"
+          gh issue edit "$NUMBER" --add-label "internal-issue"
+        fi
   triage-new:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Label triage
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.issue.number }}
           LABELS: to-triage
         run: |
-          echo "applying triage label"
-          gh issue edit $NUMBER --add-label $LABELS
+          echo "Applying triage label for new issue"
+          gh issue edit "$NUMBER" --add-label "$LABELS"
+

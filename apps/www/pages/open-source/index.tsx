@@ -1,3 +1,5 @@
+import 'swiper/css'
+
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
@@ -10,9 +12,6 @@ import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
 
 import pageData from '~/data/open-source'
-
-// Import Swiper styles if swiper used on page
-import 'swiper/css'
 
 const OpenSource = () => {
   const router = useRouter()

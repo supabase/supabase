@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -45,6 +45,10 @@ const UpgradingState = () => {
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const isCompleted = status === DatabaseUpgradeStatus.Upgraded
+
+  const isPerformingFullPhysicalBackup =
+    status === DatabaseUpgradeStatus.Upgrading &&
+    progress === DatabaseUpgradeProgress.CompletedUpgrade
 
   const initiatedAtUTC = dayjs.utc(initiated_at ?? 0).format('DD MMM YYYY HH:mm:ss')
   const initiatedAt = dayjs
@@ -123,11 +127,26 @@ const UpgradingState = () => {
                   <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-center">Upgrading in progress</p>
-                  <p className="text-sm text-center text-foreground-light">
-                    Upgrades can take from a few minutes up to several hours depending on the size
-                    of your database. Your project will be offline while it is being upgraded.
-                  </p>
+                  {isPerformingFullPhysicalBackup ? (
+                    <div>
+                      <p className="text-center">Performing a full backup</p>
+                      <p className="text-sm text-center text-foreground-light">
+                        Upgrade is now complete, and your project is online. A full backup is now
+                        being performed to ensure that there is a proper base backup available
+                        post-upgrade. This can take from a few minutes up to several hours depending
+                        on the size of your database.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-center">Upgrading in progress</p>
+                      <p className="text-sm text-center text-foreground-light">
+                        Upgrades can take from a few minutes up to several hours depending on the
+                        size of your database. Your project will be offline while it is being
+                        upgraded.
+                      </p>
+                    </div>
+                  )}
 
                   <div
                     className="!mt-4 !mb-2 py-3 px-4 transition-all overflow-hidden border rounded relative"

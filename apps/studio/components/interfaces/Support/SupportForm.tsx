@@ -1,4 +1,5 @@
-import { CLIENT_LIBRARIES } from 'common/constants'
+import * as Sentry from '@sentry/nextjs'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   AlertCircle,
   Book,
@@ -13,6 +14,10 @@ import {
   Plus,
   X,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import {
   DocsSearchResultType as PageType,
@@ -21,9 +26,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-
-import * as Sentry from '@sentry/nextjs'
-
+import { CLIENT_LIBRARIES } from 'common/constants'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -32,16 +35,10 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
+import { useFlag } from 'hooks/ui/useFlag'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -54,12 +51,12 @@ import {
   Separator,
   cn,
 } from 'ui'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-
-import { TextHighlighter } from 'ui-patterns/Cmdk/Command.utils'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -70,7 +67,12 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) => {
-  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
+  const supabaseClient = useSupabaseClient()
+  const {
+    handleDocsSearchDebounced,
+    searchState,
+    searchState: state,
+  } = useDocsSearch(supabaseClient)
   const [subject, setSubject] = useState('')
   const [docsResults, setDocsResults] = useState<Page[]>([])
 
@@ -667,9 +669,9 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                       <div className="space-y-4 mb-1">
                         {subscription?.plan.id === 'free' && (
                           <p>
-                            Free plan support is available within the community and officially by
+                            Free Plan support is available within the community and officially by
                             the team on a best efforts basis. For a guaranteed response we recommend
-                            upgrading to the Pro plan. Enhanced SLAs for support are available on
+                            upgrading to the Pro Plan. Enhanced SLAs for support are available on
                             our Enterprise Plan.
                           </p>
                         )}
@@ -678,7 +680,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
                           <p>
                             Pro Plan includes email-based support. You can expect an answer within 1
                             business day in most situations for all severities. We recommend
-                            upgrading to the Team plan for prioritized ticketing on all issues and
+                            upgrading to the Team Plan for prioritized ticketing on all issues and
                             prioritized escalation to product engineering teams. Enhanced SLAs for
                             support are available on our Enterprise Plan.
                           </p>
@@ -686,7 +688,7 @@ const SupportForm = ({ setSentCategory, setSelectedProject }: SupportFormProps) 
 
                         {subscription?.plan.id === 'team' && (
                           <p>
-                            Team plan includes email-based support. You get prioritized ticketing on
+                            Team Plan includes email-based support. You get prioritized ticketing on
                             all issues and prioritized escalation to product engineering teams. Low,
                             Normal, and High severity tickets will generally be handled within 1
                             business day, while Urgent issues, we respond within 1 day, 365 days a

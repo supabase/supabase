@@ -18,6 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type ResultsDropdownProps = {
   id: string
@@ -25,9 +27,13 @@ export type ResultsDropdownProps = {
 
 const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
-  const snap = useSqlEditorStateSnapshot()
   const telemetryProps = useTelemetryProps()
-  const result = snap.results?.[id]?.[0] ?? undefined
+
+  const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
+
+  const result = enableFolders ? snapV2.results?.[id]?.[0] : snap.results?.[id]?.[0] ?? undefined
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
   const router = useRouter()
 
@@ -130,7 +136,11 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         className="hidden"
         headers={headers}
         data={csvData}
-        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`}
+        filename={
+          enableFolders
+            ? `supabase_${project?.ref}_${snapV2.snippets[id]?.snippet.name}.csv`
+            : `supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`
+        }
       />
 
       <DropdownMenuContent side="bottom" align="start">

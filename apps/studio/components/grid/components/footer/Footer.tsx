@@ -1,17 +1,16 @@
-import { Pagination } from './pagination'
-import useTable from 'hooks/misc/useTable'
 import { useParams } from 'common'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useUrlState } from 'hooks'
-import RefreshButton from '../header/RefreshButton'
 import { GridFooter } from 'components/ui/GridFooter'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import useTable from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import RefreshButton from '../header/RefreshButton'
+import { Pagination } from './pagination'
 
 export interface FooterProps {
-  isLoading?: boolean
   isRefetching?: boolean
 }
 
-const Footer = ({ isLoading, isRefetching }: FooterProps) => {
+const Footer = ({ isRefetching }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: selectedTable } = useTable(id)
@@ -30,7 +29,7 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
     <GridFooter>
       {selectedView === 'data' && <Pagination />}
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-x-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
         )}

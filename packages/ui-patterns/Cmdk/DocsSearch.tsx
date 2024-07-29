@@ -1,3 +1,6 @@
+'use client'
+
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
@@ -5,12 +8,11 @@ import {
   useDocsSearch,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
-import { Button } from 'ui'
+import { Button, StatusIcon } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
-import { StatusIcon } from '../Icons/StatusIcons'
+import { useCommandMenu } from './CommandMenuContext'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -22,12 +24,13 @@ const questions = [
 ]
 
 const DocsSearch = () => {
+  const supabaseClient = useSupabaseClient()
   const {
     searchState: state,
     handleDocsSearch: handleSearch,
     handleDocsSearchDebounced: debouncedSearch,
     resetSearch,
-  } = useDocsSearch()
+  } = useDocsSearch(supabaseClient)
   const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const initialLoad = useRef(true)
   const router = useRouter()

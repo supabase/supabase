@@ -1,11 +1,35 @@
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+'use client'
+
+import type {
+  Branch,
+  Org,
+  Project,
+  Variable,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
+import type { ProjectApiData } from '~/lib/fetch/projectApi'
+
+import { Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
-import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn, IconCopy, IconCheck } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn } from 'ui'
+
+import {
+  ComboBox,
+  ComboBoxOption,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
+import {
+  fromBranchValue,
+  fromOrgProjectValue,
+  prettyFormatVariable,
+  toBranchValue,
+  toDisplayNameOrgProject,
+  toOrgProjectValue,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import { useCopy } from '~/hooks/useCopy'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
@@ -13,20 +37,6 @@ import { useProjectApiQuery } from '~/lib/fetch/projectApi'
 import { useProjectsQuery } from '~/lib/fetch/projects'
 import { LOCAL_STORAGE_KEYS, retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
-
-import { ComboBox, ComboBoxOption } from './ProjectConfigVariables.ComboBox'
-import {
-  type Branch,
-  type Org,
-  type Project,
-  type Variable,
-  fromBranchValue,
-  fromOrgProjectValue,
-  prettyFormatVariable,
-  toBranchValue,
-  toDisplayNameOrgProject,
-  toOrgProjectValue,
-} from './ProjectConfigVariables.utils'
 
 type ProjectOrgDataState =
   | 'userLoading'
@@ -61,7 +71,6 @@ const projectsStore = proxy({
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
     projectsStore.selectedProject = project
-    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project?.ref)
   },
   selectedBranch: null as Branch | null,
@@ -114,7 +123,6 @@ function OrgProjectSelector() {
         : projects.map((project) => {
             const organization = organizations.find((org) => org.id === project.organization_id)
             return {
-              // @ts-ignore -- problem in OpenAPI spec -- project has ref property
               id: project.ref,
               value: toOrgProjectValue(organization, project),
               displayName: toDisplayNameOrgProject(organization, project),
@@ -131,9 +139,7 @@ function OrgProjectSelector() {
       let storedOrg: Org
       let storedProject: Project
       if (storedMaybeOrgId && storedMaybeProjectRef) {
-        // @ts-ignore -- problem in OpenAPI spec -- org id is returned as number, not string
         storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
-        // @ts-ignore -- problem in OpenAPI spec -- project has ref property
         storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
       }
 
@@ -165,7 +171,6 @@ function OrgProjectSelector() {
         if (!orgId || !projectRef) return
 
         const org = organizations.find((org) => org.id === orgId)
-        // @ts-ignore -- problem in OpenAPI spec -- project has ref property
         const project = projects.find((project) => project.ref === projectRef)
 
         if (org && project && project.organization_id === org.id) {
@@ -182,11 +187,9 @@ function BranchSelector() {
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
 
-  // @ts-ignore -- problem in OpenAPI spec -- project has is_branch_enabled property
   const hasBranches = selectedProject?.is_branch_enabled ?? false
 
   const { data, isPending, isError } = useBranchesQuery(
-    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     { projectRef: selectedProject?.ref },
     { enabled: isLoggedIn && hasBranches }
   )
@@ -263,9 +266,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
 
   const { selectedProject, selectedBranch } = useSnapshot(projectsStore)
 
-  // @ts-ignore -- problem in OpenAPI spec -- project has is_branch-enabled property
   const hasBranches = selectedProject?.is_branch_enabled ?? false
-  // @ts-ignore -- problem in OpenAPI spec -- project has ref property
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
   const {
@@ -279,6 +280,17 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     { enabled: isLoggedIn && !!ref }
   )
 
+  function isInvalid(apiData: ProjectApiData) {
+    switch (variable) {
+      case 'url':
+        return !apiData.autoApiService.endpoint
+      case 'anonKey':
+        // If the anon key is not available, the backend may return the string:
+        // You're using an older version of Supabase. Create a new project for the latest Auth features.
+        return /older version/.test(apiData.autoApiService.defaultApiKey)
+    }
+  }
+
   const stateSummary: VariableDataState = isUserLoading
     ? 'userLoading'
     : !isLoggedIn
@@ -287,7 +299,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : isPending
           ? 'loggedIn.selectedProject.dataPending'
-          : isError
+          : isError || isInvalid(apiData)
             ? 'loggedIn.selectedProject.dataError'
             : 'loggedIn.selectedProject.dataSuccess'
 
@@ -331,7 +343,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             onClick={handleCopy}
             aria-label="Copy"
           >
-            {copied ? <IconCheck /> : <IconCopy />}
+            {copied ? <Check /> : <Copy />}
           </Button>
         </CopyToClipboard>
       </div>
