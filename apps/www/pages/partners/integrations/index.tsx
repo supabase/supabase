@@ -32,7 +32,7 @@ type IntegrationCategoryCode = keyof typeof IntegrationCategory
 export async function getStaticProps() {
   const response = await fetch(`${API_URL}/integrations-directory`)
   const value = (await response.json()) as components['schemas']['GetIntegrationsDirectoryResponse']
-  const entries = value.entries
+  const entries = value.entries || []
 
   const { data: partners } = await supabase
     .from('partners')
@@ -47,7 +47,7 @@ export async function getStaticProps() {
     const found = entries.find((entry) => entry.title === partner.title)
     if (!found) {
       const category = Object.entries(IntegrationCategory).find(([k, v]) => v === partner.category)
-      const keyCategory = (category ? category[0] : 'api') as keyof typeof IntegrationCategory
+      const keyCategory = (category ? category[0] : 'api') as IntegrationCategoryCode
 
       const toInsert = {
         ...partner,
