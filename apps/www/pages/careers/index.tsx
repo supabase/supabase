@@ -111,9 +111,11 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
-            <a href="#positions">
-              <Button className="text-white xl:text-sm mt-4">Open positions</Button>
-            </a>
+            <div className="mt-4">
+              <a href="#positions">
+                <Button type="primary">Open positions</Button>
+              </a>
+            </div>
           </div>
 
           <SectionContainer>
@@ -283,7 +285,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
-                                  resolvedTheme?.includes('dark') ? '-dark' : '-light'
+                                  resolvedTheme?.includes('dark') ? '-light' : '-dark'
                                 }.svg`}
                                 className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
                                 alt={`${human.icon} icon`}
@@ -384,28 +386,13 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   Great people deserve great benefits
                 </h2>
               </div>
-              <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-6">
+              <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-16">
                 {career.benefits.map(
                   (benefits: { icon: string; title: string; text: string }, i: number) => {
                     return (
-                      <div
-                        className="h-full bg-surface-75 drop-shadow-sm border border-muted p-6 rounded-lg flex items-start space-x-6 w-full"
-                        key={i}
-                      >
-                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12 aspect-square rounded-lg flex items-center">
-                          <div className="relative w-full h-full mx-auto">
-                            <Image
-                              src={`/images/career/icons/${benefits.icon}${
-                                resolvedTheme?.includes('dark') ? '-dark' : '-light'
-                              }.svg`}
-                              alt={`${benefits.icon} icon`}
-                              layout="fill"
-                              objectFit="cover"
-                            />
-                          </div>
-                        </div>
+                      <div className="h-full flex items-start space-x-6 w-full" key={i}>
                         <div className="h-fit text-sm lg:text-base">
-                          <h2 className="text-base">{benefits.title}</h2>
+                          <h2 className="text-sm">{benefits.title}</h2>
                           <ReactMarkdown className="prose pt-1 text-sm">
                             {benefits.text}
                           </ReactMarkdown>
@@ -499,10 +486,10 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                         key={i}
                         className="
                         first-of-type:rounded-t-md last-of-type:rounded-b-md
-                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7 
-                        flex flex-col md:flex-row 
+                        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7
+                        flex flex-col md:flex-row
                         md:items-center
-                        transition hover:bg-surface-100 
+                        transition hover:bg-surface-100
                         hover:cursor-pointer"
                       >
                         <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">
