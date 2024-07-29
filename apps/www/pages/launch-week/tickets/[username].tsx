@@ -107,11 +107,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
-  fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-ticket-og?username=${encodeURIComponent(
-      username ?? ''
-    )}`
-  )
+  supabaseAdmin.functions.invoke(`lw12-ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // fetch a specific user
   if (username) {
@@ -126,7 +122,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
-  const ogImageUrl = `https://deulbcctwgmwupazcfmd.supabase.co/storage/v1/object/public/images/launch-week/lw12/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {
