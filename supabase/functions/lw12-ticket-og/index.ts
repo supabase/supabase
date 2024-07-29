@@ -8,6 +8,4 @@ import { handler } from './handler.tsx'
 
 console.log(`Function "lw12-ticket-og" up and running`)
 
-console.log(`force update`)
-
 serve(handler)
