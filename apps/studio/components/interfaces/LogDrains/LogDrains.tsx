@@ -26,6 +26,7 @@ import { MoreHorizontal, Pen, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
+import AlertError from 'components/ui/AlertError'
 
 export function LogDrains({
   onNewDrainClick,
@@ -37,7 +38,7 @@ export function LogDrains({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
-  const { data: logDrains, isLoading, refetch } = useLogDrainsQuery({ ref })
+  const { data: logDrains, isLoading, refetch, error, isError } = useLogDrainsQuery({ ref })
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
@@ -71,6 +72,9 @@ export function LogDrains({
     )
   }
 
+  if (isError) {
+    return <AlertError error={error}></AlertError>
+  }
   return (
     <>
       <Panel className="">
@@ -89,8 +93,8 @@ export function LogDrains({
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
                 <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.source}</TableCell>
-                <TableCell>{new Date(drain.inserted_at).toLocaleString()}</TableCell>
+                <TableCell>{drain.type}</TableCell>
+                {/* <TableCell>{new Date(drain).toLocaleString()}</TableCell> */}
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

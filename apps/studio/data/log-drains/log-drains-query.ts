@@ -9,42 +9,20 @@ export type LogDrainsVariables = {
 }
 
 export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSignal) {
-  //   const { data, error } = await get(`/todo-add-endpoint`, {
-  //     params: { path: { ref: ref } },
-  //     signal,
-  //   })
+  if (!ref) {
+    throw new Error('ref is required')
+  }
 
-  //   if (error) {
-  //     handleError(error)
-  //   }
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/log-drains`, {
+    params: { path: { ref: ref } },
+    signal,
+  })
 
-  //   return data;
+  if (error) {
+    handleError(error)
+  }
 
-  // return [
-  //   {
-  //       config: {},
-  //       id: 12,
-  //       inserted_at: '2021-10-14T14:00:00.000000Z',
-  //       name: 'DataDog',
-  //       token: '1234567890',
-  //       updated_at: '2021-10-14T14:00:00.000000Z',
-  //     },
-  //   ]
-
-  // return from localstorage for now
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
-
-  return logDrains as {
-    config: Record<string, any>
-    id: number
-    source: LogDrainSource
-    inserted_at: string
-    name: string
-    token: string
-    updated_at: string
-  }[]
+  return data
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
