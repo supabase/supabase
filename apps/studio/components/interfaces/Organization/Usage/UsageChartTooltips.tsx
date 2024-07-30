@@ -4,7 +4,7 @@ import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
   value: any
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
