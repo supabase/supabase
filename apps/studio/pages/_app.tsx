@@ -167,7 +167,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
                         <AppBannerContextProvider>
                           <CommandMenuWrapper>
                             <AppBannerWrapper>
