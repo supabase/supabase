@@ -47,6 +47,14 @@
         {
           "label": "Backups",
           "url": "/project/_/database/backups/scheduled"
+        },
+        {
+          "label": "Wrappers",
+          "url": "/project/_/database/wrappers"
+        },
+        {
+          "label": "Migrations",
+          "url": "/project/_/database/migrations"
         }
       ]
     },

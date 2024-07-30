@@ -27,8 +27,8 @@ import {
   FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 const RateLimits = () => {

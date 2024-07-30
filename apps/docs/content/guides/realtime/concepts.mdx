@@ -21,9 +21,9 @@ When you initialize your Supabase Realtime client, you define a `topic` that uni
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const client = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-const roomOne = client.channel('room-one') // set your topic here
+const roomOne = supabase.channel('room-one') // set your topic here
 ```
 
 ## Broadcast
@@ -62,7 +62,7 @@ When a new client subscribes to a channel, it will immediately receive the chann
 The Postgres Changes extension listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 ```js
-const allChanges = client
+const allChanges = supabase
   .channel('schema-db-changes')
   .on(
     'postgres_changes',

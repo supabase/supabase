@@ -1586,7 +1586,121 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "required": true,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "required": false,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1708,7 +1822,121 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "required": true,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "required": false,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1776,7 +2004,121 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "required": true,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "required": false,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -1844,7 +2186,121 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "messages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "result": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            },
+                            "ssl": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "validation_records": {
+                                  "required": true,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "txt_name": {
+                                        "type": "string"
+                                      },
+                                      "txt_value": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "txt_name",
+                                      "txt_value"
+                                    ]
+                                  }
+                                },
+                                "validation_errors": {
+                                  "required": false,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "message": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "message"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "ownership_verification": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "required": true,
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "custom_origin_server": {
+                              "type": "string"
+                            },
+                            "verification_errors": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "hostname",
+                            "ssl",
+                            "ownership_verification",
+                            "custom_origin_server",
+                            "status"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "errors",
+                        "messages",
+                        "result"
+                      ]
                     }
                   },
                   "required": [
@@ -3406,6 +3862,9 @@
                             "initiated_at": {
                               "type": "string"
                             },
+                            "latest_status_at": {
+                              "type": "string"
+                            },
                             "target_version": {
                               "type": "number"
                             },
@@ -3450,6 +3909,7 @@
                           },
                           "required": [
                             "initiated_at",
+                            "latest_status_at",
                             "target_version",
                             "status"
                           ]
@@ -9834,6 +10294,240 @@
           "branch_name"
         ]
       },
+      "ValidationRecord": {
+        "type": "object",
+        "properties": {
+          "txt_name": {
+            "type": "string"
+          },
+          "txt_value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "txt_name",
+          "txt_value"
+        ]
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "CustomHostnameDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "ssl": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "required": true,
+                "type": "string"
+              },
+              "validation_records": {
+                "required": true,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "txt_name": {
+                      "type": "string"
+                    },
+                    "txt_value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "txt_name",
+                    "txt_value"
+                  ]
+                }
+              },
+              "validation_errors": {
+                "required": false,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "ownership_verification": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "required": true,
+                "type": "string"
+              },
+              "name": {
+                "required": true,
+                "type": "string"
+              },
+              "value": {
+                "required": true,
+                "type": "string"
+              }
+            }
+          },
+          "custom_origin_server": {
+            "type": "string"
+          },
+          "verification_errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "hostname",
+          "ssl",
+          "ownership_verification",
+          "custom_origin_server",
+          "status"
+        ]
+      },
+      "CfResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "hostname": {
+                "type": "string"
+              },
+              "ssl": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "required": true,
+                    "type": "string"
+                  },
+                  "validation_records": {
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "txt_name": {
+                          "type": "string"
+                        },
+                        "txt_value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "txt_name",
+                        "txt_value"
+                      ]
+                    }
+                  },
+                  "validation_errors": {
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "message"
+                      ]
+                    }
+                  }
+                }
+              },
+              "ownership_verification": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "required": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "required": true,
+                    "type": "string"
+                  },
+                  "value": {
+                    "required": true,
+                    "type": "string"
+                  }
+                }
+              },
+              "custom_origin_server": {
+                "type": "string"
+              },
+              "verification_errors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "hostname",
+              "ssl",
+              "ownership_verification",
+              "custom_origin_server",
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "errors",
+          "messages",
+          "result"
+        ]
+      },
       "UpdateCustomHostnameResponse": {
         "type": "object",
         "properties": {
@@ -9851,7 +10545,121 @@
             "type": "string"
           },
           "data": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "errors": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "result": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "hostname": {
+                    "type": "string"
+                  },
+                  "ssl": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "required": true,
+                        "type": "string"
+                      },
+                      "validation_records": {
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "txt_name": {
+                              "type": "string"
+                            },
+                            "txt_value": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "txt_name",
+                            "txt_value"
+                          ]
+                        }
+                      },
+                      "validation_errors": {
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "message"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "ownership_verification": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "required": true,
+                        "type": "string"
+                      },
+                      "name": {
+                        "required": true,
+                        "type": "string"
+                      },
+                      "value": {
+                        "required": true,
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "custom_origin_server": {
+                    "type": "string"
+                  },
+                  "verification_errors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "hostname",
+                  "ssl",
+                  "ownership_verification",
+                  "custom_origin_server",
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "success",
+              "errors",
+              "messages",
+              "result"
+            ]
           }
         },
         "required": [
@@ -10346,6 +11154,9 @@
           "initiated_at": {
             "type": "string"
           },
+          "latest_status_at": {
+            "type": "string"
+          },
           "target_version": {
             "type": "number"
           },
@@ -10390,6 +11201,7 @@
         },
         "required": [
           "initiated_at",
+          "latest_status_at",
           "target_version",
           "status"
         ]
@@ -10404,6 +11216,9 @@
                 "type": "object",
                 "properties": {
                   "initiated_at": {
+                    "type": "string"
+                  },
+                  "latest_status_at": {
                     "type": "string"
                   },
                   "target_version": {
@@ -10450,6 +11265,7 @@
                 },
                 "required": [
                   "initiated_at",
+                  "latest_status_at",
                   "target_version",
                   "status"
                 ]

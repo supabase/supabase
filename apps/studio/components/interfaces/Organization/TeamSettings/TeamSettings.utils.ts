@@ -4,19 +4,19 @@ import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermis
 import type { Permission, Role } from 'types'
 
 export const useGetRolesManagementPermissions = (
-  orgId?: number,
+  orgSlug?: string,
   roles?: Role[],
   permissions?: Permission[]
 ): { rolesAddable: Number[]; rolesRemovable: Number[] } => {
-  const { permissions: allPermissions, organizationId } = useGetPermissions(
+  const { permissions: allPermissions, organizationSlug } = useGetPermissions(
     permissions,
-    orgId,
-    permissions !== undefined && orgId !== undefined
+    orgSlug,
+    permissions !== undefined && orgSlug !== undefined
   )
 
   const rolesAddable: Number[] = []
   const rolesRemovable: Number[] = []
-  if (!roles || !orgId) return { rolesAddable, rolesRemovable }
+  if (!roles || !orgSlug) return { rolesAddable, rolesRemovable }
 
   roles.forEach((role: Role) => {
     const canAdd = doPermissionsCheck(
@@ -26,7 +26,7 @@ export const useGetRolesManagementPermissions = (
       {
         resource: { role_id: role.id },
       },
-      organizationId
+      organizationSlug
     )
     if (canAdd) rolesAddable.push(role.id)
 
@@ -37,7 +37,7 @@ export const useGetRolesManagementPermissions = (
       {
         resource: { role_id: role.id },
       },
-      organizationId
+      organizationSlug
     )
     if (canRemove) rolesRemovable.push(role.id)
   })

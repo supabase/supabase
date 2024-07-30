@@ -20,7 +20,7 @@ import {
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { Code } from 'lucide-react'
+import { Check, Code } from 'lucide-react'
 
 interface FunctionSelectorProps {
   className?: string
@@ -136,7 +136,7 @@ const FunctionSelector = ({
                       >
                         <span>{func.name}</span>
                         {value === func.name && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" size={14} strokeWidth={2} />
                         )}
                       </CommandItem_Shadcn_>
                     ))}
