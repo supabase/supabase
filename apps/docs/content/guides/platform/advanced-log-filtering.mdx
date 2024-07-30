@@ -22,8 +22,8 @@ This approach is commonly used with JSON and array columns, so it might look a b
 ```sql
 select
   event_message,
-  error_severity, -- found in parsed
-  user_name -- found in parsed
+  parsed.error_severity,
+  parsed.user_name 
 from
   postgres_logs
   -- extract first layer
@@ -51,7 +51,7 @@ from postgres_logs
 where regexp_contains(event_message, 'is present');
 ```
 
-There are multiple filters that you should consider using:
+There are multiple operators that you should consider using:
 
 ### Find messages that start with a phrase
 
@@ -171,7 +171,7 @@ Each product table operates independently without any relationships to other log
 
 ### The `with` keyword and subqueries are not supported
 
-The query editor parses logs for optimization. The parser does not yet support `with` and subquery statements.
+The parser does not yet support `with` and subquery statements.
 
 ### The `ilike` and `similar to` keywords are not supported
 
