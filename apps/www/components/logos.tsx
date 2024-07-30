@@ -88,6 +88,7 @@ export default function Logos() {
                 alt={logo.alt}
                 fill
                 sizes="100%"
+                priority
                 className={'object-scale-down bg-no-repeat'}
               />
             </div>
