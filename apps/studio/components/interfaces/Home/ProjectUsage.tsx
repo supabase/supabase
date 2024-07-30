@@ -9,7 +9,7 @@ import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
 import Panel from 'components/ui/Panel'
 import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
 import {
@@ -53,7 +53,7 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const charts = useFillTimeseriesSorted(
+  const { data: charts } = useFillTimeseriesSorted(
     data?.result || [],
     'timestamp',
     [

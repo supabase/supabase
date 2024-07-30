@@ -36,6 +36,9 @@ import {
   cn,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Snippet } from 'data/content/sql-folders-query'
 
 const ROWS_PER_PAGE_OPTIONS = [
   { value: -1, label: 'No limit' },
@@ -64,7 +67,10 @@ const UtilityActions = ({
   const os = detectOS()
   const client = useQueryClient()
   const { project } = useProjectContext()
+
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -72,8 +78,13 @@ const UtilityActions = ({
     true
   )
 
-  const snippet = snap.snippets[id]
-  const isFavorite = snippet !== undefined ? snippet.snippet.content.favorite : false
+  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
+  const isFavorite =
+    snippet !== undefined
+      ? enableFolders
+        ? (snippet.snippet as Snippet).favorite
+        : snippet.snippet.content.favorite
+      : false
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -83,7 +94,12 @@ const UtilityActions = ({
   }
 
   const addFavorite = async () => {
-    snap.addFavorite(id)
+    if (enableFolders) {
+      snapV2.addFavorite(id)
+    } else {
+      snap.addFavorite(id)
+    }
+
     client.setQueryData<ContentData>(
       contentKeys.list(project?.ref),
       (oldData: ContentData | undefined) => {
@@ -106,7 +122,12 @@ const UtilityActions = ({
   }
 
   const removeFavorite = async () => {
-    snap.removeFavorite(id)
+    if (enableFolders) {
+      snapV2.removeFavorite(id)
+    } else {
+      snap.removeFavorite(id)
+    }
+
     client.setQueryData<ContentData>(
       contentKeys.list(project?.ref),
       (oldData: ContentData | undefined) => {
@@ -222,7 +243,7 @@ const UtilityActions = ({
               type="text"
               onClick={prettifyQuery}
               className="px-1"
-              icon={<AlignLeft size="tiny" strokeWidth={2} />}
+              icon={<AlignLeft strokeWidth={2} />}
             />
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
@@ -232,13 +253,20 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="default" iconRight={<ChevronDown size={14} />}>
-            {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snap.limit)?.label}
+            {
+              ROWS_PER_PAGE_OPTIONS.find(
+                (opt) => opt.value === (enableFolders ? snapV2.limit : snap.limit)
+              )?.label
+            }
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-42">
           <DropdownMenuRadioGroup
-            value={snap.limit.toString()}
-            onValueChange={(val) => snap.setLimit(Number(val))}
+            value={enableFolders ? snapV2.limit.toString() : snap.limit.toString()}
+            onValueChange={(val) => {
+              if (enableFolders) snapV2.setLimit(Number(val))
+              else snap.setLimit(Number(val))
+            }}
           >
             {ROWS_PER_PAGE_OPTIONS.map((option) => (
               <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
@@ -251,7 +279,13 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
-          <DatabaseSelector variant="connected-on-right" onSelectId={() => snap.resetResult(id)} />
+          <DatabaseSelector
+            variant="connected-on-right"
+            onSelectId={() => {
+              if (enableFolders) snapV2.resetResult(id)
+              else snap.resetResult(id)
+            }}
+          />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
             onClick={() => executeQuery()}

@@ -69,7 +69,7 @@ const QueryError = ({
             <div className="flex gap-2">
               <CollapsibleTrigger_Shadcn_ asChild>
                 <Button
-                  size={'tiny'}
+                  size="tiny"
                   type="outline"
                   className={cn('group', styles['ai-icon__container--allow-hover-effect'])}
                 >
@@ -78,7 +78,7 @@ const QueryError = ({
               </CollapsibleTrigger_Shadcn_>
               {!hasHipaaAddon && isAiAssistantEnabled && (
                 <Button
-                  size={'tiny'}
+                  size="tiny"
                   type="default"
                   className={cn(
                     'group',

@@ -21,7 +21,7 @@ import {
   useGetPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -57,7 +57,7 @@ export const InviteMemberButton = () => {
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -86,7 +86,7 @@ export const InviteMemberButton = () => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles,
     permissions ?? []
   )
@@ -99,7 +99,7 @@ export const InviteMemberButton = () => {
         PermissionAction.CREATE,
         'user_invites',
         { resource: { role_id } },
-        organization?.id
+        organization?.slug
       )
     )
 
@@ -139,7 +139,7 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       inviteMember(
         {
           slug,
@@ -237,7 +237,7 @@ export const InviteMemberButton = () => {
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              {projectLevelPermissionsEnabled && currentPlan?.id === 'enterprise' && (
+              {isOptedIntoProjectLevelPermissions && currentPlan?.id === 'enterprise' && (
                 <FormField_Shadcn_
                   name="applyToOrg"
                   control={form.control}
@@ -367,7 +367,7 @@ export const InviteMemberButton = () => {
                       account security for your team. This allows company administrators to enforce
                       the use of an identity provider when logging into Supabase.
                     </p>
-                    <p>This is only available for organizations on teams plan or above.</p>
+                    <p>This is only available for organizations on Team Plan or above.</p>
                     <div className="flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link
@@ -382,7 +382,7 @@ export const InviteMemberButton = () => {
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
                             <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                              Upgrade to Teams
+                              Upgrade to Team
                             </Link>
                           </Button>
                         )}

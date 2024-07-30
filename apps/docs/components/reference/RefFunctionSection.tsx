@@ -7,7 +7,7 @@ import Param from '~/components/Params'
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import { IRefFunctionSection } from './Reference.types'
+import type { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)

@@ -38,9 +38,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Switch,
+  WarningIcon,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface GitHubIntegrationConnectionFormProps {
   disabled?: boolean

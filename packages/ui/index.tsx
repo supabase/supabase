@@ -19,6 +19,7 @@ export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
+export * from './src/components/TreeView/TreeView'
 
 // NAV
 
@@ -74,7 +75,7 @@ export * from './src/components/shadcn/ui/dropdown-menu'
 export * from './src/components/shadcn/ui/use-toast'
 export * from './src/components/shadcn/ui/toast'
 export * from './src/components/shadcn/ui/toaster'
-
+export * from './src/components/shadcn/ui/sonner'
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
@@ -263,6 +264,8 @@ export * from './src/components/TreeView'
 export * from './src/components/TextLink'
 
 export * from './src/layout/banners'
+
+export * from './src/components/StatusIcon'
 
 // config
 

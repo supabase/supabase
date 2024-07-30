@@ -1242,6 +1242,11 @@ module.exports = [
     source: '/docs/reference/cli/supabase-db-remote-commit',
     destination: '/docs/reference/supabase-db-pull',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-gen-types-typescript',
+    destination: '/docs/reference/supabase-gen-types',
+  },
 
   {
     permanent: true,
@@ -1811,6 +1816,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/managing-environments',
     destination: '/docs/guides/cli/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/migrations/auth0',
+    destination: '/docs/guides/resources/migrating-to-supabase/auth0',
   },
   {
     permanent: true,
