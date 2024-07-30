@@ -1,7 +1,5 @@
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import ImageGrid from './ImageGrid'
-import { cn } from 'ui'
 
 export default function Logos() {
   const { basePath } = useRouter()
@@ -90,17 +88,11 @@ export default function Logos() {
                 alt={logo.alt}
                 fill
                 sizes="100%"
-                className={
-                  cn('object-scale-down bg-no-repeat')
-                  //   !removeFilter && 'contrast-0 filter opacity-50'
-                }
+                className={'object-scale-down bg-no-repeat'}
               />
             </div>
           ))}
         </div>
-        <p className="text-foreground-lighter text-center mt-8">
-          Over 1 million developers trust Supabase
-        </p>
       </div>
     </div>
   )
