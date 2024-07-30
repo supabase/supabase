@@ -5,7 +5,7 @@ info:
   title: Supabase Python Client
   description: |
 
-    Supabase Python(Community).
+    Supabase Python
 
   definition: spec/enrichments/tsdoc_v2/combined.json
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_py_v2.yml

@@ -15,7 +15,7 @@ export const CLIENT_LIBRARIES = [
   },
   {
     language: 'Python',
-    officialSupport: false,
+    officialSupport: true,
     releaseState: 'Alpha',
     docsUrl: 'https://supabase.com/docs/reference/python/initializing',
     gitUrl: 'https://github.com/supabase/supabase-py',

@@ -120,7 +120,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-python',
             href: '/reference/python/introduction',
             level: 'reference_python',
-            community: true,
           },
           {
             label: 'C#',
