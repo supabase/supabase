@@ -29,7 +29,7 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
 import { useCommandMenu } from 'ui-patterns/Cmdk'
 import { useProjectContext } from '../ProjectContext'
@@ -337,15 +337,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (
