@@ -49,7 +49,7 @@ Logs will be sent to a provided HTTP endpoint, see [documentation](https://grafa
 
 Events will get batched with multiple streams per request, with each log source having its own stream. The stream will be labelled with the `source` key.
 
-Requests will be in the form of a gzipped JSON body. The payload message will be a stringified JSON of the raw log event. No custom structured JSON metadata will be attached to stream values.
+Requests will be in the form of a gzipped JSON body. The payload message will be a stringified JSON of the raw log event. No custom structured JSON metadata will be attached to stream values. It is recommended that an `Authorization` header is used for authentication at the destination.
 
 #### Elastic - Filebeat
 
