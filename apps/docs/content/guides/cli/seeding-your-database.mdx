@@ -52,9 +52,9 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 
 You can generate seed data for local development using [Snaplet](https://github.com/snaplet/seed).
 
-<Admonition type="tip" >
-To use Snaplet, you need to have Node.js and npm installed. 
-You can add Node.js to your project by running `npm init -y` in your project directory.
+<Admonition type="tip">
+  To use Snaplet, you need to have Node.js and npm installed. You can add Node.js to your project by
+  running `npm init -y` in your project directory.
 </Admonition>
 
 If this is your first time using Snaplet to seed your project, you'll need to set up Snaplet with the following command:
@@ -65,26 +65,27 @@ npx @snaplet/seed init
 
 This command will analyze your database and its structure, and then generate a JavaScript client which can be used to define exactly how your data should be generated using code. The `init` command generates a configuration file, `seed.config.ts` and an example script, `seed.ts`, as a starting point.
 
-<Admonition type="tip" >
-During `init` if you are not using an ORM or your ORM is not in the supported list, choose `node-postgres`. 
+<Admonition type="tip">
+  During `init` if you are not using an ORM or your ORM is not in the supported list, choose
+  `node-postgres`.
 </Admonition>
 
 In most cases we only want to generate data for spesific schemas or tables. This is defined with `select`.
 Here is an example `seed.config.ts` configuration file:
+
 ```ts
 export default defineConfig({
   adapter: async () => {
     const client = new Client({
-      connectionString: "postgresql://postgres:postgres@localhost:54322/postgres",
-    });
-    await client.connect();
-    return new SeedPg(client);
+      connectionString: 'postgresql://postgres:postgres@localhost:54322/postgres',
+    })
+    await client.connect()
+    return new SeedPg(client)
   },
   // We only want to generate data for the public schema
-  select: [ "!*","public.*" ]
-});
+  select: ['!*', 'public.*'],
+})
 ```
-
 
 Suppose you have a database with the following schema:
 
