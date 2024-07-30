@@ -236,7 +236,7 @@ themeFiles.map(function (filePath, i) {
   fileName = fileName === 'concept-one' ? 'dark' : fileName
 
   const selector = isCombinedDark
-    ? `[data-theme='${fileName}'],
+    ? `[data-theme='deep-dark'],
 .deep-dark,
 [data-theme='classic-dark'],
 .classic-dark,
