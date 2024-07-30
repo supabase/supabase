@@ -1,35 +1,34 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import { z } from 'zod'
 
-import { del, handleError } from 'data/fetchers'
+import pgMeta from '@supabase/pg-meta'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
+import { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
   connectionString?: string
-  id: number
+  func: DatabaseFunction
 }
 
 export async function deleteDatabaseFunction({
   projectRef,
   connectionString,
-  id,
+  func,
 }: DatabaseFunctionDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql, zod } = pgMeta.functions.remove(func)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/functions', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['functions', 'delete', func.id.toString()],
   })
 
-  if (error) handleError(error)
-  return data
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionDeleteData = Awaited<ReturnType<typeof deleteDatabaseFunction>>
@@ -49,7 +48,7 @@ export const useDatabaseFunctionDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
+        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

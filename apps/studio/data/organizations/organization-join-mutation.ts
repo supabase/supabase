@@ -10,6 +10,8 @@ export type OrganizationJoinVariables = {
   token: string
 }
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function joinOrganization({ slug, token }: OrganizationJoinVariables) {
   const { data, error } = await post('/platform/organizations/{slug}/members/join', {
     params: { path: { slug }, query: { token } },

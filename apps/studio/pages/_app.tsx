@@ -1,3 +1,4 @@
+import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -111,10 +112,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
-    console.error(error.stack)
-    Sentry.captureMessage(`Full page crash: ${error.message || 'Unknown error message'}`, {
-      level: 'error',
+    Sentry.withScope(function (scope) {
+      scope.setTag('globalErrorBoundary', true)
+      Sentry.captureException(error)
     })
+
+    console.error(error.stack)
   }
 
   useEffect(() => {
@@ -164,7 +167,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
                         <AppBannerContextProvider>
                           <CommandMenuWrapper>
                             <AppBannerWrapper>
@@ -180,8 +188,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <HCaptchaLoadedStore />
-                <Toaster />
+                {!isTestEnv && <HCaptchaLoadedStore />}
+                {!isTestEnv && <Toaster />}
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>

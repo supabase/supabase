@@ -76,7 +76,7 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
       enabled: enabled,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        if (lastPage.length < limit) return undefined
+        if ((lastPage ?? []).length < limit) return undefined
         return page
       },
       ...options,

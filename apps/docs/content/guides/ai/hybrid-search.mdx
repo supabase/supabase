@@ -108,7 +108,7 @@ with full_text as (
 semantic as (
   select
     id,
-    row_number() over (order by doc_vector <#> query_embedding) as rank_ix
+    row_number() over (order by embedding <#> query_embedding) as rank_ix
   from
     documents
   order by rank_ix
@@ -166,7 +166,7 @@ from
 In practice, you will likely be calling this from the [Supabase client](/docs/reference/javascript/introduction) or through a custom backend layer. Here is a quick example of how you might call this from an [Edge Function](/docs/guides/functions) using JavaScript:
 
 ```tsx
-import { createClient } from 'npm:@supabase/supabase-js'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import OpenAI from 'npm:openai'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!

@@ -10,6 +10,8 @@ import rewrites from './lib/rewrites.js'
 import { remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
+import { withContentlayer } from 'next-contentlayer2'
+
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
@@ -42,6 +44,8 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
+  reactStrictMode: true,
+  swcMinify: true,
   images: {
     dangerouslyAllowSVG: true,
     domains: [
@@ -89,10 +93,19 @@ const nextConfig = {
   async redirects() {
     return redirects
   },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
+  },
 }
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer]
+  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }

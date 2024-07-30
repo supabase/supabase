@@ -1,3 +1,5 @@
+'use client'
+
 import { LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'

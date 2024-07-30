@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { secretsKeys } from './keys'
-import type { ResponseError } from 'types'
+
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { secretsKeys } from './keys'
 
 export type SecretsVariables = {
   projectRef?: string
@@ -18,7 +19,7 @@ export async function getSecrets({ projectRef }: SecretsVariables, signal?: Abor
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

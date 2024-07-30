@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
@@ -14,12 +13,14 @@ export type EdgeFunctionsDeleteVariables = {
 export async function deleteEdgeFunction({ projectRef, slug }: EdgeFunctionsDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await delete_(`${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}`, {})
-  if (response.error) {
-    throw response.error
-  }
+  const { data, error } = await del(`/v1/projects/{ref}/functions/{function_slug}`, {
+    params: {
+      path: { ref: projectRef, function_slug: slug },
+    },
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type EdgeFunctionsDeleteData = Awaited<ReturnType<typeof deleteEdgeFunction>>

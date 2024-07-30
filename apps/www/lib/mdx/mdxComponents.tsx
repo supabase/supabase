@@ -1,8 +1,5 @@
-import 'react-medium-image-zoom/dist/styles.css'
-
 import { PropsWithChildren } from 'react'
-import Image from 'next/image'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
+import NextImage from 'next/image'
 
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -21,26 +18,15 @@ import {
   Heading,
   IconArrowUpRight,
   IconTriangle,
+  Image,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
-import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+import { type ImageProps } from 'ui/src/components/Image/Image'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
 
 const ignoreClass = 'ignore-on-export'
-
-const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
-  switch (align) {
-    case 'left':
-      return 'text-left'
-    case 'right':
-      return 'text-right'
-    case 'center':
-    default:
-      return 'text-center'
-  }
-}
 
 const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   <a
@@ -104,37 +90,32 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <span className={['next-image--dynamic-fill'].join(' ')}>
-            <Image
-              {...props}
-              className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
-              fill
-              loading="lazy"
-            />
-          </span>
+          <Image
+            fill
+            className={cn(
+              'm-0 object-cover',
+              type === 'blog' ? 'rounded-md border' : '',
+              props.wide && 'wide',
+              props.className
+            )}
+            {...props}
+          />
         )
       }
       return <img {...props} />
     },
-    Img: ({ zoomable = true, className, ...props }: any) => (
-      <figure className={cn('m-0', className)}>
-        <ZoomableImg zoomable={zoomable}>
-          <span
-            className={[
-              'next-image--dynamic-fill',
-              type === 'blog' ? 'rounded-md border' : '',
-              props.wide && 'wide',
-            ].join(' ')}
-          >
-            <ThemeImage fill className="m-0 object-cover" {...props} />
-          </span>
-        </ZoomableImg>
-        {props.caption && (
-          <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
-            {props.caption}
-          </figcaption>
+    Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
+      <Image
+        fill
+        className={cn(
+          'm-0 object-cover',
+          type === 'blog' ? 'rounded-md border' : '',
+          props.wide && 'wide',
+          className
         )}
-      </figure>
+        zoomable={zoomable}
+        {...props}
+      />
     ),
     Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,

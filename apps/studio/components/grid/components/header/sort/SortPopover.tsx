@@ -1,12 +1,12 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { DropdownControl } from 'components/grid/components/common'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -42,10 +42,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(sorts || []).length > 0 ? 'link' : 'text'}
-          icon={<List strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -66,8 +63,8 @@ export interface SortOverlayProps {
 
 const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayProps) => {
   const initialSorts = useMemo(
-    () => formatSortURLParams((sortsFromUrl as string[]) ?? []),
-    [sortsFromUrl]
+    () => formatSortURLParams(table.name, sortsFromUrl ?? []),
+    [table.name, sortsFromUrl]
   )
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
@@ -82,7 +79,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
     }) || []
 
   function onAddSort(columnName: string | number) {
-    setSorts([...sorts, { column: columnName as string, ascending: true }])
+    setSorts([...sorts, { table: table.name, column: columnName as string, ascending: true }])
   }
 
   const onDeleteSort = useCallback((column: string) => {
@@ -143,11 +140,13 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
             align="start"
           >
             <Button
+              asChild
               type="text"
-              iconRight={<ChevronDown />}
+              iconRight={<ChevronDown size="14" className="text-foreground-light" />}
               className="sb-grid-dropdown__item-trigger"
+              data-testid="table-editor-pick-column-to-sort-button"
             >
-              Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by
+              <span>Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by</span>
             </Button>
           </DropdownControl>
         ) : (

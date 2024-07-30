@@ -1,24 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
+import { z } from 'zod'
 
-import { handleError, post } from 'data/fetchers'
-import type { Dictionary, ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
+import pgMeta from '@supabase/pg-meta'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
+import { sqlKeys } from 'data/sql/keys'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
   connectionString?: string
-  payload: {
-    name: string
-    schema: string
-    args: string[]
-    behavior: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-    definition: string
-    language: string
-    return_type: string
-    security_definer: boolean
-    config_params?: Dictionary<string>
-  }
+  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }
 
 export async function createDatabaseFunction({
@@ -26,20 +18,16 @@ export async function createDatabaseFunction({
   connectionString,
   payload,
 }: DatabaseFunctionCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql, zod } = pgMeta.functions.create(payload)
 
-  const { data, error } = await post('/platform/pg-meta/{ref}/functions', {
-    params: {
-      path: { ref: projectRef },
-    },
-    // @ts-ignore API codegen is typed wrongly, i suspect its using the body for edge functions instead
-    body: payload,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['functions', 'create'],
   })
 
-  if (error) handleError(error)
-  return data
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionCreateData = Awaited<ReturnType<typeof createDatabaseFunction>>
@@ -59,7 +47,7 @@ export const useDatabaseFunctionCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
+        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

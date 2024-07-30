@@ -7,7 +7,7 @@ const openai = new OpenAI({ apiKey: openAiKey })
 
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {
-    const model = 'gpt-4-1106-preview'
+    const model = 'gpt-4o-2024-05-13'
 
     const completionResponse = await openai.chat.completions.create({
       model,

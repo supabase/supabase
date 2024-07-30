@@ -119,14 +119,16 @@ create or replace function match_documents (
 )
 returns table (
   id bigint,
-  content text,
+  title text,
+  body text,
   similarity float
 )
 language sql stable
 as $$
   select
     documents.id,
-    documents.content,
+    documents.title,
+    documents.body,
     1 - (documents.embedding <=> query_embedding) as similarity
   from documents
   where 1 - (documents.embedding <=> query_embedding) > match_threshold

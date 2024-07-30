@@ -243,6 +243,7 @@ const Column = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
           <InputWithSuggestions
+            data-testid={`${column.name}-default-value`}
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
                 ? 'EMPTY'
@@ -280,6 +281,7 @@ const Column = ({
               className="pointer-events-auto"
               align="end"
               modal={true}
+              data-testid={`${column.name}-extra-options`}
               header={
                 <div className="flex items-center justify-center">
                   <h5 className="text-sm text-foreground">Extra options</h5>

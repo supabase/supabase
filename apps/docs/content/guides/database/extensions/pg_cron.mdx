@@ -99,7 +99,15 @@ select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
 
 ```sql
-select cron.schedule('call-db-function', '*/5 * * * *', 'CALL hello_world()');
+select cron.schedule('call-db-function', '*/5 * * * *', 'SELECT hello_world()');
+```
+
+### Call a database stored procedure
+
+To use a stored procedure, you can call it like this:
+
+```sql
+select cron.schedule('call-db-procedure', '*/5 * * * *', 'CALL my_procedure()');
 ```
 
 ### Invoke Supabase Edge Function every 30 seconds
@@ -151,6 +159,8 @@ cron.alter_job(
   active boolean default null
 )
 ```
+
+It is also possible to modify a job by using the `cron.schedule()` function, with the same job name. This will replace the existing job, in the manner of an upsert.
 
 ### Unschedule a job
 

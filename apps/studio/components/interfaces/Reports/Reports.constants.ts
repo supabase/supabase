@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { DatetimeHelper } from '../Settings/Logs'
+
+import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 24
@@ -280,6 +281,8 @@ limit 12
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Most frequently called queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -305,6 +308,8 @@ select
         queryType: 'db',
         sql: (_, where, orderBy) => `
 -- Most time consuming queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -321,6 +326,8 @@ select
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Slowest queries by max execution time
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,

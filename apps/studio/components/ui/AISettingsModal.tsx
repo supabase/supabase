@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -7,12 +12,8 @@ import {
   Button,
   Modal,
   Toggle,
+  WarningIcon,
 } from 'ui'
-
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
@@ -38,8 +39,8 @@ const AISettingsModal = () => {
       visible={snap.showAiSettingsModal}
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
-      <div className="flex flex-col items-start justify-between gap-y-4 px-6 py-3">
-        <div className="flex justify-between gap-x-8 mr-8 my-4">
+      <Modal.Content className="flex flex-col items-start justify-between gap-y-4">
+        <div className="flex justify-between gap-x-5 mr-8 my-4">
           <Toggle
             disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
@@ -78,7 +79,7 @@ const AISettingsModal = () => {
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-      </div>
+      </Modal.Content>
     </Modal>
   )
 }

@@ -8,8 +8,8 @@ import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
@@ -39,7 +39,6 @@ const DatabaseUsage = () => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const state = useDatabaseSelectorStateSnapshot()
 
-  const isReadReplicasEnabled = project?.is_read_replicas_enabled
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
@@ -69,7 +68,7 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Database" showDatabaseSelector={isReadReplicasEnabled} />
+      <ReportHeader showDatabaseSelector title="Database" />
       <section>
         <Panel title={<h2>Database health</h2>}>
           <Panel.Content>

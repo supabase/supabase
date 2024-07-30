@@ -37,6 +37,9 @@ interface TabsSubComponents {
   Panel: React.FC<PropsWithChildren<PanelProps>>
 }
 
+/**
+ * @deprecated Use ./Tabs_shadcn_ instead
+ */
 const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
@@ -141,6 +144,9 @@ interface PanelProps {
   className?: string
 }
 
+/**
+ * @deprecated Use ./TabsContent_Shadcn_ instead
+ */
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 

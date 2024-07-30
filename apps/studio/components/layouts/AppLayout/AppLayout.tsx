@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import AppHeader from './AppHeader'
 
 const AppLayout = ({ children }: PropsWithChildren<{}>) => {

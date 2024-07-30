@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, IconSearch, Input, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
+import { Alert, Button, IconSearch, Input, SidePanel } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
 
 const Migrations = () => {

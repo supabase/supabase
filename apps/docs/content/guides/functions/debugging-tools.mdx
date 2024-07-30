@@ -1,0 +1,24 @@
+---
+id: 'functions-debugging-tools'
+title: 'Local Debugging with DevTools'
+description: 'How to use Chrome DevTools to debug Edge Functions.'
+subtitle: 'How to use Chrome DevTools to debug Edge Functions.'
+tocVideo: 'sOrtcoKg5zQ'
+---
+
+Since [v1.171.0](https://github.com/supabase/cli/releases/tag/v1.171.0) the Supabase CLI supports debugging Edge Functions via the v8 inspector protocol, allowing for debugging via [Chrome DevTools](https://developer.chrome.com/docs/devtools/) and other Chromium-based browsers.
+
+### Inspect with Chrome Developer Tools
+
+You can use the [Chrome DevTools](https://developer.chrome.com/docs/devtools/) to set breakpoints and inspect the execution of your Edge Functions.
+
+1. Serve your functions in [inspect mode](/docs/reference/cli/supabase-functions-serve): `supabase functions serve --inspect-mode brk`. This will set a breakpoint at the first line to pause script execution before any code runs.
+1. In your Chrome browser navigate to `chrome://inspect`.
+1. Click the "Configure..."" button to the right of the Discover network targets checkbox.
+1. In the Target discovery settings dialog box that opens, enter `127.0.0.1:8083` in the blank space and click the "Done" button to exit the dialog box.
+1. Click "Open dedicated DevTools for Node" to complete the preparation for debugging. The opened DevTools window will now listen to any incoming requests to edge-runtime.
+1. Send a request to your function running locally, e.g. via curl or Postman. The DevTools window will now pause script execution at first line.
+1. In the "Sources" tab navigate to `file://` > `home/deno/functions/<your-function-name>/index.ts`.
+1. Use the DevTools to set breakpoints and inspect the execution of your Edge Function.
+
+![Debugging in Chrome DevTools.](/docs/img/guides/functions/debug-chrome-devtools.png)

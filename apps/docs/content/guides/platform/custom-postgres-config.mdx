@@ -40,7 +40,7 @@ The following parameters are available for overrides:
 To get started:
 
 1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.69.0+.
-1. [Log in](/docs/guides/resources/supabase-getting-started/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
 
 The `postgres config` command of the CLI can be used for setting configuration parameters:
 
@@ -61,6 +61,17 @@ $ supabase --experimental --project-ref <project-ref> postgres-config update --c
 - Custom Postgres Config -
 Config                  |Value    |
 max_parallel_workers    |3        |
+- End of Custom Postgres Config -
+```
+
+When configuring parameters that require time units, such as `statement_timeout`, the CLI expects a string value with a time unit. Supported units include `ms`, `s`, and `min`.
+
+```bash
+$ supabase --experimental --project-ref <project-ref> postgres-config update --config statement_timeout=1000ms
+
+- Custom Postgres Config -
+Config            |Value   |
+statement_timeout |1000ms  |
 - End of Custom Postgres Config -
 ```
 

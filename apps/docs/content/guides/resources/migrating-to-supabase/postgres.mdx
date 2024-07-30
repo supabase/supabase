@@ -49,25 +49,25 @@ The fastest way to migrate your database is with the Supabase migration tool on 
 </TabPanel>
 <TabPanel id="cli" label="Migrate using CLI tools">
 
-### Export your database to a file in console [#export-database]
+1. Export your database to a file in console
 
-Use `pg_dump` with your Postgres credentials to export your database to a file (e.g., `dump.sql`).
+   Use `pg_dump` with your Postgres credentials to export your database to a file (e.g., `dump.sql`).
 
-```bash
-pg_dump --clean --if-exists --quote-all-identifiers \
- -h $HOST -U $USER -d $DATABASE \
- --no-owner --no-privileges > dump.sql
-```
+   ```bash
+   pg_dump --clean --if-exists --quote-all-identifiers \
+   -h $HOST -U $USER -d $DATABASE \
+   --no-owner --no-privileges > dump.sql
+   ```
 
-### Import the database to your Supabase project [#import-database-to-supabase]
+2. Import the database to your Supabase project
 
-Use `psql` to import the Postgres database file to your Supabase project.
+   Use `psql` to import the Postgres database file to your Supabase project.
 
-```bash
-psql -d "$YOUR_CONNECTION_STRING" -f dump.sql
-```
+   ```bash
+   psql -d "$YOUR_CONNECTION_STRING" -f dump.sql
+   ```
 
-### Additional options
+Additional options
 
 - To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
 - To exclude a schema: `--exclude-schema=PATTERN`.
@@ -80,3 +80,7 @@ Run `pg_dump --help` for a full list of options.
 </Tabs>
 
 <MigrationWarnings />
+
+## Enterprise
+
+[Contact us](https://forms.supabase.com/enterprise) if you need more help migrating your project.

@@ -3,7 +3,8 @@ import { ExternalLink } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { Button, toast as UiToast } from 'ui'
 
-import { Query, SupaRow } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
+import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
@@ -82,6 +83,7 @@ export const useTableRowDeleteMutation = ({
       async onError(data, variables, context) {
         if (onError === undefined) {
           const { table, rows } = variables
+          const isPkError = data.message.includes('Please add a primary key column')
           const isFkError = data.message.includes('violates foreign key constraint')
           const isMultipleRows = rows.length > 1
 
@@ -117,6 +119,36 @@ export const useTableRowDeleteMutation = ({
                       target="_blank"
                       rel="noreferrer"
                       href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                    >
+                      Documentation
+                    </a>
+                  </Button>
+                </div>
+              ),
+            })
+          } else if (isPkError) {
+            UiToast({
+              variant: 'default',
+              style: { flexDirection: 'column' },
+              title: (
+                <Markdown
+                  className="text-foreground [&>p]:m-0"
+                  content="Unable to delete row(s) as table has no primary keys"
+                />
+              ) as any,
+              description: (
+                <Markdown
+                  className="[&>p]:m-0"
+                  content="Add a primary key column to your table first to serve as a unique identifier for each row before updating or deleting the row."
+                />
+              ),
+              action: (
+                <div className="w-full flex gap-x-2 !mx-0 mt-3">
+                  <Button asChild type="outline" icon={<ExternalLink />}>
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/docs/guides/database/tables#primary-keys"
                     >
                       Documentation
                     </a>

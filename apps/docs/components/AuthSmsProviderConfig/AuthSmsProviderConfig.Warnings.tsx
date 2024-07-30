@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Admonition } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 const CostWarning = () => (
   <Admonition type="warning">

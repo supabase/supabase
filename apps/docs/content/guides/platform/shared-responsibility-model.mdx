@@ -4,9 +4,25 @@ title: 'Shared Responsibility Model'
 description: 'Running databases is a shared responsibility between you and Supabase.'
 ---
 
-Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for. This is by design: we to give you the freedom to use your database however you want. While we _could_ put many more restrictions in place to ensure that you can’t do anything wrong, you will eventually find those restrictions prohibitive.
+Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for. This is by design: we want to give you the freedom to use your database however you want. While we _could_ put many more restrictions in place to ensure that you can’t do anything wrong, you will eventually find those restrictions prohibitive.
 
-Generally, we aim reduce your burden of managing infrastructure and knowing about Postgres internals, minimizing configuration as much as we can. Here are a few things that you should know:
+<Image
+  alt="Diagram showing the shared responsibility model between Supabase and the customer. The customer is responsible for Application architecture and implementation, information and data, the database schema and user management. The responsibility for API rate-limiting, Postgres security controls, upgrades, performance tuning and resource allocation is shared. Supabase is responsible for Postgres backups and observability, operating system maintenance, infrastructure and the monitoring and security thereof."
+  src={{
+    light: '/docs/img/platform/shared-responsibility-model--light.png',
+    dark: '/docs/img/platform/shared-responsibility-model--dark.png',
+  }}
+  zoomable
+/>
+
+To summarize, you are always responsible for:
+
+- Your Supabase account
+- Access management (Supabase account, database, tables, etc)
+- Data
+- Applying security controls
+
+Generally, we aim to reduce your burden of managing infrastructure and knowing about Postgres internals, minimizing configuration as much as we can. Here are a few things that you should know:
 
 ## You share the security responsibility
 
@@ -15,6 +31,10 @@ We give you full access to the database. If you share that access with other peo
 If you have an inexperienced member on your team, then you probably shouldn’t give them access to Production. You should set internal workflows around what they should and should not be able to do, with restricted access to avoid anything that might be deemed dangerous.
 
 You are also responsible for ensuring that tables with sensitive data have the right level of access. You are also responsible for managing your database secrets and API keys, storing them safely in an encrypted store.
+
+Supabase provides controls for [securing your data](/docs/guides/database/secure-data), and it is recommended that you always apply [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
+
+We will also provide you with security alerts through [Security Advisor](https://supabase.com/dashboard/project/_/database/security-advisor) and applying the recommendations are your responsibility.
 
 ## You decide your own workflow
 
@@ -44,15 +64,22 @@ You are responsible for using best-practices to optimize and manage your databas
 
 You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://supabase.com/dashboard/project/_/reports/database) to help with this.
 
+## Before going to production
+
+We recommend reviewing and applying the recommendations offered in our [Production Checklist](/docs/guides/platform/going-into-prod). This checklist covers the responsibilities discussed here and a few additional general production readiness best practices.
+
 ## Managing healthcare data
 
 You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
 
-- Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team plan](https://supabase.com/pricing) to sign a BAA with us.
+- Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team Plan](https://supabase.com/pricing) to sign a BAA with us.
+- Ensuring [MFA is enabled](/docs/guides/platform/multi-factor-authentication) on all Supabase accounts.
 - Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
 - Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
 - Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
 - Not using [Edge functions](/docs/guides/functions) or [Fly Postgres](/docs/guides/platform/fly-postgres) to process PHI.
+- Not using [branching](/docs/guides/platform/branching) to process PHI.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
+- Not [transferring projects](/docs/guides/platform/project-transfer) to a non-HIPAA organization.

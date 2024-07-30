@@ -127,7 +127,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -155,7 +155,7 @@ You can create a policy where the `using` clause checks if the user owns the pro
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -182,7 +182,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -220,10 +220,10 @@ Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
-Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
+Returns the JWT of the user making the request. Anything that you store in the user's `raw_app_meta_data` column or the `raw_user_meta_data` column will be accessible using this function. It's important to know the distinction between these two:
 
-- `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
-- `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
+- `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
+- `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
 
 The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
 
@@ -269,7 +269,7 @@ Supabase will adhere to the RLS policy of the signed-in user, even if the client
 You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
-grant bypassrls on "table_name" to "role_name";
+alter role "role_name" with bypassrls;
 ```
 
 This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.

@@ -1,47 +1,58 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { storageCredentialsKeys } from './s3-access-key-keys'
-import { post } from 'data/fetchers'
+import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
-type CreateS3AccessKeyCredential = {
+import { handleError, post } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { storageCredentialsKeys } from './s3-access-key-keys'
+
+type CreateS3AccessKeyCredentialVariables = {
   description: string
   projectRef?: string
 }
+
 const createS3AccessKeyCredential = async ({
   description,
   projectRef,
-}: CreateS3AccessKeyCredential) => {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+}: CreateS3AccessKeyCredentialVariables) => {
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const res = await post('/platform/storage/{ref}/credentials', {
-    params: {
-      path: {
-        ref: projectRef,
-      },
-    },
-    body: {
-      description,
-    },
+  const { data, error } = await post('/platform/storage/{ref}/credentials', {
+    params: { path: { ref: projectRef } },
+    body: { description },
   })
 
-  return res
+  if (error) handleError(error)
+  return data
 }
 
-type S3AccessKeyCreateMutation = {
-  projectRef?: string
-}
+type S3AccessKeyDeleteData = Awaited<ReturnType<typeof createS3AccessKeyCredential>>
 
-export function useS3AccessKeyCreateMutation({ projectRef }: S3AccessKeyCreateMutation) {
+export function useS3AccessKeyCreateMutation({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<S3AccessKeyDeleteData, ResponseError, CreateS3AccessKeyCredentialVariables>,
+  'mutationFn'
+> = {}) {
   const queryClient = useQueryClient()
 
-  const keys = storageCredentialsKeys.credentials(projectRef)
-
-  return useMutation({
-    mutationFn: ({ description }: { description: string }) =>
-      createS3AccessKeyCredential({ description, projectRef }),
-    onSettled: () => {
-      queryClient.invalidateQueries(keys)
-    },
-  })
+  return useMutation<S3AccessKeyDeleteData, ResponseError, CreateS3AccessKeyCredentialVariables>(
+    (vars) => createS3AccessKeyCredential(vars),
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create S3 access key: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
 }

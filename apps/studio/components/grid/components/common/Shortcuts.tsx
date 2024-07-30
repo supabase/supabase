@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { useTrackedState } from '../../store'
-import { useKeyboardShortcuts } from './Hooks'
 import type { DataGridHandle } from 'react-data-grid'
-import { formatClipboardValue, copyToClipboard } from '../../utils'
+import { useTrackedState } from '../../store/Store'
+import { copyToClipboard, formatClipboardValue } from '../../utils/common'
+import { useKeyboardShortcuts } from './Hooks'
 
 type ShortcutsProps = {
   gridRef: React.RefObject<DataGridHandle>

@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
@@ -11,9 +10,12 @@ export type ProjectDeleteVariables = {
 }
 
 export async function deleteProject({ projectRef }: ProjectDeleteVariables) {
-  const response = await delete_(`${API_URL}/projects/${projectRef}`)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await del('/platform/projects/{ref}', {
+    params: { path: { ref: projectRef } },
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectDeleteData = Awaited<ReturnType<typeof deleteProject>>

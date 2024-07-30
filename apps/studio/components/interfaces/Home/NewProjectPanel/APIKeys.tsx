@@ -2,14 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import Link from 'next/link'
 import { useState } from 'react'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
   js: `

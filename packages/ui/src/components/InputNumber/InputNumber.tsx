@@ -26,6 +26,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ with type="number" instead or ./ui-patterns/data-inputs/input with type="number"
+ */
 function InputNumber({
   defaultValue,
   descriptionText,

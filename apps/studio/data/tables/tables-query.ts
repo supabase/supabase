@@ -68,12 +68,13 @@ export type TablesError = ResponseError
 export const useTablesQuery = <TData = TablesData>(
   { projectRef, connectionString, schema, includeColumns }: TablesVariables,
   { enabled = true, ...options }: UseQueryOptions<TablesData, TablesError, TData> = {}
-) =>
-  useQuery<TablesData, TablesError, TData>(
+) => {
+  return useQuery<TablesData, TablesError, TData>(
     tableKeys.list(projectRef, schema, includeColumns),
     ({ signal }) => getTables({ projectRef, connectionString, schema, includeColumns }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
+}
 
 /**
  * useGetTables

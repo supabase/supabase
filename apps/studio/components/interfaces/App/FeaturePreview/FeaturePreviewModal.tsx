@@ -87,7 +87,7 @@ const FeaturePreviewModal = () => {
       onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
+        <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {

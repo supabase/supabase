@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { put } from 'data/fetchers'
+import { handleError, put } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
@@ -32,10 +32,7 @@ export async function updateOrgSubscription({
     params: { path: { slug } },
   })
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data
 }
 

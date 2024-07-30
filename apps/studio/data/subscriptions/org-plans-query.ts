@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { subscriptionKeys } from './keys'
 
 export type OrgPlansVariables = {
@@ -13,8 +13,7 @@ export async function getOrgPlans({ orgSlug }: OrgPlansVariables, signal?: Abort
     params: { path: { slug: orgSlug } },
     signal,
   })
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 
