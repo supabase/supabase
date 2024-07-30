@@ -82,9 +82,9 @@ export default function Logos() {
   return (
     <div className="py-12 pb:14 lg:pb-24">
       <div className="max-w-xl md:max-w-3xl lg:max-w-7xl mx-auto px-5 lg:px-12">
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-5 lg:gap-x-4 lg:gap-y-7">
           {logos.map((logo) => (
-            <div className={`relative h-12 w-16 md:w-21 lg:w-[128px] overflow-auto`}>
+            <div className={`relative h-4 w-16 md:w-21 lg:w-[128px] lg:h-6 overflow-auto`}>
               <Image
                 src={logo.image}
                 alt={logo.alt}
