@@ -99,7 +99,7 @@ export default function Logos() {
           ))}
         </div>
         <p className="text-foreground-lighter text-center mt-8">
-          100s of trusted companies use Supabase
+          Over 1 million developers trust Supabase
         </p>
       </div>
     </div>
