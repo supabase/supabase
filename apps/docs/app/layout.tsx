@@ -9,6 +9,7 @@ import { type Metadata, type Viewport } from 'next'
 
 import { BASE_PATH } from '~/lib/constants'
 import { GlobalProviders } from '~/features/app.providers'
+import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',
@@ -45,7 +46,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body>
-        <GlobalProviders>{children}</GlobalProviders>
+        <GlobalProviders>
+          <TopNavSkeleton>{children}</TopNavSkeleton>
+        </GlobalProviders>
       </body>
     </html>
   )

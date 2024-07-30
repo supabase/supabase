@@ -43,7 +43,7 @@ const TeamSettings = () => {
   const roles = rolesData?.roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
+    selectedOrganization?.slug,
     roles,
     permissions ?? []
   )

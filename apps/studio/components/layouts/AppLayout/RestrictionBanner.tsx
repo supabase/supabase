@@ -2,9 +2,8 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { AlertTitle_Shadcn_, Alert_Shadcn_, Button, CriticalIcon, WarningIcon } from 'ui'
 
 /**
  * Shown on projects in organization which are above their qouta

@@ -20,7 +20,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsOptedIntoProjectLevelPermissions } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -33,6 +33,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -50,7 +51,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useIsOptedIntoProjectLevelPermissions(slug as string)
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
@@ -62,7 +63,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
+    selectedOrganization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
@@ -107,8 +108,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
-  const { mutate: deleteInvitationOld, isLoading: isDeletingInviteOld } =
-    useOrganizationMemberInviteDeleteMutation()
+  const { mutate: deleteInvitationOld } = useOrganizationMemberInviteDeleteMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
@@ -125,7 +125,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId, skipInvalidation: true },
         {
@@ -170,7 +170,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId },
         { onSuccess: () => toast.success('Successfully revoked the invitation.') }
@@ -283,6 +283,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
+        loading={isDeletingMember}
         title="Confirm to remove"
         confirmLabel="Remove"
         onCancel={() => setIsDeleteModalOpen(false)}

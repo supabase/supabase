@@ -1,3 +1,4 @@
+import { IS_DEV } from '~/lib/constants'
 import type { GlobalMenuItems, NavMenuConstant, References } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
@@ -119,7 +120,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-python',
             href: '/reference/python/introduction',
             level: 'reference_python',
-            community: true,
           },
           {
             label: 'C#',
@@ -190,6 +190,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Status',
             icon: 'status',
             href: 'https://status.supabase.com/',
+          },
+          {
+            label: 'Contributing',
+            icon: 'contributing',
+            href: '/contributing' as `/${string}`,
           },
         ],
       ],
@@ -546,10 +551,6 @@ export const auth = {
       ],
     },
     {
-      name: 'Migrations',
-      items: [{ name: 'Migrate from Auth0', url: '/guides/auth/migrations/auth0' }],
-    },
-    {
       name: 'Concepts',
       items: [
         { name: 'Users', url: '/guides/auth/users' },
@@ -883,10 +884,6 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
-        },
-        {
-          name: 'pg-safeupdate: Required Where Clauses',
-          url: '/guides/database/extensions/pg-safeupdate',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1336,6 +1333,14 @@ export const realtime: NavMenuConstant = {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
         },
+        {
+          name: 'Using Realtime Presence with Flutter',
+          url: '/guides/realtime/realtime-user-presence',
+        },
+        {
+          name: 'Listening to Postgres Changes with Flutter',
+          url: '/guides/realtime/realtime-listening-flutter',
+        },
       ],
     },
     {
@@ -1729,7 +1734,7 @@ export const platform: NavMenuConstant = {
       name: 'Platform Management',
       url: undefined,
       items: [
-        { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'Regions', url: '/guides/platform/regions' },
         {
           name: 'Custom Postgres Config',
           url: '/guides/platform/custom-postgres-config',
@@ -1757,9 +1762,16 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/network-restrictions',
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
-        { name: 'Permissions', url: '/guides/platform/permissions' },
-        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
         { name: 'Branching', url: '/guides/platform/branching' },
+      ],
+    },
+    {
+      name: 'Security',
+      url: undefined,
+      items: [
+        { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Platform-required Permissions', url: '/guides/platform/permissions' },
       ],
     },
     {
@@ -1894,6 +1906,10 @@ export const resources: NavMenuConstant = {
       name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
+        {
+          name: 'Auth0',
+          url: '/guides/resources/migrating-to-supabase/auth0',
+        },
         {
           name: 'Firebase Auth',
           url: '/guides/resources/migrating-to-supabase/firebase-auth',

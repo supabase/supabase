@@ -21,7 +21,7 @@ import {
   IconExternalLink,
   IconTrash,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
