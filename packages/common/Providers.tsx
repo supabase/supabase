@@ -7,7 +7,12 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   // @ts-ignore next-themes is old :/
 
   return (
-    <NextThemesProvider {...props} themes={['dark', 'light']}>
+    <NextThemesProvider
+      {...props}
+      themes={['dark', 'light']}
+      defaultTheme="dark"
+      storageKey={'supabase-theme'}
+    >
       {children}
     </NextThemesProvider>
   )
