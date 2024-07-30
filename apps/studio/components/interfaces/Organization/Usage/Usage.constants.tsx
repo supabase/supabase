@@ -47,7 +47,7 @@ export interface CategoryAttribute {
   key: string // Property from organization usage
   attributes: Attribute[] // For querying against stats-daily / infra-monitoring
   name: string
-  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
   links?: {
     name: string
     url: string
@@ -56,7 +56,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
+  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
 }
 
 export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity' | 'compute'
@@ -68,7 +68,9 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
-export const USAGE_CATEGORIES: CategoryMeta[] = [
+export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[] = (
+  subscription
+) => [
   {
     key: 'bandwidth',
     name: 'Bandwidth',
@@ -106,15 +108,25 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+          subscription?.usage_based_billing_project_addons === true
+            ? 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks and are billed based on provisioned disk size, rather than database space used.'
+            : 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
         links: [
           {
             name: 'Documentation',
             url: 'https://supabase.com/docs/guides/platform/database-size',
           },
+          ...(subscription?.usage_based_billing_project_addons === true
+            ? [
+                {
+                  name: 'Disk Management',
+                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                },
+              ]
+            : []),
         ],
         chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => {
+        additionalInfo: (usage?: OrgUsageResponse) => {
           const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
           const usageRatio =
             typeof usageMeta !== 'number'
