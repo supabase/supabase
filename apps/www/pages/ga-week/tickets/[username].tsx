@@ -50,11 +50,11 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   //   isDarkTheme && setTheme('deep-dark')
   // }, [isDarkTheme])
 
-  useEffect(() => {
-    return () => {
-      isDark && setTheme('dark')
-    }
-  }, [])
+  // useEffect(() => {
+  //   return () => {
+  //     isDark && setTheme('dark')
+  //   }
+  // }, [])
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
