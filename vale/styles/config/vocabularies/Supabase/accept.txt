@@ -36,6 +36,7 @@ Markprompt
 [Mm]iddleware
 [Nn]amespace(d|s)?
 Next.js
+npm
 Nuxt
 OAuth
 OpenAI
