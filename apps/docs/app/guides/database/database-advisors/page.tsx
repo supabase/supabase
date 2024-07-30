@@ -6,7 +6,8 @@ import rehypeSlug from 'rehype-slug'
 import { Heading } from 'ui'
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -54,7 +55,7 @@ const DatabaseAdvisorDocs = async () => {
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>
-      <MDXRemoteGuides source={markdownIntro} />
+      <MDXRemoteBase source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
@@ -64,7 +65,7 @@ const DatabaseAdvisorDocs = async () => {
             label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
           >
             <section id={getBasename(lint.path)}>
-              <MDXRemoteGuides source={lint.content} options={options} />
+              <MDXRemoteBase source={lint.content} options={options} />
             </section>
           </TabPanel>
         ))}

@@ -38,9 +38,9 @@ import {
   DropdownMenuTrigger,
   Input,
   Modal,
+  WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,

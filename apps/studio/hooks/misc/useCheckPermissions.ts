@@ -34,20 +34,20 @@ export function doPermissionsCheck(
   action: string,
   resource: string,
   data?: object,
-  organizationId?: number,
-  projectId?: number
+  organizationSlug?: string,
+  projectRef?: string
 ) {
   if (!permissions || !Array.isArray(permissions)) {
     return false
   }
 
-  if (projectId) {
+  if (projectRef) {
     const projectPermissions = permissions.filter(
       (permission) =>
-        permission.organization_id === organizationId &&
+        permission.organization_slug === organizationSlug &&
         permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
         permission.resources.some((res) => resource.match(toRegexpString(res))) &&
-        permission.project_ids?.includes(projectId)
+        permission.project_refs?.includes(projectRef)
     )
     if (projectPermissions.length > 0) {
       return doPermissionConditionCheck(projectPermissions, { resource_name: resource, ...data })
@@ -56,10 +56,10 @@ export function doPermissionsCheck(
 
   const orgPermissions = permissions
     // filter out org-level permission
-    .filter((permission) => !permission.project_ids || permission.project_ids.length === 0)
+    .filter((permission) => !permission.project_refs || permission.project_refs.length === 0)
     .filter(
       (permission) =>
-        permission.organization_id === organizationId &&
+        permission.organization_slug === organizationSlug &&
         permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
         permission.resources.some((res) => resource.match(toRegexpString(res)))
     )
@@ -68,16 +68,16 @@ export function doPermissionsCheck(
 
 export function useGetPermissions(
   permissionsOverride?: Permission[],
-  organizationIdOverride?: number,
+  organizationSlugOverride?: string,
   enabled = true
 ) {
-  return useGetProjectPermissions(permissionsOverride, organizationIdOverride, undefined, enabled)
+  return useGetProjectPermissions(permissionsOverride, organizationSlugOverride, undefined, enabled)
 }
 
 export function useGetProjectPermissions(
   permissionsOverride?: Permission[],
-  organizationIdOverride?: number,
-  projectIdOverride?: number,
+  organizationSlugOverride?: string,
+  projectRefOverride?: string,
   enabled = true
 ) {
   const permissionsResult = usePermissionsQuery({
@@ -88,24 +88,27 @@ export function useGetProjectPermissions(
     permissionsOverride === undefined ? permissionsResult.data : permissionsOverride
 
   const organizationResult = useSelectedOrganization({
-    enabled: organizationIdOverride === undefined && enabled,
+    enabled: organizationSlugOverride === undefined && enabled,
   })
 
   const organization =
-    organizationIdOverride === undefined ? organizationResult : { id: organizationIdOverride }
-  const organizationId = organization?.id
+    organizationSlugOverride === undefined ? organizationResult : { slug: organizationSlugOverride }
+  const organizationSlug = organization?.slug
 
   const projectResult = useSelectedProject({
-    enabled: projectIdOverride === undefined && enabled,
+    enabled: projectRefOverride === undefined && enabled,
   })
 
-  const project = projectIdOverride === undefined ? projectResult : { id: projectIdOverride }
-  const projectId = project?.id
+  const project =
+    projectRefOverride === undefined || projectResult?.parent_project_ref
+      ? projectResult
+      : { ref: projectRefOverride, parent_project_ref: undefined }
+  const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
 
   return {
     permissions,
-    organizationId,
-    projectId,
+    organizationSlug,
+    projectRef,
   }
 }
 
@@ -115,12 +118,12 @@ export function useCheckPermissions(
   data?: object,
   // [Joshen] Pass the variables if you want to avoid hooks in this
   // e.g If you want to use useCheckPermissions in a loop like organization settings
-  organizationId?: number,
+  organizationSlug?: string,
   permissions?: Permission[]
 ) {
   return useCheckProjectPermissions(action, resource, data, {
-    organizationId,
-    projectId: undefined,
+    organizationSlug,
+    projectRef: undefined,
     permissions,
   })
 }
@@ -130,24 +133,24 @@ export function useCheckProjectPermissions(
   resource: string,
   data?: object,
   overrides?: {
-    organizationId?: number
-    projectId?: number
+    organizationSlug?: string
+    projectRef?: string
     permissions?: Permission[]
   }
 ) {
   const isLoggedIn = useIsLoggedIn()
-  const { organizationId, projectId, permissions } = overrides ?? {}
+  const { organizationSlug, projectRef, permissions } = overrides ?? {}
 
   const {
     permissions: allPermissions,
-    organizationId: orgId,
-    projectId: _projectId,
-  } = useGetProjectPermissions(permissions, organizationId, projectId, isLoggedIn)
+    organizationSlug: _organizationSlug,
+    projectRef: _projectRef,
+  } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
   if (!isLoggedIn) return false
   if (!IS_PLATFORM) return true
 
-  return doPermissionsCheck(allPermissions, action, resource, data, orgId, _projectId)
+  return doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef)
 }
 
 export function usePermissionsLoaded() {

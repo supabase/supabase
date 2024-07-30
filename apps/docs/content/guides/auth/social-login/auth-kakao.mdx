@@ -77,6 +77,8 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 >
 <TabPanel id="js" label="JavaScript">
 
+<CreateClientSnippet />
+
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
 
 ```js
@@ -155,6 +157,51 @@ suspend fun signOut() {
 
 </TabPanel>
 </Tabs>
+
+## Using Kakao Login JS SDK
+
+[Kakao Login JS SDK](https://developers.kakao.com/docs/latest/en/kakaologin/js) is an official Kakao SDK for authenticating Kakao users on websites.
+
+Exchange the [authorization code returned by Kakao API](https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code) for an [ID Token](https://developers.kakao.com/docs/latest/en/kakaologin/common#login-with-oidc).
+
+For example, this code shows a how to get ID Token:
+
+```
+const requestUrl = new URL(request.url);
+const code = requestUrl.searchParams.get('code');
+
+if (code) {
+  const res = await fetch('https://kauth.kakao.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: '<CLIENT_ID>',
+      redirect_uri: '<url>/api/auth/kakao/oidc',
+      code,
+      client_secret: '<CLIENT_SECRET>',
+    }),
+  });
+
+  const {id_token} = await res.json();
+}
+```
+
+Use the ID Token to sign in:
+
+```
+const res = await auth.signInWithIdToken({
+  provider: 'kakao',
+  token: id_token,
+});
+```
+
+### Configuration
+
+1. Set 'State' to 'ON' under [OpenID Connect Activation](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#activate-oidc) on Kakao Developers portal Application Dashboard.
+2. Add `openid` to [scope](https://developers.kakao.com/docs/latest/en/kakaologin/common#additional-consent-scope) along with the scope values you wish to obtain consent for.
 
 ## Resources
 

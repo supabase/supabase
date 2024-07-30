@@ -77,7 +77,6 @@ import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
-import { Mermaid } from './Mermaid'
 import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
@@ -146,7 +145,6 @@ const components = {
   JwtGenerator,
   KotlinProjectSetup,
   Link,
-  Mermaid,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,

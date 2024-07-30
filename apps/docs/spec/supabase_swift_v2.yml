@@ -73,7 +73,7 @@ functions:
     title: "Overview"
     notes: |
       The auth methods can be accessed via the `supabase.auth` namespace.
-      
+
       ### Handling deep links
 
       #### UIKit app lifecycle
@@ -120,7 +120,7 @@ functions:
           supabase.auth.handle(url)
         }
       ```
-    
+
     examples:
       - id: create-auth-client
         name: Create auth client
@@ -767,6 +767,68 @@ functions:
           ```swift
           try await supabase.auth.update(user: UserAttributes(email: "new@email.com"))
           ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "new_email": "new@email.com",
+              "email_change_sent_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {
+                "email": "example@email.com",
+                "email_verified": false,
+                "phone_verified": false,
+                "sub": "11111111-1111-1111-1111-111111111111"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```swift
+          try await supabase.auth.update(
+            user: UserAttributes(
+              phone: "123456789"
+            )
+          )
+          ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
@@ -784,6 +846,20 @@ functions:
               data: [
                 "hello": .string("world")
               ]
+            )
+          )
+          ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: |
+          If **Secure password change** is enabled in your [project's email provider settings](/dashboard/project/_/auth/providers), updating the user's password would require a nonce if the user **hasn't recently signed in**. The nonce is sent to the user's email or phone number. A user is deemed recently signed in if the session was created in the last 24 hours.
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.update(
+            user: UserAttributes(
+              password: "new password",
+              nonce: "123456"
             )
           )
           ```

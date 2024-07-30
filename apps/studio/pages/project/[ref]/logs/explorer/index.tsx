@@ -4,36 +4,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import {
-  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LogsTableName,
-  TEMPLATES,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
-import type {
-  DatePickerToFrom,
-  LogTemplate,
-  LogsWarning,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import {
-  maybeShowUpgradePrompt,
-  useEditorHints,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import {
   Button,
   Form,
@@ -45,6 +15,42 @@ import {
 } from 'ui'
 import { IS_PLATFORM } from 'common'
 
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
+import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import {
+  maybeShowUpgradePrompt,
+  useEditorHints,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useLocalStorage } from '@uidotdev/usehooks'
+import {
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  LOGS_TABLES,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs/Logs.constants'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
+
+const PLACEHOLDER_WAREHOUSE_QUERY =
+  '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
 
@@ -56,24 +62,66 @@ const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACE
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const router = useRouter()
-  const { ref: projectRef, q, ite, its } = useParams()
+  const { ref, q, ite, its } = useParams()
+  const projectRef = ref as string
   const organization = useSelectedOrganization()
   const [editorId, setEditorId] = useState<string>(uuidv4())
+  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
+  const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
+    PLACEHOLDER_WAREHOUSE_QUERY
+  )
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+
+  const routerSource = router.query.source as SourceType
+  const [sourceType, setSourceType] = useState<SourceType>(routerSource || 'logs')
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
-    projectRef as string,
+  const {
+    params,
+    logData,
+    error,
+    isLoading: logsLoading,
+    changeQuery,
+    runQuery,
+    setParams,
+  } = useLogsQuery(
+    projectRef,
     {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
+    },
+    sourceType === 'logs'
+  )
+
+  const {
+    refetch: runWarehouseQuery,
+    data: warehouseResults,
+    isFetching: warehouseFetching,
+    error: warehouseError,
+  } = useWarehouseQueryQuery(
+    { ref: projectRef, sql: warehouseEditorValue },
+    {
+      enabled: false,
     }
   )
+
+  useEffect(() => {
+    if (warehouseError) {
+      toast.error(warehouseError.message)
+    }
+  }, [warehouseError])
+
+  const isLoading = logsLoading || warehouseFetching
+
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const { data: warehouseCollections } = useWarehouseCollectionsQuery({ projectRef })
+
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
@@ -136,9 +184,49 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
+
     if (value && typeof value === 'string') {
       setEditorValue(value)
     }
+
+    if (sourceType === 'warehouse') {
+      const whQuery = warehouseEditorValue
+
+      if (!warehouseCollections?.length) {
+        toast.error('You do not have any collections in your warehouse yet.')
+        return
+      }
+
+      // Check that a collection name is included in the query
+      const collectionNames = warehouseCollections?.map((collection) => collection.name)
+      const collectionExists = collectionNames?.find((collectionName) =>
+        whQuery.includes(collectionName)
+      )
+
+      if (!collectionExists) {
+        toast.error('Please specify a collection name in the query')
+        return
+      }
+
+      // Check that the user is not trying to query logs tables and warehouse collections at the same time
+      const logsSources = Object.values(LOGS_TABLES)
+      const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
+
+      if (logsSourceExists) {
+        toast.error(
+          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
+        )
+        return
+      }
+
+      runWarehouseQuery()
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, q: query },
+      })
+      return
+    }
+
     changeQuery(query)
     runQuery()
     router.push({
@@ -151,10 +239,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleClear = () => {
     setEditorValue('')
     setEditorId(uuidv4())
+    setWarehouseEditorId(uuidv4())
     changeQuery('')
   }
 
-  const handleInsertSource = (source: LogsTableName) => {
+  const handleInsertSource = (source: string) => {
+    if (sourceType === 'warehouse') {
+      //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
+
+      setWarehouseEditorId(uuidv4())
+
+      return
+    }
+
     setEditorValue((prev) => {
       const index = prev.indexOf('from')
       if (index === -1) return `${prev}${source}`
@@ -214,20 +311,44 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onClear={handleClear}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            warehouseCollections={warehouseCollections || []}
             onSelectTemplate={onSelectTemplate}
+            warehouseTemplates={createWarehouseQueryTemplates(warehouseCollections || [])}
+            onSelectWarehouseTemplate={(template) => {
+              setWarehouseEditorValue(template.query)
+              setWarehouseEditorId(uuidv4())
+            }}
             onSave={handleOnSave}
             isLoading={isLoading}
             warnings={warnings}
+            dataSource={sourceType}
+            onDataSourceChange={(srcType) => {
+              setSourceType(srcType)
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, source: srcType },
+              })
+            }}
           />
 
           <ShimmerLine active={isLoading} />
-          <CodeEditor
-            id={editorId}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            onInputRun={handleRun}
-          />
+          {sourceType === 'warehouse' ? (
+            <CodeEditor
+              id={warehouseEditorId}
+              language="pgsql" // its bq sql but monaco doesn't have a language for it
+              defaultValue={warehouseEditorValue}
+              onInputChange={(v) => setWarehouseEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          ) : (
+            <CodeEditor
+              id={editorId}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
@@ -238,9 +359,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
               params={params}
-              data={logData}
+              data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
               error={error}
-              projectRef={projectRef as string}
+              projectRef={projectRef}
             />
           </LoadingOpacity>
           <div className="flex flex-row justify-end mt-2">

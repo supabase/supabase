@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { Button } from 'ui'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
+import { Button, CriticalIcon } from 'ui'
 
 import { useProjectContext } from './ProjectContext'
 
