@@ -59,7 +59,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">Select an message</h3>
+            <h3 className="text-sm text-foreground">Select a message</h3>
             <p className="text-xs text-foreground-lighter">
               Click on a message on the left to view details.
             </p>
