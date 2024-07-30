@@ -46,9 +46,9 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const isDark = resolvedTheme?.includes('dark')
   const isDarkTheme = resolvedTheme === 'dark'
 
-  useEffect(() => {
-    isDarkTheme && setTheme('deep-dark')
-  }, [isDarkTheme])
+  // useEffect(() => {
+  //   isDarkTheme && setTheme('deep-dark')
+  // }, [isDarkTheme])
 
   useEffect(() => {
     return () => {
