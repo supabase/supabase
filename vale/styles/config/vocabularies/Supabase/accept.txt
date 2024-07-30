@@ -68,6 +68,7 @@ Roboflow
 [Ss]ignups?
 SQLAlchemy
 [Ss]upabase
+Snaplet
 Supavisor
 [Ss]upersets?
 Terraform
