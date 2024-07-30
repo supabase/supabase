@@ -87,6 +87,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     unitName: 'GB-Hrs',
     category: 'Database',
-    tip: 'Each project gets provisioned with 8 GB of disk. When you get close to the disk size limit, we autoscale your disk by 1.5x. The first 8 GB of disk is free for every single project - each additional GB of provisioned disk size is billed and prorated down to the hour.',
+    tip: 'Each project gets provisioned with 8 GB of disk. When you get close to the disk size limit, we autoscale your disk by 1.5x. The first 8 GB of disk is free for every single project.',
   },
 ]

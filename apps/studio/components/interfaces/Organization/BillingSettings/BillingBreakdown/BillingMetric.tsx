@@ -70,7 +70,7 @@ const BillingMetric = ({
   const unit = billingMetricUnit(usageMeta.metric as PricingMetric)
 
   const percentageLabel =
-    usageMeta.usage === 0
+    usageMeta.usage === 0 || usageMeta.pricing_free_units === 0
       ? ''
       : usageRatio < 0.01
         ? '(<1%)'
@@ -92,7 +92,7 @@ const BillingMetric = ({
           <p className="text-sm text-foreground-light">{metric.name}</p>
         )}
         <span className="text-sm">{usageLabel}</span>&nbsp;
-        {usageMeta.cost && usageMeta.cost > 0 ? (
+        {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
           <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
         ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
           <span className="text-sm">{percentageLabel}</span>
@@ -147,6 +147,24 @@ const BillingMetric = ({
                   <div className="text-xs text-foreground space-y-2">
                     <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
+                    {metric.tip && (
+                      <div className="my-2">
+                        <p className="text-xs">{metric.tip}</p>
+                      </div>
+                    )}
+
+                    {subscription.usage_billing_enabled === false &&
+                      relativeToSubscription &&
+                      (isApproachingLimit || isExceededLimit) && (
+                        <div className="mt-2">
+                          <p className="text-xs">
+                            Exceeding your plans included usage will lead to restrictions to your
+                            project. Upgrade to a usage-based plan or disable the spend cap to avoid
+                            restrictions.
+                          </p>
+                        </div>
+                      )}
+
                     {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
                       <table className="list-disc w-full">
                         <thead>
@@ -180,24 +198,6 @@ const BillingMetric = ({
                         </tfoot>
                       </table>
                     )}
-
-                    {metric.tip && (
-                      <div className="my-2">
-                        <p className="text-xs">{metric.tip}</p>
-                      </div>
-                    )}
-
-                    {subscription.usage_billing_enabled === false &&
-                      relativeToSubscription &&
-                      (isApproachingLimit || isExceededLimit) && (
-                        <div className="mt-2">
-                          <p className="text-xs">
-                            Exceeding your plans included usage will lead to restrictions to your
-                            project. Upgrade to a usage-based plan or disable the spend cap to avoid
-                            restrictions.
-                          </p>
-                        </div>
-                      )}
                   </div>
                 </div>
               </Tooltip.Content>
