@@ -1,11 +1,11 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
-type ContentBase = {
+export type ContentBase = {
   id?: string
   name: string
   description?: string

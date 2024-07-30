@@ -6,8 +6,6 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { useCheckPermissions } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 

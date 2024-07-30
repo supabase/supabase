@@ -15,26 +15,27 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
-  IconAlertTriangle,
+  CriticalIcon,
   IconExternalLink,
   IconInfo,
   Modal,
   Radio,
   SidePanel,
+  WarningIcon,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -179,18 +180,6 @@ const ComputeInstanceSidePanel = () => {
       } else {
         setSelectedOption(defaultInstanceSize)
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change project compute size',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -236,7 +225,7 @@ const ComputeInstanceSidePanel = () => {
         }
         tooltip={
           isFreePlan
-            ? 'Unable to update compute instance on a free plan'
+            ? 'Unable to update compute instance on a Free Plan'
             : !canUpdateCompute
               ? 'You do not have permission to update compute instance'
               : undefined
@@ -280,7 +269,7 @@ const ComputeInstanceSidePanel = () => {
                   withIcon
                   className="mb-4"
                   variant="info"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
@@ -423,9 +412,9 @@ const ComputeInstanceSidePanel = () => {
                   Unable to downgrade as project has active read replicas
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The minimum compute instance size for using read replicas is the Small Compute.
-                  You need to remove all read replicas before downgrading Compute as it requires at
-                  least a Small compute instance.
+                  The minimum compute size for using read replicas is the Small Compute. You need to
+                  remove all read replicas before downgrading Compute as it requires at least a
+                  Small compute instance.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
                   <Button asChild type="default">
@@ -443,8 +432,8 @@ const ComputeInstanceSidePanel = () => {
                 <WarningIcon />
                 <AlertTitle_Shadcn_>Disable PITR before downgrading</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  You currently have PITR enabled. The minimum compute instance size for using PITR
-                  is the Small Compute.
+                  You currently have PITR enabled. The minimum compute size for using PITR is the
+                  Small Compute.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_>
                   You need to disable PITR before downgrading Compute as it requires at least a

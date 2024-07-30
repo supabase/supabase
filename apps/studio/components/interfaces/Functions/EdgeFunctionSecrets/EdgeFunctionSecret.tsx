@@ -4,7 +4,7 @@ import { Trash } from 'lucide-react'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret

@@ -1,8 +1,10 @@
 import * as Popover from '@radix-ui/react-popover'
 import { motion } from 'framer-motion'
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { PropsWithChildren, useEffect, useState } from 'react'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { Button, IconInfo } from 'ui'
 
 export interface AISchemaSuggestionPopoverProps {

@@ -4,7 +4,8 @@ import Link from 'next/link'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button, IconGitBranch } from 'ui'
 

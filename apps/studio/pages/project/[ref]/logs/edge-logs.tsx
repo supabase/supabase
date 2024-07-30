@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()

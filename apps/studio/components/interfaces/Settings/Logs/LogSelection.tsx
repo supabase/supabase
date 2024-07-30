@@ -1,3 +1,10 @@
+import { MousePointerClick, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { Loading } from 'components/ui/Loading'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 import {
   Button,
   CodeBlock,
@@ -7,17 +14,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import CopyButton from 'components/ui/CopyButton'
-import { Loading } from 'components/ui/Loading'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useEffect, useMemo, useState } from 'react'
-import {
-  isDefaultLogPreviewFormat,
-  isUnixMicro,
-  LogsEndpointParams,
-  unixMicroToIsoTimestamp,
-} from '.'
-import type { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -25,9 +21,8 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import { MousePointerClick, X } from 'lucide-react'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
-import toast from 'react-hot-toast'
+import type { LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import { isDefaultLogPreviewFormat, isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 
 export interface LogSelectionProps {
   log: LogData | null

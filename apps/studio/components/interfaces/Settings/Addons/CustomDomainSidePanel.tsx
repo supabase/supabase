@@ -10,9 +10,10 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -92,18 +93,6 @@ const CustomDomainSidePanel = () => {
       } else {
         setSelectedOption('cd_none')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Custom domains',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -134,7 +123,7 @@ const CustomDomainSidePanel = () => {
       }
       tooltip={
         isFreePlan
-          ? 'Unable to enable custom domain on a free plan'
+          ? 'Unable to enable custom domain on a Free Plan'
           : !canUpdateCustomDomain
             ? 'You do not have permission to update custom domain'
             : undefined
@@ -184,22 +173,7 @@ const CustomDomainSidePanel = () => {
               type="large-cards"
               size="tiny"
               id="custom-domain"
-              onChange={(event: any) => {
-                setSelectedOption(event.target.value)
-                Telemetry.sendActivity(
-                  {
-                    activity: 'Option Selected',
-                    source: 'Dashboard',
-                    data: {
-                      title: 'Custom domains',
-                      section: 'Add ons',
-                      option: event.target.label,
-                    },
-                    projectRef,
-                  },
-                  router
-                )
-              }}
+              onChange={(event: any) => setSelectedOption(event.target.value)}
             >
               <Radio
                 name="custom-domain"
@@ -312,7 +286,7 @@ const CustomDomainSidePanel = () => {
             <Alert
               withIcon
               variant="info"
-              title="Custom domains are unavailable on the free plan"
+              title="Custom domains are unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
                   <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>

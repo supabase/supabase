@@ -1,0 +1,49 @@
+---
+id: 'log-drains'
+title: 'Log Drains'
+description: 'Getting started with Supabase Log Drains'
+---
+
+Log drains will send all logs of the Supabase stack to one or more desired destinations. It is only available for customers on Team and Enterprise Plans.
+
+<Admonition type="note">
+
+Log drains is in **Private Alpha**, and is not available in the dashboard yet. [Reach out to us](https://forms.supabase.com/logdrains) to get log drains enabled for your project.
+
+You can read about the initial announcement [here](https://github.com/orgs/supabase/discussions/26650).
+
+</Admonition>
+
+The following table lists the supported destinations and the required setup configuration:
+
+| Destination        | Transport Method | Configuration                                     |
+| ------------------ | ---------------- | ------------------------------------------------- |
+| Generic Webhook    | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
+| Datadog            | HTTP             | API Key <br /> Region                             |
+| Elastic - Filebeat | HTTP             | URL <br /> Username and Password                  |
+
+### Destinations And Behavior
+
+HTTP requests will be batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
+
+#### Generic Webhook
+
+Logs will be sent as a JSON payload. Both HTTP1 and HTTP2 are supported. A preset configuration of Headers can be supplied for all requests.
+
+Note that requests will be **unsigned**.
+
+:::note
+Unsigned webhook requests are temporary and all requests will be signed in the near future.
+:::
+
+#### Datadog
+
+Logs sent to Datadog will have the name of the log source set on the `service` field of the event.
+
+The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.
+
+#### Elastic - Filebeat
+
+Logs will be sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
+
+The Filebeat server only handles HTTP1 requests. Basic Auth can be provided for optional user authentication.

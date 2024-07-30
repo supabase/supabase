@@ -1,5 +1,4 @@
 import { CommandMenuProvider } from '@ui-patterns/Cmdk'
-import PromoToast from '@ui-patterns/PromoToast'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
 import { type PropsWithChildren } from 'react'
@@ -24,10 +23,9 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <CommandMenuProvider site="docs">
-              <div className="h-screen flex flex-col">
+              <div className="flex flex-col">
                 <SiteLayout>
                   <PortalToast />
-                  <PromoToast />
                   {children}
                 </SiteLayout>
                 <ThemeSandbox />

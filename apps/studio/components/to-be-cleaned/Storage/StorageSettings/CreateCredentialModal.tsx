@@ -8,7 +8,7 @@ import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,

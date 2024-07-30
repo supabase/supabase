@@ -25,7 +25,9 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'

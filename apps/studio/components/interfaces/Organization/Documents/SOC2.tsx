@@ -15,7 +15,7 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getDocument } from 'data/documents/document-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -53,7 +53,7 @@ const SOC2 = () => {
         <p className="text-base m-0">SOC2 Type 2</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            Organizations on Teams plan or above have access to our most recent SOC2 Type 2 report.
+            Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
@@ -76,7 +76,7 @@ const SOC2 = () => {
               <div className="flex items-center justify-center h-full">
                 {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
                   <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                    <Button type="default">Upgrade to Teams</Button>
+                    <Button type="default">Upgrade to Team</Button>
                   </Link>
                 ) : (
                   <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>

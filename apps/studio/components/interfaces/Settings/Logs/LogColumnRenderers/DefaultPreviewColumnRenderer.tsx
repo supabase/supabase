@@ -1,5 +1,5 @@
 import { Column, RenderCellProps } from 'react-data-grid'
-import { LogData } from '..'
+import type { LogData } from '../Logs.types'
 import { RowLayout, TextFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
 export const defaultRenderCell = (props: RenderCellProps<LogData, unknown>) => (

@@ -5,7 +5,7 @@ import { Download } from 'lucide-react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge } from 'ui'
 
 interface BackupItemProps {

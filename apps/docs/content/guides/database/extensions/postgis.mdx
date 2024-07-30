@@ -422,6 +422,24 @@ val data = supabase.postgrest.rpc(
 </TabPanel>
 </Tabs>
 
+## Troubleshooting
+
+<Admonition type="caution">
+
+The [official PostGIS documentation](https://postgis.net/documentation/tips/tip-move-postgis-schema/) for relocating the schema will cause issues for Supabase projects. These issues might not be apparent immediately but will eventually surface. To relocate your schema, use the following steps instead.
+
+</Admonition>
+
+As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (Eg. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
+
+1. Backup your Database to prevent data loss - You can do this through the [CLI](https://supabase.com/docs/reference/cli/supabase-db-dump) or Postgres backup tools such as [pg_dumpall](https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-ALL)
+
+2. Drop all dependencies you created and the PostGIS extension - `DROP EXTENSION postgis CASCADE;`
+
+3. Enable PostGIS extension in the new schema - `CREATE EXTENSION postgis SCHEMA extensions;`
+
+4. Restore dropped data via the Backup if necessary from step 1 with your tool of choice.
+
 ## Resources
 
 - [Official PostGIS documentation](https://postgis.net/documentation/)

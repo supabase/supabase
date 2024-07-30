@@ -3,19 +3,18 @@ import { MoreVertical, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { TooltipContent } from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
-import {
-  useCreateWarehouseAccessToken,
-  useDeleteWarehouseAccessToken,
-  useWarehouseAccessTokensQuery,
-} from 'data/analytics'
-import { useCheckPermissions } from 'hooks'
+import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
+import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -35,7 +34,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import CreateWarehouseAccessToken from './CreateWarehouseAccessToken'
-import { TooltipContent } from '@radix-ui/react-tooltip'
 
 const AccessTokenItem = ({
   token,
@@ -104,7 +102,7 @@ const AccessTokenItem = ({
   )
 }
 
-const WarehouseAccessTokens = () => {
+export const WarehouseAccessTokens = () => {
   const isProjectActive = useIsProjectActive()
   const params = useParams()
   const projectRef = params.ref as string
@@ -141,10 +139,10 @@ const WarehouseAccessTokens = () => {
   const isLoading = deleteLoading || createLoading
 
   return (
-    <section className="1xl:px-28 mx-auto flex flex-col gap-y-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 pb-32">
+    <section className="flex flex-col gap-y-10 py-6 pb-32">
       <FormHeader
         className="!mb-0"
-        title="Warehouse access tokens"
+        title="Access tokens"
         description="Manage your warehouse access tokens for this project."
         actions={
           <CreateWarehouseAccessToken
@@ -181,7 +179,7 @@ const WarehouseAccessTokens = () => {
                   <Table
                     head={[
                       <Table.th key="description">Description</Table.th>,
-                      <Table.th key="token">Created at</Table.th>,
+                      <Table.th key="created_at">Created at</Table.th>,
                       <Table.th key="token">Token</Table.th>,
                       <Table.th key="actions" />,
                     ]}

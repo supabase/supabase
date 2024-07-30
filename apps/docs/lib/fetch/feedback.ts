@@ -20,7 +20,7 @@ export async function sendFeedback({
 }: SendFeedbackVariables) {
   const { data, error } = await post('/platform/feedback/docs', {
     body: {
-      page: pathname,
+      page: pathname ?? '',
       isHelpful,
       title,
       feedback: message,

@@ -1,5 +1,5 @@
-import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
+import type { PreviewLogData } from '../Logs.types'
 import {
   jsonSyntaxHighlight,
   ResponseCodeFormatter,

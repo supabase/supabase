@@ -13,7 +13,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -204,7 +204,7 @@ const StorageSettings = () => {
                 <UpgradeToPro
                   icon={<Clock size={14} className="text-foreground-muted" />}
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 50 GB."
+                  secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
                 />
               </div>
             )}

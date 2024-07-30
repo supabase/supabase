@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'

@@ -174,7 +174,7 @@
   }
 
   [type='checkbox']:checked {
-    @apply bg-foreground;
+    @apply bg-background dark:bg-foreground;
     border-color: transparent;
     background-size: 100% 100%;
     background-position: center;
@@ -184,7 +184,7 @@
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
-    @apply text-foreground border-default transition-all;
+    @apply text-background dark:text-foreground border-default transition-all;
     @apply hover:border-foreground focus:ring-0 focus:outline-none;
 
     @apply bg-transparent;
@@ -397,26 +397,6 @@
 
 .sb-grid-time-editor {
   @apply h-full w-full px-2;
-}
-
-/*
-  Pagination
-*/
-
-.sb-grid-pagination {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-pagination-input-container {
-  @apply w-12;
-}
-.sb-grid-pagination-input {
-  @apply block w-12;
-}
-
-.sb-grid-pagination-input .sbui-inputnumber {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
 }
 
 /*

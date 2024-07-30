@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PropsWithChildren, useMemo } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 

@@ -3,7 +3,7 @@ import { differenceInDays } from 'date-fns'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 
 import CopyButton from 'components/ui/CopyButton'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,

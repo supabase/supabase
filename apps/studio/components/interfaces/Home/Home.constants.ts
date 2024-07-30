@@ -15,7 +15,7 @@ export const CLIENT_LIBRARIES = [
   },
   {
     language: 'Python',
-    officialSupport: false,
+    officialSupport: true,
     releaseState: 'Alpha',
     docsUrl: 'https://supabase.com/docs/reference/python/initializing',
     gitUrl: 'https://github.com/supabase/supabase-py',
@@ -92,5 +92,11 @@ export const EXAMPLE_PROJECTS = [
     title: 'Svelte todo list app',
     description: 'Sveltejs todo with TailwindCSS and Snowpack',
     url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list',
+  },
+  {
+    framework: 'Flutter',
+    title: 'Flutter MFA app',
+    description: 'A Flutter app demonstrating how to implement MFA',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/auth/flutter-mfa',
   },
 ]

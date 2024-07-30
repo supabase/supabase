@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import z from 'zod'
 
-import { FormActions } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import type { Profile } from 'data/profile/types'

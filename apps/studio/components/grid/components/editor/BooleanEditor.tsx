@@ -1,6 +1,6 @@
-import { Select } from 'ui'
+import { useTrackedState } from 'components/grid/store/Store'
 import type { RenderEditCellProps } from 'react-data-grid'
-import { useTrackedState } from 'components/grid/store'
+import { Select } from 'ui'
 
 interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   isNullable?: boolean

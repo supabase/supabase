@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
@@ -13,6 +12,14 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
 import {
   Badge,
   Button,
@@ -26,12 +33,6 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks'
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 

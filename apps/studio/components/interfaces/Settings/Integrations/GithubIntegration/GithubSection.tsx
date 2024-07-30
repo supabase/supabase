@@ -19,7 +19,10 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'

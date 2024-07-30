@@ -4,17 +4,21 @@ import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 
-import { useKeyboardShortcuts } from 'hooks'
+import { GridFooter } from 'components/ui/GridFooter'
+import { useKeyboardShortcuts } from 'hooks/deprecated'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { GridFooter } from 'components/ui/GridFooter'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
+  const enableFolders = useFlag('sqlFolderOrganization')
   const [cellPosition, setCellPosition] = useState<any>(undefined)
 
   const snap = useSqlEditorStateSnapshot()
-  const results = snap.results[id]?.[0]
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const results = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
   const onCopyCell = () => {
     if (cellPosition) {

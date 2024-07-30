@@ -40,7 +40,8 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
@@ -73,6 +74,7 @@ interface AIPolicyEditorPanelProps {
   selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
+  authContext: 'database' | 'realtime'
 }
 
 /**
@@ -85,6 +87,7 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedTable,
   selectedPolicy,
   onSelectCancel,
+  authContext,
 }: AIPolicyEditorPanelProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -546,6 +549,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           setFieldError(undefined)
                           if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
                         }}
+                        authContext={authContext}
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection

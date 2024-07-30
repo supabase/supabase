@@ -5,9 +5,9 @@ import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
-import { AuthLayout } from 'components/layouts'
+import Policies from 'components/interfaces/Auth/Policies/Policies'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
@@ -16,7 +16,8 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, usePermissionsLoaded, useUrlState } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
@@ -202,6 +203,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           setShowPolicyAiEditor(false)
           setSelectedPolicyToEdit(undefined)
         }}
+        authContext="database"
       />
     </div>
   )

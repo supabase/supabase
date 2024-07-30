@@ -1,61 +1,14 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import {
-  createContext,
-  ElementRef,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { ElementRef, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { CommandInput } from './Command.utils'
+import { CommandMenuContext } from './CommandMenuContext'
 
 // `CommandMenu` is heavy - code split to reduce app bundle size
 const CommandMenu = dynamic(() => import('./CommandMenu'), {
   loading: () => <p>Loading...</p>,
 })
-
-export interface CommandMenuContextValue {
-  isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  isLoading: boolean
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  search: string
-  setSearch: React.Dispatch<React.SetStateAction<string>>
-  pages: string[]
-  setPages: React.Dispatch<React.SetStateAction<string[]>>
-  currentPage?: string
-  inputRef: React.RefObject<HTMLInputElement>
-  site: 'studio' | 'docs' | 'website'
-
-  /**
-   * Project metadata for easy retrieval
-   */
-  project?: { ref?: string; apiKeys?: { anon?: string; service?: string }; apiUrl?: string }
-  /**
-   * Any additional metadata that CMDK component can use in its AI prompts
-   */
-  metadata?: { definitions?: string; flags?: { [key: string]: string } }
-  /**
-   * Opt in flag to use additional metadata in AI prompts
-   */
-  isOptedInToAI: boolean
-
-  // Optional callback to save a generated SQL output
-  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
-}
-export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
-export const useCommandMenu = () => {
-  const context = useContext(CommandMenuContext)
-
-  if (context === undefined) {
-    throw new Error('useCommandMenu was used outside of CommandMenuProvider')
-  }
-
-  return context
-}
 
 export interface CommandMenuProviderProps {
   site: 'studio' | 'docs' | 'website'
