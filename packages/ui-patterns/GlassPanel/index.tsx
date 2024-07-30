@@ -42,9 +42,7 @@ export const GlassPanel = ({
     <div
       className={cn(
         'shrink-0',
-        showIconBg
-          ? 'bg-brand-200 dark:bg-brand-400 border border-brand-300 dark:border-brand-400 w-8 h-8 flex items-center justify-center rounded'
-          : ''
+        showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded' : ''
       )}
     >
       {props.children}
@@ -76,7 +74,7 @@ export const GlassPanel = ({
         'border rounded-lg',
         'text-left',
         background
-          ? 'hover:border-strong bg-surface-100'
+          ? 'hover:border-strong bg-surface-75'
           : 'border-muted hover:border-default bg-transparent',
         'transition',
         className
@@ -93,10 +91,10 @@ export const GlassPanel = ({
             "
         />
       )}
-      <div
+      {/* <div
         className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
         style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
-      />
+      /> */}
       <div
         className={cn(
           'px-8 pb-8 relative',

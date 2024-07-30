@@ -42,10 +42,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(sorts || []).length > 0 ? 'link' : 'text'}
-          icon={<List strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
