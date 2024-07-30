@@ -20,6 +20,7 @@ The following table lists the supported destinations and the required setup conf
 | ------------------ | ---------------- | ------------------------------------------------- |
 | Generic Webhook    | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
 | Datadog            | HTTP             | API Key <br /> Region                             |
+| Loki               | HTTP             | URL <br /> Headers                                |
 | Elastic - Filebeat | HTTP             | URL <br /> Username and Password                  |
 
 ### Destinations And Behavior
@@ -38,9 +39,17 @@ Unsigned webhook requests are temporary and all requests will be signed in the n
 
 #### Datadog
 
-Logs sent to Datadog will have the name of the log source set on the `service` field of the event.
+Logs sent to Datadog will have the name of the log source set on the `service` field of the event. The request body will be gzipped.
 
 The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.
+
+#### Loki
+
+Logs will be sent to a provided HTTP endpoint, see [documentation](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs) for `POST /loki/api/v1/push`.
+
+Events will get batched with multiple streams per request, with each log source having its own stream. The stream will be labelled with the `source` key.
+
+Requests will be in the form of a gzipped JSON body. The payload message will be a stringified JSON of the raw log event. No custom structured JSON metadata will be attached to stream values.
 
 #### Elastic - Filebeat
 
