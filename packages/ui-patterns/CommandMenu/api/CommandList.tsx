@@ -29,7 +29,7 @@ const CommandList = forwardRef<
   return (
     <CommandList_Shadcn_
       ref={setRef}
-      className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
+      className={cn('max-h-[initial] overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}
     >
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
