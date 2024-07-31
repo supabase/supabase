@@ -1,6 +1,7 @@
 import { CommandMenuProvider } from '@ui-patterns/Cmdk'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
+import { PromoToast } from 'ui-patterns'
 import { type PropsWithChildren } from 'react'
 
 import SiteLayout from '~/layouts/SiteLayout'
@@ -26,6 +27,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
               <div className="flex flex-col">
                 <SiteLayout>
                   <PortalToast />
+                  <PromoToast />
                   {children}
                 </SiteLayout>
                 <ThemeSandbox />

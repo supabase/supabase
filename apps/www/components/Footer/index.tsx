@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -10,6 +9,7 @@ import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 
 interface Props {
   className?: string
@@ -17,12 +17,11 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('/launch-week')
+  const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
-  const forceDark = isLaunchWeek || pathname === '/'
+  const forceDark = isDarkLaunchWeek || pathname === '/'
 
   if (props.hideFooter) {
     return null
@@ -32,7 +31,7 @@ const Footer = (props: Props) => {
     <footer
       className={cn(
         'bg-alternative',
-        isLaunchWeek && 'bg-[#060809]',
+        isDarkLaunchWeek && 'bg-[#060809]',
         isGAWeek && 'dark:bg-alternative',
         props.className
       )}
