@@ -96,6 +96,8 @@ export async function handler(req: Request) {
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
 
+  console.log('force deploy')
+
   try {
     if (!username) throw new Error('missing username param')
 
