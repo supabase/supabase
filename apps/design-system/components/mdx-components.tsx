@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { kebabCase } from 'lodash'
 import Link from 'next/link'
 import { useMDXComponent } from 'next-contentlayer2/hooks'
+import { Link as LinkIcon } from 'lucide-react'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
 import { cn } from 'ui'
@@ -65,16 +66,19 @@ const components = {
     return (
       <h2
         className={cn(
-          'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0',
+          'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0 group relative -ml-2 pl-2',
           className
         )}
         {...props}
         id={id}
       >
-        <a href={`#${id}`} className="pr-2 text-foreground-lighter">
-          #
+        <a href={`#${id}`}>
+          <div className="absolute -ml-6 mt-1.5 opacity-0 group-hover:opacity-100 h-5 w-5 flex items-center justify-center text-foreground-lighter hover:text-foreground">
+            <LinkIcon size="14" />
+          </div>
+
+          {children}
         </a>
-        {children}
       </h2>
     )
   },
