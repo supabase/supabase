@@ -34,7 +34,7 @@ pg_cron is not fully supported on Fly Postgres. Read more about this [Fly Postgr
 
 ```sql
 -- Example: enable the "pg_cron" extension
-create extension pg_cron with schema extensions;
+create extension pg_cron with schema pg_catalog;
 
 grant usage on schema cron to postgres;
 grant all privileges on all tables in schema cron to postgres;
