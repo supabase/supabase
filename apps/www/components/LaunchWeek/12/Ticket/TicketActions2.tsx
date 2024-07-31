@@ -69,6 +69,10 @@ export default function TicketActions2() {
           .eq('launch_week', 'lw12')
           .eq('username', username)
       }
+
+      if (userData.shared_on_linkedin && userData.shared_on_twitter) {
+        await fetch(`/api-v2/ticket-og?username=${username}&platinum=true`)
+      }
     })
   }
 

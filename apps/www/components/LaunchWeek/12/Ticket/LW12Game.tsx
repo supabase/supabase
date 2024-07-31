@@ -80,6 +80,8 @@ const LWXGame = ({ setIsGameMode }: Props) => {
             if (res.error) return console.log('error', res.error)
             setIsGameMode(false)
           })
+
+        await fetch(`/api-v2/ticket-og?username=${user.username}&secret=true`)
       } else {
         localStorage.setItem('lw12_secret', 'true')
 
