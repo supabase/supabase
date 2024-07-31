@@ -66,6 +66,7 @@ export default function Ticket() {
     "role": ${user.role ? `"${user.role}"` : 'null'},
     "company": ${user.company ? `"${user.company}"` : 'null'},
     "location": ${user.location ? `"${user.location}"` : 'null'},
+  },
   "error": null
 }
 `
