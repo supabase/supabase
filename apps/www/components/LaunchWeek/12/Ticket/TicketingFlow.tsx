@@ -142,7 +142,7 @@ const TicketingFlow = () => {
                           <p className="text-2xl mb-1">You found a secret ticket</p>
                         )}
                         {!hasSecretTicket && (
-                          <p className="text-2xl mb-1">You're in {FIRST_NAME}!</p>
+                          <p className="text-2xl mb-1">You're in, {FIRST_NAME}!</p>
                         )}
                         <p className="text-2xl text-foreground-light">
                           Share your ticket to win limited swag.
