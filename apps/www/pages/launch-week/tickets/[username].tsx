@@ -112,7 +112,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       ? process.env.VERCEL_URL
       : 'http://localhost:3000'
 
-  // fetch /api-v2/ticket-og
+  // fetch the normal ticket
+  // stores the og images in supabase storage
   fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // supabaseAdmin.functions.invoke(`lw12-ticket-og?username=${encodeURIComponent(username ?? '')}`)
@@ -127,6 +128,17 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       .single()
 
     user = data
+  }
+
+  // fetch the platinum ticket
+  // stores the og images in supabase storage
+  if (user?.secret) {
+    fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
+  } else if (user?.platinum) {
+    // fetch /api-v2/ticket-og
+    fetch(
+      `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
+    )
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
