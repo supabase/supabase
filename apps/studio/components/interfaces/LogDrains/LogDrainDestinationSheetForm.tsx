@@ -188,12 +188,8 @@ export function LogDrainDestinationSheetForm({
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
-                console.log({
-                  form,
-                  values: form.getValues(),
-                  errors: form.formState.errors,
-                })
                 form.handleSubmit(onSubmit)(e)
+                form.reset()
               }}
             >
               <div className="space-y-4">
@@ -366,7 +362,7 @@ export function LogDrainDestinationSheetForm({
               <Input_Shadcn_
                 size={'tiny'}
                 type="text"
-                placeholder="Header name"
+                placeholder="x-header-name"
                 value={newCustomHeader.name}
                 onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
               />

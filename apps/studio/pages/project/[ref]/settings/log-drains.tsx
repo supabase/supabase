@@ -73,7 +73,14 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </ScaffoldDescription>
           </div>
           <div className="flex items-center justify-end">
-            <Button onClick={() => setOpen(true)} type="primary">
+            <Button
+              onClick={() => {
+                setSelectedLogDrain(null)
+                setMode('create')
+                setOpen(true)
+              }}
+              type="primary"
+            >
               Add destination
             </Button>
           </div>
