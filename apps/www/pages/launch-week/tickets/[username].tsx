@@ -15,6 +15,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW12Background from '~/components/LaunchWeek/12/LW12Background'
+import { useTheme } from 'next-themes'
 
 const LW12TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/12/Ticket/TicketContainer')
@@ -38,6 +39,20 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
+  const { resolvedTheme, setTheme } = useTheme()
+
+  // const isDark = resolvedTheme?.includes('dark')
+  // const isDarkTheme = resolvedTheme === 'dark'
+
+  // useEffect(() => {
+  //   isDarkTheme && setTheme('deep-dark')
+  // }, [isDarkTheme])
+
+  // useEffect(() => {
+  //   return () => {
+  //     isDark && setTheme('dark')
+  //   }
+  // }, [])
 
   if (!ticketNumber) {
     return <Error statusCode={404} />

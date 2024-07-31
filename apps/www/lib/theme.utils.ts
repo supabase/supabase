@@ -14,7 +14,7 @@ export function useForceDeepDark() {
   useEffect(() => {
     const handleDocumentLoad = () => {
       // Update the HTML element attributes
-      const theme = forceDarkMode || isDarkTheme ? (isGaSection ? 'deep-dark' : 'dark') : 'light'
+      const theme = forceDarkMode || isDarkTheme ? 'dark' : 'light'
 
       document.documentElement.setAttribute('data-theme', theme)
       document.documentElement.style.colorScheme = theme

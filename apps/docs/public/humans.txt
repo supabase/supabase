@@ -3,6 +3,7 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Aleksi Immonen
 Alexander Korotkov
 Amy Q
 Angelico de los Reyes
@@ -33,6 +34,7 @@ Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
+Jenny Kibiri
 Jess Shears
 Joel Lee
 John Pena
@@ -40,6 +42,7 @@ Jon M
 Jonny Summers-Muir
 Jordi Enric
 Joshen Lim
+Julien Goux
 Kamil Ogórek
 Kang Ming Tay
 Karan S

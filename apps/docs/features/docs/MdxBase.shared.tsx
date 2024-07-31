@@ -29,6 +29,7 @@ import {
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
+import { RegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
@@ -68,6 +69,7 @@ const components = {
   ProjectSetup,
   QuickstartIntro,
   RealtimeLimitsEstimator,
+  RegionsList,
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,

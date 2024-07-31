@@ -5,7 +5,6 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import HeroFrameworks from './HeroFrameworks'
 import AnnouncementBadge from '~/components/Announcement/Badge'
 
 const Hero = () => {
@@ -65,8 +64,6 @@ const Hero = () => {
                     </Link>
                   </Button>
                 </div>
-
-                <HeroFrameworks className="mt-4 lg:mt-6" />
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import specAuthV1 from '~/spec/gotrue_v1_config.yaml' assert { type: 'yml' }
 
 const meta = {
@@ -23,7 +24,7 @@ const AuthConfigPage = async () => {
         'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/auth/config.tsx'
       )}
     >
-      <MDXRemoteGuides source={descriptionMdx} />
+      <MDXRemoteBase source={descriptionMdx} />
 
       <div>
         {specAuthV1.info.tags.map((tag: ReturnType<typeof specAuthV1>['info']['tags']) => {

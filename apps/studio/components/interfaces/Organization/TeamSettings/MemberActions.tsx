@@ -63,7 +63,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
+    selectedOrganization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
