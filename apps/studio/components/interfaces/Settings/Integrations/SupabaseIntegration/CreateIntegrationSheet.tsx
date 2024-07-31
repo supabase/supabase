@@ -37,11 +37,11 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
+  WarningIcon,
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { DroppableTextArea } from './DroppableTextArea'
 import { LogoFileInput } from './LogoFileInput'
 
@@ -208,6 +208,7 @@ export const CreateIntegrationSheet = ({
           id={FORM_ID}
           className="w-full flex-1 overflow-auto"
           onSubmit={form.handleSubmit(onSubmit)}
+          tabIndex={-1}
         >
           <Separator />
           <SheetSection className="space-y-4">
@@ -297,7 +298,6 @@ export const CreateIntegrationSheet = ({
                     <FormItemLayout>
                       <FormControl_Shadcn_>
                         <LogoFileInput logoUrl={field.value} onChange={field.onChange} />
-                        {/* <SupabaseFileInput value={field.value} onChange={field.onChange} /> */}
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

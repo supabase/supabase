@@ -20,7 +20,7 @@ const IntegrationsDirectoryPlanNotice = () => {
         directory for this project
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_>
-        <Button size="tiny" type="default" className="mt-4">
+        <Button size="tiny" type="default" className="mt-4" asChild>
           <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
             Upgrade to Pro
           </Link>
