@@ -14,8 +14,15 @@ export default function TicketActions() {
         />
       </div>
       <p className="text-foreground-light text-sm ">
-        Share your ticket to increase your chances of winning a Wandrd backpack and other limited
-        swag.
+        Share your ticket to increase your chances of winning a{' '}
+        <a
+          href="https://www.wandrd.com/products/prvke?variant=39289416089680"
+          target="_blank"
+          className="text-foreground hover:text-brand transition"
+        >
+          Wandrd backpack
+        </a>{' '}
+        and other limited swag.
       </p>
     </div>
   )
