@@ -107,6 +107,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
+  const SITE_URL =
+    (process.env.NEXT_PUBLIC_VERCEL_ENV as string) !== 'development'
+      ? process.env.VERCEL_URL
+      : 'http://localhost:3000'
+
   // fetch /api-v2/ticket-og
   fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
