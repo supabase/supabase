@@ -107,7 +107,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
-  supabaseAdmin.functions.invoke(`lw12-ticket-og?username=${encodeURIComponent(username ?? '')}`)
+  // fetch /api-v2/ticket-og
+  fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
+
+  // supabaseAdmin.functions.invoke(`lw12-ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // fetch a specific user
   if (username) {
