@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
+export const revalidate = true
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -151,6 +152,8 @@ export async function GET(req: Request, res: Response) {
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
     } = user
+
+    console.log(user)
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum)
