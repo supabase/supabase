@@ -44,7 +44,7 @@ export const themes = {
       'hljs-literal': {
         color: '#ffffff', // corresponds to --ray-token-number
       },
-      'hljs-attribute': {
+      'hljs-attr': {
         color: '#3ecf8e', // corresponds to --ray-token-property
       },
     },
@@ -76,7 +76,7 @@ export const themes = {
       'hljs-variable': {
         color: '#e06c75', // Variables
       },
-      'hljs-attribute': {
+      'hljs-attr': {
         color: '#d19a66', // Attributes
       },
       'hljs-number': {
@@ -132,7 +132,7 @@ export const themes = {
       'hljs-variable': {
         color: '#e06c75', // Variables
       },
-      'hljs-attribute': {
+      'hljs-attr': {
         color: '#fff', // Attributes
       },
       'hljs-number': {

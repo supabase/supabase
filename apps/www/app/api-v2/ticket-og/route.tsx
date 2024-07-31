@@ -110,7 +110,7 @@ export async function GET(req: Request, res: Response) {
       CODE_STRING: themes[ticketType].CODE_THEME['hljs-string'].color,
       CODE_NUMBER: themes[ticketType].CODE_THEME['hljs'].color,
       CODE_NULL: themes[ticketType].CODE_THEME['hljs'].color,
-      JSON_KEY: themes[ticketType].CODE_THEME['hljs-attribute'].color,
+      JSON_KEY: themes[ticketType].CODE_THEME['hljs-attr'].color,
     }
 
     const fontData = await font
