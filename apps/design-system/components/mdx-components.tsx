@@ -2,10 +2,8 @@
 
 import * as React from 'react'
 import Image from 'next/image'
-import { kebabCase } from 'lodash'
 import Link from 'next/link'
 import { useMDXComponent } from 'next-contentlayer2/hooks'
-import { Link as LinkIcon } from 'lucide-react'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
 import { cn } from 'ui'
@@ -67,7 +65,6 @@ const components = {
       {...props}
     />
   ),
-
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       className={cn('font-heading mt-8 scroll-m-20 text-xl tracking-tight', className)}
