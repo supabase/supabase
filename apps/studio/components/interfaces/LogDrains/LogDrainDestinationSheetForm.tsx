@@ -155,7 +155,10 @@ export function LogDrainDestinationSheetForm({
   const customHeaders = form.watch('customHeaders')
 
   function removeHeader(name: string) {
-    form.setValue('customHeaders', customHeaders?.filter((header) => header.name !== name))
+    form.setValue(
+      'customHeaders',
+      customHeaders?.filter((header) => header.name !== name)
+    )
   }
 
   function addHeader() {
