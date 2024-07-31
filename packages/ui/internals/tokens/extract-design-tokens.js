@@ -41,6 +41,13 @@ try {
     console.log(`Theme file "${themeName}.json" written successfully.`)
   })
 
+  // duplicate the /themes/concept-one.json file to /themes/dark-combined.json
+  const darkThemePath = path.join(themesDirectory, 'concept-one.json')
+  const darkCombinedThemePath = path.join(themesDirectory, 'dark-combined.json')
+  const darkThemeData = fs.readFileSync(darkThemePath)
+  fs.writeFileSync(darkCombinedThemePath, darkThemeData)
+  console.log('Dark combined theme file written successfully.')
+
   console.log('Extraction completed!')
 } catch (error) {
   console.error('Error:', error.message)

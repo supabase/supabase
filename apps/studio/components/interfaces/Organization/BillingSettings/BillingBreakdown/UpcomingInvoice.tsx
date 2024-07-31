@@ -193,7 +193,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                         </td>
                         <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
                           {fee.usage_original
-                            ? `${formatUsage(fee.usage_metric!, fee.usage_original)}`
+                            ? `${formatUsage(fee.usage_metric!, { usage: fee.usage_original })}`
                             : fee.quantity
                               ? fee.quantity
                               : null}
@@ -223,7 +223,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               {breakdown.project_name}
                             </td>
                             <td className="pb-1 text-xs tabular-nums text-right pr-4">
-                              {formatUsage(fee.usage_metric!, breakdown.usage)}
+                              {formatUsage(fee.usage_metric!, breakdown)}
                             </td>
                             <td />
                             <td />

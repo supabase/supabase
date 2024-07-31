@@ -21,7 +21,7 @@ export interface UsageBarChartProps {
   data: DataPoint[]
   name: string // Used within the tooltip
   attributes: Attribute[]
-  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
   yLimit?: number
   yMin?: number
   yLeftMargin?: number

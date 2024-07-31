@@ -83,7 +83,7 @@ StyleDictionary.registerTransform({
   matcher: (prop) => prop.type === 'color',
   transformer: (prop) => {
     if (!prop.original.value) {
-      console.error(`No colorvalue detected for ${prop.name}.`)
+      console.error(`No color value detected for ${prop.name}.`)
     }
 
     if (prop.original.value === '#') {
@@ -224,11 +224,31 @@ console.log(`Building Theme Styles...`)
 
 console.log(`\n`)
 
+console.log(themeFiles)
+
 themeFiles.map(function (filePath, i) {
   let fileName = fileNameCleaner(filePath)
 
+  const isCombinedDark = fileName === 'dark-combined' ? true : false
+
   // rename concept-one to dark-new
-  fileName = fileName === 'concept-one' ? 'deep-dark' : fileName
+  fileName = fileName === 'dark' ? 'classic-dark' : fileName
+  fileName = fileName === 'concept-one' ? 'dark' : fileName
+
+  const selector = isCombinedDark
+    ? `[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='classic-dark'],
+.classic-dark,
+[data-theme='dark'],
+.dark`
+    : fileName === 'dark'
+      ? `[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='${fileName}'],
+.${fileName}`
+      : `[data-theme='${fileName}'],
+.${fileName}`
 
   let configTailwindFilesByType = []
 
@@ -254,8 +274,7 @@ themeFiles.map(function (filePath, i) {
             options: {
               showFileHeader: false,
               outputReferences: true,
-              selector: `[data-theme='${fileName}'],
-.${fileName}`,
+              selector: selector,
             },
             filter: (token) => token.filePath === filePath,
           },

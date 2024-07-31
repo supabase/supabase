@@ -51,10 +51,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(filters || []).length > 0 ? 'link' : 'text'}
-          icon={<FilterIcon strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>

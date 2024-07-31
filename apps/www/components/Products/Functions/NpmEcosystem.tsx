@@ -109,7 +109,7 @@ const NpmEcosystem = () => {
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-100))`,
+          background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-75))`,
         }}
       />
       <div className="absolute z-10 inset-0 flex flex-col items-center justify-center font-bold text-7xl uppercase text-foreground-light group-hover:text-foreground transition-colors">

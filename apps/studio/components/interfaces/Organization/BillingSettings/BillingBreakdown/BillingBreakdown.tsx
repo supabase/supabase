@@ -52,7 +52,7 @@ const BillingBreakdown = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         {!canReadSubscriptions ? (
-          <NoPermission resourceText="view this organization's billing" />
+          <NoPermission resourceText="view this organization's billing breakdown" />
         ) : (
           <>
             {isLoadingSubscription && (

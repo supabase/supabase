@@ -22,7 +22,7 @@ function FeaturedThumb(blog: PostTypes) {
     <div key={blog.slug} className="w-full">
       <Link
         href={`${blog.path}`}
-        className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-overlay border border-transparent hover:border-overlay p-2 sm:p-4 rounded-xl"
+        className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
       >
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image

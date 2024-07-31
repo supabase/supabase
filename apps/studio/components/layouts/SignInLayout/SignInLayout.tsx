@@ -63,11 +63,6 @@ const SignInLayout = ({
 
           await queryClient.resetQueries()
           router.push(getReturnToPath())
-        } else {
-          // if the user doesn't have a token, he needs to go back to the sign-in page
-          const redirectTo = buildPathWithParams('/sign-in')
-          router.replace(redirectTo)
-          return
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods

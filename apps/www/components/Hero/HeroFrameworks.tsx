@@ -63,8 +63,8 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
 
   return (
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
-      <small className="small !text-foreground-light">Works seamlessly with 20+ frameworks</small>
-      <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0 flex flex-wrap items-center justify-center gap-1 xs:gap-2 sm:flex-nowrap">
+      <p className="text-foreground-light">Works seamlessly with 20+ frameworks</p>
+      <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0 flex flex-wrap items-center justify-center gap-1 xs:gap-5 sm:flex-nowrap">
         {frameworks.map((framework) => (
           <Link
             href={framework.docs}

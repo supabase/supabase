@@ -491,7 +491,7 @@
                       "free",
                       "pro"
                     ],
-                    "description": "Subscription plan is now set on organization level and is ignored in this request",
+                    "description": "Subscription Plan is now set on organization level and is ignored in this request",
                     "example": "free",
                     "deprecated": true
                   },
@@ -9763,7 +9763,7 @@
               "free",
               "pro"
             ],
-            "description": "Subscription plan is now set on organization level and is ignored in this request",
+            "description": "Subscription Plan is now set on organization level and is ignored in this request",
             "example": "free",
             "deprecated": true
           },

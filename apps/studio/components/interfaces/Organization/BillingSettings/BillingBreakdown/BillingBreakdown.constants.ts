@@ -6,9 +6,10 @@ export interface Metric {
   key: string
   name: string
   units: string
-  anchor: string
+  anchor?: string
   category: string
-  unitName: string
+  unitName?: string
+  tip?: string
 }
 
 export const BILLING_BREAKDOWN_METRICS: Metric[] = [
@@ -58,7 +59,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     anchor: 'storageImageTransformations',
     category: 'Storage',
-    unitName: 'image',
   },
   {
     key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
@@ -66,7 +66,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     anchor: 'realtimePeakConnections',
     category: 'Realtime',
-    unitName: 'connection',
   },
   {
     key: PricingMetric.REALTIME_MESSAGE_COUNT,
@@ -74,7 +73,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     anchor: 'realtimeMessageCount',
     category: 'Realtime',
-    unitName: 'message',
   },
   {
     key: PricingMetric.FUNCTION_INVOCATIONS,
@@ -82,6 +80,13 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     units: 'absolute',
     anchor: 'funcInvocations',
     category: 'Edge Functions',
-    unitName: 'invocation',
+  },
+  {
+    key: PricingMetric.DISK_SIZE_GB_HOURS,
+    name: 'Disk Size',
+    units: 'absolute',
+    unitName: 'GB-Hrs',
+    category: 'Database',
+    tip: 'Each project gets provisioned with 8 GB of disk. When you get close to the disk size limit, we autoscale your disk by 1.5x. The first 8 GB of disk is free for every single project.',
   },
 ]

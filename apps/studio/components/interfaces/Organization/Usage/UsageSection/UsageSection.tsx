@@ -35,7 +35,9 @@ const UsageSection = ({
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({ orgSlug })
 
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
+  const categoryMeta = USAGE_CATEGORIES(subscription).find(
+    (category) => category.key === categoryKey
+  )
   if (!categoryMeta) return null
 
   return (

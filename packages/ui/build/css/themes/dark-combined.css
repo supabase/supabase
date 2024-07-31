@@ -1,5 +1,9 @@
 [data-theme='deep-dark'],
-.deep-dark {
+.deep-dark,
+[data-theme='classic-dark'],
+.classic-dark,
+[data-theme='dark'],
+.dark {
   --helpers-os-appearance: Dark;
   --code-block-5: 13.8deg 89.7% 69.6%;
   --code-block-4: 276.1deg 67.7% 74.5%;
@@ -29,14 +33,16 @@
   --destructive-400: 6.7deg 60% 20.6%;
   --destructive-300: 7.5deg 51.3% 15.3%;
   --destructive-200: 10.9deg 23.4% 9.2%;
-  --border-stronger: 0deg 0% 22%;
-  --border-strong: 0deg 0% 20%;
+  --border-stronger: 0deg 0% 27.1%;
+  --border-strong: 0deg 0% 21.2%;
   --border-alternative: 0deg 0% 26.7%;
   --border-control: 0deg 0% 22.4%;
   --border-overlay: 0deg 0% 20%;
   --border-secondary: 0deg 0% 14.1%;
   --border-muted: 0deg 0% 14.1%;
-  --border-default: 0deg 0% 16.1%;
+  --border-default: 0deg 0% 18%;
+  --background-dash-canvas: 0deg 0% 7.1%;
+  --background-dash-sidebar: 0deg 0% 9%;
   --background-dialog-default: 0deg 0% 7.1%;
   --background-muted: 0deg 0% 14.1%;
   --background-overlay-hover: 0deg 0% 18%;

@@ -58,9 +58,13 @@ const TotalUsage = ({
     )
 
   const sortedBillingMetrics = useMemo(() => {
-    if (!usage) return BILLING_BREAKDOWN_METRICS
+    if (!usage) return []
 
-    return BILLING_BREAKDOWN_METRICS.slice().sort((a, b) => {
+    const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
+      usage.usages.some((usage) => !usage.available_in_plan || usage.metric === metric.key)
+    )
+
+    return breakdownMetrics.slice().sort((a, b) => {
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'
@@ -92,8 +96,8 @@ const TotalUsage = ({
         section={{
           name: 'Usage Summary',
           description: isUsageBillingEnabled
-            ? 'Your plan includes a limited amount of usage. If the usage on your organization exceeds these quotas, your subscription will be charged for the overages. It may take up to 24 hours for usage stats to update.'
-            : 'Your plan includes a limited amount of usage. If the usage on your organization exceeds these quotas, you may experience restrictions, as you are currently not billed for overages. It may take up to 24 hours for usage stats to update.',
+            ? `Your plan includes a limited amount of usage. If the usage on your organization exceeds these quotas, your subscription will be charged for the overages. It may take up to ${subscription?.usage_based_billing_project_addons ? '1 hour' : '24 hours'} for usage stats to update.`
+            : `Your plan includes a limited amount of usage. If the usage on your organization exceeds these quotas, you may experience restrictions, as you are currently not billed for overages. It may take up to ${subscription?.usage_based_billing_project_addons ? '1 hour' : '24 hours'} for usage stats to update.`,
           links: [
             {
               name: 'How billing works',
@@ -184,7 +188,8 @@ const TotalUsage = ({
                 <div
                   className={clsx(
                     'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                    i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4'
+                    (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
+                    'border-b'
                   )}
                   key={metric}
                 >

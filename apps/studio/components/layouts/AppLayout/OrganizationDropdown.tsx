@@ -18,13 +18,13 @@ import {
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { ChevronsUpDown } from 'lucide-react'
 
 interface OrganizationDropdownProps {
   isNewNav?: boolean
@@ -52,13 +52,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <div className="flex items-center space-x-2 cursor-pointer">
-            <Button
-              type="text"
-              className="pr-2"
-              iconRight={
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-              }
-            >
+            <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
               <div className="flex items-center space-x-2">
                 <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
                 {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}

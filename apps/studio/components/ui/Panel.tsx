@@ -26,7 +26,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       {props.title && (
         <div
           className={cn(
-            'bg-surface-100 border-b border-muted flex items-center px-6 py-4',
+            'bg-surface-100 border-b border-default flex items-center px-6 py-4',
             props.titleClasses
           )}
         >
@@ -35,7 +35,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       )}
       {props.children}
       {props.footer && (
-        <div className="bg-surface-100 border-t border-muted">
+        <div className="bg-surface-100 border-t border-default">
           <div className="flex h-12 items-center px-6">{props.footer}</div>
         </div>
       )}

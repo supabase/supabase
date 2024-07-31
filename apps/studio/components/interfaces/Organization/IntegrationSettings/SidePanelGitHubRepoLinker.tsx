@@ -36,7 +36,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+    useGitHubAuthorizationQuery({ enabled: sidePanelStateSnapshot.githubConnectionsOpen })
 
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<

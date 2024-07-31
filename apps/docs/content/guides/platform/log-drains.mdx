@@ -20,30 +20,39 @@ The following table lists the supported destinations and the required setup conf
 | ------------------ | ---------------- | ------------------------------------------------- |
 | Generic Webhook    | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
 | Datadog            | HTTP             | API Key <br /> Region                             |
+| Loki               | HTTP             | URL <br /> Headers                                |
 | Elastic - Filebeat | HTTP             | URL <br /> Username and Password                  |
 
 ### Destinations And Behavior
 
-HTTP requests will be batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
+HTTP requests are batched with a max of 250 items with at most 1 second intervals. Gzip compression will also be used if the 3rd party provider supports it.
 
 #### Generic Webhook
 
-Logs will be sent as a JSON payload. Both HTTP1 and HTTP2 are supported. A preset configuration of Headers can be supplied for all requests.
+Logs are sent as a JSON payload. Both HTTP1 and HTTP2 are supported. A preset configuration of Headers can be supplied for all requests.
 
-Note that requests will be **unsigned**.
+Note that requests are **unsigned**.
 
 :::note
-Unsigned webhook requests are temporary and all requests will be signed in the near future.
+Unsigned webhook requests are temporary and all requests are signed in the near future.
 :::
 
 #### Datadog
 
-Logs sent to Datadog will have the name of the log source set on the `service` field of the event.
+Logs sent to Datadog have the name of the log source set on the `service` field of the event. The request body is gzipped.
 
-The payload message will be a stringified JSON of the raw log event, prefixed with the event timestamp.
+The payload message are a stringified JSON of the raw log event, prefixed with the event timestamp.
+
+#### Loki
+
+Logs are sent to a provided HTTP endpoint, see [documentation](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs) for `POST /loki/api/v1/push`.
+
+Events will get batched with multiple streams per request, with each log source having its own stream. The stream is labeled with the `source` key.
+
+Requests are in the form of a gzipped JSON body. The payload message is a stringified JSON of the raw log event. No custom structured JSON metadata is attached to stream values. It is recommended that an `Authorization` header is used for authentication at the destination.
 
 #### Elastic - Filebeat
 
-Logs will be sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
+Logs are sent to Filebeat server. See the [Filebeat documentation](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html) on how to set up the Filebeat HTTP server.
 
 The Filebeat server only handles HTTP1 requests. Basic Auth can be provided for optional user authentication.

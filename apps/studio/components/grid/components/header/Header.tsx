@@ -61,7 +61,7 @@ const Header = ({
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-surface-100 px-5 py-1.5">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-5 py-1.5">
         {customHeader ? (
           <>{customHeader}</>
         ) : (

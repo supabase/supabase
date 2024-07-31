@@ -118,7 +118,6 @@ export default function App({ Component, pageProps }: AppProps) {
         <AuthProvider>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
-            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}

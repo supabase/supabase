@@ -38,6 +38,8 @@ export const ChartYFormatterCompactNumber = (number: number | string, unit: stri
     const formattedBytes = formatBytesCompact(number).replace(/\s/g, '')
 
     return formattedBytes === '0bytes' ? '0' : formattedBytes
+  } else if (unit === 'gigabytes') {
+    return compactNumberFormatter.format(number) + 'GB'
   } else {
     return compactNumberFormatter.format(number)
   }
@@ -53,6 +55,8 @@ export const ChartTooltipValueFormatter = (number: number | string, unit: string
     const formattedBytes = formatBytesPrecision(number).replace(/\s/g, '')
 
     return formattedBytes === '0bytes' ? '0' : formattedBytes
+  } else if (unit === 'gigabytes') {
+    return compactNumberFormatter.format(number) + 'GB'
   } else {
     return compactNumberFormatter.format(number)
   }

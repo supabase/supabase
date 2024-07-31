@@ -59,7 +59,7 @@ const DialogContentVariants = cva(
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
     'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
-    'bg-200'
+    'bg-dash-sidebar'
   ),
   {
     variants: {
