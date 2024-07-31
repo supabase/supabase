@@ -4,9 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export const runtime = 'edge' // 'nodejs' is the default
-export const config = {
-  runtime: 'edge',
-}
+
 export const dynamic = 'force-dynamic' // defaults to auto
 export const revalidate = true
 
