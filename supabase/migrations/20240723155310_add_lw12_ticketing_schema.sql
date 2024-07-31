@@ -138,5 +138,5 @@ alter publication supabase_realtime add table public.meetups;
 create policy "Allow anybody to select all meetups"
 on public.meetups
 as permissive
-for all
+for select
 using (true);
