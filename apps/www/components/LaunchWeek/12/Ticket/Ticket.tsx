@@ -90,7 +90,7 @@ export default function Ticket() {
       style={{ transformStyle: 'preserve-3d', transform: 'perspective(1000px)' }}
     >
       <Panel
-        outerClassName="flex relative flex-col w-[360px] border h-auto max-h-[680px] rounded-xl !shadow-xl !p-0"
+        outerClassName="dark flex relative flex-col w-[360px] border h-auto max-h-[680px] rounded-xl !shadow-xl !p-0"
         innerClassName="flex relative flex-col w-full transition-colors aspect-[3/4] rounded-xl text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"
