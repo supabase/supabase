@@ -1,13 +1,14 @@
 export const themes = {
   regular: {
-    TICKET_BORDER: 'hsl(var(--border-muted))',
-    TICKET_FOREGROUND: 'hsl(var(--foreground-default))',
-    TICKET_FOREGROUND_LIGHT: '#888888',
-    TICKET_BACKGROUND: 'hsl(var(--background-surface-100) / 1)',
-    TICKET_BACKGROUND_CODE: 'hsl(var(--background-surface-75) / 1)',
-    CODE_HIGHLIGHT_BACKGROUND: 'hsl(var(--background-surface-300) / 1)',
+    OG_BACKGROUND: '#121212',
+    TICKET_BORDER: '#242424',
+    TICKET_FOREGROUND: '#FAFAFA',
+    TICKET_FOREGROUND_LIGHT: '#B4B4B4',
+    TICKET_BACKGROUND: '#1F1F1F',
+    TICKET_BACKGROUND_CODE: '#171717',
+    CODE_HIGHLIGHT_BACKGROUND: '#292929',
     CODE_HIGHLIGHT_BORDER: '',
-    CODE_LINE_NUMBER: 'hsl(var(--foreground-lighter) / 0.5)',
+    CODE_LINE_NUMBER: '#4D4D4D',
     CODE_THEME: {
       hljs: {
         color: '#fff', // corresponds to --ray-foreground
@@ -43,20 +44,21 @@ export const themes = {
       'hljs-literal': {
         color: '#ffffff', // corresponds to --ray-token-number
       },
-      'hljs-attr': {
+      'hljs-attribute': {
         color: '#3ecf8e', // corresponds to --ray-token-property
       },
     },
   },
   platinum: {
-    TICKET_BORDER: 'hsl(var(--border-muted))',
-    TICKET_FOREGROUND: 'hsl(var(--foreground-default))',
+    OG_BACKGROUND: '#121212',
+    TICKET_BORDER: '#242424',
+    TICKET_FOREGROUND: '#FAFAFA',
     TICKET_FOREGROUND_LIGHT: '#888888',
     TICKET_BACKGROUND: '#212427',
     TICKET_BACKGROUND_CODE: '#24292D',
     CODE_HIGHLIGHT_BACKGROUND: '#272B2E',
     CODE_HIGHLIGHT_BORDER: '',
-    CODE_LINE_NUMBER: 'hsl(var(--foreground-lighter) / 0.5)',
+    CODE_LINE_NUMBER: '#4D4D4D',
     CODE_THEME: {
       hljs: {
         color: '#abb2bf', // General text color
@@ -104,6 +106,7 @@ export const themes = {
     },
   },
   secret: {
+    OG_BACKGROUND: '#0F2BE6',
     TICKET_BORDER: '#3059F2',
     TICKET_FOREGROUND: '#EDEDED',
     TICKET_FOREGROUND_LIGHT: '#EDEDED',
@@ -130,7 +133,7 @@ export const themes = {
         color: '#e06c75', // Variables
       },
       'hljs-attribute': {
-        color: '#d19a66', // Attributes
+        color: '#fff', // Attributes
       },
       'hljs-number': {
         color: '#d19a66', // Numbers
