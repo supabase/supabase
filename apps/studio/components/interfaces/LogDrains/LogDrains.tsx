@@ -1,12 +1,10 @@
-import { LogDrainData, LogDrainsData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { useParams } from 'common'
 import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import {
-  Accordion,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -14,19 +12,22 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from 'ui'
-import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
 import { MoreHorizontal, Pen, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import AlertError from 'components/ui/AlertError'
 import toast from 'react-hot-toast'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import Link from 'next/link'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { CardContent, CardDescription, CardTitle } from '@ui/components/shadcn/ui/card'
 
 export function LogDrains({
   onNewDrainClick,
@@ -35,6 +36,10 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
+  const org = useSelectedOrganization()
+
+  const { isLoading: orgPlanLoading, isPaid } = useCurrentOrgPlan()
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
@@ -51,7 +56,7 @@ export function LogDrains({
     },
   })
 
-  if (isLoading) {
+  if (isLoading || orgPlanLoading) {
     return (
       <div>
         <GenericSkeletonLoader />
@@ -79,6 +84,18 @@ export function LogDrains({
 
   if (isError) {
     return <AlertError error={error}></AlertError>
+  }
+
+  if (true) {
+    return (
+      <div className="p-8">
+        <CardButton title="Upgrade to Pro" description="Upgrade to a paid plan to use Log Drains">
+          <Button className="mt-2" asChild>
+            <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
+          </Button>
+        </CardButton>
+      </div>
+    )
   }
   return (
     <>
