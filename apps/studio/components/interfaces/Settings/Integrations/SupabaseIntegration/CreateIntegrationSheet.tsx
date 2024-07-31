@@ -49,7 +49,7 @@ const FORM_ID = 'create-integration-sidepanel'
 interface CreateIntegrationSheetProps {
   integrationEntry?: IntegrationEntry
   onChange: (hasChanges: boolean) => void
-  onClosing: () => void
+  onClosing: (ignoreChanges: boolean) => void
 }
 
 export const IntegrationCategory = {
@@ -127,7 +127,7 @@ export const CreateIntegrationSheet = ({
         }
 
         setShowDeleteDraftDialog(false)
-        onClosing()
+        onClosing(true)
       },
     })
 
@@ -152,7 +152,7 @@ export const CreateIntegrationSheet = ({
         {
           onSuccess: () => {
             toast.success(`Successfully updated integration`)
-            onClosing()
+            onClosing(true)
           },
         }
       )
@@ -176,7 +176,7 @@ export const CreateIntegrationSheet = ({
         {
           onSuccess: () => {
             toast.success(`Successfully added an integration entry ${data.slug}`)
-            onClosing()
+            onClosing(true)
           },
         }
       )
@@ -461,7 +461,7 @@ export const CreateIntegrationSheet = ({
           </div>
         )}
 
-        <Button type="default" onClick={() => onClosing()} loading={isLoading}>
+        <Button type="default" onClick={() => onClosing(false)} loading={isLoading}>
           Cancel
         </Button>
         <Button form={FORM_ID} htmlType="submit" loading={isLoading}>

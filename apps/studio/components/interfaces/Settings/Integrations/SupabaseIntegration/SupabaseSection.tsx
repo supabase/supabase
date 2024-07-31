@@ -48,6 +48,22 @@ const SupabaseSection = () => {
   // if the create integration sheet has changes that haven't been saved, show a confirmation modal
   const [isClosingPanel, setIsClosingPanel] = useState(false)
 
+  //
+  /**
+   * Closes the create integration sheet. Will show a confirmation modal if there are unsaved changes.
+   *
+   * @param ignoreChanges ignore the changes in some cases (when closing the sheet after a successful save)
+   */
+  const closeSheet = (ignoreChanges: boolean = false) => {
+    if (hasChanges && !ignoreChanges) {
+      setIsClosingPanel(true)
+    } else {
+      setIsClosingPanel(false)
+      setVisible(false)
+      setHasChanges(false)
+    }
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
@@ -205,6 +221,7 @@ const SupabaseSection = () => {
                   onConfirm={() => {
                     setIsClosingPanel(false)
                     setVisible(false)
+                    setHasChanges(false)
                   }}
                 >
                   <p className="text-sm text-foreground-light">
@@ -213,18 +230,15 @@ const SupabaseSection = () => {
                   </p>
                 </ConfirmationModal>
 
-                <Sheet
-                  open={visible}
-                  onOpenChange={() => (hasChanges ? setIsClosingPanel(true) : setVisible(false))}
-                >
+                <Sheet open={visible} onOpenChange={closeSheet}>
                   <SheetContent showClose={false} className="flex flex-col gap-0">
                     <CreateIntegrationSheet
                       onChange={(value) => {
                         if (value !== hasChanges) {
-                          setHasChanges(hasChanges)
+                          setHasChanges(value)
                         }
                       }}
-                      onClosing={() => (hasChanges ? setIsClosingPanel(true) : setVisible(false))}
+                      onClosing={closeSheet}
                       integrationEntry={draftEntry || entry}
                     />
                   </SheetContent>
