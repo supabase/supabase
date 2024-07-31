@@ -154,7 +154,8 @@ const TicketingFlow = () => {
                       <div>
                         <p className="text-2xl mb-1">{FIRST_NAME}, almost there!</p>
                         <p className="text-2xl text-foreground-light">
-                          Keep sharing to max out your chances of winning.
+                          Share on {userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
+                          increase your chances of winning.
                         </p>
                       </div>
                     )}
