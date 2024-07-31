@@ -6,16 +6,19 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
-import { Button } from 'ui'
-import { SITE_URL, LW_URL } from '~/lib/constants'
+import { Button, Divider, Separator } from 'ui'
+import { SITE_URL, LW_URL, LW12_DATE } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
+import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW12Background from '~/components/LaunchWeek/12/LW12Background'
 import { useTheme } from 'next-themes'
+import TicketCopy from '~/components/LaunchWeek/12/Ticket/TicketCopy'
 
 const LW12TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/12/Ticket/TicketContainer')
@@ -54,6 +57,11 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   //   }
   // }, [])
 
+  const transition = DEFAULT_TRANSITION
+  const initial = INITIAL_BOTTOM
+  const animate = getAnimation({ duration: 1 })
+  const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
+
   if (!ticketNumber) {
     return <Error statusCode={404} />
   }
@@ -85,28 +93,53 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout className="bg-alternative">
-          <div className="relative -mt-[65px] overflow-hidden">
-            <SectionContainer className="relative !pt-8 lg:!pt-10 z-10 flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left">
-              <div className="w-auto min-h-[400px] pt-24 flex items-center">
-                <LW12TicketContainer />
-              </div>
-              <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-4 text-foreground text-center md:text-left max-w-sm">
-                <h1 className="text-2xl">{DISPLAY_NAME?.split(' ')[0]}'s Ticket</h1>
-                <span className="text-foreground-lighter mb-2">
-                  Join {FIRST_NAME} on Supabase Launch Week 12 and claim your ticket for a chance to
-                  win supa swag.
-                </span>
-                <Button type="alternative" asChild>
-                  <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                    Claim your ticket
-                  </Link>
-                </Button>
-              </div>
-            </SectionContainer>
-            <LW12Background className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
-          </div>
-          <CTABanner className="!bg-alternative border-t-0" />
+        <DefaultLayout
+          className="
+            -mt-[60px] pt-[60px]
+            overflow-hidden
+            xl:h-screen !min-h-fit
+            xl:!max-h-[calc(100vh-60px)]
+            "
+        >
+          <SectionContainer className="relative h-full flex-1">
+            <div className="relative z-10 flex h-full">
+              <LazyMotion features={domAnimation}>
+                <AnimatePresence mode="wait" key={ticketState}>
+                  <m.div
+                    key="ticket"
+                    initial={initial}
+                    animate={animate}
+                    exit={exit}
+                    className="w-full flex-1 min-h-[400px] h-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-32 text-foreground text-center md:text-left"
+                  >
+                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
+                      <LW12TicketContainer />
+                      <TicketCopy />
+                    </div>
+                    <div className="xl:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
+                      <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-2 text-foreground text-center md:text-left max-w-sm">
+                        <h1 className="text-foreground text-2xl">
+                          {DISPLAY_NAME?.split(' ')[0]}'s Ticket
+                        </h1>
+                        <span className="text-foreground-light text-2xl">
+                          Join {FIRST_NAME} on Supabase Launch Week 12 and claim your ticket for a
+                          chance to win supa swag.
+                        </span>
+                      </div>
+                      <div>
+                        <Button type="primary" asChild size="small">
+                          <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
+                            Claim your ticket
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </m.div>
+                </AnimatePresence>
+              </LazyMotion>
+            </div>
+            <LW12Background className={'opacity-80 dark:opacity-60'} />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
