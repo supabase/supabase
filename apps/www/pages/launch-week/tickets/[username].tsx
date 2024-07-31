@@ -36,7 +36,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const DISPLAY_NAME = name || username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
-  const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} LW12 ticket`
+  const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} LW12 Ticket`
   const DESCRIPTION = `Claim your Supabase Launch Week 12 ticket for a chance to win supa swag.`
   const PAGE_URL = `${LW_URL}/tickets/${username}`
 
@@ -122,8 +122,8 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                           {DISPLAY_NAME?.split(' ')[0]}'s Ticket
                         </h1>
                         <span className="text-foreground-light text-2xl">
-                          Join {FIRST_NAME} at Supabase Launch Week 12 and claim your ticket for a
-                          chance to win supa swag.
+                          Join {FIRST_NAME} for Supabase Launch Week 12. Claim your ticket for a
+                          chance to win limitied swag.
                         </span>
                       </div>
                       <div>
