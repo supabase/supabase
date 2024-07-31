@@ -15,9 +15,9 @@ export default {
     image: (
       <div className="relative z-10 flex items-center justify-center mb-4">
         <div
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3ECF8E] via-[#576a61] to-[#3ecfb2] border border-brand-900 flex items-center justify-center"
+          className="w-12 h-12 rounded-xl bg-brand border border-brand-900 flex items-center justify-center"
           style={{
-            boxShadow: '0 0 20px #25e7761f, 0 0 30px rgba(238, 240, 190, 0.1)',
+            boxShadow: '0 0 20px hsl(var(--brand-300)), 0 0 30px hsl(var(--brand-200))',
           }}
         >
           <svg

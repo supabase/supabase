@@ -1,4 +1,5 @@
-import { IconCheck, IconMinus, cn } from 'ui'
+import { Check, Minus } from 'lucide-react'
+import { cn } from 'ui'
 
 export interface RoleImpersonationRadioProps<T extends string> {
   label?: string
@@ -19,7 +20,7 @@ function RoleImpersonationRadio<T extends string>({
     <label
       className={cn(
         'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 w-44 cursor-pointer transition-colors',
-        isSelected && 'border-stronger bg-surface-300'
+        isSelected && 'border-foreground-muted hover:border-foreground-muted bg-surface-300'
       )}
       tabIndex={0}
       onKeyDown={(e) => {
@@ -35,10 +36,10 @@ function RoleImpersonationRadio<T extends string>({
         {isSelected && (
           <div className="flex items-center justify-center p-0.5 bg-foreground text-background rounded-full">
             {typeof isSelected === 'boolean' && (
-              <IconCheck size={12} strokeWidth="4" className="text-background" />
+              <Check size={12} strokeWidth="4" className="text-background" />
             )}
             {isSelected === 'partially' && (
-              <IconMinus size={12} strokeWidth="4" className="text-background" />
+              <Minus size={12} strokeWidth="4" className="text-background" />
             )}
           </div>
         )}

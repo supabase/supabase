@@ -204,13 +204,14 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               key={category}
               type={
                 category === 'all' && !searchTerm && !activeCategory
-                  ? 'alternative'
+                  ? 'default'
                   : category === activeCategory
-                    ? 'alternative'
+                    ? 'default'
                     : 'outline'
               }
               onClick={() => handleSetCategory(category)}
               size={is2XL ? 'tiny' : 'small'}
+              className="rounded-full"
             >
               {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
             </Button>
