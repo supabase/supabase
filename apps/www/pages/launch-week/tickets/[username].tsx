@@ -122,7 +122,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                           {DISPLAY_NAME?.split(' ')[0]}'s Ticket
                         </h1>
                         <span className="text-foreground-light text-2xl">
-                          Join {FIRST_NAME} on Supabase Launch Week 12 and claim your ticket for a
+                          Join {FIRST_NAME} at Supabase Launch Week 12 and claim your ticket for a
                           chance to win supa swag.
                         </span>
                       </div>

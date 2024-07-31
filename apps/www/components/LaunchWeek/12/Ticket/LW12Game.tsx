@@ -139,7 +139,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
             {winningCompliment}
           </p>
           <p className="text-foreground-lighter font-san text-sm">
-            Claim and share the secret ticket to boost your chances of winning swag.
+            Claim and share the secret ticket to boost your chances of winning limited swag.
           </p>
         </div>
         <div
