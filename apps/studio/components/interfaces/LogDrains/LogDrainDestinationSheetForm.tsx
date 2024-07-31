@@ -302,6 +302,7 @@ export function LogDrainDestinationSheetForm({
                 {type === 'datadog' && (
                   <div className="grid gap-4">
                     <LogDrainFormItem
+                      type="password"
                       value="api_key"
                       label="API Key"
                       formControl={form.control}
