@@ -11,7 +11,6 @@ import { useIntegrationDirectoryEntryUpdateMutation } from 'data/integrations-di
 import { IntegrationEntry } from 'data/integrations-directory/integrations-directory-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useState } from 'react'
-import type { FormSchema } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
