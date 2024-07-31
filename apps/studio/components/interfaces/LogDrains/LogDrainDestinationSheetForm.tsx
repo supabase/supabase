@@ -142,7 +142,6 @@ export function LogDrainDestinationSheetForm({
     form.setValue('url', defaultValues?.config?.url || '')
     form.setValue('api_key', defaultValues?.config?.api_key || '')
     form.setValue('region', defaultValues?.config?.region || '')
-    form.setValue('url', defaultValues?.config?.url || '')
     form.setValue('username', defaultValues?.config?.username || '')
     form.setValue('password', defaultValues?.config?.password || '')
   }, [defaultType, form, defaultValues])
