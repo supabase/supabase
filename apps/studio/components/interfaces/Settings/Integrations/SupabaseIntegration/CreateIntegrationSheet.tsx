@@ -76,15 +76,17 @@ const FormSchema = z.object({
     'messaging',
     'storage',
   ]),
-  description: z.string(),
-  developer: z.string(),
-  docs: z.string(),
-  logo: z.string().nullable(),
-  overview: z.string(),
-  slug: z.string(),
-  title: z.string(),
+  description: z.string().trim().min(1, 'The description must be at least 1 character'),
+  developer: z.string().trim().min(1, 'The developer must be at least 1 character'),
+  docs: z.string().url('The docs must be a valid URL'),
+  logo: z.string().url('The logo is missing, please upload an image'),
+  overview: z.string().trim().min(1, 'The overview must be at least 1 character'),
+  slug: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]+$/, 'The slug must be alphanumeric and can contain - or _'),
+  title: z.string().trim().min(1, 'The title must be at least 1 character'),
   video: z.string().optional(),
-  website: z.string(),
+  website: z.string().url('The website must be a valid URL'),
 })
 
 export const CreateIntegrationSheet = ({
@@ -104,7 +106,7 @@ export const CreateIntegrationSheet = ({
       description: integrationEntry?.description ?? '',
       developer: integrationEntry?.developer ?? '',
       docs: integrationEntry?.docs ?? '',
-      logo: integrationEntry?.logo ?? null,
+      logo: integrationEntry?.logo ?? '',
       overview: integrationEntry?.overview ?? '',
       slug: integrationEntry?.slug ?? '',
       title: integrationEntry?.title ?? '',
