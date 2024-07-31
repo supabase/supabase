@@ -410,7 +410,7 @@ export const CreateIntegrationSheet = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Description"
-                  description="Short description for your integration. Will be shown on the directory page page."
+                  description="Short description for your integration tha will be shown on the directory page."
                 >
                   <FormControl_Shadcn_>
                     <ExpandingTextArea {...field} className="min-h-24" />
@@ -423,10 +423,10 @@ export const CreateIntegrationSheet = ({
               control={form.control}
               name="overview"
               render={({ field }) => (
-                <FormItemLayout label="Overview" description="">
-                  <p className="text-foreground-lighter">
-                    Extended description for your integration. Will be shown on your page.
-                  </p>
+                <FormItemLayout
+                  label="Overview"
+                  description="Extended description for your integration that will be shown on your page. Supports markdown formatting."
+                >
                   <FormControl_Shadcn_>
                     <Tabs_Shadcn_ defaultValue="write" className="w-full">
                       <TabsList_Shadcn_ className="grid w-full grid-cols-2">

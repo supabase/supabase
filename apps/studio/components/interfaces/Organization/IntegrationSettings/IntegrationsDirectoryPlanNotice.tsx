@@ -10,7 +10,7 @@ const IntegrationsDirectoryPlanNotice = () => {
   const selectedOrg = useSelectedOrganization()
 
   return (
-    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border">
+    <Alert_Shadcn_ className="px-6 py-4 [&>svg]:top-6 [&>svg]:left-6 bg-alternative border-alternative rounded-md">
       <AlertCircleIcon />
       <AlertTitle_Shadcn_>
         Integrations directory is only available on the Pro plan and above

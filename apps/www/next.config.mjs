@@ -58,8 +58,8 @@ const nextConfig = {
       'images.unsplash.com',
       'img.youtube.com',
       'vercel.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'xguihxuzqibwxjnimxev.supabase.co',
+      'obuldanrptloktxcffvn.supabase.co', // 'misc use' project
+      'xguihxuzqibwxjnimxev.supabase.co', // '[LIVE] supabase-com' project
       'pbs.twimg.com',
       'res.cloudinary.com',
       's3-us-west-2.amazonaws.com',

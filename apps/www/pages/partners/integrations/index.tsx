@@ -214,10 +214,10 @@ function IntegrationPartnersPage(props: Props) {
                     />
 
                     <PartnerLinkBox
-                      href={`/partners/integrations#become-a-partner`}
-                      title="Become a partner"
+                      href={`https://supabase.com/dashboard/org/_/integrations`}
+                      title="List your integration"
                       color="brand"
-                      description="Fill out a quick 30 second form to apply to become a partner"
+                      description="Add your entry to our Integrations Directory and become listed here"
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
