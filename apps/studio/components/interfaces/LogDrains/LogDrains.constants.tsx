@@ -2,7 +2,7 @@ import { Computer, DogIcon, WebhookIcon } from 'lucide-react'
 
 const iconProps = { size: 24, strokeWidth: 1.5, className: 'text-foreground-light' }
 
-export const LOG_DRAIN_SOURCES = [
+export const LOG_DRAIN_TYPES = [
   {
     value: 'webhook',
     name: 'Webhook',
@@ -16,15 +16,15 @@ export const LOG_DRAIN_SOURCES = [
     icon: <DogIcon {...iconProps} />,
   },
   {
-    value: 'elasticfilebeat',
+    value: 'elastic',
     name: 'Elastic Filebeat',
     description: 'Filebeat is a lightweight shipper for forwarding and centralizing log data',
     icon: <Computer {...iconProps} />,
   },
 ] as const
 
-export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_SOURCES.map((source) => source.value)
-export type LogDrainSource = (typeof LOG_DRAIN_SOURCES)[number]['value']
+export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
+export type LogDrainType = (typeof LOG_DRAIN_TYPES)[number]['value']
 
 export const DATADOG_REGIONS = [
   {
@@ -52,3 +52,18 @@ export const DATADOG_REGIONS = [
     value: 'us5',
   },
 ] as const
+
+export type LogDrainDatadogConfig = {
+  api_key: string
+  region: string
+}
+
+export type LogDrainElasticConfig = {
+  url: string
+  username: string
+  password: string
+}
+
+export type LogDrainWebhookConfig = {
+  url: string
+}

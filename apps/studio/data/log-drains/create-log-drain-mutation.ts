@@ -4,37 +4,27 @@ import toast from 'react-hot-toast'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
-import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export type LogDrainCreateVariables = {
   projectRef: string
   name: string
-  description?: string
-  source: LogDrainSource
+  config: Record<string, any>
+  type: LogDrainType
 }
 
-export async function createLogDrain(data: LogDrainCreateVariables) {
-  // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
-  // const { data, error } = await post('/platform/projects/{ref}/resources/{id}', {
-  //   params: { path: { ref: projectRef, id } },
-  //   body: { newLogDrain },
-  // })
-
-  // if (error) handleError(error)
-  // return data
-
-  // store in localstorage for now
-  const logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
-  logDrains.push({
-    id: Math.floor(Math.random() * 1000000),
-    name: data.name,
-    source: data.source,
-    inserted_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+export async function createLogDrain(payload: LogDrainCreateVariables) {
+  const { data, error } = await post('/platform/projects/{ref}/analytics/log-drains', {
+    params: { path: { ref: payload.projectRef } },
+    body: {
+      name: payload.name,
+      type: payload.type,
+      config: payload.config as any,
+    },
   })
-  localStorage.setItem('logDrains', JSON.stringify(logDrains))
 
-  return logDrains
+  if (error) handleError(error)
+  return data
 }
 
 type LogDrainCreateData = Awaited<ReturnType<typeof createLogDrain>>

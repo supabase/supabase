@@ -7,28 +7,17 @@ import { logDrainsKeys } from './keys'
 
 export type LogDrainDeleteVariables = {
   projectRef: string
-  id: number
+  token: string
 }
 
-export async function deleteLogDrain({ projectRef, id }: LogDrainDeleteVariables) {
+export async function deleteLogDrain({ projectRef, token }: LogDrainDeleteVariables) {
   // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
-  // const { data, error } = await del('/platform/projects/{ref}/resources/{id}', {
-  //   params: { path: { ref: projectRef, id } },
-  // })
+  const { data, error } = await del('/platform/projects/{ref}/analytics/log-drains/{token}', {
+    params: { path: { ref: projectRef, token } },
+  })
 
-  // if (error) handleError(error)
-  // return data
-
-  // remove from localstorage for now
-  // await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  console.log('deleting log drain', id)
-
-  let logDrains = JSON.parse(localStorage.getItem('logDrains') || '[]')
-  logDrains = logDrains.filter((drain: any) => drain.id !== id)
-  localStorage.setItem('logDrains', JSON.stringify(logDrains))
-
-  return
+  if (error) handleError(error)
+  return data
 }
 
 type LogDrainDeleteData = Awaited<ReturnType<typeof deleteLogDrain>>

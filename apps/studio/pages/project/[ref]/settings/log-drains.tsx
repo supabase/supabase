@@ -10,7 +10,7 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { Button } from 'ui'
 import { useEffect, useState } from 'react'
-import { LogDrainSource } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { LogDrainData } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
@@ -31,12 +31,20 @@ const LogDrainsSettings: NextPageWithLayout = () => {
       toast.success('Log drain destination created')
       setOpen(false)
     },
+    onError: () => {
+      toast.error('Failed to create log drain')
+      setOpen(false)
+    },
   })
 
   const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination updated')
       setOpen(false)
+    },
+    onError: () => {
+      setOpen(false)
+      toast.error('Failed to update log drain')
     },
   })
 
@@ -48,8 +56,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
-  function handleNewClick(src: LogDrainSource) {
-    setSelectedLogDrain({ source: src })
+  function handleNewClick(src: LogDrainType) {
+    setSelectedLogDrain({ type: src })
+    setMode('create')
     setOpen(true)
   }
 
@@ -79,23 +88,30 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
             setOpen(v)
           }}
-          defaultValues={selectedLogDrain || {}}
+          defaultValues={selectedLogDrain as any}
           isLoading={isLoading}
-          onSubmit={(values) => {
+          onSubmit={({ name, type, ...values }) => {
             const logDrainValues = {
-              ...values,
+              name,
+              type,
+              config: values as any, // TODO: fix generated API types from backend
               id: selectedLogDrain?.id,
               projectRef: ref,
             }
 
-            console.log(logDrainValues)
             if (mode === 'create') {
               createLogDrain(logDrainValues)
             } else {
-              if (logDrainValues.id && typeof logDrainValues.id === 'number') {
-                updateLogDrain(logDrainValues as LogDrainUpdateVariables)
-              } else {
+              if (!logDrainValues.id) {
                 throw new Error('Log drain ID is required')
+              } else {
+                if (!selectedLogDrain?.token) {
+                  throw new Error('Log drain token is required')
+                }
+                updateLogDrain({
+                  ...logDrainValues,
+                  token: selectedLogDrain?.token,
+                })
               }
             }
           }}

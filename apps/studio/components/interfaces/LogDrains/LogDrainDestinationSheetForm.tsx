@@ -1,10 +1,5 @@
 import { useParams } from 'common'
-import {
-  DATADOG_REGIONS,
-  LOG_DRAIN_SOURCE_VALUES,
-  LOG_DRAIN_SOURCES,
-  LogDrainSource,
-} from './LogDrains.constants'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -42,16 +37,13 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData } from 'data/log-drains/log-drains-query'
-import Panel from 'components/ui/Panel'
 
 const FORM_ID = 'log-drain-destination-form'
 
-type SourceValue = (typeof LOG_DRAIN_SOURCE_VALUES)[number]
-
-const formUnion = z.discriminatedUnion('source', [
+const formUnion = z.discriminatedUnion('type', [
   z.object({
-    source: z.literal('webhook'),
-    webhookUrl: z.string().url('Webhook URL is required and must be a valid URL'),
+    type: z.literal('webhook'),
+    url: z.string().url('Webhook URL is required and must be a valid URL'),
     httpVersion: z.enum(['HTTP1', 'HTTP2']),
     gzip: z.boolean(),
     customHeaders: z
@@ -64,12 +56,12 @@ const formUnion = z.discriminatedUnion('source', [
       .optional(),
   }),
   z.object({
-    source: z.literal('datadog'),
-    apiKey: z.string().min(1, { message: 'API key is required' }),
+    type: z.literal('datadog'),
+    api_key: z.string().min(1, { message: 'API key is required' }),
     region: z.string().min(1, { message: 'Region is required' }),
   }),
   z.object({
-    source: z.literal('elasticfilebeat'),
+    type: z.literal('elastic'),
     filebeatUrl: z.string().url({ message: 'URL is required and must be a valid URL' }),
     username: z.string().min(1, { message: 'Username is required' }),
     password: z.string().min(1, { message: 'Password is required' }),
@@ -124,12 +116,12 @@ export function LogDrainDestinationSheetForm({
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
-  defaultValues?: Partial<LogDrainData>
+  defaultValues?: Partial<LogDrainData> & { type: LogDrainType }
   isLoading?: boolean
   onSubmit: (values: z.infer<typeof formSchema>) => void
 }) {
   const { ref } = useParams() as { ref: string }
-  const defaultSource = defaultValues?.source || 'webhook'
+  const defaultType = defaultValues?.type || 'webhook'
 
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
 
@@ -139,22 +131,27 @@ export function LogDrainDestinationSheetForm({
       customHeaders: [],
       httpVersion: 'HTTP2',
       gzip: false,
+      type: defaultType,
       ...defaultValues,
     },
   })
 
   useEffect(() => {
-    form.setValue('source', defaultSource)
-  }, [defaultSource, form])
+    form.setValue('type', defaultType)
+    form.setValue('name', defaultValues?.name || '')
+    form.setValue('url', defaultValues?.config?.url || '')
+    form.setValue('api_key', defaultValues?.config?.api_key || '')
+    form.setValue('region', defaultValues?.config?.region || '')
+    form.setValue('filebeatUrl', defaultValues?.config?.filebeatUrl || '')
+    form.setValue('username', defaultValues?.config?.username || '')
+    form.setValue('password', defaultValues?.config?.password || '')
+  }, [defaultType, form, defaultValues])
 
-  const source = form.watch('source')
+  const type = form.watch('type')
   const customHeaders = form.watch('customHeaders')
 
   function removeHeader(name: string) {
-    form.setValue(
-      'customHeaders',
-      customHeaders?.filter((header) => header.name !== name)
-    )
+    form.setValue('customHeaders', customHeaders?.filter((header) => header.name !== name))
   }
 
   function addHeader() {
@@ -209,21 +206,21 @@ export function LogDrainDestinationSheetForm({
                 />
                 <LogDrainFormItem
                   value="description"
+                  placeholder="My Destination"
                   label="Description"
-                  placeholder="Description of the destination"
                   formControl={form.control}
                 />
                 <RadioGroupStacked
-                  value={source}
-                  onValueChange={(v: SourceValue) => form.setValue('source', v)}
+                  value={type}
+                  onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                 >
-                  {LOG_DRAIN_SOURCES.map((source) => (
+                  {LOG_DRAIN_TYPES.map((type) => (
                     <RadioGroupStackedItem
-                      value={source.value}
-                      key={source.value}
-                      id={source.value}
-                      label={source.name}
-                      description={source.description}
+                      value={type.value}
+                      key={type.value}
+                      id={type.value}
+                      label={type.name}
+                      description={type.description}
                       className="text-left"
                     />
                   ))}
@@ -231,10 +228,10 @@ export function LogDrainDestinationSheetForm({
               </div>
 
               <div className="space-y-4 mt-6">
-                {source === 'webhook' && (
+                {type === 'webhook' && (
                   <>
                     <LogDrainFormItem
-                      value="webhookUrl"
+                      value="url"
                       label="Webhook URL"
                       formControl={form.control}
                       placeholder="https://example.com/webhooks/log-drain"
@@ -302,10 +299,10 @@ export function LogDrainDestinationSheetForm({
                     </div>
                   </>
                 )}
-                {source === 'datadog' && (
+                {type === 'datadog' && (
                   <div className="grid gap-4">
                     <LogDrainFormItem
-                      value="apiKey"
+                      value="api_key"
                       label="API Key"
                       formControl={form.control}
                       description="The API Key obtained from the Datadog dashboard."
@@ -337,7 +334,7 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
-                {source === 'elasticfilebeat' && (
+                {type === 'elastic' && (
                   <div className="grid gap-4">
                     <LogDrainFormItem
                       value="filebeatUrl"
@@ -360,7 +357,7 @@ export function LogDrainDestinationSheetForm({
               </div>
             </form>
           </Form_Shadcn_>
-          {source === 'webhook' && (
+          {type === 'webhook' && (
             <form
               onSubmit={(e) => {
                 e.preventDefault()

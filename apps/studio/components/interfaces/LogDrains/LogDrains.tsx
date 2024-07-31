@@ -1,7 +1,6 @@
 import { LogDrainData, LogDrainsData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import Link from 'next/link'
-import { LOG_DRAIN_SOURCES, LogDrainSource } from './LogDrains.constants'
+import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { useParams } from 'common'
 import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
@@ -27,12 +26,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import AlertError from 'components/ui/AlertError'
+import toast from 'react-hot-toast'
 
 export function LogDrains({
   onNewDrainClick,
   onUpdateDrainClick,
 }: {
-  onNewDrainClick: (src: LogDrainSource) => void
+  onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -43,6 +43,11 @@ export function LogDrains({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
       setSelectedLogDrain(null)
+    },
+    onError: () => {
+      setIsDeleteModalOpen(false)
+      setSelectedLogDrain(null)
+      toast.error('Failed to delete log drain')
     },
   })
 
@@ -57,7 +62,7 @@ export function LogDrains({
   if (!isLoading && logDrains?.length === 0) {
     return (
       <div className="grid grid-cols-2 gap-3">
-        {LOG_DRAIN_SOURCES.map((src) => (
+        {LOG_DRAIN_TYPES.map((src) => (
           <CardButton
             key={src.value}
             title={src.name}
@@ -83,7 +88,7 @@ export function LogDrains({
             <TableRow>
               <TableHead className="w-[100px]">Name</TableHead>
               <TableHead>Source</TableHead>
-              <TableHead>Created At</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
@@ -94,7 +99,7 @@ export function LogDrains({
               <TableRow key={drain.id}>
                 <TableCell className="font-medium">{drain.name}</TableCell>
                 <TableCell>{drain.type}</TableCell>
-                {/* <TableCell>{new Date(drain).toLocaleString()}</TableCell> */}
+                <TableCell>{drain.description}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -133,8 +138,8 @@ export function LogDrains({
             title="Delete Log Drain"
             visible={isDeleteModalOpen}
             onConfirm={() => {
-              if (selectedLogDrain && selectedLogDrain.id && ref) {
-                deleteLogDrain({ id: selectedLogDrain.id, projectRef: ref })
+              if (selectedLogDrain && ref) {
+                deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
               }
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
