@@ -29,27 +29,27 @@ export type LogDrainType = (typeof LOG_DRAIN_TYPES)[number]['value']
 export const DATADOG_REGIONS = [
   {
     label: 'AP1',
-    value: 'ap1',
+    value: 'AP1',
   },
   {
     label: 'EU',
-    value: 'eu',
+    value: 'EU',
   },
   {
     label: 'US1',
-    value: 'us1',
+    value: 'US1',
   },
   {
     label: 'US1-FED',
-    value: 'us1-fed',
+    value: 'US1-FED',
   },
   {
     label: 'US3',
-    value: 'us3',
+    value: 'US3',
   },
   {
     label: 'US5',
-    value: 'us5',
+    value: 'US5',
   },
 ] as const
 
