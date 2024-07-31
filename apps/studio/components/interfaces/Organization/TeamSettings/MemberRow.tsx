@@ -128,8 +128,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                     })
                     .filter((x) => x.length > 0)
 
-            if (projectsApplied.length === 0) return null
-
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
