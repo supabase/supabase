@@ -13,9 +13,9 @@ export default function TicketActions() {
           className="object-top mx-auto inset-x-0 w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
         />
       </div>
-      <p className="text-foreground-light text-sm">
-        Each time you share your ticket you increase your chances of winning a Wandrd backpack and
-        other limited swag.
+      <p className="text-foreground-light text-sm ">
+        Share your ticket to increase your chances of winning a Wandrd backpack and other limited
+        swag.
       </p>
     </div>
   )
