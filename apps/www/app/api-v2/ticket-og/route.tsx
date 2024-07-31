@@ -1,22 +1,18 @@
 import React from 'react'
 import { ImageResponse } from '@vercel/og'
 import { createClient } from '@supabase/supabase-js'
-import { NextApiRequest, NextApiResponse } from 'next'
 
 export const runtime = 'edge' // 'nodejs' is the default
-
 export const dynamic = 'force-dynamic' // defaults to auto
-export const revalidate = true
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const SUPABASE_URL =
-  (process.env.NEXT_PUBLIC_VERCEL_ENV as string) !== 'development'
-    ? process.env.NEXT_PUBLIC_SUPABASE_URL
-    : 'http://host.docker.internal:54321'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12`
 
@@ -99,19 +95,16 @@ const STYLING_CONFIG = {
 
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
+  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
-
-  console.log('force deploy')
 
   try {
     if (!username) throw new Error('missing username param')
 
     const supabaseAdminClient = createClient(
-      (process.env.NEXT_PUBLIC_VERCEL_ENV as string) !== 'development'
-        ? (process.env.NEXT_PUBLIC_SUPABASE_URL as string)
-        : 'http://host.docker.internal:54321',
+      process.env.NEXT_PUBLIC_SUPABASE_URL as string,
       process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY as string
     )
 
@@ -595,6 +588,8 @@ export async function GET(req: Request, res: Response) {
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
     // return await generatedTicketImage
 
+    console.log('gets here')
+    console.log('process.env.NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL)
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
@@ -606,10 +601,13 @@ export async function GET(req: Request, res: Response) {
         upsert: true,
       })
 
+    console.log('gets here 2')
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
+    console.log('gets here 3')
     const NEW_TIMESTAMP = new Date()
 
+    console.log('gets here 4')
     return await fetch(`${STORAGE_URL}/og/${ticketType}/${username}.png?t=${NEW_TIMESTAMP}`)
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {

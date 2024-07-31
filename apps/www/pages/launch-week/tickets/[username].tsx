@@ -122,10 +122,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
-  const SITE_URL =
-    (process.env.NEXT_PUBLIC_VERCEL_ENV as string) !== 'development'
-      ? process.env.VERCEL_URL
-      : 'http://localhost:3000'
+  console.log('process.env.NEXT_PUBLIC_VERCEL_ENV', process.env.NEXT_PUBLIC_VERCEL_ENV)
+
+  const SITE_URL = process.env.VERCEL_URL ?? 'http://localhost:3000'
+
+  console.log('SITE_URL', SITE_URL)
 
   // fetch the normal ticket
   // stores the og images in supabase storage
