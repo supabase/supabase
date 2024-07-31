@@ -34,6 +34,8 @@ const schema = object({
   SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
     .min(0, 'Must be a value more than 0')
     .required('Must have a Reuse Interval value'),
+  MFA_TOTP_ENROLL_ENABLED: boolean().required(),
+  MFA_TOTP_VERIFY_ENABLED: boolean().required(),
   MFA_MAX_ENROLLED_FACTORS: number()
     .min(0, 'Must be be a value more than 0')
     .max(30, 'Must be a value no greater than 30'),
@@ -73,6 +75,9 @@ const AdvancedAuthSettingsForm = () => {
     SITE_URL: authConfig?.SITE_URL,
     JWT_EXP: authConfig?.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
+    // TOTP is enabled by default
+    MFA_TOTP_ENROLL_ENABLED: authConfig?.MFA_TOTP_ENROLL_ENABLED || true,
+    MFA_TOTP_VERIFY_ENABLED: authConfig?.MFA_TOTP_VERIFY_ENABLED || true,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
@@ -143,9 +148,9 @@ const AdvancedAuthSettingsForm = () => {
                     handleReset={handleReset}
                     disabled={!canUpdateConfig}
                     helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
+                    !canUpdateConfig
+                    ? 'You need additional permissions to update authentication settings'
+                    : undefined
                     }
                   />
                 </div>
@@ -196,6 +201,22 @@ const AdvancedAuthSettingsForm = () => {
                     label="Maximum number of per-user MFA factors"
                     descriptionText="How many MFA factors can be enrolled at once per user."
                     actions={<span className="mr-3 text-foreground-lighter">factors</span>}
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="MFA_TOTP_ENROLL_ENABLED"
+                    size="small"
+                    label="Allow Enrollment of TOTP factors for MFA"
+                    layout="flex"
+                    descriptionText="Control whether users can enroll new TOTP factors"
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="MFA_TOTP_VERIFY_ENABLED"
+                    size="small"
+                    label="Control whether users can perform MFA Authentication with a TOTP factor"
+                    layout="flex"
+                    descriptionText="Allow verification"
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
