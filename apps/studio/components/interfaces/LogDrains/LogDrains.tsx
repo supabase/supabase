@@ -86,7 +86,7 @@ export function LogDrains({
     return <AlertError error={error}></AlertError>
   }
 
-  if (true) {
+  if (!isPaid) {
     return (
       <div className="p-8">
         <CardButton title="Upgrade to Pro" description="Upgrade to a paid plan to use Log Drains">
