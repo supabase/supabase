@@ -3,13 +3,13 @@ import dayjs from 'dayjs'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
-import { Button, cn } from 'ui'
+import { Button, cn, IconCheck } from 'ui'
 import { useParams } from '~/hooks/useParams'
 import LaunchWeekPrizeCard from '../LaunchWeekPrizeCard'
 import TicketCopy from './TicketCopy'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
-export default function TicketActions() {
+export default function TicketActions2() {
   const { userData, supabase } = useConfData()
   const { platinum, username, metadata, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
@@ -73,20 +73,51 @@ export default function TicketActions() {
   }
 
   return (
-    <div className="bg-surface-75 border border-muted w-full h-auto flex flex-col lg:flex-row rounded-lg overflow-hidden gap-3 items-center pr-12">
-      <div className="relative flex items-center justify-center h-auto w-full lg:w-2/5 object-center border-b lg:border-none border-muted overflow-hidden">
-        <NextImage
-          src="/images/launchweek/12/lw12-backpack-crop.png"
-          alt="Supabase LW12 Wandrd backpack"
-          draggable={false}
-          width={300}
-          height={300}
-          className="object-cover lg:object-top mx-auto inset-x-0 w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
-        />
-      </div>
-      <p className="text-foreground-light text-sm">
+    <div className="flex flex-col gap-4 ">
+      {/* <LabelBadge text="5 sets" /> */}
+      {/* <p className="text-foreground-light text-sm">
         Boost your chances of winning Supabase LW12 Wandrd backpack and other awards.
-      </p>
+      </p> */}
+      <div
+        className={cn(
+          'w-full gap-2 flex flex-col items-center',
+          sharePage ? 'justify-center' : 'justify-between'
+        )}
+      >
+        <div className="flex w-full gap-2">
+          <Button
+            type="secondary"
+            size="small"
+            disabled
+            className="opacity-100"
+            icon={<IconCheck strokeWidth={3} />}
+          >
+            Ticket claimed
+          </Button>
+          <Button
+            onClick={() => handleShare('twitter')}
+            type={userData.shared_on_twitter ? 'secondary' : 'default'}
+            icon={userData.shared_on_twitter && <IconCheck strokeWidth={3} />}
+            size="small"
+            asChild
+          >
+            <Link href={tweetUrl} target="_blank">
+              {userData.shared_on_twitter ? 'Shared on Twitter' : 'Share on Twitter'}
+            </Link>
+          </Button>
+          <Button
+            onClick={() => handleShare('linkedin')}
+            type={userData.shared_on_linkedin ? 'secondary' : 'default'}
+            icon={userData.shared_on_linkedin && <IconCheck strokeWidth={3} />}
+            size="small"
+            asChild
+          >
+            <Link href={linkedInUrl} target="_blank">
+              {userData.shared_on_linkedin ? 'Shared on Linkedin' : 'Share on Linkedin'}
+            </Link>
+          </Button>
+        </div>{' '}
+      </div>
     </div>
   )
 }

@@ -17,26 +17,30 @@ export default function TicketCopy() {
   }`
 
   return (
-    <div className="h-full w-full">
-      <button
-        type="button"
-        name="Copy"
-        ref={buttonRef}
-        onClick={() => {
-          navigator.clipboard.writeText(url).then(() => {
-            setCopied(true)
-            setTimeout(() => {
-              setCopied(false)
-            }, 2000)
-          })
-        }}
-        className="w-full h-full flex justify-center md:justify-start items-center gap-2 relative text-foreground-light hover:text-foreground text-xs"
-      >
-        <div className="w-4 min-w-4 flex-shrink-0">
-          {copied ? <Check size={14} strokeWidth={1.5} /> : <Copy size={14} strokeWidth={1.5} />}
-        </div>
-        <span className="truncate">{displayUrl}</span>
-      </button>
-    </div>
+    // <div className="h-full w-full">
+    <button
+      type="button"
+      name="Copy"
+      ref={buttonRef}
+      onClick={() => {
+        navigator.clipboard.writeText(url).then(() => {
+          setCopied(true)
+          setTimeout(() => {
+            setCopied(false)
+          }, 2000)
+        })
+      }}
+      className="font-mono w-full flex justify-center items-center gap-2 relative text-foreground-light hover:text-foreground text-sm"
+    >
+      <div className="w-4 min-w-4 flex-shrink-0">
+        {copied ? (
+          <Check size={14} strokeWidth={3} className="text-foreground" />
+        ) : (
+          <Copy size={14} strokeWidth={1.5} />
+        )}
+      </div>
+      <span className="truncate">{displayUrl}</span>
+    </button>
+    // </div>
   )
 }

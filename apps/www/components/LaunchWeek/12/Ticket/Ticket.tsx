@@ -44,8 +44,7 @@ export default function Ticket() {
     }
   }, [ticketRef])
 
-  const code = codeBlock`
-await supabase
+  const code = codeBlock`await supabase
   .from('tickets')
   .select('*')
   .eq('launch_week', 'lw12')
@@ -60,12 +59,12 @@ await supabase
   // Keep following indentation for proper json layout with conditionals
   const responseJson = codeBlock`
 {
-  data: {
-    name: "${user.name}",
-    username: "${username}",
-    ticket_number: "${ticketNumber}",
-  ${HAS_ROLE && `  role: "${user.role}",\n`}${HAS_COMPANY && `  company: "${user.company}",\n`}${HAS_LOCATION && `  location: "${user.location}",\n`}},
-  error: null
+  "data": {
+    "name": "${user.name}",
+    "username": "${username}",
+    "ticket_number": "${ticketNumber}",
+  ${HAS_ROLE && `  "role": "${user.role}",\n`}${HAS_COMPANY && `  "company": "${user.company}",\n`}${HAS_LOCATION && `  "location": "${user.location}",\n`}},
+  "error": null
 }
 `
 
@@ -92,10 +91,10 @@ await supabase
     >
       <Panel
         outerClassName="flex relative flex-col w-[360px] border h-auto max-h-[680px] rounded-xl !shadow-xl !p-0"
-        innerClassName="flex relative flex-col w-full transition-colors aspect-[396/613] rounded-xl text-left text-sm group/ticket"
+        innerClassName="flex relative flex-col w-full transition-colors aspect-[3/4] rounded-xl text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"
-        style={{ transform: 'translateZ(-10px)' }}
+        style={{ transform: 'translateZ(-10px)', borderColor: TICKET_THEME.TICKET_BORDER }}
         innerStyle={{ background: TICKET_THEME.TICKET_BACKGROUND }}
       >
         <div
@@ -113,7 +112,7 @@ await supabase
             <strong className="font-medium">Launch Week</strong> 12 Ticket
           </span>
           <CodeBlock
-            language="js"
+            language="jsx"
             hideCopy
             theme={TICKET_THEME.CODE_THEME}
             styleConfig={{
@@ -126,8 +125,8 @@ await supabase
         </div>
         <div className="w-full py-4 flex-grow flex flex-col gap-4">
           <span
-            className="px-4 uppercase tracking-wider text-xs"
-            style={{ color: TICKET_THEME.TICKET_FOREGROUND_LIGHT }}
+            className="px-4 uppercase tracking-wider text-xs font-mono"
+            style={{ color: TICKET_THEME.CODE_LINE_NUMBER }}
           >
             TICKET RESPONSE
           </span>
@@ -148,9 +147,9 @@ await supabase
               {responseJson}
             </CodeBlock>
           )}
-          <span className="px-4 text-xs" style={{ color: TICKET_THEME.TICKET_FOREGROUND_LIGHT }}>
+          {/* <span className="px-4 text-xs" style={{ color: TICKET_THEME.TICKET_FOREGROUND_LIGHT }}>
             {resTime}ms <span className="uppercase">Response time</span>
-          </span>
+          </span> */}
         </div>
         {/* Edit hover button */}
         {!sharePage && (
