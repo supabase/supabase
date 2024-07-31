@@ -86,7 +86,6 @@ export default function LaunchWeekIndex() {
       >
         <DefaultLayout
           className="
-            bg-alternative
             -mt-[60px] pt-[60px]
             overflow-hidden
             xl:h-screen !min-h-fit
