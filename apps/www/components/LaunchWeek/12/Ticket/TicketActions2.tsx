@@ -88,21 +88,26 @@ export default function TicketActions2() {
           sharePage ? 'justify-center' : 'justify-between'
         )}
       >
-        <div className="flex w-full gap-2">
+        <div className="flex flex-row w-full gap-2">
           <Button
             type="secondary"
             size="small"
+            className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50"
             disabled
-            className="opacity-100"
-            icon={<IconCheck strokeWidth={3} />}
+            icon={<IconCheck strokeWidth={3} className="hidden lg:block" />}
           >
             Ticket claimed
           </Button>
           <Button
             onClick={() => handleShare('twitter')}
             type={userData.shared_on_twitter ? 'secondary' : 'default'}
-            icon={userData.shared_on_twitter && <IconCheck strokeWidth={3} />}
+            icon={
+              userData.shared_on_twitter && (
+                <IconCheck strokeWidth={3} className="hidden lg:block" />
+              )
+            }
             size="small"
+            className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
           >
             <Link href={tweetUrl} target="_blank">
@@ -112,8 +117,13 @@ export default function TicketActions2() {
           <Button
             onClick={() => handleShare('linkedin')}
             type={userData.shared_on_linkedin ? 'secondary' : 'default'}
-            icon={userData.shared_on_linkedin && <IconCheck strokeWidth={3} />}
+            icon={
+              userData.shared_on_linkedin && (
+                <IconCheck strokeWidth={3} className="hidden lg:block" />
+              )
+            }
             size="small"
+            className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
           >
             <Link href={linkedInUrl} target="_blank">
