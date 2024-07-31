@@ -49,7 +49,7 @@ module.exports = config({
         'flash-code-slow': 'flash-code 2s forwards',
         spinner: 'spinner 1s both infinite',
         marquee: 'marquee 35s linear infinite',
-        'marquee-vertical': 'marquee-vertical 60s linear infinite both',
+        'marquee-vertical': 'marquee-vertical 180s linear infinite both',
         'pulse-radar': 'pulse-radar 3s linear infinite',
         'slide-in': 'slideIn 250ms ease-in both',
       },
