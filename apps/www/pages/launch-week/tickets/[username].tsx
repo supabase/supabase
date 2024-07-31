@@ -124,7 +124,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   console.log('process.env.NEXT_PUBLIC_VERCEL_ENV', process.env.NEXT_PUBLIC_VERCEL_ENV)
 
-  const SITE_URL = process.env.VERCEL_URL ?? 'http://localhost:3000'
+  const SITE_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
 
   console.log('SITE_URL', SITE_URL)
 
