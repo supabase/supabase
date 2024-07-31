@@ -129,13 +129,14 @@ export function LogDrainDestinationSheetForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customHeaders: [],
-      httpVersion: 'HTTP2',
-      gzip: false,
       type: defaultType,
       ...defaultValues,
     },
   })
 
+  // IDK why but this useEffect is needed to set the default values
+  // Suppossedly if you call form.reset() defaultValues is not cached, but I have found it to be very unreliable, and  sometimes the form will open with the wrong default values.
+  // - Jordi
   useEffect(() => {
     form.setValue('type', defaultType)
     form.setValue('name', defaultValues?.name || '')
@@ -144,6 +145,10 @@ export function LogDrainDestinationSheetForm({
     form.setValue('region', defaultValues?.config?.region || '')
     form.setValue('username', defaultValues?.config?.username || '')
     form.setValue('password', defaultValues?.config?.password || '')
+    form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
+    form.setValue('gzip', defaultValues?.config?.gzip || true)
+    form.setValue('customHeaders', defaultValues?.config?.customHeaders || [])
+    form.setValue('description', defaultValues?.description || '')
   }, [defaultType, form, defaultValues])
 
   const type = form.watch('type')
@@ -175,6 +180,7 @@ export function LogDrainDestinationSheetForm({
       open={open}
       onOpenChange={(v) => {
         form.reset()
+        form.setValue('customHeaders', [])
         onOpenChange(v)
       }}
     >
@@ -349,12 +355,13 @@ export function LogDrainDestinationSheetForm({
               </div>
             </form>
           </Form_Shadcn_>
+
+          {/* This form needs to be outside the <Form_Shadcn_> */}
           {type === 'webhook' && (
             <form
               onSubmit={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                console.log('test')
                 addHeader()
               }}
               className="flex gap-2 mt-2 items-center"
