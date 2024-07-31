@@ -22,18 +22,15 @@ const CountdownComponent = ({
     } else {
       // Render countdown
       return (
-        <div className="flex items-baseline gap-3 font-mono text-sm text-foreground-muted">
-          <span>Launch Week starts in</span>
-          <CountdownWidget
-            days={days}
-            hours={hours}
-            minutes={minutes}
-            seconds={seconds}
-            showCard={showCard}
-            className={className}
-            size={size}
-          />
-        </div>
+        <CountdownWidget
+          days={days}
+          hours={hours}
+          minutes={minutes}
+          seconds={seconds}
+          showCard={showCard}
+          className={className}
+          size={size}
+        />
       )
     }
   }

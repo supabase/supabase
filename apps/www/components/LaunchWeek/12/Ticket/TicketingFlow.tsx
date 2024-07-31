@@ -94,7 +94,7 @@ const TicketingFlow = () => {
                       size="large"
                     />
                   </div>
-                  <div className="flex flex-col md:items-center gap-2">
+                  <div className="flex flex-col md:items-center gap-6">
                     <div className="flex flex-col md:flex-row flex-wrap gap-2 md:gap-6 uppercase text-2xl tracking-wider">
                       <h2 className="text-foreground">
                         <strong className="font-medium">Launch Week</strong> 12
@@ -102,7 +102,7 @@ const TicketingFlow = () => {
                       <span className="h-full border-r border-foreground hidden md:inline" />
                       <p className="text-foreground-light">{LW12_DATE}</p>
                     </div>
-                    <p className="text-foreground-lighter text-lg">
+                    <p className="text-foreground-lighter text-lg ">
                       Join us for a week of new features and find new ways to level up your
                       development.
                     </p>
@@ -120,7 +120,9 @@ const TicketingFlow = () => {
                 >
                   <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
                     <TicketContainer />
-                    {!hasPlatinumTicket && <TicketPresence />}
+                    {/* {!hasPlatinumTicket && <TicketPresence />} */}
+                    {/* // not sure why this was only non platinum */}
+                    <TicketPresence />
                     <TicketCopy />
                   </div>
                   <div className="order-first xl:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">

@@ -143,13 +143,11 @@ export default function TicketForm() {
   ) : (
     <div className="flex flex-col gap-10 items-start justify-center relative z-20">
       <Button
-        size="tiny"
-        type="outline"
+        size="small"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
         iconLeft={session && <CheckCircle />}
         loading={formState === 'loading'}
-        className="px-4 h-auto !py-1.5"
       >
         Claim your ticket
       </Button>
