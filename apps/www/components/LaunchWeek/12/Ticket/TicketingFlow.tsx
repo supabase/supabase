@@ -124,9 +124,6 @@ const TicketingFlow = () => {
                     <TicketCopy />
                   </div>
                   <div className="order-first xl:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
-                    <div className="flex flex-col">
-                      <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
-                    </div>
                     {hasPlatinumTicket ? (
                       <div>
                         {hasSecretTicket ? (
@@ -152,10 +149,10 @@ const TicketingFlow = () => {
                       </div>
                     ) : (
                       <div>
-                        <p className="text-2xl mb-1">{FIRST_NAME}, almost there!</p>
+                        <p className="text-2xl mb-1">Almost there {FIRST_NAME}!</p>
                         <p className="text-2xl text-foreground-light">
-                          Share on {userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
-                          increase your chances of winning.
+                          Share on {!userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
+                          increase your chances of winning limited swag.
                         </p>
                       </div>
                     )}
@@ -163,6 +160,7 @@ const TicketingFlow = () => {
                     <div className="w-full my-3">
                       <TicketActions />
                     </div>
+                    <CountdownComponent date={LW12_LAUNCH_DATE} showCard={false} />
                   </div>
                 </m.div>
               )}
