@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import IntegrationsDirectoryPlanNotice from 'components/interfaces/Organization/IntegrationSettings/IntegrationsDirectoryPlanNotice'
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -8,14 +9,12 @@ import {
 } from 'components/layouts/Scaffold'
 import { useIntegrationDirectoryEntryDeleteMutation } from 'data/integrations-directory/integration-directory-entry-delete-mutation'
 import { useIntegrationsDirectoryQuery } from 'data/integrations-directory/integrations-directory-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import toast from 'react-hot-toast'
 import { Button, Sheet, SheetContent } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateIntegrationSheet } from './CreateIntegrationSheet'
-import IntegrationsDirectoryPlanNotice from 'components/interfaces/Organization/IntegrationSettings/IntegrationsDirectoryPlanNotice'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { getURL } from 'lib/helpers'
 
 const SupabaseSection = () => {
   const organization = useSelectedOrganization()
@@ -42,7 +41,12 @@ const SupabaseSection = () => {
   const entry = entries.find((entry) => entry.approved)
   const draftEntry = entries.find((entry) => !entry.approved)
 
+  // whether the create integration sheet is shown
   const [visible, setVisible] = useState(false)
+  // describes whether the create integration sheet form has changes (is dirty)
+  const [hasChanges, setHasChanges] = useState(false)
+  // if the create integration sheet has changes that haven't been saved, show a confirmation modal
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
 
   return (
     <ScaffoldContainer>
@@ -193,10 +197,34 @@ const SupabaseSection = () => {
                     undone.
                   </p>
                 </ConfirmationModal>
-                <Sheet open={visible} onOpenChange={(open) => setVisible(open)}>
+                <ConfirmationModal
+                  visible={isClosingPanel}
+                  title="Discard changes"
+                  confirmLabel="Discard"
+                  onCancel={() => setIsClosingPanel(false)}
+                  onConfirm={() => {
+                    setIsClosingPanel(false)
+                    setVisible(false)
+                  }}
+                >
+                  <p className="text-sm text-foreground-light">
+                    There are unsaved changes. Are you sure you want to close the panel? Your
+                    changes will be lost.
+                  </p>
+                </ConfirmationModal>
+
+                <Sheet
+                  open={visible}
+                  onOpenChange={() => (hasChanges ? setIsClosingPanel(true) : setVisible(false))}
+                >
                   <SheetContent showClose={false} className="flex flex-col gap-0">
                     <CreateIntegrationSheet
-                      setVisible={(open) => setVisible(open)}
+                      onChange={(value) => {
+                        if (value !== hasChanges) {
+                          setHasChanges(hasChanges)
+                        }
+                      }}
+                      onClosing={() => (hasChanges ? setIsClosingPanel(true) : setVisible(false))}
                       integrationEntry={draftEntry || entry}
                     />
                   </SheetContent>

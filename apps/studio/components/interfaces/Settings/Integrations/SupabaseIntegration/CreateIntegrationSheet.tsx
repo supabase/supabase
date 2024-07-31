@@ -49,7 +49,8 @@ const FORM_ID = 'create-integration-sidepanel'
 
 interface CreateIntegrationSheetProps {
   integrationEntry?: IntegrationEntry
-  setVisible: (value: boolean) => void
+  onChange: (hasChanges: boolean) => void
+  onClosing: () => void
 }
 
 export const IntegrationCategory = {
@@ -89,7 +90,8 @@ const FormSchema = z.object({
 
 export const CreateIntegrationSheet = ({
   integrationEntry,
-  setVisible,
+  onChange,
+  onClosing,
 }: CreateIntegrationSheetProps) => {
   const organization = useSelectedOrganization()
   const [showDeleteDraftDialog, setShowDeleteDraftDialog] = useState(false)
@@ -124,7 +126,7 @@ export const CreateIntegrationSheet = ({
         }
 
         setShowDeleteDraftDialog(false)
-        setVisible(false)
+        onClosing()
       },
     })
 
@@ -149,7 +151,7 @@ export const CreateIntegrationSheet = ({
         {
           onSuccess: () => {
             toast.success(`Successfully updated integration`)
-            setVisible(false)
+            onClosing()
           },
         }
       )
@@ -173,7 +175,7 @@ export const CreateIntegrationSheet = ({
         {
           onSuccess: () => {
             toast.success(`Successfully added an integration entry ${data.slug}`)
-            setVisible(false)
+            onClosing()
           },
         }
       )
@@ -181,6 +183,12 @@ export const CreateIntegrationSheet = ({
   }
 
   const isLoading = isCreating || isUpdating || isDeleting
+
+  // set a variable in the parent component to indicate if the form has changes. The variable is used to show a
+  // confirmation dialog when the user tries to close the sheet.
+  form.watch(() => {
+    onChange(form.formState.isDirty || !form.formState.isSubmitted)
+  })
 
   return (
     <>
@@ -452,7 +460,7 @@ export const CreateIntegrationSheet = ({
           </div>
         )}
 
-        <Button type="default" onClick={() => setVisible(false)} loading={isLoading}>
+        <Button type="default" onClick={() => onClosing()} loading={isLoading}>
           Cancel
         </Button>
         <Button form={FORM_ID} htmlType="submit" loading={isLoading}>
