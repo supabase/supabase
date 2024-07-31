@@ -525,8 +525,6 @@ export async function GET(req: Request, res: Response) {
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
     // return await generatedTicketImage
 
-    console.log('gets here')
-    console.log('process.env.NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL)
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
@@ -538,13 +536,10 @@ export async function GET(req: Request, res: Response) {
         upsert: true,
       })
 
-    console.log('gets here 2')
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
-    console.log('gets here 3')
     const NEW_TIMESTAMP = new Date()
 
-    console.log('gets here 4')
     return await fetch(`${STORAGE_URL}/og/${ticketType}/${username}.png?t=${NEW_TIMESTAMP}`)
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
