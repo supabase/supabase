@@ -62,7 +62,7 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('elastic'),
-    filebeatUrl: z.string().url({ message: 'URL is required and must be a valid URL' }),
+    url: z.string().url({ message: 'URL is required and must be a valid URL' }),
     username: z.string().min(1, { message: 'Username is required' }),
     password: z.string().min(1, { message: 'Password is required' }),
   }),
@@ -337,11 +337,7 @@ export function LogDrainDestinationSheetForm({
                 )}
                 {type === 'elastic' && (
                   <div className="grid gap-4">
-                    <LogDrainFormItem
-                      value="filebeatUrl"
-                      label="Filebeat URL"
-                      formControl={form.control}
-                    />
+                    <LogDrainFormItem value="url" label="Filebeat URL" formControl={form.control} />
                     <LogDrainFormItem
                       value="username"
                       label="Username"
