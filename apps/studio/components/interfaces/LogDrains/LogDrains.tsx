@@ -86,7 +86,7 @@ export function LogDrains({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Name</TableHead>
+              <TableHead className="w-[250px]">Name</TableHead>
               <TableHead>Source</TableHead>
               <TableHead>Description</TableHead>
               <TableHead className="text-right">
