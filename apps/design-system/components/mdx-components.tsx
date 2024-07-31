@@ -58,30 +58,16 @@ const components = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
   ),
-  h2: ({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const arrayChildren = React.Children.toArray(children)
-    // construct an id from the children strings. It's good enough to be unique and shareable.
-    const id = kebabCase(arrayChildren.filter((str) => typeof str === 'string').join(' '))
+  h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2
+      className={cn(
+        'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0',
+        className
+      )}
+      {...props}
+    />
+  ),
 
-    return (
-      <h2
-        className={cn(
-          'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl tracking-tight first:mt-0 group relative -ml-2 pl-2',
-          className
-        )}
-        {...props}
-        id={id}
-      >
-        <a href={`#${id}`}>
-          <div className="absolute -ml-6 mt-1.5 opacity-0 group-hover:opacity-100 h-5 w-5 flex items-center justify-center text-foreground-lighter hover:text-foreground">
-            <LinkIcon size="14" />
-          </div>
-
-          {children}
-        </a>
-      </h2>
-    )
-  },
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       className={cn('font-heading mt-8 scroll-m-20 text-xl tracking-tight', className)}
