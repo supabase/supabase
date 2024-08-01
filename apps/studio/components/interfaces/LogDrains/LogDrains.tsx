@@ -17,17 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { MoreHorizontal, Pen, Pencil, TrashIcon } from 'lucide-react'
+import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useState } from 'react'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import AlertError from 'components/ui/AlertError'
 import toast from 'react-hot-toast'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import Link from 'next/link'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { CardContent, CardDescription, CardTitle } from '@ui/components/shadcn/ui/card'
 
 export function LogDrains({
   onNewDrainClick,
@@ -39,11 +37,23 @@ export function LogDrains({
   const org = useSelectedOrganization()
 
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
+  const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
-  const { data: logDrains, isLoading, refetch, error, isError } = useLogDrainsQuery({ ref })
+  const {
+    data: logDrains,
+    isLoading,
+    refetch,
+    error,
+    isError,
+  } = useLogDrainsQuery(
+    { ref },
+    {
+      enabled: logDrainsEnabled,
+    }
+  )
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
@@ -56,22 +66,20 @@ export function LogDrains({
     },
   })
 
+  if (!orgPlanLoading && !logDrainsEnabled) {
+    return (
+      <CardButton title="Upgrade to Pro" description="Upgrade to a Team Plan to use Log Drains">
+        <Button className="mt-2" asChild>
+          <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
+        </Button>
+      </CardButton>
+    )
+  }
+
   if (isLoading || orgPlanLoading) {
     return (
       <div>
         <GenericSkeletonLoader />
-      </div>
-    )
-  }
-
-  if (plan?.id === 'free' || plan?.id === 'pro') {
-    return (
-      <div className="p-8">
-        <CardButton title="Upgrade to Pro" description="Upgrade to a Team Plan to use Log Drains">
-          <Button className="mt-2" asChild>
-            <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
-          </Button>
-        </CardButton>
       </div>
     )
   }

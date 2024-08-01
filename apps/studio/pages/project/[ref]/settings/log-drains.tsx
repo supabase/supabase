@@ -14,17 +14,19 @@ import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constant
 import { LogDrainData } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
-import {
-  LogDrainUpdateVariables,
-  useUpdateLogDrainMutation,
-} from 'data/log-drains/update-log-drain-mutation'
+import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useParams } from 'common'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
+
+  const { plan, isLoading: planLoading } = useCurrentOrgPlan()
+
+  const logDrainsEnabled = !planLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
 
   const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
@@ -74,6 +76,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           </div>
           <div className="flex items-center justify-end">
             <Button
+              disabled={!logDrainsEnabled}
               onClick={() => {
                 setSelectedLogDrain(null)
                 setMode('create')
@@ -109,12 +112,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             if (mode === 'create') {
               createLogDrain(logDrainValues)
             } else {
-              if (!logDrainValues.id) {
-                throw new Error('Log drain ID is required')
+              if (!logDrainValues.id || !selectedLogDrain?.token) {
+                throw new Error('Log drain ID and token is required')
               } else {
-                if (!selectedLogDrain?.token) {
-                  throw new Error('Log drain token is required')
-                }
+                console.log('logDrainValues', logDrainValues)
                 updateLogDrain({
                   ...logDrainValues,
                   token: selectedLogDrain?.token,
