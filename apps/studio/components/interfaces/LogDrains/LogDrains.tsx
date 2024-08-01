@@ -68,9 +68,12 @@ export function LogDrains({
 
   if (!orgPlanLoading && !logDrainsEnabled) {
     return (
-      <CardButton title="Upgrade to Pro" description="Upgrade to a Team Plan to use Log Drains">
+      <CardButton
+        title="Upgrade to a Team Plan"
+        description="Upgrade to a Team or Enterprise Plan to use Log Drains"
+      >
         <Button className="mt-2" asChild>
-          <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
+          <Link href={`/org/${org?.slug}/billing`}>Upgrade to Team</Link>
         </Button>
       </CardButton>
     )
