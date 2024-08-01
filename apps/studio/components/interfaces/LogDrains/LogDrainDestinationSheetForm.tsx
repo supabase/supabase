@@ -149,7 +149,7 @@ export function LogDrainDestinationSheetForm({
     } else {
       form.reset()
     }
-  }, [defaultType, form, defaultValues])
+  }, [defaultType, form, defaultValues, mode])
 
   const type = form.watch('type')
 
@@ -291,11 +291,18 @@ export function LogDrainDestinationSheetForm({
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex gap-2 p-2 items-center">
-                          <FormControl_Shadcn_>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl_Shadcn_>
-                          <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
+                        <FormItem_Shadcn_ className="space-y-2">
+                          <div className="flex gap-2 items-center">
+                            <FormControl_Shadcn_>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl_Shadcn_>
+                            <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
+                            <InfoTooltip align="start">
+                              Gzip can reduce the size of the payload and increase the speed of the
+                              request,
+                              <br /> but it will increase the CPU usage of the destination.
+                            </InfoTooltip>
+                          </div>
                         </FormItem_Shadcn_>
                       )}
                     />
