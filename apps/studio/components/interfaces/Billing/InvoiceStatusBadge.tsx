@@ -24,13 +24,17 @@ const invoiceStatusMapping: Record<
     badgeVariant: 'brand',
   },
 
-  // We do not want to overcomplicate it for the user, so we'll treat uncollectible/open the same from a user perspective
+  // We do not want to overcomplicate it for the user, so we'll treat uncollectible/open/issued the same from a user perspective
   // it's an outstanding invoice
   [InvoiceStatus.UNCOLLECTIBLE]: {
     label: 'Outstanding',
     badgeVariant: 'destructive',
   },
   [InvoiceStatus.OPEN]: {
+    label: 'Outstanding',
+    badgeVariant: 'destructive',
+  },
+  [InvoiceStatus.ISSUED]: {
     label: 'Outstanding',
     badgeVariant: 'destructive',
   },

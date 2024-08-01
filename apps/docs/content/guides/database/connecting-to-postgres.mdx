@@ -10,6 +10,7 @@ Supabase provides several options for programmatically connecting to your Postgr
 1. Programmatic access using the Data APIs
 1. Connection pooling for scalable connections
 1. Direct connections using the built-in Postgres connection system
+1. Using one of the many [Client Libraries](https://supabase.com/docs#client-libraries)
 
 <Admonition type="caution">
 
@@ -31,19 +32,16 @@ A "connection pool" is a system (external to Postgres) which manages Postgres co
 
 When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
-<figure>
-  <Image
-    className="hidden dark:block"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
-  />
-  <Image
-    className="dark:hidden"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
-  />
-  <figcaption>Connecting to the database directly vs using a Connection Pooler</figcaption>
-</figure>
+<Image
+  alt="New migration files trigger migrations on the preview instance."
+  src={{
+    dark: '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png',
+    light:
+      '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
+  }}
+  caption="Connecting to the database directly vs using a Connection Pooler"
+  zoomable
+/>
 
 Every Supabase project comes with a connection pooler for managing connections to your database. The pooler provides 2 important services:
 
@@ -65,6 +63,10 @@ You can find the connection pool config in the [Database settings](/dashboard/pr
 1. Go to the `Settings` section.
 2. Click `Database`.
 3. Under `Connection string`, make sure `Use connection pooling` is checked. Copy the URI.
+
+### Pre-requisites
+
+The connection pooler on Supabase projects currently uses the `pgbouncer` Postgres role to make an initial connection to the `postgres` database. If these permissions are revoked, you will not be able to use the pooler until the requisite permissions have been granted.
 
 ## Direct connections
 
@@ -190,15 +192,13 @@ You can obtain your connection info and Server root certificate from your applic
     <StepHikeCompact.Code>
 
     <Image
-      className="hidden dark:block"
       alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2"
-    />
-    <Image
-      className="dark:hidden"
-      alt="Register a new postgres server."
-      src="/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png"
-    />
+      src={{
+          dark: '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2',
+          light:
+            '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png',
+        }}
+      />
 
     </StepHikeCompact.Code>
 
@@ -224,7 +224,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Details title="Connect">
 
-    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters.
+    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters. Fill in your Database password that you made when creating your project (It can be reset in Database Settings above if you don't have it).
 
     </StepHikeCompact.Details>
 
@@ -240,7 +240,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Details title="SSL">
 
-    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database) and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
 
     </StepHikeCompact.Details>
 

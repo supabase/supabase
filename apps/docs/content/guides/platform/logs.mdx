@@ -21,14 +21,16 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://supabase.com/dashboard/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
+[API logs](https://supabase.com/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
+
+When viewing logs originating from the API Load Balancer endpoint, the upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
 ![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
+[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases. Logs for a specific database can be toggled with the `Source` button on the upper-right section of the dashboard.
 
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
@@ -86,14 +88,6 @@ Edge Function log messages have a max length of 10,000 characters. If you try to
 ---
 
 ## Logging Postgres queries
-
-By default, only DDL statements are logged for new Supabase projects.
-
-<Admonition type="note">
-
-For projects created before 18th July 2023, statement execution logging is disabled completely by default.
-
-</Admonition>
 
 To enable query logs for other categories of statements:
 
@@ -291,7 +285,7 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
-### Log source reference
+### Logs field reference
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 
@@ -299,11 +293,13 @@ Refer to the full field reference for each available source below. Do note that 
   {(logConstants) => (
     <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
       {logConstants.schemas.map((schema) => (
-        <TabPanel id={schema.reference} label={schema.name}>
+        <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
           <table>
             <thead>
-              <td className="font-bold">Path</td>
-              <td className="font-bold">Type</td>
+              <tr>
+                <th className="font-bold">Path</th>
+                <th className="font-bold">Type</th>
+              </tr>
             </thead>
             <tbody>
               {schema.fields

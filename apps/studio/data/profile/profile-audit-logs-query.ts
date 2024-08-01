@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
@@ -24,7 +24,7 @@ export async function getProfileAuditLogs(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as ProfileAuditLogsData
 }
 

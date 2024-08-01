@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
 import type { AddonVariantId } from './types'
@@ -27,8 +27,7 @@ export async function removeSubscriptionAddon({
     },
   })
 
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 

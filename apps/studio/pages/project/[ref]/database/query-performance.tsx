@@ -10,33 +10,32 @@ import {
 } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { DatabaseLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
-import { useFlag } from 'hooks'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+
+const PRESET_MAP = {
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
+  [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
+} as const
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
 
-  // [Joshen] Has been false on configcat for a long time
-  const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
-  const orderBy = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
-  const searchQuery = (router.query.search as string) || ''
-  const roles = router.query.roles || []
-  const presetMap = {
-    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
-    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
-    [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
-  } as const
+  const orderBy = sort !== undefined ? ({ column: sort, order } as QueryPerformanceSort) : undefined
+  const searchQuery = search ?? ''
+  const roles = router?.query?.roles ?? []
   const preset =
-    presetMap[router.query.preset as QUERY_PERFORMANCE_REPORT_TYPES] || 'mostTimeConsuming'
+    urlPreset !== undefined
+      ? PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+      : 'mostTimeConsuming'
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
@@ -47,13 +46,11 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* [Joshen] Need to double check what this is about and if it's still relevant */}
-      {/* {tableIndexEfficiencyEnabled && <IndexEfficiencyNotice isLoading={isLoading} />} */}
-
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Query Performance"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+        actions={<DatabaseSelector />}
       />
       <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
     </div>

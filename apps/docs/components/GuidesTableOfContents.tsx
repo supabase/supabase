@@ -1,14 +1,16 @@
+'use client'
+
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-
-import { cn, TAB_CHANGE_EVENT_NAME } from 'ui'
-import { ExpandableVideo } from 'ui-patterns'
-
-import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { cn } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { proxy, useSnapshot } from 'valtio'
+import {
+  highlightSelectedTocItem,
+  removeAnchor,
+} from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { Feedback } from '~/components/Feedback'
 import useHash from '~/hooks/useHash'
-import { useRerenderOnEvt } from '~/hooks/useManualRerender'
-import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
-import { Feedback } from './Feedback'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
@@ -20,7 +22,7 @@ const formatSlug = (slug: string) => {
 
 const formatTOCHeader = (content: string) => {
   let begin = false
-  const res = []
+  const res: Array<string> = []
   for (const x of content) {
     if (x === '`') {
       if (!begin) {
@@ -37,16 +39,39 @@ const formatTOCHeader = (content: string) => {
   return res.join('')
 }
 
+const tocRenderSwitch = proxy({
+  renderFlag: 0,
+  toggleRenderFlag: () => void (tocRenderSwitch.renderFlag = (tocRenderSwitch.renderFlag + 1) % 2),
+})
+
+const useSubscribeTocRerender = () => {
+  const { renderFlag } = useSnapshot(tocRenderSwitch)
+  return void renderFlag // Prevent it from being detected as unused code
+}
+
+const useTocRerenderTrigger = () => {
+  const { toggleRenderFlag } = useSnapshot(tocRenderSwitch)
+  return toggleRenderFlag
+}
+
+interface TOCHeader {
+  id?: string
+  text: string
+  link: string
+  level: number
+}
+
 const GuidesTableOfContents = ({
   className,
   overrideToc,
   video,
 }: {
   className?: string
-  overrideToc?: Array<{ text: string; link: string; level: number }>
+  overrideToc?: Array<TOCHeader>
   video?: string
 }) => {
-  const [tocList, setTocList] = useState([])
+  useSubscribeTocRerender()
+  const [tocList, setTocList] = useState<TOCHeader[]>([])
   const pathname = usePathname()
   const [hash] = useHash()
 
@@ -63,21 +88,26 @@ const GuidesTableOfContents = ({
       const headings = Array.from(
         document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
       )
+
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
           const text = heading.textContent.replace('#', '')
-          const link = heading.querySelector('a').getAttribute('href')
+          const link = heading.querySelector('a')?.getAttribute('href')
+          if (!link) return null
+
           const level = heading.tagName === 'H2' ? 2 : 3
-          return { text, link, level }
+
+          return { text, link, level } as Partial<TOCHeader>
         })
+        .filter((x): x is TOCHeader => !!x && !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 
     return () => clearTimeout(timeoutHandle)
     /**
      * window.location.href needed to recalculate toc when page changes,
-     * useRerenderOnEvt below will guarantee rerender on change
+     * `useSubscribeTocRerender` above will trigger the rerender
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overrideToc, typeof window !== 'undefined' && window.location.href])
@@ -88,12 +118,6 @@ const GuidesTableOfContents = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, JSON.stringify(displayedList)])
-
-  /**
-   * Displayed headings may change if the tab changes, so the table of contents
-   * needs to rerender.
-   */
-  useRerenderOnEvt(TAB_CHANGE_EVENT_NAME)
 
   if (!displayedList.length) return
 
@@ -126,3 +150,5 @@ const GuidesTableOfContents = ({
 }
 
 export default GuidesTableOfContents
+export { useTocRerenderTrigger }
+export type { TOCHeader }

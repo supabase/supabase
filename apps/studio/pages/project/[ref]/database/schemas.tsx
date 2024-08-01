@@ -2,7 +2,7 @@ import { partition } from 'lodash'
 import { useState } from 'react'
 
 import SchemaGraph from 'components/interfaces/Database/Schemas/SchemaGraph'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'

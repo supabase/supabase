@@ -26,10 +26,13 @@ export async function getIndexAdvisorResult({
 }: GetIndexAdvisorResultVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
+  // swap single quotes for double to prevent syntax errors
+  const escapedQuery = query.replace(/'/g, "''")
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from index_advisor('${query}');`,
+    sql: `select * from index_advisor('${escapedQuery}');`,
   })
   return result[0] as GetIndexAdvisorResultResponse
 }
@@ -50,10 +53,11 @@ export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
     {
       retry: false,
       enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof query !== 'undefined' &&
-        (query.startsWith('select') || query.startsWith('SELECT')),
+        (enabled &&
+          typeof projectRef !== 'undefined' &&
+          typeof query !== 'undefined' &&
+          (query.startsWith('select') || query.startsWith('SELECT'))) ||
+        query.trim().toLowerCase().startsWith('with pgrst_source'),
       ...options,
     }
   )

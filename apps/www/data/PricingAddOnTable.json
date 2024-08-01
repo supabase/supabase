@@ -10,7 +10,7 @@
     "rows": [
       {
         "columns": [
-          { "key": "plan", "title": "Plan", "value": "Micro" },
+          { "key": "plan", "title": "Compute Size", "value": "Micro" },
           { "key": "pricing", "title": "Price USD", "value": "$10" },
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },

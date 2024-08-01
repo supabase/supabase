@@ -2,16 +2,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import saveAs from 'file-saver'
+import { ArrowUp, ChevronDown, Download, FileText, Trash, X } from 'lucide-react'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { useDispatch, useTrackedState } from 'components/grid/store'
+import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useUrlState } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -23,16 +25,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconArrowUp,
-  IconChevronDown,
-  IconDownload,
-  IconFileText,
-  IconTrash,
-  IconX,
   cn,
 } from 'ui'
-
-import { FilterPopover } from './filter'
+import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
@@ -44,7 +39,6 @@ export type HeaderProps = {
   table: SupaTable
   sorts: Sort[]
   filters: Filter[]
-  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
   onImportData?: () => void
@@ -61,14 +55,13 @@ const Header = ({
   onImportData,
   headerActions,
   customHeader,
-  isRefetching,
 }: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-surface-100 px-5 py-1.5">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-5 py-1.5">
         {customHeader ? (
           <>{customHeader}</>
         ) : (
@@ -78,7 +71,6 @@ const Header = ({
             ) : (
               <DefaultHeader
                 table={table}
-                isRefetching={isRefetching}
                 onAddColumn={onAddColumn}
                 onAddRow={onAddRow}
                 onImportData={onImportData}
@@ -96,18 +88,11 @@ export default Header
 
 type DefaultHeaderProps = {
   table: SupaTable
-  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
   onImportData?: () => void
 }
-const DefaultHeader = ({
-  table,
-  isRefetching,
-  onAddColumn,
-  onAddRow,
-  onImportData,
-}: DefaultHeaderProps) => {
+const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -134,7 +119,7 @@ const DefaultHeader = ({
                     data-testid="table-editor-insert-new-row"
                     type="primary"
                     size="tiny"
-                    icon={<IconChevronDown size={14} strokeWidth={1.5} />}
+                    icon={<ChevronDown strokeWidth={1.5} />}
                   >
                     Insert
                   </Button>
@@ -201,8 +186,12 @@ const DefaultHeader = ({
                             onClick={onImportData}
                           >
                             <div className="relative -mt-2">
-                              <IconFileText className="-translate-x-[2px]" />
-                              <IconArrowUp
+                              <FileText
+                                size={18}
+                                strokeWidth={1.5}
+                                className="-translate-x-[2px]"
+                              />
+                              <ArrowUp
                                 className={clsx(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                                   'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
@@ -260,7 +249,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count'],
+      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table,
@@ -358,22 +347,17 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-3">
-        <Button
-          type="default"
-          style={{ padding: '3px' }}
-          icon={<IconX size="tiny" strokeWidth={2} />}
-          onClick={deselectRows}
-        />
+        <Button type="default" className="px-1" icon={<X />} onClick={deselectRows} />
         <span className="text-xs text-foreground">
           {allRowsSelected
-            ? `${totalRows} rows selected`
+            ? `All rows in table selected`
             : selectedRows.size > 1
               ? `${selectedRows.size} rows selected`
               : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
-            Select all {totalRows} rows
+            Select all rows in table
           </Button>
         )}
       </div>
@@ -382,7 +366,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
         <Button
           type="primary"
           size="tiny"
-          icon={<IconDownload />}
+          icon={<Download />}
           loading={isExporting}
           disabled={isExporting}
           onClick={onRowsExportCSV}
@@ -395,12 +379,12 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               <Button
                 type="default"
                 size="tiny"
-                icon={<IconTrash size="tiny" />}
+                icon={<Trash />}
                 onClick={onRowsDelete}
                 disabled={allRowsSelected && isImpersonatingRole}
               >
                 {allRowsSelected
-                  ? `Delete ${totalRows} rows`
+                  ? `Delete all rows in table`
                   : selectedRows.size > 1
                     ? `Delete ${selectedRows.size} rows`
                     : `Delete ${selectedRows.size} row`}

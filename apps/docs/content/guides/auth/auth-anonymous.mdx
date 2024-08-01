@@ -133,10 +133,10 @@ try await supabase.auth.updateUser(
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```kotlin
-supabase.auth.updateUser {
+supabase.auth.modifyUser {
     email = "example@email.com"
 }
 ```

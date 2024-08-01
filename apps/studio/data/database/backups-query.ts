@@ -1,9 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
-import type { components } from 'data/api'
 
 export type BackupsVariables = {
   projectRef?: string
@@ -19,7 +19,7 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

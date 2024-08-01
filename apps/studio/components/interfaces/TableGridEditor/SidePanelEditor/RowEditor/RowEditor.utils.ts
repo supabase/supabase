@@ -82,7 +82,7 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-const parseValue = (originalValue: any, format: string) => {
+export const parseValue = (originalValue: any, format: string) => {
   try {
     if (
       originalValue === null ||

@@ -38,24 +38,11 @@ export const LockedCreateQuerySection = ({
             Use options above to edit
           </p>
         </div>
-        <Button
+        {/* <Button
           type="default"
           onClick={() => {
             const query = isEditing
-              ? generateCreatePolicyQuery({
-                  name,
-                  schema,
-                  table,
-                  behavior,
-                  command,
-                  roles: roles.length === 0 ? 'public' : roles,
-                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
-                  check:
-                    command === 'insert'
-                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
-                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
-                })
-              : generateAlterPolicyQuery({
+              ? generateAlterPolicyQuery({
                   name: '',
                   newName: name,
                   schema,
@@ -68,11 +55,24 @@ export const LockedCreateQuerySection = ({
                       ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
                       : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
                 })
+              : generateCreatePolicyQuery({
+                  name,
+                  schema,
+                  table,
+                  behavior,
+                  command,
+                  roles: roles.length === 0 ? 'public' : roles,
+                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
+                  check:
+                    command === 'insert'
+                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
+                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
+                })
             router.push(`/project/${ref}/sql/new?content=${query}`)
           }}
         >
           Open in SQL Editor
-        </Button>
+        </Button> */}
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>

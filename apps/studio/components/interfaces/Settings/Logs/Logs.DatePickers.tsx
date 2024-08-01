@@ -1,6 +1,7 @@
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+
 import {
   Alert,
   Button,
@@ -11,7 +12,8 @@ import {
   DropdownMenuTrigger,
   IconClock,
 } from 'ui'
-import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
+import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
+import type { DatetimeHelper } from './Logs.types'
 
 interface Props {
   to: string

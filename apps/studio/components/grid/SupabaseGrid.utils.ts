@@ -1,15 +1,11 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import type { Filter } from 'components/grid/types'
+import { compact } from 'lodash'
+import type { Dictionary } from 'types'
+import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-import type { Dictionary } from 'types'
-import { getGridColumns } from './utils/gridColumns'
-import { FilterOperatorOptions } from './components/header/filter'
-import type { Filter } from 'components/grid/types'
-
-export function defaultErrorHandler(error: any) {
-  console.error('Supabase grid error: ', error)
-}
 
 /**
  * Ensure that if editable is false, we should remove all editing actions
@@ -31,19 +27,18 @@ export function cleanupProps(props: SupabaseGridProps) {
   }
 }
 
-export function formatSortURLParams(sort?: string[]) {
-  return (
-    Array.isArray(sort)
-      ? sort
-          .map((s) => {
-            const [column, order] = s.split(':')
-            // Reject any possible malformed sort param
-            if (!column || !order) return undefined
-            else return { column, ascending: order === 'asc' }
-          })
-          .filter((s) => s !== undefined)
-      : []
-  ) as Sort[]
+export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+  if (Array.isArray(sort)) {
+    return compact(
+      sort.map((s) => {
+        const [column, order] = s.split(':')
+        // Reject any possible malformed sort param
+        if (!column || !order) return undefined
+        else return { table: tableName, column, ascending: order === 'asc' }
+      })
+    )
+  }
+  return []
 }
 
 export function formatFilterURLParams(filter?: string[]): Filter[] {
@@ -65,58 +60,6 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
           .filter((f) => f !== undefined)
       : []
   ) as Filter[]
-}
-
-export async function initTable(
-  props: SupabaseGridProps,
-  state: InitialStateType,
-  dispatch: (value: any) => void,
-  sort?: string[], // Comes directly from URL param
-  filter?: string[] // Comes directly from URL param
-): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  const savedState = props.projectRef
-    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
-    : undefined
-
-  // Check for saved state on initial load and also, load sort and filters via URL param only if given
-  // Otherwise load from local storage to resume user session
-  if (
-    !state.isInitialComplete &&
-    sort === undefined &&
-    filter === undefined &&
-    (savedState?.sorts || savedState?.filters)
-  ) {
-    return {
-      savedState: {
-        sorts: savedState.sorts,
-        filters: savedState.filters,
-      },
-    }
-  }
-
-  const gridColumns = getGridColumns(props.table, {
-    projectRef: props.projectRef,
-    tableId: props.tableId,
-    editable: props.editable,
-    defaultWidth: props.gridProps?.defaultColumnWidth,
-    onAddColumn: props.editable ? props.onAddColumn : undefined,
-    onExpandJSONEditor: props.onExpandJSONEditor,
-    onExpandTextEditor: props.onExpandTextEditor,
-  })
-
-  dispatch({
-    type: 'INIT_TABLE',
-    payload: {
-      table: props.table,
-      gridProps: props.gridProps,
-      gridColumns,
-      savedState,
-      editable: props.editable,
-      onError: props.onError ?? defaultErrorHandler,
-    },
-  })
-
-  return { savedState: {} }
 }
 
 export function parseSupaTable(
@@ -172,20 +115,12 @@ export function parseSupaTable(
   })
 
   return {
+    id: table.id,
     name: table.name,
     comment: table.comment,
     schema: table.schema,
     columns: supaColumns,
   }
-}
-
-function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
-  const jsonStr = localStorage.getItem(storageKey)
-  if (!jsonStr) return
-  const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
 }
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
@@ -218,6 +153,6 @@ function saveStorage(
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
-function getStorageKey(prefix: string, ref: string) {
+export function getStorageKey(prefix: string, ref: string) {
   return `${prefix}_${ref}`
 }

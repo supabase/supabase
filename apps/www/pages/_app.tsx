@@ -20,6 +20,7 @@ import MetaFaviconsPagesRouter, {
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
+import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -67,7 +68,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath, pathname } = useRouter()
 
-  const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
+  const isDarkLaunchWeek = useDarkLaunchWeeks()
+  const forceDarkMode = pathname === '/' || isDarkLaunchWeek
 
   let applicationName = 'Supabase'
   let faviconRoute = DEFAULT_FAVICON_ROUTE
@@ -118,7 +120,6 @@ export default function App({ Component, pageProps }: AppProps) {
         <AuthProvider>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
-            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}

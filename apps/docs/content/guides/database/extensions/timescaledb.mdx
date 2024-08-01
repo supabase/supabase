@@ -47,7 +47,7 @@ First we create a hypertable, which is a virtual table that is partitioned into 
 {/* prettier-ignore */}
 ```sql
 create table temperatures (
-  time timestampz not null,
+  time timestamptz not null,
   sensor_id int not null,
   temperature double precision not null
 );

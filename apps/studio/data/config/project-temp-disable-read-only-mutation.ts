@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { usageKeys } from 'data/usage/keys'
 import type { ResponseError } from 'types'
 
@@ -14,7 +14,7 @@ export async function tempDisableReadOnlyMode({ projectRef }: TempDisableReadOnl
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -20,7 +20,7 @@ There are several reasons why you might want to add social login to your applica
 
 Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
-<div className="grid grid-cols-12 gap-10 not-prose py-8">
+<div className="grid grid-cols-12 xs:gap-x-10 gap-y-10 not-prose py-8">
   <NavData data="socialLoginItems">
     {(data) =>
       data.map((item) => (
@@ -28,7 +28,7 @@ Supabase supports a suite of social providers. Follow these guides to configure 
           href={`${item.url}`}
           key={item.name}
           passHref
-          className="col-span-6 lg:col-span-4 xl:col-span-3"
+          className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
         >
           <IconPanel
             title={item.name}

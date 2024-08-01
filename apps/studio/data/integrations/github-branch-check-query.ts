@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type GithubBranchVariables = {
@@ -26,7 +26,7 @@ export async function checkGithubBranchValidity(
     }
   )
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

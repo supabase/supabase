@@ -20,7 +20,7 @@ const ForgotPasswordForm = () => {
   const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
     onSuccess: async () => {
       toast.success(
-        `If you registered using your email and password, you will receive a password reset email.`
+        `If you registered using your email and password, you will receive a password reset email. The password reset link expires in 10 minutes.`
       )
       await router.push('/sign-in')
     },

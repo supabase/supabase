@@ -17,6 +17,7 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
   const countryOrigin = request?.headers?.[0]?.cf_ipcountry
   const clientInfo = request?.headers?.[0]?.x_client_info
   const referer = request?.headers?.[0]?.referer
+  const redirectIdentifier = log?.metadata[0]?.load_balancer_redirect_identifier
 
   return (
     <>
@@ -32,6 +33,9 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
         <SelectionDetailedRow label="Origin Country" value={countryOrigin} />
         {clientInfo && <SelectionDetailedRow label="Client" value={clientInfo} />}
         {referer && <SelectionDetailedRow label="Referer" value={referer} />}
+        {redirectIdentifier && (
+          <SelectionDetailedRow label="Redirect Identifier" value={redirectIdentifier} />
+        )}
       </div>
       <LogsDivider />
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>

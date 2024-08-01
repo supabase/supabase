@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {
   Alert,
   Button,
+  DialogFooter,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -87,7 +88,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       <Modal
         closable
         hideFooter
-        size="medium"
+        size="small"
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
@@ -105,7 +106,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           validate={validate}
         >
           {() => (
-            <div className="py-3 space-y-4">
+            <>
               {tokenScope === 'V0' && (
                 <Modal.Content>
                   <Alert
@@ -139,8 +140,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                   className="w-full"
                 />
               </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
+              <DialogFooter>
                 <div className="flex items-center space-x-2 justify-end">
                   <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
                     Cancel
@@ -149,8 +149,8 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                     Generate token
                   </Button>
                 </div>
-              </Modal.Content>
-            </div>
+              </DialogFooter>
+            </>
           )}
         </Form>
       </Modal>

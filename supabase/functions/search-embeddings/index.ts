@@ -1,10 +1,10 @@
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { Database } from '../common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
-const openAiKey = Deno.env.get('OPENAI_KEY')
+const openAiKey = Deno.env.get('OPENAI_API_KEY')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     }
 
     if (!openAiKey) {
-      throw new ApplicationError('Missing environment variable OPENAI_KEY')
+      throw new ApplicationError('Missing environment variable OPENAI_API_KEY')
     }
 
     if (!supabaseUrl) {

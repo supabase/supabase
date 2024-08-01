@@ -20,7 +20,7 @@ The keys are both long-lived JWTs. If you decode these keys, you will see that t
 
 ## The `anon` key
 
-The `anon` key has very few privileges. You can use it in your [RLS policies](/docs/guides/auth/row-level-security) to allow unauthenticated access. For example, this policy will allow unauthenticated access to the `profiles` table:
+The `anon` key has very few privileges. You can use it in your [RLS policies](/docs/guides/database/postgres/row-level-security) to allow unauthenticated access. For example, this policy will allow unauthenticated access to the `profiles` table:
 
 ```sql
 create policy "Allow public access" on profiles to anon for

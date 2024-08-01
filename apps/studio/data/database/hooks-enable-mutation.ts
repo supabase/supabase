@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
@@ -13,7 +13,7 @@ export async function enableDatabaseWebhooks({ ref }: HooksEnableVariables) {
   const { data, error } = await post('/platform/database/{ref}/hook-enable', {
     params: { path: { ref } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

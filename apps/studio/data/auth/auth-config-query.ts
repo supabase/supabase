@@ -22,7 +22,7 @@ export async function getProjectAuthConfig(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

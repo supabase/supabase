@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 
@@ -20,27 +20,19 @@ export async function revokeColumnPrivileges({
   revokes,
 }: ColumnPrivilegesRevokeVariables) {
   const headers = new Headers()
-  if (connectionString) {
-    headers.set('x-connection-encrypted', connectionString)
-  }
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await del('/platform/pg-meta/{ref}/column-privileges', {
     params: {
-      path: {
-        ref: projectRef,
-      },
+      path: { ref: projectRef },
       // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: {
-        'x-connection-encrypted': connectionString!,
-      },
+      header: { 'x-connection-encrypted': connectionString! },
     },
     body: revokes,
     headers,
   })
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 

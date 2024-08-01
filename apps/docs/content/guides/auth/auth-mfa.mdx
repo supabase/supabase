@@ -17,7 +17,7 @@ Users with weak passwords or compromised social login accounts are prone to mali
 
 ## Overview
 
-Supabase Auth implements only Time-based One Time Password(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users.
+Supabase Auth implements only Time-based One Time Password(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users. The [MFA API](/docs/reference/javascript/auth-mfa-api) is enabled on all Supabase projects by default.
 
 Applications using MFA require two important flows:
 
@@ -34,16 +34,13 @@ Supabase Auth provides:
 
 Below is a flow chart illustrating how these APIs work together to enable MFA features in your app.
 
-<Mermaid
-  chart={`
-graph TD;
-  InitS((Setup flow)) --> SAAL1[/Session is AAL1/] --> Enroll[Enroll API] --> ShowQR[Show QR code] --> Scan([User: Scan QR code in authenticator]) --> Enter([User: Enter code]) --> Verify[Challenge + Verify API] --> Check{{Is code correct?}}
-  Check -->|Yes| AAL2[/Upgrade to AAL2/] --> Done((Done))
-  Check -->|No| Enter
-  InitA((Login flow)) --> SignIn([User: Sign-in]) --> AAL1[/Upgrade to AAL1/] --> ListFactors[List Factors API]
-  ListFactors -->|1 or more factors| OpenAuth([User: Open authenticator]) --> Enter
-  ListFactors -->|0 factors| Setup[[Setup flow]]
-`}
+<Image
+  alt="Diagram showing the flow of Multi-Factor authentication"
+  src={{
+    light: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
+    dark: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
+  }}
+  containerClassName="max-w-[700px]"
 />
 
 These sets of APIs let you control the MFA experience that works for you. You can create flows where MFA is optional, mandatory for all, or only specific groups of users.
@@ -595,7 +592,7 @@ For example, the following structure describes a user that first signed in with 
 }
 ```
 
-Use the `supabase.auth.getAuthenticatorAssuranceLevel()` method to get easy access to this information in your browser app.
+Use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` method to get easy access to this information in your browser app.
 
 You can use this PostgreSQL snippet in RLS policies, too:
 

@@ -20,7 +20,7 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
   className="text-foreground-light border-b mt-8 pb-2"
   >
   
-  <Accordion.Item
+  <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
       >
@@ -96,7 +96,7 @@ export const handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -143,7 +143,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -154,7 +154,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 <Admonition type="note">
 
-Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the content-range header.
+Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the `content-range` and `x-supabase-api-version` headers.
 
 </Admonition>
 
@@ -679,7 +679,7 @@ async function supabase({ event, resolve }) {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -747,7 +747,7 @@ async function supabase({ event, resolve }) {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -784,7 +784,7 @@ export const handle: Handle = sequence(supabase, authorization)
 
 ### Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
+For [row level security](https://supabase.com/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```svelte src/routes/+page.svelte
 <script lang="ts">
@@ -972,7 +972,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -2031,6 +2031,6 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 - [Auth Helpers Source code](https://github.com/supabase/auth-helpers)
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)
 
-</Accordion.Item>
+</AccordionItem>
 
 </Accordion>

@@ -2,12 +2,13 @@ import { Transition } from '@headlessui/react'
 import { get, noop, sum } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
-import { Checkbox, IconUpload } from 'ui'
+import { Checkbox } from 'ui'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { Upload } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   CONTEXT_MENU_KEYS,
@@ -15,7 +16,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import type { StorageColumn } from '../Storage.types'
+import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
@@ -41,7 +42,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
             className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
             style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
           >
-            <IconUpload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+            <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
             <p className="text-center text-sm  text-white mt-2 pointer-events-none">
               Drop your files to upload to this folder
             </p>
@@ -54,12 +55,12 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 
 export interface FileExplorerColumnProps {
   index: number
-  view: string
+  view: STORAGE_VIEWS
   column: StorageColumn
   fullWidth?: boolean
-  openedFolders?: any[]
-  selectedItems: any[]
-  selectedFilePreview: any
+  openedFolders?: StorageItem[]
+  selectedItems: StorageItemWithColumn[]
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -75,7 +76,7 @@ const FileExplorerColumn = ({
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview = {},
+  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -105,7 +106,7 @@ const FileExplorerColumn = ({
     (item) => item.type === STORAGE_ROW_TYPES.FILE
   )
 
-  const columnItems = column.items
+  const columnItems = column.items.map((item, index) => ({ ...item, columnIndex: index }))
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const isEmpty =

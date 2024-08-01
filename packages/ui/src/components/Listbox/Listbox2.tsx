@@ -1,3 +1,5 @@
+'use client'
+
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
@@ -36,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 }
 
 /**
- * @deprecated The component should not be used
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function Listbox({
   children,
@@ -278,6 +280,9 @@ type addOnBefore = {
   active: boolean
 }
 
+/**
+ * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ */
 function SelectOption({
   id,
   value,

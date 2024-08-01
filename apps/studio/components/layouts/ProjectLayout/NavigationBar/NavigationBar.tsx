@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
@@ -7,6 +6,15 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -21,16 +29,9 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
 import { useCommandMenu } from 'ui-patterns/Cmdk'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -80,6 +81,7 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+  const showWarehouse = useFlag('warehouse')
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
@@ -97,7 +99,7 @@ const NavigationBar = () => {
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
@@ -111,6 +113,7 @@ const NavigationBar = () => {
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[40px]"
+              onClick={onCloseNavigationIconLink}
             >
               <img
                 alt="Supabase"
@@ -162,6 +165,18 @@ const NavigationBar = () => {
                   Project API
                 </NavigationIconButton>
               )
+            } else if (route.key === 'logs') {
+              // TODO: Undo this when warehouse flag is removed
+              const label = showWarehouse ? 'Logs & Analytics' : route.label
+              const newRoute = { ...route, label }
+              return (
+                <NavigationIconLink
+                  key={newRoute.key}
+                  route={newRoute}
+                  isActive={activeRoute === newRoute.key}
+                  onClick={onCloseNavigationIconLink}
+                />
+              )
             } else {
               return (
                 <NavigationIconLink
@@ -193,7 +208,7 @@ const NavigationBar = () => {
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
               rightText={
                 <div
                   className={cn(
@@ -322,15 +337,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (

@@ -36,6 +36,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const resource = snap.activeDocsSection[1]
 
   const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery({ projectRef: ref })
+
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
     definition !== undefined

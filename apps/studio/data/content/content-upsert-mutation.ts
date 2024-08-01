@@ -2,12 +2,12 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import type { components } from 'data/api'
-import { put } from 'data/fetchers'
+import { handleError, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Content['content']
 }
 
@@ -35,7 +35,7 @@ export async function upsertContent(
     },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
 
   return data
 }

@@ -41,14 +41,12 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
       header={<h3>Confirm to delete role "{role?.name}"</h3>}
       loading={isDeleting}
     >
-      <div className="py-4">
-        <Modal.Content>
-          <p className="text-sm">
-            This will automatically revoke any membership of this role in other roles, and this
-            action cannot be undone.
-          </p>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <p className="text-sm">
+          This will automatically revoke any membership of this role in other roles, and this action
+          cannot be undone.
+        </p>
+      </Modal.Content>
     </Modal>
   )
 }

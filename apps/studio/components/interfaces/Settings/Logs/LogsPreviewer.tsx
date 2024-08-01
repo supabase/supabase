@@ -1,30 +1,23 @@
-import { useParams } from 'common'
+import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { Button, IconRewind } from 'ui'
 
-import {
-  Filters,
-  LogEventChart,
-  LogSearchCallback,
-  LogTable,
-  LogTemplate,
-  LogsTableName,
-  QueryType,
-  ensureNoTimestampConflict,
-  maybeShowUpgradePrompt,
-} from 'components/interfaces/Settings/Logs'
+import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { LOGS_TABLES } from './Logs.constants'
+import { Button } from 'ui'
+import LogEventChart from './LogEventChart'
+import LogTable from './LogTable'
+import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
+import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
 
 /**
@@ -55,10 +48,8 @@ export const LogsPreviewer = ({
   const router = useRouter()
   const { s, ite, its, db } = useParams()
   const [showChart, setShowChart] = useState(true)
-  const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
-  const readReplicasEnabled = project?.is_read_replicas_enabled
 
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -88,7 +79,7 @@ export const LogsPreviewer = ({
     setFilters((prev) => ({
       ...prev,
       search_query: s as string,
-      ...(readReplicasEnabled ? { database: db as string } : {}),
+      database: db as string,
     }))
     if (ite || its) {
       setParams((prev) => ({
@@ -110,11 +101,20 @@ export const LogsPreviewer = ({
   }, [its, subscription])
 
   useEffect(() => {
-    if (readReplicasEnabled && db !== undefined) {
+    if (db !== undefined) {
       const database = databases?.find((d) => d.identifier === db)
       if (database !== undefined) state.setSelectedDatabaseId(db)
+    } else if (state.selectedDatabaseId !== undefined && state.selectedDatabaseId !== projectRef) {
+      if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, db: state.selectedDatabaseId },
+        })
+      } else {
+        state.setSelectedDatabaseId(projectRef)
+      }
     }
-  }, [readReplicasEnabled, db, isSuccess])
+  }, [db, isSuccess])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -204,17 +204,15 @@ export const LogsPreviewer = ({
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
         onSelectedDatabaseChange={(id: string) => {
-          if (readReplicasEnabled) {
-            setFilters((prev) => ({
-              ...prev,
-              database: id !== projectRef ? undefined : id,
-            }))
-            const { db, ...params } = router.query
-            router.push({
-              pathname: router.pathname,
-              query: id !== projectRef ? { ...router.query, db: id } : params,
-            })
-          }
+          setFilters((prev) => ({
+            ...prev,
+            database: id !== projectRef ? undefined : id,
+          }))
+          const { db, ...params } = router.query
+          router.push({
+            pathname: router.pathname,
+            query: id !== projectRef ? { ...router.query, db: id } : params,
+          })
         }}
       />
       {children}
@@ -259,7 +257,7 @@ export const LogsPreviewer = ({
           <div className="border-t flex flex-row justify-between p-2">
             <Button
               onClick={loadOlder}
-              icon={<IconRewind />}
+              icon={<Rewind />}
               type="default"
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
