@@ -6,12 +6,14 @@ import AlertError from 'components/ui/AlertError'
 import { User, useUsersQuery } from 'data/auth/users-query'
 import { User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, FormLabel_Shadcn_, Input, Switch } from 'ui'
+import { Button, Input, Switch } from 'ui'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 
+type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
+
 const UserImpersonationSelector = () => {
-  const [aal, setAal] = useState<'aal1'| 'aal2'>('aal1')
   const [searchText, setSearchText] = useState('')
+  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { project } = useProjectContext()
@@ -47,7 +49,7 @@ const UserImpersonationSelector = () => {
   }
 
   function toggleAalState() {
-    setAal(prev => prev === 'aal2' ? 'aal1' : 'aal2')
+    setAal((prev) => (prev === 'aal2' ? 'aal1' : 'aal2'))
   }
 
   return (
@@ -68,12 +70,6 @@ const UserImpersonationSelector = () => {
           ? "Select a user to respect your database's Row-Level Security policies for that particular user."
           : "Results will respect your database's Row-Level Security policies for this user."}
       </p>
-
-      <h3>MFA Assurance Level</h3>
-      <div className="flex flex-row items-center gap-x-2">
-        <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
-        <FormLabel_Shadcn_>{aal.toUpperCase()}</FormLabel_Shadcn_>
-      </div>
 
       {!impersonatingUser ? (
         <div className="flex flex-col gap-2 mt-4">
@@ -102,6 +98,15 @@ const UserImpersonationSelector = () => {
               )
             }
           />
+
+          <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
+            <h3>MFA assurance level</h3>
+            <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
+              <p className={aal === 'aal1' ? 'text-white' : undefined}>AAL1</p>
+              <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
+              <p className={aal === 'aal2' ? 'text-white' : undefined}>AAL2</p>
+            </div>
+          </div>
 
           {isLoading && (
             <div className="flex flex-col gap-2 items-center justify-center h-24">
@@ -134,6 +139,7 @@ const UserImpersonationSelector = () => {
           user={impersonatingUser}
           onClick={stopImpersonating}
           isImpersonating={true}
+          aal={aal}
         />
       )}
     </div>
@@ -148,7 +154,12 @@ interface UserRowProps {
   isImpersonating?: boolean
 }
 
-const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
+const UserImpersonatingRow = ({
+  user,
+  onClick,
+  isImpersonating = false,
+  aal,
+}: UserRowProps & { aal: AuthenticatorAssuranceLevels }) => {
   const avatarUrl = getAvatarUrl(user)
   const displayName =
     getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
@@ -156,7 +167,7 @@ const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRo
 
   return (
     <div className="flex items-center gap-3 py-2 text-foreground">
-      <div className="flex items-center gap-4 bg-surface-200 pr-5 pl-0.5 py-0.5 border rounded-full max-w-l">
+      <div className="flex items-center gap-4 bg-surface-200 pr-4 pl-0.5 py-0.5 border rounded-full max-w-l">
         {avatarUrl ? (
           <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
         ) : (
@@ -165,7 +176,12 @@ const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRo
           </div>
         )}
 
-        <span className="text-sm truncate">{displayName}</span>
+        <span className="text-sm truncate">
+          {displayName}{' '}
+          <span className="ml-2 text-foreground-lighter text-xs font-light">
+            {aal === 'aal2' ? 'AAL2' : 'AAL1'}
+          </span>
+        </span>
       </div>
 
       <Button
