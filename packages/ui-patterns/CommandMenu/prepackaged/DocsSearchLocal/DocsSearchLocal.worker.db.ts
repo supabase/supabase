@@ -1,13 +1,10 @@
-import { postError } from './local-search.worker.messages'
-import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './local-search.worker.sql'
+import type { PGlite } from '@electric-sql/pglite'
+import type { SupabaseClient } from '@supabase/auth-helpers-react'
 
-/**
- * @typedef {import('@electric-sql/pglite').PGlite} PGlite
- */
+import type { Database } from 'common'
 
-/**
- * @typedef {import('@supabase/supabase-js').SupabaseClient} SupabaseClient
- */
+import { convertError, postError } from './DocsSearchLocal.shared.messages'
+import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './DocsSearchLocal.worker.sql'
 
 /**
  * Get all rows from a table via Supabase.
@@ -15,12 +12,16 @@ import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './local-search.worker.sql'
  * Since Supabase SDK restricts to 1000 rows per query, we need to page through
  * the table exhaustively.
  *
- * @param {SupabaseClient} supabase
- * @param {string} table - The table to query
- * @param {string} columns - Comma-separated columns, in Supabase SDK format
- * @param {string} order - The column to order the results. Needed for paging
+ * @param table - The table to query
+ * @param columns - Comma-separated columns, in Supabase SDK format
+ * @param order - The column to order the results. Needed for paging
  */
-export async function pageThroughRows(supabase, table, columns, order) {
+export async function pageThroughRows<Table extends keyof Database['public']['Tables']>(
+  supabase: SupabaseClient<Database>,
+  table: Table,
+  columns: string,
+  order: string
+) {
   const MAX_ROWS_PER_FETCH = 1000
 
   let rowsInLastFetch = 0
@@ -28,36 +29,31 @@ export async function pageThroughRows(supabase, table, columns, order) {
   const allData = []
 
   do {
-    const { data = [], error } = await supabase
-      .from(table)
+    let { data, error } = await supabase
+      .from<Table, Database['public']['Tables'][Table]>(table)
       .select(columns)
       .order(order)
       .gt(order, largestIndexLastFetched)
     if (error) {
-      return [error, null]
+      return [error, null] as const
     }
 
+    data ??= []
     allData.push(...data)
     rowsInLastFetch = data.length
     largestIndexLastFetched =
+      // @ts-ignore
       data.length === 0 ? largestIndexLastFetched : data[data.length - 1][order]
   } while (rowsInLastFetch === MAX_ROWS_PER_FETCH)
 
-  return [null, allData]
+  return [null, allData as unknown as Array<Database['public']['Tables'][Table]['Row']>] as const
 }
 
-/**
- * Copy page table data from remote database to PGlite.
- *
- * @param {SupabaseClient} supabase
- * @param {PGlite} db
- * @returns {void}
- */
-export async function copyPages(supabase, db) {
-  const [pagesError, pages] = await pageThroughRows(
+export async function copyPages(supabase: SupabaseClient, db: PGlite) {
+  const [pagesError, pages] = await pageThroughRows<'page'>(
     supabase,
     'page',
-    'id,path,meta,type,source',
+    'id, path, meta, type, source',
     'id'
   )
   if (pagesError) {
@@ -74,24 +70,17 @@ export async function copyPages(supabase, db) {
       try {
         await db.query(INSERT_PAGES, parameters)
       } catch (error) {
-        postError(error, { parameters })
+        postError(convertError(error), { parameters })
       }
     })
   )
 }
 
-/**
- * Copy page sections table data from remote database to PGlite.
- *
- * @param {SupabaseClient} supabase
- * @param {PGlite} db
- * @returns {void}
- */
-export async function copyPageSections(supabase, db) {
-  const [pageSectionsError, pageSections] = await pageThroughRows(
+export async function copyPageSections(supabase: SupabaseClient, db: PGlite) {
+  const [pageSectionsError, pageSections] = await pageThroughRows<'page_section'>(
     supabase,
     'page_section',
-    'id,page_id,slug,heading,rag_ignore,hf_embedding',
+    'id, page_id, slug, heading, rag_ignore, hf_embedding',
     'id'
   )
   if (pageSectionsError) {
@@ -115,7 +104,7 @@ export async function copyPageSections(supabase, db) {
       try {
         await db.query(INSERT_PAGE_SECTIONS, parameters)
       } catch (error) {
-        postError(error, { parameters })
+        postError(convertError(error), { parameters })
       }
     })
   )

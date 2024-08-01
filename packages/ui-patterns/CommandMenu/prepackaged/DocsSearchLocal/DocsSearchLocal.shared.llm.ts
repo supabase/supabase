@@ -1,23 +1,20 @@
-import { pipeline } from '@xenova/transformers'
+import type { Tensor } from '@xenova/transformers'
 
 const MODEL = 'Supabase/gte-small'
 
-/**
- * @typedef {Object} Extractor
- * @property {(input: string) => Promise<Tensor>} extract
- */
+export interface Extractor {
+  extract: (input: string) => Promise<Tensor>
+}
 
 export function setupSingletonExtractor() {
-  /**
-   * @type {Extractor}
-   */
-  let _extractor
+  let _extractor: Extractor
 
   async function extractor() {
     if (!_extractor) {
+      const { pipeline } = await import('@xenova/transformers')
       const pipe = await pipeline('feature-extraction', MODEL)
 
-      function extract(input) {
+      function extract(input: string) {
         return pipe(input, { pooling: 'mean', normalize: true })
       }
       _extractor = { extract }

@@ -5,6 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "codegen:types": "supabase gen types typescript --local >| ./database-types.ts",
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "@supabase/auth-js": "^2.63.0",
     "next": "*",
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "supabase": "*"
   }
 }

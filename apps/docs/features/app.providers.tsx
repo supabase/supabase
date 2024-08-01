@@ -1,15 +1,16 @@
+import { type PropsWithChildren } from 'react'
+
 import { CommandProvider } from '@ui-patterns/CommandMenu'
+import { SearchWorkerProvider } from '@ui-patterns/CommandMenu/prepackaged/DocsSearchLocal'
 import { ThemeProvider } from 'common'
 import { PortalToast } from 'ui'
 import { PromoToast } from 'ui-patterns'
-import { type PropsWithChildren } from 'react'
 
 import SiteLayout from '~/layouts/SiteLayout'
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { ShortcutPreviewBuild } from './envs/staging.client'
-import { SearchWorkerProvider } from './local-search/local-search.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'

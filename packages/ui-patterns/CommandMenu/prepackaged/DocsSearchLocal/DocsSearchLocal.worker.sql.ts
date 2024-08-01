@@ -2,7 +2,7 @@ export const CREATE_VECTOR_EXTENSION = 'create extension if not exists vector;'
 
 export const CREATE_PAGE_TABLE = `
 create table if not exists page (
-    id bigserial primary key,
+    id bigint primary key,
     path text,
     meta jsonb,
     type text,
@@ -12,10 +12,8 @@ create table if not exists page (
 
 export const CREATE_PAGE_SECTION_TABLE = `
 create table if not exists page_section (
-    id bigserial primary key,
-    -- foreign reference seems to cause errors when copying data, so omitting it
-    -- remote db is source of truth anyway
-    page_id bigint,
+    id bigint primary key,
+    page_id bigint references page (id) on delete cascade,
     slug text,
     heading text,
     rag_ignore boolean,

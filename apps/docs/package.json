@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
-    "@electric-sql/pglite": "0.2.0-alpha.0",
     "@har-sdk/openapi-sampler": "^2.2.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
@@ -36,7 +35,6 @@
     "@supabase/supabase-js": "^2.44.3",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/react-query": "^5.13.4",
-    "@xenova/transformers": "^2.17.2",
     "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",

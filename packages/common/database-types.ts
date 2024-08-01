@@ -34,6 +34,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_pgbouncer_projects: {
+        Row: {
+          id: number
+          project_ref: string | null
+        }
+        Insert: {
+          id?: number
+          project_ref?: string | null
+        }
+        Update: {
+          id?: number
+          project_ref?: string | null
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           date_created: string
@@ -55,6 +70,33 @@ export type Database = {
           metadata?: Json | null
           page?: string
           vote?: Database["public"]["Enums"]["feedback_vote"]
+        }
+        Relationships: []
+      }
+      last_changed: {
+        Row: {
+          checksum: string
+          heading: string
+          id: number
+          last_checked: string
+          last_updated: string
+          parent_page: string
+        }
+        Insert: {
+          checksum: string
+          heading: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page: string
+        }
+        Update: {
+          checksum?: string
+          heading?: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page?: string
         }
         Relationships: []
       }
@@ -105,6 +147,7 @@ export type Database = {
           content: string | null
           embedding: string | null
           heading: string | null
+          hf_embedding: string | null
           id: number
           page_id: number
           rag_ignore: boolean | null
@@ -115,6 +158,7 @@ export type Database = {
           content?: string | null
           embedding?: string | null
           heading?: string | null
+          hf_embedding?: string | null
           id?: number
           page_id: number
           rag_ignore?: boolean | null
@@ -125,6 +169,7 @@ export type Database = {
           content?: string | null
           embedding?: string | null
           heading?: string | null
+          hf_embedding?: string | null
           id?: number
           page_id?: number
           rag_ignore?: boolean | null
@@ -141,11 +186,30 @@ export type Database = {
           },
         ]
       }
+      vercel_project_connections_without_supavisor: {
+        Row: {
+          id: number
+          project_ref: string
+        }
+        Insert: {
+          id?: number
+          project_ref: string
+        }
+        Update: {
+          id?: number
+          project_ref?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_last_changed_pages: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       docs_search_embeddings: {
         Args: {
           embedding: string
@@ -175,17 +239,6 @@ export type Database = {
           description: string
         }[]
       }
-      get_page_parents: {
-        Args: {
-          page_id: number
-        }
-        Returns: {
-          id: number
-          parent_page_id: number
-          path: string
-          meta: Json
-        }[]
-      }
       hnswhandler: {
         Args: {
           "": unknown
@@ -207,22 +260,6 @@ export type Database = {
         }
         Returns: unknown
       }
-      match_page_sections: {
-        Args: {
-          embedding: string
-          match_threshold: number
-          match_count: number
-          min_content_length: number
-        }
-        Returns: {
-          id: number
-          page_id: number
-          slug: string
-          heading: string
-          content: string
-          similarity: number
-        }[]
-      }
       match_page_sections_v2: {
         Args: {
           embedding: string
@@ -233,12 +270,23 @@ export type Database = {
           content: string | null
           embedding: string | null
           heading: string | null
+          hf_embedding: string | null
           id: number
           page_id: number
           rag_ignore: boolean | null
           slug: string | null
           token_count: number | null
         }[]
+      }
+      update_last_changed_checksum: {
+        Args: {
+          new_parent_page: string
+          new_heading: string
+          new_checksum: string
+          git_update_time: string
+          check_time: string
+        }
+        Returns: string
       }
       vector_avg: {
         Args: {
