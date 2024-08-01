@@ -1,7 +1,7 @@
 import { components } from 'api-types'
 import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import router, { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 import { IconLoader, IconSearch, Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -91,43 +91,43 @@ function IntegrationPartnersPage(props: Props) {
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
 
-  // useEffect(() => {
-  //   const searchPartners = async () => {
-  //     setIsSearching(true)
+  const searchPartners = useCallback(
+    (term: string) => {
+      // This code is leftover from the original implementation when the search was done on the server side. We now
+      // search on client side because the data is coming from two different sources.
+      // let query = supabase.from('partners').select('*').eq('approved', true).order('category').order('title')
 
-  //     let query = supabase
-  //       .from('partners')
-  //       .select('*')
-  //       .eq('approved', true)
-  //       .order('category')
-  //       .order('title')
+      // if (term.trim()) {
+      //   query = query.textSearch('tsv', `${term.trim()}`, {
+      //     type: 'websearch',
+      //     config: 'english',
+      //   })
+      // }
 
-  //     if (search.trim()) {
-  //       query = query.textSearch('tsv', `${search.trim()}`, {
-  //         type: 'websearch',
-  //         config: 'english',
-  //       })
-  //     }
+      return initialPartners.filter((partner) =>
+        partner.title.toLowerCase().includes(term.toLowerCase())
+      )
+    },
+    [initialPartners]
+  )
 
-  //     const { data: partners } = await query
+  useEffect(() => {
+    if (debouncedSearchTerm.trim() === '') {
+      setIsSearching(false)
+      setPartners(initialPartners)
+      return
+    }
 
-  //     return partners
-  //   }
+    setIsSearching(true)
 
-  //   if (search.trim() === '') {
-  //     setIsSearching(false)
-  //     setPartners(initialPartners)
-  //     return
-  //   }
+    const partners = searchPartners(debouncedSearchTerm)
 
-  //   searchPartners().then((partners) => {
-  //     if (partners) {
-  //       setPartners(partners)
-  //     }
+    if (partners) {
+      setPartners(partners)
+    }
 
-  //     setIsSearching(false)
-  //   })
-  // }, [debouncedSearchTerm, router])
+    setIsSearching(false)
+  }, [debouncedSearchTerm, initialPartners, router, searchPartners])
 
   return (
     <>
