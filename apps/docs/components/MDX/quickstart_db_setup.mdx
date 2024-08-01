@@ -1,0 +1,46 @@
+<StepHikeCompact.Details title="Create a Supabase project">
+
+Go to [database.new](https://database.new) and create a new Supabase project.
+
+When your project is up and running, go to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
+
+Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `countries` table with some sample data.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    -- Create the table
+    create table countries (
+      id bigint primary key generated always as identity,
+      name text not null
+    );
+    -- Insert some sample data into the table
+    insert into countries (name)
+    values
+      ('Canada'),
+      ('United States'),
+      ('Mexico');
+
+    alter table countries enable row level security;
+    ```
+
+</StepHikeCompact.Code>
+
+<StepHikeCompact.Details>
+
+Make the data in your table publicly readable by adding an RLS policy:
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    create policy "public can read countries"
+    on public.countries
+    for select to anon
+    using (true);
+    ```
+
+</StepHikeCompact.Code>

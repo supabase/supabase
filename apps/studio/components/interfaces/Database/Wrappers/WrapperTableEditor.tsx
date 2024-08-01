@@ -91,7 +91,7 @@ const WrapperTableEditor = ({
                 >
                   <div className="space-y-1">
                     <p>{table.label}</p>
-                    <p className="opacity-50">{table.description}</p>
+                    <p className="text-foreground-lighter">{table.description}</p>
                   </div>
                 </Listbox.Option>
               )

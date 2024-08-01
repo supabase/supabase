@@ -29,6 +29,7 @@
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.5",
     "@supabase/supabase-js": "^2.44.3",
+    "@vercel/og": "^0.6.2",
     "animejs": "^3.2.2",
     "classnames": "^2.3.1",
     "cobe": "^0.6.2",

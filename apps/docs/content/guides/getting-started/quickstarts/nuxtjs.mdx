@@ -8,30 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
-
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
-
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql Editor
-      -- Create the table
-      create table countries (
-        id serial primary key,
-        name varchar(255) not null
-      );
-
-      -- Insert some sample data into the table
-      insert into countries (name) values ('United States');
-      insert into countries (name) values ('Canada');
-      insert into countries (name) values ('Mexico');
-      ````
-
-    </StepHikeCompact.Code>
+    
+    <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
 

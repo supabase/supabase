@@ -63,7 +63,9 @@
         "NEXT_PUBLIC_*",
         "NODE_ENV",
         "OPENAI_API_KEY",
-        "npm_lifecycle_event"
+        "npm_lifecycle_event",
+        "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
+        "VERCEL_URL"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
