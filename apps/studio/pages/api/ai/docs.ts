@@ -3,8 +3,6 @@ import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
-export const runtime = 'edge'
-
 const openAiKey = process.env.OPENAI_API_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string

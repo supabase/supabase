@@ -46,6 +46,11 @@ const nextConfig = {
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
   reactStrictMode: true,
   swcMinify: true,
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': ['**/@electric-sql/pglite/**/*'],
+    },
+  },
   images: {
     dangerouslyAllowSVG: true,
     domains: [
