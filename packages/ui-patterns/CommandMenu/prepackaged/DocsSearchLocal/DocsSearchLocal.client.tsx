@@ -1,6 +1,7 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/auth-helpers-react'
+import type { PostgrestSingleResponse } from '@supabase/supabase-js'
 import type { PropsWithChildren } from 'react'
 import {
   createContext,
@@ -9,6 +10,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react'
 import { z } from 'zod'
@@ -121,11 +123,12 @@ type SearchState =
   | { status: 'error' }
   | { status: 'empty' }
   | { status: 'results'; results: Array<SearchResult> }
+type SearchState_Results = Extract<SearchState, { status: 'results' }>
 
 type SearchAction =
   | { type: 'TRIGGERED' }
   | { type: 'ERRORED' }
-  | { type: 'COMPLETED'; results: Array<SearchResult> }
+  | { type: 'COMPLETED'; results: unknown }
   | { type: 'RESET' }
 type SearchAction_Complete = Extract<SearchAction, { type: 'COMPLETED' }>
 
@@ -188,8 +191,16 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
     case stateActionPair('results', 'ERRORED'):
       return { status: 'error' }
     case stateActionPair('results', 'COMPLETED'): {
-      const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
-      return results.length === 0 ? { status: 'empty' } : { status: 'results', results }
+      const newResults = parseMaybeSearchResults((action as SearchAction_Complete).results).filter(
+        (result) =>
+          !(state as SearchState_Results).results.some(
+            (existingResult) => existingResult.path === result.path
+          )
+      )
+      return {
+        status: 'results',
+        results: (state as SearchState_Results).results.concat(newResults),
+      }
     }
     case stateActionPair('results', 'RESET'):
       return { status: 'initial' }
@@ -202,6 +213,11 @@ export function useLocalSearch(supabase: SupabaseClient) {
   const { worker, ready } = useContext(SearchWorkerContext)
 
   const [searchState, dispatch] = useReducer(deriveSearchState, { status: 'initial' })
+  const rejectRunningSearches = useRef([] as Array<(reason: any) => void>)
+  const remoteSearchIdempotencyKey = useRef(0)
+
+  const FUNCTIONS_URL = '/functions/v1/'
+  const ABORT_REASON = 'INTENTIONALLY_ABORTED'
 
   const search = useCallback(
     (query: string) => {
@@ -215,15 +231,61 @@ export function useLocalSearch(supabase: SupabaseClient) {
           payload: { query },
         })
       } else {
-        // Fall back to regular FTS if worker not ready
-        supabase.rpc('docs_search_fts', { query }).then(({ data, error }) => {
-          if (error) {
-            console.error(error)
-            return dispatch({ type: 'ERRORED' })
-          }
+        // Fall back to regular remote search if worker not ready
+        const localIdempotencyKey = ++remoteSearchIdempotencyKey.current
+        while (rejectRunningSearches.current.length > 0) {
+          rejectRunningSearches.current.pop()?.(ABORT_REASON)
+        }
 
-          dispatch({ type: 'COMPLETED', results: data })
+        new Promise<PostgrestSingleResponse<any>>(async (resolve, reject) => {
+          rejectRunningSearches.current.push(reject)
+
+          const result = await supabase.rpc('docs_search_fts', { query })
+          resolve(result)
         })
+          .then(({ data, error }) => {
+            if (error) {
+              throw error
+            } else if (localIdempotencyKey === remoteSearchIdempotencyKey.current) {
+              dispatch({ type: 'COMPLETED', results: data })
+            }
+          })
+          .catch((error) => {
+            if (error === ABORT_REASON) {
+              // Ignore, intentionally cancelled
+            } else {
+              console.error(error)
+              return dispatch({ type: 'ERRORED' })
+            }
+          })
+
+        new Promise(async (resolve, reject) => {
+          rejectRunningSearches.current.push(reject)
+
+          const result = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`,
+            {
+              method: 'POST',
+              body: JSON.stringify({ query }),
+            }
+          )
+          const data = await result.json()
+
+          resolve(data)
+        })
+          .then((data) => {
+            if (localIdempotencyKey === remoteSearchIdempotencyKey.current) {
+              dispatch({ type: 'COMPLETED', results: data })
+            }
+          })
+          .catch((error) => {
+            if (error === ABORT_REASON) {
+              // Ignore, intentionally cancelled
+            } else {
+              console.error(error)
+              return dispatch({ type: 'ERRORED' })
+            }
+          })
       }
 
       dispatch({ type: 'TRIGGERED' })
