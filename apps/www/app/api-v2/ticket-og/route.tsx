@@ -262,7 +262,7 @@ export async function GET(req: Request, res: Response) {
                     <span>&#40;</span>
                     <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'username'</span>
                     <span tw="mr-3">,</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_NUMBER }}>{username}</span>
+                    <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'{username}'</span>
                     <span>&#41;</span>
                   </span>
                   <span tw="pl-4">
