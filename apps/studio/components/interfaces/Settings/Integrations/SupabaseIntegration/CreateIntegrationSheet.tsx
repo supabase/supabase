@@ -43,6 +43,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DroppableTextArea } from './DroppableTextArea'
 import { LogoFileInput } from './LogoFileInput'
+import content from 'pages/api/projects/[ref]/content'
 
 const FORM_ID = 'create-integration-sidepanel'
 
@@ -424,10 +425,6 @@ export const CreateIntegrationSheet = ({
               name="overview"
               render={({ field }) => (
                 <FormItemLayout label="Overview" description="">
-                  <p className="text-foreground-lighter">
-                    Extended description for your integration that will be shown on your page.
-                    Supports markdown formatting.
-                  </p>
                   <FormControl_Shadcn_>
                     <Tabs_Shadcn_ defaultValue="write" className="w-full">
                       <TabsList_Shadcn_ className="grid w-full grid-cols-2">

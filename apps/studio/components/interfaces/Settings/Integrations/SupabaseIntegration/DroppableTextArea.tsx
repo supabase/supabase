@@ -63,7 +63,7 @@ export const DroppableTextArea = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [areFilesValid, setAreFilesValid] = useState<'none' | 'valid' | 'invalid'>('none')
 
-  const onDragOver = (event: any) => {
+  const onDragOver: DragEventHandler<HTMLTextAreaElement> = (event) => {
     if (event) {
       event.stopPropagation()
       event.preventDefault()
@@ -162,8 +162,9 @@ export const DroppableTextArea = ({
       />
 
       <div className="px-1 pt-2">
-        <span className="text-sm text-scale-1000">
-          Attach files by dragging &amp; dropping them or{' '}
+        <span className="text-sm text-foreground-lighter">
+          Extended description for your integration that will be shown on your page. Supports
+          markdown formatting. Attach files by dragging &amp; dropping them or{' '}
           <a className="underline cursor-pointer" onClick={onUploadClick}>
             click here
           </a>{' '}
