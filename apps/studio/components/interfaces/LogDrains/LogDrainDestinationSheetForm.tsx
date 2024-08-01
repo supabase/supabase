@@ -266,10 +266,7 @@ export function LogDrainDestinationSheetForm({
                       render={({ field }) => (
                         <FormItem_Shadcn_>
                           <FormControl_Shadcn_>
-                            <RadioGroupStacked
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
+                            <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
                               <FormItem_Shadcn_ asChild>
                                 <FormControl_Shadcn_>
                                   <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
