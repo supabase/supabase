@@ -16,7 +16,10 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const snap = useAppStateSnapshot()
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center', // Layout
+      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-muted', // Layout
+      'group-hover/item:text-foreground-light',
+      isActive && '!text-foreground',
+      'transition-colors',
     ]
 
     const classes = [
@@ -26,10 +29,9 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
       'group-data-[state=expanded]:-space-x-2',
-      'text-foreground-lighter hover:text-foreground ',
       'hover:bg-surface-200',
-      `${isActive ? '!bg-selection !text-foreground shadow-sm' : ''}`,
       'group/item',
+      `${isActive && '!bg-selection shadow-sm'}`,
     ]
 
     return route.link !== undefined ? (
@@ -53,6 +55,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
             'group-aria-current/item:text-foreground',
             'absolute left-7 group-data-[state=expanded]:left-12',
             'opacity-0 group-data-[state=expanded]:opacity-100',
+            `${isActive && 'text-foreground hover:text-foreground'}`,
             'transition-all'
           )}
         >

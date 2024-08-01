@@ -4007,7 +4007,7 @@ export interface components {
         | 'STORAGE_IMAGES_TRANSFORMED'
         | 'REALTIME_MESSAGE_COUNT'
         | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_GB_HOURS'
+        | 'DISK_SIZE_GB_HOURS'
         | 'COMPUTE_HOURS_BRANCH'
         | 'COMPUTE_HOURS_XS'
         | 'COMPUTE_HOURS_SM'
@@ -4037,7 +4037,6 @@ export interface components {
       usage_original: number
     }
     OrgUsageResponse: {
-      slugs: string[]
       usage_billing_enabled: boolean
       usages: components['schemas']['OrgMetricUsage'][]
     }
@@ -4404,6 +4403,7 @@ export interface components {
       price_type: components['schemas']['ProjectAddonVariantPricingType']
     }
     ProjectAllocation: {
+      hours?: number
       name: string
       ref: string
       usage: number
@@ -7935,7 +7935,7 @@ export interface operations {
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_GB_HOURS'
+          | 'DISK_SIZE_GB_HOURS'
           | 'COMPUTE_HOURS_BRANCH'
           | 'COMPUTE_HOURS_XS'
           | 'COMPUTE_HOURS_SM'

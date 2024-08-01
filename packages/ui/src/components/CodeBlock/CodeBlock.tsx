@@ -37,10 +37,17 @@ export interface CodeBlockProps {
     | 'curl'
     | 'http'
   linesToHighlight?: number[]
+  highlightBorder?: boolean
+  styleConfig?: {
+    lineNumber?: string
+    highlightBackgroundColor?: string
+    highlightBorderColor?: string
+  }
   hideCopy?: boolean
   hideLineNumbers?: boolean
   className?: string
   value?: string
+  theme?: any
   children?: string
   renderer?: SyntaxHighlighterProps['renderer']
 }
@@ -49,8 +56,11 @@ export const CodeBlock = ({
   title,
   language,
   linesToHighlight = [],
+  highlightBorder,
+  styleConfig,
   className,
   value,
+  theme,
   children,
   hideCopy = false,
   hideLineNumbers = false,
@@ -58,7 +68,7 @@ export const CodeBlock = ({
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
-  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
+  const monokaiTheme = theme ?? monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -131,7 +141,16 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
+                  style: {
+                    display: 'block',
+                    backgroundColor: styleConfig?.highlightBackgroundColor
+                      ? styleConfig?.highlightBackgroundColor
+                      : 'hsl(var(--background-selection))',
+                    borderLeft: highlightBorder
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
+                      : null,
+                  },
+                  class: 'hljs-line-highlight',
                 }
               }
               return {}
@@ -144,7 +163,7 @@ export const CodeBlock = ({
               paddingLeft: '4px',
               paddingRight: '4px',
               marginRight: '12px',
-              color: '#828282',
+              color: styleConfig?.lineNumber ?? '#828282',
               textAlign: 'center',
               fontSize: large ? 14 : 12,
               paddingTop: '4px',

@@ -6,19 +6,19 @@ import { useEffect, useState } from 'react'
 import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import CountdownComponent from 'ui/src/layout/banners/LW11CountdownBanner/Countdown'
+import CountdownComponent from 'ui/src/layout/banners/LW12CountdownBanner/Countdown'
 import announcement from 'ui/src/layout/banners/data/Announcement.json'
 import { useTheme } from 'next-themes'
 
-const LW11BGDark =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/regular/001.png'
-const LW11BGLight =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/platinum/001.png'
+const LW12BGDark =
+  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12/assets/bg-dark.svg?t=2024-07-26T09%3A59%3A25.373Z'
+const LW12BGLight =
+  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12/assets/bg-light.svg?t=2024-07-26T09%3A59%3A25.373Z'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
   const { resolvedTheme } = useTheme()
-  const bgImage = resolvedTheme?.includes('dark') ? LW11BGDark : LW11BGLight
+  const bgImage = resolvedTheme?.includes('dark') ? LW12BGDark : LW12BGLight
 
   useEffect(() => {
     const shouldHide =
@@ -44,16 +44,18 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        <p className="text-foreground flex flex-col text-lg w-full leading-6 mb-1">
-          General Availability Week
-        </p>
+      <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
+        Launch Week 12
+      </p>
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+        <span>AUGUST 12-16 / 7AM PT</span>
+        <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week">
-            Learn more
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
+            Claim your ticket
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>
