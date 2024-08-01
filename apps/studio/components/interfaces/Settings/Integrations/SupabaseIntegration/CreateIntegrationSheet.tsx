@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { X } from 'lucide-react'
+import { FileX, X } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
@@ -65,17 +65,14 @@ export const IntegrationCategory = {
 } as const
 
 const FormSchema = z.object({
-  category: z.enum([
-    'api',
-    'auth',
-    'caching',
-    'data',
-    'devtools',
-    'fdw',
-    'lowcode',
-    'messaging',
-    'storage',
-  ]),
+  category: z.enum(
+    ['api', 'auth', 'caching', 'data', 'devtools', 'fdw', 'lowcode', 'messaging', 'storage'],
+    {
+      errorMap: () => {
+        return { message: 'Please select one of the provided categories' }
+      },
+    }
+  ),
   description: z.string().trim().min(1, 'The description must be at least 1 character'),
   developer: z.string().trim().min(1, 'The developer must be at least 1 character'),
   docs: z.string().url('The docs must be a valid URL'),
@@ -102,7 +99,7 @@ export const CreateIntegrationSheet = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      category: integrationEntry?.category ?? 'api',
+      category: integrationEntry?.category ?? undefined,
       description: integrationEntry?.description ?? '',
       developer: integrationEntry?.developer ?? '',
       docs: integrationEntry?.docs ?? '',
@@ -304,7 +301,14 @@ export const CreateIntegrationSheet = ({
                   control={form.control}
                   name="logo"
                   render={({ field }) => (
-                    <FormItemLayout>
+                    <FormItemLayout
+                      style={{
+                        display: 'flex',
+                        justifyItems: 'center',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                      }}
+                    >
                       <FormControl_Shadcn_>
                         <LogoFileInput logoUrl={field.value} onChange={field.onChange} />
                       </FormControl_Shadcn_>
@@ -389,7 +393,8 @@ export const CreateIntegrationSheet = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Video"
-                  description="(optional) A YouTube ID for the introduction video for this integration"
+                  description="A YouTube ID for the introduction video for this integration"
+                  labelOptional="Optional"
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} />
@@ -418,10 +423,10 @@ export const CreateIntegrationSheet = ({
               control={form.control}
               name="overview"
               render={({ field }) => (
-                <FormItemLayout
-                  label="Overview"
-                  description="Extended description for your integration. Will be shown on your page."
-                >
+                <FormItemLayout label="Overview" description="">
+                  <p className="text-foreground-lighter">
+                    Extended description for your integration. Will be shown on your page.
+                  </p>
                   <FormControl_Shadcn_>
                     <Tabs_Shadcn_ defaultValue="write" className="w-full">
                       <TabsList_Shadcn_ className="grid w-full grid-cols-2">
