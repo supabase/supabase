@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { cn, Textarea } from 'ui'
 import { uploadFileToSupabaseComProject } from './upload'
+import { TextArea } from '@ui/components/shadcn/ui/text-area'
 
 const VALID_FILE_EXTENSIONS = ['image/jpeg', 'image/png']
 
@@ -134,7 +135,7 @@ export const DroppableTextArea = ({
 
   return (
     <div>
-      <Textarea
+      <TextArea
         disabled={disabled}
         onDragEnter={(e) => checkFiles(e)}
         onDragExit={() => setAreFilesValid('none')}
