@@ -38,7 +38,7 @@ export function LogDrains({
 }) {
   const org = useSelectedOrganization()
 
-  const { isLoading: orgPlanLoading, isPaid } = useCurrentOrgPlan()
+  const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
@@ -60,6 +60,18 @@ export function LogDrains({
     return (
       <div>
         <GenericSkeletonLoader />
+      </div>
+    )
+  }
+
+  if (plan?.id === 'free' || plan?.id === 'pro') {
+    return (
+      <div className="p-8">
+        <CardButton title="Upgrade to Pro" description="Upgrade to a Team Plan to use Log Drains">
+          <Button className="mt-2" asChild>
+            <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
+          </Button>
+        </CardButton>
       </div>
     )
   }
@@ -86,17 +98,6 @@ export function LogDrains({
     return <AlertError error={error}></AlertError>
   }
 
-  if (!isPaid) {
-    return (
-      <div className="p-8">
-        <CardButton title="Upgrade to Pro" description="Upgrade to a paid plan to use Log Drains">
-          <Button className="mt-2" asChild>
-            <Link href={`/org/${org?.slug}/billing`}>Upgrade to Pro</Link>
-          </Button>
-        </CardButton>
-      </div>
-    )
-  }
   return (
     <>
       <Panel className="">
