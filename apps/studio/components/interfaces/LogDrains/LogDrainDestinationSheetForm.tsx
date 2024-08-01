@@ -46,14 +46,7 @@ const formUnion = z.discriminatedUnion('type', [
     url: z.string().url('Webhook URL is required and must be a valid URL'),
     httpVersion: z.enum(['HTTP1', 'HTTP2']),
     gzip: z.boolean(),
-    customHeaders: z
-      .array(
-        z.object({
-          name: z.string(),
-          value: z.string(),
-        })
-      )
-      .optional(),
+    headers: z.record(z.string(), z.string()),
   }),
   z.object({
     type: z.literal('datadog'),
@@ -120,24 +113,23 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: z.infer<typeof formSchema>) => void
 }) {
-  const { ref } = useParams() as { ref: string }
   const defaultType = defaultValues?.type || 'webhook'
-
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customHeaders: [],
       type: defaultType,
       ...defaultValues,
     },
   })
 
+  const headers = form.watch('headers')
+
   // IDK why but this useEffect is needed to set the default values
   // Suppossedly if you call form.reset() defaultValues is not cached, but I have found it to be very unreliable, and  sometimes the form will open with the wrong default values.
   // - Jordi
   useEffect(() => {
+    if (form.formState.isDirty) return
     form.setValue('type', defaultType)
     form.setValue('name', defaultValues?.name || '')
     form.setValue('url', defaultValues?.config?.url || '')
@@ -147,26 +139,29 @@ export function LogDrainDestinationSheetForm({
     form.setValue('password', defaultValues?.config?.password || '')
     form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
     form.setValue('gzip', defaultValues?.config?.gzip || true)
-    form.setValue('customHeaders', defaultValues?.config?.customHeaders || [])
+    form.setValue('headers', defaultValues?.config?.headers || {})
     form.setValue('description', defaultValues?.description || '')
   }, [defaultType, form, defaultValues])
 
   const type = form.watch('type')
-  const customHeaders = form.watch('customHeaders')
 
-  function removeHeader(name: string) {
-    form.setValue(
-      'customHeaders',
-      customHeaders?.filter((header) => header.name !== name)
-    )
+  function removeHeader(key: string) {
+    const newHeaders = {
+      ...headers,
+    }
+    delete newHeaders[key]
+    form.setValue('headers', newHeaders)
   }
 
   function addHeader() {
-    if (form.getValues('customHeaders')?.length === 20) {
+    const formHeaders = form.getValues('headers')
+    if (!formHeaders) return
+    const headerKeys = Object.keys(formHeaders)
+    if (headerKeys?.length === 20) {
       toast.error('You can only have 20 custom headers')
       return
     }
-    if (customHeaders?.find((header) => header.name === newCustomHeader.name)) {
+    if (headerKeys?.includes(newCustomHeader.name)) {
       toast.error('Header name already exists')
       return
     }
@@ -174,16 +169,17 @@ export function LogDrainDestinationSheetForm({
       toast.error('Header name and value are required')
       return
     }
-    form.setValue('customHeaders', [...(customHeaders || []), newCustomHeader])
+    form.setValue('headers', { ...formHeaders, [newCustomHeader.name]: newCustomHeader.value })
     setNewCustomHeader({ name: '', value: '' })
   }
+
+  const hasHeaders = Object.keys(headers || {})?.length > 0
 
   return (
     <Sheet
       open={open}
       onOpenChange={(v) => {
         form.reset()
-        form.setValue('customHeaders', [])
         onOpenChange(v)
       }}
     >
@@ -198,7 +194,6 @@ export function LogDrainDestinationSheetForm({
               onSubmit={(e) => {
                 e.preventDefault()
                 form.handleSubmit(onSubmit)(e)
-                form.reset()
               }}
             >
               <div className="space-y-4">
@@ -282,24 +277,25 @@ export function LogDrainDestinationSheetForm({
 
                     <div>
                       <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
-                      {customHeaders?.map((header) => (
-                        <div
-                          className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
-                          key={header.name}
-                        >
-                          <div className="w-full px-1">{header.name}</div>
-                          <div className="w-full px-1 truncate" title={header.value}>
-                            {header.value}
+                      {hasHeaders &&
+                        Object.keys(headers || {})?.map((headerKey) => (
+                          <div
+                            className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
+                            key={headerKey}
+                          >
+                            <div className="w-full px-1">{headerKey}</div>
+                            <div className="w-full px-1 truncate" title={headers[headerKey]}>
+                              {headers[headerKey]}
+                            </div>
+                            <Button
+                              className="justify-self-end opacity-0 group-hover:opacity-100"
+                              type="text"
+                              title="Remove"
+                              icon={<TrashIcon />}
+                              onClick={() => removeHeader(headerKey)}
+                            ></Button>
                           </div>
-                          <Button
-                            className="justify-self-end opacity-0 group-hover:opacity-100"
-                            type="text"
-                            title="Remove"
-                            icon={<TrashIcon />}
-                            onClick={() => removeHeader(header.name)}
-                          ></Button>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </>
                 )}
