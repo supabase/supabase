@@ -231,7 +231,11 @@ const SupabaseSection = () => {
                 </ConfirmationModal>
 
                 <Sheet open={visible} onOpenChange={closeSheet}>
-                  <SheetContent showClose={false} className="flex flex-col gap-0">
+                  <SheetContent
+                    showClose={false}
+                    className="flex flex-col gap-0"
+                    tabIndex={undefined}
+                  >
                     <CreateIntegrationSheet
                       onChange={(value) => {
                         if (value !== hasChanges) {
