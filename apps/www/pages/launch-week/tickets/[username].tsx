@@ -123,7 +123,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                         </h1>
                         <span className="text-foreground-light text-2xl">
                           Join {FIRST_NAME} for Supabase Launch Week 12. Claim your ticket for a
-                          chance to win limitied swag.
+                          chance to win limited swag.
                         </span>
                       </div>
                       <div>
