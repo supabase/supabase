@@ -22,7 +22,7 @@ export default function TicketActions2() {
   const text = hasSecretTicket ? TWEET_TEXT_SECRET : platinum ? TWEET_TEXT_PLATINUM : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
   const downloadUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-og?username=${encodeURIComponent(
     username ?? ''
   )}`
@@ -88,24 +88,20 @@ export default function TicketActions2() {
           sharePage ? 'justify-center' : 'justify-between'
         )}
       >
-        <div className="flex flex-row w-full gap-2">
+        <div className="flex flex-row flex-wrap justify-center w-full gap-2">
           <Button
             type="secondary"
             size="small"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50"
             disabled
-            icon={<IconCheck strokeWidth={3} className="hidden lg:block" />}
+            icon={<IconCheck strokeWidth={3} />}
           >
             Ticket claimed
           </Button>
           <Button
             onClick={() => handleShare('twitter')}
             type={userData.shared_on_twitter ? 'secondary' : 'default'}
-            icon={
-              userData.shared_on_twitter && (
-                <IconCheck strokeWidth={3} className="hidden lg:block" />
-              )
-            }
+            icon={userData.shared_on_twitter && <IconCheck strokeWidth={3} />}
             size="small"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
@@ -117,11 +113,7 @@ export default function TicketActions2() {
           <Button
             onClick={() => handleShare('linkedin')}
             type={userData.shared_on_linkedin ? 'secondary' : 'default'}
-            icon={
-              userData.shared_on_linkedin && (
-                <IconCheck strokeWidth={3} className="hidden lg:block" />
-              )
-            }
+            icon={userData.shared_on_linkedin && <IconCheck strokeWidth={3} />}
             size="small"
             className="px-2 lg:px-3.5 h-[28px] lg:h-[34px]"
             asChild
