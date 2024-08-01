@@ -6,10 +6,11 @@ import AlertError from 'components/ui/AlertError'
 import { User, useUsersQuery } from 'data/auth/users-query'
 import { User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, Input } from 'ui'
+import { Button, FormLabel_Shadcn_, Input, Switch } from 'ui'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 
 const UserImpersonationSelector = () => {
+  const [aal, setAal] = useState<'aal1'| 'aal2'>('aal1')
   const [searchText, setSearchText] = useState('')
   const debouncedSearchText = useDebounce(searchText, 300)
 
@@ -37,11 +38,16 @@ const UserImpersonationSelector = () => {
       type: 'postgrest',
       role: 'authenticated',
       user,
+      aal,
     })
   }
 
   function stopImpersonating() {
     state.setRole(undefined)
+  }
+
+  function toggleAalState() {
+    setAal(prev => prev === 'aal2' ? 'aal1' : 'aal2')
   }
 
   return (
@@ -62,6 +68,12 @@ const UserImpersonationSelector = () => {
           ? "Select a user to respect your database's Row-Level Security policies for that particular user."
           : "Results will respect your database's Row-Level Security policies for this user."}
       </p>
+
+      <h3>MFA Assurance Level</h3>
+      <div className="flex flex-row items-center gap-x-2">
+        <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
+        <FormLabel_Shadcn_>{aal.toUpperCase()}</FormLabel_Shadcn_>
+      </div>
 
       {!impersonatingUser ? (
         <div className="flex flex-col gap-2 mt-4">
