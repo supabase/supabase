@@ -13,7 +13,7 @@ import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
-export type IntegrationsDirectoryEntry = components['schemas']['IntegrationsDirectoryReadonlyEntry']
+export type IntegrationsDirectoryEntry = components['schemas']['IntegrationsDirectoryListItem']
 
 export const IntegrationCategory = {
   api: 'API',
@@ -56,6 +56,7 @@ export async function getStaticProps() {
         docs: partner.docs ?? '',
         featured: partner.featured ?? false,
         images: partner.images ?? [],
+        inserted_at: partner.created_at,
       }
 
       entries.push(toInsert)

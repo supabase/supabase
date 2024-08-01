@@ -3139,6 +3139,23 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    GetIntegrationsDirectoryEntryResponse: {
+      approved: boolean
+      category: components['schemas']['IntegrationsDirectoryCategory']
+      description: string
+      developer: string
+      docs: string
+      featured: boolean
+      logo: string
+      overview: string
+      slug: string
+      title: string
+      video: string | null
+      website: string
+    }
+    GetIntegrationsDirectoryResponse: {
+      entries: components['schemas']['IntegrationsDirectoryListItem'][]
+    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3182,9 +3199,6 @@ export interface components {
         | 'storage:write'
       )[]
       website: string
-    }
-    GetIntegrationsDirectoryResponse: {
-      entries: components['schemas']['IntegrationsDirectoryReadonlyEntry'][]
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -3583,14 +3597,12 @@ export interface components {
       | 'storage'
     IntegrationsDirectoryEntry: {
       approved: boolean
-      call_to_action_link: string | null
       category: components['schemas']['IntegrationsDirectoryCategory']
       description: string
       developer: string
       docs: string
       featured: boolean
       id: number
-      images: string[]
       inserted_at: string
       logo: string
       organization_slug: string | null
@@ -3602,21 +3614,14 @@ export interface components {
       video: string | null
       website: string
     }
-    IntegrationsDirectoryReadonlyEntry: {
-      approved: boolean
-      call_to_action_link: string | null
+    IntegrationsDirectoryListItem: {
       category: components['schemas']['IntegrationsDirectoryCategory']
       description: string
-      developer: string
-      docs: string
       featured: boolean
-      images: string[]
+      inserted_at: string
       logo: string
-      overview: string
       slug: string
       title: string
-      video: string | null
-      website: string
     }
     IntegrationVercelProject: {
       framework?: string | null
@@ -3979,12 +3984,10 @@ export interface components {
       fileUrl: string
     }
     OrgIntegrationsDirectoryRequestBody: {
-      call_to_action_link?: string
       category: components['schemas']['IntegrationsDirectoryCategory']
       description: string
       developer: string
       docs: string
-      images: string[]
       logo: string
       overview: string
       slug: string
@@ -7103,7 +7106,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['IntegrationsDirectoryReadonlyEntry']
+          'application/json': components['schemas']['GetIntegrationsDirectoryEntryResponse']
         }
       }
       /** @description Failed to retrieve integrations directory entry */
