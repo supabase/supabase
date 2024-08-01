@@ -133,17 +133,22 @@ export function LogDrainDestinationSheetForm({
   // - Jordi
   useEffect(() => {
     if (form.formState.isDirty) return
-    form.setValue('type', defaultType)
-    form.setValue('name', defaultValues?.name || '')
-    form.setValue('url', defaultValues?.config?.url || '')
-    form.setValue('api_key', defaultValues?.config?.api_key || '')
-    form.setValue('region', defaultValues?.config?.region || '')
-    form.setValue('username', defaultValues?.config?.username || '')
-    form.setValue('password', defaultValues?.config?.password || '')
-    form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
-    form.setValue('gzip', defaultValues?.config?.gzip || true)
-    form.setValue('headers', defaultValues?.config?.headers || {})
-    form.setValue('description', defaultValues?.description || '')
+
+    if (mode === 'update') {
+      form.setValue('type', defaultType)
+      form.setValue('name', defaultValues?.name || '')
+      form.setValue('url', defaultValues?.config?.url || '')
+      form.setValue('api_key', defaultValues?.config?.api_key || '')
+      form.setValue('region', defaultValues?.config?.region || '')
+      form.setValue('username', defaultValues?.config?.username || '')
+      form.setValue('password', defaultValues?.config?.password || '')
+      form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
+      form.setValue('gzip', defaultValues?.config?.gzip || true)
+      form.setValue('headers', defaultValues?.config?.headers || {})
+      form.setValue('description', defaultValues?.description || '')
+    } else {
+      form.reset()
+    }
   }, [defaultType, form, defaultValues])
 
   const type = form.watch('type')
