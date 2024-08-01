@@ -19,32 +19,54 @@ import { MAIN_THREAD_MESSAGE, WORKER_MESSAGE } from './DocsSearchLocal.shared.me
 
 interface WorkerContext {
   worker: Worker | undefined
-  ready: boolean | false
+  ready: boolean
+  skipWorker: boolean
 }
 
-const SearchWorkerContext = createContext<WorkerContext>({ worker: undefined, ready: false })
+const SearchWorkerContext = createContext<WorkerContext>({
+  worker: undefined,
+  ready: false,
+  skipWorker: true,
+})
 
 export function SearchWorkerProvider({ children }: PropsWithChildren) {
   const [worker, setWorker] = useState<Worker>()
   const [ready, setReady] = useState(false)
+  const [skipWorker, setSkipWorker] = useState(true)
 
   useEffect(() => {
-    const worker = new Worker(new URL('./DocsSearchLocal.worker', import.meta.url), {
-      type: 'module',
-    })
-    worker.onerror = (errorEvent) => {
-      console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent.message}`)
-    }
+    const useWorker =
+      'connection' in navigator &&
+      !(navigator.connection as any).saveData &&
+      (navigator.connection as any).effectiveType === '4g'
+    if (!useWorker) return
 
-    worker.postMessage({
-      type: MAIN_THREAD_MESSAGE.INIT,
-      payload: {
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      },
-    })
+    setSkipWorker(false)
 
-    setWorker(worker)
+    const requestIdleCallbackIfSupported =
+      'requestIdleCallback' in window ? requestIdleCallback : setTimeout
+    requestIdleCallbackIfSupported(() => {
+      const worker = new Worker(new URL('./DocsSearchLocal.worker', import.meta.url), {
+        type: 'module',
+      })
+      worker.onerror = (errorEvent) => {
+        console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent.message}`)
+      }
+
+      worker.postMessage({
+        type: MAIN_THREAD_MESSAGE.INIT,
+        payload: {
+          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        },
+      })
+
+      setWorker(worker)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!worker) return
 
     function logWorkerMessage(event: MessageEvent) {
       if (event.data.type === WORKER_MESSAGE.CHECKPOINT) {
@@ -64,9 +86,9 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
       worker.removeEventListener('message', logWorkerMessage)
       worker.terminate()
     }
-  }, [])
+  }, [worker])
 
-  const api = useMemo(() => ({ worker, ready }), [worker, ready])
+  const api = useMemo(() => ({ worker, ready, skipWorker }), [worker, ready, skipWorker])
 
   return <SearchWorkerContext.Provider value={api}>{children}</SearchWorkerContext.Provider>
 }
@@ -210,7 +232,7 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
 }
 
 export function useLocalSearch(supabase: SupabaseClient) {
-  const { worker, ready } = useContext(SearchWorkerContext)
+  const { worker, ready, skipWorker } = useContext(SearchWorkerContext)
 
   const [searchState, dispatch] = useReducer(deriveSearchState, { status: 'initial' })
   const rejectRunningSearches = useRef([] as Array<(reason: any) => void>)
@@ -219,23 +241,23 @@ export function useLocalSearch(supabase: SupabaseClient) {
   const FUNCTIONS_URL = '/functions/v1/'
   const ABORT_REASON = 'INTENTIONALLY_ABORTED'
 
+  function abortRunningRemoteSearches() {
+    while (rejectRunningSearches.current.length > 0) {
+      rejectRunningSearches.current.pop()?.(ABORT_REASON)
+    }
+  }
+
   const search = useCallback(
     (query: string) => {
-      if (!worker) {
-        console.error('Search ran before worker was initiated')
-      }
-
-      if (ready) {
+      if (!skipWorker && ready) {
         worker?.postMessage({
           type: MAIN_THREAD_MESSAGE.SEARCH,
           payload: { query },
         })
       } else {
-        // Fall back to regular remote search if worker not ready
+        // Fall back to regular remote search
         const localIdempotencyKey = ++remoteSearchIdempotencyKey.current
-        while (rejectRunningSearches.current.length > 0) {
-          rejectRunningSearches.current.pop()?.(ABORT_REASON)
-        }
+        abortRunningRemoteSearches()
 
         new Promise<PostgrestSingleResponse<any>>(async (resolve, reject) => {
           rejectRunningSearches.current.push(reject)
@@ -297,6 +319,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
     worker?.postMessage({
       type: MAIN_THREAD_MESSAGE.ABORT_SEARCH,
     })
+    abortRunningRemoteSearches()
     dispatch({ type: 'RESET' })
   }, [dispatch])
 
