@@ -201,10 +201,6 @@ export function LogDrainDestinationSheetForm({
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
-
-                const payload = form.getValues()
-                console.log('payload', payload)
-
                 form.handleSubmit(onSubmit)(e)
               }}
             >
