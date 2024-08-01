@@ -17,6 +17,8 @@ import toast from 'react-hot-toast'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useParams } from 'common'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import Link from 'next/link'
+import { ExternalLink } from 'lucide-react'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false)
@@ -74,7 +76,16 @@ const LogDrainsSettings: NextPageWithLayout = () => {
               Send your project logs to third party destinations
             </ScaffoldDescription>
           </div>
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end gap-2">
+            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
+              <Link
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/platform/log-drains"
+              >
+                Documentation
+              </Link>
+            </Button>
             <Button
               disabled={!logDrainsEnabled}
               onClick={() => {
