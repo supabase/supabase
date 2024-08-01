@@ -3,12 +3,12 @@ import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEdito
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { XYCoord } from 'dnd-core'
 import * as React from 'react'
+import { useEffect } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
+import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
-import { useEffect } from 'react'
 
 export function ColumnHeader<R>({
   column,

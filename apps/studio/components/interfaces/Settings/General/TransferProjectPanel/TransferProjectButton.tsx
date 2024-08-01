@@ -1,28 +1,27 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
+import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Alert,
   Button,
-  IconAlertCircle,
-  IconInfo,
   IconLoader,
   IconShield,
   IconTool,
   IconUsers,
+  InfoIcon,
   Listbox,
   Loading,
   Modal,
 } from 'ui'
-
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
-import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
-import { formatCurrency } from 'lib/helpers'
-import { InfoIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
@@ -81,43 +80,27 @@ const TransferProjectButton = () => {
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            onClick={toggle}
-            type="default"
-            disabled={!canTransferProject || disableProjectTransfer}
-          >
-            Transfer project
-          </Button>
-        </Tooltip.Trigger>
-        {(!canTransferProject || disableProjectTransfer) && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {!canTransferProject
-                    ? 'You need additional permissions to transfer this project'
-                    : 'Project transfers are temporarily disabled, please try again later.'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        onClick={toggle}
+        disabled={!canTransferProject || disableProjectTransfer}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canTransferProject
+              ? 'You need additional permissions to transfer this project'
+              : 'Project transfers are temporarily disabled, please try again later.',
+          },
+        }}
+      >
+        Transfer project
+      </ButtonTooltip>
 
       <Modal
-        closable
         onCancel={() => toggle()}
         visible={isOpen}
         loading={isTransferring}
-        size={'large'}
+        size={'xlarge'}
         header={`Transfer project ${project?.name}`}
         customFooter={
           <div className="flex items-center space-x-2 justify-end">
@@ -158,8 +141,11 @@ const TransferProjectButton = () => {
                 <IconLoader />
               </span>
               <div>
-                <p className="font-bold">No downtime</p>
-                <p>There is no downtime or restrictions involved when transferring a project.</p>
+                <p className="font-bold">Possible downtime</p>
+                <p>
+                  There might be a short downtime when transferring projects from a paid to a free
+                  organization.
+                </p>
               </div>
             </li>
 
@@ -222,78 +208,12 @@ const TransferProjectButton = () => {
                   ))}
                 </Listbox>
               )}
-
-              <p className="text-foreground-light text-sm">
-                The target organization needs to use{' '}
-                <Link
-                  href="https://supabase.com/docs/guides/platform/org-based-billing"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  organization-based billing
-                </Link>
-                . To migrate an organization to the new billing, head to your{' '}
-                <Link href="/org/_/billing" target="_blank" rel="noreferrer" className="underline">
-                  organizations billing settings
-                </Link>
-                .
-              </p>
             </div>
           )}
         </Modal.Content>
 
         <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
           <Modal.Content>
-            {transferPreviewData && transferPreviewData.valid && (
-              <div className="text-sm text-foreground-light p-4 bg-surface-200">
-                {transferPreviewData.source_subscription_plan !==
-                transferPreviewData.target_subscription_plan ? (
-                  <div>
-                    <p>
-                      Your project is currently on the{' '}
-                      {transferPreviewData.source_subscription_plan} plan, whereas the target
-                      organization uses the {transferPreviewData.target_subscription_plan} plan.
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    Your project and the target organization are both on the{' '}
-                    {transferPreviewData.source_subscription_plan} subscription plan.
-                  </div>
-                )}
-
-                <div className="my-4">
-                  {transferPreviewData.credits_on_source_organization === 0 ? (
-                    <span> Your current organization won't be granted any prorated credits.</span>
-                  ) : (
-                    <span>
-                      {' '}
-                      Your current organization will be granted{' '}
-                      <span className="text-brand">
-                        ${transferPreviewData.credits_on_source_organization}
-                      </span>{' '}
-                      in credits as proration.
-                    </span>
-                  )}
-                  {transferPreviewData.costs_on_target_organization === 0 ? (
-                    <span>
-                      {' '}
-                      The target organization won't be charged any immediate upfront payment.
-                    </span>
-                  ) : (
-                    <span>
-                      {' '}
-                      The target organization will be billed{' '}
-                      <span className="text-brand">
-                        {formatCurrency(transferPreviewData.costs_on_target_organization)}
-                      </span>{' '}
-                      immediately to prorate for the remainder of the billing period.
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
             {transferPreviewData && transferPreviewData.warnings.length > 0 && (
               <Alert
                 withIcon

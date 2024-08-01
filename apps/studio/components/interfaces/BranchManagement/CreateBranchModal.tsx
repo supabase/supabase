@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { Check, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -12,7 +13,8 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,9 +26,6 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   IconAlertCircle,
-  IconCheck,
-  IconExternalLink,
-  IconLoader,
   Input_Shadcn_,
   Modal,
 } from 'ui'
@@ -140,13 +139,12 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
         <Modal
           hideFooter
           size="medium"
-          modal={false}
           visible={visible}
           onCancel={onClose}
           header="Create a new preview branch"
           confirmText="Create Preview Branch"
         >
-          <Modal.Content className="">
+          <Modal.Content>
             {isLoadingConnections && <GenericSkeletonLoader />}
             {isErrorConnections && (
               <AlertError
@@ -166,7 +164,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <IconExternalLink size={14} strokeWidth={1.5} />
+                    <ExternalLink size={14} strokeWidth={1.5} />
                   </Link>
                 </div>
               </div>
@@ -184,7 +182,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
               control={form.control}
               name="branchName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="relative">
+                <FormItem_Shadcn_ className="relative flex flex-col gap-y-1">
                   <label className="text-sm text-foreground-light">
                     Choose your branch to create a preview from
                   </label>
@@ -193,9 +191,9 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                   </FormControl_Shadcn_>
                   <div className="absolute top-9 right-3">
                     {isChecking ? (
-                      <IconLoader className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                     ) : isValid ? (
-                      <IconCheck className="text-brand" strokeWidth={2} />
+                      <Check size={14} className="text-brand" strokeWidth={2} />
                     ) : null}
                   </div>
 

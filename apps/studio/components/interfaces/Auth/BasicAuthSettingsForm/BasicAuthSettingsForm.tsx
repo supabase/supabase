@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -7,18 +7,16 @@ import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -26,14 +24,11 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
-  IconEye,
-  IconEyeOff,
   Input,
   InputNumber,
   Toggle,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
@@ -91,6 +86,7 @@ const BasicAuthSettingsForm = () => {
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [hidden, setHidden] = useState(true)
+  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
@@ -146,11 +142,15 @@ const BasicAuthSettingsForm = () => {
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
-        <IconAlertCircle strokeWidth={2} />
+        <WarningIcon />
         <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
+  }
+
+  if (!canReadConfig) {
+    return <NoPermission resourceText="view auth configuration settings" />
   }
 
   return (
@@ -352,7 +352,7 @@ const BasicAuthSettingsForm = () => {
                   ) : (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro plan."
+                      secondaryText="Configuring user sessions requires the Pro Plan."
                     />
                   )}
                   <Toggle
@@ -434,7 +434,7 @@ const BasicAuthSettingsForm = () => {
                         disabled={!canUpdateConfig}
                         actions={
                           <Button
-                            icon={hidden ? <IconEye /> : <IconEyeOff />}
+                            icon={hidden ? <Eye /> : <EyeOff />}
                             type="default"
                             onClick={() => setHidden(!hidden)}
                           />

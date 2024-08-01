@@ -1,20 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { handleError, patch } from 'data/fetchers'
+import { put, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { components } from 'api-types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug: string
-  address?: {
-    city: string | null
-    country: string | null
-    line1: string | null
-    line2: string | null
-    postal_code: string | null
-    state: string | null
-  } | null
+  address?: components['schemas']['CustomerBillingAddress']
 }
 
 export async function updateOrganizationCustomerProfile({
@@ -26,13 +20,13 @@ export async function updateOrganizationCustomerProfile({
   const payload: any = {}
   if (address) payload.address = address
 
-  const { data, error } = await patch(`/platform/organizations/{slug}/customer`, {
-    body: payload,
+  const { data, error } = await put(`/platform/organizations/{slug}/customer`, {
     params: {
       path: {
         slug,
       },
     },
+    body: { address },
   })
   if (error) throw handleError(error)
   return data
@@ -62,8 +56,17 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     OrganizationCustomerProfileUpdateVariables
   >((vars) => updateOrganizationCustomerProfile(vars), {
     async onSuccess(data, variables, context) {
-      const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
+      const { address, slug } = variables
+
+      // We do not invalidate here as GET endpoint data is stale for 1-2 seconds, so we handle state manually
+      queryClient.setQueriesData(organizationKeys.customerProfile(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          address,
+        }
+      })
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

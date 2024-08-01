@@ -42,7 +42,7 @@ const DialogOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       'bg-black/40 backdrop-blur-sm',
-      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide',
       className
     )}
     {...props}
@@ -54,12 +54,12 @@ const DialogContentVariants = cva(
   cn(
     'my-8',
     'relative z-50 grid w-full border shadow-md dark:shadow-sm duration-200',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
     'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
     'sm:rounded-lg md:w-full',
-    'bg-200'
+    'bg-dash-sidebar'
   ),
   {
     variants: {
@@ -82,10 +82,13 @@ const DialogContentVariants = cva(
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
-    VariantProps<typeof DialogContentVariants> & { hideClose?: boolean }
->(({ className, children, size, hideClose, ...props }, ref) => (
+    VariantProps<typeof DialogContentVariants> & {
+      hideClose?: boolean
+      dialogOverlayProps?: React.ComponentPropsWithoutRef<typeof DialogOverlay>
+    }
+>(({ className, children, size, hideClose, dialogOverlayProps, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay>
+    <DialogOverlay {...dialogOverlayProps}>
       <DialogPrimitive.Content
         ref={ref}
         className={cn(DialogContentVariants({ size }), className)}
@@ -185,7 +188,11 @@ const DialogSection = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
 >(({ className, children, padding, ...props }, ref) => (
-  <div ref={ref} {...props} className={cn(DialogPaddingVariants({ padding }), className)}>
+  <div
+    ref={ref}
+    {...props}
+    className={cn(DialogPaddingVariants({ padding }), 'overflow-hidden', className)}
+  >
     {children}
   </div>
 ))

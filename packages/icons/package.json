@@ -5,7 +5,7 @@
     "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
   },
   "dependencies": {
-    "typescript": "^5.4.3",
+    "typescript": "^5.5.0",
     "@supabase/build-icons": "*"
   }
 }

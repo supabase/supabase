@@ -10,11 +10,11 @@ import {
   Select,
 } from 'ui'
 
+import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { Edit, Edit2, Link } from 'lucide-react'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { RowField } from './RowEditor.types'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 
 export interface InputFieldProps {
   field: RowField
@@ -41,6 +41,7 @@ const InputField = ({
       return (
         <div className="text-area-text-sm">
           <Input.TextArea
+            data-testid={`${field.name}-input`}
             layout="horizontal"
             label={field.name}
             className="text-sm"
@@ -88,6 +89,7 @@ const InputField = ({
   if (field.foreignKey !== undefined) {
     return (
       <Input
+        data-testid={`${field.name}-input`}
         layout="horizontal"
         label={field.name}
         value={field.value ?? ''}
@@ -131,6 +133,7 @@ const InputField = ({
     return (
       <div className="text-area-text-sm">
         <Input.TextArea
+          data-testid={`${field.name}-input`}
           layout="horizontal"
           label={field.name}
           className="text-sm"
@@ -187,6 +190,7 @@ const InputField = ({
 
     return (
       <Input
+        data-testid={`${field.name}-input`}
         layout="horizontal"
         value={field.value ?? ''}
         label={field.name}
@@ -284,6 +288,7 @@ const InputField = ({
 
   return (
     <Input
+      data-testid={`${field.name}-input`}
       layout="horizontal"
       label={field.name}
       descriptionText={field.comment}

@@ -1,6 +1,10 @@
+import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertTriangle } from 'ui'
+import { useParams } from 'common'
 
 export function EmailRateLimitsAlert() {
+  const { ref: projectRef } = useParams()
+
   return (
     <Alert_Shadcn_ variant="warning">
       <IconAlertTriangle strokeWidth={2} />
@@ -15,8 +19,15 @@ export function EmailRateLimitsAlert() {
         >
           documentation
         </a>{' '}
-        for an up-to-date information on the current rate limits. Please use a custom SMTP server if
-        you're planning on having large number of users.
+        for an up-to-date information on the current rate limits. Please use a{' '}
+        <Link
+          className="underline"
+          target="_blank"
+          href={`/project/${projectRef}/settings/auth#auth-config-smtp-form`}
+        >
+          custom SMTP server
+        </Link>{' '}
+        if you're planning on having large number of users.
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

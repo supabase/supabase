@@ -1,5 +1,5 @@
 import { StreamingTextResponse } from 'ai'
-import { generateV2 } from 'ai-commands/edge'
+import { chatSql } from 'ai-commands/edge'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -48,7 +48,7 @@ async function handlePost(request: NextRequest) {
   const { messages, existingSql, entityDefinitions } = body
 
   try {
-    const stream = await generateV2(openai, messages, existingSql, entityDefinitions)
+    const stream = await chatSql(openai, messages, existingSql, entityDefinitions)
     return new StreamingTextResponse(stream)
   } catch (error) {
     if (error instanceof Error) {

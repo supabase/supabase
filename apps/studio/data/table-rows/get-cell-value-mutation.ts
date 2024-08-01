@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { Query } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
@@ -20,7 +20,7 @@ export function getCellValueSql({
 }: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .select(column)
+    .select(`"${column}"`)
     .match(pkMatch)
     .toSql()
 }

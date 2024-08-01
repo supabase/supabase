@@ -82,19 +82,19 @@ You also need to grant usage to `supabase_auth_admin`:
 grant usage on schema public to supabase_auth_admin;
 ```
 
-Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+Also revoke permissions from the `authenticated`, `public`, and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs. The `public` role has access to functions created on `public.*` by default and `anon` and `authenticated` inherit permissions from the `public` role. Permission is revoked from the `public` role in order to prevent the `anon` and `authenticated` roles from inheriting permissions to invoke the Postgres Hook.
 
 ```sql
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
-For security, avoid using the `security definer` tag where possible. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+For security, we recommend against the use of the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
 
 We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
-Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
 </TabPanel>
 <TabPanel id="https-hook-security-model" label="HTTP">
@@ -506,11 +506,11 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -669,11 +669,11 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -780,7 +780,7 @@ grant execute
 
 revoke execute
   on function public.hook_notify_user_on_failed_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant all
   on table public.password_sign_in_attempts
@@ -788,7 +788,7 @@ grant all
 
 revoke all
   on table public.password_sign_in_attempts
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -1058,7 +1058,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant all
   on table public.profiles
@@ -1066,7 +1066,7 @@ grant all
 
 revoke all
   on table public.profiles
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -1118,7 +1118,7 @@ grant all
 
 revoke all
   on table public.profiles
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -1162,7 +1162,7 @@ grant execute
 
 revoke execute
   on function public.restrict_application_access
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 </TabPanel>
@@ -1591,14 +1591,14 @@ Create a table to store jobs
 
 ```sql
 create table job_queue (
-    job_id uuid primary key default gen_random_uuid(),
-    job_data jsonb not null,
-    created_at timestamp default now(),
-    status text default 'pending',
-    priority int default 0,
-    retry_count int default 0,
-    max_retries int default 2,
-    scheduled_at timestamp default now()
+  job_id uuid primary key default gen_random_uuid(),
+  job_data jsonb not null,
+  created_at timestamp default now(),
+  status text default 'pending',
+  priority int default 0,
+  retry_count int default 0,
+  max_retries int default 2,
+  scheduled_at timestamp default now()
 );
 ```
 
@@ -1696,10 +1696,11 @@ revoke execute
 Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
 
 ```sql
-select cron.schedule(
-    '* * * * *',  -- this cron expression means every minute.
+select
+  cron.schedule(
+    '* * * * *', -- this cron expression means every minute.
     'select dequeue_and_run_jobs();'
-);
+  );
 ```
 
 </TabPanel>
@@ -2284,14 +2285,14 @@ Create a table to store jobs
 
 ```sql
 create table job_queue (
-    job_id uuid primary key default gen_random_uuid(),
-    job_data jsonb not null,
-    created_at timestamp default now(),
-    status text default 'pending',
-    priority int default 0,
-    retry_count int default 0,
-    max_retries int default 2,
-    scheduled_at timestamp default now()
+  job_id uuid primary key default gen_random_uuid(),
+  job_data jsonb not null,
+  created_at timestamp default now(),
+  status text default 'pending',
+  priority int default 0,
+  retry_count int default 0,
+  max_retries int default 2,
+  scheduled_at timestamp default now()
 );
 ```
 
@@ -2390,10 +2391,11 @@ revoke execute
 Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
 
 ```sql
-select cron.schedule(
-    '* * * * *',  -- this cron expression means every minute.
+select
+  cron.schedule(
+    '* * * * *', -- this cron expression means every minute.
     'select dequeue_and_run_jobs();'
-);
+  );
 ```
 
 </TabPanel>

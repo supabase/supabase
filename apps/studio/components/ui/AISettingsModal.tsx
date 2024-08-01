@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -7,12 +12,8 @@ import {
   Button,
   Modal,
   Toggle,
+  WarningIcon,
 } from 'ui'
-
-import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()

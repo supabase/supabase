@@ -51,25 +51,25 @@ The fastest way to migrate your database is with the Supabase migration tool on 
 </TabPanel>
 <TabPanel id="cli" label="Migrate using CLI tools">
 
-### Export your Render database to a file in console [#export-render-database]
+1. Export your Render database to a file in console
 
-Use `pg_dump` with your Render credentials to export your Render database to a file (e.g., `render_dump.sql`).
+   Use `pg_dump` with your Render credentials to export your Render database to a file (e.g., `render_dump.sql`).
 
-```bash
-pg_dump --clean --if-exists --quote-all-identifiers \
- -h $RENDER_HOST -U $RENDER_USER -d $RENDER_DATABASE \
- --no-owner --no-privileges > render_dump.sql
-```
+   ```bash
+   pg_dump --clean --if-exists --quote-all-identifiers \
+   -h $RENDER_HOST -U $RENDER_USER -d $RENDER_DATABASE \
+   --no-owner --no-privileges > render_dump.sql
+   ```
 
-### Import the database to your Supabase project [#import-database-to-supabase]
+2. Import the database to your Supabase project
 
-Use `psql` to import the Render database file to your Supabase project.
+   Use `psql` to import the Render database file to your Supabase project.
 
-```bash
-psql -d "$YOUR_CONNECTION_STRING" -f render_dump.sql
-```
+   ```bash
+   psql -d "$YOUR_CONNECTION_STRING" -f render_dump.sql
+   ```
 
-### Additional options
+Additional options
 
 - To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
 - To exclude a schema: `--exclude-schema=PATTERN`.
@@ -82,3 +82,7 @@ Run `pg_dump --help` for a full list of options.
 </Tabs>
 
 <MigrationWarnings />
+
+## Enterprise
+
+[Contact us](https://forms.supabase.com/enterprise) if you need more help migrating your project.

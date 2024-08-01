@@ -26,6 +26,7 @@ interface RootProps {
   header?: React.ReactNode
   footer?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
+  'data-testid'?: string
 }
 
 /**
@@ -49,6 +50,7 @@ function Popover({
   footer,
   size = 'content',
   disabled,
+  'data-testid': dataTestId,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -69,6 +71,7 @@ function Popover({
         disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
+        data-testid={dataTestId}
       >
         {children}
       </RadixPopover.Trigger>

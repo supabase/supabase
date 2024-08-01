@@ -5,17 +5,9 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import {
-  Button,
-  Form_Shadcn_,
-  IconDollarSign,
-  IconExternalLink,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
 import * as z from 'zod'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -25,8 +17,11 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { DollarSign, FileText } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, Form_Shadcn_, IconExternalLink, IconGitBranch, Modal } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
@@ -41,6 +36,8 @@ const EnableBranchingModal = () => {
   // but calling form.formState.isValid somehow removes the onBlur check,
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
+
+  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
 
   const {
     data: connections,
@@ -137,7 +134,7 @@ const EnableBranchingModal = () => {
         hideFooter
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="!bg !max-w-[40rem]"
+        className="block"
         size="medium"
         hideClose
       >
@@ -215,7 +212,7 @@ const EnableBranchingModal = () => {
                   <div className="flex flex-row gap-4">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <IconDollarSign className="text-warning" size={20} strokeWidth={2} />
+                        <DollarSign className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -232,7 +229,7 @@ const EnableBranchingModal = () => {
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <IconFileText className="text-warning" size={20} strokeWidth={2} />
+                        <FileText className="text-warning" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">

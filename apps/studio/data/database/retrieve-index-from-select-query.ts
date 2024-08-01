@@ -109,10 +109,11 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
     {
       retry: false,
       enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof query !== 'undefined' &&
-        (query.startsWith('select') || query.startsWith('SELECT')),
+        (enabled &&
+          typeof projectRef !== 'undefined' &&
+          typeof query !== 'undefined' &&
+          (query.startsWith('select') || query.startsWith('SELECT'))) ||
+        query.trim().toLowerCase().startsWith('with pgrst_source'),
       ...options,
     }
   )

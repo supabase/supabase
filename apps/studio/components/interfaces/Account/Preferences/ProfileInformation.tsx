@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import z from 'zod'
 
-import { FormActions } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import type { Profile } from 'data/profile/types'
@@ -32,7 +32,10 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   })
 
   const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
-    onSuccess: () => toast.success('Successfully saved profile'),
+    onSuccess: (data) => {
+      toast.success('Successfully saved profile')
+      form.reset({ first_name: data.first_name, last_name: data.last_name })
+    },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
 

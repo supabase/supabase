@@ -1,5 +1,5 @@
 import { Input } from 'ui'
-import { LogQueryError } from '..'
+import type { LogQueryError } from '../Logs.types'
 
 export interface ErrorRendererProps {
   error: LogQueryError

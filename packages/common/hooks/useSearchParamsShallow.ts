@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useId, useMemo, useReducer, useRef } from 'react'
 
 /**

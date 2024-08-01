@@ -7,7 +7,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { VaultSecret } from 'types'
 import {
   Button,

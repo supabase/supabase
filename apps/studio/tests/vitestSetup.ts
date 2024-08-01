@@ -11,6 +11,7 @@ beforeAll(() => {
 
   mswServer.listen({ onUnhandledRequest: 'error' })
   vi.mock('next/router', () => require('next-router-mock'))
+  vi.mock('next/compat/router', () => require('next-router-mock'))
 
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })

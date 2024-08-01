@@ -17,15 +17,15 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ExternalLink } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
+import SpreadsheetImport from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
@@ -255,6 +255,7 @@ const TableEditor = ({
     >
       <SidePanel.Content className="space-y-10 py-6">
         <Input
+          data-testid="table-name-input"
           label="Name"
           layout="horizontal"
           type="text"
@@ -282,12 +283,7 @@ const TableEditor = ({
               <Badge>Recommended</Badge>
             </div>
           }
-          // @ts-ignore
-          description={
-            <>
-              <p>Restrict access to your table by enabling RLS and writing Postgres policies.</p>
-            </>
-          }
+          description="Restrict access to your table by enabling RLS and writing Postgres policies."
           checked={tableFields.isRLSEnabled}
           onChange={() => {
             // if isEnabled, show confirm modal to turn off

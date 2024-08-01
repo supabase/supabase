@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { get, handleError } from 'data/fetchers'
-import { useProjectByRef } from 'hooks'
+import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'

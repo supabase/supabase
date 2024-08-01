@@ -4,7 +4,7 @@
 
 console.log('Hello from the Sentry Functions Challenge!')
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.42.5'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import * as Sentry from 'https://deno.land/x/sentry@7.102.0/index.mjs'
 
 const supabase = createClient(

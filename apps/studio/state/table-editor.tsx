@@ -1,7 +1,7 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid'
-import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { SupaRow } from 'components/grid/types'
+import type { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
@@ -57,6 +57,11 @@ export const createTableEditorState = () => {
     selectedSchemaName: 'public',
     setSelectedSchemaName: (schemaName: string) => {
       state.selectedSchemaName = schemaName
+    },
+
+    enforceExactCount: false,
+    setEnforceExactCount: (value: boolean) => {
+      state.enforceExactCount = value
     },
 
     page: 1,

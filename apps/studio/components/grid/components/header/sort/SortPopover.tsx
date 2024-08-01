@@ -1,12 +1,12 @@
-import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { DropdownControl } from 'components/grid/components/common'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -42,10 +42,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(sorts || []).length > 0 ? 'link' : 'text'}
-          icon={<List strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -143,11 +140,13 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
             align="start"
           >
             <Button
+              asChild
               type="text"
               iconRight={<ChevronDown size="14" className="text-foreground-light" />}
               className="sb-grid-dropdown__item-trigger"
+              data-testid="table-editor-pick-column-to-sort-button"
             >
-              Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by
+              <span>Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by</span>
             </Button>
           </DropdownControl>
         ) : (

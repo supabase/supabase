@@ -45,7 +45,7 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
 >
 <TabPanel id="colab" label="Migrate using Colab">
 
-1. Select the Dabase Engine from the Source database in the dropdown
+1. Select the Database Engine from the Source database in the dropdown
 1. Set the environment variables (`HOST`, `USER`, `SOURCE_DB`,`PASSWORD`, `SUPABASE_URL`, and `SUPABASE_PASSWORD`) in the Colab notebook.
 1. Run the first two steps in [the notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Amazon_RDS_to_Supabase.ipynb) in order. The first sets engine and installs the necessary files.
 1. Run the third step to start the migration. This will take a few minutes.
@@ -53,46 +53,49 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
 </TabPanel>
 <TabPanel id="MySQL" label="Migrate from MySQL with pgloader">
 
-    Install pgloader.
-    Create a configuration file (e.g., config.load).
+1. Install pgloader.
+2. Create a configuration file (e.g., config.load).
 
-    For your destination, use your Supabase connection string with `Use connection pooling` enabled, and the mode set to `Session`. You can get the string from your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/general).
+   For your destination, use your Supabase connection string with `Use connection pooling` enabled, and the mode set to `Session`. You can get the string from your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/general).
 
-```sql
-load database
-  from mysql://user:password@host/source_db
-  into postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
-alter schema 'public' owner to 'postgres';
-set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-```
+   ```sql
+   load database
+     from mysql://user:password@host/source_db
+     into postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+   alter schema 'public' owner to 'postgres';
+   set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
+   ```
 
-##Run the migration with pgloader
+3. Run the migration with pgloader
 
-```bash
-pgloader config.load
-```
+   ```bash
+   pgloader config.load
+   ```
 
 </TabPanel>
 <TabPanel id="MS SQL" label="Migrate from MSSQL">
 
-    Install pgloader.
-    Create a configuration file (e.g., config.load).
+1. Install pgloader.
+2. Create a configuration file (e.g., config.load).
 
-```sql
-LOAD DATABASE
-    FROM mssql://USER:PASSWORD@HOST/SOURCE_DB
-    INTO postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
-ALTER SCHEMA 'public' OWNER TO 'postgres';
-set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
-```
+   ```sql
+   LOAD DATABASE
+       FROM mssql://USER:PASSWORD@HOST/SOURCE_DB
+       INTO postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+   ALTER SCHEMA 'public' OWNER TO 'postgres';
+   set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
+   ```
 
-##Run the migration with pgloader
+3. Run the migration with pgloader
 
-```bash
-pgloader config.load
-```
+   ```bash
+   pgloader config.load
+   ```
 
 </TabPanel>
 </Tabs>
 
 <MigrationWarnings />
+## Enterprise
+
+[Contact us](https://forms.supabase.com/enterprise) if you need more help migrating your project.

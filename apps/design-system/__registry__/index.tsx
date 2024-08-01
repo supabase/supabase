@@ -192,6 +192,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "button-sizes": {
+      name: "button-sizes",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-sizes")),
+      source: "",
+      files: ["registry/default/example/button-sizes.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-default": {
+      name: "button-default",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-default")),
+      source: "",
+      files: ["registry/default/example/button-default.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-warning": {
+      name: "button-warning",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/button-warning")),
+      source: "",
+      files: ["registry/default/example/button-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "button-secondary": {
       name: "button-secondary",
       type: "components:example",
@@ -452,6 +485,94 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/command-dialog")),
       source: "",
       files: ["registry/default/example/command-dialog.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-demo": {
+      name: "commandmenu-demo",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-demo")),
+      source: "",
+      files: ["registry/default/example/commandmenu-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-badge": {
+      name: "commandmenu-badge",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-badge")),
+      source: "",
+      files: ["registry/default/example/commandmenu-badge.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-icon": {
+      name: "commandmenu-icon",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-icon")),
+      source: "",
+      files: ["registry/default/example/commandmenu-icon.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-hidden": {
+      name: "commandmenu-hidden",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-hidden")),
+      source: "",
+      files: ["registry/default/example/commandmenu-hidden.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-force": {
+      name: "commandmenu-force",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-force")),
+      source: "",
+      files: ["registry/default/example/commandmenu-force.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-conditional": {
+      name: "commandmenu-conditional",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-conditional")),
+      source: "",
+      files: ["registry/default/example/commandmenu-conditional.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-subpage": {
+      name: "commandmenu-subpage",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-subpage")),
+      source: "",
+      files: ["registry/default/example/commandmenu-subpage.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "commandmenu-subpage-custom": {
+      name: "commandmenu-subpage-custom",
+      type: "components:example",
+      registryDependencies: ["commandmenu"],
+      component: React.lazy(() => import("@/registry/default/example/commandmenu-subpage-custom")),
+      source: "",
+      files: ["registry/default/example/commandmenu-subpage-custom.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1035,6 +1156,39 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/slider-demo")),
       source: "",
       files: ["registry/default/example/slider-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sonner-demo": {
+      name: "sonner-demo",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-demo")),
+      source: "",
+      files: ["registry/default/example/sonner-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sonner-types": {
+      name: "sonner-types",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-types")),
+      source: "",
+      files: ["registry/default/example/sonner-types.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "sonner-upload": {
+      name: "sonner-upload",
+      type: "components:example",
+      registryDependencies: ["sonner"],
+      component: React.lazy(() => import("@/registry/default/example/sonner-upload")),
+      source: "",
+      files: ["registry/default/example/sonner-upload.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1798,6 +1952,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "assistant-chat-demo": {
+      name: "assistant-chat-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/assistant-chat-demo")),
+      source: "",
+      files: ["registry/default/example/assistant-chat-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "assistant-chat-commands": {
+      name: "assistant-chat-commands",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/assistant-chat-commands")),
+      source: "",
+      files: ["registry/default/example/assistant-chat-commands.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "color-usage-surface-www-and-docs": {
       name: "color-usage-surface-www-and-docs",
       type: "docs:example",
@@ -1827,6 +2003,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/color-usage-surface-studio-frame")),
       source: "",
       files: ["registry/default/example/color-usage-surface-studio-frame.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "expanding-textarea-demo": {
+      name: "expanding-textarea-demo",
+      type: "docs:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
+      source: "",
+      files: ["registry/default/example/expanding-textarea-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

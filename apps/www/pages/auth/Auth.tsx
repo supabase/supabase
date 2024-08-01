@@ -1,9 +1,9 @@
-import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
+import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield, Image } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
@@ -16,7 +16,6 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 import ProductsNav from '~/components/Products/ProductsNav'
 import { PRODUCT_NAMES } from 'shared-data/products'
 
@@ -60,7 +59,7 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <ThemeImage
+            <Image
               src={{
                 light: `${basePath}/images/product/auth/header--light.png`,
                 dark: `${basePath}/images/product/auth/header--dark.png`,
@@ -96,7 +95,7 @@ function AuthPage() {
                   {AuthProviders.map((auth, i) => {
                     return (
                       <div className="flex w-fit items-center" key={i}>
-                        <Image
+                        <NextImage
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}
                           key={auth.name}

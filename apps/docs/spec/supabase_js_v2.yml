@@ -186,6 +186,7 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
   - id: auth-api
     title: 'Overview'
     notes: |
@@ -575,7 +576,7 @@ functions:
             const [session, setSession] = React.useState(null)
 
             React.useEffect(() => {
-              const subscription = supabase.auth.onAuthStateChange(
+              const {data: { subscription }} = supabase.auth.onAuthStateChange(
                 (event, session) => {
                   if (event === 'SIGNED_OUT') {
                     setSession(null)
@@ -895,7 +896,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -1822,14 +1823,12 @@ functions:
     title: 'setSession()'
     $ref: '@supabase/auth-js.GoTrueClient.setSession'
     notes: |
-      - `setSession()` takes in a refresh token and uses it to get a new session.
-      - The refresh token can only be used once to obtain a new session.
-      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - This method sets the session using an `access_token` and `refresh_token`.
+      - If successful, a `SIGNED_IN` event is emitted.
     examples:
-      - id: refresh-the-session
-        name: Refresh the session
-        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+      - id: set-the-session
+        name: Set the session
+        description: Sets the session data from an access_token and refresh_token, then returns an auth response or error.
         isSpotlight: true
         code: |
           ```js
@@ -7239,7 +7238,8 @@ functions:
           ```json
           {
             "data": {
-              "path": "avatars/public/avatar1.png"
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
             },
             "error": null
           }
@@ -7285,7 +7285,8 @@ functions:
           ```json
           {
             "data": {
-              "path": "avatars/public/avatar1.png"
+              "path": "public/avatar1.png",
+              "fullPath": "avatars/public/avatar1.png"
             },
             "error": null
           }
