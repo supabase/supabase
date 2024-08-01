@@ -9,9 +9,9 @@ import type { NextPageWithLayout } from 'types'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { Button } from 'ui'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
-import { LogDrainData } from 'data/log-drains/log-drains-query'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
@@ -29,6 +29,13 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { plan, isLoading: planLoading } = useCurrentOrgPlan()
 
   const logDrainsEnabled = !planLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
+
+  const { data: logDrains } = useLogDrainsQuery(
+    { ref },
+    {
+      enabled: logDrainsEnabled,
+    }
+  )
 
   const { mutate: createLogDrain, isLoading: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
@@ -86,17 +93,19 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                 Documentation
               </Link>
             </Button>
-            <Button
-              disabled={!logDrainsEnabled}
-              onClick={() => {
-                setSelectedLogDrain(null)
-                setMode('create')
-                setOpen(true)
-              }}
-              type="primary"
-            >
-              Add destination
-            </Button>
+            {!(logDrains?.length === 0) && (
+              <Button
+                disabled={!logDrainsEnabled}
+                onClick={() => {
+                  setSelectedLogDrain(null)
+                  setMode('create')
+                  setOpen(true)
+                }}
+                type="primary"
+              >
+                Add destination
+              </Button>
+            )}
           </div>
         </ScaffoldHeader>
       </ScaffoldContainer>
