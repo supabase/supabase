@@ -423,10 +423,11 @@ export const CreateIntegrationSheet = ({
               control={form.control}
               name="overview"
               render={({ field }) => (
-                <FormItemLayout
-                  label="Overview"
-                  description="Extended description for your integration that will be shown on your page. Supports markdown formatting."
-                >
+                <FormItemLayout label="Overview" description="">
+                  <p className="text-foreground-lighter">
+                    Extended description for your integration that will be shown on your page.
+                    Supports markdown formatting.
+                  </p>
                   <FormControl_Shadcn_>
                     <Tabs_Shadcn_ defaultValue="write" className="w-full">
                       <TabsList_Shadcn_ className="grid w-full grid-cols-2">
