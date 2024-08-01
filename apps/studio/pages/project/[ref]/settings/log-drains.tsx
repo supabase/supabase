@@ -91,6 +91,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <LogDrainDestinationSheetForm
+          mode={mode}
           open={open}
           onOpenChange={(v) => {
             if (!v) {
@@ -107,6 +108,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
               config: values as any, // TODO: fix generated API types from backend
               id: selectedLogDrain?.id,
               projectRef: ref,
+              token: selectedLogDrain?.token,
             }
 
             if (mode === 'create') {
@@ -116,10 +118,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                 throw new Error('Log drain ID and token is required')
               } else {
                 console.log('logDrainValues', logDrainValues)
-                updateLogDrain({
-                  ...logDrainValues,
-                  token: selectedLogDrain?.token,
-                })
+                updateLogDrain(logDrainValues)
               }
             }
           }}

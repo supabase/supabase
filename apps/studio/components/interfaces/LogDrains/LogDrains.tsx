@@ -112,9 +112,9 @@ export function LogDrains({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Name</TableHead>
-              <TableHead>Source</TableHead>
+              <TableHead className="max-w-[200px]">Name</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead className="text-right">Source</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
@@ -124,8 +124,8 @@ export function LogDrains({
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
                 <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.type}</TableCell>
                 <TableCell>{drain.description}</TableCell>
+                <TableCell className="text-right font-mono">{drain.type}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

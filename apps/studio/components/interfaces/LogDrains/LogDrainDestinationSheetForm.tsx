@@ -27,7 +27,7 @@ import {
   SelectValue_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  Label_Shadcn_,
+  cn,
 } from 'ui'
 
 import { z } from 'zod'
@@ -37,6 +37,7 @@ import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData } from 'data/log-drains/log-drains-query'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -106,12 +107,14 @@ export function LogDrainDestinationSheetForm({
   defaultValues,
   onSubmit,
   isLoading,
+  mode,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
   defaultValues?: Partial<LogDrainData> & { type: LogDrainType }
   isLoading?: boolean
   onSubmit: (values: z.infer<typeof formSchema>) => void
+  mode: 'create' | 'update'
 }) {
   const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
@@ -193,6 +196,10 @@ export function LogDrainDestinationSheetForm({
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
+
+                const payload = form.getValues()
+                console.log('payload', payload)
+
                 form.handleSubmit(onSubmit)(e)
               }}
             >
@@ -209,9 +216,22 @@ export function LogDrainDestinationSheetForm({
                   label="Description"
                   formControl={form.control}
                 />
+                <div>
+                  {mode === 'update' && (
+                    <div className="flex items-center gap-2 text-sm text-foreground-light">
+                      <InfoTooltip align="start">
+                        You cannot change the type of an existing log drain. Please, create a new
+                        log drain with the new type.
+                      </InfoTooltip>
+                      Can't update log drain type
+                    </div>
+                  )}
+                </div>
                 <RadioGroupStacked
+                  className={cn(mode === 'update' && 'opacity-50')}
                   value={type}
                   onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                  disabled={mode === 'update'}
                 >
                   {LOG_DRAIN_TYPES.map((type) => (
                     <RadioGroupStackedItem
