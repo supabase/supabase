@@ -966,8 +966,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/mssql',
         },
         {
+          name: 'Connecting to Paddle',
+          url: '/guides/database/extensions/wrappers/paddle',
+        },
+        {
           name: 'Connecting to Redis',
           url: '/guides/database/extensions/wrappers/redis',
+        },
+        {
+          name: 'Connecting to Snowflake',
+          url: '/guides/database/extensions/wrappers/snowflake',
         },
         {
           name: 'Connecting to Stripe',
