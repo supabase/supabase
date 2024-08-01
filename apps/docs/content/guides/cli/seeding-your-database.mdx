@@ -53,8 +53,9 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 You can generate seed data for local development using [Snaplet](https://github.com/snaplet/seed).
 
 <Admonition type="tip">
-  To use Snaplet, you need to have Node.js and npm installed. You can add Node.js to your project by
-  running `npm init -y` in your project directory.
+
+To use Snaplet, you need to have Node.js and npm installed. You can add Node.js to your project by running `npm init -y` in your project directory.
+
 </Admonition>
 
 If this is your first time using Snaplet to seed your project, you'll need to set up Snaplet with the following command:
@@ -66,12 +67,12 @@ npx @snaplet/seed init
 This command will analyze your database and its structure, and then generate a JavaScript client which can be used to define exactly how your data should be generated using code. The `init` command generates a configuration file, `seed.config.ts` and an example script, `seed.ts`, as a starting point.
 
 <Admonition type="tip">
-  During `init` if you are not using an Object Relational Mapper (ORM) or your ORM is not in the
-  supported list, choose `node-postgres`.
+
+During `init` if you are not using an Object Relational Mapper (ORM) or your ORM is not in the supported list, choose `node-postgres`.
+  
 </Admonition>
 
-In most cases you only want to generate data for specific schemas or tables. This is defined with `select`.
-Here is an example `seed.config.ts` configuration file:
+In most cases you only want to generate data for specific schemas or tables. This is defined with `select`. Here is an example `seed.config.ts` configuration file:
 
 ```ts
 export default defineConfig({
