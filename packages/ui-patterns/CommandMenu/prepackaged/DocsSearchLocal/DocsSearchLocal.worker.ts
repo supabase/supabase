@@ -29,20 +29,36 @@ const REJECT_REASON = {
 
 const getExtractor = setupSingletonExtractor()
 
-self.addEventListener('message', async (event) => {
-  switch (event.data.type) {
-    case MAIN_THREAD_MESSAGE.INIT:
-      const { supabaseUrl, supabaseAnonKey } = event.data.payload
-      return init(supabaseUrl, supabaseAnonKey)
-    case MAIN_THREAD_MESSAGE.SEARCH:
-      const { query } = event.data.payload
-      return handleSearch(query)
-    case MAIN_THREAD_MESSAGE.ABORT_SEARCH:
-      return abortSearch()
-  }
+self.addEventListener('connect', (connectEvent) => {
+  // @ts-ignore
+  const port = connectEvent.ports[0] as MessagePort
+  checkpoint(port, { status: 'CONNECTED' })
+
+  port.addEventListener('message', async (event) => {
+    switch (event.data.type) {
+      case MAIN_THREAD_MESSAGE.INIT:
+        const { supabaseUrl, supabaseAnonKey } = event.data.payload
+        if (ready) {
+          return alreadyReady(port)
+        } else {
+          return init(port, supabaseUrl, supabaseAnonKey)
+        }
+      case MAIN_THREAD_MESSAGE.SEARCH:
+        const { query } = event.data.payload
+        return handleSearch(port, query)
+      case MAIN_THREAD_MESSAGE.ABORT_SEARCH:
+        return abortSearch()
+    }
+  })
+
+  port.start()
 })
 
-async function init(supabaseUrl: string, supabaseAnonKey: string) {
+function alreadyReady(port: MessagePort) {
+  checkpoint(port, { status: 'READY' })
+}
+
+async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: string) {
   db = new PGlite({
     extensions: {
       vector: new URL(
@@ -67,19 +83,15 @@ async function init(supabaseUrl: string, supabaseAnonKey: string) {
   ])
 
   ready = true
-  checkpoint({
+  checkpoint(port, {
     status: 'READY',
   })
 }
 
-/**
- * @param {SupabaseClient} supabase
- * @param {string} query
- * @returns {void}
- */
-async function handleSearch(query: string) {
+async function handleSearch(port: MessagePort, query: string) {
   if (!ready) {
     return postError(
+      port,
       {
         message: WORKER_MESSAGE.NOT_READY,
       },
@@ -104,7 +116,7 @@ async function handleSearch(query: string) {
       resolve(results)
     })
       .then((data) => {
-        self.postMessage({
+        port.postMessage({
           type: WORKER_MESSAGE.SEARCH_RESULTS,
           payload: {
             matches: JSON.stringify((data as Results<unknown>).rows),
@@ -115,7 +127,7 @@ async function handleSearch(query: string) {
         /* Silently ignore */
       })
   } catch (error) {
-    postError(convertError(error))
+    postError(port, convertError(error))
   }
 }
 

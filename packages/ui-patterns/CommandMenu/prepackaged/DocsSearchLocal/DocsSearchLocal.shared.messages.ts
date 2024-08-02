@@ -25,8 +25,8 @@ type ErrorLike = {
  *
  * @param payload - Custom event data associated with the checkpoint
  */
-export function checkpoint<Payload extends object>(payload: Payload) {
-  self.postMessage({
+export function checkpoint<Payload extends object>(port: MessagePort, payload: Payload) {
+  port.postMessage({
     type: WORKER_MESSAGE.CHECKPOINT,
     payload,
   })
@@ -41,7 +41,11 @@ export function convertError(error: unknown): ErrorLike {
  *
  * @param [maybeCustomPayload] - Custom data to associate with the error
  */
-export function postError<Payload extends object>(error: ErrorLike, maybeCustomPayload?: Payload) {
+export function postError<Payload extends object>(
+  port: MessagePort,
+  error: ErrorLike,
+  maybeCustomPayload?: Payload
+) {
   const message = {
     type: WORKER_MESSAGE.SEARCH_ERROR,
     payload: { message: error.message },

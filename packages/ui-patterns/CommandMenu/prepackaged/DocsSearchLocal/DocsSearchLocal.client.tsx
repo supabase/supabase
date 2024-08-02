@@ -18,19 +18,19 @@ import { z } from 'zod'
 import { MAIN_THREAD_MESSAGE, WORKER_MESSAGE } from './DocsSearchLocal.shared.messages'
 
 interface WorkerContext {
-  worker: Worker | undefined
+  port: MessagePort | undefined
   ready: boolean
   skipWorker: boolean
 }
 
 const SearchWorkerContext = createContext<WorkerContext>({
-  worker: undefined,
+  port: undefined,
   ready: false,
   skipWorker: true,
 })
 
 export function SearchWorkerProvider({ children }: PropsWithChildren) {
-  const [worker, setWorker] = useState<Worker>()
+  const [port, setPort] = useState<MessagePort>()
   const [ready, setReady] = useState(false)
   const [skipWorker, setSkipWorker] = useState(true)
 
@@ -46,30 +46,34 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
     const requestIdleCallbackIfSupported =
       'requestIdleCallback' in window ? requestIdleCallback : setTimeout
     requestIdleCallbackIfSupported(() => {
-      const worker = new Worker(new URL('./DocsSearchLocal.worker', import.meta.url), {
+      const port = new SharedWorker(new URL('./DocsSearchLocal.worker', import.meta.url), {
         type: 'module',
-      })
-      worker.onerror = (errorEvent) => {
-        console.error(`UNCAUGHT WORKER ERROR:\n\n${errorEvent.message}`)
+      }).port
+      port.start()
+      port.onmessageerror = (messageEvent) => {
+        console.error(`UNCAUGHT WORKER ERROR:\n\n${messageEvent}`)
       }
 
-      worker.postMessage({
-        type: MAIN_THREAD_MESSAGE.INIT,
-        payload: {
-          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        },
-      })
-
-      setWorker(worker)
+      setPort(port)
     })
+
+    return () => port?.close()
   }, [])
 
   useEffect(() => {
-    if (!worker) return
+    if (!port) return
 
-    function logWorkerMessage(event: MessageEvent) {
+    function handleGeneralWorkerMessage(event: MessageEvent) {
       if (event.data.type === WORKER_MESSAGE.CHECKPOINT) {
+        if (event.data.payload?.status === 'CONNECTED') {
+          port?.postMessage({
+            type: MAIN_THREAD_MESSAGE.INIT,
+            payload: {
+              supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            },
+          })
+        }
         if (event.data.payload?.status === 'READY') {
           setReady(true)
         }
@@ -81,14 +85,13 @@ export function SearchWorkerProvider({ children }: PropsWithChildren) {
       }
     }
 
-    worker.addEventListener('message', logWorkerMessage)
+    port.addEventListener('message', handleGeneralWorkerMessage)
     return () => {
-      worker.removeEventListener('message', logWorkerMessage)
-      worker.terminate()
+      port.removeEventListener('message', handleGeneralWorkerMessage)
     }
-  }, [worker])
+  }, [port])
 
-  const api = useMemo(() => ({ worker, ready, skipWorker }), [worker, ready, skipWorker])
+  const api = useMemo(() => ({ port, ready, skipWorker }), [port, ready, skipWorker])
 
   return <SearchWorkerContext.Provider value={api}>{children}</SearchWorkerContext.Provider>
 }
@@ -232,7 +235,7 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
 }
 
 export function useLocalSearch(supabase: SupabaseClient) {
-  const { worker, ready, skipWorker } = useContext(SearchWorkerContext)
+  const { port, ready, skipWorker } = useContext(SearchWorkerContext)
 
   const [searchState, dispatch] = useReducer(deriveSearchState, { status: 'initial' })
   const rejectRunningSearches = useRef([] as Array<(reason: any) => void>)
@@ -250,7 +253,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
   const search = useCallback(
     (query: string) => {
       if (!skipWorker && ready) {
-        worker?.postMessage({
+        port?.postMessage({
           type: MAIN_THREAD_MESSAGE.SEARCH,
           payload: { query },
         })
@@ -312,11 +315,11 @@ export function useLocalSearch(supabase: SupabaseClient) {
 
       dispatch({ type: 'TRIGGERED' })
     },
-    [worker, ready, supabase]
+    [port, ready, supabase]
   )
 
   const reset = useCallback(() => {
-    worker?.postMessage({
+    port?.postMessage({
       type: MAIN_THREAD_MESSAGE.ABORT_SEARCH,
     })
     abortRunningRemoteSearches()
@@ -324,7 +327,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
   }, [dispatch])
 
   useEffect(() => {
-    if (!worker) return
+    if (!port) return
 
     function handleSearchResults(event: MessageEvent) {
       if (event.data.type === WORKER_MESSAGE.SEARCH_ERROR) {
@@ -338,10 +341,10 @@ export function useLocalSearch(supabase: SupabaseClient) {
       }
     }
 
-    const currentWorker = worker
-    currentWorker.addEventListener('message', handleSearchResults)
-    return () => currentWorker.removeEventListener('message', handleSearchResults)
-  }, [worker])
+    const currentPort = port
+    port.addEventListener('message', handleSearchResults)
+    return () => currentPort.removeEventListener('message', handleSearchResults)
+  }, [port])
 
   const api = useMemo(() => ({ search, searchState, reset }), [search, searchState, reset])
 
