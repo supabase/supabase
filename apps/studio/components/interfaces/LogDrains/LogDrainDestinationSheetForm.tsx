@@ -36,7 +36,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useState } from 'react'
 import { TrashIcon } from 'lucide-react'
-import { LogDrainData } from 'data/log-drains/log-drains-query'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const FORM_ID = 'log-drain-destination-form'
@@ -131,6 +131,11 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
+  const { ref } = useParams()
+  const { data: logDrains } = useLogDrainsQuery({
+    ref,
+  })
+
   const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
 
@@ -202,6 +207,15 @@ export function LogDrainDestinationSheetForm({
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
+
+                // Temp check to make sure the name is unique
+                const logDrainName = form.getValues('name')
+                const logDrainExists = logDrains?.find((drain) => drain.name === logDrainName)
+                if (logDrainExists) {
+                  toast.error('Log drain name already exists')
+                  return
+                }
+
                 form.handleSubmit(onSubmit)(e)
               }}
             >
