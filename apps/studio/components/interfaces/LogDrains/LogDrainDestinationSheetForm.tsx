@@ -232,12 +232,12 @@ export function LogDrainDestinationSheetForm({
                   label="Name"
                   formControl={form.control}
                 />
-                <LogDrainFormItem
+                {/* <LogDrainFormItem
                   value="description"
                   placeholder="My Destination"
                   label="Description"
                   formControl={form.control}
-                />
+                /> */}
                 {mode === 'create' && (
                   <RadioGroupStacked
                     defaultValue={defaultType}
