@@ -94,8 +94,8 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
             <Panel.Content>
-              <div className=" ">
-                <div className="">
+              <div>
+                <div>
                   {currentDiskSize && (
                     <span className="text-foreground-light flex gap-2 items-baseline">
                       <h4 className="text-foreground">Current Disk Storage</h4>
@@ -157,7 +157,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                           <Markdown
                             className="max-w-full"
                             content={`
-We auto-scale your disk as you need more storage, but can only do this every 6 hours.
+We auto-scale your disk as you need more storage, but can only do this once every 6 hours.
 If you upload more than 1.5x the current size of your storage, your database will go
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.

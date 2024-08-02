@@ -60,7 +60,7 @@ const DiskSizeConfigurationModal = ({
   }
 
   const currentDiskSize = project?.volumeSizeGb ?? 0
-  // to do, update with max_disk_volume_size_gb
+
   const maxDiskSize = 200
 
   const INITIAL_VALUES = {
