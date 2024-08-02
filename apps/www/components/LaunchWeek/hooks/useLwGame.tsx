@@ -47,11 +47,11 @@ const useLwGame = (disabled?: boolean) => {
     }
   }
 
-  useEffect(() => {
-    if (!disabled) window.addEventListener('keydown', onKeyDown)
+  // useEffect(() => {
+  //   if (!disabled) window.addEventListener('keydown', onKeyDown)
 
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [disabled])
+  //   return () => window.removeEventListener('keydown', onKeyDown)
+  // }, [disabled])
 
   return { isGameMode, setIsGameMode }
 }

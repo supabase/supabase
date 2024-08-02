@@ -665,6 +665,18 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/platform/projects/{ref}/analytics/log-drains': {
+    /** Lists all log drains */
+    get: operations['LogDrainController_listLogDrains']
+    /** Create a log drain */
+    post: operations['LogDrainController_createLogDrain']
+  }
+  '/platform/projects/{ref}/analytics/log-drains/{token}': {
+    /** Update a log drain */
+    put: operations['LogDrainController_updateLogDrain']
+    /** Delete a log drain */
+    delete: operations['LogDrainController_deleteLogDrain']
+  }
   '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
     get: operations['v1-list-all-warehouse-tokens']
@@ -983,10 +995,6 @@ export interface paths {
     /** Sets up a payment method */
     post: operations['SetupIntentController_setUpPaymentMethod']
   }
-  '/platform/telemetry/activity': {
-    /** Sends server activity */
-    post: operations['TelemetryActivityController_sendServerActivity']
-  }
   '/platform/telemetry/event': {
     /** Sends analytics server event */
     post: operations['TelemetryEventController_sendServerEvent']
@@ -998,10 +1006,6 @@ export interface paths {
   '/platform/telemetry/page': {
     /** Send server page event */
     post: operations['TelemetryPageController_sendServerPage']
-  }
-  '/platform/telemetry/pageview': {
-    /** Send pageview event */
-    post: operations['TelemetryPageviewController_sendServerPageViewed']
   }
   '/platform/tos/fly': {
     /** Redirects to Fly sso flow */
@@ -1491,6 +1495,18 @@ export interface paths {
   '/v0/projects/{ref}/analytics/endpoints/usage.api-requests-count': {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
+  }
+  '/v0/projects/{ref}/analytics/log-drains': {
+    /** Lists all log drains */
+    get: operations['LogDrainController_listLogDrains']
+    /** Create a log drain */
+    post: operations['LogDrainController_createLogDrain']
+  }
+  '/v0/projects/{ref}/analytics/log-drains/{token}': {
+    /** Update a log drain */
+    put: operations['LogDrainController_updateLogDrain']
+    /** Delete a log drain */
+    delete: operations['LogDrainController_deleteLogDrain']
   }
   '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
     /** Lists project's warehouse access tokens from logflare */
@@ -2509,6 +2525,13 @@ export interface components {
       partner_billing: components['schemas']['AwsPartnerBillingBody']
       primary_email: string
     }
+    CreateBackendParams: {
+      config: Record<string, never>
+      description?: string
+      name: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+    }
     CreateBranchBody: {
       branch_name: string
       git_branch?: string
@@ -2852,16 +2875,8 @@ export interface components {
       custom_origin_server: string
       hostname: string
       id: string
-      ownership_verification: {
-        name?: string
-        type?: string
-        value?: string
-      }
-      ssl: {
-        status?: string
-        validation_errors?: components['schemas']['ValidationError'][]
-        validation_records?: components['schemas']['ValidationRecord'][]
-      }
+      ownership_verification: components['schemas']['OwnershipVerification']
+      ssl: components['schemas']['SslValidation']
       status: string
       verification_errors?: string[]
     }
@@ -3614,6 +3629,20 @@ export interface components {
       scopes: string
       token: string
     }
+    LFBackend: {
+      config: Record<string, never>
+      description?: string
+      id: number
+      metadata: {
+        project_ref?: string
+        type?: string
+      }
+      name: string
+      token: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      user_id: number
+    }
     LFEndpoint: {
       cache_duration_seconds: number
       description: string
@@ -3948,11 +3977,10 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
-    PageBody: {
-      location: string
-      path: string
-      referrer?: string
-      title?: string
+    OwnershipVerification: {
+      name: string
+      type: string
+      value: string
     }
     PasswordCheckBody: {
       password: string
@@ -4755,9 +4783,11 @@ export interface components {
     }
     RestrictionData: {
       grace_period_end?: string
+      report_date?: string
       /** @enum {string} */
       restrictions?: 'drop_requests_402'
       usage_stats?: components['schemas']['UsageStats']
+      violation_data?: Record<string, never>
       violations?: (
         | 'exceed_db_size_quota'
         | 'exceed_egress_quota'
@@ -5035,6 +5065,11 @@ export interface components {
     SslEnforcements: {
       database: boolean
     }
+    SslValidation: {
+      status: string
+      validation_errors?: components['schemas']['ValidationError'][]
+      validation_records: components['schemas']['ValidationRecord'][]
+    }
     StorageBucket: {
       created_at: string
       id: string
@@ -5210,14 +5245,6 @@ export interface components {
     TaxIdV2Response: {
       tax_id: components['schemas']['TaxIdV2'] | null
     }
-    TelemetryActivityBody: {
-      activity: string
-      data?: Record<string, never>
-      orgSlug?: string
-      page: components['schemas']['PageBody']
-      projectRef?: string
-      source: string
-    }
     TelemetryEventBody: {
       action: string
       category: string
@@ -5236,14 +5263,6 @@ export interface components {
       ga?: components['schemas']['GoogleAnalyticBody']
       referrer: string
       route?: string
-      title: string
-    }
-    TelemetryPageviewBody: {
-      location: string
-      orgSlug?: string
-      path: string
-      projectRef?: string
-      referrer: string
       title: string
     }
     ThirdPartyAuth: {
@@ -5446,6 +5465,11 @@ export interface components {
       smtp_sender_name?: string
       smtp_user?: string
       uri_allow_list?: string
+    }
+    UpdateBackendParams: {
+      config?: Record<string, never>
+      description?: string
+      name?: string
     }
     UpdateBranchBody: {
       branch_name?: string
@@ -10725,6 +10749,110 @@ export interface operations {
       }
     }
   }
+  /** Lists all log drains */
+  LogDrainController_listLogDrains: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFBackend'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch log drains */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a log drain */
+  LogDrainController_createLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateBackendParams']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create a log drain */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a log drain */
+  LogDrainController_updateLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains token */
+        token: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParams']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update log drain */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a log drain */
+  LogDrainController_deleteLogDrain: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains token */
+        token: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete a log drain */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Lists project's warehouse access tokens from logflare */
   'v1-list-all-warehouse-tokens': {
     parameters: {
@@ -12680,23 +12808,6 @@ export interface operations {
       }
     }
   }
-  /** Sends server activity */
-  TelemetryActivityController_sendServerActivity: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryActivityBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to send server activity */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Sends analytics server event */
   TelemetryEventController_sendServerEvent: {
     requestBody: {
@@ -12743,23 +12854,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to send server page event */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Send pageview event */
-  TelemetryPageviewController_sendServerPageViewed: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TelemetryPageviewBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to send pageview event */
       500: {
         content: never
       }
@@ -14742,6 +14836,9 @@ export interface operations {
       201: {
         content: never
       }
+      403: {
+        content: never
+      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -14763,6 +14860,9 @@ export interface operations {
     }
     responses: {
       201: {
+        content: never
+      }
+      403: {
         content: never
       }
       /** @description Failed to set up read replica */

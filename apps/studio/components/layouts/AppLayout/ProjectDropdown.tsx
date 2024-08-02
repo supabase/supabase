@@ -28,6 +28,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { ChevronsUpDown } from 'lucide-react'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -122,13 +123,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
     <div className="flex items-center px-2">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            className="pr-2"
-            iconRight={
-              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-            }
-          >
+          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
             <div className="flex items-center space-x-2">
               <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
             </div>
