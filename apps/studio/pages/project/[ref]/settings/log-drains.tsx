@@ -50,7 +50,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
 
   const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
     onSuccess: () => {
-      toast.success('Log drain destination updated')
+      toast.success('Log drain updated')
       setOpen(false)
     },
     onError: () => {

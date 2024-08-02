@@ -219,7 +219,7 @@ export function LogDrainDestinationSheetForm({
                         You cannot change the type of an existing log drain. Please, create a new
                         log drain with the new type.
                       </InfoTooltip>
-                      Can't update log drain type
+                      Log drain type can't be updated after creation
                     </div>
                   )}
                 </div>
