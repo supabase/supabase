@@ -164,6 +164,8 @@ export function LogDrains({
           </TableBody>
 
           <ConfirmationModal
+            confirmLabel="Delete"
+            variant="destructive"
             title="Delete Log Drain"
             visible={isDeleteModalOpen}
             onConfirm={() => {

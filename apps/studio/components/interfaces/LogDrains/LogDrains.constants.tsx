@@ -24,7 +24,10 @@ export const LOG_DRAIN_TYPES = [
 ] as const
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
-export type LogDrainType = (typeof LOG_DRAIN_TYPES)[number]['value']
+
+// Added postgres and bigquery here because the generated api types require them but they're not available yet.
+// Once we add them they can be removed from this type and added to the LOG_DRAIN_TYPES array.
+export type LogDrainType = (typeof LOG_DRAIN_TYPES)[number]['value'] | 'postgres' | 'bigquery'
 
 export const DATADOG_REGIONS = [
   {

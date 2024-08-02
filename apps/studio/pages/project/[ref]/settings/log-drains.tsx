@@ -10,7 +10,7 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { Button } from 'ui'
 import { useState } from 'react'
-import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
@@ -119,7 +119,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
             setOpen(v)
           }}
-          defaultValues={selectedLogDrain as any}
+          defaultValues={{
+            type: selectedLogDrain?.type || 'webhook',
+            ...selectedLogDrain,
+          }}
           isLoading={isLoading}
           onSubmit={({ name, type, ...values }) => {
             const logDrainValues = {
@@ -137,7 +140,6 @@ const LogDrainsSettings: NextPageWithLayout = () => {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
               } else {
-                console.log('logDrainValues', logDrainValues)
                 updateLogDrain(logDrainValues)
               }
             }

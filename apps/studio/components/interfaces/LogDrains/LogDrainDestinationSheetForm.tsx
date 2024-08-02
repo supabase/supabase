@@ -34,7 +34,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData } from 'data/log-drains/log-drains-query'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -45,9 +45,9 @@ const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
     url: z.string().url('Webhook URL is required and must be a valid URL'),
-    httpVersion: z.enum(['HTTP1', 'HTTP2']),
+    http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
-    headers: z.record(z.string(), z.string()),
+    headers: z.record(z.string(), z.string()).optional(),
   }),
   z.object({
     type: z.literal('datadog'),
@@ -59,6 +59,12 @@ const formUnion = z.discriminatedUnion('type', [
     url: z.string().url({ message: 'URL is required and must be a valid URL' }),
     username: z.string().min(1, { message: 'Username is required' }),
     password: z.string().min(1, { message: 'Password is required' }),
+  }),
+  z.object({
+    type: z.literal('postgres'),
+  }),
+  z.object({
+    type: z.literal('bigquery'),
   }),
 ])
 
@@ -78,6 +84,7 @@ function LogDrainFormItem({
   formControl,
   placeholder,
   type,
+  defaultValue,
 }: {
   value: string
   label: string
@@ -85,6 +92,7 @@ function LogDrainFormItem({
   placeholder?: string
   description?: string
   type?: string
+  defaultValue?: string
 }) {
   return (
     <FormField_Shadcn_
@@ -93,13 +101,20 @@ function LogDrainFormItem({
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
           <FormControl_Shadcn_>
-            <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
+            <Input_Shadcn_
+              defaultValue={defaultValue}
+              type={type || 'text'}
+              placeholder={placeholder}
+              {...field}
+            />
           </FormControl_Shadcn_>
         </FormItemLayout>
       )}
     />
   )
 }
+
+type DefaultValues = { type: LogDrainType } & Partial<LogDrainData>
 
 export function LogDrainDestinationSheetForm({
   open,
@@ -111,41 +126,32 @@ export function LogDrainDestinationSheetForm({
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
-  defaultValues?: Partial<LogDrainData> & { type: LogDrainType }
+  defaultValues?: DefaultValues
   isLoading?: boolean
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
   const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
+      name: defaultValues?.name || '',
+      description: defaultValues?.description || '',
       type: defaultType,
-      ...defaultValues,
+      http: defaultValues?.config?.http || 'http2',
+      gzip: defaultValues?.config?.gzip || true,
+      headers: defaultValues?.config?.headers || {},
+      url: defaultValues?.config?.url || '',
+      api_key: defaultValues?.config?.api_key || '',
+      region: defaultValues?.config?.region || '',
+      username: defaultValues?.config?.username || '',
+      password: defaultValues?.config?.password || '',
     },
   })
 
   const headers = form.watch('headers')
-
-  // IDK why but this useEffect is needed to set the default values
-  // Suppossedly if you call form.reset() defaultValues is not cached, but I have found it to be very unreliable, and  sometimes the form will open with the wrong default values.
-  // - Jordi
-  useEffect(() => {
-    if (form.formState.isDirty) return
-    form.setValue('type', defaultType)
-    form.setValue('name', defaultValues?.name || '')
-    form.setValue('url', defaultValues?.config?.url || '')
-    form.setValue('api_key', defaultValues?.config?.api_key || '')
-    form.setValue('region', defaultValues?.config?.region || '')
-    form.setValue('username', defaultValues?.config?.username || '')
-    form.setValue('password', defaultValues?.config?.password || '')
-    form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
-    form.setValue('gzip', defaultValues?.config?.gzip || true)
-    form.setValue('headers', defaultValues?.config?.headers || {})
-    form.setValue('description', defaultValues?.description || '')
-  }, [defaultType, form, defaultValues, mode])
-
   const type = form.watch('type')
 
   function removeHeader(key: string) {
@@ -178,14 +184,9 @@ export function LogDrainDestinationSheetForm({
 
   const hasHeaders = Object.keys(headers || {})?.length > 0
 
+  console.log('defaultValues ====>>', defaultValues)
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(v) => {
-        form.reset()
-        onOpenChange(v)
-      }}
-    >
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent tabIndex={undefined} showClose={false} size="lg" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
@@ -243,23 +244,19 @@ export function LogDrainDestinationSheetForm({
                     />
                     <FormField_Shadcn_
                       control={form.control}
-                      name="httpVersion"
+                      name="http"
                       render={({ field }) => (
                         <FormItem_Shadcn_>
                           <FormControl_Shadcn_>
-                            <RadioGroupStacked
-                              defaultValue="HTTP2"
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
+                            <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
                               <FormItem_Shadcn_ asChild>
                                 <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="HTTP1" label="HTTP/1" />
+                                  <RadioGroupStackedItem value="http1" label="HTTP/1" />
                                 </FormControl_Shadcn_>
                               </FormItem_Shadcn_>
                               <FormItem_Shadcn_ asChild>
                                 <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="HTTP2" label="HTTP/2" />
+                                  <RadioGroupStackedItem value="http2" label="HTTP/2" />
                                 </FormControl_Shadcn_>
                               </FormItem_Shadcn_>
                             </RadioGroupStacked>
@@ -269,7 +266,7 @@ export function LogDrainDestinationSheetForm({
                       )}
                     />
 
-                    <FormField_Shadcn_
+                    {/* <FormField_Shadcn_
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
@@ -281,13 +278,11 @@ export function LogDrainDestinationSheetForm({
                             <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
                             <InfoTooltip align="start">
                               Gzip compresses logs before sending it to the destination.
-                              <br /> This leads to lesser egress and faster performance but may
-                              <br /> increase the CPU usage of the destination
                             </InfoTooltip>
                           </div>
                         </FormItem_Shadcn_>
                       )}
-                    />
+                    /> */}
 
                     <div>
                       <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
@@ -298,8 +293,8 @@ export function LogDrainDestinationSheetForm({
                             key={headerKey}
                           >
                             <div className="w-full px-1">{headerKey}</div>
-                            <div className="w-full px-1 truncate" title={headers[headerKey]}>
-                              {headers[headerKey]}
+                            <div className="w-full px-1 truncate" title={headers?.[headerKey]}>
+                              {headers?.[headerKey]}
                             </div>
                             <Button
                               className="justify-self-end opacity-0 group-hover:opacity-100"
