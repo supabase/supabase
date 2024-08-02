@@ -10,7 +10,7 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { Button } from 'ui'
 import { useState } from 'react'
-import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import toast from 'react-hot-toast'
@@ -19,8 +19,13 @@ import { useParams } from 'common'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Alert } from '@ui/components/shadcn/ui/alert'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
+  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
@@ -50,7 +55,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
 
   const { mutate: updateLogDrain, isLoading: updateLoading } = useUpdateLogDrainMutation({
     onSuccess: () => {
-      toast.success('Log drain destination updated')
+      toast.success('Log drain updated')
       setOpen(false)
     },
     onError: () => {
@@ -95,7 +100,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </Button>
             {!(logDrains?.length === 0) && (
               <Button
-                disabled={!logDrainsEnabled}
+                disabled={!logDrainsEnabled || !canManageLogDrains}
                 onClick={() => {
                   setSelectedLogDrain(null)
                   setMode('create')
@@ -119,7 +124,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
             setOpen(v)
           }}
-          defaultValues={selectedLogDrain as any}
+          defaultValues={{
+            type: selectedLogDrain?.type || 'webhook',
+            ...selectedLogDrain,
+          }}
           isLoading={isLoading}
           onSubmit={({ name, type, ...values }) => {
             const logDrainValues = {
@@ -137,13 +145,16 @@ const LogDrainsSettings: NextPageWithLayout = () => {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
               } else {
-                console.log('logDrainValues', logDrainValues)
                 updateLogDrain(logDrainValues)
               }
             }
           }}
         />
-        <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
+        {canManageLogDrains ? (
+          <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
+        ) : (
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
+        )}
       </ScaffoldContainer>
     </>
   )
