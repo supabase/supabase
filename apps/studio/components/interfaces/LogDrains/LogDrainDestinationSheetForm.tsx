@@ -212,35 +212,24 @@ export function LogDrainDestinationSheetForm({
                   label="Description"
                   formControl={form.control}
                 />
-                <div>
-                  {mode === 'update' && (
-                    <div className="flex items-center gap-2 text-sm text-foreground-light">
-                      <InfoTooltip align="start">
-                        You cannot change the type of an existing log drain. Please, create a new
-                        log drain with the new type.
-                      </InfoTooltip>
-                      Log drain type can't be updated after creation
-                    </div>
-                  )}
-                </div>
-                <RadioGroupStacked
-                  className={cn(mode === 'update' && 'opacity-50')}
-                  defaultValue={defaultType}
-                  value={form.getValues('type')}
-                  onValueChange={(v: LogDrainType) => form.setValue('type', v)}
-                  disabled={mode === 'update'}
-                >
-                  {LOG_DRAIN_TYPES.map((type) => (
-                    <RadioGroupStackedItem
-                      value={type.value}
-                      key={type.value}
-                      id={type.value}
-                      label={type.name}
-                      description={type.description}
-                      className="text-left"
-                    />
-                  ))}
-                </RadioGroupStacked>
+                {mode === 'create' && (
+                  <RadioGroupStacked
+                    defaultValue={defaultType}
+                    value={form.getValues('type')}
+                    onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                  >
+                    {LOG_DRAIN_TYPES.map((type) => (
+                      <RadioGroupStackedItem
+                        value={type.value}
+                        key={type.value}
+                        id={type.value}
+                        label={type.name}
+                        description={type.description}
+                        className="text-left"
+                      />
+                    ))}
+                  </RadioGroupStacked>
+                )}
               </div>
 
               <div className="space-y-4 mt-6">
