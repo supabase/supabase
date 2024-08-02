@@ -13,7 +13,7 @@ type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'authenticated'
-      user: User,
+      user: User
       aal?: 'aal1' | 'aal2'
     }
 
