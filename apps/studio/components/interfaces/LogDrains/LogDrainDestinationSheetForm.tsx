@@ -34,7 +34,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -188,6 +188,12 @@ export function LogDrainDestinationSheetForm({
   }
 
   const hasHeaders = Object.keys(headers || {})?.length > 0
+
+  useEffect(() => {
+    if (mode === 'create' && !open) {
+      form.reset()
+    }
+  }, [mode, open, form])
 
   return (
     <Sheet
