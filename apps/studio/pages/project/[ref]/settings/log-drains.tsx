@@ -19,8 +19,13 @@ import { useParams } from 'common'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Alert } from '@ui/components/shadcn/ui/alert'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
+  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
@@ -95,7 +100,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </Button>
             {!(logDrains?.length === 0) && (
               <Button
-                disabled={!logDrainsEnabled}
+                disabled={!logDrainsEnabled || !canManageLogDrains}
                 onClick={() => {
                   setSelectedLogDrain(null)
                   setMode('create')
@@ -145,7 +150,11 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
           }}
         />
-        <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
+        {canManageLogDrains ? (
+          <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
+        ) : (
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
+        )}
       </ScaffoldContainer>
     </>
   )
