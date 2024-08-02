@@ -13,7 +13,7 @@ import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_  } from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -73,7 +73,7 @@ const Home: NextPageWithLayout = () => {
             </div>
             <div className="flex justify-center mx-6">
               <Tabs_Shadcn_ defaultValue="app">
-                <TabsList_Shadcn_ className="grid w-1/2 grid-cols-2 mx-auto">
+                <TabsList_Shadcn_ className="flex gap-4">
                   <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
                 </TabsList_Shadcn_>
