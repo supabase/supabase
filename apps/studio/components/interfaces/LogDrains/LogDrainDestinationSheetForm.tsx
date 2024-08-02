@@ -186,7 +186,13 @@ export function LogDrainDestinationSheetForm({
 
   console.log('defaultValues ====>>', defaultValues)
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet
+      open={open}
+      onOpenChange={(v) => {
+        setNewCustomHeader({ name: '', value: '' })
+        onOpenChange(v)
+      }}
+    >
       <SheetContent tabIndex={undefined} showClose={false} size="lg" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
