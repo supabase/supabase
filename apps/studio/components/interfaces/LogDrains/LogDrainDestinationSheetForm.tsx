@@ -265,12 +265,12 @@ export function LogDrainDestinationSheetForm({
                             >
                               <FormItem_Shadcn_ asChild>
                                 <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="HTTP1" label="HTTP1" />
+                                  <RadioGroupStackedItem value="HTTP1" label="HTTP/1" />
                                 </FormControl_Shadcn_>
                               </FormItem_Shadcn_>
                               <FormItem_Shadcn_ asChild>
                                 <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="HTTP2" label="HTTP2" />
+                                  <RadioGroupStackedItem value="HTTP2" label="HTTP/2" />
                                 </FormControl_Shadcn_>
                               </FormItem_Shadcn_>
                             </RadioGroupStacked>
@@ -291,9 +291,9 @@ export function LogDrainDestinationSheetForm({
                             </FormControl_Shadcn_>
                             <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
                             <InfoTooltip align="start">
-                              Gzip can reduce the size of the payload and increase the speed of the
-                              request,
-                              <br /> but it will increase the CPU usage of the destination.
+                              Gzip compresses logs before sending it to the destination.
+                              <br /> This leads to lesser egress and faster performance but may
+                              <br /> increase the CPU usage of the destination
                             </InfoTooltip>
                           </div>
                         </FormItem_Shadcn_>
