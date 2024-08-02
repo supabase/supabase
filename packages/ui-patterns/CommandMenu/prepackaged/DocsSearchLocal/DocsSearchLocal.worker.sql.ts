@@ -53,19 +53,13 @@ insert into page_section (
     $5,
     $6
 )
-`
+`.trim()
 
 export const SEARCH_EMBEDDINGS = `
 with match as(
     select *
     from page_section
-    -- The dot product is negative because of a Postgres limitation, so we negate it
     where (page_section.hf_embedding <#> $1) * -1 > $2	
-    -- Embeddings are normalized to length 1, so
-    -- cosine similarity and dot product will produce the same results.
-    -- Using dot product which can be computed slightly faster.
-    --
-    -- For the different syntaxes, see https://github.com/pgvector/pgvector
     order by page_section.hf_embedding <#> $1
     limit 10
   )
@@ -76,8 +70,8 @@ with match as(
     page.meta ->> 'title' as title,
     page.meta ->> 'subtitle' as subtitle,
     page.meta ->> 'description' as description,
-    array_agg(match.heading) as headings,
-    array_agg(match.slug) as slugs
+    array_agg(match.heading) filter (where match.heading is not null) as headings,
+    array_agg(match.slug) filter (where match.slug is not null) as slugs
   from page
   join match on match.page_id = page.id
   group by page.id;
