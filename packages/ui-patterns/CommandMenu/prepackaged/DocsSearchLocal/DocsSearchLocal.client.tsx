@@ -151,6 +151,7 @@ type SearchState =
   | { status: 'initial' }
   | { status: 'loading' }
   | { status: 'error' }
+  | { status: 'stale'; results: Array<SearchResult> }
   | { status: 'empty' }
   | { status: 'results'; results: Array<SearchResult> }
 type SearchState_Results = Extract<SearchState, { status: 'results' }>
@@ -204,6 +205,16 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
       return state
     case stateActionPair('error', 'RESET'):
       return { status: 'initial' }
+    case stateActionPair('stale', 'TRIGGERED'):
+      // noop
+      return state
+    case stateActionPair('stale', 'ERRORED'):
+      return { status: 'error' }
+    case stateActionPair('stale', 'COMPLETED'):
+      const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
+      return results.length === 0 ? { status: 'empty' } : { status: 'results', results }
+    case stateActionPair('stale', 'RESET'):
+      return { status: 'initial' }
     case stateActionPair('empty', 'TRIGGERED'):
       // noop since current results should stay visible until reset
       return state
@@ -216,8 +227,7 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
     case stateActionPair('empty', 'RESET'):
       return { status: 'initial' }
     case stateActionPair('results', 'TRIGGERED'):
-      // noop since current results should stay visible until reset
-      return state
+      return { status: 'stale', results: (state as SearchState_Results).results }
     case stateActionPair('results', 'ERRORED'):
       return { status: 'error' }
     case stateActionPair('results', 'COMPLETED'): {
@@ -342,7 +352,6 @@ export function useLocalSearch(supabase: SupabaseClient) {
         dispatch({ type: 'ERRORED' })
       } else if (event.data.type == WORKER_MESSAGE.SEARCH_RESULTS) {
         const searchResults = JSON.parse(event.data.payload.matches)
-        console.log('RECEIVED RESULTS FROM WORKER:', searchResults)
         dispatch({ type: 'COMPLETED', results: searchResults })
       }
     }

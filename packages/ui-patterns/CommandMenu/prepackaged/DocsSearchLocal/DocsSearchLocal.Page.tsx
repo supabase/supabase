@@ -67,6 +67,8 @@ const DocsSearchPage = () => {
   const supabaseClient = useSupabaseClient()
   const { searchState, handleSearch, debouncedSearch, reset } = useDocsSearchLocal(supabaseClient)
 
+  console.log('SEARCH STATE:', searchState)
+
   const setIsOpen = useSetCommandMenuOpen()
   const setQuery = useSetQuery()
   const query = useQuery()
@@ -136,7 +138,8 @@ const DocsSearchPage = () => {
         query &&
         // If there are results, cmdk menu will trigger navigation to the highlighted
         // result on Enter, even though the active element is the input
-        searchState.status !== 'results'
+        searchState.status !== 'results' &&
+        searchState.status !== 'stale'
       ) {
         event.preventDefault()
         debouncedSearch.cancel()
@@ -155,7 +158,7 @@ const DocsSearchPage = () => {
         <CommandInput placeholder="Search..." ref={inputRef} />
       </CommandHeader>
       <CommandList_Shadcn_ className="max-h-[initial]">
-        {searchState.status === 'results' &&
+        {(searchState.status === 'results' || searchState.status === 'stale') &&
           searchState.results.map((page, i) => {
             return (
               <CommandGroup_Shadcn_
