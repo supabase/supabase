@@ -133,22 +133,17 @@ export function LogDrainDestinationSheetForm({
   // - Jordi
   useEffect(() => {
     if (form.formState.isDirty) return
-
-    if (mode === 'update') {
-      form.setValue('type', defaultType)
-      form.setValue('name', defaultValues?.name || '')
-      form.setValue('url', defaultValues?.config?.url || '')
-      form.setValue('api_key', defaultValues?.config?.api_key || '')
-      form.setValue('region', defaultValues?.config?.region || '')
-      form.setValue('username', defaultValues?.config?.username || '')
-      form.setValue('password', defaultValues?.config?.password || '')
-      form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
-      form.setValue('gzip', defaultValues?.config?.gzip || true)
-      form.setValue('headers', defaultValues?.config?.headers || {})
-      form.setValue('description', defaultValues?.description || '')
-    } else {
-      form.reset()
-    }
+    form.setValue('type', defaultType)
+    form.setValue('name', defaultValues?.name || '')
+    form.setValue('url', defaultValues?.config?.url || '')
+    form.setValue('api_key', defaultValues?.config?.api_key || '')
+    form.setValue('region', defaultValues?.config?.region || '')
+    form.setValue('username', defaultValues?.config?.username || '')
+    form.setValue('password', defaultValues?.config?.password || '')
+    form.setValue('httpVersion', defaultValues?.config?.httpVersion || 'HTTP2')
+    form.setValue('gzip', defaultValues?.config?.gzip || true)
+    form.setValue('headers', defaultValues?.config?.headers || {})
+    form.setValue('description', defaultValues?.description || '')
   }, [defaultType, form, defaultValues, mode])
 
   const type = form.watch('type')
@@ -230,7 +225,8 @@ export function LogDrainDestinationSheetForm({
                 </div>
                 <RadioGroupStacked
                   className={cn(mode === 'update' && 'opacity-50')}
-                  value={type}
+                  defaultValue={defaultType}
+                  value={form.getValues('type')}
                   onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                   disabled={mode === 'update'}
                 >
