@@ -101,10 +101,10 @@ const searchResultSchema = z.object({
   path: z.string(),
   type: z.enum(['markdown', 'github-discussions', 'partner-integration', 'reference']),
   title: z.string(),
-  subtitle: z.string().optional(),
-  description: z.string().optional(),
-  headings: z.array(z.string()).optional(),
-  slugs: z.array(z.string()).optional(),
+  subtitle: z.union([z.string(), z.null()]),
+  description: z.union([z.string(), z.null()]),
+  headings: z.array(z.string()),
+  slugs: z.array(z.string()),
 })
 export interface SearchResultSubsection {
   title: string
@@ -118,14 +118,16 @@ export type SearchResultType = SearchResult['type']
 function parseMaybeSearchResults(maybeResults: unknown): Array<SearchResult> {
   if (!Array.isArray(maybeResults)) return []
 
-  return maybeResults
+  const parsedResults = maybeResults
     .map((maybeResult) => searchResultSchema.safeParse(maybeResult))
     .filter((parseResult) => parseResult.success === true)
     .map((validResult) => {
       const data = validResult.data
       if (!data.headings || !data.slugs || data.headings.length !== data.slugs.length) {
-        if (data.headings) delete data.headings
-        if (data.slugs) delete data.slugs
+        const formattedData = data as unknown as SearchResult
+        if (formattedData.headings) delete formattedData.headings
+        // @ts-ignore
+        if (formattedData.slugs) delete formattedData.slugs
         return data as unknown as SearchResult
       }
 
@@ -133,13 +135,16 @@ function parseMaybeSearchResults(maybeResults: unknown): Array<SearchResult> {
         title: heading,
         slug: data.slugs![index],
       }))
-      delete data.slugs
 
       const formattedData = data as unknown as SearchResult
+      // @ts-ignore
+      delete formattedData.slugs
       formattedData.headings = formattedHeadings
 
       return formattedData
     })
+
+  return parsedResults
 }
 
 type SearchState =
@@ -337,6 +342,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
         dispatch({ type: 'ERRORED' })
       } else if (event.data.type == WORKER_MESSAGE.SEARCH_RESULTS) {
         const searchResults = JSON.parse(event.data.payload.matches)
+        console.log('RECEIVED RESULTS FROM WORKER:', searchResults)
         dispatch({ type: 'COMPLETED', results: searchResults })
       }
     }

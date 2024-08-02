@@ -15,6 +15,7 @@ import {
   CREATE_PAGE_TABLE,
   CREATE_PAGE_SECTION_TABLE,
   SEARCH_EMBEDDINGS,
+  SEARCH_FTS,
 } from './DocsSearchLocal.worker.sql'
 
 const VECTOR_MATCH_THRESHOLD = 0.8
@@ -77,8 +78,8 @@ async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: str
   // local search is guaranteed to be quick.
   const eagerPipelineInitiation = getExtractor()
   await Promise.all([
-    copyPages(supabase, db),
-    copyPageSections(supabase, db),
+    copyPages(port, supabase, db),
+    copyPageSections(port, supabase, db),
     eagerPipelineInitiation,
   ])
 
@@ -109,11 +110,16 @@ async function handleSearch(port: MessagePort, query: string) {
     new Promise(async (resolve, rejectThis) => {
       reject = rejectThis
 
-      const results = await db.query(SEARCH_EMBEDDINGS, [
-        `[${featureArray.join(',')}]`,
-        VECTOR_MATCH_THRESHOLD,
-      ])
-      resolve(results)
+      try {
+        const results = await db.query(SEARCH_EMBEDDINGS, [
+          `[${featureArray.join(',')}]`,
+          VECTOR_MATCH_THRESHOLD,
+          query,
+        ])
+        resolve(results)
+      } catch (error) {
+        rejectThis(error)
+      }
     })
       .then((data) => {
         port.postMessage({
@@ -123,8 +129,12 @@ async function handleSearch(port: MessagePort, query: string) {
           },
         })
       })
-      .catch(() => {
-        /* Silently ignore */
+      .catch((error) => {
+        if (error === REJECT_REASON.NEW_SEARCH) {
+          /* Silently ignore */
+        } else {
+          postError(port, convertError(error))
+        }
       })
   } catch (error) {
     postError(port, convertError(error))

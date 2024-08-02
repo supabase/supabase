@@ -4,9 +4,14 @@ export const CREATE_PAGE_TABLE = `
 create table if not exists page (
     id bigint primary key,
     path text,
-    meta jsonb,
-    type text,
-    source text
+	meta jsonb,
+	type text,
+	source text,
+    content text,
+	tsv tsvector generated always as (
+		to_tsvector('simple', coalesce(content, '')) ||
+			to_tsvector('simple', coalesce(meta ->> 'title', ''))
+	) stored
 )
 `.trim()
 
@@ -27,13 +32,15 @@ insert into page (
     path,
     meta,
     type,
-    source
+    source,
+	content
 ) values (
     $1,
     $2,
     $3,
     $4,
-    $5
+    $5,
+	$6
 )
 `.trim()
 
@@ -56,23 +63,56 @@ insert into page_section (
 `.trim()
 
 export const SEARCH_EMBEDDINGS = `
-with match as(
-    select *
-    from page_section
-    where (page_section.hf_embedding <#> $1) * -1 > $2	
-    order by page_section.hf_embedding <#> $1
-    limit 10
-  )
-  select
-    page.id,
-    page.path,
-    page.type,
-    page.meta ->> 'title' as title,
-    page.meta ->> 'subtitle' as subtitle,
-    page.meta ->> 'description' as description,
-    array_agg(match.heading) filter (where match.heading is not null) as headings,
-    array_agg(match.slug) filter (where match.slug is not null) as slugs
-  from page
-  join match on match.page_id = page.id
-  group by page.id;
+with semantic_match as (
+	select *
+	from page_section
+	where (page_section.hf_embedding <#> $1) * -1 > $2	
+	order by page_section.hf_embedding <#> $1
+	limit 10
+)
+select
+	page.id,
+	page.path,
+	page.type,
+	page.meta ->> 'title' as title,
+	page.meta ->> 'subtitle' as subtitle,
+	page.meta ->> 'description' as description,
+	array_agg(semantic_match.heading) filter (where semantic_match.heading is not null) as headings,
+	array_agg(semantic_match.slug) filter (where semantic_match.slug is not null) as slugs
+from page
+join semantic_match on semantic_match.page_id = page.id
+group by page.id
+union (
+	select
+		page.id,
+		page.path,
+		page.type,
+		page.meta ->> 'title' as title,
+		page.meta ->> 'subtitle' as subtitle,
+		page.meta ->> 'description' as description,
+		array_agg(page_section.heading) filter (where page_section.heading is not null) as headings,
+		array_agg(page_section.slug) filter (where page_section.slug is not null) as slugs
+	from page
+	join page_section on page_section.page_id = page.id
+	where page.tsv @@ websearch_to_tsquery('simple', $3)
+	group by page.id
+	limit 10
+);
+`.trim()
+
+export const SEARCH_FTS = `
+select
+	page.id,
+	page.path,
+	page.type,
+	page.meta ->> 'title' as title,
+	page.meta ->> 'subtitle' as subtitle,
+	page.meta ->> 'description' as description,
+	array_agg(page_section.heading) filter (where page_section.heading is not null) as headings,
+	array_agg(page_section.slug) filter (where page_section.slug is not null) as slugs
+from page
+join page_section on page_section.page_id = page.id
+where page.tsv @@ websearch_to_tsquery('simple', $1)
+group by page.id
+limit 10;
 `.trim()

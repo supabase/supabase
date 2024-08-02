@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/auth-helpers-react'
 
 import type { Database } from 'common'
 
-import { convertError, postError } from './DocsSearchLocal.shared.messages'
+import { checkpoint, convertError, postError } from './DocsSearchLocal.shared.messages'
 import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './DocsSearchLocal.worker.sql'
 
 /**
@@ -49,34 +49,34 @@ export async function pageThroughRows<Table extends keyof Database['public']['Ta
   return [null, allData as unknown as Array<Database['public']['Tables'][Table]['Row']>] as const
 }
 
-export async function copyPages(supabase: SupabaseClient, db: PGlite) {
+export async function copyPages(port: MessagePort, supabase: SupabaseClient, db: PGlite) {
   const [pagesError, pages] = await pageThroughRows<'page'>(
     supabase,
     'page',
-    'id, path, meta, type, source',
+    'id, path, meta, type, source, content',
     'id'
   )
   if (pagesError) {
-    return postError(pagesError)
+    return postError(port, pagesError)
   }
   if (!pages) {
-    return postError({ message: `Couldn't fetch any pages from remote database.` })
+    return postError(port, { message: `Couldn't fetch any pages from remote database.` })
   }
 
   await Promise.all(
     pages.map(async (page) => {
-      const parameters = [page.id, page.path, page.meta, page.type, page.source]
+      const parameters = [page.id, page.path, page.meta, page.type, page.source, page.content]
 
       try {
         await db.query(INSERT_PAGES, parameters)
       } catch (error) {
-        postError(convertError(error), { parameters })
+        postError(port, convertError(error), { parameters })
       }
     })
   )
 }
 
-export async function copyPageSections(supabase: SupabaseClient, db: PGlite) {
+export async function copyPageSections(port: MessagePort, supabase: SupabaseClient, db: PGlite) {
   const [pageSectionsError, pageSections] = await pageThroughRows<'page_section'>(
     supabase,
     'page_section',
@@ -84,10 +84,10 @@ export async function copyPageSections(supabase: SupabaseClient, db: PGlite) {
     'id'
   )
   if (pageSectionsError) {
-    return postError(pageSectionsError)
+    return postError(port, pageSectionsError)
   }
   if (!pageSections) {
-    return postError({ message: `Couldn't fetch any page sections from remote database.` })
+    return postError(port, { message: `Couldn't fetch any page sections from remote database.` })
   }
 
   await Promise.all(
@@ -104,7 +104,7 @@ export async function copyPageSections(supabase: SupabaseClient, db: PGlite) {
       try {
         await db.query(INSERT_PAGE_SECTIONS, parameters)
       } catch (error) {
-        postError(convertError(error), { parameters })
+        postError(port, convertError(error), { parameters })
       }
     })
   )
