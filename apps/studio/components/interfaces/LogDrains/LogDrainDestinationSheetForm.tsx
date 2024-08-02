@@ -184,7 +184,6 @@ export function LogDrainDestinationSheetForm({
 
   const hasHeaders = Object.keys(headers || {})?.length > 0
 
-  console.log('defaultValues ====>>', defaultValues)
   return (
     <Sheet
       open={open}
