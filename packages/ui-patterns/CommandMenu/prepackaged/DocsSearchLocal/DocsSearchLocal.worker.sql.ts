@@ -63,51 +63,59 @@ insert into page_section (
 `.trim()
 
 export const SEARCH_EMBEDDINGS = `
-with semantic_match as (
+select * from (
 	select
 		*,
-		(page_section.hf_embedding <#> $1) * -1 as match_score
-	from page_section
-	where (page_section.hf_embedding <#> $1) * -1 > $2	
-	order by page_section.hf_embedding <#> $1
-	limit 10
+		row_number(*) over (partition by id order by match_score desc) as disambiguator
+	from (
+		with semantic_match as (
+			select
+				*,
+				(page_section.hf_embedding <#> $1) * -1 as match_score
+			from page_section
+			where (page_section.hf_embedding <#> $1) * -1 > $2	
+			order by page_section.hf_embedding <#> $1
+			limit 10
+		)
+		select
+			page.id,
+			page.path,
+			page.type,
+			page.meta ->> 'title' as title,
+			page.meta ->> 'subtitle' as subtitle,
+			page.meta ->> 'description' as description,
+			array_agg(semantic_match.heading) filter (where semantic_match.heading is not null) as headings,
+			array_agg(semantic_match.slug) filter (where semantic_match.slug is not null) as slugs,
+			'semantic' as match_type,
+			max(semantic_match.match_score) as match_score
+		from page
+		join semantic_match on semantic_match.page_id = page.id
+		group by page.id
+		union all (
+			select
+				page.id,
+				page.path,
+				page.type,
+				page.meta ->> 'title' as title,
+				page.meta ->> 'subtitle' as subtitle,
+				page.meta ->> 'description' as description,
+				'{}' as headings,
+				'{}' as slugs,
+				'fts' as match_type,
+				-- Weighting factor determined by trial and error
+				least(1, ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1) * 100) as match_score
+			from page
+			join page_section on page_section.page_id = page.id
+			where page.tsv @@ websearch_to_tsquery('simple', $3)
+			group by page.id
+			order by ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1)
+			limit 10
+		)
+	)
 )
-select
-	page.id,
-	page.path,
-	page.type,
-	page.meta ->> 'title' as title,
-	page.meta ->> 'subtitle' as subtitle,
-	page.meta ->> 'description' as description,
-	array_agg(semantic_match.heading) filter (where semantic_match.heading is not null) as headings,
-	array_agg(semantic_match.slug) filter (where semantic_match.slug is not null) as slugs,
-	'semantic' as match_type,
-	max(semantic_match.match_score) as match_score
-from page
-join semantic_match on semantic_match.page_id = page.id
-group by page.id
-union (
-	select
-		page.id,
-		page.path,
-		page.type,
-		page.meta ->> 'title' as title,
-		page.meta ->> 'subtitle' as subtitle,
-		page.meta ->> 'description' as description,
-		'{}' as headings,
-		'{}' as slugs,
-		'fts' as match_type,
-		-- Weighting factor determined by trial and error
-		least(1, ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1) * 100) as match_score
-	from page
-	join page_section on page_section.page_id = page.id
-	where page.tsv @@ websearch_to_tsquery('simple', $3)
-	group by page.id
-	order by ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1)
-	limit 10
-)
+where disambiguator = 1
 order by match_score desc
-limit 10;
+limit 10
 ;
 `.trim()
 
