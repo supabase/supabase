@@ -43,6 +43,49 @@ Logs sent to Datadog have the name of the log source set on the `service` field 
 
 The payload message are a stringified JSON of the raw log event, prefixed with the event timestamp.
 
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+>
+    <AccordionItem
+      header="Walkthrough"
+      id="walkthrough"
+    >
+
+    1. Generate API Key in Datadog dashboard
+    2. Create log drain in Supabase dashboard
+    3. Watch for events in the Datadog Logs page
+
+    </AccordionItem>
+
+    <AccordionItem
+      header="Example destination configuration"
+      id="cfg"
+    >
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for extracting the timestamp to a `date` field
+    ```
+    %{date("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"):date}
+    ```
+
+    [Grok parser](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/grok_parser?tab=matchers) matcher for converting stringified JSON to structured JSON on the `json` field.
+    ```
+     %{data::json}
+     ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log level.
+    ```
+    metadata.parsed.error_severity, metadata.level
+    ```
+
+    [Remapper](https://docs.datadoghq.com/service_management/events/pipelines_and_processors/remapper) for setting the log event message.
+    ```
+    event_message
+    ```
+    </AccordionItem>
+
+</Accordion>
+
 #### Loki
 
 Logs are sent to a provided HTTP endpoint, see [documentation](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs) for `POST /loki/api/v1/push`.
