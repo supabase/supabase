@@ -507,13 +507,26 @@ export const pricing: Pricing = {
       },
       {
         title: 'Log drain',
+        tooltips: {
+          main: 'Only events processed and sent to destinations are counted. Bandwidth required to export logs count towards usage.',
+          team: 'Volume discounts available.',
+          enterprise: 'Volume discounts available.',
+        },
         plans: {
           free: false,
           pro: false,
-          team: 'Coming soon',
-          enterprise: 'Coming soon',
+          team: [
+            '$60 per drain per month per project add on',
+            'and $0.20 per Million processed',
+            'and $0.09 per GB bandwidth',
+          ],
+          enterprise: [
+            '$60 per drain per month per project add on',
+            'and $0.20 per Million processed',
+            'and $0.09 per GB',
+          ],
         },
-        usage_based: false,
+        usage_based: true,
       },
       {
         title: 'Metrics endpoint',
