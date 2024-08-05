@@ -214,7 +214,7 @@ export function LogDrainDestinationSheetForm({
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection>
+        <SheetSection className="!px-0">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
@@ -232,7 +232,7 @@ export function LogDrainDestinationSheetForm({
                 form.handleSubmit(onSubmit)(e)
               }}
             >
-              <div className="space-y-4">
+              <div className="space-y-4 px-content">
                 <LogDrainFormItem
                   value="name"
                   placeholder="My Destination"
@@ -265,39 +265,41 @@ export function LogDrainDestinationSheetForm({
                 )}
               </div>
 
-              <div className="space-y-6 mt-6">
+              <div className="space-y-6 mt-4">
                 {type === 'webhook' && (
                   <>
-                    <LogDrainFormItem
-                      value="url"
-                      label="Webhook URL"
-                      formControl={form.control}
-                      placeholder="https://example.com/webhooks/log-drain"
-                    />
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="http"
-                      render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2">
-                          <FormLabel_Shadcn_>HTTP Version</FormLabel_Shadcn_>
-                          <FormControl_Shadcn_>
-                            <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
-                              <FormItem_Shadcn_ asChild>
-                                <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="http1" label="HTTP/1" />
-                                </FormControl_Shadcn_>
-                              </FormItem_Shadcn_>
-                              <FormItem_Shadcn_ asChild>
-                                <FormControl_Shadcn_>
-                                  <RadioGroupStackedItem value="http2" label="HTTP/2" />
-                                </FormControl_Shadcn_>
-                              </FormItem_Shadcn_>
-                            </RadioGroupStacked>
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
-                        </FormItem_Shadcn_>
-                      )}
-                    />
+                    <div className="px-content">
+                      <LogDrainFormItem
+                        value="url"
+                        label="Webhook URL"
+                        formControl={form.control}
+                        placeholder="https://example.com/webhooks/log-drain"
+                      />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="http"
+                        render={({ field }) => (
+                          <FormItem_Shadcn_ className="space-y-2">
+                            <FormLabel_Shadcn_>HTTP Version</FormLabel_Shadcn_>
+                            <FormControl_Shadcn_>
+                              <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
+                                <FormItem_Shadcn_ asChild>
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStackedItem value="http1" label="HTTP/1" />
+                                  </FormControl_Shadcn_>
+                                </FormItem_Shadcn_>
+                                <FormItem_Shadcn_ asChild>
+                                  <FormControl_Shadcn_>
+                                    <RadioGroupStackedItem value="http2" label="HTTP/2" />
+                                  </FormControl_Shadcn_>
+                                </FormItem_Shadcn_>
+                              </RadioGroupStacked>
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    </div>
 
                     {/* <FormField_Shadcn_
                       control={form.control}
@@ -318,21 +320,21 @@ export function LogDrainDestinationSheetForm({
                     /> */}
 
                     <div className="space-y-2">
-                      <div>
+                      <div className="px-content">
                         <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                         <p className="text-xs text-foreground-lighter">
                           Set custom headers when draining logs to the webhook URL
                         </p>
                       </div>
-                      <div>
+                      <div className="divide-y border-y">
                         {hasHeaders &&
                           Object.keys(headers || {})?.map((headerKey) => (
                             <div
-                              className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
+                              className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
                               key={headerKey}
                             >
-                              <div className="w-full px-1">{headerKey}</div>
-                              <div className="w-full px-1 truncate" title={headers?.[headerKey]}>
+                              <div className="w-full">{headerKey}</div>
+                              <div className="w-full truncate" title={headers?.[headerKey]}>
                                 {headers?.[headerKey]}
                               </div>
                               <Button
@@ -349,7 +351,7 @@ export function LogDrainDestinationSheetForm({
                   </>
                 )}
                 {type === 'datadog' && (
-                  <div className="grid gap-4">
+                  <div className="grid gap-4 px-content">
                     <LogDrainFormItem
                       type="password"
                       value="api_key"
@@ -385,7 +387,7 @@ export function LogDrainDestinationSheetForm({
                   </div>
                 )}
                 {type === 'elastic' && (
-                  <div className="grid gap-4">
+                  <div className="grid gap-4 px-content">
                     <LogDrainFormItem value="url" label="Filebeat URL" formControl={form.control} />
                     <LogDrainFormItem
                       value="username"
@@ -412,17 +414,23 @@ export function LogDrainDestinationSheetForm({
                 e.stopPropagation()
                 addHeader()
               }}
-              className="flex gap-2 mt-2 items-center"
+              className="flex gap-2 mt-4 items-center px-content"
             >
+              <label className="sr-only" htmlFor="header-name">
+                Header name
+              </label>
               <Input_Shadcn_
-                size={'tiny'}
+                id="header-name"
                 type="text"
                 placeholder="x-header-name"
                 value={newCustomHeader.name}
                 onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
               />
+              <label className="sr-only" htmlFor="header-value">
+                Header value
+              </label>
               <Input_Shadcn_
-                size={'tiny'}
+                id="header-value"
                 type="text"
                 placeholder="Header value"
                 value={newCustomHeader.value}
@@ -436,7 +444,7 @@ export function LogDrainDestinationSheetForm({
           )}
         </SheetSection>
 
-        <SheetFooter className="p-4">
+        <SheetFooter className="p-content">
           <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
             Save destination
           </Button>
