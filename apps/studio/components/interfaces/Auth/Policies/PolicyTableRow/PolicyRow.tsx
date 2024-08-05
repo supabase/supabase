@@ -2,6 +2,11 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Panel from 'components/ui/Panel'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -14,11 +19,6 @@ import {
   IconMoreVertical,
   IconTrash,
 } from 'ui'
-
-import Panel from 'components/ui/Panel'
-import { useCheckPermissions } from 'hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 interface PolicyRowProps {
   policy: PostgresPolicy

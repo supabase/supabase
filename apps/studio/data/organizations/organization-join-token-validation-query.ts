@@ -11,6 +11,8 @@ export type OrganizationJoinTokenValidationVariables = {
 
 export type TokenInfo = components['schemas']['InviteResponse'] | undefined
 
+// [Joshen TODO] Should be deprecated now - double check before deleting
+
 export async function validateTokenInformation(
   { slug, token }: OrganizationJoinTokenValidationVariables,
   signal?: AbortSignal

@@ -53,7 +53,8 @@ const FeedbackWidget = ({
       localStorage.removeItem(FEEDBACK_STORAGE_KEY)
       localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
       toast.success(
-        'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.'
+        'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.',
+        { duration: 8000 }
       )
       setSending(false)
     },

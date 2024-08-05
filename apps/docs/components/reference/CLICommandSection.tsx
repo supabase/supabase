@@ -1,10 +1,10 @@
 import ReactMarkdown from 'react-markdown'
 import { CodeBlock, IconChevronRight } from 'ui'
-import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import Options from '~/components/Options'
 import Param from '~/components/Params'
-import { Tabs, TabPanel } from '~/components/Tabs'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import RefDetailCollapse from './RefDetailCollapse'
 
 export type Flag = {
@@ -80,7 +80,7 @@ const CliCommandSection = (props) => {
                   <ReactMarkdown>{command.description}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-foreground-light text-base">
+                <p className="capitalize mb-4 scroll-mt-24 mt-0 text-foreground-light text-base">
                   {command.summary}
                 </p>
               )}

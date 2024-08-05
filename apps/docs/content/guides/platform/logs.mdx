@@ -285,7 +285,7 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
-### Log source reference
+### Logs field reference
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 
@@ -293,11 +293,13 @@ Refer to the full field reference for each available source below. Do note that 
   {(logConstants) => (
     <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
       {logConstants.schemas.map((schema) => (
-        <TabPanel id={schema.reference} label={schema.name}>
+        <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
           <table>
             <thead>
-              <td className="font-bold">Path</td>
-              <td className="font-bold">Type</td>
+              <tr>
+                <th className="font-bold">Path</th>
+                <th className="font-bold">Type</th>
+              </tr>
             </thead>
             <tbody>
               {schema.fields

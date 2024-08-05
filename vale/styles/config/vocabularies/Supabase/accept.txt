@@ -36,6 +36,7 @@ Markprompt
 [Mm]iddleware
 [Nn]amespace(d|s)?
 Next.js
+npm
 Nuxt
 OAuth
 OpenAI
@@ -68,6 +69,7 @@ Roboflow
 [Ss]ignups?
 SQLAlchemy
 [Ss]upabase
+Snaplet
 Supavisor
 [Ss]upersets?
 Terraform

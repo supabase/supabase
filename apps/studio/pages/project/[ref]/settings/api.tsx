@@ -1,5 +1,5 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 

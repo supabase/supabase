@@ -21,7 +21,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
-import PostgrestConfig from './PostgrestConfig'
+import { PostgrestConfig } from './PostgrestConfig'
 
 const ServiceList = () => {
   const client = useQueryClient()

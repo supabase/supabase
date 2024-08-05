@@ -1,9 +1,9 @@
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -39,7 +39,7 @@ const WithSidebar = ({
         <div
           id="with-sidebar"
           className={[
-            'h-full bg-studio',
+            'h-full bg-dash-sidebar',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >

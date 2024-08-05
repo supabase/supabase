@@ -3,11 +3,11 @@ import 'swiper/css'
 
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
+import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconX, Image, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 // data
@@ -18,7 +18,6 @@ import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import ProductsNav from '~/components/Products/ProductsNav'
@@ -85,10 +84,10 @@ function Database() {
             "PostgreSQL is one of the world's most scalable databases.",
           ]}
           image={[
-            <ThemeImage
+            <Image
               src={{
-                light: `${basePath}/images/product/database/header--light-2.png`,
                 dark: `${basePath}/images/product/database/header--dark-2.png`,
+                light: `${basePath}/images/product/database/header--light-2.png`,
               }}
               alt="database header"
               layout="responsive"
@@ -106,7 +105,7 @@ function Database() {
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <div className="flex w-fit items-center">
-                  <Image
+                  <NextImage
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
                     height={30}
