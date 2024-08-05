@@ -48,7 +48,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && !item.breakdown)
+      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
@@ -180,8 +180,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
                           {(() => {
-                            const matchingTooltipData = feeTooltipData.find((it) =>
-                              fee.usage_metric?.startsWith(it.identifier)
+                            const matchingTooltipData = feeTooltipData.find(
+                              (it) => fee.usage_metric?.startsWith(it.identifier)
                             )
                             return matchingTooltipData ? (
                               <InvoiceTooltip
