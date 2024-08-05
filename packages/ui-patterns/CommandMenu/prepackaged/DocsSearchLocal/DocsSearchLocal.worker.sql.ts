@@ -10,6 +10,8 @@ create table if not exists page (
     content text,
     tsv tsvector generated always as (
         setweight(to_tsvector('simple', coalesce(meta ->> 'title', '')), 'A') ||
+		    setweight(to_tsvector('simple', coalesce(meta ->> 'subtitle', '')), 'B') ||
+			setweight(to_tsvector('simple', coalesce(meta ->> 'description', '')), 'C') ||
             setweight(to_tsvector('simple', coalesce(content, '')), 'D')
     ) stored
 )
@@ -73,8 +75,8 @@ select * from (
 				*,
 				(page_section.hf_embedding <#> $1) * -1 as match_score
 			from page_section
-			where (page_section.hf_embedding <#> $1) * -1 > $2	
-			order by page_section.hf_embedding <#> $1
+			where match_score > $2	
+			order by match_score desc
 			limit 10
 		)
 		select
@@ -102,14 +104,16 @@ select * from (
 				'{}' as headings,
 				'{}' as slugs,
 				'fts' as match_type,
-				-- Weighting factor determined by trial and error
-				least(1, ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1) * 100) as match_score
+				least(1,
+					-- Weighting factor determined by trial and error
+					ts_rank('{0.01, 0.1, 0.2, 1.0}', page.tsv, websearch_to_tsquery('simple', $3), 1) * 100
+				) as match_score
 			from page
 			join page_section on page_section.page_id = page.id
 			where page.tsv @@ websearch_to_tsquery('simple', $3)
 			group by page.id
-			order by ts_rank(page.tsv, websearch_to_tsquery('simple', $3), 1)
-			limit 10
+			order by match_score desc
+			limit 20
 		)
 	)
 )

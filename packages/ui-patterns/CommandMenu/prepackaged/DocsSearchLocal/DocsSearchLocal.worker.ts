@@ -66,28 +66,32 @@ function alreadyReady(port: MessagePort) {
 async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: string) {
   state = 'initiating'
 
-  db = new PGlite({
-    extensions: {
-      vector: new URL(
-        '../../../../../node_modules/@electric-sql/pglite/dist/vector.tar.gz',
-        import.meta.url
-      ),
-    },
-  })
-  await db.exec(CREATE_VECTOR_EXTENSION)
-  await db.exec(CREATE_PAGE_TABLE)
-  await db.exec(CREATE_PAGE_SECTION_TABLE)
+  try {
+    db = new PGlite({
+      extensions: {
+        vector: new URL(
+          '../../../../../node_modules/@electric-sql/pglite/dist/vector.tar.gz',
+          import.meta.url
+        ),
+      },
+    })
+    await db.exec(CREATE_VECTOR_EXTENSION)
+    await db.exec(CREATE_PAGE_TABLE)
+    await db.exec(CREATE_PAGE_SECTION_TABLE)
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey)
-  // Preload the extraction pipeline before signaling that the worker is ready.
-  // This allows the search client to fall back to remote search until local
-  // search is guaranteed to be quick.
-  const eagerPipelineInitiation = getExtractor()
-  await Promise.all([
-    copyPages(port, supabase, db),
-    copyPageSections(port, supabase, db),
-    eagerPipelineInitiation,
-  ])
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    // Preload the extraction pipeline before signaling that the worker is ready.
+    // This allows the search client to fall back to remote search until local
+    // search is guaranteed to be quick.
+    const eagerPipelineInitiation = getExtractor()
+    await Promise.all([
+      copyPages(port, supabase, db),
+      copyPageSections(port, supabase, db),
+      eagerPipelineInitiation,
+    ])
+  } catch (error) {
+    return postError(port, convertError(error))
+  }
 
   state = 'ready'
   checkpoint(port, {
