@@ -56,6 +56,15 @@ const formUnion = z.discriminatedUnion('type', [
     api_key: z.string().min(1, { message: 'API key is required' }),
     region: z.string().min(1, { message: 'Region is required' }),
   }),
+  z.object({
+    type: z.literal('elastic'),
+  }),
+  z.object({
+    type: z.literal('postgres'),
+  }),
+  z.object({
+    type: z.literal('bigquery'),
+  }),
 ])
 
 const formSchema = z
