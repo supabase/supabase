@@ -4,14 +4,14 @@ export const CREATE_PAGE_TABLE = `
 create table if not exists page (
     id bigint primary key,
     path text,
-	meta jsonb,
-	type text,
-	source text,
+    meta jsonb,
+    type text,
+    source text,
     content text,
-	tsv tsvector generated always as (
-		setweight(to_tsvector('simple', coalesce(meta ->> 'title', '')), 'A') ||
-			setweight(to_tsvector('simple', coalesce(content, '')), 'D')
-	) stored
+    tsv tsvector generated always as (
+        setweight(to_tsvector('simple', coalesce(meta ->> 'title', '')), 'A') ||
+            setweight(to_tsvector('simple', coalesce(content, '')), 'D')
+    ) stored
 )
 `.trim()
 
@@ -33,14 +33,14 @@ insert into page (
     meta,
     type,
     source,
-	content
+    content
 ) values (
     $1,
     $2,
     $3,
     $4,
     $5,
-	$6
+    $6
 )
 `.trim()
 
@@ -117,21 +117,4 @@ where disambiguator = 1
 order by match_score desc
 limit 10
 ;
-`.trim()
-
-export const SEARCH_FTS = `
-select
-	page.id,
-	page.path,
-	page.type,
-	page.meta ->> 'title' as title,
-	page.meta ->> 'subtitle' as subtitle,
-	page.meta ->> 'description' as description,
-	array_agg(page_section.heading) filter (where page_section.heading is not null) as headings,
-	array_agg(page_section.slug) filter (where page_section.slug is not null) as slugs
-from page
-join page_section on page_section.page_id = page.id
-where page.tsv @@ websearch_to_tsquery('simple', $1)
-group by page.id
-limit 10;
 `.trim()

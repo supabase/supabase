@@ -22,7 +22,11 @@ import {
   useSetQuery,
 } from '../..'
 import { BASE_PATH } from '../shared/constants'
-import { SearchResult, SearchResultSubsection, SearchResultType } from './DocsSearchLocal.client'
+import type {
+  SearchResult,
+  SearchResultSubsection,
+  SearchResultType,
+} from './DocsSearchLocal.client'
 import { useDocsSearchLocal } from './useDocsSearchLocal'
 
 const questions = [
@@ -66,8 +70,6 @@ const IconContainer = (
 const DocsSearchPage = () => {
   const supabaseClient = useSupabaseClient()
   const { searchState, handleSearch, debouncedSearch, reset } = useDocsSearchLocal(supabaseClient)
-
-  console.log('SEARCH STATE:', searchState)
 
   const setIsOpen = useSetCommandMenuOpen()
   const setQuery = useSetQuery()

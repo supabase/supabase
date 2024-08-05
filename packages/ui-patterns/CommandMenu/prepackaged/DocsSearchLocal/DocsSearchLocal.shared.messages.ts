@@ -54,5 +54,5 @@ export function postError<Payload extends object>(
     if ('message' in maybeCustomPayload) delete maybeCustomPayload.message
     Object.assign(message.payload, maybeCustomPayload)
   }
-  self.postMessage(message)
+  port.postMessage(message)
 }

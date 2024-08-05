@@ -1,13 +1,7 @@
 import { Book } from 'lucide-react'
 
-import {
-  PageType,
-  useRegisterCommands,
-  useRegisterPage,
-  useSetPage,
-  type CommandOptions,
-  type ICommand,
-} from '../..'
+import type { CommandOptions, ICommand } from '../..'
+import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from '../..'
 import { DocsSearchPage } from './DocsSearchLocal.Page'
 
 const DOCS_SEARCH_COMMANDS = {

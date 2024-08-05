@@ -3,7 +3,6 @@ import { PGlite } from '@electric-sql/pglite'
 import { createClient } from '@supabase/supabase-js'
 
 import { setupSingletonExtractor } from './DocsSearchLocal.shared.llm'
-import { copyPageSections, copyPages } from './DocsSearchLocal.worker.db'
 import {
   MAIN_THREAD_MESSAGE,
   WORKER_MESSAGE,
@@ -11,6 +10,7 @@ import {
   convertError,
   postError,
 } from './DocsSearchLocal.shared.messages'
+import { copyPageSections, copyPages } from './DocsSearchLocal.worker.db'
 import {
   CREATE_VECTOR_EXTENSION,
   CREATE_PAGE_TABLE,
@@ -79,9 +79,9 @@ async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: str
   await db.exec(CREATE_PAGE_SECTION_TABLE)
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey)
-  // Preload the extraction pipeline before signalling that the worker is
-  // ready. This allows the search client to fall back to remote search until
-  // local search is guaranteed to be quick.
+  // Preload the extraction pipeline before signaling that the worker is ready.
+  // This allows the search client to fall back to remote search until local
+  // search is guaranteed to be quick.
   const eagerPipelineInitiation = getExtractor()
   await Promise.all([
     copyPages(port, supabase, db),

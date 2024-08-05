@@ -311,7 +311,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
           })
           .catch((error) => {
             if (error === ABORT_REASON) {
-              // Ignore, intentionally cancelled
+              // Ignore, intentionally canceled
             } else {
               console.error(error)
               if (outstandingSearches === 1) {
@@ -348,7 +348,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
           })
           .catch((error) => {
             if (error === ABORT_REASON) {
-              // Ignore, intentionally cancelled
+              // Ignore, intentionally canceled
             } else {
               console.error(error)
               if (outstandingSearches === 1) {
@@ -385,7 +385,6 @@ export function useLocalSearch(supabase: SupabaseClient) {
         dispatch({ type: 'ERRORED' })
       } else if (event.data.type == WORKER_MESSAGE.SEARCH_RESULTS) {
         const searchResults = JSON.parse(event.data.payload.matches)
-        console.log('RESULTS RECEIVED FROM WORKER:', searchResults)
         dispatch({ type: 'COMPLETED', results: searchResults })
       }
     }

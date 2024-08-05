@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/auth-helpers-react'
 
 import type { Database } from 'common'
 
-import { checkpoint, convertError, postError } from './DocsSearchLocal.shared.messages'
+import { convertError, postError } from './DocsSearchLocal.shared.messages'
 import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './DocsSearchLocal.worker.sql'
 
 /**
@@ -16,7 +16,7 @@ import { INSERT_PAGE_SECTIONS, INSERT_PAGES } from './DocsSearchLocal.worker.sql
  * @param columns - Comma-separated columns, in Supabase SDK format
  * @param order - The column to order the results. Needed for paging
  */
-export async function pageThroughRows<Table extends keyof Database['public']['Tables']>(
+async function pageThroughRows<Table extends keyof Database['public']['Tables']>(
   supabase: SupabaseClient<Database>,
   table: Table,
   columns: string,

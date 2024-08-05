@@ -100,9 +100,6 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
-    outputFileTracingExcludes: {
-      '*': ['**/@electric-sql/pglite/**/*'],
-    },
   },
   async redirects() {
     return [
