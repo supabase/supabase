@@ -318,7 +318,12 @@ export function LogDrainDestinationSheetForm({
                     /> */}
 
                     <div className="space-y-2">
-                      <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
+                      <div>
+                        <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
+                        <p className="text-xs text-foreground-lighter">
+                          Set custom headers when draining logs to the webhook URL
+                        </p>
+                      </div>
                       <div>
                         {hasHeaders &&
                           Object.keys(headers || {})?.map((headerKey) => (
