@@ -11,7 +11,7 @@ export const LOG_DRAIN_TYPES = [
   },
   {
     value: 'datadog',
-    name: 'Data dog',
+    name: 'Datadog',
     description: 'Datadog is a monitoring service for cloud-scale applications',
     icon: <DogIcon {...iconProps} />,
   },

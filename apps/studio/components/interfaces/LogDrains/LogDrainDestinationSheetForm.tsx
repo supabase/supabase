@@ -265,7 +265,7 @@ export function LogDrainDestinationSheetForm({
                 )}
               </div>
 
-              <div className="space-y-4 mt-6">
+              <div className="space-y-6 mt-6">
                 {type === 'webhook' && (
                   <>
                     <LogDrainFormItem
@@ -278,7 +278,8 @@ export function LogDrainDestinationSheetForm({
                       control={form.control}
                       name="http"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem_Shadcn_ className="space-y-2">
+                          <FormLabel_Shadcn_>HTTP Version</FormLabel_Shadcn_>
                           <FormControl_Shadcn_>
                             <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
                               <FormItem_Shadcn_ asChild>
@@ -316,27 +317,29 @@ export function LogDrainDestinationSheetForm({
                       )}
                     /> */}
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
-                      {hasHeaders &&
-                        Object.keys(headers || {})?.map((headerKey) => (
-                          <div
-                            className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
-                            key={headerKey}
-                          >
-                            <div className="w-full px-1">{headerKey}</div>
-                            <div className="w-full px-1 truncate" title={headers?.[headerKey]}>
-                              {headers?.[headerKey]}
+                      <div>
+                        {hasHeaders &&
+                          Object.keys(headers || {})?.map((headerKey) => (
+                            <div
+                              className="flex hover:bg-background-alternative text-sm text-foreground items-center font-mono border-b p-1.5 group"
+                              key={headerKey}
+                            >
+                              <div className="w-full px-1">{headerKey}</div>
+                              <div className="w-full px-1 truncate" title={headers?.[headerKey]}>
+                                {headers?.[headerKey]}
+                              </div>
+                              <Button
+                                className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
+                                type="text"
+                                title="Remove"
+                                icon={<TrashIcon />}
+                                onClick={() => removeHeader(headerKey)}
+                              ></Button>
                             </div>
-                            <Button
-                              className="justify-self-end opacity-0 group-hover:opacity-100"
-                              type="text"
-                              title="Remove"
-                              icon={<TrashIcon />}
-                              onClick={() => removeHeader(headerKey)}
-                            ></Button>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
                     </div>
                   </>
                 )}
