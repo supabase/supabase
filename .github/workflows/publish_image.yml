@@ -168,12 +168,13 @@ jobs:
       - name: Create a new branch
         run: |
           cd '${{ env.cli_repo }}'
+          git checkout '${{ env.cli_repo_main_branch }}'
           git checkout -b '${{ env.service_to_update }}/${{ needs.settings.outputs.image_version }}'
 
       - name: Update file
         run: |
           cd '${{ env.cli_repo }}'
-          sed -i 's/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:.*/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:${{ needs.settings.outputs.image_version }}"/' internal/utils/misc.go
+          sed -i 's/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:.*/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:${{ needs.settings.outputs.image_version }}"/' pkg/config/constants.go
 
       - name: Commit changes
         run: |
