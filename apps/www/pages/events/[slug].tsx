@@ -144,8 +144,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 items-start mb-8">
                   <div className="flex flex-row text-sm">
-                    <span className="uppercase text-brand">{event.type}</span>
-                    <span className="mx-2 px-2 border-x">
+                    <span className="uppercase text-brand font-mono">{event.type}</span>
+                    <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).format(`DD MMM YYYY [at] hA [${event.timezone}]`)}
                     </span>
                     <span className="">Duration: {event.duration}</span>
