@@ -20,8 +20,9 @@ services:
           "-e",
           "require('http').get('http://studio:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
         ]
-      timeout: 5s
-      interval: 5s
+      start_period: 30s  # Initial delay before health checks start
+      timeout: 10s
+      interval: 30s
       retries: 3
     depends_on:
       analytics:
