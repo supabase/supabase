@@ -13,7 +13,7 @@ jobs:
   settings:
     runs-on: ubuntu-latest
     outputs:
-      image_version: '20240805'
+      image_version: ${{ '20240805' }}
     steps:
       - id: meta
         uses: docker/metadata-action@v4
