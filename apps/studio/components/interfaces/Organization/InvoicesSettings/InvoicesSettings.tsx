@@ -106,7 +106,10 @@ const InvoicesSettings = () => {
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td>
-                        <InvoiceStatusBadge status={x.status as InvoiceStatus} />
+                        <InvoiceStatusBadge
+                          status={x.status as InvoiceStatus}
+                          paymentAttempted={x.payment_attempted}
+                        />
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
