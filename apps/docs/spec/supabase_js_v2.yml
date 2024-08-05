@@ -2249,6 +2249,7 @@ functions:
       ```html
       <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
       ```
+      - There is a limit of one verified phone factor per user. If you are attempting to register an additional phone factor you will first need to unenroll your current factor.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -2292,20 +2293,17 @@ functions:
             phone_number: '+12345678',
           })
 
-          // Use the id to create a challenge.
-          // The challenge can be verified by entering the code generated from the authenticator app.
-          // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          // TODO: addd caveats
-          const {} = data
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          const { id, type, friendly_name, phone } = data
           ```
         response: |
           ```json
           {
             data: {
               id: '<ID>',
-              type: 'phone'
-              // TODO: Check further fields
-              friendly_name?: 'Important app'
+              type: 'phone',
+              friendly_name?: 'Important app',
+              phone: '+5787123456'
             },
             error: null
           }
@@ -2316,8 +2314,7 @@ functions:
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
-      - TODO: Describe that challenge sends an SMS for Phones and teh corresponding rate limits
-      - TODO: Descirbe that Phone factors default to SMS as a challenge
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `sms` unless otherwise specified.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -2339,7 +2336,26 @@ functions:
           }
           ```
       - id: create-mfa-phone-challenge
-        name: Create a challenge for a phone factor
+        name: Create a challenge for a phone factor (WhatsApp)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge-whatsapp
+        name: Create a challenge for a phone factor using the WhatsApp channel
         isSpotlight: true
         code: |
           ```js
@@ -2438,7 +2454,7 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
-      - Intended for use with only TOTP factors as there is a delay between challenge and receipt of the code used for verification in Phone factors.
+      - Intended for use with only TOTP factors. The SMS and code will take time to reach the user so we discouraging calling challenge after verify as it will lead to an invalid verification.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
     examples:
@@ -3163,7 +3179,7 @@ functions:
             { phone_confirm: true }
           )
           ```
-  - id: mfa-list-factors
+  - id: mfa-list-factors-admin
     title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
@@ -3178,7 +3194,6 @@ functions:
           ```json
           {
             data: {
-              // TODO: Change this - the format is wrong
               factors: Factor[
                 {
                   id: '<ID>',
