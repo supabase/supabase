@@ -9,9 +9,10 @@ import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { getContentById } from 'data/content/content-id-query'
+import { getContentById, useContentIdQuery } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
+  getSQLSnippetFolders,
   Snippet,
   SnippetDetail,
   SnippetFolder,
@@ -39,12 +40,6 @@ import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 
-// Requirements
-// - Asynchronous loading
-// - Directory tree
-// - Multi select
-// - Context menu
-
 interface SQLEditorNavProps {
   searchText: string
 }
@@ -58,6 +53,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
+  const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
@@ -65,6 +61,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const [showSharedSnippets, setShowSharedSnippets] = useState(false)
   const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
+  const [defaultExpandedFolderIds, setDefaultExpandedFolderIds] = useState<string[]>()
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
   const [selectedSnippetToShare, setSelectedSnippetToShare] = useState<Snippet>()
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
@@ -84,6 +81,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const contents = snapV2.sortedSnippets.filter((x) =>
     searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
   )
+  const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
   const numPrivateSnippets = Object.keys(snapV2.snippets).length
@@ -109,6 +107,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =================================
   // [Joshen] React Queries
   // =================================
+
   useSQLSnippetFoldersQuery(
     { projectRef },
     {
@@ -282,13 +281,24 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // ======================================
 
   useEffect(() => {
-    if (id !== undefined && snapV2.loaded && snapV2.snippets[id] !== undefined) {
-      const snippet = snapV2.snippets[id].snippet
-      if (snippet.visibility === 'project') {
-        setShowSharedSnippets(true)
+    const loadFolderContents = async (folderId: string) => {
+      const { contents } = await getSQLSnippetFolders({ projectRef, folderId })
+      if (projectRef) {
+        contents?.forEach((snippet) => snapV2.addSnippet({ projectRef, snippet }))
       }
     }
-  }, [id, snapV2.loaded])
+
+    if (snippet !== undefined && !mountedId) {
+      if (snippet.visibility === 'project') setShowSharedSnippets(true)
+      if (snippet.folder_id) {
+        setDefaultExpandedFolderIds([snippet.folder_id])
+        loadFolderContents(snippet.folder_id)
+      }
+
+      // Only want to run this once when loading sql/[id] route
+      setMountedId(true)
+    }
+  }, [snippet, mountedId])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
@@ -439,6 +449,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               data={privateSnippetsTreeState}
               selectedIds={selectedSnippets.map((x) => x.id)}
               aria-label="private-snippets"
+              expandedIds={defaultExpandedFolderIds}
               nodeRenderer={({ element, ...props }) => (
                 <SQLEditorTreeViewItem
                   {...props}
