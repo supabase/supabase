@@ -1,6 +1,5 @@
 import { useCommonSections, useSpec } from './NavigationMenu.utils'
 import NavigationMenuRefListItems from './NavigationMenuRefListItems'
-import { ICommonCategory } from '~/components/reference/Reference.types'
 
 import React from 'react'
 
