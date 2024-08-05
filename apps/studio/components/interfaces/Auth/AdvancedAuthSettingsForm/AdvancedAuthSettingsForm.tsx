@@ -40,9 +40,9 @@ const schema = object({
   MFA_PHONE_ENROLL_ENABLED: boolean().required(),
   MFA_PHONE_VERIFY_ENABLED: boolean().required(),
   MFA_PHONE_OTP_LENGTH: number()
-    .min(6, 'Must be a value more than 6')
+    .min(6, 'Must be a value 6 or larger')
     .max(30, 'must be a value no greater than 30'),
-  SMS_TEMPLATE: string().required('SMS template is required.'),
+  MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
   MFA_MAX_ENROLLED_FACTORS: number()
     .min(0, 'Must be be a value more than 0')
     .max(30, 'Must be a value no greater than 30'),
@@ -85,6 +85,10 @@ const AdvancedAuthSettingsForm = () => {
     // TOTP is enabled by default
     MFA_TOTP_ENROLL_ENABLED: authConfig?.MFA_TOTP_ENROLL_ENABLED || true,
     MFA_TOTP_VERIFY_ENABLED: authConfig?.MFA_TOTP_VERIFY_ENABLED || true,
+    MFA_PHONE_ENROLL_ENABLED: authConfig?.MFA_PHONE_ENROLL_ENABLED || false,
+    MFA_PHONE_VERIFY_ENABLED: authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
+    MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_ENROLL_ENABLED || 6,
+    MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_SMS_TEMPLATE || 'Your code is {{ .Code }}',
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
@@ -231,13 +235,13 @@ const AdvancedAuthSettingsForm = () => {
                     size="small"
                     label="Allow Enrollment of Phone factors for MFA"
                     layout="flex"
-                    descriptionText="Control whether users can enroll new TOTP factors"
+                    descriptionText="Control whether users can enroll new Phone factors"
                     disabled={!canUpdateConfig}
                   />
                   <Toggle
                     id="MFA_PHONE_VERIFY_ENABLED"
                     size="small"
-                    label="Control whether users can perform MFA Authentication with a TOTP factor"
+                    label="Control whether users can perform MFA Authentication with a Phone factor"
                     layout="flex"
                     descriptionText="Allow verification"
                     disabled={!canUpdateConfig}
@@ -247,14 +251,13 @@ const AdvancedAuthSettingsForm = () => {
                     size="small"
                     label="Phone OTP Length"
                     descriptionText="Number of digits in OTP"
-                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
                   <Input
-                    id="MFA_PHONE_SMS_TEMPLATE"
+                    id="MFA_PHONE_TEMPLATE"
                     size="small"
-                    label="SMS Template"
-                    descriptionText="Content of SMS Template"
+                    label="Template For MFA Phone Verification"
+                    descriptionText="Content of MFA Phone Template"
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
