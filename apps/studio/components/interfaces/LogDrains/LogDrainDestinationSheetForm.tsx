@@ -39,6 +39,8 @@ import { TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import Link from 'next/link'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
+import { FormDescription } from '@ui/components/shadcn/ui/form'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -247,29 +249,39 @@ export function LogDrainDestinationSheetForm({
                   formControl={form.control}
                 /> */}
                 {mode === 'create' && (
-                  <RadioGroupStacked
-                    defaultValue={defaultType}
-                    value={form.getValues('type')}
-                    onValueChange={(v: LogDrainType) => form.setValue('type', v)}
-                  >
-                    {LOG_DRAIN_TYPES.map((type) => (
-                      <RadioGroupStackedItem
-                        value={type.value}
-                        key={type.value}
-                        id={type.value}
-                        label={type.name}
-                        description={type.description}
-                        className="text-left"
-                      />
-                    ))}
-                  </RadioGroupStacked>
+                  <FormItemLayout layout="horizontal" label="Type">
+                    <Select
+                      defaultValue={defaultType}
+                      value={form.getValues('type')}
+                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                    >
+                      <SelectTrigger>
+                        {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LOG_DRAIN_TYPES.map((type) => (
+                          <SelectItem
+                            value={type.value}
+                            key={type.value}
+                            id={type.value}
+                            className="text-left"
+                          >
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                      <FormDescription className="mt-2">
+                        {LOG_DRAIN_TYPES.find((t) => t.value === type)?.description}
+                      </FormDescription>
+                    </Select>
+                  </FormItemLayout>
                 )}
               </div>
 
               <div className="space-y-6 mt-4">
                 {type === 'webhook' && (
                   <>
-                    <div className="px-content">
+                    <div className="px-content space-y-6">
                       <LogDrainFormItem
                         value="url"
                         label="Endpoint URL"
@@ -280,8 +292,7 @@ export function LogDrainDestinationSheetForm({
                         control={form.control}
                         name="http"
                         render={({ field }) => (
-                          <FormItem_Shadcn_ className="space-y-2">
-                            <FormLabel_Shadcn_>HTTP Version</FormLabel_Shadcn_>
+                          <FormItemLayout layout="horizontal" label="HTTP Version">
                             <FormControl_Shadcn_>
                               <RadioGroupStacked onValueChange={field.onChange} value={field.value}>
                                 <FormItem_Shadcn_ asChild>
@@ -297,7 +308,7 @@ export function LogDrainDestinationSheetForm({
                               </RadioGroupStacked>
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
+                          </FormItemLayout>
                         )}
                       />
                     </div>
@@ -456,6 +467,8 @@ export function LogDrainDestinationSheetForm({
             </form>
           )}
         </SheetSection>
+
+        <SheetSection></SheetSection>
 
         <SheetFooter className="p-content">
           <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
