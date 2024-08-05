@@ -1,4 +1,5 @@
-import { PGlite, Results } from '@electric-sql/pglite'
+import type { Results } from '@electric-sql/pglite'
+import { PGlite } from '@electric-sql/pglite'
 import { createClient } from '@supabase/supabase-js'
 
 import { setupSingletonExtractor } from './DocsSearchLocal.shared.llm'
@@ -15,13 +16,13 @@ import {
   CREATE_PAGE_TABLE,
   CREATE_PAGE_SECTION_TABLE,
   SEARCH_EMBEDDINGS,
-  SEARCH_FTS,
 } from './DocsSearchLocal.worker.sql'
 
 const VECTOR_MATCH_THRESHOLD = 0.8
 
 let db: PGlite
-let ready = false
+let state: 'uninitiated' | 'initiating' | 'ready' = 'uninitiated'
+let readyListeners = [] as Array<() => void>
 
 let reject: ((value: unknown) => void) | undefined
 const REJECT_REASON = {
@@ -39,11 +40,14 @@ self.addEventListener('connect', (connectEvent) => {
     switch (event.data.type) {
       case MAIN_THREAD_MESSAGE.INIT:
         const { supabaseUrl, supabaseAnonKey } = event.data.payload
-        if (ready) {
-          return alreadyReady(port)
-        } else {
+        if (state === 'uninitiated') {
           return init(port, supabaseUrl, supabaseAnonKey)
+        } else if (state === 'initiating') {
+          readyListeners.push(() => {
+            alreadyReady(port)
+          })
         }
+        return alreadyReady(port)
       case MAIN_THREAD_MESSAGE.SEARCH:
         const { query } = event.data.payload
         return handleSearch(port, query)
@@ -60,6 +64,8 @@ function alreadyReady(port: MessagePort) {
 }
 
 async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: string) {
+  state = 'initiating'
+
   db = new PGlite({
     extensions: {
       vector: new URL(
@@ -83,14 +89,17 @@ async function init(port: MessagePort, supabaseUrl: string, supabaseAnonKey: str
     eagerPipelineInitiation,
   ])
 
-  ready = true
+  state = 'ready'
   checkpoint(port, {
     status: 'READY',
   })
+  while (readyListeners.length > 0) {
+    readyListeners.pop()?.()
+  }
 }
 
 async function handleSearch(port: MessagePort, query: string) {
-  if (!ready) {
+  if (state !== 'ready') {
     return postError(
       port,
       {
