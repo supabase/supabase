@@ -32,7 +32,7 @@ Using PostGIS we can then programmatically generate vector tiles and serve them 
 
 Vector tiles are packets of geographic data, packaged into pre-defined roughly-square shaped "tiles" for transfer over the web. Map data is requested by a client as a set of "tiles" corresponding to square areas of land of a pre-defined size and location.
 
-Especially for large datasets, this has the benefit that the data transfer is greatly reduced because because only data within the current viewport, and at the current zoom level needs to be transferred.
+Especially for large datasets, this has the benefit that the data transfer is greatly reduced because only data within the current viewport, and at the current zoom level needs to be transferred.
 
 </Admonition>
 
@@ -71,7 +71,7 @@ PG_USE_COPY=true ogr2ogr -f pgdump places.sql places.geojson
 
 Enable the PostGIS extension on your Supabase Database on a dedicated separate `gis` schema. To do so you can navigate to the [SQL Editor](/dashboard/project/_/sql/new) and run the following SQL, or you can enable the extension from the [Database Extensions Settings](/dashboard/project/_/database/extensions).
 
-As PostGIS can be quite compute heavy, we recommend enabling it on a decidacted separate schema, for example names `gis`!
+As PostGIS can be quite compute heavy, we recommend enabling it on a dedicated separate schema, for example, named `gis`!
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS "gis";
@@ -149,14 +149,14 @@ END;
 $$;
 ```
 
-To limit the amount of data send over the wire, we limit the amount of metadata to include in the vector tile. For example we add a condition for the zoom level, and only return the place name when the user has zoomed in beyond level 13.
+To limit the amount of data sent over the wire, we limit the amount of metadata to include in the vector tile. For example we add a condition for the zoom level, and only return the place name when the user has zoomed in beyond level 13.
 
 ## Use supabase-js to fetch vector tiles from MapLibre GL client
 
 You can find the full `index.html` code on [GitHub](https://github.com/bdon/supabase-vector-tile/blob/main/index.html). Here we'll highlight how to add a new protocol to MapLibreGL to fetch the bas64 encoded binary vector tile data via supabase-js so that MapLibre GL can fetch and render the data as your users interact with the map:
 
 ```js index.html
-const client = supabase.createClient('you-supabase-api-url', 'your-supabase-anon-key')
+const client = supabase.createClient('your-supabase-api-url', 'your-supabase-anon-key')
 
 function base64ToArrayBuffer(base64) {
   var binaryString = atob(base64)
@@ -213,7 +213,7 @@ const map = new maplibregl.Map({
 
 ## On demand fetch additional JSON metadata
 
-To limit the amount of data send over the wire, we don't encode all the metadata in the vector tile itself, but rather set up an onclick handler to fetch the additional metadata on demand within the MapLibre GL popup:
+To limit the amount of data sent over the wire, we don't encode all the metadata in the vector tile itself, but rather set up an onclick handler to fetch the additional metadata on demand within the MapLibre GL popup:
 
 ```js index.html
 // ..

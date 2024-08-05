@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Info } from 'lucide-react'
 
 import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-import { IconInfo } from 'ui'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -28,8 +28,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   } = useBackupsQuery({ projectRef: ref })
 
   const isPitrEnabled = backups?.pitr_enabled
-  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
   const isPermissionsLoaded = usePermissionsLoaded()
+
+  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <ScaffoldContainer>
@@ -39,7 +40,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
             <FormHeader className="!mb-0" title="Database Backups" />
 
             <DatabaseBackupsNav active="scheduled" projRef={ref} />
-            <div className="space-y-8">
+            <div className="flex flex-col gap-y-4">
               {isLoading && <GenericSkeletonLoader />}
 
               {isError && (
@@ -59,7 +60,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                     <InformationBox
                       hideCollapse
                       defaultVisibility
-                      icon={<IconInfo strokeWidth={2} />}
+                      icon={<Info strokeWidth={2} />}
                       title="Point-In-Time-Recovery (PITR) enabled"
                       description={
                         <div>

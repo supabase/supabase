@@ -1,4 +1,4 @@
-import { format, ident, literal } from '@scaleleap/pg-format'
+import { format, ident, literal } from '@supabase/pg-meta/src/pg-format'
 import type { Dictionary } from 'types'
 import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
 

@@ -2,16 +2,23 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plug } from 'lucide-react'
 import { useState } from 'react'
+
+import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
   DIALOG_PADDING_Y,
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  Dialog,
   IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -19,13 +26,6 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-
-import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useCheckPermissions } from 'hooks'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'

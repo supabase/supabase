@@ -10,7 +10,7 @@ To enable Slack Auth for your project, you need to set up a Slack OAuth applicat
 
 <Admonition type="caution">
 
-The Slack OAuth provider supported by Supabase uses Slack's [**Legacy OAuth API**](https://api.slack.com/legacy/oauth). If you created an OAuth app on Slack recently, some of the scopes specified may not work with the Slack OAuth provider on Supabase. You can refer to the [**list of supported scopes**](https://api.slack.com/scopes) for the legacy OAuth app and this [**github issue**](https://github.com/supabase/gotrue/issues/1294) for future updates.
+We will be replacing the existing Slack provider with a new Slack (OIDC) provider. Developers with Slack OAuth Applications created prior to 24th June 2024 should create a new application and migrate their credentials from the Slack provider to the Slack (OIDC) provider. Existing OAuth Applications built with the old Slack provider will continue to work up till 10th October. You can refer to the [**list of supported scopes**](https://api.slack.com/scopes?filter=user) for the new Slack (OIDC) User.
 
 </Admonition>
 
@@ -56,7 +56,7 @@ Under the sidebar, select `OAuth & Permissions` and look for `Redirect URLs`:
 
 Under `Scopes`:
 
-- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that Supabase Auth uses to request for user information. You can add any additional scopes that you may need as well.
+- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that Supabase Auth uses to request for user information. Do not add other scopes as [Sign In With Slack only supports `profile`, `email`, `openid`](https://api.slack.com/authentication/sign-in-with-slack#request).
 
 ## Enter your Slack credentials into your Supabase project
 
@@ -73,12 +73,14 @@ Under `Scopes`:
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `slack` as the `provider`:
+<CreateClientSnippet />
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `slack_oidc` as the `provider`:
 
 ```js
 async function signInWithSlack() {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'slack',
+    provider: 'slack_oidc',
   })
 }
 ```
@@ -97,11 +99,11 @@ Future<void> signInWithSlack() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Slack` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `SlackOIDC` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithSlack() {
-	supabase.auth.signInWith(Slack)
+	supabase.auth.signInWith(SlackOIDC)
 }
 ```
 

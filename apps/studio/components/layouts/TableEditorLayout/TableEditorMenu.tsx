@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
@@ -8,11 +7,14 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -36,7 +38,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -120,40 +121,25 @@ const TableEditorMenu = () => {
 
           <div className="grid gap-3 mx-4">
             {!isLocked ? (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger className="w-full" asChild>
-                  <Button
-                    title="Create a new table"
-                    name="New table"
-                    block
-                    disabled={!canCreateTables}
-                    size="tiny"
-                    icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
-                    type="default"
-                    className="justify-start"
-                    onClick={snap.onAddTable}
-                  >
-                    New table
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreateTables && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create tables
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <ButtonTooltip
+                block
+                title="Create a new table"
+                name="New table"
+                disabled={!canCreateTables}
+                size="tiny"
+                icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                type="default"
+                className="justify-start"
+                onClick={snap.onAddTable}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to create tables',
+                  },
+                }}
+              >
+                New table
+              </ButtonTooltip>
             ) : (
               <Alert_Shadcn_>
                 <AlertTitle_Shadcn_ className="text-sm">

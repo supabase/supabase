@@ -31,6 +31,7 @@ interface UsePoolerCheckboxInterface {
   id: string
   checked: boolean
   poolingMode: 'transaction' | 'session'
+  ipv4AddonAdded: boolean
   onCheckedChange: (value: boolean) => void
   onSelectPoolingMode: (mode: 'transaction' | 'session') => void
 }
@@ -39,6 +40,7 @@ export const UsePoolerCheckbox = ({
   id,
   checked,
   poolingMode = 'transaction',
+  ipv4AddonAdded,
   onCheckedChange,
   onSelectPoolingMode,
 }: UsePoolerCheckboxInterface) => {
@@ -171,7 +173,7 @@ export const UsePoolerCheckbox = ({
               {isSuccess && checked && <Badge>Supavisor</Badge>}
               {isSuccessSettings && (
                 <Badge>
-                  {checked
+                  {checked || ipv4AddonAdded
                     ? 'Resolves to IPv4'
                     : resolvesToIpV6
                       ? 'Resolves to IPv6'

@@ -14,12 +14,12 @@ export default function CreateRoomModal({ channel }: { channel: RealtimeChannel 
 
     supabase.realtime.setAuth(token)
 
-    const rooms_response = await supabase.from('rooms').insert({ topic }).select('id')
+    const rooms_response = await supabase.from('rooms').insert({ topic }).select('topic')
 
     if (rooms_response.data) {
       await supabase
         .from('rooms_users')
-        .insert({ user_id: user.data.user!.id, room_id: rooms_response.data![0].id })
+        .insert({ user_id: user.data.user!.id, room_topic: rooms_response.data![0].topic })
 
       await channel?.send({
         type: 'broadcast',

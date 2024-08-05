@@ -1,4 +1,6 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import {
@@ -7,21 +9,27 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import UpcomingInvoice from './UpcomingInvoice'
-import { useIsFeatureEnabled } from 'hooks'
-import Link from 'next/link'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
+
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,
     error: subscriptionError,
     isLoading: isLoadingSubscription,
     isError: isErrorSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug })
+  } = useOrgSubscriptionQuery({ orgSlug }, { enabled: canReadSubscriptions })
 
   const invoiceFeatureEnabled = useIsFeatureEnabled('billing:invoices')
 
@@ -43,34 +51,40 @@ const BillingBreakdown = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoadingSubscription && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
-
-        {isErrorSubscription && (
-          <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
-        )}
-
-        {invoiceFeatureEnabled && (
+        {!canReadSubscriptions ? (
+          <NoPermission resourceText="view this organization's billing breakdown" />
+        ) : (
           <>
-            <p className="text-sm text-foreground-light">
-              The table shows your upcoming invoice, excluding credits. This invoice will continue
-              updating until the end of your billing period on {billingCycleEnd.format('MMMM DD')}.
-              See{' '}
-              <Link
-                className="text-green-900 transition hover:text-green-1000"
-                href={`/org/${orgSlug}/usage`}
-              >
-                usage page
-              </Link>{' '}
-              for a more detailed usage breakdown.
-            </p>
+            {isLoadingSubscription && (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            )}
 
-            <UpcomingInvoice slug={orgSlug} />
+            {isErrorSubscription && (
+              <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
+            )}
+
+            {invoiceFeatureEnabled && (
+              <>
+                <p className="text-sm text-foreground-light">
+                  The table shows your upcoming invoice, excluding credits. This invoice will
+                  continue updating until the end of your billing period on{' '}
+                  {billingCycleEnd.format('MMMM DD')}. See{' '}
+                  <Link
+                    className="text-green-900 transition hover:text-green-1000"
+                    href={`/org/${orgSlug}/usage`}
+                  >
+                    usage page
+                  </Link>{' '}
+                  for a more detailed usage breakdown.
+                </p>
+
+                <UpcomingInvoice slug={orgSlug} />
+              </>
+            )}
           </>
         )}
       </ScaffoldSectionContent>

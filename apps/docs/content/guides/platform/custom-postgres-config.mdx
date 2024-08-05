@@ -64,6 +64,17 @@ max_parallel_workers    |3        |
 - End of Custom Postgres Config -
 ```
 
+When configuring parameters that require time units, such as `statement_timeout`, the CLI expects a string value with a time unit. Supported units include `ms`, `s`, and `min`.
+
+```bash
+$ supabase --experimental --project-ref <project-ref> postgres-config update --config statement_timeout=1000ms
+
+- Custom Postgres Config -
+Config            |Value   |
+statement_timeout |1000ms  |
+- End of Custom Postgres Config -
+```
+
 ## Considerations
 
 1. The Postgres cluster will be restarted in order to change the configuration being used. This will cause momentary disruption to existing database connections; in most cases this should not take more than a few seconds.

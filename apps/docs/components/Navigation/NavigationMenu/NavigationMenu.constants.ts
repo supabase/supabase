@@ -1,15 +1,10 @@
-import type { HomepageMenuItems, NavMenuConstant, References } from '../Navigation.types'
+import { IS_DEV } from '~/lib/constants'
+import type { GlobalMenuItems, NavMenuConstant, References } from '../Navigation.types'
 
-export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
+export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
-      label: 'Home',
-      icon: 'home',
-      href: '/',
-      level: 'home',
-    },
-    {
-      label: 'Getting Started',
+      label: 'Start',
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
@@ -17,164 +12,192 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
-      label: 'Product',
-    },
-    {
-      label: 'Database',
-      icon: 'database',
-      href: '/guides/database/overview',
-      level: 'database',
-    },
-    {
-      label: 'Auth',
-      icon: 'auth',
-      href: '/guides/auth',
-      level: 'auth',
-    },
-    {
-      label: 'Storage',
-      icon: 'storage',
-      href: '/guides/storage',
-      level: 'storage',
-    },
-    {
-      label: 'Edge Functions',
-      icon: 'edge-functions',
-      href: '/guides/functions',
-      level: 'functions',
-    },
-    {
-      label: 'Realtime',
-      icon: 'realtime',
-      href: '/guides/realtime',
-      level: 'realtime',
-    },
-    {
-      label: 'AI & Vectors',
-      icon: 'ai',
-      href: '/guides/ai',
-      level: 'ai',
-    },
-  ],
-  [
-    {
-      label: 'Data API',
-    },
-    {
-      label: 'REST',
-      icon: 'rest',
-      href: '/guides/api',
-      level: 'api',
-    },
-    {
-      label: 'GraphQL',
-      icon: 'graphql',
-      href: '/guides/graphql',
-      level: 'graphql',
+      label: 'Products',
+      menuItems: [
+        [
+          {
+            label: 'Database',
+            icon: 'database',
+            href: '/guides/database/overview',
+            level: 'database',
+          },
+          {
+            label: 'Auth',
+            icon: 'auth',
+            href: '/guides/auth',
+            level: 'auth',
+          },
+          {
+            label: 'Storage',
+            icon: 'storage',
+            href: '/guides/storage',
+            level: 'storage',
+          },
+          {
+            label: 'Edge Functions',
+            icon: 'edge-functions',
+            href: '/guides/functions',
+            level: 'functions',
+          },
+          {
+            label: 'Realtime',
+            icon: 'realtime',
+            href: '/guides/realtime',
+            level: 'realtime',
+          },
+          {
+            label: 'AI & Vectors',
+            icon: 'ai',
+            href: '/guides/ai',
+            level: 'ai',
+          },
+        ],
+      ],
     },
   ],
   [
     {
-      label: 'Development Cycle',
-    },
-    {
-      label: 'Local Dev / CLI',
-      icon: 'dev-cli',
-      href: '/guides/cli',
-      level: 'reference_javascript',
-    },
-    {
-      label: 'Platform',
-      icon: 'platform',
-      href: '/guides/platform',
-      level: 'platform',
-    },
-    {
-      label: 'Self-Hosting',
-      icon: 'self-hosting',
-      href: '/guides/self-hosting',
-      level: 'self_hosting',
+      label: 'Build',
+      menuItems: [
+        [
+          {
+            label: 'Local Dev / CLI',
+            icon: 'dev-cli',
+            href: '/guides/cli',
+            level: 'reference_javascript',
+          },
+          {
+            label: 'Platform',
+            icon: 'platform',
+            href: '/guides/platform',
+            level: 'platform',
+          },
+          {
+            label: 'Self-Hosting',
+            icon: 'self-hosting',
+            href: '/guides/self-hosting',
+            level: 'self_hosting',
+          },
+          {
+            label: 'Integrations',
+            icon: 'integrations',
+            hasLightIcon: true,
+            href: 'https://supabase.com/partners/integrations',
+            level: 'integrations',
+          },
+        ],
+      ],
     },
   ],
   [
     {
-      label: 'Client Library Reference',
-    },
-    {
-      label: 'JavaScript',
-      icon: 'reference-javascript',
-      href: '/reference/javascript/introduction',
-      level: 'reference_javascript',
-    },
-    {
-      label: 'Flutter',
-      icon: 'reference-dart',
-      href: '/reference/dart/introduction',
-      level: 'reference_dart',
-    },
-    {
-      label: 'Swift',
-      icon: 'reference-swift',
-      href: '/reference/swift/introduction',
-      level: 'reference_swift',
-    },
-    {
-      label: 'Python',
-      icon: 'reference-python',
-      href: '/reference/python/introduction',
-      level: 'reference_python',
-      community: true,
-    },
-    {
-      label: 'C#',
-      icon: 'reference-csharp',
-      href: '/reference/csharp/introduction',
-      level: 'reference_csharp',
-      community: true,
-    },
-    {
-      label: 'Kotlin',
-      icon: 'reference-kotlin',
-      href: '/reference/kotlin/introduction',
-      level: 'reference_kotlin',
-      community: true,
+      label: 'Reference',
+      menuItems: [
+        [
+          {
+            label: 'Client Library Reference',
+          },
+          {
+            label: 'JavaScript',
+            icon: 'reference-javascript',
+            href: '/reference/javascript/introduction',
+            level: 'reference_javascript',
+          },
+          {
+            label: 'Flutter',
+            icon: 'reference-dart',
+            href: '/reference/dart/introduction',
+            level: 'reference_dart',
+          },
+          {
+            label: 'Swift',
+            icon: 'reference-swift',
+            href: '/reference/swift/introduction',
+            level: 'reference_swift',
+          },
+          {
+            label: 'Python',
+            icon: 'reference-python',
+            href: '/reference/python/introduction',
+            level: 'reference_python',
+          },
+          {
+            label: 'C#',
+            icon: 'reference-csharp',
+            href: '/reference/csharp/introduction',
+            level: 'reference_csharp',
+            community: true,
+          },
+          {
+            label: 'Kotlin',
+            icon: 'reference-kotlin',
+            href: '/reference/kotlin/introduction',
+            level: 'reference_kotlin',
+            community: true,
+          },
+        ],
+        [
+          {
+            label: 'CLI Commands',
+            icon: 'reference-cli',
+            href: '/reference/cli/introduction',
+            level: 'reference_javascript',
+          },
+          {
+            label: 'Management API',
+            icon: 'reference-api',
+            href: '/reference/api/introduction',
+            level: 'reference_javascript',
+          },
+        ],
+        [
+          { label: 'Data API' },
+          {
+            label: 'REST',
+            icon: 'rest',
+            href: '/guides/api',
+            level: 'api',
+          },
+          {
+            label: 'GraphQL',
+            icon: 'graphql',
+            href: '/guides/graphql',
+            level: 'graphql',
+          },
+        ],
+      ],
     },
   ],
   [
     {
       label: 'Resources',
-    },
-    {
-      label: 'CLI Commands',
-      icon: 'reference-cli',
-      href: '/reference/cli/introduction',
-      level: 'reference_javascript',
-    },
-    {
-      label: 'Management API',
-      icon: 'reference-api',
-      href: '/reference/api/introduction',
-      level: 'reference_javascript',
-    },
-    {
-      label: 'Guides and Examples',
-      icon: 'resources',
-      href: '/guides/resources',
-      level: 'resources',
-    },
-    {
-      label: 'Integrations',
-      icon: 'integrations',
-      hasLightIcon: true,
-      href: 'https://supabase.com/partners/integrations',
-      level: 'integrations',
-    },
-  ],
-  [
-    {
-      label: 'Status',
-      icon: 'status',
-      href: 'https://status.supabase.com/',
+      menuItems: [
+        [
+          {
+            label: 'Migration guides',
+            icon: 'resources',
+            href: '/guides/resources',
+            level: 'resources',
+          },
+          {
+            label: 'Changelog',
+            icon: 'changelog',
+            hasLightIcon: true,
+            href: 'https://supabase.com/changelog',
+            level: 'changelog',
+          },
+          {
+            label: 'Status',
+            icon: 'status',
+            href: 'https://status.supabase.com/',
+          },
+          {
+            label: 'Contributing',
+            icon: 'contributing',
+            href: '/contributing' as `/${string}`,
+          },
+        ],
+      ],
     },
   ],
 ]
@@ -226,7 +249,8 @@ export const REFERENCES: References = {
 
 export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
-  title: 'Getting Started',
+  title: 'Start with Supabase',
+  url: '/guides/getting-started',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
@@ -735,6 +759,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/column-level-security',
         },
         {
+          name: 'Hardening the Data API',
+          url: '/guides/database/hardening-data-api',
+        },
+        {
           name: 'Custom Claims & RBAC',
           url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
@@ -746,10 +774,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Superuser Access and Unsupported Operations',
           url: '/guides/database/postgres/roles-superuser',
-        },
-        {
-          name: 'Column level privileges',
-          url: '/guides/database/postgres/column-level-security',
         },
       ],
     },
@@ -773,6 +797,17 @@ export const database: NavMenuConstant = {
           name: 'Database Advisors',
           url: '/guides/database/database-advisors',
         },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Timeouts',
+          url: '/guides/database/postgres/timeouts',
+        },
         {
           name: 'Debugging and monitoring',
           url: '/guides/database/inspect',
@@ -781,7 +816,6 @@ export const database: NavMenuConstant = {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
         },
-        { name: 'Testing your database', url: '/guides/database/testing' },
       ],
     },
     {
@@ -862,10 +896,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/postgis',
         },
         {
-          name: 'pg-safeupdate: Required Where Clauses',
-          url: '/guides/database/extensions/pg-safeupdate',
-        },
-        {
           name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
@@ -936,8 +966,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/mssql',
         },
         {
+          name: 'Connecting to Paddle',
+          url: '/guides/database/extensions/wrappers/paddle',
+        },
+        {
           name: 'Connecting to Redis',
           url: '/guides/database/extensions/wrappers/redis',
+        },
+        {
+          name: 'Connecting to Snowflake',
+          url: '/guides/database/extensions/wrappers/snowflake',
         },
         {
           name: 'Connecting to Stripe',
@@ -1180,7 +1218,7 @@ export const functions: NavMenuConstant = {
     },
     {
       name: 'Examples',
-      url: '/guides/functions/examples',
+      url: undefined,
       items: [
         {
           name: 'CORS support for invoking from the browser',
@@ -1297,6 +1335,11 @@ export const realtime: NavMenuConstant = {
       ],
     },
     {
+      name: 'Security',
+      url: undefined,
+      items: [{ name: 'Authorization', url: '/guides/realtime/authorization' }],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
@@ -1307,6 +1350,14 @@ export const realtime: NavMenuConstant = {
         {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs',
+        },
+        {
+          name: 'Using Realtime Presence with Flutter',
+          url: '/guides/realtime/realtime-user-presence',
+        },
+        {
+          name: 'Listening to Postgres Changes with Flutter',
+          url: '/guides/realtime/realtime-listening-flutter',
         },
       ],
     },
@@ -1692,6 +1743,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Log Drains', url: '/guides/platform/log-drains' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
         { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
       ],
@@ -1700,7 +1752,7 @@ export const platform: NavMenuConstant = {
       name: 'Platform Management',
       url: undefined,
       items: [
-        { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'Regions', url: '/guides/platform/regions' },
         {
           name: 'Custom Postgres Config',
           url: '/guides/platform/custom-postgres-config',
@@ -1728,9 +1780,16 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/network-restrictions',
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
-        { name: 'Permissions', url: '/guides/platform/permissions' },
-        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
         { name: 'Branching', url: '/guides/platform/branching' },
+      ],
+    },
+    {
+      name: 'Security',
+      url: undefined,
+      items: [
+        { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Platform-required Permissions', url: '/guides/platform/permissions' },
       ],
     },
     {
@@ -1865,6 +1924,10 @@ export const resources: NavMenuConstant = {
       name: 'Migrate to Supabase',
       url: '/guides/resources/migrating-to-supabase',
       items: [
+        {
+          name: 'Auth0',
+          url: '/guides/resources/migrating-to-supabase/auth0',
+        },
         {
           name: 'Firebase Auth',
           url: '/guides/resources/migrating-to-supabase/firebase-auth',

@@ -1,11 +1,4 @@
-import {
-  ensureNoTimestampConflict,
-  fillTimeseries,
-  genChartQuery,
-  genDefaultQuery,
-  LogsTableName,
-  SQL_FILTER_TEMPLATES,
-} from 'components/interfaces/Settings/Logs'
+import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
 import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
 

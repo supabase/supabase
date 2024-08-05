@@ -1,5 +1,5 @@
-import type { Filter, ServiceError, SupaTable } from 'components/grid'
-import { isNumericalColumn } from 'components/grid/utils'
+import type { Filter, ServiceError, SupaTable } from 'components/grid/types'
+import { isNumericalColumn } from 'components/grid/utils/types'
 import type { Table } from 'data/tables/table-query'
 
 /**

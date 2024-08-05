@@ -33,7 +33,8 @@
     "test:playwright": "npm --prefix playwright-tests run test",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
-    "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
+    "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
+    "api:codegen": "cd packages/api-types && npm run codegen"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
