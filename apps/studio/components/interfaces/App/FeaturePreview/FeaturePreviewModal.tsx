@@ -2,20 +2,18 @@ import { useTelemetryProps } from 'common'
 import { FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
-import { useFlag } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
+import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
-  const isAiAssistantEnabled = useFlag('policyEditorWithAi')
-
   // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
   const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
     {
@@ -24,23 +22,37 @@ const FeaturePreviewModal = () => {
       content: <APISidePanelPreview />,
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     },
-    ...(isAiAssistantEnabled
-      ? [
-          {
-            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-            name: 'Supabase Assistant for RLS policies',
-            content: <RLSAIAssistantPreview />,
-            discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
-          },
-        ]
-      : []),
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
+      name: 'Supabase Assistant for RLS policies',
+      content: <RLSAIAssistantPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
+      name: 'Column-level privileges',
+      content: <CLSPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
+    },
   ]
 
   const router = useRouter()
   const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
   const featurePreviewContext = useFeaturePreviewContext()
-  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(FEATURE_PREVIEWS?.[0]?.key)
+
+  const selectedFeaturePreview =
+    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
+
+  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+
+  // this modal can be triggered on other pages
+  // Update local state when valtio state changes
+  useEffect(() => {
+    if (snap.selectedFeaturePreview !== '') {
+      setSelectedFeatureKey(snap.selectedFeaturePreview)
+    }
+  }, [snap.selectedFeaturePreview])
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -59,6 +71,11 @@ const FeaturePreviewModal = () => {
     )
   }
 
+  function handleCloseFeaturePreviewModal() {
+    snap.setShowFeaturePreviewModal(false)
+    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+  }
+
   return (
     <Modal
       hideFooter
@@ -67,12 +84,12 @@ const FeaturePreviewModal = () => {
       className="max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
-      onCancel={() => snap.setShowFeaturePreviewModal(false)}
+      onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
+        <div className="flex">
           <div>
-            <ScrollArea className="h-[550px] w-[240px] border-r">
+            <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
@@ -90,7 +107,9 @@ const FeaturePreviewModal = () => {
                     ) : (
                       <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
-                    <p className="text-sm">{feature.name}</p>
+                    <p className="text-sm truncate" title={feature.name}>
+                      {feature.name}
+                    </p>
                   </div>
                 )
               })}

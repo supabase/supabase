@@ -9,5 +9,12 @@
     return <IconBase icon={AlignLeft} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { alignLeft } from 'lucide-react'
+  */
   export default IconAlignLeft
   

@@ -1,9 +1,10 @@
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, IconChevronRight, Tabs } from 'ui'
-import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
+import { CodeBlock, IconChevronRight } from 'ui'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import RefDetailCollapse from './RefDetailCollapse'
 
 export type Flag = {
@@ -79,7 +80,7 @@ const CliCommandSection = (props) => {
                   <ReactMarkdown>{command.description}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-foreground-light text-base">
+                <p className="capitalize mb-4 scroll-mt-24 mt-0 text-foreground-light text-base">
                   {command.summary}
                 </p>
               )}
@@ -108,21 +109,19 @@ const CliCommandSection = (props) => {
             {commandFlags.length > 0 && (
               <>
                 <h3 className="text-lg text-foreground mb-3">Flags</h3>
-                <ul className="">
+                <ul>
                   {commandFlags.map((flag: Flag) => (
-                    <>
-                      <li className="mt-0">
-                        <Param {...flag} isOptional={!flag.required}>
-                          {flag?.accepted_values && (
-                            <Options>
-                              {flag?.accepted_values.map((value) => {
-                                return <Options.Option {...value} />
-                              })}
-                            </Options>
-                          )}
-                        </Param>
-                      </li>
-                    </>
+                    <li key={flag.id} className="mt-0">
+                      <Param {...flag} isOptional={!flag.required}>
+                        {flag?.accepted_values && (
+                          <Options>
+                            {flag?.accepted_values.map((value) => {
+                              return <Options.Option key={value.id} {...value} />
+                            })}
+                          </Options>
+                        )}
+                      </Param>
+                    </li>
                   ))}
                 </ul>
               </>
@@ -144,7 +143,7 @@ const CliCommandSection = (props) => {
                 command.examples.map((example) => {
                   const exampleId = `${command.id}-${example.id}`
                   return (
-                    <Tabs.Panel
+                    <TabPanel
                       id={exampleId}
                       key={exampleId}
                       label={example.name}
@@ -183,12 +182,12 @@ const CliCommandSection = (props) => {
                           </div>
                         </RefDetailCollapse>
                       )}
-                    </Tabs.Panel>
+                    </TabPanel>
                   )
                 })
               ) : (
                 // TODO: remove this block once all commands have examples
-                <Tabs.Panel
+                <TabPanel
                   id={`${command.id}-basic-usage`}
                   key={`${command.id}-basic-usage`}
                   label="Basic usage"
@@ -201,7 +200,7 @@ const CliCommandSection = (props) => {
                   >
                     {command.usage}
                   </CodeBlock>
-                </Tabs.Panel>
+                </TabPanel>
               )}
             </Tabs>
           </div>

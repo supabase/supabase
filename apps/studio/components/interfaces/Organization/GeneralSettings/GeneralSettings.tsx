@@ -1,31 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
+import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
 const GeneralSettings = () => {
-  const queryClient = useQueryClient()
-  const { ui } = useStore()
   const { slug } = useParams()
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const selectedOrganization = useSelectedOrganization()
   const { name, opt_in_tags } = selectedOrganization ?? {}
@@ -42,10 +38,7 @@ const GeneralSettings = () => {
 
   const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to update this organization',
-      })
+      return toast.error('You do not have the required permissions to update this organization')
     }
 
     if (!slug) return console.error('Slug is required')
@@ -55,8 +48,8 @@ const GeneralSettings = () => {
       values.isOptedIntoAi && !existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
         ? existingOptInTags.concat([OPT_IN_TAGS.AI_SQL])
         : !values.isOptedIntoAi && existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
-        ? existingOptInTags.filter((x) => x !== OPT_IN_TAGS.AI_SQL)
-        : existingOptInTags
+          ? existingOptInTags.filter((x) => x !== OPT_IN_TAGS.AI_SQL)
+          : existingOptInTags
 
     updateOrganization(
       { slug, name: values.name, opt_in_tags: updatedOptInTags },
@@ -64,7 +57,7 @@ const GeneralSettings = () => {
         onSuccess: () => {
           resetForm({ values, initialValues: values })
           invalidateOrganizationsQuery(queryClient)
-          ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+          toast.success('Successfully saved settings')
         },
       }
     )
@@ -135,7 +128,7 @@ const GeneralSettings = () => {
                           <IconChevronRight
                             strokeWidth={2}
                             size={16}
-                            className={clsx('transition-all', open ? 'rotate-90' : '')}
+                            className={cn('transition-all', open ? 'rotate-90' : '')}
                           />
                           <p className="text-sm text-foreground-light underline">
                             Important information regarding opting in
@@ -203,4 +196,4 @@ const GeneralSettings = () => {
   )
 }
 
-export default observer(GeneralSettings)
+export default GeneralSettings

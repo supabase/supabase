@@ -1,28 +1,27 @@
+import { ChevronDown, Database, Plus, X } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
+import SVG from 'react-inlinesvg'
+
+import { useParams } from 'common'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { Auth, Realtime, Storage } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconBox,
-  IconChevronDown,
-  IconCode,
-  IconDatabase,
-  IconKey,
-  IconPlus,
-  IconX,
-  IconZap,
   Input,
   Popover,
   Select,
+  cn,
 } from 'ui'
-
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import { ReportFilterItem } from './Reports.types'
+import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -41,7 +40,7 @@ const PRODUCT_FILTERS = [
     filterValue: '/rest',
     label: 'REST',
     description: 'Requests made to PostgREST',
-    icon: IconDatabase,
+    icon: Database,
   },
   {
     key: 'auth',
@@ -49,7 +48,7 @@ const PRODUCT_FILTERS = [
     filterValue: '/auth',
     label: 'Auth',
     description: 'Auth and authorization requests',
-    icon: IconKey,
+    icon: Auth,
   },
   {
     key: 'storage',
@@ -57,7 +56,7 @@ const PRODUCT_FILTERS = [
     filterValue: '/storage',
     label: 'Storage',
     description: 'Storage asset requests',
-    icon: IconBox,
+    icon: Storage,
   },
   {
     key: 'realtime',
@@ -65,24 +64,15 @@ const PRODUCT_FILTERS = [
     filterValue: '/realtime',
     label: 'Realtime',
     description: 'Realtime connection requests',
-    icon: IconZap,
+    icon: Realtime,
   },
-  // TODO: support functions once union parsing is fixed
-  // {
-  //   key: 'functions',
-  //   filterKey: 'request.host',
-  //   filterValue: '.functions.',
-  //   label: 'Edge Functions',
-  //   description: 'Edge function calls',
-  //   icon: IconCode,
-  // },
   {
     key: 'graphql',
     filterKey: 'request.path',
     filterValue: '/graphql',
     label: 'GraphQL',
     description: 'Requests made to pg_graphql',
-    icon: IconCode,
+    icon: null,
   },
 ]
 
@@ -95,6 +85,9 @@ const ReportFilterBar = ({
   onRemoveFilters,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
+  const { ref } = useParams()
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
+
   const filterKeys = [
     'request.path',
     'request.method',
@@ -130,7 +123,7 @@ const ReportFilterBar = ({
           key: productFilter.filterKey,
           compare: 'matches',
           value: productFilter.filterValue,
-        } as ReportFilterItem)
+        }) as ReportFilterItem
     )
     onRemoveFilters(toRemove)
     if (nextProductFilter) {
@@ -144,7 +137,7 @@ const ReportFilterBar = ({
   }
 
   return (
-    <div>
+    <div className="flex items-center justify-between">
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
         <DatePickers
           onChange={onDatepickerChange}
@@ -157,7 +150,7 @@ const ReportFilterBar = ({
             <Button
               type="default"
               className="inline-flex flex-row gap-2"
-              iconRight={<IconChevronDown size={14} />}
+              iconRight={<ChevronDown size={14} />}
             >
               <span>
                 {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
@@ -171,6 +164,7 @@ const ReportFilterBar = ({
             <DropdownMenuSeparator />
             {PRODUCT_FILTERS.map((productFilter) => {
               const Icon = productFilter.icon
+
               return (
                 <DropdownMenuItem
                   key={productFilter.key}
@@ -178,7 +172,17 @@ const ReportFilterBar = ({
                   disabled={productFilter.key === currentProductFilter?.key}
                   onClick={() => handleProductFilterChange(productFilter)}
                 >
-                  <Icon size={20} className="mr-2" />
+                  {productFilter.key === 'graphql' ? (
+                    <SVG
+                      src={`${BASE_PATH}/img/graphql.svg`}
+                      className="w-[20px] h-[20px] mr-2"
+                      preProcessor={(code) =>
+                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                      }
+                    />
+                  ) : Icon !== null ? (
+                    <Icon size={20} strokeWidth={1.5} className="mr-2" />
+                  ) : null}
                   <div className="flex flex-col">
                     <p
                       className={cn(
@@ -214,7 +218,7 @@ const ReportFilterBar = ({
                 size="tiny"
                 className="!p-0 !space-x-0"
                 onClick={() => onRemoveFilters([filter])}
-                icon={<IconX size="tiny" className="text-foreground-light" />}
+                icon={<X size={14} className="text-foreground-light" />}
               >
                 <span className="sr-only">Remove</span>
               </Button>
@@ -294,12 +298,18 @@ const ReportFilterBar = ({
             asChild
             type="default"
             size="tiny"
-            icon={<IconPlus size="tiny" className={`text-foreground-light `} />}
+            icon={<Plus size={14} className={`text-foreground-light `} />}
           >
             <span>Add filter</span>
           </Button>
         </Popover>
       </div>
+
+      <DatabaseSelector
+        additionalOptions={
+          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
+        }
+      />
     </div>
   )
 }

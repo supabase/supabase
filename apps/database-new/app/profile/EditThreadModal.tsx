@@ -21,7 +21,7 @@ const EditThreadModal = ({
     message: undefined,
     success: undefined,
     data: {
-      row_id: thread.id,
+      thread_id: thread.thread_id,
       thread_title: thread.thread_title,
     },
   }
@@ -56,7 +56,7 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form ref={formRef} action={formAction} key={`${thread.id}-update-thread-title-form`}>
+      <form ref={formRef} action={formAction} key={`${thread.thread_id}-update-thread-title-form`}>
         <Modal.Content className="py-4">
           <Label_Shadcn_ htmlFor="thread_title">Provide a name for your thread</Label_Shadcn_>
           <Input_Shadcn_
@@ -65,7 +65,7 @@ const EditThreadModal = ({
             name="thread_title"
             defaultValue={state.data.thread_title}
           />
-          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
+          <Input_Shadcn_ name="thread_id" value={state.data.thread_id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">

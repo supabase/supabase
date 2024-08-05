@@ -1,0 +1,188 @@
+---
+title: 'Read Replicas'
+description: 'Deploy read-only databases across multiple regions, for lower latency.'
+subtitle: 'Deploy read-only databases across multiple regions, for lower latency and better resource management.'
+---
+
+Read Replicas are additional databases that are kept in sync with your Primary database. You can read your data from a Read Replica, which helps with:
+
+- **Load balancing:** Read Replicas reduce load on the Primary database. For example, you can use a Read Replica for complex analytical queries and reserve the Primary for user-facing create, update, and delete operations.
+- **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
+- **Redundancy:** Read Replicas provide data redundancy.
+
+<Image
+  alt="Map view of all project databases."
+  src="/docs/img/guides/platform/read-replicas/map-view.png?v=1"
+  containerClassName="max-w-[700px] !mx-auto"
+  zoomable
+/>
+
+## About Read Replicas
+
+The database you start with when launching a Supabase project is your Primary database. Read Replicas are kept in sync with the Primary through a process called "replication." Replication is asynchronous to ensure that transactions on the Primary aren't blocked. There is a delay between an update on the Primary and the time that a Read Replica receives the change. This delay is called "replication lag."
+
+You can only read data from a Read Replica. This is in contrast to a Primary database, where you can both read and write:
+
+|              | select | insert | update | delete |
+| ------------ | ------ | ------ | ------ | ------ |
+| Primary      | ✅     | ✅     | ✅     | ✅     |
+| Read Replica | ✅     | -      | -      | -      |
+
+## Prerequisites
+
+<Admonition type="note">
+
+Read Replicas are available for all projects on the Pro, Team and Enterprise plans. Spin one up now over at the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure).
+
+</Admonition>
+
+Projects must meet these requirements to use Read Replicas:
+
+1. Running on AWS.
+   - Support for projects on Fly.io is coming.
+1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
+   - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
+1. Running on Postgres 15+.
+   - For projects running on older versions of Postgres, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
+   - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
+   - If you're not using PITR, you'll be able to switch to physical backups as part of the Read Replica setup process. Note that physical backups can't be downloaded from the dashboard in the way logical backups can.
+
+## Getting started
+
+To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard. Each project can deploy up to two Read Replicas and all Read Replicas inherit the compute size of their Primary database.
+
+### Deploying a Read Replica
+
+A Read Replica is deployed by using a physical backup as a starting point, and a combination of WAL file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete. The duration of restoring from a physical backup is roughly dependent and directly related to the database size of your project. The time taken to catch up to the primary using WAL archives and direct replication is dependent on the level of activity on the Primary database; a more active database will produce a larger number of WAL files that will need to be processed.
+
+Along with the progress of the deployment, the dashboard displays rough estimates for each component.
+
+### What does it mean when "Init failed" is observed?
+
+The status `Init failed` indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica may have failed to be deployed:
+
+- Underlying instance failed to come up.
+- Network issue leading to inability to connect to the Primary database.
+- Possible incompatible database settings between the Primary and Read Replica databases.
+- Platform issues.
+
+It is safe to drop this failed Read Replica, and in the event of a transient issue, attempt to spin up another one. If however spinning up Read Replicas for your project consistently fails, do check out our [status page](https://status.supabase.com) for any ongoing incidents, or open a support ticket [here](/dashboard/support/new). To aid the investigation, do not bring down the recently failed Read Replica.
+
+## Features
+
+Read Replicas offer the following features:
+
+### Dedicated endpoints
+
+Each Read Replica has its own dedicated database and API endpoints.
+
+- Find the database endpoint on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection Info**
+- Find the API endpoint on the [API Settings page](/dashboard/project/_/settings/api) under **Project URL**
+
+Read Replicas only support `GET` requests from the [REST API](/docs/guides/api). If you are calling a read-only Postgres function through the REST API, make sure to set the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
+
+Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't able to use a Read Replica or its API endpoint. Support for more products will be added in the future.
+
+If you're using an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replicas), the database endpoints for your Read Replicas will also use an IPv4 add-on.
+
+### Dedicated connection pool
+
+A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection String**.
+
+### API load balancer
+
+A load balancer is deployed to automatically balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
+
+The load balancer uses a round-robin strategy to route `GET` requests to all available API endpoints, including the Primary database. This means that `GET` requests are randomly and evenly split among databases. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+
+To call a read-only Postgres function on Read Replicas through the REST API, use the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
+
+If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
+
+<Admonition type="caution">
+
+If you use a [custom domain](/docs/guides/platform/custom-domains), requests will not be routed through the load balancer. You should instead use the dedicated endpoints provided in the dashboard.
+
+</Admonition>
+
+### Querying through the SQL editor
+
+In the SQL editor, you can choose if you want to run the query on a particular Read Replica.
+
+<Image
+  alt="SQL editor view."
+  src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
+  containerClassName="max-w-[700px]"
+  zoomable
+/>
+
+### Logging
+
+When a Read Replica is deployed, it emits logs from the following services:
+
+- [API](/dashboard/project/_/logs/edge-logs)
+- [Postgres](/dashboard/project/_/logs/postgres-logs)
+- [PostgREST](/dashboard/project/_/logs/postgrest-logs)
+- [Supavisor](/dashboard/project/_/logs/pooler-logs)
+
+Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Viewing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
+
+For API logs, logs can originate from the API Load Balancer as well. The upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
+
+### Metrics
+
+Observability and metrics for Read Replicas are available on the Supabase Dashboard. Resource utilization for a specific Read Replica can be viewed on the [Database Reports page](/dashboard/project/_/reports/database) by toggling for `Source`. Likewise, metrics on API requests going through either a Read Replica or Load Balancer API endpoint are also available on the dashboard through the [API Reports page](/dashboard/project/_/reports/api-overview)
+
+We recommend ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment. If you have an existing ingestion pipeline set up for your project, you can [update it](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
+
+### Centralized configuration management
+
+All settings configured through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with the Primary database or with other Read Replicas.
+
+## Operations blocked by Read Replicas
+
+### Project upgrades and data restorations
+
+The following procedures require all Read Replicas for a project to be brought down before they can be performed:
+
+1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
+
+These operations need to be completed before Read Replicas can be re-deployed.
+
+## About replication
+
+We use a hybrid approach to replicate data from a Primary to its Read Replicas, combining the native methods of streaming replication and file-based log shipping.
+
+### Streaming replication
+
+Postgres generates a Write Ahead Log (WAL) as database changes occur. With streaming replication, these changes stream from the Primary to the Read Replica server. The WAL alone is sufficient to reconstruct the database to its current state.
+
+This replication method is fast, since changes are streamed directly from the Primary to the Read Replica. On the other hand, it faces challenges when the Read Replica can't keep up with the WAL changes from its Primary. This can happen when the Read Replica is too small, running on degraded hardware, or has a heavier workload running.
+
+To address this, Postgres does provide tunable configuration, like `wal_keep_size`, to adjust the WAL retained by the Primary. If the Read Replica fails to “catch up” before the WAL surpasses the `wal_keep_size` setting, the replication is terminated. Tuning is a bit of an art - the amount of WAL required is variable for every situation.
+
+### File-based log shipping
+
+In this replication method, the Primary continuously buffers WAL changes to a local file and then sends the file to the Read Replica. If multiple Read Replicas are present, files could also be sent to an intermediary location accessible by all. The Read Replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the Primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach Read Replicas if the Primary goes down before the file is transferred. In these cases, if the Primary fails a Replica using streaming replication would (in most cases) be more up-to-date than a Replica using file-based log shipping.
+
+### File-based log shipping 🤝 streaming replication
+
+<Image
+  alt="Map view of Primary and Read Replica databases"
+  caption="Map view of Primary and Read Replica databases"
+  src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
+  containerClassName="max-w-[700px] mx-auto"
+  zoomable
+/>
+
+We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
+
+We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, Read Replicas connect to the Primary and stream the WAL directly.
+
+### Monitoring replication lag
+
+Replication lag for a specific Read Replica can be monitored through the dashboard. On the [Database Reports page](/dashboard/project/_/reports/database) Read Replicas will have an additional chart under `Replica Information` displaying historical replication lag in seconds. Realtime replication lag in seconds can be observed on the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). This is the value on top of the Read Replica. Do note that there is no single threshold to indicate when replication lag should be addressed. It would be fully dependent on the requirements of your project.
+
+If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms accordingly with the metric: `physical_replication_lag_physical_replica_lag_seconds`.

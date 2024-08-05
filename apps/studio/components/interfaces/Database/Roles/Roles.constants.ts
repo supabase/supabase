@@ -6,10 +6,11 @@ export const SUPABASE_ROLES = [
   'dashboard_user',
   'supabase_admin',
   'supabase_auth_admin',
+  'supabase_functions_admin',
   'supabase_read_only_user',
+  'supabase_realtime_admin',
   'supabase_replication_admin',
   'supabase_storage_admin',
-  'supabase_functions_admin',
   'pgbouncer',
   'pgsodium_keyholder',
   'pgsodium_keyiduser',
@@ -33,35 +34,35 @@ export const SYSTEM_ROLES = [
 ] as const
 
 export const ROLE_PERMISSIONS = {
-  can_login: {
+  canLogin: {
     disabled: false,
     description: 'User can login',
     grant_by_dashboard: true,
   },
-  can_create_role: {
+  canCreateRole: {
     disabled: false,
     description: 'User can create roles',
     grant_by_dashboard: true,
   },
-  can_create_db: {
+  canCreateDb: {
     disabled: false,
     description: 'User can create databases',
     grant_by_dashboard: true,
   },
-  can_bypass_rls: {
-    disabled: true,
+  canBypassRls: {
+    disabled: false,
     description: 'User bypasses every row level security policy',
-    grant_by_dashboard: false,
+    grant_by_dashboard: true,
   },
-  is_superuser: {
+  isSuperuser: {
     disabled: true,
     description: 'User is a Superuser',
     grant_by_dashboard: false,
   },
-  is_replication_role: {
-    disabled: true,
+  isReplicationRole: {
+    disabled: false,
     description:
       'User can initiate streaming replication and put the system in and out of backup mode',
-    grant_by_dashboard: false,
+    grant_by_dashboard: true,
   },
 } as const

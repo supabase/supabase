@@ -1,27 +1,32 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { ProductMenu } from 'components/ui/ProductMenu'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
+import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
 export interface RealtimeLayoutProps {
-  title?: string
+  title: string
 }
 
-const RealtimeLayout = ({ children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const { meta } = useStore()
+const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
+  const authzEnabled = useFlag('authzRealtime')
+
   return (
     <ProjectLayout
-      isLoading={false}
+      title={title}
       product="Realtime"
-      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
+      productMenu={
+        <ProductMenu page={page} menu={generateRealtimeMenu(project!, { authzEnabled })} />
+      }
     >
       {children}
     </ProjectLayout>

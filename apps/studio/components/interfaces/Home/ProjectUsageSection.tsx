@@ -1,17 +1,15 @@
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
-import { IconAlertCircle } from 'ui'
+import dayjs from 'dayjs'
+import { AlertCircle } from 'lucide-react'
 
 import { NewProjectPanel } from 'components/interfaces/Home'
 import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/LoadingState'
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
 import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import ProjectUsage from './ProjectUsage'
-import { useSelectedProject } from 'hooks'
-import dayjs from 'dayjs'
 
-const ProjectUsageSection = observer(() => {
+const ProjectUsageSection = () => {
   const project = useSelectedProject()
 
   const {
@@ -32,7 +30,7 @@ const ProjectUsageSection = observer(() => {
       <InformationBox
         hideCollapse
         defaultVisibility
-        icon={<IconAlertCircle strokeWidth={2} />}
+        icon={<AlertCircle size={18} strokeWidth={2} />}
         title="There was an issue loading the usage details of your project"
       />
     )
@@ -55,5 +53,6 @@ const ProjectUsageSection = observer(() => {
       )}
     </>
   )
-})
+}
+
 export default ProjectUsageSection

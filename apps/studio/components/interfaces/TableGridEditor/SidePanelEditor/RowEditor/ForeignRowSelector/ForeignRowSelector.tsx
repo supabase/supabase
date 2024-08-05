@@ -1,16 +1,19 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { IconLoader, SidePanel } from 'ui'
 
-import { parseSupaTable } from 'components/grid'
-import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  parseSupaTable,
+} from 'components/grid/SupabaseGrid.utils'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import FilterPopover from 'components/grid/components/header/filter'
-import SortPopover from 'components/grid/components/header/sort'
+import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
+import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -164,7 +167,7 @@ const ForeignRowSelector = ({
                 <SelectorGrid
                   table={supaTable}
                   rows={data.rows}
-                  onRowSelect={(row) => onSelect(row[columnName ?? ''])}
+                  onRowSelect={(row) => onSelect(row[columnName?.[0] ?? ''])}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center border-b border-t border-default">

@@ -35,7 +35,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { XIcon } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
@@ -71,7 +73,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -84,7 +86,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
-    'graphiql-rls-bypass-warning-dismissed',
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
     false
   )
 

@@ -1,10 +1,19 @@
+import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_URL, PRICING_TIER_PRODUCT_IDS, PROVIDERS } from 'lib/constants'
-import { ProjectBase, ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, post } from 'data/fetchers'
+import { PROVIDERS } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+
+const WHITELIST_ERRORS = [
+  'The following organization members have reached their maximum limits for the number of active free projects',
+  'db_pass must be longer than or equal to 4 characters',
+]
+
+export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
 
 export type ProjectCreateVariables = {
   name: string
@@ -14,9 +23,11 @@ export type ProjectCreateVariables = {
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
-  configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
+  dbInstanceSize?: DbInstanceSize
+  dataApiExposedSchemas?: string[]
+  dataApiUseApiSchema?: boolean
 }
 
 export async function createProject({
@@ -25,28 +36,35 @@ export async function createProject({
   dbPass,
   dbRegion,
   dbSql,
-  dbPricingTierId = PRICING_TIER_PRODUCT_IDS.FREE,
   cloudProvider = PROVIDERS.AWS.id,
-  configurationId,
   authSiteUrl,
   customSupabaseRequest,
+  dbInstanceSize,
+  dataApiExposedSchemas,
+  dataApiUseApiSchema,
 }: ProjectCreateVariables) {
-  const response = await post(`${API_URL}/projects`, {
+  const body: components['schemas']['CreateProjectBody'] = {
     cloud_provider: cloudProvider,
     org_id: organizationId,
     name,
     db_pass: dbPass,
     db_region: dbRegion,
     db_sql: dbSql,
-    db_pricing_tier_id: dbPricingTierId,
     auth_site_url: authSiteUrl,
-    vercel_configuration_id: configurationId,
     ...(customSupabaseRequest !== undefined && {
-      custom_supabase_internal_requests: customSupabaseRequest,
+      custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
+    desired_instance_size: dbInstanceSize,
+    data_api_exposed_schemas: dataApiExposedSchemas,
+    data_api_use_api_schema: dataApiUseApiSchema,
+  }
+
+  const { data, error } = await post(`/platform/projects`, {
+    body,
   })
-  if (response.error) throw response.error
-  return response as ProjectBase
+
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectCreateData = Awaited<ReturnType<typeof createProject>>
@@ -73,6 +91,9 @@ export const useProjectCreateMutation = ({
           toast.error(`Failed to create new project: ${data.message}`)
         } else {
           onError(data, variables, context)
+        }
+        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
         }
       },
       ...options,

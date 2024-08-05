@@ -1,6 +1,6 @@
 import { filterFunctionsRequestResponse } from 'lib/logs'
-import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
+import type { PreviewLogData } from '../Logs.types'
 import {
   jsonSyntaxHighlight,
   ResponseCodeFormatter,
@@ -29,6 +29,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         <SelectionDetailedRow label="Method" value={method} />
         <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
+        <SelectionDetailedRow label="Execution ID" value={metadata.execution_id} />
         <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
         <SelectionDetailedRow label="Log ID" value={log.id} />
         {requestUrl !== undefined && (
@@ -61,13 +62,6 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
       </div>
     </>
   )
-}
-
-export const FunctionInvocationHeaderRender = (log: any) => {
-  const method = log?.method
-  const path = log?.request?.url
-
-  return `${method} ${path}`
 }
 
 export default FunctionInvocationSelectionRender

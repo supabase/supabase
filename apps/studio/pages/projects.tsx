@@ -1,19 +1,25 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
-import { AccountLayout } from 'components/layouts'
-import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
+import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import HomePageActions from 'components/interfaces/HomePageActions'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AlertError from 'components/ui/AlertError'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { NextPageWithLayout } from 'types'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const [search, setSearch] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string[]>([
+    PROJECT_STATUS.ACTIVE_HEALTHY,
+    PROJECT_STATUS.INACTIVE,
+  ])
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
@@ -47,23 +53,26 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {navLayoutV2 && (
         <div className={`flex items-center justify-center h-full`}>
-          <Connecting />
+          <Loading />
         </div>
       )}
-
       {!navLayoutV2 && (
-        <div className="py-4 px-5">
-          {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (
-            <div className="my-2">
-              <div className="flex">
-                <div className="">
-                  <OrganizationDropdown organizations={organizations} />
-                </div>
-              </div>
-            </div>
+        <div className="p-5">
+          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+            <HomePageActions
+              search={search}
+              filterStatus={filterStatus}
+              setSearch={setSearch}
+              setFilterStatus={setFilterStatus}
+              organizations={organizations}
+            />
           )}
-          <div className="my-8 space-y-8">
-            <ProjectList />
+          <div className="my-6 space-y-8">
+            <ProjectList
+              search={search}
+              filterStatus={filterStatus}
+              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+            />
           </div>
         </div>
       )}

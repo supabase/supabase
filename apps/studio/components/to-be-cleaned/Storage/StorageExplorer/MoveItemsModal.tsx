@@ -1,11 +1,12 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
+import { StorageItemWithColumn } from '../Storage.types'
 
 interface MoveItemsModalProps {
   bucketName: string
   visible: boolean
-  selectedItemsToMove: any[]
+  selectedItemsToMove: StorageItemWithColumn[]
   onSelectCancel: () => void
   onSelectMove: (path: string) => void
 }
@@ -30,8 +31,8 @@ const MoveItemsModal = ({
   const title = multipleFiles
     ? `Moving ${selectedItemsToMove.length} items within ${bucketName}`
     : selectedItemsToMove.length === 1
-    ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
-    : ``
+      ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
+      : ``
 
   const description = `Enter the path to where you'd like to move the file${
     multipleFiles ? 's' : ''
@@ -65,7 +66,7 @@ const MoveItemsModal = ({
       }
     >
       <Modal.Content>
-        <form className="my-4">
+        <form>
           <div className="relative flex items-center">
             <Input
               autoFocus

@@ -1,6 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import z from 'zod'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -12,11 +17,6 @@ import {
   SidePanel,
   Switch,
 } from 'ui'
-import z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormActions } from 'components/ui/Forms'
-import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface CreateRolePanelProps {
@@ -26,22 +26,22 @@ interface CreateRolePanelProps {
 
 const FormSchema = z.object({
   name: z.string().trim().min(1, 'You must provide a name').default(''),
-  is_superuser: z.boolean().default(false),
-  can_login: z.boolean().default(false),
-  can_create_role: z.boolean().default(false),
-  can_create_db: z.boolean().default(false),
-  is_replication_role: z.boolean().default(false),
-  can_bypass_rls: z.boolean().default(false),
+  isSuperuser: z.boolean().default(false),
+  canLogin: z.boolean().default(false),
+  canCreateRole: z.boolean().default(false),
+  canCreateDb: z.boolean().default(false),
+  isReplicationRole: z.boolean().default(false),
+  canBypassRls: z.boolean().default(false),
 })
 
 const initialValues = {
   name: '',
-  is_superuser: false,
-  can_login: false,
-  can_create_role: false,
-  can_create_db: false,
-  is_replication_role: false,
-  can_bypass_rls: false,
+  isSuperuser: false,
+  canLogin: false,
+  canCreateRole: false,
+  canCreateDb: false,
+  isReplicationRole: false,
+  canBypassRls: false,
 }
 
 const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
@@ -54,9 +54,9 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   })
 
   const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
-    onSuccess: (res) => {
-      toast.success(`Successfully created new role: ${res.name}`)
-      onClose()
+    onSuccess: (_, vars) => {
+      toast.success(`Successfully created new role: ${vars.payload.name}`)
+      handleClose()
     },
   })
 
@@ -71,7 +71,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const handleClose = () => {
     onClose()
-    form.reset()
+    form.reset(initialValues)
   }
 
   return (
@@ -88,7 +88,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             form={formId}
             isSubmitting={isCreating}
             hasChanges={form.formState.isDirty}
-            handleReset={() => form.reset()}
+            handleReset={handleClose}
           />
         </div>
       }

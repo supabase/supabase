@@ -18,7 +18,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface TriggerListProps {
   schema: string
@@ -54,7 +54,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={6}>
+        <Table.td colSpan={7}>
           <p className="text-sm text-foreground">No triggers created yet</p>
           <p className="text-sm text-foreground-light">
             There are no triggers found in the schema "{schema}"
@@ -67,7 +67,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+        <Table.td colSpan={7}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
@@ -100,11 +100,17 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
             </div>
+          </Table.td>
+
+          <Table.td className="hidden space-x-2 xl:table-cell">
+            <p title={x.orientation} className="truncate">
+              {x.orientation}
+            </p>
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
-import { Enum } from './AuthProvidersForm.types'
+import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
   name: string

@@ -1,22 +1,21 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconExternalLink } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
+import { Button, IconExternalLink } from 'ui'
 
 const VaultToggle = () => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const [isEnabling, setIsEnabling] = useState(false)
@@ -45,16 +44,15 @@ const VaultToggle = () => {
 
     setIsEnabling(true)
 
-    const { error: createSchemaError } = await meta.query(
-      `create schema if not exists ${vaultExtension.schema ?? 'vault'};`
-    )
-    if (createSchemaError) {
-      setIsEnabling(false)
-      return ui.setNotification({
-        error: createSchemaError,
-        category: 'error',
-        message: `Failed to create schema: ${createSchemaError.message}`,
+    try {
+      await executeSql({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: `create schema if not exists ${vaultExtension.schema ?? 'vault'};`,
       })
+    } catch (createSchemaError: any) {
+      setIsEnabling(false)
+      return toast.error(`Failed to create schema: ${createSchemaError.message}`)
     }
 
     enableExtension({
@@ -70,7 +68,7 @@ const VaultToggle = () => {
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-background border rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-studio border rounded bg-no-repeat"
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
@@ -162,4 +160,4 @@ const VaultToggle = () => {
   )
 }
 
-export default observer(VaultToggle)
+export default VaultToggle

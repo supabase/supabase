@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
+
 import {
   Button,
   IconActivity,
@@ -16,14 +17,12 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useProjectContext } from '../ProjectContext'
 
-interface HelpPopoverProps {
-  alt?: boolean
-}
-
-const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
+const HelpPopover = () => {
   const router = useRouter()
-  const projectRef = router.query.ref
+  const { project } = useProjectContext()
+  const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
   return (
@@ -34,36 +33,28 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             <div className="relative flex items-center">
               <Button
                 id="help-popover-button"
-                type={alt ? 'text' : 'default'}
-                className={alt ? 'px-1' : ''}
+                type="text"
+                className="px-1"
                 icon={
-                  <IconHelpCircle
-                    size={alt ? 18 : 16}
-                    strokeWidth={1.5}
-                    className={alt ? 'text-foreground-light' : 'text-foreground-lighter'}
-                  />
+                  <IconHelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
                 }
-              >
-                {!alt && <span>Help</span>}
-              </Button>
+              />
             </div>
           </Tooltip.Trigger>
         </PopoverTrigger_Shadcn_>
-        {alt ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'space-y-2 border border-background',
-                ].join(' ')}
-              >
-                <p className="text-xs text-foreground">Help</p>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : null}
+        <Tooltip.Portal>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'space-y-2 border border-background',
+              ].join(' ')}
+            >
+              <p className="text-xs text-foreground">Help</p>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Portal>
       </Tooltip.Root>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">

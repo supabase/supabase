@@ -1,33 +1,36 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
+import { ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import DatePicker from 'react-datepicker'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import InformationBox from 'components/ui/InformationBox'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertTriangle,
-  IconChevronLeft,
-  IconChevronRight,
-  IconExternalLink,
-  IconHelpCircle,
   Modal,
+  WarningIcon,
 } from 'ui'
-
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import InformationBox from 'components/ui/InformationBox'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { PROJECT_STATUS } from 'lib/constants'
 import BackupsEmpty from '../BackupsEmpty'
-import { Timezone } from './PITR.types'
+import BackupsStorageAlert from '../BackupsStorageAlert'
+import type { Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
@@ -36,9 +39,7 @@ import {
 } from './PITR.utils'
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
-import TimezoneSelection from './TimezoneSelection'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import Link from 'next/link'
+import { TimezoneSelection } from './TimezoneSelection'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -50,6 +51,11 @@ const PITRSelection = () => {
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
+
+  const canTriggerPhysicalBackups = useCheckPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.restore.prepare'
+  )
 
   const hasReadReplicas = (databases ?? []).length > 1
 
@@ -139,13 +145,14 @@ const PITRSelection = () => {
         title="Restore your database from a backup"
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
+      <BackupsStorageAlert />
       {hasNoBackupsAvailable ? (
         <BackupsEmpty />
       ) : (
         <>
           {hasReadReplicas && (
             <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
+              <WarningIcon />
               <AlertTitle_Shadcn_>
                 Unable to restore from PITR as project has read replicas enabled
               </AlertTitle_Shadcn_>
@@ -180,34 +187,24 @@ const PITRSelection = () => {
                   <Button type="default" onClick={onCancel}>
                     Cancel
                   </Button>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="warning"
-                        disabled={isSelectedOutOfRange || !selectedDate}
-                        onClick={() => setShowConfirmation(true)}
-                      >
-                        Review restore details
-                      </Button>
-                    </Tooltip.Trigger>
-                    {isSelectedOutOfRange && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'bg-alternative rounded py-1 px-2 leading-none shadow',
-                              'border-background border w-48 text-center',
-                            ].join(' ')}
-                          >
-                            <span className="text-foreground text-xs">
-                              Selected date is out of range where backups are available
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
+
+                  <ButtonTooltip
+                    type="warning"
+                    disabled={isSelectedOutOfRange || !selectedDate || !canTriggerPhysicalBackups}
+                    onClick={() => setShowConfirmation(true)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isSelectedOutOfRange
+                          ? 'Selected date is out of range where backups are available'
+                          : !canTriggerPhysicalBackups
+                            ? 'You need additional permissions to trigger a restore'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Review restore details
+                  </ButtonTooltip>
                 </div>
               }
             >
@@ -239,7 +236,7 @@ const PITRSelection = () => {
                             text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
-                            <IconChevronLeft size={16} strokeWidth={2} />
+                            <ChevronLeft size={16} strokeWidth={2} />
                           </button>
                           <span className="text-foreground-light text-sm">
                             {format(date, 'MMMM yyyy')}
@@ -253,7 +250,7 @@ const PITRSelection = () => {
                             text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
-                            <IconChevronRight size={16} strokeWidth={2} />
+                            <ChevronRight size={16} strokeWidth={2} />
                           </button>
                         </div>
                       </div>
@@ -272,7 +269,7 @@ const PITRSelection = () => {
                         <InformationBox
                           defaultVisibility
                           hideCollapse
-                          icon={<IconHelpCircle strokeWidth={2} />}
+                          icon={<HelpCircle size={14} strokeWidth={2} />}
                           title="Select a date which you'd like to restore your database to"
                         />
                       </div>
@@ -295,8 +292,6 @@ const PITRSelection = () => {
                           <p className="text-sm text-foreground-light">Time zone</p>
                           <div className="w-[350px]">
                             <TimezoneSelection
-                              hideLabel
-                              dropdownWidth="w-[400px]"
                               selectedTimezone={selectedTimezone}
                               onSelectTimezone={setSelectedTimezone}
                             />
@@ -355,8 +350,8 @@ const PITRSelection = () => {
           )}
         </>
       )}
+
       <Modal
-        closable
         size="medium"
         visible={showConfirmation}
         onCancel={() => setShowConfirmation(false)}
@@ -381,44 +376,40 @@ const PITRSelection = () => {
           </div>
         }
       >
-        <div className="space-y-4 py-3">
-          <Modal.Content>
-            <div className="py-2 space-y-1">
-              <p className="text-sm text-foreground-light">Your database will be restored to:</p>
+        <Modal.Content>
+          <div className="py-2 space-y-1">
+            <p className="text-sm text-foreground-light">Your database will be restored to:</p>
+          </div>
+          <div className="py-2 flex flex-col gap-3">
+            <div>
+              <p className="text-sm font-mono text-foreground-lighter">{selectedTimezone?.text}</p>
+              <p className="text-2xl">{recoveryTimeString}</p>
             </div>
-            <div className="py-2 flex flex-col gap-3">
-              <div>
-                <p className="text-sm font-mono text-foreground-lighter">
-                  {selectedTimezone?.text}
-                </p>
-                <p className="text-2xl">{recoveryTimeString}</p>
-              </div>
-              <div>
-                <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
-                <p className="text-2xl">{recoveryTimeStringUtc}</p>
-              </div>
+            <div>
+              <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
+              <p className="text-2xl">{recoveryTimeStringUtc}</p>
             </div>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <Alert
-              withIcon
-              variant="warning"
-              title="This action cannot be undone, not cancelled once started"
-            >
-              Any changes made to your database after this point in time will be lost. This includes
-              any changes to your project's storage and authentication.
-            </Alert>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <p className="text-sm text-foreground-light">
-              Restores may take from a few minutes up to several hours depending on the size of your
-              database. During this period, your project will not be available, until the
-              restoration is completed.
-            </p>
-          </Modal.Content>
-        </div>
+          </div>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <Alert
+            withIcon
+            variant="warning"
+            title="This action cannot be undone, not canceled once started"
+          >
+            Any changes made to your database after this point in time will be lost. This includes
+            any changes to your project's storage and authentication.
+          </Alert>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content>
+          <p className="text-sm text-foreground-light">
+            Restores may take from a few minutes up to several hours depending on the size of your
+            database. During this period, your project will not be available, until the restoration
+            is completed.
+          </p>
+        </Modal.Content>
       </Modal>
     </>
   )

@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 
@@ -10,7 +10,7 @@ import {
   TIMESTAMP_TYPES,
   TIME_TYPES,
 } from '../SidePanelEditor.constants'
-import { RowField } from './RowEditor.types'
+import type { RowField } from './RowEditor.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -25,14 +25,14 @@ export const generateRowFields = (
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
         : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-        ? column.default_value
-        : isUndefined(row) && column.format === 'bool' && column.is_nullable
-        ? 'null'
-        : isUndefined(row)
-        ? ''
-        : DATETIME_TYPES.includes(column.format)
-        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-        : parseValue(row[column.name], column.format)
+          ? column.default_value
+          : isUndefined(row) && column.format === 'bool' && column.is_nullable
+            ? 'null'
+            : isUndefined(row)
+              ? ''
+              : DATETIME_TYPES.includes(column.format)
+                ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+                : parseValue(row[column.name], column.format)
 
     const foreignKey = find(relationships, (relationship) => {
       return (
@@ -86,7 +86,6 @@ export const parseValue = (originalValue: any, format: string) => {
   try {
     if (
       originalValue === null ||
-      (Array.isArray(originalValue) && originalValue.length === 0) ||
       (typeof originalValue === 'string' && originalValue.length === 0)
     ) {
       return originalValue
@@ -164,8 +163,8 @@ export const generateRowObjectFromFields = (
     const value = TEXT_TYPES.includes(field.format)
       ? field.value
       : (field?.value ?? '').length === 0
-      ? null
-      : field.value
+        ? null
+        : field.value
 
     if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)

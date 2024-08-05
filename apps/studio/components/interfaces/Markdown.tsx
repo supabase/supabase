@@ -1,8 +1,8 @@
-import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { ReactMarkdown, ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
+import remarkGfm from 'remark-gfm'
 import { cn } from 'ui'
 
-interface Props extends Omit<ReactMarkdownProps, 'children' | 'node'> {
+interface Props extends Omit<ReactMarkdownOptions, 'children' | 'node'> {
   className?: string
   content: string
   extLinks?: boolean
@@ -11,6 +11,7 @@ interface Props extends Omit<ReactMarkdownProps, 'children' | 'node'> {
 const Markdown = ({ className, content = '', extLinks = false, ...props }: Props) => {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
       components={{
         h3: ({ children }) => <h3 className="mb-1">{children}</h3>,
         a: ({ href, children }) => (

@@ -30,12 +30,12 @@ const ProductEmptyState = ({
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <div className="flex space-x-4 rounded border border-overlay bg-surface-100 p-6 shadow-md">
+      <div className="flex space-x-4 rounded border bg-surface-100 p-6 shadow-md">
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>
-            <h5>{title}</h5>
-            <div className="flex flex-col space-y-2">{children}</div>
+            <h5 className="text-foreground">{title}</h5>
+            <div className="flex flex-col space-y-2 text-foreground-light">{children}</div>
             {hasAction && (
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (

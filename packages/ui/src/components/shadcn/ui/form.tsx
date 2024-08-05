@@ -1,6 +1,8 @@
-import * as React from 'react'
+'use client'
+
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
+import * as React from 'react'
 import {
   Controller,
   ControllerProps,
@@ -8,16 +10,17 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  useWatch,
 } from 'react-hook-form'
 
-import { cn } from '@ui/lib/utils'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { cn } from '../../../lib/utils/cn'
+import { Label } from './label'
 
 const Form = FormProvider
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   name: TName
 }
@@ -26,7 +29,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFi
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
@@ -66,17 +69,20 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const id = React.useId()
+const FormItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { asChild?: boolean }
+>(({ asChild, ...props }, ref) => {
+  const id = React.useId()
 
-    return (
-      <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn('space-y-2', className)} {...props} />
-      </FormItemContext.Provider>
-    )
-  }
-)
+  const Comp = asChild ? Slot : 'div'
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <Comp ref={ref} {...props} />
+    </FormItemContext.Provider>
+  )
+})
 FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
@@ -88,7 +94,13 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && 'text-destructive', className, 'leading-normal')}
+      className={cn(
+        'text-foreground-light',
+        'transition-colors',
+        error && '!text-destructive',
+        className,
+        'leading-normal'
+      )}
       htmlFor={formItemId}
       {...props}
     />
@@ -156,12 +168,13 @@ const FormMessage = React.forwardRef<
 FormMessage.displayName = 'FormMessage'
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
   FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  useFormField,
+  useWatch,
 }

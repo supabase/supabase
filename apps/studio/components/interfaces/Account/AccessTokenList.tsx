@@ -1,19 +1,17 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconTrash, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useStore } from 'hooks'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-const AccessTokenList = observer(() => {
-  const { ui } = useStore()
+const AccessTokenList = () => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully deleted access token' })
+      toast.success('Successfully deleted access token')
       setIsOpen(false)
     },
   })
@@ -79,23 +77,21 @@ const AccessTokenList = observer(() => {
       </div>
       <ConfirmationModal
         visible={isOpen}
-        danger={true}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsOpen(false)}
-        onSelectConfirm={() => {
+        variant={'destructive'}
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => setIsOpen(false)}
+        onConfirm={() => {
           if (token) onDeleteToken(token.id)
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
-          </p>
-        </Modal.Content>
+        <p className="py-4 text-sm text-foreground-light">
+          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+        </p>
       </ConfirmationModal>
     </>
   )
-})
+}
 
 export default AccessTokenList

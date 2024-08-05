@@ -16,3 +16,4 @@ apps/docs/pages/guides/integrations/*.mdx
 apps/studio/public
 apps/**/.turbo
 apps/docs/CONTRIBUTING.md
+apps/design-system/__registry__

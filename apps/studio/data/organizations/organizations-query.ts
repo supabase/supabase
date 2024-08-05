@@ -2,7 +2,7 @@ import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstac
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { Organization, ResponseError } from 'types'
+import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export async function getOrganizations(signal?: AbortSignal): Promise<Organization[]> {
@@ -29,16 +29,6 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
     ({ signal }) => getOrganizations(signal),
     { enabled: enabled, ...options, staleTime: 30 * 60 * 1000 }
   )
-
-export function prefetchOrganizations(client: QueryClient) {
-  return client.prefetchQuery(organizationKeys.list(), ({ signal }) => getOrganizations(signal))
-}
-
-export const useOrganizationsPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => prefetchOrganizations(client), [])
-}
 
 export function invalidateOrganizationsQuery(client: QueryClient) {
   return client.invalidateQueries(organizationKeys.list())

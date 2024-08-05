@@ -3,6 +3,22 @@
   -webkit-text-size-adjust: 100%;
 }
 
+.monaco-editor-alt.monaco-editor-alt,
+.monaco-editor-alt > .monaco-editor {
+  --vscode-editor-background: hsl(var(--background-surface-300)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-surface-300)) !important;
+}
+
+.monaco-editor-alt .current-line {
+  border: 0 !important;
+}
+
+.monaco-editor,
+.monaco-diff-editor {
+  --vscode-editor-background: hsl(var(--background-surface-200)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-surface-200)) !important;
+}
+
 .gutter {
   @apply bg-border-control;
   cursor: row-resize;
@@ -29,6 +45,10 @@ span.th.tr.td.textarea {
 .grid-monaco-editor,
 .monaco-editor label:hover {
   cursor: inherit;
+}
+
+.find-widget {
+  margin-right: 30px;
 }
 
 .grid-monaco-editor,

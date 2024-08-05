@@ -1,0 +1,70 @@
+---
+id: 'ai-vecs-python-client'
+title: 'Semantic Text Deduplication'
+subtitle: 'Finding duplicate movie reviews with Supabase Vecs.'
+breadcrumb: 'AI Quickstarts'
+---
+
+This guide will walk you through a ["Semantic Text Deduplication"](https://github.com/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb) example using Colab and Supabase Vecs. You'll learn how to find similar movie reviews using embeddings, and remove any that seem like duplicates. You will:
+
+1. Launch a Postgres database that uses pgvector to store embeddings
+1. Launch a notebook that connects to your database
+1. Load the IMDB dataset
+1. Use the `sentence-transformers/all-MiniLM-L6-v2` model to create an embedding representing the semantic meaning of each review.
+1. Search for all duplicates.
+
+<DatabaseSetup />
+
+## Launching a notebook
+
+Launch our [`semantic_text_deduplication`](https://github.com/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb) notebook in Colab:
+
+<a
+  className="w-64"
+  href="https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb"
+>
+  <img src="/docs/img/ai/colab-badge.svg" />
+</a>
+
+At the top of the notebook, you'll see a button `Copy to Drive`. Click this button to copy the notebook to your Google Drive.
+
+## Connecting to your database
+
+Inside the Notebook, find the cell which specifies the `DB_CONNECTION`. It will contain some code like this:
+
+```python
+import vecs
+
+DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+
+# create vector store client
+vx = vecs.create_client(DB_CONNECTION)
+```
+
+Replace the `DB_CONNECTION` with your own connection string for your database. You can find the Postgres connection string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) of your Supabase project.
+
+<Admonition type='note'>
+
+SQLAlchemy requires the connection string to start with `postgresql://` (instead of `postgres://`). Don't forget to rename this after copying the string from the dashboard.
+
+</Admonition>
+
+<Admonition type='note'>
+
+You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since Colab does not support IPv6.
+
+</Admonition>
+
+## Stepping through the notebook
+
+Now all that's left is to step through the notebook. You can do this by clicking the "execute" button (`ctrl+enter`) at the top left of each code cell. The notebook guides you through the process of creating a collection, adding data to it, and querying it.
+
+You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+
+![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
+
+<HuggingFaceDeployment />
+
+## Next steps
+
+You can now start building your own applications with Vecs. Check our [examples](/docs/guides/ai#examples) for ideas.

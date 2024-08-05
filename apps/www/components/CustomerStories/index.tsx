@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { GlassPanel } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 import SectionContainer from '../Layouts/SectionContainer'
 import TextLink from '../TextLink'

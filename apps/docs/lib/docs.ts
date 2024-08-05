@@ -1,98 +1,153 @@
-import fs from 'fs'
-import { join } from 'path'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import matter from 'gray-matter'
-import nonGeneratedReferencePages from 'data/nonGeneratedReferencePages'
-import { REFERENCES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { serialize } from 'next-mdx-remote/serialize'
+import type { SerializeOptions } from 'next-mdx-remote/dist/types'
+import { existsSync } from 'node:fs'
+import { readdir, readFile } from 'node:fs/promises'
+import { dirname, join, extname, sep, basename } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import remarkGfm from 'remark-gfm'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 
-const docsDirectory = process.cwd()
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
-const getPathToGeneratedDoc = (slug: string) => {
-  const sections = slug.split('/')
-  const updatedSections = sections.slice()
-  updatedSections.splice(updatedSections.length - 1, 0, 'generated')
-  return updatedSections.join('/')
+const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '..')
+export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
+export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
+
+export type GuideFrontmatter = {
+  title: string
+  subtitle?: string
+  description?: string
+  canonical?: string
+  hideToc?: boolean
+  // @deprecated
+  hide_table_of_contents?: boolean
+  tocVideo?: string
 }
 
-export function getDocsBySlug(slug: string) {
-  const realSlug = slug.replace(/\.mdx$/, '')
-
-  const formattedSlug =
-    (realSlug.includes('reference/javascript/') &&
-      !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/dart/') && !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/cli/') && !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/api/') && !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/auth/') && !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/realtime/') && !nonGeneratedReferencePages.includes(realSlug)) ||
-    (realSlug.includes('reference/storage/') && !nonGeneratedReferencePages.includes(realSlug))
-      ? getPathToGeneratedDoc(realSlug)
-      : realSlug
-
-  // files can either be .md or .mdx
-  // we need to check which one exists
-  let fullPath
-  let fullPathMD = join(docsDirectory, `${formattedSlug}.md`)
-  let fullPathMDX = join(docsDirectory, `${formattedSlug}.mdx`)
-
-  if (fs.existsSync(fullPathMD)) {
-    fullPath = fullPathMD
+/**
+ * Validate the frontmatter for guide MDX files.
+ *
+ * @throws Throws if frontmatter is invalid.
+ */
+export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
+  if (!('title' in obj) || typeof obj.title !== 'string') {
+    throw Error(
+      // @ts-expect-error - Getting undefined for unknown property is desired here.
+      `Invalid guide frontmatter: Title must exist and be a string. Received: ${obj.title}`
+    )
   }
-
-  if (fs.existsSync(fullPathMDX)) {
-    fullPath = fullPathMDX
+  if ('subtitle' in obj && typeof obj.subtitle !== 'string') {
+    throw Error(`Invalid guide frontmatter: Subtitle must be a sring. Received: ${obj.subtitle}`)
   }
-
-  // if no match, 404
-  if (!fs.existsSync(fullPath)) {
-    console.log(`\nfile ${fullPath} not found, redirect to 404\n`)
-    fullPath = join(docsDirectory, 'pages/404.mdx')
+  if ('description' in obj && typeof obj.description !== 'string') {
+    throw Error(
+      `Invalid guide frontmatter: Description must be a string. Received: ${obj.description}`
+    )
   }
-
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-
-  const { data, content } = matter(fileContents)
-
-  // Append the title as the h1 tag in the content
-  const formattedContent = data.title !== undefined ? `# ${data.title} \n\n${content}` : content
-
-  return { slug: realSlug, meta: data, content: formattedContent }
+  if ('canonical' in obj && typeof obj.canonical !== 'string') {
+    throw Error(`Invalid guide frontmatter: Canonical must be a string. Received: ${obj.canonical}`)
+  }
+  if ('hideToc' in obj && typeof obj.hideToc !== 'boolean') {
+    throw Error(`Invalid guide frontmatter: hideToc must be a boolean. Received: ${obj.hideToc}`)
+  }
+  if ('hide_table_of_contents' in obj && typeof obj.hide_table_of_contents !== 'boolean') {
+    throw Error(
+      `Invalid guide frontmatter: hide_table_of_contents must be a boolean. Received ${obj.hide_table_of_contents}`
+    )
+  }
+  if ('tocVideo' in obj && typeof obj.tocVideo !== 'string') {
+    throw Error(`Invalid guide frontmatter: tocVideo must be a string. Received ${obj.tocVideo}`)
+  }
+  return true
 }
 
-export function getAllDocs() {
-  const slugs = walk('docs')
-  const docs = slugs.map((slug) => getDocsBySlug(slug))
+export async function getGuidesStaticPaths(section: string) {
+  const directory = join(GUIDES_DIRECTORY, section)
 
-  return docs
-}
+  const files = (await readdir(directory, { recursive: true }))
+    .filter((file) => extname(file) === '.mdx' && !basename(file).startsWith('_'))
+    .map((file) => ({
+      params: {
+        slug: file.replace(/\.mdx$/, '').split(sep),
+      },
+    }))
 
-function walk(dir: string) {
-  let results: string[] = []
-  const list = fs.readdirSync(dir)
-  list.forEach(function (file) {
-    file = dir + '/' + file
-    let slugs = []
-
-    fs.readdirSync(dir).forEach((file) => {
-      let absolute = join(dir, file)
-      if (fs.statSync(absolute).isDirectory()) {
-        fs.readdirSync(absolute).forEach((subFile) => slugs.push(file.concat('/' + subFile)))
-      }
-    })
-  })
-  return results
-}
-
-// [Joshen] Initially tried to simplify the NavBar versioning by reading the directory
-// but caused some issues on Vercel. Just gonna park this for now.
-export function getLibraryVersions(slug: string) {
-  const paths = slug.split('/')
-  if (paths.includes('reference') && paths.length >= 3) {
-    const reference = REFERENCES[paths[2]]
-    if (reference?.library !== undefined) {
-      const path = `data/nav/${reference.library}`
-      const list = fs.readdirSync(path).map((file) => file.split('.')[0])
-      return list.reverse()
-    }
+  // Index page isn't included in the directory
+  const indexFile = join(GUIDES_DIRECTORY, `${section}.mdx`)
+  if (existsSync(indexFile)) {
+    files.push({ params: { slug: [] } })
   }
-  return []
+
+  return {
+    paths: files,
+    fallback: false,
+  }
+}
+
+export async function getGuidesStaticProps(
+  section: string,
+  { params }: { params?: { slug?: string | Array<string> } }
+) {
+  let relPath: string
+  switch (typeof params?.slug) {
+    case 'string':
+      relPath = section + sep + params.slug
+      break
+    case 'object': // actually an array
+      relPath = section + sep + params.slug.join(sep)
+      break
+    case 'undefined':
+      relPath = section
+  }
+
+  const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
+  /**
+   * SAFETY CHECK:
+   * Prevent accessing anything outside of GUIDES_DIRECTORY
+   */
+  if (!fullPath.startsWith(GUIDES_DIRECTORY)) {
+    throw Error('Accessing forbidden route. Content must be within the GUIDES_DIRECTORY.')
+  }
+
+  const mdx = await readFile(fullPath, 'utf-8')
+
+  const editLink = `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+
+  const { data: frontmatter, content } = matter(mdx)
+  if (!isValidGuideFrontmatter(frontmatter)) {
+    // Will have thrown
+    return
+  }
+
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
+  const mdxOptions: SerializeOptions = {
+    mdxOptions: {
+      useDynamicImport: true,
+      remarkPlugins: [
+        [remarkMath, { singleDollarTextMath: false }],
+        remarkGfm,
+        [remarkCodeHike, codeHikeOptions],
+      ],
+      rehypePlugins: [rehypeKatex as any],
+    },
+  }
+  const mdxSource = await serialize(content, mdxOptions)
+
+  return {
+    props: {
+      frontmatter,
+      mdxSource,
+      editLink,
+    },
+  }
 }

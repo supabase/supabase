@@ -1,26 +1,25 @@
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
 import Link from 'next/link'
 
-import { useParams } from 'common'
-import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import { LogsLayout } from 'components/layouts'
+import LogsSavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { IconSave, Loading } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-
   const { data, isLoading } = useContentQuery(ref)
 
   if (isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
 
-  let saved = [...(data?.content ?? [])].filter((c) => c.type === 'log_sql')
-  saved.sort((a, b) => a.name.localeCompare(b.name))
+  const saved = [...(data?.content ?? [])]
+    .filter((c) => c.type === 'log_sql')
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
@@ -63,4 +62,4 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
 LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
-export default observer(LogsSavedPage)
+export default LogsSavedPage

@@ -1,5 +1,4 @@
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
 import HookList from './HookList'
@@ -18,7 +17,7 @@ const SchemaTable = ({
   deleteHook = noop,
 }: SchemaTableProps) => {
   return (
-    <div key={schema} className="">
+    <div key={schema}>
       <div className="sticky top-0 backdrop-blur backdrop-filter">
         <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-foreground-light">schema</h5>
@@ -57,4 +56,4 @@ const SchemaTable = ({
   )
 }
 
-export default observer(SchemaTable)
+export default SchemaTable

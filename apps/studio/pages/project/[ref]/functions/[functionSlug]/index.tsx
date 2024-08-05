@@ -1,26 +1,29 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import dayjs, { Dayjs } from 'dayjs'
+import meanBy from 'lodash/meanBy'
+import sumBy from 'lodash/sumBy'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
-import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
 import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import dayjs, { Dayjs } from 'dayjs'
-import { useCheckPermissions, useFlag } from 'hooks'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import sumBy from 'lodash/sumBy'
-import meanBy from 'lodash/meanBy'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-import { ChartIntervals, NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -70,41 +73,23 @@ const PageLayout: NextPageWithLayout = () => {
     slug: functionSlug,
   })
   const id = selectedFunction?.id
-  const resourceUsageMetricsEnabled = useFlag('enableResourceUsageMetricsForEdgeFunctions')
 
-  const invStatsResult = useFunctionsInvStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: !resourceUsageMetricsEnabled }
-  )
+  const reqStatsResult = useFunctionsReqStatsQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key,
+  })
 
-  const reqStatsResult = useFunctionsReqStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
-
-  const resourceUsageResult = useFunctionsResourceUsageQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
+  const resourceUsageResult = useFunctionsResourceUsageQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key,
+  })
 
   const reqStatsData = useMemo(() => {
-    const result = resourceUsageMetricsEnabled
-      ? reqStatsResult.data?.result
-      : invStatsResult.data?.result
+    const result = reqStatsResult.data?.result
     return result || []
-  }, [invStatsResult.data, reqStatsResult.data, resourceUsageMetricsEnabled])
+  }, [reqStatsResult.data])
 
   const resourceUsageData = useMemo(() => {
     return resourceUsageResult.data?.result || []
@@ -119,7 +104,11 @@ const PageLayout: NextPageWithLayout = () => {
     return [start, end]
   }, [selectedInterval])
 
-  const execTimeChartData = useFillTimeseriesSorted(
+  const {
+    data: execTimeChartData,
+    error: execTimeError,
+    isError: isErrorExecTime,
+  } = useFillTimeseriesSorted(
     reqStatsData,
     'timestamp',
     ['avg_execution_time'],
@@ -128,7 +117,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const invocationsChartData = useFillTimeseriesSorted(
+  const {
+    data: invocationsChartData,
+    error: invocationsError,
+    isError: isErrorInvocations,
+  } = useFillTimeseriesSorted(
     reqStatsData,
     'timestamp',
     ['count', 'success_count', 'redirect_count', 'client_err_count', 'server_err_count'],
@@ -137,7 +130,11 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const resourceUsageChartData = useFillTimeseriesSorted(
+  const {
+    data: resourceUsageChartData,
+    error: resourceUsageError,
+    isError: isErrorResourceUsage,
+  } = useFillTimeseriesSorted(
     resourceUsageData,
     'timestamp',
     ['avg_cpu_time_used', 'avg_memory_used'],
@@ -185,17 +182,21 @@ const PageLayout: NextPageWithLayout = () => {
           Statistics for past {selectedInterval.label}
         </span>
       </div>
-      <div className="">
+      <div>
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
           <ReportWidget
             title="Execution time"
             tooltip="Average execution time of function invocations"
             data={execTimeChartData}
-            isLoading={
-              resourceUsageMetricsEnabled ? reqStatsResult.isLoading : invStatsResult.isLoading
-            }
+            isLoading={reqStatsResult.isLoading}
             renderer={(props) => {
-              return (
+              return isErrorExecTime ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{execTimeError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
                 <AreaChart
                   className="w-full"
                   xAxisKey="timestamp"
@@ -208,12 +209,20 @@ const PageLayout: NextPageWithLayout = () => {
               )
             }}
           />
-          {resourceUsageMetricsEnabled ? (
-            <ReportWidget
-              title="Invocations"
-              data={invocationsChartData}
-              isLoading={reqStatsResult.isLoading}
-              renderer={(props) => {
+          <ReportWidget
+            title="Invocations"
+            data={invocationsChartData}
+            isLoading={reqStatsResult.isLoading}
+            renderer={(props) => {
+              if (isErrorInvocations) {
+                return (
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>{invocationsError.message}</AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )
+              } else {
                 const data = props.data
                   .map((d: any) => [
                     {
@@ -256,74 +265,59 @@ const PageLayout: NextPageWithLayout = () => {
                     }}
                   />
                 )
-              }}
-            />
-          ) : (
-            <ReportWidget
-              title="Invocations"
-              data={invocationsChartData}
-              isLoading={invStatsResult.isLoading}
-              renderer={(props) => (
-                <BarChart
+              }
+            }}
+          />
+          <ReportWidget
+            title="CPU time"
+            tooltip="Average CPU time usage for the function"
+            data={resourceUsageChartData}
+            isLoading={resourceUsageResult.isLoading}
+            renderer={(props) => {
+              return isErrorResourceUsage ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{resourceUsageError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
+                <AreaChart
                   className="w-full"
                   xAxisKey="timestamp"
-                  yAxisKey="count"
-                  data={props.data}
-                  highlightedValue={sumBy(props.data, 'count')}
                   customDateFormat={selectedInterval.format}
-                  onBarClick={(v) => {
-                    router.push(
-                      `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${
-                        v.timestamp
-                      }`
-                    )
-                  }}
+                  yAxisKey="avg_cpu_time_used"
+                  data={props.data}
+                  format="ms"
+                  highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
                 />
-              )}
-            />
-          )}
-          {resourceUsageMetricsEnabled && (
-            <>
-              <ReportWidget
-                title="CPU time"
-                tooltip="Average CPU time usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
-                  return (
-                    <AreaChart
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="avg_cpu_time_used"
-                      data={props.data}
-                      format="ms"
-                      highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
-                    />
-                  )
-                }}
-              />
-              <ReportWidget
-                title="Memory"
-                tooltip="Average memory usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
-                  return (
-                    <AreaChart
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="avg_memory_used"
-                      data={props.data}
-                      format="MB"
-                      highlightedValue={meanBy(props.data, 'avg_memory_used')}
-                    />
-                  )
-                }}
-              />
-            </>
-          )}
+              )
+            }}
+          />
+          <ReportWidget
+            title="Memory"
+            tooltip="Average memory usage for the function"
+            data={resourceUsageChartData}
+            isLoading={resourceUsageResult.isLoading}
+            renderer={(props) => {
+              return isErrorResourceUsage ? (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>{resourceUsageError.message}</AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              ) : (
+                <AreaChart
+                  className="w-full"
+                  xAxisKey="timestamp"
+                  customDateFormat={selectedInterval.format}
+                  yAxisKey="avg_memory_used"
+                  data={props.data}
+                  format="MB"
+                  highlightedValue={meanBy(props.data, 'avg_memory_used')}
+                />
+              )
+            }}
+          />
         </div>
       </div>
     </div>
@@ -332,4 +326,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

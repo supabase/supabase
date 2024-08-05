@@ -19,9 +19,14 @@
   - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] 엣지 기능 [문서](https://supabase.com/docs/guides/functions)
 - [x] 파일 스토리지. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + 벡터/임베딩스 툴킷. [Docs](https://supabase.com/docs/guides/ai)
 - [x] 대시보드
 
 ![슈퍼베이스 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## 문서
 
@@ -36,17 +41,6 @@
 - [이메일 지원](https://supabase.com/docs/support#business-support). 최상의 대상: 데이터베이스 또는 인프라 문제.
 - [디스코드](https://discord.supabase.com). 최고의 용도: 애플리케이션 공유 및 커뮤니티와의 교류.
 
-## 상태
-
-- [x] 알파: 비공개 고객들을 대상으로 Supabase를 테스트 중입니다
-- [x] 공개 알파: 누구나 [supabase.com/dashboard](https://supabase.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
-- [x] 공개 베타: 대부분의 비기업용 사용 사례에 충분히 안정적입니다
-- [ ] 공개: 일반 사용 가능 [[상태](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-현재 공개 베타 버전입니다. 주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
 ---
 
 ## 작동 방식
@@ -58,7 +52,7 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
 [자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
-![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.
@@ -210,6 +204,42 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
+## Badges (배지)
+
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
 
 ## 번역
 

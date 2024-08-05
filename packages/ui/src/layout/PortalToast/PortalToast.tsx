@@ -1,6 +1,9 @@
+'use client'
+
+import { X } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { Toaster, ToastBar, toast } from 'react-hot-toast'
-import { Button, IconX } from 'ui'
+import { ToastBar, Toaster, toast } from 'react-hot-toast'
+import { Button } from '../../components/Button/Button'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore
@@ -14,7 +17,7 @@ const PortalToast = () => (
     <Toaster
       position="top-right"
       toastOptions={{
-        className: '!bg-overlay !text border !max-w-[600px]',
+        className: '!bg-overlay !text border !max-w-[600px] !items-start',
         style: {
           padding: '8px',
           paddingLeft: '16px',
@@ -33,15 +36,15 @@ const PortalToast = () => (
             const isConsentToast = t.id === 'consent-toast'
             return (
               <>
-                {icon}
-                <div className="flex items-center">
+                <div className="mt-1">{icon}</div>
+                <div className="w-full flex items-start">
                   <div
                     className={`toast-message w-full ${
                       t.type === 'loading'
                         ? 'max-w-[380px]'
                         : isConsentToast
-                        ? 'max-w-[800px]'
-                        : 'max-w-[260px]'
+                          ? 'max-w-none sm:max-w-[800px]'
+                          : 'max-w-[280px]'
                     }`}
                   >
                     {message}
@@ -57,7 +60,7 @@ const PortalToast = () => (
                           toast.dismiss(t.id)
                         }}
                       >
-                        <IconX size={14} strokeWidth={2} />
+                        <X size={14} strokeWidth={2} />
                       </Button>
                     </div>
                   )}

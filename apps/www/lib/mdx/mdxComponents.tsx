@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react'
-import Image from 'next/image'
+import NextImage from 'next/image'
+
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { CH } from '@code-hike/mdx/components'
@@ -8,36 +9,35 @@ import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
 import {
+  Admonition,
   Badge,
+  cn,
   Collapsible_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  Heading,
+  IconArrowUpRight,
   IconTriangle,
-  cn,
-  ThemeImage,
-  Admonition,
+  Image,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
-import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
-
-import 'react-medium-image-zoom/dist/styles.css'
+import { type ImageProps } from 'ui/src/components/Image/Image'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
 
 const ignoreClass = 'ignore-on-export'
 
-const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
-  switch (align) {
-    case 'left':
-      return 'text-left'
-    case 'right':
-      return 'text-right'
-    case 'center':
-    default:
-      return 'text-center'
-  }
-}
+const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
+  <a
+    href={props.href}
+    target={props.target}
+    className={cn('inline relative [&_p]:inline', props.target === '_blank' && 'mr-4')}
+  >
+    {props.children}{' '}
+    {props.target === '_blank' && <IconArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
+  </a>
+)
 
 const BlogCollapsible = ({ title, ...props }: { title: string }) => {
   return (
@@ -66,6 +66,12 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
     CH,
+    h1: (props: any) => <Heading {...props} tag="h1" />,
+    h2: (props: any) => <Heading {...props} tag="h2" />,
+    h3: (props: any) => <Heading {...props} tag="h3" />,
+    h4: (props: any) => <Heading {...props} tag="h4" />,
+    h5: (props: any) => <Heading {...props} tag="h5" />,
+    h6: (props: any) => <Heading {...props} tag="h6" />,
     Badge,
     Quote,
     Avatar,
@@ -84,43 +90,34 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <span className={['next-image--dynamic-fill'].join(' ')}>
-            <Image
-              {...props}
-              className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
-              fill
-              loading="lazy"
-            />
-          </span>
+          <Image
+            fill
+            className={cn(
+              'm-0 object-cover',
+              type === 'blog' ? 'rounded-md border' : '',
+              props.wide && 'wide',
+              props.className
+            )}
+            {...props}
+          />
         )
       }
       return <img {...props} />
     },
-    Img: ({ zoomable = true, className, ...props }: any) => (
-      <figure className={cn('m-0', className)}>
-        <ZoomableImg zoomable={zoomable}>
-          <span
-            className={[
-              'next-image--dynamic-fill',
-              type === 'blog' ? 'rounded-md border' : '',
-              props.wide && 'wide',
-            ].join(' ')}
-          >
-            <ThemeImage fill className="m-0 object-cover" {...props} />
-          </span>
-        </ZoomableImg>
-        {props.caption && (
-          <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
-            {props.caption}
-          </figcaption>
+    Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
+      <Image
+        fill
+        className={cn(
+          'm-0 object-cover',
+          type === 'blog' ? 'rounded-md border' : '',
+          props.wide && 'wide',
+          className
         )}
-      </figure>
+        zoomable={zoomable}
+        {...props}
+      />
     ),
-    Link: (props: PropsWithChildren<HTMLAnchorElement>) => (
-      <a href={props.href} target={props.target}>
-        {props.children}
-      </a>
-    ),
+    Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
     Admonition,

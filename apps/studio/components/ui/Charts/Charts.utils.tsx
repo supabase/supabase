@@ -1,10 +1,11 @@
-import { DATETIME_FORMAT } from 'components/interfaces/Reports/Reports.constants'
 import dayjs from 'dayjs'
-import React, { useMemo } from 'react'
-import { ResponsiveContainer } from 'recharts'
-import { DateTimeFormats } from './Charts.constants'
-import { CommonChartProps, StackedChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
+import { FC, PropsWithChildren, useMemo } from 'react'
+import { ResponsiveContainer } from 'recharts'
+
+import { DateTimeFormats } from './Charts.constants'
+import type { CommonChartProps, StackedChartProps } from './Charts.types'
+
 dayjs.extend(utc)
 
 /**
@@ -16,7 +17,7 @@ dayjs.extend(utc)
  * numberFormatter(123, 2)    // "123.00"
  */
 export const numberFormatter = (num: number, precision = 2) =>
-  isFloat(num) ? precisionFormatter(num, precision) : String(num)
+  isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
 
 /**
  * Tests if a number is a float.
@@ -37,10 +38,10 @@ export const isFloat = (num: number) => String(num).includes('.')
 export const precisionFormatter = (num: number, precision: number): string => {
   if (isFloat(num)) {
     const [head, tail] = String(num).split('.')
-    return head + '.' + tail.slice(0, precision)
+    return Number(head).toLocaleString() + '.' + tail.slice(0, precision)
   } else {
     // pad int with 0
-    return String(num) + '.' + '0'.repeat(precision)
+    return num.toLocaleString() + '.' + '0'.repeat(precision)
   }
 }
 
@@ -82,14 +83,13 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: React.FC<React.PropsWithChildren> = useMemo(
+  const Container: FC<PropsWithChildren> = useMemo(
     () =>
-      ({ children }) =>
-        (
-          <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
-            {children as JSX.Element}
-          </ResponsiveContainer>
-        ),
+      ({ children }) => (
+        <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
+          {children as JSX.Element}
+        </ResponsiveContainer>
+      ),
     [size]
   )
   return {
@@ -112,17 +112,20 @@ export const useStacked = ({
 } & Pick<CommonChartProps<Record<string, number>>, 'data'>) => {
   const stackedData = useMemo(() => {
     if (!data) return []
-    const mapping = data.reduce((acc, datum) => {
-      const x = datum[xAxisKey]
-      const y = datum[yAxisKey]
-      const s = datum[stackKey]
-      if (!acc[x]) {
-        acc[x] = {}
-      }
+    const mapping = data.reduce(
+      (acc, datum) => {
+        const x = datum[xAxisKey]
+        const y = datum[yAxisKey]
+        const s = datum[stackKey]
+        if (!acc[x]) {
+          acc[x] = {}
+        }
 
-      acc[x][s] = y
-      return acc
-    }, {} as Record<string, Record<string, number>>)
+        acc[x][s] = y
+        return acc
+      },
+      {} as Record<string, Record<string, number>>
+    )
 
     const flattened = Object.entries(mapping).map(([x, sMap]) => ({
       ...sMap,

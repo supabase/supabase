@@ -1,12 +1,13 @@
-import { has } from 'lodash'
-import { useState, useEffect, useRef } from 'react'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { has } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
+import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
 
 export interface FileExplorerRowEditingProps {
-  item: any
-  view: string
+  item: StorageItem
+  view: STORAGE_VIEWS
   columnIndex: number
 }
 
@@ -34,7 +35,13 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
   }
 
   useEffect(() => {
-    if (inputRef.current) inputRef.current.select()
+    // select just the name of the file without the extension
+    if (inputRef.current) {
+      const dotIndex = item.name.lastIndexOf('.')
+      const selectionEnd = dotIndex !== -1 ? dotIndex : item.name.length
+      inputRef.current.setSelectionRange(0, selectionEnd)
+      inputRef.current.focus()
+    }
 
     // [Joshen] Esc should revert changes
     const handleEsc = (event: KeyboardEvent) => {
@@ -51,7 +58,7 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
   return (
     <div className="storage-row flex items-center justify-between rounded bg-gray-500">
       <div className="flex h-full flex-grow items-center px-2.5">
-        <div className="">
+        <div>
           <RowIcon
             view={view}
             status={item.status}

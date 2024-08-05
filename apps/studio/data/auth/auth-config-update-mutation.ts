@@ -1,17 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { components } from 'data/api'
-import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
 }
-
-export type UpdateAuthConfigResponse = components['schemas']['GoTrueConfig']
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
   const { data, error } = await patch('/platform/auth/{ref}/config', {
@@ -23,8 +21,7 @@ export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateV
     },
   })
 
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 
@@ -45,9 +42,7 @@ export const useAuthConfigUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
-        await Promise.all([queryClient.invalidateQueries(authKeys.authConfig(projectRef))])
-
+        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

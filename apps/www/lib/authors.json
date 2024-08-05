@@ -148,7 +148,7 @@
     "author_id": "tyler_shukert",
     "author": "Tyler Shukert",
     "username": "dshukertjr",
-    "position": "DevRel & Flutter",
+    "position": "DevRel",
     "author_url": "https://twitter.com/dshukertjr",
     "author_image_url": "https://github.com/dshukertjr.png"
   },
@@ -170,7 +170,7 @@
   },
   {
     "author_id": "rodrigo_mansueli",
-    "author": "Rodrigo Mansueli Nunes",
+    "author": "Rodrigo Mansueli",
     "username": "mansueli",
     "position": "Support Engineer",
     "author_url": "https://github.com/mansueli",
@@ -362,8 +362,8 @@
     "author_id": "long",
     "author": "Long Hoang",
     "username": "loong",
-    "position": "Engineering",
-    "author_url": "https://twitter.com/beertocode",
+    "position": "Growth",
+    "author_url": "https://github.com/loong",
     "author_image_url": "https://github.com/loong.png"
   },
   {
@@ -397,5 +397,85 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/psteinroe",
     "author_image_url": "/images/philipp-steinrotter.jpg"
+  },
+  {
+    "author_id": "giancarlo",
+    "author": "Giancarlo Buomprisco",
+    "username": "giancarlo",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/gc_psk",
+    "author_image_url": "https://github.com/Gbuomprisco.png"
+  },
+  {
+    "author_id": "filipe",
+    "author": "Filipe Cabaço",
+    "username": "filipe",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/filipecabaco",
+    "author_image_url": "https://github.com/filipecabaco.png"
+  },
+  {
+    "author_id": "raminder_singh",
+    "author": "Raminder Singh",
+    "username": "imor",
+    "position": "Engineering",
+    "author_url": "https://github.com/imor",
+    "author_image_url": "https://github.com/imor.png"
+  },
+  {
+    "author_id": "samrose",
+    "author": "Sam Rose",
+    "username": "samrose",
+    "position": "Engineering",
+    "author_url": "https://github.com/samrose",
+    "author_image_url": "https://github.com/samrose.png"
+  },
+  {
+    "author_id": "timabdulla",
+    "author": "Tim Abdulla",
+    "username": "timabdulla",
+    "position": "Guest Author",
+    "author_url": "https://github.com/timabdulla",
+    "author_image_url": "https://github.com/timabdulla.png"
+  },
+  {
+    "author_id": "grdsdev",
+    "author": "Guilherme Souza",
+    "username": "grdsdev",
+    "position": "Engineering",
+    "author_url": "https://github.com/grdsdev",
+    "author_image_url": "https://github.com/grdsdev.png"
+  },
+  {
+    "author_id": "chris_chandler",
+    "author": "Chris Chandler",
+    "username": "chrischandler",
+    "position": "Partnerships",
+    "author_url": "https://github.com/chrischandler",
+    "author_image_url": "https://github.com/chrischandler.png"
+  },
+  {
+    "author_id": "bdon",
+    "author": "Brandon Liu",
+    "username": "bdon",
+    "position": "Guest Author",
+    "author_url": "https://github.com/bdon",
+    "author_image_url": "https://github.com/bdon.png"
+  },
+  {
+    "author_id": "p6l-richard",
+    "author": "Richard Poelderl",
+    "username": "p6l-richard",
+    "position": "Guest Author",
+    "author_url": "https://github.com/p6l-richard",
+    "author_image_url": "https://github.com/p6l-richard.png"
+  },
+  {
+    "author_id": "PeerRich",
+    "author": "Peer Richelsen",
+    "username": "PeerRich",
+    "position": "Guest Author",
+    "author_url": "https://github.com/PeerRich",
+    "author_image_url": "https://github.com/PeerRich.png"
   }
 ]

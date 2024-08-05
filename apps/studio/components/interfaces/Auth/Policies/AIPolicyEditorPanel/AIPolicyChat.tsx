@@ -1,48 +1,58 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTelemetryProps } from 'common'
+import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
 import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
-  AiIcon,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
-  IconSettings,
   Input_Shadcn_,
+  cn,
 } from 'ui'
-import * as z from 'zod'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
-
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { AiIcon } from 'ui-patterns/Cmdk'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
+  selectedMessage?: string
   loading: boolean
   onSubmit: (s: string) => void
-  onDiff: (s: string) => void
+  onDiff: (message: { id: string; content: string }) => void
   onChange: (value: boolean) => void
 }
 
 export const AIPolicyChat = ({
   messages,
+  selectedMessage,
   loading,
   onSubmit,
   onDiff,
   onChange,
 }: AIPolicyChatProps) => {
+  const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
+  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
@@ -78,25 +88,31 @@ export const AIPolicyChat = ({
 
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
-      <div className="overflow-auto flex-1">
+      <div className="overflow-auto flex-1 divide-y divide-border">
         <Message
           key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
-          }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
+          }, I can help you to write RLS policies. I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
-          <div>
-            <Button
-              type="default"
-              icon={<IconSettings strokeWidth={1.5} />}
-              onClick={() => snap.setShowAiSettingsModal(true)}
-            >
-              AI Settings
-            </Button>
-          </div>
+          <Button
+            type="default"
+            className="w-min"
+            icon={
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full',
+                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
+                )}
+              />
+            }
+            onClick={() => snap.setShowAiSettingsModal(true)}
+          >
+            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
+          </Button>
         </Message>
 
         {messages.map((m) => (
@@ -107,7 +123,8 @@ export const AIPolicyChat = ({
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
             isDebug={m.isDebug}
-            onDiff={onDiff}
+            isSelected={m.id === selectedMessage}
+            onDiff={(content) => onDiff({ id: m.id, content })}
           />
         ))}
 

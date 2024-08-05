@@ -1,4 +1,5 @@
-import { Badge, Button, Checkbox, IconExternalLink, Modal } from 'ui'
+import { noop } from 'lodash'
+import { Badge, Button, Checkbox, Modal } from 'ui'
 
 import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 import SqlEditor from 'components/ui/SqlEditor'
@@ -70,7 +71,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
             <div key={method} className="mr-2 mt-2 font-mono">
-              <Badge color={allowedClientLibraryMethods.includes(method) ? 'green' : 'gray'}>
+              <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
                 {method}
               </Badge>
             </div>
@@ -82,24 +83,13 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="flex w-full items-center justify-end space-x-4 border-t px-6 py-3 border-default">
-    <Button asChild type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-      <a
-        href="https://supabase.com/docs/guides/storage/access-control"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Documentation
-      </a>
+  <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
+    <Button type="default" onClick={onViewTemplates}>
+      View templates
     </Button>
-    <div className="flex w-full items-center justify-end gap-2">
-      <Button type="default" onClick={onViewTemplates}>
-        View templates
-      </Button>
-      <Button type="primary" onClick={onReviewPolicy}>
-        Review
-      </Button>
-    </div>
+    <Button type="primary" onClick={onReviewPolicy}>
+      Review
+    </Button>
   </div>
 )
 
@@ -107,19 +97,19 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 const StoragePoliciesEditor = ({
   policyFormFields = {},
-  onViewTemplates = () => {},
-  onUpdatePolicyName = () => {},
-  onUpdatePolicyDefinition = () => {},
-  onToggleOperation = () => {},
-  onUpdatePolicyRoles = () => {},
-  onReviewPolicy = () => {},
+  onViewTemplates = noop,
+  onUpdatePolicyName = noop,
+  onUpdatePolicyDefinition = noop,
+  onToggleOperation = noop,
+  onUpdatePolicyRoles = noop,
+  onReviewPolicy = noop,
 }: any) => {
   const definition = policyFormFields.definition
   const selectedRoles = policyFormFields.roles
 
   return (
-    <div className="">
-      <div className="mb-8 space-y-8 py-6">
+    <>
+      <div className="space-y-4 py-4">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}
@@ -147,7 +137,7 @@ const StoragePoliciesEditor = ({
         </Modal.Content>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
-    </div>
+    </>
   )
 }
 

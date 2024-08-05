@@ -1,8 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Modal } from 'ui'
-
-import { useStore } from 'hooks'
 
 interface AddPaymentMethodFormProps {
   returnUrl: string
@@ -15,7 +14,6 @@ interface AddPaymentMethodFormProps {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMethodFormProps) => {
-  const { ui } = useStore()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -44,10 +42,7 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
 
     if (error) {
       setIsSaving(false)
-      ui.setNotification({
-        category: 'error',
-        message: error?.message ?? ' Failed to save card details',
-      })
+      toast.error(error?.message ?? ' Failed to save card details')
     } else {
       setIsSaving(false)
       onConfirm()
@@ -60,23 +55,33 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
 
   return (
     <form onSubmit={handleSubmit}>
-      <Modal.Content>
-        <div
-          className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
-        >
-          <PaymentElement />
-        </div>
+      <Modal.Content
+        className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
+      >
+        <PaymentElement className="[.p-LinkAutofillPrompt]:pt-0" />
       </Modal.Content>
       <Modal.Separator />
-      <Modal.Content>
-        <div className="flex items-center space-x-2 pt-2">
-          <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
-            Save
-          </Button>
-          <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
-            Cancel
-          </Button>
-        </div>
+      <Modal.Content className="flex items-center space-x-2">
+        <Button
+          htmlType="button"
+          size="small"
+          type="default"
+          onClick={onCancel}
+          block
+          disabled={isSaving}
+        >
+          Cancel
+        </Button>
+        <Button
+          block
+          htmlType="submit"
+          size="small"
+          type="primary"
+          loading={isSaving}
+          disabled={isSaving}
+        >
+          Add payment method
+        </Button>
       </Modal.Content>
     </form>
   )

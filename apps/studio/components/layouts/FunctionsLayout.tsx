@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-import { Button, IconCode, IconExternalLink } from 'ui'
+import type { PropsWithChildren } from 'react'
 
+import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useCheckPermissions, withAuth } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { withAuth } from 'hooks/misc/withAuth'
+import { Button, IconCode, IconExternalLink } from 'ui'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import ProjectLayout from './'
+import ProjectLayout from './ProjectLayout/ProjectLayout'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -152,4 +152,4 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   )
 }
 
-export default withAuth(observer(FunctionsLayout))
+export default withAuth(FunctionsLayout)

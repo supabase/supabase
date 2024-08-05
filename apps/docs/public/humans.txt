@@ -3,9 +3,9 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Aleksi Immonen
 Alexander Korotkov
 Amy Q
-Andrew Smith
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -13,52 +13,62 @@ Beng Eu
 Bo Lu
 Bobbie Soedirgo
 Bruno Andrade
+Carel de Waal
 Chandana Anumula
 Charis Lam
 Chase Granberry
+Chris Caruso
 Chris Copplestone
 Chris Gwilliams
+Craig Cannon
 Dave Wilson
+Deji I
 Div Arora
 Divit D
 Egor Romanov
+Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
 Greg Richardson
+Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
-Isaiah Hamilton
+Jenny Kibiri
 Jess Shears
 Joel Lee
+John Pena
 Jon M
 Jonny Summers-Muir
 Jordi Enric
 Joshen Lim
+Julien Goux
 Kamil Ogórek
 Kang Ming Tay
+Karan S
 Karlo Ison
 Kevin Brolly
 Kevin Grüneberg
-Lakshmipathi G
+Lakshan Perera
 Laura C
-Leo T
 Long Hoang
 Margarita Sandomirskaia
 Marijana Pavlinić
 Mark Burggraf
+Michael Ridley
 Monica El Khoury
-Nikita Kotlyarov
 Oli R
 Pamela Chia
+Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Peter Lyn
 Qiao Han
 Raminder Singh
-Ramiro Nuñez Dosio
-Rodrigo Martins Mansueli
+Rodrigo Mansueli
 Rory Wilding
+Sam Rose
 Sreyas Udayavarman
 Stanislav M
 Steve Chavez
@@ -67,6 +77,8 @@ Supun Sudaraka Kalidasa
 Terry Sutton
 Thomas E
 Thor Schaeff
+Tom Ashley
+Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
@@ -90,5 +102,6 @@ Supabase would not be possible without the work of some other amazing open sourc
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
 - Phoenix - https://www.phoenixframework.org/
 - GoTrue - https://github.com/netlify/gotrue

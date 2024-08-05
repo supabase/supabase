@@ -1,8 +1,7 @@
-import { useCallback } from 'react'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
-import { auth, getAccessToken } from 'lib/gotrue'
+import { getAccessToken } from 'lib/gotrue'
 
 export async function getSessionAccessToken() {
   // ignore if server-side
@@ -28,11 +27,3 @@ export const useSessionAccessTokenQuery = <TData = SessionAccessTokenData>({
     () => getSessionAccessToken(),
     options
   )
-
-export const useSessionAccessTokenPrefetch = () => {
-  const client = useQueryClient()
-  return useCallback(
-    () => client.prefetchQuery(authKeys.accessToken(), () => getSessionAccessToken()),
-    []
-  )
-}

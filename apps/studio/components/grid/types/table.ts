@@ -19,6 +19,7 @@ export interface SupaColumn {
 }
 
 export interface SupaTable {
+  readonly id: number
   readonly columns: SupaColumn[]
   readonly name: string
   readonly schema?: string | null

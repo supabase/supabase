@@ -24,9 +24,9 @@ export const data = [
       'Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction',
     description:
       "Explore how Good Tape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase's managed services.",
-    imgUrl: 'images/customers/logos/goodtape.png',
-    logo: '/images/customers/logos/goodtape.png',
-    logo_inverse: '/images/customers/logos/light/goodtape.png',
+    imgUrl: 'images/customers/logos/good-tape.png',
+    logo: '/images/customers/logos/good-tape.png',
+    logo_inverse: '/images/customers/logos/light/good-tape.png',
     organization: 'Good Tape',
     url: '/customers/good-tape',
     path: '/customers/good-tape',

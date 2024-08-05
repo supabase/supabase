@@ -1,6 +1,12 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
-import Link from 'next/link'
+import {
+  EmptyIntegrationConnection,
+  IntegrationConnection,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import type { GitHubConnection } from 'data/integrations/github-connections-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Check, Loader2 } from 'lucide-react'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
   Badge,
   Button,
@@ -8,100 +14,74 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
-  IconCheck,
-  IconLoader,
   Input_Shadcn_,
   Modal,
 } from 'ui'
-
-import {
-  EmptyIntegrationConnection,
-  IntegrationConnection,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import { Integration } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 interface GithubRepositorySelectionProps {
   form: any
   isChecking: boolean
   isValid: boolean
-  integration?: Integration
-  hasGithubIntegrationInstalled: boolean
+  githubConnection?: GitHubConnection
 }
 
 const GithubRepositorySelection = ({
   form,
   isChecking,
   isValid,
-  integration,
-  hasGithubIntegrationInstalled,
+  githubConnection,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()
 
-  const githubConnection = integration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
-  )
-
   const sidePanels = useSidePanelsStateSnapshot()
-  const githubIntegrationAppUrl =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-      ? `https://github.com/apps/supabase/installations/new?state=${ref}`
-      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
-      : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   function onSelectConnectRepo() {
-    if (integration) {
-      sidePanels.setGithubConnectionsOpen(true)
-      sidePanels.setGithubConnectionsIntegrationId(integration.id)
-    }
+    sidePanels.setGithubConnectionsOpen(true)
   }
 
   return (
-    <div
-      className={clsx(
-        'border-t border-b',
-        !hasGithubIntegrationInstalled ? 'border-warning-300 bg-warning-200' : ''
-      )}
-    >
+    <div className="border-t border-b">
       <Modal.Content className="px-7">
         <div className="py-6">
           <div className="flex items-center space-x-2">
             <p>Git Connection</p>
-            <Badge color="amber">Required</Badge>
+            <Badge variant="warning">Required</Badge>
           </div>
           <p className="text-sm text-foreground-light !mb-4">
             {githubConnection !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
-          {!hasGithubIntegrationInstalled && (
-            <Button asChild type="default" className="!mt-3">
-              <Link href={githubIntegrationAppUrl}>Install Github Integration</Link>
-            </Button>
-          )}
-          {hasGithubIntegrationInstalled && !githubConnection && (
-            <EmptyIntegrationConnection
-              showNode={false}
-              onClick={() => onSelectConnectRepo()}
-              orgSlug={org?.slug}
-            />
-          )}
-          {integration && githubConnection && (
+
+          {githubConnection ? (
             <>
               <ul className="mb-3">
                 <IntegrationConnection
                   type={'GitHub'}
-                  connection={githubConnection}
+                  connection={{
+                    id: String(githubConnection.id),
+                    added_by: {
+                      id: String(githubConnection.user?.id),
+                      primary_email: githubConnection.user?.primary_email ?? '',
+                      username: githubConnection.user?.username ?? '',
+                    },
+                    foreign_project_id: String(githubConnection.repository.id),
+                    supabase_project_ref: githubConnection.project.ref,
+                    organization_integration_id: 'unused',
+                    inserted_at: githubConnection.inserted_at,
+                    updated_at: githubConnection.updated_at,
+                    metadata: {
+                      name: githubConnection.repository.name,
+                    } as any,
+                  }}
                   showNode={false}
                   actions={
                     <Button type="default" onClick={() => onSelectConnectRepo()}>
                       Configure connection
                     </Button>
                   }
-                  orientation="vertical"
+                  orientation="horizontal"
                 />
               </ul>
 
@@ -109,7 +89,7 @@ const GithubRepositorySelection = ({
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="relative">
+                  <FormItem_Shadcn_ className="flex flex-col gap-y-1 relative">
                     <label className="text-sm text-foreground-light">
                       Choose your production branch
                     </label>
@@ -118,9 +98,9 @@ const GithubRepositorySelection = ({
                     </FormControl_Shadcn_>
                     <div className="absolute top-9 right-3">
                       {isChecking ? (
-                        <IconLoader className="animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                       ) : isValid ? (
-                        <IconCheck className="text-brand" strokeWidth={2} />
+                        <Check size={14} className="text-brand" strokeWidth={2} />
                       ) : null}
                     </div>
 
@@ -129,6 +109,12 @@ const GithubRepositorySelection = ({
                 )}
               />
             </>
+          ) : (
+            <EmptyIntegrationConnection
+              showNode={false}
+              onClick={() => onSelectConnectRepo()}
+              orgSlug={org?.slug}
+            />
           )}
         </div>
       </Modal.Content>

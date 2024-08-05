@@ -1,5 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
-import { WrapperMeta } from './Wrappers.types'
+import type { WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
@@ -9,6 +9,12 @@ export const WRAPPER_HANDLERS = {
   BIG_QUERY: 'big_query_fdw_handler',
   AIRTABLE: 'airtable_fdw_handler',
   LOGFLARE: 'logflare_fdw_handler',
+  AUTH0: 'auth0_fdw_handler',
+  COGNITO: 'cognito_fdw_handler',
+  MSSQL: 'mssql_fdw_handler',
+  REDIS: 'redis_fdw_handler',
+  PADDLE: 'wasm_fdw_handler',
+  SNOWFLAKE: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -27,7 +33,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Stripe Secret Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
           urlHelper: 'https://stripe.com/docs/keys',
         },
         {
@@ -36,11 +42,62 @@ export const WRAPPERS: WrapperMeta[] = [
           defaultValue: 'https://api.stripe.com/v1',
           required: false,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
     tables: [
+      {
+        label: 'Accounts',
+        description: 'List of accounts on your Stripe account',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'business_type',
+            type: 'text',
+          },
+          {
+            name: 'country',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'type',
+            type: 'text',
+          },
+          {
+            name: 'created',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'accounts',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
       {
         label: 'Balance',
         description: 'The balance currently on your Stripe account',
@@ -219,13 +276,14 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
         ],
       },
       {
@@ -367,13 +425,14 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
         ],
       },
       {
@@ -413,13 +472,14 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
         ],
       },
     ],
@@ -439,26 +499,17 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Project ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'sa_key_id',
           label: 'Service Account Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
           isTextArea: true,
           urlHelper: 'https://firebase.google.com/docs/admin/setup#initialize-sdk',
         },
-        // NOTE(alaister): this is a valid option, but it may confuse the basic use case
-        // so I'm omitting it for now. We can add back once we make it's use clearer.
-        // {
-        //   name: 'access_token',
-        //   label: 'OAuth2 token to access Firebase',
-        //   required: false,
-        //   encrypted: false,
-        //   hidden: false,
-        // },
       ],
     },
     tables: [
@@ -574,21 +625,21 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Access Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'vault_secret_access_key',
           label: 'Access Key Secret',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'aws_region',
           label: 'AWS Region',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
           defaultValue: 'us-east-1',
         },
       ],
@@ -657,7 +708,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'ClickHouse Connection String',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -701,21 +752,21 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Service Account Key',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
         {
           name: 'project_id',
           label: 'Project ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
         {
           name: 'dataset_id',
           label: 'Dataset ID',
           required: true,
           encrypted: false,
-          hidden: false,
+          secureEntry: false,
         },
       ],
     },
@@ -775,7 +826,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'API Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -817,7 +868,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'API Key ID',
           required: true,
           encrypted: true,
-          hidden: true,
+          secureEntry: true,
         },
       ],
     },
@@ -829,6 +880,539 @@ export const WRAPPERS: WrapperMeta[] = [
           {
             name: 'endpoint',
             label: 'Endpoint',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'auth0_wrapper',
+    handlerName: WRAPPER_HANDLERS.AUTH0,
+    validatorName: 'auth0_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/auth0-icon.svg`,
+    extensionName: 'Auth0Fdw',
+    label: 'Auth0',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/auth0',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'api_key_id',
+          label: 'Auth0 API key or PAT',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'url',
+          label: 'Auth0 API URL',
+          defaultValue: 'https://dev-<tenant-id>.us.auth0.com/api/v2/users',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Users',
+        description: 'Auth0 Users',
+        availableColumns: [
+          {
+            name: 'user_id',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'email_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'phone_number',
+            type: 'text',
+          },
+          {
+            name: 'phone_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'created_at',
+            type: 'jsonb',
+          },
+          {
+            name: 'updated_at',
+            type: 'jsonb',
+          },
+          {
+            name: 'identities',
+            type: 'jsonb',
+          },
+          {
+            name: 'app_metadata',
+            type: 'jsonb',
+          },
+          {
+            name: 'user_metadata',
+            type: 'jsonb',
+          },
+          {
+            name: 'picture',
+            type: 'text',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'nickname',
+            type: 'text',
+          },
+          {
+            name: 'multifactor',
+            type: 'jsonb',
+          },
+          {
+            name: 'last_ip',
+            type: 'text',
+          },
+          {
+            name: 'last_login',
+            type: 'jsonb',
+          },
+          {
+            name: 'logins_count',
+            type: 'integer',
+          },
+          {
+            name: 'blocked',
+            type: 'boolean',
+          },
+          {
+            name: 'given_name',
+            type: 'text',
+          },
+          {
+            name: 'family_name',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'cognito_wrapper',
+    handlerName: WRAPPER_HANDLERS.COGNITO,
+    validatorName: 'cognito_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/cognito-icon.svg`,
+    extensionName: 'CognitoFdw',
+    label: 'Cognito',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cognito',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'aws_access_key_id',
+          label: 'AWS Access Key ID',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'api_key_id',
+          label: 'AWS Secret Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'region',
+          label: 'Region',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'user_pool_id',
+          label: 'User Pool ID',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Users',
+        description: 'Cognito Users',
+        availableColumns: [
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'text',
+          },
+          {
+            name: 'email_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'identities',
+            type: 'jsonb',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'mssql_wrapper',
+    handlerName: WRAPPER_HANDLERS.MSSQL,
+    validatorName: 'mssql_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/mssql-icon.svg`,
+    extensionName: 'mssqlFdw',
+    label: 'Microsoft SQL Server',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/mssql',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'conn_string_id',
+          label: 'Connection String',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Microsoft SQL Server Table',
+        description: 'Map to an Microsoft SQL Server Table',
+        options: [
+          {
+            name: 'table',
+            label: 'MSSQL Table',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'redis_wrapper',
+    handlerName: WRAPPER_HANDLERS.REDIS,
+    validatorName: 'redis_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/redis-icon.svg`,
+    extensionName: 'redisFdw',
+    label: 'Redis',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/redis',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'conn_url_id',
+          label: 'Connection URL',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Redis Table',
+        description: 'Map to an Redis Table',
+        options: [
+          {
+            name: 'src_type',
+            label: 'Source Type',
+            editable: true,
+            required: true,
+            type: 'select',
+            defaultValue: 'list',
+            options: [
+              {
+                label: 'list',
+                value: 'list',
+              },
+              {
+                label: 'set',
+                value: 'set',
+              },
+              {
+                label: 'hash',
+                value: 'hash',
+              },
+              {
+                label: 'zset',
+                value: 'zset',
+              },
+              {
+                label: 'stream',
+                value: 'stream',
+              },
+              {
+                label: 'multi_list',
+                value: 'multi_list',
+              },
+              {
+                label: 'multi_set',
+                value: 'multi_set',
+              },
+              {
+                label: 'multi_hash',
+                value: 'multi_hash',
+              },
+              {
+                label: 'multi_zset',
+                value: 'multi_zset',
+              },
+            ],
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: false,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'paddle_wrapper',
+    handlerName: WRAPPER_HANDLERS.PADDLE,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/paddle-icon.svg`,
+    extensionName: 'paddleFdw',
+    label: 'Paddle',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/paddle',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_paddle_fdw_v0.1.0/paddle_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:paddle-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '7d0b902440ac2ef1af85d09807145247f14d1d8fd4d700227e5a4d84c8145409',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'Paddle API URL',
+          defaultValue: 'https://api.paddle.com',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'api_key_id',
+          label: 'Paddle API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Paddle Object',
+        description: 'Map to an Paddle Object',
+        options: [
+          {
+            name: 'object',
+            label: 'Object',
+            editable: true,
+            required: true,
+            type: 'select',
+            defaultValue: 'products',
+            options: [
+              { label: 'Products', value: 'products' },
+              { label: 'Prices', value: 'prices' },
+              { label: 'Discounts', value: 'discounts' },
+              { label: 'Customers', value: 'customers' },
+              { label: 'Transactions', value: 'transactions' },
+              { label: 'Reports', value: 'reports' },
+              { label: 'Notification Settings', value: 'notification-settings' },
+              { label: 'notifications', value: 'notifications' },
+            ],
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'snowflake_wrapper',
+    handlerName: WRAPPER_HANDLERS.SNOWFLAKE,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+    extensionName: 'snowflakeFdw',
+    label: 'Snowflake',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/snowflake',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_snowflake_fdw_v0.1.0/snowflake_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:snowflake-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '2fb46fd8afa63f3975dadf772338106b609b131861849356e0c09dde032d1af8',
+          hidden: true,
+        },
+        {
+          name: 'account_identifier',
+          label: 'Account Identifier',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'user',
+          label: 'User',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'public_key_fingerprint',
+          label: 'Public Key Fingerprint',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'private_key_id',
+          label: 'Private Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Snowflake Table',
+        description: 'Map to an Snowflake Table',
+        options: [
+          {
+            name: 'table',
+            label: 'Table',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'rowid_column',
+            label: 'Row ID Column',
+            defaultValue: 'id',
             editable: true,
             required: true,
             type: 'text',

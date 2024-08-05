@@ -1,23 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { PropsWithChildren, useMemo } from 'react'
-import { CommandMenuProvider } from 'ui'
-
 import { codeBlock } from 'common-tags'
+import { PropsWithChildren, useMemo } from 'react'
+import toast from 'react-hot-toast'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
-import { OPT_IN_TAGS } from 'lib/constants'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
-  const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
   const opt_in_tags = selectedOrganization?.opt_in_tags
@@ -56,10 +57,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const onSaveGeneratedSQL = async (answer: string, title: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
-      ui.setNotification({
-        category: 'info',
-        message: 'Unable to save query as you do not have sufficient permissions for this project',
-      })
+      toast('Unable to save query as you do not have sufficient permissions for this project')
       return
     }
 
@@ -84,15 +82,9 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
       })
 
       snap.addSnippet(snippet as SqlSnippet, ref)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully saved snippet!`,
-      })
+      toast.success(`Successfully saved snippet!`)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 

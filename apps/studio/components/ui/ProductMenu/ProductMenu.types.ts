@@ -13,6 +13,7 @@ export interface ProductMenuGroupItem {
   url: string
   items: any[]
   icon?: ReactNode
+  rightIcon?: ReactNode
   isExternal?: boolean
   disabled?: boolean
   label?: string

@@ -1,17 +1,40 @@
+import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, Listbox, SidePanel } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import CodeEditor from 'components/ui/CodeEditor'
-import MultiSelect, { MultiSelectOption } from 'components/ui/MultiSelect'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useStore } from 'hooks'
+import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectSeparator_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+  SidePanel,
+  cn,
+} from 'ui'
+import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {
@@ -20,12 +43,13 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState('public')
-  const [selectedEntity, setSelectedEntity] = useState('---')
+  const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
+  const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
+  const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
 
   const { refetch: refetchIndexes } = useIndexesQuery({
     schema: selectedSchema,
@@ -36,16 +60,13 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities } = useEntityTypesQuery(
-    {
-      schema: selectedSchema,
-      sort: 'alphabetical',
-      search: undefined,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { keepPreviousData: true }
-  )
+  const { data: entities, isLoading } = useEntityTypesQuery({
+    schema: selectedSchema,
+    sort: 'alphabetical',
+    search: undefined,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const {
     data: tableColumns,
     isLoading: isLoadingTableColumns,
@@ -61,14 +82,10 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     onSuccess: async () => {
       await refetchIndexes()
       onClose()
-      ui.setNotification({ category: 'success', message: `Successfully created index` })
+      toast.success(`Successfully created index`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create index: ${error.message}`,
-      })
+      toast.error(`Failed to create index: ${error.message}`)
     },
   })
 
@@ -82,9 +99,9 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
 
   const generatedSQL = `
-CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns.join(
-    ', '
-  )});
+CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+    .map((column) => `"${column}"`)
+    .join(', ')});
 `.trim()
 
   const onSaveIndex = () => {
@@ -100,14 +117,14 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
   useEffect(() => {
     if (visible) {
       setSelectedSchema('public')
-      setSelectedEntity('---')
+      setSelectedEntity('')
       setSelectedColumns([])
       setSelectedIndexType(INDEX_TYPES[0].value)
     }
   }, [visible])
 
   useEffect(() => {
-    setSelectedEntity('---')
+    setSelectedEntity('')
     setSelectedColumns([])
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedSchema])
@@ -116,6 +133,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedColumns([])
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
+
+  const isSelectEntityDisabled = entityTypes.length === 0
 
   return (
     <SidePanel
@@ -129,60 +148,155 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     >
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
-          <Listbox
-            size="small"
-            label="Select a schema"
-            value={selectedSchema}
-            onChange={setSelectedSchema}
-          >
-            {(schemas ?? []).map((schema) => (
-              <Listbox.Option key={schema.name} value={schema.name} label={schema.name}>
-                {schema.name}
-              </Listbox.Option>
-            ))}
-          </Listbox>
-
-          {entityTypes.length === 0 ? (
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light leading-4">Select a table</p>
-              <Input
-                disabled
-                placeholder="No tables available in schema"
-                descriptionText="Create a table in this schema via the Table or SQL editor first"
-              />
-            </div>
-          ) : (
-            <Listbox
-              size="small"
-              label="Select a table"
-              value={selectedEntity}
-              onChange={setSelectedEntity}
+          <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
+            <Popover_Shadcn_
+              modal={false}
+              open={schemaDropdownOpen}
+              onOpenChange={setSchemaDropdownOpen}
             >
-              <Listbox.Option key="default-option-table" value="---" label="---">
-                ---
-              </Listbox.Option>
-              {(entityTypes ?? []).map((entity) => (
-                <Listbox.Option key={entity.name} value={entity.name} label={entity.name}>
-                  {entity.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
-          )}
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  size={'medium'}
+                  className={`w-full [&>span]:w-full text-left`}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedSchema !== undefined && selectedSchema !== ''
+                    ? selectedSchema
+                    : 'Choose a schema'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find schema..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(schemas ?? []).map((schema) => (
+                          <CommandItem_Shadcn_
+                            key={schema.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                          >
+                            <span>{schema.name}</span>
+                            {selectedEntity === schema.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </FormItemLayout>
 
-          {selectedEntity !== '---' && (
-            <div>
-              <p className="text-sm text-foreground-light mb-2">Select up to 32 columns</p>
+          <FormItemLayout
+            label="Select a table"
+            name="select-table"
+            description={
+              isSelectEntityDisabled &&
+              !isLoading &&
+              'Create a table in this schema via the Table or SQL editor first'
+            }
+            isReactForm={false}
+          >
+            <Popover_Shadcn_
+              modal={false}
+              open={tableDropdownOpen}
+              onOpenChange={setTableDropdownOpen}
+            >
+              <PopoverTrigger_Shadcn_ asChild disabled={isSelectEntityDisabled || isLoading}>
+                {isLoading ? (
+                  <ShimmeringLoader className="h-[38px]" />
+                ) : (
+                  <Button
+                    type="default"
+                    size="medium"
+                    className={cn(
+                      'w-full [&>span]:w-full text-left',
+                      selectedEntity === '' && 'text-foreground-lighter'
+                    )}
+                    iconRight={
+                      <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                    }
+                  >
+                    {selectedEntity !== undefined && selectedEntity !== ''
+                      ? selectedEntity
+                      : isSelectEntityDisabled
+                        ? 'No tables available in schema'
+                        : 'Choose a table'}
+                  </Button>
+                )}
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find table..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(entityTypes || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(entityTypes ?? []).map((entity) => (
+                          <CommandItem_Shadcn_
+                            key={entity.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                          >
+                            <span>{entity.name}</span>
+                            {selectedEntity === entity.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </FormItemLayout>
+
+          {selectedEntity && (
+            <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
-                <MultiSelect
+                <MultiSelectV2
                   options={columnOptions}
-                  placeholder=""
+                  placeholder="Choose which columns to create an index on"
                   searchPlaceholder="Search for a column"
                   value={selectedColumns}
                   onChange={setSelectedColumns}
                 />
               )}
-            </div>
+            </FormItemLayout>
           )}
         </SidePanel.Content>
 
@@ -190,21 +304,43 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           <>
             <SidePanel.Separator />
             <SidePanel.Content className="space-y-6">
-              <Listbox
-                size="small"
+              <FormItemLayout
                 label="Select an index type"
-                value={selectedIndexType}
-                onChange={setSelectedIndexType}
+                name="selected-index-type"
+                isReactForm={false}
               >
-                {INDEX_TYPES.map((index) => (
-                  <Listbox.Option key={index.name} value={index.value} label={index.name}>
-                    <p>{index.name}</p>
-                    {index.description.split('\n').map((x, idx) => (
-                      <p key={`${index.value}-description-${idx}`}>{x}</p>
+                <Select_Shadcn_
+                  value={selectedIndexType}
+                  onValueChange={setSelectedIndexType}
+                  name="selected-index-type"
+                >
+                  <SelectTrigger_Shadcn_ size={'small'}>
+                    <SelectValue_Shadcn_ className="font-mono">
+                      {selectedIndexType}
+                    </SelectValue_Shadcn_>
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    {INDEX_TYPES.map((index, i) => (
+                      <>
+                        <SelectItem_Shadcn_ key={index.name} value={index.value}>
+                          <div className="flex flex-col gap-0.5">
+                            <span>{index.name}</span>
+                            {index.description.split('\n').map((x, idx) => (
+                              <span
+                                className="text-foreground-lighter group-focus:text-foreground-light group-data-[state=checked]:text-foreground-light"
+                                key={`${index.value}-description-${idx}`}
+                              >
+                                {x}
+                              </span>
+                            ))}
+                          </div>
+                        </SelectItem_Shadcn_>
+                        {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
+                      </>
                     ))}
-                  </Listbox.Option>
-                ))}
-              </Listbox>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
             </SidePanel.Content>
             <SidePanel.Separator />
             <SidePanel.Content>

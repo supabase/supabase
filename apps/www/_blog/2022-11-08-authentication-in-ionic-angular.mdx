@@ -5,7 +5,7 @@ author: simon_grimm
 image: simmon-grim-ionic-angular-authentication/ionic-angular-supabase.jpg
 thumb: simmon-grim-ionic-angular-authentication/ionic-angular-supabase.jpg
 categories:
-  - engineering
+  - developers
 tags:
   - ionic
   - angular
@@ -115,7 +115,7 @@ create policy "Authenticated users can create groups." on groups for
   insert to authenticated with check (true);
 
 create policy "The owner can delete a group." on groups for
-    delete using (auth.uid() = creator);
+    delete using ((select auth.uid()) = creator);
 
 -- Message Policies
 create policy "Authenticated users can read messages." on messages
@@ -1479,7 +1479,11 @@ import { App, URLOpenListenerEvent } from '@capacitor/app'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private zone: NgZone, private router: Router, private authService: AuthService) {
+  constructor(
+    private zone: NgZone,
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.setupListener()
   }
 

@@ -1,4 +1,3 @@
-import Divider from 'components/ui/Divider'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -6,7 +5,6 @@ import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-import { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -15,9 +13,9 @@ import {
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
 import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import {
@@ -25,7 +23,8 @@ import {
   VERCEL_DEFAULT_EXTERNAL_ID,
   VERCEL_INTEGRATION_CONFIGS,
 } from 'lib/vercelConfigs'
-import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select } from 'ui'
+import type { Dictionary } from 'types'
+import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select, Separator } from 'ui'
 
 interface IVercelIntegrationStore {
   code: string
@@ -154,16 +153,16 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
     }
   }
   async getVercelProjects() {
-    const { data, error }: any = await fetchVercelProjects({
+    const { data, error } = await fetchVercelProjects({
       vercelTeamId: this.teamId,
       vercelToken: this.token,
     })
     if (error) {
       toast.error(error)
-    } else {
+    } else if (data) {
       this.vercelProjects = data
       // if currentProjectId available. Auto select it
-      if (data && this.currentProjectId) {
+      if (this.currentProjectId) {
         // @ts-ignore
         const found = data.find((x: { id: string }) => (x.id = this.currentProjectId))
         if (found) this.selectedVercelProjectId = found.id
@@ -441,7 +440,7 @@ const ProjectLinks = observer(() => {
         <h4 className="text-lg">Link Vercel to Supabase</h4>
         <p>Choose which of your Vercel projects to link to your existing Supabase projects.</p>
       </div>
-      <Divider light />
+      <Separator />
       <div className="space-y-2">
         <div className="flex justify-between">
           <p className="text-foreground-light">Vercel Projects</p>
@@ -449,7 +448,7 @@ const ProjectLinks = observer(() => {
           <p className="text-foreground-light">Supabase Projects</p>
         </div>
         <ProjectLinkList />
-        <Divider light />
+        <Separator />
         <div className="flex justify-end py-4">{displayButton()}</div>
       </div>
     </div>
@@ -616,8 +615,8 @@ const ProjectLinkItem = observer(
               result.status === 'waiting'
                 ? 'text-foreground-light'
                 : result.status === 'fail'
-                ? 'text-foreground-light'
-                : 'text-foreground'
+                  ? 'text-foreground-light'
+                  : 'text-foreground'
             }`}
           >
             {result?.message ?? 'Processing...'}

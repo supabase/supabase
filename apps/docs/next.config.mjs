@@ -1,11 +1,12 @@
 // @ts-check
-import nextMdx from '@next/mdx'
-import remarkGfm from 'remark-gfm'
-import rehypeSlug from 'rehype-slug'
 import { remarkCodeHike } from '@code-hike/mdx'
+import nextMdx from '@next/mdx'
+import os from 'node:os'
+import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
+import withYaml from 'next-plugin-yaml'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
@@ -33,26 +34,13 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
-const nextConfig = {
-  outputFileTracing: true,
-  experimental: {
-    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
-    outputFileTracingExcludes: {
-      '*': [
-        './node_modules/@swc/core-linux-x64-gnu',
-        './node_modules/@swc/core-linux-x64-musl',
-        './node_modules/esbuild/**/*',
-        './node_modules/webpack/**/*',
-        './node_modules/rollup/**/*',
-      ],
-    },
-  },
 
+const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
   // swcMinify: true,
-  basePath: '/docs',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: true,
     domains: [
@@ -64,7 +52,8 @@ const nextConfig = {
       'weweb-changelog.ghost.io',
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co'
+      'obuldanrptloktxcffvn.supabase.co',
+      'xguihxuzqibwxjnimxev.supabase.co',
     ],
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
@@ -74,7 +63,31 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
+  /**
+   * The SQL to REST API translator relies on libpg-query, which packages a
+   * native Node.js module that wraps the Postgres query parser.
+   *
+   * The default webpack config can't load native modules, so we need a custom
+   * loader for it, which calls process.dlopen to load C++ Addons.
+   *
+   * See https://github.com/eisberg-labs/nextjs-node-loader
+   */
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.node$/,
+      use: [
+        {
+          loader: 'nextjs-node-loader',
+          options: {
+            flags: os.constants.dlopen.RTLD_NOW,
+            outputPath: config.output.path,
+          },
+        },
+      ],
+    })
+    return config
+  },
   async headers() {
     return [
       {
@@ -132,6 +145,15 @@ const nextConfig = {
         permanent: false,
       },
     ]
+  },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 

@@ -3,12 +3,13 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw } from 'ui'
 
-import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { AuditLog } from 'data/organizations/organization-audit-logs-query'
+import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -247,8 +248,8 @@ const AuditLogs = () => {
                             {project?.name
                               ? 'Project: '
                               : organization?.name
-                              ? 'Organization: '
-                              : null}
+                                ? 'Organization: '
+                                : null}
                             {project?.name ?? organization?.name ?? '-'}
                           </p>
                           <p
@@ -258,8 +259,8 @@ const AuditLogs = () => {
                             {log.target.metadata.project_ref
                               ? 'Ref: '
                               : log.target.metadata.org_slug
-                              ? 'Slug: '
-                              : null}
+                                ? 'Slug: '
+                                : null}
                             {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
                           </p>
                         </Table.td>

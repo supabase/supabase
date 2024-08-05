@@ -1,15 +1,15 @@
 import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { DocsLayout } from 'components/layouts'
+import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -17,7 +17,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
@@ -49,7 +49,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
       url: `${API_URL}/projects/${projectRef}/api/graphql`,
       fetch,
     })
-    const customFetcher: Fetcher = (graphqlParams, opts) => {
+    const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
       const role = getImpersonatedRole()
@@ -59,7 +59,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
         role !== undefined &&
         role.type === 'postgrest'
       ) {
-        userAuthorization = `Bearer ${getRoleImpersonationJWT(projectRef, jwtSecret, role)}`
+        try {
+          const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
+          userAuthorization = 'Bearer ' + token
+        } catch (err: any) {
+          toast.error(`Failed to get JWT for role: ${err.message}`)
+        }
       }
 
       return fetcherFn(graphqlParams, {
@@ -80,7 +85,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
-    return <Connecting />
+    return <Loading />
   }
 
   if (pgGraphqlExtension?.installed_version === null) {
@@ -105,4 +110,5 @@ const GraphiQLPage: NextPageWithLayout = () => {
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
-export default observer(GraphiQLPage)
+
+export default GraphiQLPage

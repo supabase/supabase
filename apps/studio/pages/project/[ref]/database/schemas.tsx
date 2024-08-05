@@ -2,13 +2,13 @@ import { partition } from 'lodash'
 import { useState } from 'react'
 
 import SchemaGraph from 'components/interfaces/Database/Schemas/SchemaGraph'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SchemasPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -32,12 +32,12 @@ const SchemasPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex w-full h-full flex-col">
-        <div className="p-4 border-b border-default">
+        <div className="p-4 border-b border-muted">
           {isLoading && (
             <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}
+          {isError && <AlertError error={error as any} subject="Failed to retrieve schemas" />}
 
           {isSuccess && (
             <SchemaSelector

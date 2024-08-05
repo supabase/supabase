@@ -1,13 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Button, IconChevronRight, IconPieChart } from 'ui'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { useMemo } from 'react'
+import { formatCurrency } from 'lib/helpers'
 
 export interface BillingMetricProps {
   idx: number
@@ -35,21 +36,30 @@ const BillingMetric = ({
     } else if (
       (usageMeta.cost && usageMeta.cost > 0) ||
       !relativeToSubscription ||
-      usageMeta.unlimited
+      usageMeta.unlimited ||
+      usageMeta.pricing_free_units === 0
     ) {
-      return metric.units === 'bytes'
+      return metric.units === 'bytes' || metric.units === 'gigabytes'
         ? `${usageMeta.usage.toLocaleString() ?? 0} GB`
-        : usageMeta.usage.toLocaleString()
+        : usageMeta.usage.toLocaleString() + (metric.unitName ? ` ${metric.unitName}` : '')
     } else {
-      return metric.units === 'bytes'
+      return metric.units === 'bytes' || metric.units === 'gigabytes'
         ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units ?? 0} GB`
-        : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}`
+        : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}` +
+            (metric.unitName ? ` ${metric.unitName}` : '')
     }
   }, [usageMeta, relativeToSubscription, metric])
 
+  const sortedProjectAllocations = useMemo(() => {
+    if (!usageMeta || !usageMeta.project_allocations) return []
+
+    return usageMeta.project_allocations.sort((a, b) => b.usage - a.usage)
+  }, [usageMeta])
+
   if (!usageMeta) return null
 
-  const usageRatio = usageMeta.usage / (usageMeta.pricing_free_units ?? 0)
+  const usageRatio =
+    usageMeta.usage === 0 ? 0 : usageMeta.usage / (usageMeta.pricing_free_units ?? 0)
 
   const isUsageBillingEnabled = subscription?.usage_billing_enabled === true
 
@@ -60,24 +70,32 @@ const BillingMetric = ({
   const unit = billingMetricUnit(usageMeta.metric as PricingMetric)
 
   const percentageLabel =
-    usageRatio < 0.01 ? '<1%' : `${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%`
+    usageMeta.usage === 0 || usageMeta.pricing_free_units === 0
+      ? ''
+      : usageRatio < 0.01
+        ? '(<1%)'
+        : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
   return (
     <div className="flex items-center justify-between">
       <div>
-        <Link href={`/org/${slug}/usage#${metric.anchor}`}>
-          <div className="group flex items-center space-x-2">
-            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-              {metric.name}
-            </p>
-            <IconChevronRight strokeWidth={1.5} size={16} className="transition" />
-          </div>
-        </Link>
+        {metric.anchor ? (
+          <Link href={`/org/${slug}/usage#${metric.anchor}`}>
+            <div className="group flex items-center space-x-2">
+              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                {metric.name}
+              </p>
+              <IconChevronRight strokeWidth={1.5} size={16} className="transition" />
+            </div>
+          </Link>
+        ) : (
+          <p className="text-sm text-foreground-light">{metric.name}</p>
+        )}
         <span className="text-sm">{usageLabel}</span>&nbsp;
-        {usageMeta.cost && usageMeta.cost > 0 ? (
-          <span className="text-sm">(${usageMeta.cost})</span>
+        {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
+          <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
         ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
-          <span className="text-sm">({percentageLabel})</span>
+          <span className="text-sm">{percentageLabel}</span>
         ) : null}
       </div>
 
@@ -111,10 +129,10 @@ const BillingMetric = ({
                       isUsageBillingEnabled
                         ? 'text-gray-dark-800'
                         : isExceededLimit
-                        ? 'text-red-900'
-                        : isApproachingLimit
-                        ? 'text-yellow-1000'
-                        : 'text-gray-dark-800'
+                          ? 'text-red-900'
+                          : isApproachingLimit
+                            ? 'text-yellow-1000'
+                            : 'text-gray-dark-800'
                     }
                   />
                 </svg>
@@ -129,39 +147,10 @@ const BillingMetric = ({
                   <div className="text-xs text-foreground space-y-2">
                     <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
-                    {usageMeta.project_allocations && usageMeta.project_allocations.length > 0 && (
-                      <table className="list-disc w-full">
-                        <thead>
-                          <tr>
-                            <th className="text-left">Project</th>
-                            <th className="text-right">Usage</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {usageMeta.project_allocations.map((allocation) => (
-                            <tr key={`${usageMeta.metric}_${allocation.ref}`}>
-                              <td>{allocation.name}</td>
-                              <td className="text-right">
-                                {formatUsage(usageMeta.metric as PricingMetric, allocation.usage)}
-                              </td>
-                            </tr>
-                          ))}
-                          <tr></tr>
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td className="py-2 border-t text-left">
-                              Total{unit && <span> ({unit})</span>}
-                            </td>
-                            <td className="py-2 border-t text-right">
-                              {formatUsage(
-                                usageMeta.metric as PricingMetric,
-                                usageMeta.usage_original
-                              )}{' '}
-                            </td>
-                          </tr>
-                        </tfoot>
-                      </table>
+                    {metric.tip && (
+                      <div className="my-2">
+                        <p className="text-xs">{metric.tip}</p>
+                      </div>
                     )}
 
                     {subscription.usage_billing_enabled === false &&
@@ -175,6 +164,40 @@ const BillingMetric = ({
                           </p>
                         </div>
                       )}
+
+                    {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
+                      <table className="list-disc w-full">
+                        <thead>
+                          <tr>
+                            <th className="text-left">Project</th>
+                            <th className="text-right">Usage</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sortedProjectAllocations.map((allocation) => (
+                            <tr key={`${usageMeta.metric}_${allocation.ref}`}>
+                              <td>{allocation.name}</td>
+                              <td className="text-right">
+                                {formatUsage(usageMeta.metric as PricingMetric, allocation)}
+                              </td>
+                            </tr>
+                          ))}
+                          <tr></tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td className="py-2 border-t text-left">
+                              Total{unit && <span> ({unit})</span>}
+                            </td>
+                            <td className="py-2 border-t text-right">
+                              {formatUsage(usageMeta.metric as PricingMetric, {
+                                usage: usageMeta.usage_original,
+                              })}{' '}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    )}
                   </div>
                 </div>
               </Tooltip.Content>

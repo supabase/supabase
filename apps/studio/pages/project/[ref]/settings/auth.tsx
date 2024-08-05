@@ -1,33 +1,53 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import {
-  SmtpForm,
-  BasicAuthSettingsForm,
   AdvancedAuthSettingsForm,
+  BasicAuthSettingsForm,
+  SmtpForm,
+  ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
-import { SettingsLayout } from 'components/layouts'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = () => {
+const AuthSettings: NextPageWithLayout = () => {
+  const isPermissionsLoaded = usePermissionsLoaded()
+  // TODO: check if these permissions cover third party auth as well
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  if (!canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
-  } else {
-    return (
-      <div className="1xl:px-28 mx-auto flex flex-col gap-8 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-        <BasicAuthSettingsForm />
-        <SmtpForm />
-        <AdvancedAuthSettingsForm />
-      </div>
-    )
-  }
+  return (
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Auth settings</ScaffoldTitle>
+          <ScaffoldDescription>Configure security and user session settings</ScaffoldDescription>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        {!isPermissionsLoaded ? (
+          <GenericSkeletonLoader />
+        ) : !canReadAuthSettings ? (
+          <NoPermission isFullPage resourceText="access your project's authentication settings" />
+        ) : (
+          <>
+            <BasicAuthSettingsForm />
+            <SmtpForm />
+            <AdvancedAuthSettingsForm />
+            <ThirdPartyAuthForm />
+          </>
+        )}
+      </ScaffoldContainer>
+    </>
+  )
 }
 
-PageLayout.getLayout = (page) => {
-  return <SettingsLayout>{page}</SettingsLayout>
-}
-
-export default PageLayout
+AuthSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
+export default AuthSettings

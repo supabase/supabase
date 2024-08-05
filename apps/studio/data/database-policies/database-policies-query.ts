@@ -1,8 +1,7 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePoliciesVariables = {
@@ -33,7 +32,7 @@ export async function getDatabasePolicies(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -55,19 +54,3 @@ export const useDatabasePoliciesQuery = <TData = DatabasePoliciesData>(
       ...options,
     }
   )
-
-export const useDatabasePoliciesPrefetch = ({
-  projectRef,
-  connectionString,
-  schema,
-}: DatabasePoliciesVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databasePoliciesKeys.list(projectRef, schema), ({ signal }) =>
-        getDatabasePolicies({ projectRef, connectionString, schema }, signal)
-      )
-    }
-  }, [projectRef])
-}

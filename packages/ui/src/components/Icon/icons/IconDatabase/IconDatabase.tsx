@@ -9,5 +9,12 @@
     return <IconBase icon={Database} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { database } from 'lucide-react'
+  */
   export default IconDatabase
   

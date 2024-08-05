@@ -1,10 +1,7 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (
-  ref: string,
-  options: { hooksReleased?: boolean } = {}
-): ProductMenuGroup[] => {
+export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
       title: 'Manage',
@@ -45,17 +42,13 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
-              ...(options?.hooksReleased
-                ? [
-                    {
-                      name: 'Hooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/auth/hooks`,
-                      items: [],
-                      label: 'BETA',
-                    },
-                  ]
-                : []),
+              {
+                name: 'Hooks',
+                key: 'hooks',
+                url: `/project/${ref}/auth/hooks`,
+                items: [],
+                label: 'BETA',
+              },
             ]
           : []),
       ],

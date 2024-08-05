@@ -1,7 +1,6 @@
-import { post } from 'lib/common/fetch'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
-import { toast } from 'react-hot-toast'
-import { v4 as _uuidV4 } from 'uuid'
+import toast from 'react-hot-toast'
+
+export { default as uuidv4 } from './uuid'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -42,8 +41,12 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
-export const uuidv4 = () => {
-  return _uuidV4()
+export const removeJSONTrailingComma = (jsonString: string) => {
+  /**
+   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+   * bracket ']' using a regular expression.
+   */
+  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
 }
 
 export const timeout = (ms: number) => {
@@ -55,8 +58,8 @@ export const getURL = () => {
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com/dashboard'
+        ? process.env.VERCEL_URL
+        : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -84,36 +87,6 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
     o[field] = model[field]
   })
   return o
-}
-
-/**
- * Trims down a JSON Schema only to the fields that a user wants.
- * @param {object} jsonSchema
- * @param {array} fields a list of properties to pluck. eg: ['first_name', 'last_name']
- */
-export const pluckJsonSchemaFields = (jsonSchema: any, fields: any) => {
-  let schema: any = {
-    type: 'object',
-    required: [],
-    properties: {},
-  }
-  fields.forEach((field: any) => {
-    if (jsonSchema.properties[field]) {
-      schema.properties[field] = jsonSchema.properties[field]
-      if (jsonSchema.required.includes(field)) schema.required.push(field)
-    }
-  })
-  return schema
-}
-
-/**
- * Before return to frontend, we should filter sensitive project props
- */
-export const filterSensitiveProjectProps = (project: any) => {
-  project.db_user_supabase = undefined
-  project.db_pass_supabase = undefined
-
-  return project
 }
 
 /**
@@ -168,63 +141,23 @@ export const snakeToCamel = (str: string) =>
  * text content async before coping, please use Promise<string> for the 1st arg.
  */
 export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
-  const focused = window.document.hasFocus()
-  if (focused) {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
-
-      return
-    }
-
-    Promise.resolve(str)
-      .then((text) => window.navigator?.clipboard?.writeText(text))
-      .then(callback)
-  } else {
-    console.warn('Unable to copy to clipboard')
-  }
-}
-
-export async function passwordStrength(value: string) {
-  let message: string = ''
-  let warning: string = ''
-  let strength: number = 0
-
-  if (value && value !== '') {
-    if (value.length > 99) {
-      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
-      warning = `Password should be less than 100 characters`
-    } else {
-      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const resultScore = result?.score ?? 0
-
-        const score = (PASSWORD_STRENGTH as any)[resultScore]
-        const suggestions = result.feedback?.suggestions
-          ? result.feedback.suggestions.join(' ')
-          : ''
-
-        message = `${score} ${suggestions}`
-        strength = resultScore
-
-        // warning message for anything below 4 strength :string
-        if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-          warning = `${
-            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-          } You need a stronger password.`
-        }
-      } else {
-        toast.error(`Failed to check password strength: ${response.error.message}`)
+  try {
+    const focused = window.document.hasFocus()
+    if (focused) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        const text = await Promise.resolve(str)
+        Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+        return
       }
-    }
-  }
 
-  return {
-    message,
-    warning,
-    strength,
+      Promise.resolve(str)
+        .then((text) => window.navigator?.clipboard?.writeText(text))
+        .then(callback)
+    } else {
+      console.warn('Unable to copy to clipboard')
+    }
+  } catch (error: any) {
+    toast.error(`Unable to copy to clipboard: ${error.message}`)
   }
 }
 
@@ -241,6 +174,7 @@ export const detectBrowser = () => {
 }
 
 export const detectOS = () => {
+  if (typeof window === 'undefined' || !window) return undefined
   if (typeof navigator === 'undefined' || !navigator) return undefined
 
   const userAgent = window.navigator.userAgent.toLowerCase()
@@ -287,9 +221,7 @@ export const removeCommentsFromSql = (sql: string) => {
   return cleanedSql
 }
 
-export const getSemanticVersion = (version: string) => {
-  if (!version) return 0
-
+const formatSemver = (version: string) => {
   // e.g supabase-postgres-14.1.0.88
   // There's 4 segments instead so we can't use the semver package
   const segments = version.split('supabase-postgres-')
@@ -298,5 +230,49 @@ export const getSemanticVersion = (version: string) => {
   // e.g supabase-postgres-14.1.0.99-vault-rc1
   const formattedSemver = semver.split('-')[0]
 
+  return formattedSemver
+}
+
+export const getSemanticVersion = (version: string) => {
+  if (!version) return 0
+
+  const formattedSemver = formatSemver(version)
   return Number(formattedSemver.split('.').join(''))
+}
+
+export const getDatabaseMajorVersion = (version: string) => {
+  if (!version) return 0
+
+  const formattedSemver = formatSemver(version)
+  return Number(formattedSemver.split('.')[0])
+}
+
+const deg2rad = (deg: number) => {
+  return deg * (Math.PI / 180)
+}
+
+export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371 // Radius of the earth in kilometers
+  const dLat = deg2rad(lat2 - lat1) // deg2rad below
+  const dLon = deg2rad(lon2 - lon1)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const d = R * c // Distance in KM
+  return d
+}
+
+const currencyFormatter = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+})
+
+export const formatCurrency = (amount: number | undefined | null): string | null => {
+  if (amount === undefined || amount === null) {
+    return null
+  } else {
+    return currencyFormatter.format(amount)
+  }
 }

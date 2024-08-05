@@ -18,7 +18,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import { NextPageWithLayout, Organization } from 'types'
+import type { NextPageWithLayout, Organization } from 'types'
 
 const VERCEL_ICON = (
   <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
@@ -65,8 +65,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               project.status === PROJECT_STATUS['COMING_UP'] ||
               project.status === PROJECT_STATUS['RESTORING'])
         )
-        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
-      EMPTY_ARR,
+        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [organization?.id, supabaseProjectsData]
   )
 
@@ -176,6 +175,7 @@ This Supabase integration manages your environment variables automatically to pr
             }}
             loadingForeignProjects={isLoadingVercelProjectsData}
             loadingSupabaseProjects={isLoadingSupabaseProjectsData}
+            mode="Vercel"
           />
           <Markdown
             content={`

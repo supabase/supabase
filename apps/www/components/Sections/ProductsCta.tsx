@@ -6,12 +6,12 @@ import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 export type Products = PRODUCT_SHORTNAMES
 
 interface Props {
-  currentProduct?: Products
+  currentProduct: Products | string
 }
 
 function ProductsCta(props: Props) {
   return (
-    <SectionContainer>
+    <SectionContainer className="overflow-hidden">
       <div className="flex flex-col text-center gap-4 items-center justify-center">
         <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">
           Pick your SupaPower(s)

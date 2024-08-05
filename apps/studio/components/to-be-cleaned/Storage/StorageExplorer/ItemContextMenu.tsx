@@ -1,13 +1,14 @@
-import { observer } from 'mobx-react-lite'
-import { Menu, Item, Separator, Submenu } from 'react-contexify'
-import 'react-contexify/dist/ReactContexify.css'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
-
-import { useCheckPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { Item, Menu, Separator, Submenu } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
+
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { StorageItemWithColumn } from '../Storage.types'
 
 interface ItemContextMenuProps {
   id: string
@@ -28,7 +29,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  const onHandleClick = async (event: any, item: any, expiresIn?: number) => {
+  const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
     switch (event) {
       case 'copy':

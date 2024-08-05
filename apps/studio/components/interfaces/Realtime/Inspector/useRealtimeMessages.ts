@@ -1,12 +1,17 @@
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
-import { sortBy, take } from 'lodash'
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { RealtimeChannel, RealtimeClient } from '@supabase/realtime-js'
+import {
+  DEFAULT_GLOBAL_OPTIONS,
+  DEFAULT_REALTIME_OPTIONS,
+} from '@supabase/supabase-js/dist/main/lib/constants'
+import { merge, sortBy, take } from 'lodash'
+import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 
 function reducer(
   state: LogData[],
@@ -43,6 +48,7 @@ export interface RealtimeConfig {
   token: string
   schema: string
   table: string
+  isChannelPrivate: boolean
   filter: string | undefined
   bearer: string | null
   enableBroadcast: boolean
@@ -50,30 +56,34 @@ export interface RealtimeConfig {
   enableDbChanges: boolean
 }
 
-export const useRealtimeMessages = ({
-  enabled,
-  channelName,
-  projectRef,
-  logLevel,
-  token,
-  schema,
-  table,
-  filter,
-  bearer,
-  enablePresence,
-  enableDbChanges,
-  enableBroadcast,
-}: RealtimeConfig) => {
+export const useRealtimeMessages = (
+  config: RealtimeConfig,
+  setRealtimeConfig: Dispatch<SetStateAction<RealtimeConfig>>
+) => {
+  const {
+    enabled,
+    channelName,
+    projectRef,
+    logLevel,
+    token,
+    schema,
+    table,
+    isChannelPrivate,
+    filter,
+    bearer,
+    enablePresence,
+    enableDbChanges,
+    enableBroadcast,
+  } = config
+
+  const { data } = useProjectApiQuery({ projectRef: projectRef })
+
   // the default host is prod until the correct one comes through an API call.
-  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
-  useProjectApiQuery(
-    { projectRef: projectRef },
-    {
-      onSuccess: (data) => {
-        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
-      },
-    }
-  )
+  const host = data
+    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
+    : `https://${projectRef}.supabase.co`
+
+  const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {
@@ -81,28 +91,37 @@ export const useRealtimeMessages = ({
   }
 
   // Instantiate our client with the Realtime server and params to connect with
-  let [client, setClient] = useState<SupabaseClient<any, 'public', any> | undefined>()
+  let [client, setClient] = useState<RealtimeClient>()
   let [channel, setChannel] = useState<RealtimeChannel | undefined>()
+
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   useEffect(() => {
     if (!enabled) {
       return
     }
-    const opts = {
-      realtime: {
-        params: {
-          log_level: logLevel,
-        },
+
+    const globalOptions = merge(DEFAULT_GLOBAL_OPTIONS, {
+      headers: {
+        'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
       },
+    })
+    const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
+
+    const options = {
+      headers: globalOptions.headers,
+      ...realtimeOptions,
+      params: { apikey: token, ...realtimeOptions.params },
     }
-    const newClient = createClient(host, token, opts)
-    if (bearer != '') {
-      newClient.realtime.setAuth(bearer)
+    const realtimeClient = new RealtimeClient(realtimeUrl, options)
+
+    if (bearer) {
+      realtimeClient.setAuth(bearer)
     }
 
-    setClient(newClient)
+    setClient(realtimeClient)
     return () => {
-      client?.realtime.disconnect()
+      realtimeClient.disconnect()
       setClient(undefined)
     }
   }, [enabled, bearer, host, logLevel, token])
@@ -113,14 +132,11 @@ export const useRealtimeMessages = ({
     }
     dispatch({ type: 'clear' })
     const newChannel = client?.channel(channelName, {
-      config: { broadcast: { self: true } },
+      config: { broadcast: { self: true }, private: isChannelPrivate },
     })
     // Hack to confirm Postgres is subscribed
     // Need to add 'extension' key in the 'payload'
     newChannel.on('system' as any, {} as any, (payload: any) => {
-      // if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
-      //   pushMessageTo('#conn_info', 'postgres_subscribed', {})
-      // }
       pushMessage('SYSTEM', payload)
     })
 
@@ -157,24 +173,37 @@ export const useRealtimeMessages = ({
     }
 
     // Finally, subscribe to the Channel we just setup
-    newChannel.subscribe(async (status, error) => {
+    newChannel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         // Let LiveView know we connected so we can update the button text
         // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
 
+        const role = roleImpersonationState.role?.role
+        const computedRole =
+          role === undefined
+            ? 'service_role_'
+            : role === 'anon'
+              ? 'anon_role_'
+              : role === 'authenticated'
+                ? 'authenticated_role_'
+                : 'user_name_'
+
         if (enablePresence) {
-          const name = 'user_name_' + Math.floor(Math.random() * 100)
+          const name = computedRole + Math.floor(Math.random() * 100)
           newChannel.send({
             type: 'presence',
             event: 'TRACK',
             payload: { name: name, t: performance.now() },
           })
         }
-      } else if (status === 'CLOSED') {
-        // console.log(`Realtime Channel status: ${status}`)
-      } else {
-        // console.error(`Realtime Channel error status: ${status}`)
-        // console.error(`Realtime Channel error: ${error}`)
+      } else if (status === 'CHANNEL_ERROR') {
+        toast.error(
+          `Failed to connect to the channel ${channelName}: This may be due to restrictive RLS policies. Check your role and try again.`
+        )
+
+        newChannel.unsubscribe()
+        setChannel(undefined)
+        setRealtimeConfig({ ...config, channelName: '', enabled: false })
       }
     })
 
@@ -196,14 +225,19 @@ export const useRealtimeMessages = ({
   ])
 
   const sendMessage = useCallback(
-    (message: string, payload: any) => {
+    async (message: string, payload: any, callback: () => void) => {
       if (channel) {
-        channel.send({
+        const res = await channel.send({
           type: 'broadcast',
           event: message,
           payload,
         })
-        toast.success('Successfully broadcasted message')
+        if (res === 'error') {
+          toast.error('Failed to broadcast message')
+        } else {
+          toast.success('Successfully broadcasted message')
+          callback()
+        }
       } else {
         toast.error('Failed to broadcast message: channel has not been set')
       }

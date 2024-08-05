@@ -1,5 +1,6 @@
 const ui = require('./ui.config.js')
 const deepMerge = require('deepmerge')
+const plugin = require('tailwindcss/plugin')
 
 const color = require('./../ui/build/css/tw-extend/color')
 
@@ -99,6 +100,10 @@ const uiConfig = ui({
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('background', color),
+      /*
+       * custom background re-maps
+       */
+      studio: `hsl(var(--background-200)/ <alpha-value>)`,
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -237,21 +242,22 @@ const uiConfig = ui({
               backgroundColor: 'hsl(var(--background-surface-200))',
               border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
-              wordBreak: 'break-all',
+              // wordBreak: 'break-all',
             },
             a: {
               position: 'relative',
-              transition: 'color 0.3s ease-in-out',
+              transition: 'all 0.18s ease',
               paddingBottom: '2px',
               fontWeight: '400',
+              opacity: 1,
               color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-500))',
+              textDecorationColor: 'hsl(var(--foreground-muted))',
               textDecorationThickness: '1px',
-              textUnderlineOffset: '4px',
+              textUnderlineOffset: '2px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--colors-scale12))',
+              textDecorationColor: 'hsl(var(--foreground-default))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
@@ -366,10 +372,39 @@ const uiConfig = ui({
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
           '100%': { backgroundColor: 'transparent' },
         },
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+        'collapsible-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-collapsible-content-height)' },
+        },
+        'collapsible-up': {
+          from: { height: 'var(--radix-collapsible-content-height)' },
+          to: { height: 0 },
+        },
       },
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
+        'accordion-down': 'accordion-down 0.15s ease-out',
+        'accordion-up': 'accordion-up 0.15s ease-out',
+        'collapsible-down': 'collapsible-down 0.10s ease-out',
+        'collapsible-up': 'collapsible-up 0.10s ease-out',
+      },
+      borderRadius: {
+        // lg: `var(--radius)`,
+        // md: `calc(var(--radius) - 2px)`,
+        // sm: 'calc(var(--radius) - 4px)',
+        panel: '6px',
+      },
+      padding: {
+        content: '21px',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,
@@ -379,21 +414,91 @@ const uiConfig = ui({
       // fontFamily: {
       //   sans: ['var(--font-sans)', ...fontFamily.sans],
       // },
-      keyframes: {
-        'accordion-down': {
-          from: { height: 0 },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
-        },
-      },
       // shadcn defaults END
     },
   },
-  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('tailwindcss-animate'),
+    plugin(motionSafeTransition),
+  ],
 })
+
+/**
+ * Plugin to add `safe` versions of the `transition-*` properties, which respect
+ * `prefers-reduced-motion`.
+ *
+ * When users prefer reduced motion, the duration of transform transitions is
+ * reduced to something negiglible (1ms). The original `transition-*` properties
+ * aren't overridden to provide flexibility, in situations where you want to
+ * handle the `prefers-reduced-motion` case some other way.
+ *
+ * See https://css-tricks.com/levels-of-fix/.
+ *
+ * Usage: <div className="transition-safe duration-safe-100">
+ *        - Transitioned properties will animate with duration 100, _except_
+ *          transform properties when prefers-reduced-motion is on, which
+ *          will animate instantaneously.
+ *
+ * Note:
+ *   - `duration-safe` must be used with `transition-safe`
+ *   - Non-safe `duration` must be used with non-safe `transition`
+ *   - (Cannot be mixed)
+ */
+function motionSafeTransition({ addUtilities, matchUtilities, theme }) {
+  addUtilities({
+    '.transition-safe': {
+      transitionProperty:
+        'color, transform, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, filter, backdrop-filter',
+      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionDuration: '150ms',
+      '@media (prefers-reduced-motion)': {
+        transitionDuration:
+          '150ms, 1ms, 150ms, 150ms, 150ms, 150ms, 150ms, 150ms, 150ms, 150s, 150ms',
+      },
+    },
+    '.transition-safe-all': {
+      transitionProperty: 'all, transform',
+      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionDuration: '150ms',
+      '@media (prefers-reduced-motion)': {
+        transitionDuration: '150ms, 1ms',
+      },
+    },
+    '.transition-safe-transform': {
+      /**
+       * The duplicate `transform` here is a hacky way of dealing with the fact
+       * that `transform` must be second in `transition-safe-all` to override
+       * `all`, and its order must be the same across all `transition-safe-*`
+       * classes, so the proper duration applies in `duration-safe`.
+       */
+      transitionProperty: 'transform, transform',
+      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionDuration: '150ms',
+      '@media (prefers-reduced-motion)': {
+        transitionDuration: '1ms',
+      },
+    },
+  })
+
+  matchUtilities(
+    {
+      'duration-safe': (value) => ({
+        transitionDuration: value,
+        '@media (prefers-reduced-motion)': {
+          /**
+           * Preserves the indicated duration for everything except `transform`.
+           *
+           * Relies on browsers truncating the `transition-duration` property
+           * if there are more values than there are transitioned properties.
+           */
+          transitionDuration: `${value}, 1ms, ${value}, ${value}, ${value}, ${value}, ${value}, ${value}, ${value}, ${value}, ${value}`,
+        },
+      }),
+    },
+    { values: theme('transitionDuration') }
+  )
+}
 
 function arrayMergeFn(destinationArray, sourceArray) {
   return destinationArray.concat(sourceArray).reduce((acc, cur) => {

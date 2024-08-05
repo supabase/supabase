@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { AlertTriangle, Info, RefreshCcw } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, IconPauseCircle } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
@@ -39,8 +39,11 @@ export const ProjectCardStatus = ({
   const getTitle = () => {
     if (projectStatus === 'isPaused') return 'Project is paused'
     if (projectStatus === 'isPausing') return 'Project is pausing'
+    if (projectStatus === 'isRestarting') return 'Project is restarting'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
+    if (projectStatus === 'isRestoreFailed') return 'Project restore failed'
+    if (projectStatus === 'isPauseFailed') return 'Project pause failed'
 
     if (!resourceWarnings) return undefined
 
@@ -55,8 +58,11 @@ export const ProjectCardStatus = ({
   const getDescription = () => {
     if (projectStatus === 'isPaused') return 'This project will not accept requests until resumed'
     if (projectStatus === 'isPausing') return 'The pause process will complete in a few minutes'
+    if (projectStatus === 'isRestarting') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isRestoreFailed') return 'Please contact support for assistance'
+    if (projectStatus === 'isPauseFailed') return 'Please contact support for assistance'
 
     if (!resourceWarnings) return undefined
 
@@ -73,8 +79,8 @@ export const ProjectCardStatus = ({
   const alertType = isCritical
     ? 'destructive'
     : projectStatus === 'isPaused'
-    ? 'default'
-    : 'warning'
+      ? 'default'
+      : 'warning'
 
   if (
     (activeWarnings.length === 0 || warningContent === undefined) &&
@@ -95,12 +101,14 @@ export const ProjectCardStatus = ({
     >
       {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
         <IconPauseCircle strokeWidth={1.5} size={12} />
-      ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
+      ) : projectStatus === 'isRestoring' ||
+        projectStatus === 'isComingUp' ||
+        projectStatus === 'isRestarting' ? (
         <RefreshCcw strokeWidth={1.5} size={12} />
       ) : (
         <AlertTriangle strokeWidth={1.5} size={12} />
       )}
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between items-center w-full gap-x-1">
         <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
@@ -112,7 +120,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border bg-background',
+                  'border bg-studio w-[280px]',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>

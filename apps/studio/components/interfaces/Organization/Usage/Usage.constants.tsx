@@ -1,7 +1,7 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {
@@ -17,8 +17,6 @@ export const COLOR_MAP = {
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
 }
-
-export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
 export const USAGE_STATUS = {
   NORMAL: 'NORMAL',
@@ -49,7 +47,7 @@ export interface CategoryAttribute {
   key: string // Property from organization usage
   attributes: Attribute[] // For querying against stats-daily / infra-monitoring
   name: string
-  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
   links?: {
     name: string
     url: string
@@ -58,7 +56,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
+  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
 }
 
 export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity' | 'compute'
@@ -70,7 +68,9 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
-export const USAGE_CATEGORIES: CategoryMeta[] = [
+export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[] = (
+  subscription
+) => [
   {
     key: 'bandwidth',
     name: 'Bandwidth',
@@ -84,18 +84,20 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
           { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
           { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
+          { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
+          { key: EgressType.SUPAVISOR, name: 'Supavisor Egress', color: 'red' },
         ],
         name: 'Total Egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (egress) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+          'Contains any outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },
   {
     key: 'sizeCount',
-    name: 'Size & Counts',
+    name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
       {
@@ -106,15 +108,25 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average',
         unit: 'bytes',
         description:
-          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+          subscription?.usage_based_billing_project_addons === true
+            ? 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks and are billed based on provisioned disk size, rather than database space used.'
+            : 'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
         links: [
           {
             name: 'Documentation',
             url: 'https://supabase.com/docs/guides/platform/database-size',
           },
+          ...(subscription?.usage_based_billing_project_addons === true
+            ? [
+                {
+                  name: 'Disk Management',
+                  url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
+                },
+              ]
+            : []),
         ],
         chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => {
+        additionalInfo: (usage?: OrgUsageResponse) => {
           const usageMeta = usage?.usages.find((x) => x.metric === PricingMetric.DATABASE_SIZE)
           const usageRatio =
             typeof usageMeta !== 'number'
@@ -145,8 +157,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                       When you reach your database size limit, your project can go into read-only
                       mode.{' '}
                       {onFreePlan
-                        ? 'Please upgrade your plan.'
-                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your plans quota.'}
+                        ? 'Please upgrade your Plan.'
+                        : 'Disable your spend cap to scale seamlessly and pay for over-usage beyond your Plans quota.'}
                     </div>
                   </div>
                 </Alert>
@@ -171,17 +183,6 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/storage',
           },
         ],
-      },
-      {
-        anchor: 'funcCount',
-        key: PricingMetric.FUNCTION_COUNT,
-        attributes: [{ key: PricingMetric.FUNCTION_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Edge Function Count',
-        chartPrefix: 'Max',
-        unit: 'absolute',
-        description:
-          'Number of serverless functions in your project.\nBilling is based on the maximum amount of functions at any point in time throughout your billing period.',
-        chartDescription: 'The data refreshes every 24 hours.',
       },
     ],
   },
@@ -272,7 +273,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Realtime Messages',
         unit: 'absolute',
         description:
-          "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
+          "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {

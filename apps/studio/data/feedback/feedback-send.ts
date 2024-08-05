@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 
 export type SendFeedbackVariables = {
   message: string
@@ -27,7 +27,7 @@ export async function sendFeedback({
       pathname,
     },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

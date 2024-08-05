@@ -1,0 +1,98 @@
+---
+title: 'Self-Hosting'
+description: 'Host Supabase on your own infrastructure.'
+subtitle: 'Host Supabase on your own infrastructure.'
+hideToc: true
+---
+
+There are several ways to host Supabase on your own computer, server, or cloud.
+
+## Officially supported
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {official.map((x) => (
+    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const official = [
+  {
+    name: 'Docker',
+    description: 'Deploy Supabase within your own infrastructure using Docker Compose.',
+    href: '/guides/self-hosting/docker',
+  },
+  {
+    name: 'BYO Cloud',
+    description:
+      'Contact our Enterprise sales team if you need Supabase managed in your own cloud.',
+    href: '/pricing',
+  },
+]
+
+Supabase is also a hosted platform. If you want to get started for free, visit [supabase.com/dashboard](https://supabase.com/dashboard).
+
+## Community supported
+
+There are several community-driven projects to help you deploy Supabase. We encourage you to try them out and contribute back to the community.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {community.map((x) => (
+    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const community = [
+  {
+    name: 'Kubernetes',
+    description: 'Helm charts to deploy a Supabase on Kubernetes.',
+    href: 'https://github.com/supabase-community/supabase-kubernetes',
+  },
+  {
+    name: 'Terraform',
+    description: 'A community-driven Terraform Provider for Supabase.',
+    href: 'https://github.com/supabase-community/supabase-terraform',
+  },
+  {
+    name: 'Traefik',
+    description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
+    href: 'https://github.com/supabase-community/supabase-traefik',
+  },
+  {
+    name: 'AWS',
+    description: 'A CloudFormation template for Supabase.',
+    href: 'https://github.com/supabase-community/supabase-on-aws',
+  },
+]
+
+## Third-party guides
+
+The following third-party providers have shown consistent support for the self-hosted version of Supabase:.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {[
+    {
+      name: 'Digital Ocean',
+      description: 'Deploys using Terraform.',
+      href: 'https://docs.digitalocean.com/developer-center/hosting-supabase-on-digitalocean/',
+    },
+    {
+      name: 'StackGres',
+      description: 'Deploys using Kubernetes.',
+      href: 'https://stackgres.io/blog/running-supabase-on-top-of-stackgres/',
+    },
+  ].map((x) => (
+    <div className="md:col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>

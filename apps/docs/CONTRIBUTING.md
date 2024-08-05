@@ -70,7 +70,7 @@ They shouldn't include:
 
 ## Repo organization
 
-Most docs pages are contained in the `apps/docs/pages` directory. Some docs sections are federated from other repositories, for example [`pg_graphql`](https://github.com/supabase/pg_graphql/tree/master/docs). Reference docs are generated from spec files in the `spec` directory.
+Most docs pages are contained in the `apps/docs/content` directory. Some docs sections are federated from other repositories, for example [`pg_graphql`](https://github.com/supabase/pg_graphql/tree/master/docs). Reference docs are generated from spec files in the `spec` directory.
 
 You can usually identify a federated or reference doc because it uses a Next.js dynamic route (for example, `[[...slug]].tsx`). Look for the spec file import or the repo definition to find the content location.
 
@@ -90,54 +90,60 @@ const docsDir = 'docs'
 const externalSite = 'https://supabase.github.io/pg_graphql'
 ```
 
-## File structure
+Check the sections for [guide structure](#guide-structure) and [reference structure](#reference-structure) to learn more about the file structures.
 
-The Supabase docs use [MDX](https://mdxjs.com/).
+## Guide structure
 
-Adding a new doc requires:
+The Supabase docs use [MDX](https://mdxjs.com/). Guides are written in unstructured prose as MDX documents.
 
-- A layout
-- Metadata
-- A page export
+Adding a new guide requires:
+
+- YAML frontmatter
 - A navigation entry (in a separate file)
 
-```js
-// required import
-import Layout from '~/layouts/DefaultGuideLayout'
+Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
 
-
-/*
- * required metadata fields
- * title: required - page title
- * description: required - page description
- *
- * optional metadata fields
- * id: optional - not currently being used 
- * subtitle: optional - displayed below the title
- * sidebar_label: optional - if you want the sidebar text to be different from the title
- * hide_table_of_contents: optional - hides the table of contents on the right side
- * tocVideo: optional - a YouTube slug, displays the video above the table of contents
- */
-export const meta = {
-  id: 'nextjs-server-components',
-  title: 'Supabase Auth with Next.js Server Components',
-  description:
-    'Authentication helpers for creating an authenticated Supabase client in Next.js 13 app directory Server Components.',
-  sidebar_label: 'Next.js Server Components',
-}
-
-// content
-You can use **Markdown syntax**.
-
-// required export
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
+```yaml
+---
+title: How to connect to Supabase
+hideToc: true
+---
 ```
 
 The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
 
 Add an entry with the `name`, `url`, and (optional) `icon` for your page.
+
+## Reference structure
+
+Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
+
+### Common spec file
+
+Each type of library (for example, language SDK or CLI) has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
+
+- **id** - Identifies the function
+- **title** - Human-readable title
+- **slug** - URL slug
+- **product** - Supabase product that owns the function. For example, database operations are owned by `database`, and auth functions are owned by`auth`
+- **type** - `function` for a structured function definition or `markdown` for a prose explainer section.
+
+To add a new function, manually add an entry to this common file.
+
+### Specific spec file
+
+Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+
+The functions listed in this file match the ones defined in the common spec file.
+
+Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. These references are pulled down and transformed using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
+
+If you're a library maintainer, follow these steps when updating function parameters or return values:
+
+1. Get your changes merged to `master` in your library
+2. This will kick off an action that automatically updates the spec file in the library's `gh-pages` branch
+3. Run `make` in `/spec` of the `supabase/supabase` repo. This will regenerate all of the `tsdoc` files that the docs site uses
+4. You should now see the changes you've made in the docs site locally
 
 ## Content reuse
 
@@ -272,13 +278,12 @@ The `queryGroup` param is optional. It lets you link directly to a tab by using 
 
 Include videos as TOC (Table of Contents) videos rather than putting them in the main text.
 
-You can define a TOC video in the page metadata:
+You can define a TOC video in the page frontmatter:
 
-```js
-export const meta = {
-  ...
-  tocVideo: 'rzglqRdZUQE',
-}
+```yaml
+---
+tocVideo: 'rzglqRdZUQE',
+---
 ```
 
 ## Styling, formatting, and grammar
@@ -321,3 +326,9 @@ Here are some exceptions and Supabase-specific guidelines.
 - `Setup` is a noun. `Set up` is a verb.
 - `Supabase` is capitalized (not `supabase`), except in code.
 - `Supabase Platform` is in title case (not `Supabase platform`).
+
+## Search
+
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+
+Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/blob/master/supabase/functions) is executed to perform the embedding search.

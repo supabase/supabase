@@ -1,29 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Button, Form, IconExternalLink, Input } from 'ui'
 import * as yup from 'yup'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Form, IconExternalLink, Input } from 'ui'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
 })
 
 const CustomDomainsConfigureHostname = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
 
@@ -132,4 +126,4 @@ const CustomDomainsConfigureHostname = () => {
   )
 }
 
-export default observer(CustomDomainsConfigureHostname)
+export default CustomDomainsConfigureHostname

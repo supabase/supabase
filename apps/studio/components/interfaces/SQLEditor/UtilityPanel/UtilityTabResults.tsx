@@ -1,55 +1,40 @@
+import { Loader2 } from 'lucide-react'
+
+import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { format } from 'sql-formatter'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button } from 'ui'
-import { useSqlEditor } from '../SQLEditor'
-import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
+  isDisabled?: boolean
+  onDebug: () => void
+  isDebugging?: boolean
 }
 
-const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
-  const { ui } = useStore()
+const UtilityTabResults = ({
+  id,
+  isExecuting,
+  isDisabled,
+  isDebugging,
+  onDebug,
+}: UtilityTabResultsProps) => {
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
   const organization = useSelectedOrganization()
+
   const snap = useSqlEditorStateSnapshot()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
-  const { data } = useEntityDefinitionsQuery(
-    {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-    },
-    { enabled: includeSchemaMetadata }
-  )
-
-  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-
-  const snippet = snap.snippets[id]
-  const result = snap.results[id]?.[0]
-  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
-
+  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -59,22 +44,24 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     result?.error?.message?.includes('canceling statement due to statement timeout') ||
     result?.error?.message?.includes('upstream request timeout')
 
-  if (isUtilityPanelCollapsed) return null
-
   if (isExecuting) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
+      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <Loader2 size={14} className="animate-spin" />
+        <p className="m-0 border-0 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (result?.error) {
     const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
       (x: string) => x.length > 0
     )
+    const readReplicaError =
+      state.selectedDatabaseId !== ref &&
+      result.error.message.includes('in a read-only transaction')
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <div className="flex flex-row justify-between items-start py-4 px-6">
+        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
           {isTimeout ? (
             <div className="flex flex-col gap-y-1">
               <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
@@ -101,60 +88,54 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div>
+            <div className="">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
-                  <pre key={`error-${i}`} className="font-mono text-sm">
+                  <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
                     {x}
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error?.message}</p>
+                <p className="font-mono text-sm">Error: {result.error?.message}</p>
+              )}
+              {result.autoLimit && (
+                <p className="text-sm text-foreground-light">
+                  Note: A limit of {result.autoLimit} was applied to your query. If this was the
+                  cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                </p>
+              )}
+              {readReplicaError && (
+                <p className="text-sm text-foreground-light">
+                  Note: Read replicas are for read only queries. Run write queries on the primary
+                  database instead.
+                </p>
               )}
             </div>
           )}
-          {!hasHipaaAddon && (
-            <Button
-              icon={
-                <div className="scale-75">
-                  <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
-                </div>
-              }
-              disabled={!!sqlDiff || isDebugSqlLoading}
-              onClick={async () => {
-                try {
-                  const { solution, sql } = await debugSql({
-                    sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                    errorMessage: result.error.message,
-                    entityDefinitions,
-                  })
 
-                  const formattedSql =
-                    sqlAiDisclaimerComment +
-                    '\n\n' +
-                    format(sql, {
-                      language: 'postgresql',
-                      keywordCase: 'lower',
-                    })
-                  setAiInput('')
-                  setDebugSolution(solution)
-                  setSqlDiff({
-                    original: snippet.snippet.content.sql,
-                    modified: formattedSql,
-                  })
-                } catch (error: unknown) {
-                  if (isError(error)) {
-                    ui.setNotification({
-                      category: 'error',
-                      message: `Failed to debug: ${error.message}`,
-                    })
-                  }
-                }
-              }}
-            >
-              Debug with Supabase AI
-            </Button>
-          )}
+          <div className="flex items-center gap-x-2">
+            {readReplicaError && (
+              <Button
+                className="py-2"
+                type="default"
+                onClick={() => {
+                  state.setSelectedDatabaseId(ref)
+                  snap.resetResult(id)
+                }}
+              >
+                Switch to primary database
+              </Button>
+            )}
+            {!hasHipaaAddon && (
+              <Button
+                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                disabled={!!isDisabled || isDebugging}
+                onClick={onDebug}
+              >
+                Debug with Supabase AI
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     )

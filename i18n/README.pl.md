@@ -58,7 +58,7 @@ Supabase to połączenie narzędzi open source. Tworzymy funkcje Firebase przy u
 Supabase jest [platformą hostowaną](https://supabase.com/dashboard). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
 Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview) i [rozwijać lokalnie](https://supabase.com/docs/guides/local-development).
 
-![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) to system obiektowo-relacyjnych baz danych z ponad 30-letnim aktywnym rozwojem, który przyniósł mu silną reputację niezawodności, solidności funkcji i wydajności.
 - [Realtime](https://github.com/supabase/realtime) to serwer Elixir, który umożliwia nasłuchiwanie wstawek, aktualizacji i usuwania PostgreSQL za pomocą websockets. Realtime sonduje wbudowaną funkcję replikacji Postgres pod kątem zmian w bazie danych, konwertuje zmiany na JSON, a następnie transmituje JSON przez websockets do autoryzowanych klientów.

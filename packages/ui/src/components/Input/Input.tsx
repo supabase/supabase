@@ -1,17 +1,16 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
-import { Button } from '../Button'
-import { IconCopy } from '../Icon/icons/IconCopy'
 
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
-
-import { cn } from '@ui/lib/utils/cn'
+import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
+import { IconCopy } from '../Icon/icons/IconCopy'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
@@ -37,6 +36,9 @@ export interface Props
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ */
 function Input({
   autoComplete,
   autoFocus,
@@ -158,6 +160,7 @@ function Input({
     >
       <div className={__styles.container}>
         <input
+          data-size={size}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           defaultValue={defaultValue}
@@ -174,7 +177,7 @@ function Input({
           className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
@@ -196,6 +199,9 @@ function Input({
   )
 }
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string

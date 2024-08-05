@@ -1,13 +1,14 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { Button } from 'ui'
 import { useTheme } from 'next-themes'
-import { API_URL } from 'lib/constants'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+
 import { useIsLoggedIn } from 'common'
-import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
 import { useOrganizationByFlyOrgIdMutation } from 'data/organizations/organization-by-fly-organization-id-mutation'
+import { useProjectByFlyExtensionIdMutation } from 'data/projects/project-by-fly-extension-id-mutation'
+import { API_URL } from 'lib/constants'
+import { Button } from 'ui'
 
 const SignInFlyTos = () => {
   const [loading, setLoading] = useState(true)
@@ -22,15 +23,15 @@ const SignInFlyTos = () => {
     onSuccess: (res) => {
       router.replace(`/project/${res.ref}`)
     },
-    onError: (_) => {
+    onError: () => {
       setLoading(false)
     },
   })
   const { mutateAsync: getOrgByFlyOrgId } = useOrganizationByFlyOrgIdMutation({
-    onSuccess: (_) => {
+    onSuccess: () => {
       router.replace('/projects')
     },
-    onError: (_) => {
+    onError: () => {
       setLoading(false)
     },
   })
@@ -47,14 +48,23 @@ const SignInFlyTos = () => {
     fly_extension_id
       ? getProjectByFlyExtensionId({ flyExtensionId: fly_extension_id as string })
       : fly_organization_id
-      ? getOrgByFlyOrgId({ flyOrganizationId: fly_organization_id as string })
-      : setLoading(false)
+        ? getOrgByFlyOrgId({ flyOrganizationId: fly_organization_id as string })
+        : setLoading(false)
   }, [isReady])
 
+  const [isRedirecting, setIsRedirecting] = useState(false)
+
   const onSignInWithFly = async () => {
-    window.location.href = fly_extension_id
-      ? `${API_URL}/tos/fly?extension_id=${fly_extension_id}`
-      : `${API_URL}/tos/fly?organization_id=${fly_organization_id}`
+    setIsRedirecting(true)
+
+    try {
+      window.location.href = fly_extension_id
+        ? `${API_URL}/tos/fly?extension_id=${fly_extension_id}`
+        : `${API_URL}/tos/fly?organization_id=${fly_organization_id}`
+    } catch (error) {
+      setIsRedirecting(false)
+      throw error
+    }
   }
 
   return (
@@ -88,7 +98,11 @@ const SignInFlyTos = () => {
         <p className="text-sm">Checking your access rights...</p>
       ) : (
         <div className="flex flex-col items-center space-x-4 space-y-4">
-          <Button onClick={onSignInWithFly} disabled={!fly_extension_id && !fly_organization_id}>
+          <Button
+            onClick={onSignInWithFly}
+            disabled={(!fly_extension_id && !fly_organization_id) || isRedirecting}
+            loading={isRedirecting}
+          >
             Login with Fly.io
           </Button>
           {isReady && !fly_extension_id && !fly_organization_id && (

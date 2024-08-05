@@ -1,35 +1,34 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import saveAs from 'file-saver'
+import { ArrowUp, ChevronDown, Download, FileText, Trash, X } from 'lucide-react'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useDispatch, useTrackedState } from 'components/grid/store/Store'
+import type { Filter, Sort, SupaTable } from 'components/grid/types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconArrowUp,
-  IconChevronDown,
-  IconDownload,
-  IconFileText,
-  IconTrash,
-  IconX,
   cn,
 } from 'ui'
-
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import RLSBannerWarning from './RLSBannerWarning'
-import RefreshButton from './RefreshButton'
-import FilterDropdown from './filter'
-import SortPopover from './sort'
+import FilterPopover from './filter/FilterPopover'
+import { SortPopover } from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -40,7 +39,6 @@ export type HeaderProps = {
   table: SupaTable
   sorts: Sort[]
   filters: Filter[]
-  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
   onImportData?: () => void
@@ -57,14 +55,13 @@ const Header = ({
   onImportData,
   headerActions,
   customHeader,
-  isRefetching,
 }: HeaderProps) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-surface-100 px-5 py-1.5">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-5 py-1.5">
         {customHeader ? (
           <>{customHeader}</>
         ) : (
@@ -74,7 +71,6 @@ const Header = ({
             ) : (
               <DefaultHeader
                 table={table}
-                isRefetching={isRefetching}
                 onAddColumn={onAddColumn}
                 onAddRow={onAddRow}
                 onImportData={onImportData}
@@ -84,7 +80,6 @@ const Header = ({
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
-      <RLSBannerWarning />
     </div>
   )
 }
@@ -93,18 +88,11 @@ export default Header
 
 type DefaultHeaderProps = {
   table: SupaTable
-  isRefetching: boolean
   onAddColumn?: () => void
   onAddRow?: () => void
   onImportData?: () => void
 }
-const DefaultHeader = ({
-  table,
-  isRefetching,
-  onAddColumn,
-  onAddRow,
-  onImportData,
-}: DefaultHeaderProps) => {
+const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHeaderProps) => {
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -117,8 +105,7 @@ const DefaultHeader = ({
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton table={table} isRefetching={isRefetching} />
-        <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
+        <FilterPopover table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
       {canAddNew && (
@@ -129,9 +116,10 @@ const DefaultHeader = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    data-testid="table-editor-insert-new-row"
                     type="primary"
                     size="tiny"
-                    icon={<IconChevronDown size={14} strokeWidth={1.5} />}
+                    icon={<ChevronDown strokeWidth={1.5} />}
                   >
                     Insert
                   </Button>
@@ -198,8 +186,12 @@ const DefaultHeader = ({
                             onClick={onImportData}
                           >
                             <div className="relative -mt-2">
-                              <IconFileText className="-translate-x-[2px]" />
-                              <IconArrowUp
+                              <FileText
+                                size={18}
+                                strokeWidth={1.5}
+                                className="-translate-x-[2px]"
+                              />
+                              <ArrowUp
                                 className={clsx(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                                   'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
@@ -232,7 +224,6 @@ type RowHeaderProps = {
   filters: Filter[]
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -240,6 +231,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const snap = useTableEditorStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const isImpersonatingRole = roleImpersonationState.role !== undefined
 
   const [isExporting, setIsExporting] = useState(false)
 
@@ -257,7 +249,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count'],
+      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table,
@@ -296,16 +288,28 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      ui.setNotification({
-        category: 'error',
-        message: `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`,
-      })
+      toast.error(
+        `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`
+      )
+      return setIsExporting(false)
+    }
+
+    if (!project) {
+      toast.error('Project is required')
       return setIsExporting(false)
     }
 
     const rows = allRowsSelected
-      ? await state.rowService!.fetchAllData(filters, sorts)
+      ? await fetchAllTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          filters,
+          sorts,
+          impersonatedRole: roleImpersonationState.role,
+        })
       : allRows.filter((x) => selectedRows.has(x.idx))
+
     const formattedRows = rows.map((row) => {
       const formattedRow = row
       Object.keys(row).map((column) => {
@@ -334,34 +338,35 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const totalRows = countData?.count ?? 0
   const { selectedRows, editable, allRowsSelected } = state
 
+  useSubscribeToImpersonatedRole(() => {
+    if (allRowsSelected || selectedRows.size > 0) {
+      deselectRows()
+    }
+  })
+
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       <div className="flex items-center gap-3">
-        <Button
-          type="default"
-          style={{ padding: '3px' }}
-          icon={<IconX size="tiny" strokeWidth={2} />}
-          onClick={deselectRows}
-        />
+        <Button type="default" className="px-1" icon={<X />} onClick={deselectRows} />
         <span className="text-xs text-foreground">
           {allRowsSelected
-            ? `${totalRows} rows selected`
+            ? `All rows in table selected`
             : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
-            Select all {totalRows} rows
+            Select all rows in table
           </Button>
         )}
       </div>
-      <div className="h-[20px] border-r border-gray-700" />
+      <div className="h-[20px] border-r border-strong" />
       <div className="flex items-center gap-2">
         <Button
           type="primary"
           size="tiny"
-          icon={<IconDownload />}
+          icon={<Download />}
           loading={isExporting}
           disabled={isExporting}
           onClick={onRowsExportCSV}
@@ -369,18 +374,41 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           Export to CSV
         </Button>
         {editable && (
-          <Button
-            type="default"
-            size="tiny"
-            icon={<IconTrash size="tiny" />}
-            onClick={onRowsDelete}
-          >
-            {allRowsSelected
-              ? `Delete ${totalRows} rows`
-              : selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
-          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="default"
+                size="tiny"
+                icon={<Trash />}
+                onClick={onRowsDelete}
+                disabled={allRowsSelected && isImpersonatingRole}
+              >
+                {allRowsSelected
+                  ? `Delete all rows in table`
+                  : selectedRows.size > 1
+                    ? `Delete ${selectedRows.size} rows`
+                    : `Delete ${selectedRows.size} row`}
+              </Button>
+            </Tooltip.Trigger>
+
+            {allRowsSelected && isImpersonatingRole && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      Table truncation is not supported when impersonating a role
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
         )}
       </div>
     </div>

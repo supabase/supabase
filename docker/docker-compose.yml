@@ -6,11 +6,11 @@
 
 name: supabase
 version: "3.8"
-services:
 
+services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20231123-64a766a
+    image: supabase/studio:20240729-ce42139
     restart: unless-stopped
     healthcheck:
       test:
@@ -37,6 +37,7 @@ services:
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
 
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_URL: http://analytics:4000
@@ -76,7 +77,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.125.1
+    image: supabase/gotrue:v2.151.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -116,6 +117,7 @@ services:
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
@@ -132,10 +134,23 @@ services:
 
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+      # Uncomment to enable custom access token hook. You'll need to create a public.custom_access_token_hook function and grant necessary permissions.
+      # See: https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token for details
+      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED="true"
+      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI="pg-functions://postgres/public/custom_access_token_hook"
+
+      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED="true"
+      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI="pg-functions://postgres/public/mfa_verification_attempt"
+
+      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED="true"
+      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI="pg-functions://postgres/public/password_verification_attempt"
+
+
+
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v12.0.1
+    image: postgrest/postgrest:v12.2.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -156,7 +171,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.25.35
+    image: supabase/realtime:v2.29.15
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -167,9 +182,14 @@ services:
       test:
         [
           "CMD",
-          "bash",
-          "-c",
-          "printf \\0 > /dev/tcp/localhost/4000"
+          "curl",
+          "-sSfL",
+          "--head",
+          "-o",
+          "/dev/null",
+          "-H",
+          "Authorization: Bearer ${ANON_KEY}",
+          "http://localhost:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
       interval: 5s
@@ -185,18 +205,17 @@ services:
       DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
       DB_ENC_KEY: supabaserealtime
       API_JWT_SECRET: ${JWT_SECRET}
-      FLY_ALLOC_ID: fly123
-      FLY_APP_NAME: realtime
       SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
       ERL_AFLAGS: -proto_dist inet_tcp
-      ENABLE_TAILSCALE: "false"
       DNS_NODES: "''"
-    command: >
-      sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
+      RLIMIT_NOFILE: "10000"
+      APP_NAME: realtime
+      SEED_SELF_HOST: true
 
+  # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.43.11
+    image: supabase/storage-api:v1.0.6
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -255,7 +274,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.75.0
+    image: supabase/postgres-meta:v0.83.2
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -273,7 +292,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.29.1
+    image: supabase/edge-runtime:v1.55.0
     restart: unless-stopped
     depends_on:
       analytics:
@@ -313,7 +332,7 @@ services:
     #     target: /opt/app/rel/logflare/bin/gcloud.json
     #     read_only: true
     environment:
-      LOGFLARE_NODE_HOST:  127.0.0.1
+      LOGFLARE_NODE_HOST: 127.0.0.1
       DB_USERNAME: supabase_admin
       DB_DATABASE: ${POSTGRES_DB}
       DB_HOSTNAME: ${POSTGRES_HOST}
@@ -323,12 +342,12 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_MIN_CLUSTER_SIZE: 1
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       POSTGRES_BACKEND_SCHEMA: _analytics
       LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
-
       # Uncomment to use Big Query backend for analytics
       # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
@@ -338,7 +357,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.147
+    image: supabase/postgres:15.1.1.78
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -379,6 +398,8 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      # Use named volume to persist pgsodium decryption key between restarts
+      - db-config:/etc/postgresql-custom
 
   vector:
     container_name: supabase-vector
@@ -400,5 +421,9 @@ services:
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
-
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
+
+volumes:
+  db-config:

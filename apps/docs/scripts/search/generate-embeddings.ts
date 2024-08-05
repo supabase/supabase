@@ -3,8 +3,8 @@ import dotenv from 'dotenv'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
+import type { Json, Section } from '../helpers.mdx'
 import { fetchSources } from './sources'
-import { Json, Section } from './sources/base'
 
 dotenv.config()
 
@@ -22,7 +22,9 @@ async function generateEmbeddings() {
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'OPENAI_KEY',
+    'OPENAI_API_KEY',
+    'NEXT_PUBLIC_MISC_USE_URL',
+    'NEXT_PUBLIC_MISC_USE_ANON_KEY',
     'SEARCH_GITHUB_APP_ID',
     'SEARCH_GITHUB_APP_INSTALLATION_ID',
     'SEARCH_GITHUB_APP_PRIVATE_KEY',
@@ -38,6 +40,7 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
@@ -71,7 +74,13 @@ async function generateEmbeddings() {
         checksum,
         sections,
         meta = {},
-      }: { checksum: string; sections: Section[]; meta?: Json } = embeddingSource.process()
+        ragIgnore = false,
+      }: {
+        checksum: string
+        sections: Section[]
+        ragIgnore?: boolean
+        meta?: Json
+      } = embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
@@ -154,10 +163,11 @@ async function generateEmbeddings() {
       console.log(`[${path}] Adding ${sections.length} page sections (with embeddings)`)
       for (const { slug, heading, content } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
+        // force a redeploy
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY })
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
           const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
@@ -175,6 +185,7 @@ async function generateEmbeddings() {
               content,
               token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
+              rag_ignore: ragIgnore,
             })
             .select()
             .limit(1)

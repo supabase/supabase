@@ -1,12 +1,13 @@
 import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
-import typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json'
-import spec from '~/spec/supabase_csharp_v0.yml' assert { type: 'yml' }
+import spec from '~/spec/supabase_csharp_v1.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import RefSEO from '~/components/reference/RefSEO'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import type { TypeSpec } from '~/components/reference/Reference.types'
 
 const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/csharp'
@@ -25,9 +26,9 @@ export default function CSharpReference(props) {
       <RefSEO title={pageTitle} />
 
       <RefSectionHandler
+        menuId={MenuId.RefCSharpV1}
         sections={filteredSection}
         spec={spec}
-        typeSpec={typeSpec}
         pageProps={props}
         type="client-lib"
       />

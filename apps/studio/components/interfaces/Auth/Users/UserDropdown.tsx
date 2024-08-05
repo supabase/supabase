@@ -1,68 +1,83 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { Mail, MoreHorizontal, ShieldOff, Trash, User as UserIcon } from 'lucide-react'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useParams } from 'common'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { User } from 'data/auth/users-query'
-import { useStore } from 'hooks'
+import type { User } from 'data/auth/users-query'
 import { timeout } from 'lib/helpers'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMail,
-  IconMoreHorizontal,
-  IconShieldOff,
-  IconTrash,
-  Modal,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface UserDropdownProps {
   user: User
-  canRemoveUser: boolean
-  canRemoveMFAFactors: boolean
+  permissions: {
+    canRemoveUser: boolean
+    canRemoveMFAFactors: boolean
+    canSendMagicLink: boolean
+    canSendRecovery: boolean
+    canSendOtp: boolean
+  }
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
-  const { ui } = useStore()
+const UserDropdown = ({
+  user,
+  permissions,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserDropdownProps) => {
   const { ref } = useParams()
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
+
+  const { canRemoveUser, canRemoveMFAFactors, canSendMagicLink, canSendRecovery, canSendOtp } =
+    permissions
 
   const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Sent password recovery to ${user.email}`,
-      })
+      toast.success(`Sent password recovery to ${user.email}`)
     },
   })
   const { mutate: sendMagicLink, isLoading: isSendingLink } = useUserSendMagicLinkMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Sent magic link to ${user.email}`,
-      })
+      toast.success(`Sent magic link to ${user.email}`)
     },
   })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Sent OTP to ${user.phone}`,
-      })
+      toast.success(`Sent OTP to ${user.phone}`)
     },
   })
-  const { mutateAsync: deleteUser, isLoading: isDeleting } = useUserDeleteMutation()
-  const { mutateAsync: deleteUserMFAFactors, isLoading: isDeletingFactors } =
-    useUserDeleteMFAFactorsMutation()
+  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted ${user.email}`)
+      setIsDeleteModalOpen(false)
+    },
+  })
+  const { mutate: deleteUserMFAFactors, isLoading: isDeletingFactors } =
+    useUserDeleteMFAFactorsMutation({
+      onSuccess: () => {
+        toast.success("Successfully deleted the user's factors")
+        setIsDeleteFactorsModalOpen(false)
+      },
+    })
+
   const isLoading = isResetting || isSendingLink || isSendingOTP || isDeleting || isDeletingFactors
 
   const handleResetPassword = async () => {
@@ -80,178 +95,171 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
     sendOTP({ projectRef: ref, user })
   }
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-
   async function handleDelete() {
     await timeout(200)
-
     if (!ref) return console.error('Project ref is required')
-    try {
-      await deleteUser({ projectRef: ref, user })
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-      setIsDeleteModalOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: error?.message ?? 'Something went wrong while trying to delete user',
-      })
-    }
+    deleteUser({ projectRef: ref, user })
   }
-
-  const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   async function handleDeleteFactors() {
     await timeout(200)
-
     if (!ref) return console.error('Project ref is required')
     if (!user.id) return console.error('User id is required')
+    deleteUserMFAFactors({ projectRef: ref, userId: user.id })
+  }
 
-    try {
-      await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
-      ui.setNotification({
-        category: 'success',
-        message: "Successfully deleted the user's factors",
-      })
-      setIsDeleteFactorsModalOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: error?.message ?? "Something went wrong while trying to delete user's factors",
-      })
-    } finally {
-    }
+  const handleViewUserInfo = () => {
+    setSelectedUser(user)
+    setUserSidePanelOpen(true)
   }
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
-            <IconMoreHorizontal />
-          </Button>
+          <Button type="text" loading={isLoading} className="px-1.5" icon={<MoreHorizontal />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <>
+            <DropdownMenuItem className="space-x-2" onClick={handleViewUserInfo}>
+              <UserIcon size={14} />
+              <p>View user info</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {user.email !== null ? (
               <>
-                <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
-                  <IconMail size="tiny" />
-                  <p>Send password recovery</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="space-x-2" onClick={handleSendMagicLink}>
-                  <IconMail size="tiny" />
-                  <p>Send magic link</p>
-                </DropdownMenuItem>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <DropdownMenuItem
+                      className="space-x-2 !pointer-events-auto"
+                      disabled={!canSendRecovery}
+                      onClick={() => {
+                        if (canSendRecovery) handleResetPassword()
+                      }}
+                    >
+                      <Mail size={14} />
+                      <p>Send password recovery</p>
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!canSendRecovery && (
+                    <TooltipContent_Shadcn_ side="left">
+                      You need additional permissions to send password recovery.
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <DropdownMenuItem
+                      disabled={!canSendMagicLink}
+                      className="space-x-2 !pointer-events-auto"
+                      onClick={() => {
+                        if (canSendMagicLink) handleSendMagicLink()
+                      }}
+                    >
+                      <Mail size={14} />
+                      <p>Send magic link</p>
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!canSendMagicLink && (
+                    <TooltipContent_Shadcn_ side="left">
+                      You need additional permissions to send magic link
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
               </>
             ) : null}
             {user.phone !== null ? (
-              <DropdownMenuItem className="space-x-2" onClick={handleSendOtp}>
-                <IconMail size="tiny" />
-                <p>Send OTP</p>
-              </DropdownMenuItem>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <DropdownMenuItem
+                    disabled={!canSendOtp}
+                    className="space-x-2 !pointer-events-auto"
+                    onClick={() => {
+                      if (canSendOtp) handleSendOtp()
+                    }}
+                  >
+                    <Mail size={14} />
+                    <p>Send OTP</p>
+                  </DropdownMenuItem>
+                </TooltipTrigger_Shadcn_>
+                {!canSendOtp && (
+                  <TooltipContent_Shadcn_ side="left">
+                    You need additional permissions to send OTP
+                  </TooltipContent_Shadcn_>
+                )}
+              </Tooltip_Shadcn_>
             ) : null}
             <DropdownMenuSeparator />
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   onClick={() => {
-                    setIsDeleteFactorsModalOpen(true)
+                    if (canRemoveMFAFactors) setIsDeleteFactorsModalOpen(true)
                   }}
                   disabled={!canRemoveMFAFactors}
-                  className="space-x-2"
+                  className="space-x-2 !pointer-events-auto"
                 >
-                  <IconShieldOff size="tiny" />
+                  <ShieldOff size={14} />
                   <p>Remove MFA factors</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
-              {/* 
-                [Joshen] Deleting MFA factors should be different ABAC perms i think
-                 need to double check with KM / anyone familiar with ABAC 
-              */}
+              </TooltipTrigger_Shadcn_>
               {!canRemoveMFAFactors && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to remove a user's authentication factors.
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to remove a user's authentication factors
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip.Root>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+            </Tooltip_Shadcn_>
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
-                  onClick={() => {
-                    setIsDeleteModalOpen(true)
-                  }}
                   disabled={!canRemoveUser}
-                  className="space-x-2"
+                  onClick={() => {
+                    if (canRemoveUser) setIsDeleteModalOpen(true)
+                  }}
+                  className="space-x-2 !pointer-events-auto"
                 >
-                  <IconTrash size="tiny" />
+                  <Trash size={14} />
                   <p>Delete user</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
+              </TooltipTrigger_Shadcn_>
               {!canRemoveUser && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={cn([
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ])}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to delete users
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent_Shadcn_ side="left">
+                  You need additional permissions to delete users
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip.Root>
+            </Tooltip_Shadcn_>
           </>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        buttonLoadingLabel="Delete"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete user {user.email}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete user {user.email}?
+        </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        onSelectCancel={() => setIsDeleteFactorsModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteFactorsModalOpen(false)}
+        onConfirm={() => {
           handleDeleteFactors()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete the user's MFA factors?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete the user's MFA factors?
+        </p>
       </ConfirmationModal>
     </>
   )

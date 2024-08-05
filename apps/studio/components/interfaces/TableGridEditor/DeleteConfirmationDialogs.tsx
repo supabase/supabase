@@ -1,39 +1,33 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
-import { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { sqlKeys } from 'data/sql/keys'
+import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
-import { tableKeys } from 'data/tables/keys'
+import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
-import { viewKeys } from 'data/views/keys'
-import { useStore, useUrlState } from 'hooks'
-import { TableLike } from 'hooks/misc/useTable'
+import type { TableLike } from 'hooks/misc/useTable'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
-  projectRef?: string
   selectedTable?: TableLike
   onAfterDeleteTable?: (tables: TableLike[]) => void
 }
 
 const DeleteConfirmationDialogs = ({
-  projectRef,
   selectedTable,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
-  const { meta, ui } = useStore()
-  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -44,57 +38,6 @@ const DeleteConfirmationDialogs = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
-    onSuccess: () => {
-      if (snap.confirmationDialog?.type === 'row') {
-        snap.confirmationDialog.callback?.()
-      }
-      toast.success(`Successfully deleted selected row(s)`)
-      snap.closeConfirmationDialog()
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete row: ${error.message}`)
-      snap.closeConfirmationDialog()
-    },
-  })
-
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
-    onSuccess: () => {
-      if (snap.confirmationDialog?.type === 'row') {
-        snap.confirmationDialog.callback?.()
-      }
-      toast.success(`Successfully deleted selected rows`)
-      snap.closeConfirmationDialog()
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete rows: ${error.message}`)
-      snap.closeConfirmationDialog()
-    },
-  })
-
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
-    onSuccess: () => {
-      if (snap.confirmationDialog?.type === 'row') {
-        snap.confirmationDialog.callback?.()
-      }
-      toast.success(`Successfully deleted all rows from table`)
-      snap.closeConfirmationDialog()
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete rows: ${error.message}`)
-      snap.closeConfirmationDialog()
-    },
-  })
-
-  const isAllRowsSelected =
-    snap.confirmationDialog?.type === 'row' ? snap.confirmationDialog.allRowsSelected : false
-  const numRows =
-    snap.confirmationDialog?.type === 'row'
-      ? snap.confirmationDialog.allRowsSelected
-        ? snap.confirmationDialog.numRows ?? 0
-        : snap.confirmationDialog.rows.length
-      : 0
 
   const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
     setParams((prevParams) => {
@@ -115,6 +58,87 @@ const DeleteConfirmationDialogs = ({
     })
   }
 
+  const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
+    onSuccess: () => {
+      if (!(snap.confirmationDialog?.type === 'column')) return
+      const selectedColumnToDelete = snap.confirmationDialog.column
+      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
+      toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
+    },
+    onError: (error) => {
+      if (!(snap.confirmationDialog?.type === 'column')) return
+      const selectedColumnToDelete = snap.confirmationDialog.column
+      toast.error(`Failed to delete ${selectedColumnToDelete!.name}: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+  const { mutate: deleteTable } = useTableDeleteMutation({
+    onSuccess: async () => {
+      const tables = await getTables(snap.selectedSchemaName)
+      onAfterDeleteTable(tables)
+      toast.success(`Successfully deleted table "${selectedTable?.name}"`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutate: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected row(s)`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutate: deleteAllRows } = useTableRowDeleteAllMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted selected rows`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const { mutate: truncateRows } = useTableRowTruncateMutation({
+    onSuccess: () => {
+      if (snap.confirmationDialog?.type === 'row') {
+        snap.confirmationDialog.callback?.()
+      }
+      toast.success(`Successfully deleted all rows from table`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+
+  const isAllRowsSelected =
+    snap.confirmationDialog?.type === 'row' ? snap.confirmationDialog.allRowsSelected : false
+  const numRows =
+    snap.confirmationDialog?.type === 'row'
+      ? snap.confirmationDialog.allRowsSelected
+        ? snap.confirmationDialog.numRows ?? 0
+        : snap.confirmationDialog.rows.length
+      : 0
+
   const isDeleteWithCascade =
     snap.confirmationDialog?.type === 'column' || snap.confirmationDialog?.type === 'table'
       ? snap.confirmationDialog.isDeleteWithCascade
@@ -122,98 +146,33 @@ const DeleteConfirmationDialogs = ({
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return
+    if (project === undefined) return
 
     const selectedColumnToDelete = snap.confirmationDialog.column
-    try {
-      if (selectedColumnToDelete === undefined) return
+    if (selectedColumnToDelete === undefined) return
 
-      const response: any = await meta.columns.del(selectedColumnToDelete.id, isDeleteWithCascade)
-      if (response.error) throw response.error
-
-      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
-      })
-
-      await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
-        queryClient.invalidateQueries(
-          tableKeys.table(project?.ref, selectedColumnToDelete!.table_id)
-        ),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [
-            'table-definition',
-            selectedTable!.schema,
-            selectedTable!.name,
-          ])
-        ),
-        // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
-        // which has a view dependent on it
-        snap.selectedSchemaName
-          ? queryClient.invalidateQueries(
-              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
-            )
-          : null,
-        // invalidate the view if there's a view with this id, not sure if this is needed because you can't delete a
-        // column from a view
-        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTable?.id)),
-      ])
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${selectedColumnToDelete!.name}: ${error.message}`,
-      })
-    } finally {
-      snap.closeConfirmationDialog()
-    }
+    deleteColumn({
+      id: selectedColumnToDelete.id,
+      cascade: isDeleteWithCascade,
+      projectRef: project.ref,
+      connectionString: project?.connectionString,
+      table: selectedTable,
+    })
   }
 
   const onConfirmDeleteTable = async () => {
     if (!(snap.confirmationDialog?.type === 'table')) return
     const selectedTableToDelete = selectedTable
 
-    try {
-      if (selectedTableToDelete === undefined) return
+    if (selectedTableToDelete === undefined) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
-      if (response.error) throw response.error
-
-      const tables = await getTables(snap.selectedSchemaName)
-
-      await Promise.all([
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        // invalidate all views from this schema
-        snap.selectedSchemaName
-          ? queryClient.invalidateQueries(
-              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
-            )
-          : null,
-        // invalidate the view if there's a view with this id
-        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTableToDelete?.id)),
-      ])
-
-      onAfterDeleteTable(tables)
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted table "${selectedTableToDelete.name}"`,
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to delete ${selectedTableToDelete?.name}: ${error.message}`,
-      })
-    } finally {
-      snap.closeConfirmationDialog()
-    }
+    deleteTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      schema: selectedTableToDelete.schema,
+      id: selectedTableToDelete.id,
+      cascade: isDeleteWithCascade,
+    })
   }
 
   const getImpersonatedRole = useGetImpersonatedRole()
@@ -226,11 +185,15 @@ const DeleteConfirmationDialogs = ({
 
     if (snap.confirmationDialog.allRowsSelected) {
       if (filters.length === 0) {
+        if (getImpersonatedRole() !== undefined) {
+          snap.closeConfirmationDialog()
+          return toast.error('Table truncation is not supported when impersonating a role')
+        }
+
         truncateRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
-          impersonatedRole: getImpersonatedRole(),
         })
       } else {
         deleteAllRows({
@@ -255,41 +218,40 @@ const DeleteConfirmationDialogs = ({
   return (
     <>
       <ConfirmationModal
-        danger
+        variant="destructive"
         size="small"
         visible={snap.confirmationDialog?.type === 'column'}
-        header={`Confirm deletion of column "${
+        title={`Confirm deletion of column "${
           snap.confirmationDialog?.type === 'column' && snap.confirmationDialog.column.name
         }"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => {
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => {
           snap.closeConfirmationDialog()
         }}
-        onSelectConfirm={onConfirmDeleteColumn}
+        onConfirm={onConfirmDeleteColumn}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
-            <Checkbox
-              label="Drop column with cascade?"
-              description="Deletes the column and its dependent objects"
-              checked={isDeleteWithCascade}
-              onChange={() => snap.toggleConfirmationIsWithCascade()}
-            />
-            {isDeleteWithCascade && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warning: Dropping with cascade may result in unintended consequences"
-              >
-                <p className="mb-4">
-                  All dependent objects will be removed, as will any objects that depend on them,
-                  recursively.
-                </p>
-                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to delete the selected column? This action cannot be undone.
+          </p>
+          <Checkbox
+            label="Drop column with cascade?"
+            description="Deletes the column and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade()}
+          />
+          {isDeleteWithCascade && (
+            <Alert_Shadcn_
+              variant="warning"
+              title="Warning: Dropping with cascade may result in unintended consequences"
+            >
+              <AlertTitle_Shadcn_>
+                All dependent objects will be removed, as will any objects that depend on them,
+                recursively.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -298,48 +260,47 @@ const DeleteConfirmationDialogs = ({
                     About dependency tracking
                   </Link>
                 </Button>
-              </Alert>
-            )}
-          </div>
-        </Modal.Content>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </div>
       </ConfirmationModal>
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
-        header={
+        title={
           <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => {
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => {
           snap.closeConfirmationDialog()
         }}
-        onSelectConfirm={onConfirmDeleteTable}
+        onConfirm={onConfirmDeleteTable}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
-            <Checkbox
-              label="Drop table with cascade?"
-              description="Deletes the table and its dependent objects"
-              checked={isDeleteWithCascade}
-              onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
-            />
-            {isDeleteWithCascade && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warning: Dropping with cascade may result in unintended consequences"
-              >
-                <p className="mb-4">
-                  All dependent objects will be removed, as will any objects that depend on them,
-                  recursively.
-                </p>
-                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to delete the selected table? This action cannot be undone.
+          </p>
+          <Checkbox
+            label="Drop table with cascade?"
+            description="Deletes the table and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
+          />
+          {isDeleteWithCascade && (
+            <Alert_Shadcn_ variant="warning">
+              <AlertTitle_Shadcn_>
+                Warning: Dropping with cascade may result in unintended consequences
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                All dependent objects will be removed, as will any objects that depend on them,
+                recursively.
+              </AlertDescription_Shadcn_>
+              <AlertDescription_Shadcn_ className="mt-4">
+                <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -348,35 +309,37 @@ const DeleteConfirmationDialogs = ({
                     About dependency tracking
                   </Link>
                 </Button>
-              </Alert>
-            )}
-          </div>
-        </Modal.Content>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </div>
       </ConfirmationModal>
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
-        header={
-          <span className="break-words">
-            Confirm to delete the selected row{numRows > 1 && 's'}
-          </span>
+        title={
+          <p className="break-words">
+            <span>Confirm to delete the selected row</span>
+            <span>{numRows > 1 && 's'}</span>
+          </p>
         }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => snap.closeConfirmationDialog()}
-        onSelectConfirm={() => onConfirmDeleteRow()}
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => snap.closeConfirmationDialog()}
+        onConfirm={() => onConfirmDeleteRow()}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
-              {numRows > 1 && `${numRows} `}row
-              {numRows > 1 && 's'}? This action cannot be undone.
-            </p>
-          </div>
-        </Modal.Content>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            <span>Are you sure you want to delete </span>
+            <span>{isAllRowsSelected ? 'all' : 'the selected'} </span>
+            <span>{numRows > 1 && `${numRows} `}</span>
+            <span>row</span>
+            <span>{numRows > 1 && 's'}</span>
+            <span>? This action cannot be undone.</span>
+          </p>
+        </div>
       </ConfirmationModal>
     </>
   )

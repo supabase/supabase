@@ -1,8 +1,10 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import { ResponseError } from 'types'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
+import { components } from 'api-types'
+
+export type DatabaseExtension = components['schemas']['PostgresExtension']
 
 export type DatabaseExtensionsVariables = {
   projectRef?: string
@@ -31,7 +33,7 @@ export async function getDatabaseExtensions(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -53,15 +55,3 @@ export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
       ...options,
     }
   )
-
-export const useDatabaseExtensionsPrefetch = ({ projectRef }: DatabaseExtensionsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseExtensionsKeys.list(projectRef), ({ signal }) =>
-        getDatabaseExtensions({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

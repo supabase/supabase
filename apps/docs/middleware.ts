@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import isbot from 'isbot'
+import { isbot } from 'isbot'
 
 export function middleware(request: NextRequest) {
   const specs = ['javascript', 'dart', 'csharp']

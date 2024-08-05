@@ -2,66 +2,72 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Badge, Button, IconLock } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Badge, Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
-  onSelectCreatePolicy: (table: PostgresTable) => void
+  onSelectCreatePolicy: () => void
 }
 
 const PolicyTableRowHeader = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
-  onSelectCreatePolicy = noop,
+  onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
+
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+
+  const isRealtimeSchema = table.schema === 'realtime'
+  const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
+  const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
-      <div className="flex space-x-4 text-left">
+      <div className="flex gap-x-4 text-left">
         <Link href={`/project/${ref}/editor/${table.id}`}>
           <h4 className="m-0">{table.name}</h4>
         </Link>
-        {isLocked ? (
-          <Badge color="scale">
-            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-              <IconLock width={12} /> Locked
-            </span>
+        <div className="flex items-center gap-x-2">
+          {isTableLocked && (
+            <Badge>
+              <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
+                <Lock size={12} /> Locked
+              </span>
+            </Badge>
+          )}
+          <Badge variant={table.rls_enabled ? 'brand' : 'warning'}>
+            {table.rls_enabled ? 'Row Level Security enabled' : 'Row Level Security disabled'}
           </Badge>
-        ) : (
-          <Badge color={table.rls_enabled ? 'green' : 'yellow'}>
-            {table.rls_enabled ? 'RLS enabled' : 'RLS disabled'}
-          </Badge>
-        )}
+        </div>
       </div>
-      {!isLocked && (
+      {!isTableLocked && (
         <div className="flex-1">
           <div className="flex flex-row justify-end gap-x-2">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="default"
-                  disabled={!canToggleRLS}
-                  onClick={() => onSelectToggleRLS(table)}
-                >
-                  {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
-                </Button>
-              </Tooltip.Trigger>
-              {!canToggleRLS && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
+            {!isRealtimeMessagesTable ? (
+              <Tooltip_Shadcn_ delayDuration={0}>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <Button
+                    type="default"
+                    disabled={!canToggleRLS}
+                    onClick={() => onSelectToggleRLS(table)}
+                  >
+                    {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
+                  </Button>
+                </TooltipTrigger_Shadcn_>
+                {!canToggleRLS && (
+                  <TooltipContent_Shadcn_ side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
@@ -73,39 +79,18 @@ const PolicyTableRowHeader = ({
                         You need additional permissions to toggle RLS
                       </span>
                     </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-            {!isAiAssistantEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="outline"
-                    disabled={!canCreatePolicies}
-                    onClick={() => onSelectCreatePolicy(table)}
-                  >
-                    New Policy
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreatePolicies && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create RLS policies
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
+                  </TooltipContent_Shadcn_>
                 )}
-              </Tooltip.Root>
+              </Tooltip_Shadcn_>
+            ) : null}
+            {!isAiAssistantEnabled && (
+              <Button
+                type="default"
+                disabled={!canToggleRLS}
+                onClick={() => onSelectCreatePolicy()}
+              >
+                Create policy
+              </Button>
             )}
           </div>
         </div>

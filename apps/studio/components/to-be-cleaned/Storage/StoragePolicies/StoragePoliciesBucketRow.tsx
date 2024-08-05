@@ -95,7 +95,7 @@ const StoragePoliciesBucketRow = ({
             <h4 className="m-0 text-lg">
               <span>{label}</span>
             </h4>
-            {bucket.public && <Badge color="yellow">Public</Badge>}
+            {bucket.public && <Badge variant="warning">Public</Badge>}
           </div>
           <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>
             New policy

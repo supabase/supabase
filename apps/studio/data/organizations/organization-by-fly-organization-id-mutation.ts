@@ -1,12 +1,15 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-
-import { get } from 'data/fetchers'
 import toast from 'react-hot-toast'
-import { ResponseError } from 'types'
+
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 
 export type OrganizationByFlyOrgIdVariables = {
   flyOrganizationId: string
 }
+
+// [Joshen] Should be converted into a query instead of a mutation
+// Will need to update sign-in-fly-tos.tsx as well
 
 export async function getOrganizationByFlyOrgId({
   flyOrganizationId,
@@ -14,7 +17,7 @@ export async function getOrganizationByFlyOrgId({
   const { data, error } = await get('/platform/organizations/fly/{fly_organization_id}', {
     params: { path: { fly_organization_id: flyOrganizationId } },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data as { slug: string }
 }
 

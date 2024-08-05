@@ -4,22 +4,20 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
 
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useStore } from 'hooks'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
 const StoragePolicies = () => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
@@ -93,7 +91,7 @@ const StoragePolicies = () => {
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
 
   const onSavePolicySuccess = async () => {
-    ui.setNotification({ category: 'success', message: 'Successfully saved policy!' })
+    toast.success('Successfully saved policy!')
     await refetch()
     onCancelPolicyEdit()
   }
@@ -108,21 +106,24 @@ const StoragePolicies = () => {
       return true
     }
 
-    return await Promise.all(
-      payloads.map(async (payload) => {
-        try {
-          await createDatabasePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            payload,
-          })
-          return false
-        } catch (error: any) {
-          toast.error(`Error adding policy: ${error.message}`)
-          return true
-        }
-      })
-    )
+    try {
+      return await Promise.all(
+        payloads.map(async (payload) => {
+          try {
+            await createDatabasePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              payload,
+            })
+            return false
+          } catch (error: any) {
+            toast.error(`Error adding policy: ${error.message}`)
+            return true
+          }
+        })
+      )
+    } finally {
+    }
   }
 
   const onCreatePolicy = async (payload: any) => {
@@ -195,7 +196,8 @@ const StoragePolicies = () => {
               find(formattedStorageObjectPolicies, { name: bucket.name }),
               ['policies'],
               []
-            )
+            ).sort((a: any, b: any) => a.name.localeCompare(b.name))
+
             return (
               <StoragePoliciesBucketRow
                 key={bucket.name}
@@ -210,7 +212,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="!mb-4 w-full border-b border-gray-600" />
+          <div className="!mb-4 w-full border-b border-muted" />
           <p className="text-sm text-foreground-light">
             You may also write policies for the tables under the storage schema directly for greater
             control
@@ -249,8 +251,8 @@ const StoragePolicies = () => {
 
       {/* Adding policies to objets/buckets table or editting any policy uses the general policy editor */}
       <PolicyEditorModal
-        visible={showGeneralPolicyEditor}
         schema="storage"
+        visible={showGeneralPolicyEditor}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}

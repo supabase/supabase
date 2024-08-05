@@ -1,18 +1,13 @@
-import { useParams } from 'common'
-import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  IconLoader,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
 
+import { useParams } from 'common'
+import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
-import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
-import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -35,8 +30,7 @@ const ServiceStatus = () => {
 
   // [Joshen] Need pooler service check eventually
   const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
-  const { data: edgeFunctionsStatus, isLoading: isLoadingEdgeFunctions } =
-    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
+  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery({ projectRef: ref })
   const { isLoading: isLoadingPostgres, isSuccess: isSuccessPostgres } =
     usePostgresServiceStatusQuery({
       projectRef: ref,
@@ -120,54 +114,52 @@ const ServiceStatus = () => {
   const allServicesOperational = services.every((service) => service.isSuccess)
 
   return (
-    <div>
-      <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="default"
-            icon={
-              isLoadingChecks ? (
-                <IconLoader className="animate-spin" />
-              ) : (
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    allServicesOperational ? 'bg-brand' : 'bg-amber-900'
-                  }`}
-                />
-              )
-            }
+    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          type="default"
+          icon={
+            isLoadingChecks ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  allServicesOperational ? 'bg-brand' : 'bg-warning'
+                }`}
+              />
+            )
+          }
+        >
+          {isBranch ? 'Preview Branch' : 'Project'} Status
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+        {services.map((service) => (
+          <div
+            key={service.name}
+            className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
           >
-            {isBranch ? 'Preview Branch' : 'Project'} Status
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
-          {services.map((service) => (
-            <div
-              key={service.name}
-              className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
-            >
-              <div>
-                <p>{service.name}</p>
-                <p className="text-foreground-light">
-                  {service.isLoading
-                    ? 'Checking status'
-                    : service.isSuccess
+            <div>
+              <p>{service.name}</p>
+              <p className="text-foreground-light">
+                {service.isLoading
+                  ? 'Checking status'
+                  : service.isSuccess
                     ? 'No issues'
                     : 'Unable to connect'}
-                </p>
-              </div>
-              {service.isLoading ? (
-                <IconLoader className="animate-spin" size="tiny" />
-              ) : service.isSuccess ? (
-                <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-              ) : (
-                <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
-              )}
+              </p>
             </div>
-          ))}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </div>
+            {service.isLoading ? (
+              <Loader2 className="animate-spin text-foreground-light" size={18} />
+            ) : service.isSuccess ? (
+              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+            ) : (
+              <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+            )}
+          </div>
+        ))}
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 

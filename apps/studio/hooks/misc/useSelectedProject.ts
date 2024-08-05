@@ -3,12 +3,14 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useMemo } from 'react'
 
-export function useSelectedProject() {
+export function useSelectedProject({ enabled = true } = {}) {
   const { ref } = useParams()
-  const { data } = useProjectDetailQuery({ ref })
+  const { data } = useProjectDetailQuery({ ref }, { enabled })
 
-  if (data) return { ...data, parentRef: data?.parent_project_ref ?? data?.ref ?? undefined }
-  return data
+  return useMemo(
+    () => data && { ...data, parentRef: data?.parent_project_ref ?? data?.ref },
+    [data]
+  )
 }
 
 export function useProjectByRef(ref?: string) {

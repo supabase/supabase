@@ -1,0 +1,42 @@
+---
+title: Multi Select
+description: Multiple selection component.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="multi-select-demo" description="" peekCode wide />
+
+## Usage
+
+```tsx
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
+```
+
+```tsx
+<MultiSelector values={value} onValuesChange={setValue}>
+  <MultiSelectorTrigger>
+    <MultiSelectorInput placeholder="Select items" />
+  </MultiSelectorTrigger>
+  <MultiSelectorContent>
+    <MultiSelectorList>
+      <MultiSelectorItem value="1">Item 1</MultiSelectorItem>
+      <MultiSelectorItem value="2">Item 2</MultiSelectorItem>
+      <MultiSelectorItem value="3">Item 3</MultiSelectorItem>
+    </MultiSelectorList>
+  </MultiSelectorContent>
+</MultiSelector>
+```
+
+## Examples
+
+### Form
+
+<ComponentPreview name="multi-select-form" />
