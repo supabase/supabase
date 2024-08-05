@@ -14,11 +14,9 @@ interface LayoutProps extends PropsWithChildren {
 
 function ReferenceLayout({ menuId, children }: LayoutProps) {
   return (
-    <>
-      <SidebarSkeleton menuId={menuId}>
-        <LayoutMainContent className="pb-0">{children}</LayoutMainContent>
-      </SidebarSkeleton>
-    </>
+    <SidebarSkeleton menuId={menuId}>
+      <LayoutMainContent className="pb-0">{children}</LayoutMainContent>
+    </SidebarSkeleton>
   )
 }
 

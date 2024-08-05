@@ -43,7 +43,7 @@ export function ReferenceSectionWrapper({
     <section
       ref={ref}
       id={id}
-      className={cn('scroll-mt-[calc(var(--header-height)+1rem)]', className)}
+      className={cn('scroll-mt-[calc(var(--header-height)+4rem)]', className)}
     >
       {children}
     </section>

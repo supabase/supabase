@@ -52,7 +52,7 @@ function Examples({ children }: PropsWithChildren) {
    * `min-w` is necessary because these are used as grid children, which have
    * default `min-w-auto`
    */
-  return <div className="w-full min-w-full sticky top-32">{children}</div>
+  return <div className="w-full min-w-full sticky top-32 self-start">{children}</div>
 }
 
 function EducationSection({ children, slug, ...props }: SectionProps) {
@@ -81,7 +81,6 @@ export const RefSubLayout = {
 
 interface StickyHeaderProps {
   title?: string
-  slug?: string
   monoFont?: boolean
   className?: string
 }

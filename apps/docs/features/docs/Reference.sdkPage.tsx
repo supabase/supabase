@@ -1,22 +1,18 @@
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { REFERENCES } from '~/content/navigation.references'
-import { getSectionsBySlug } from '~/features/docs/Reference.generated.singleton'
 import { ClientLibHeader } from '~/features/docs/Reference.header'
 import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Reference.introduction'
 import { ClientSdkNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
-import { ClientLibRefSections, SectionSwitch } from '~/features/docs/Reference.sections'
+import { ClientLibRefSections } from '~/features/docs/Reference.sections'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
-type ClientSdkReferenceProps = {
+interface ClientSdkReferenceProps {
   sdkId: string
   libVersion: string
-} & (
-  | { isCrawlerPage?: false; requestedSection?: string }
-  | { isCrawlerPage: true; requestedSection: string }
-)
+}
 
 export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkReferenceProps) {
   const libraryMeta = REFERENCES[sdkId]

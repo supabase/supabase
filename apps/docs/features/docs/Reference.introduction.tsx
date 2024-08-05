@@ -13,9 +13,9 @@ function hasIntro(sections: typeof commonClientLibSections, excludeName: string)
     sections[0]?.type === 'markdown' &&
       sections[0]?.slug === 'introduction' &&
       !(
-        'excludes' in sections &&
-        Array.isArray(sections.excludes) &&
-        sections.excludes?.includes(excludeName)
+        'excludes' in sections[0] &&
+        Array.isArray(sections[0].excludes) &&
+        sections[0].excludes?.includes(excludeName)
       )
   )
 }
@@ -35,7 +35,9 @@ export async function ClientLibIntroduction({
 }: ClientLibIntroductionProps) {
   if (!hasIntro(commonClientLibSections, excludeName)) return null
 
-  const content = await getRefMarkdown(`${libPath}/introduction`)
+  const content = await getRefMarkdown(
+    `${libPath}/${isLatestVersion ? '' : `${version}/`}introduction`
+  )
 
   return (
     <ReferenceSectionWrapper

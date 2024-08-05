@@ -6,18 +6,17 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
-import { REFERENCES } from '../../../content/navigation.references'
+import { REFERENCES } from '~/content/navigation.references'
 import {
   getFlattenedSections,
   getFunctionsList,
   getTypeSpec,
-} from '../../../features/docs/Reference.generated.singleton'
-import { getRefMarkdown } from '../../../features/docs/Reference.mdx'
-import type { MethodTypes } from '../../../features/docs/Reference.typeSpec'
-import type { AbbrevCommonClientLibSection } from '../../../features/docs/Reference.utils'
-import { notFoundLink } from '../../../features/recommendations/NotFound.utils'
-import { generateOpenGraphImageMeta } from '../../../features/seo/openGraph'
-import { BASE_PATH } from '../../../lib/constants'
+} from '~/features/docs/Reference.generated.singleton'
+import { getRefMarkdown } from '~/features/docs/Reference.mdx'
+import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
+import { BASE_PATH } from '~/lib/constants'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -117,7 +116,11 @@ async function sectionDetails(lib: string, version: string, section: AbbrevCommo
   return result
 }
 
-async function markdown(lib: string, version: string, section: AbbrevCommonClientLibSection) {
+async function markdown(
+  lib: string,
+  version: string | null,
+  section: AbbrevCommonClientLibSection
+) {
   const dir = !!section.meta?.shared ? 'shared' : lib + (version ? '/' + version : '')
 
   let content = await getRefMarkdown(dir + '/' + section.slug)

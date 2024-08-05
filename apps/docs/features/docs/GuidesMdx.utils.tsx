@@ -9,7 +9,7 @@ import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpe
 import type { OrPromise } from '~/features/helpers.types'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH, MISC_URL } from '~/lib/constants'
+import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 

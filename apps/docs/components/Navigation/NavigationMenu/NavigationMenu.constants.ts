@@ -2047,13 +2047,6 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-kotlin',
         },
-        // {
-        //   name: 'supabase-python',
-        //   url: '/reference/python/start',
-        //   level: 'reference_python',
-        //
-        //   icon: '/img/icons/menu/reference-javascript',
-        // },
       ],
     },
     {
@@ -2147,7 +2140,7 @@ export const reference_python_v2 = {
   parent: '/reference',
   pkg: {
     name: 'supabase-py',
-    repo: 'https://github.com/supabase-community/supabase-py',
+    repo: 'https://github.com/supabase/supabase-py',
   },
 }
 

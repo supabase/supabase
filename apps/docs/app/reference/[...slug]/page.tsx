@@ -23,7 +23,7 @@ export default async function ReferencePage({
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
 
   if (isClientSdkReference) {
-    const { sdkId, maybeVersion, maybeCrawlers, path } = parsedPath
+    const { sdkId, maybeVersion, path } = parsedPath
 
     const sdkData = REFERENCES[sdkId]
     const latestVersion = sdkData.versions[0]
@@ -31,14 +31,7 @@ export default async function ReferencePage({
 
     await redirectNonexistentReferenceSection(sdkId, version, path, version === latestVersion)
 
-    return (
-      <ClientSdkReferencePage
-        sdkId={sdkId}
-        libVersion={version}
-        isCrawlerPage={!!maybeCrawlers}
-        requestedSection={path[0]}
-      />
-    )
+    return <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
   } else {
     // Unimplemented -- eventually API and CLI
     redirect(notFoundLink(slug.join('/')))

@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
 import { REFERENCES } from '~/content/navigation.references'
-import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
@@ -62,7 +62,6 @@ type SectionSwitchProps = {
   sdkId: string
   version: string
   section: AbbrevCommonClientLibSection
-  isCrawlerPage?: boolean
 }
 
 export function SectionSwitch({ sdkId, version, section }: SectionSwitchProps) {

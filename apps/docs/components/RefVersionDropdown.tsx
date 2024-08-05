@@ -27,7 +27,7 @@ const RevVersionDropdown = ({
   const versions = libraryMeta?.versions ?? []
 
   if (!versions || versions.length <= 1) {
-    return <></>
+    return null
   }
 
   const onSelectVersion = (version: string) => {

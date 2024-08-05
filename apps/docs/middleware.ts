@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
 
       if (slug.length > 0) {
         const rewriteUrl = new URL(url)
-        rewriteUrl.pathname = (BASE_PATH ?? '/') + '/api/crawlers'
+        rewriteUrl.pathname = (BASE_PATH ?? '') + '/api/crawlers'
 
         return NextResponse.rewrite(rewriteUrl)
       }

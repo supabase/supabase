@@ -1,7 +1,7 @@
 'use client'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
-import { debounce, initial } from 'lodash'
+import { debounce } from 'lodash'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -40,6 +40,7 @@ export function ReferenceContentScrollHandler({
       if (initialSelectedSection) {
         const section = document.getElementById(initialSelectedSection)
         section?.scrollIntoView()
+        section?.querySelector('h2')?.focus()
       }
 
       checkedPathnameOnLoad.current = true
@@ -109,13 +110,11 @@ export function RefLink({
   section,
   skipChildren = false,
   className,
-  onClick,
 }: {
   basePath: string
   section: AbbrevCommonClientLibSection
   skipChildren?: boolean
   className?: string
-  onClick?: (evt: MouseEvent) => void
 }) {
   const ref = useRef<HTMLAnchorElement>()
 
@@ -148,12 +147,12 @@ export function RefLink({
 
             if ('slug' in section) {
               const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-              document.getElementById(section.slug)?.scrollIntoView({
+              const domElement = document.getElementById(section.slug)
+              domElement?.scrollIntoView({
                 behavior: reduceMotion ? 'auto' : 'smooth',
               })
+              domElement?.querySelector('h2')?.focus()
             }
-
-            onClick?.(evt)
           }}
         >
           {section.title}
