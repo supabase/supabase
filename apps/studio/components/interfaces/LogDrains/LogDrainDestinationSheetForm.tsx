@@ -45,7 +45,7 @@ const FORM_ID = 'log-drain-destination-form'
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().url('Webhook URL is required and must be a valid URL'),
+    url: z.string().url('Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -272,9 +272,9 @@ export function LogDrainDestinationSheetForm({
                     <div className="px-content">
                       <LogDrainFormItem
                         value="url"
-                        label="Webhook URL"
+                        label="Endpoint URL"
                         formControl={form.control}
-                        placeholder="https://example.com/webhooks/log-drain"
+                        placeholder="https://example.com/log-drain"
                       />
                       <FormField_Shadcn_
                         control={form.control}
@@ -324,7 +324,7 @@ export function LogDrainDestinationSheetForm({
                       <div className="px-content">
                         <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
                         <p className="text-xs text-foreground-lighter">
-                          Set custom headers when draining logs to the webhook URL
+                          Set custom headers when draining logs to the Endpoint URL
                         </p>
                       </div>
                       <div className="divide-y border-y">

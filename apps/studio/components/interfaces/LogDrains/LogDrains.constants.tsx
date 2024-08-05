@@ -1,13 +1,13 @@
-import { Computer, DogIcon, WebhookIcon } from 'lucide-react'
+import { BracesIcon, DogIcon } from 'lucide-react'
 
 const iconProps = { size: 24, strokeWidth: 1.5, className: 'text-foreground-light' }
 
 export const LOG_DRAIN_TYPES = [
   {
     value: 'webhook',
-    name: 'Webhook',
-    description: 'Forward logs to a custom HTTP endpoint',
-    icon: <WebhookIcon {...iconProps} />,
+    name: 'Endpoint',
+    description: 'Forward logs as a POST request to a custom HTTP endpoint',
+    icon: <BracesIcon {...iconProps} />,
   },
   {
     value: 'datadog',
