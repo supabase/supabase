@@ -5,6 +5,7 @@ import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import Connect from 'components/interfaces/Home/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
+import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
@@ -40,17 +41,15 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
         <div className="flex items-center gap-x-3">
+          <SecurityStatus />
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
       </div>
-
       <div className="mx-6">
         <ProjectUpgradeFailedBanner />
       </div>
-
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
-
       <div className="mx-6">
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
       </div>
