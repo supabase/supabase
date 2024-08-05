@@ -1,7 +1,7 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
+import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -10,13 +10,14 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, IconSearch, Input } from 'ui'
+import { Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -122,7 +123,7 @@ const FunctionsList = ({
               <Input
                 placeholder="Search for a function"
                 size="small"
-                icon={<IconSearch size="tiny" />}
+                icon={<Search size={14} />}
                 value={filterString}
                 className="w-64"
                 onChange={(e) => setFilterString(e.target.value)}
@@ -130,32 +131,18 @@ const FunctionsList = ({
             </div>
 
             {!isLocked && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
-                    Create a new function
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreateFunctions && (
-                  <Tooltip.Portal>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to create functions
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <ButtonTooltip
+                disabled={!canCreateFunctions}
+                onClick={() => createFunction()}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to create functions',
+                  },
+                }}
+              >
+                Create a new function
+              </ButtonTooltip>
             )}
           </div>
 
