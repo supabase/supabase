@@ -124,11 +124,10 @@ function parseMaybeSearchResults(maybeResults: unknown): Array<SearchResult> {
     .map((validResult) => {
       const data = validResult.data
       if (!data.headings || !data.slugs || data.headings.length !== data.slugs.length) {
-        const formattedData = data as unknown as SearchResult
+        const formattedData = data as any
         if (formattedData.headings) delete formattedData.headings
-        // @ts-ignore
         if (formattedData.slugs) delete formattedData.slugs
-        return data as unknown as SearchResult
+        return formattedData as SearchResult
       }
 
       const formattedHeadings = data.headings.map((heading, index) => ({
@@ -136,12 +135,11 @@ function parseMaybeSearchResults(maybeResults: unknown): Array<SearchResult> {
         slug: data.slugs![index],
       }))
 
-      const formattedData = data as unknown as SearchResult
-      // @ts-ignore
+      const formattedData = data as any
       delete formattedData.slugs
       formattedData.headings = formattedHeadings
 
-      return formattedData
+      return formattedData as SearchResult
     })
 
   return parsedResults
@@ -159,7 +157,7 @@ type SearchState_Results = Extract<SearchState, { status: 'results' }>
 type SearchAction =
   | { type: 'TRIGGERED' }
   | { type: 'ERRORED' }
-  | { type: 'COMPLETED'; results: unknown }
+  | { type: 'COMPLETED'; results: unknown; stillOutstanding?: boolean }
   | { type: 'RESET' }
 type SearchAction_Complete = Extract<SearchAction, { type: 'COMPLETED' }>
 
@@ -191,7 +189,12 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
       return { status: 'error' }
     case stateActionPair('loading', 'COMPLETED'): {
       const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
-      return results.length === 0 ? { status: 'empty' } : { status: 'results', results }
+      if (results.length === 0 && (action as SearchAction_Complete).stillOutstanding) {
+        return state
+      } else if (results.length === 0) {
+        return { status: 'empty' }
+      }
+      return { status: 'results', results }
     }
     case stateActionPair('loading', 'RESET'):
       return { status: 'initial' }
@@ -212,7 +215,12 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
       return { status: 'error' }
     case stateActionPair('stale', 'COMPLETED'):
       const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
-      return results.length === 0 ? { status: 'empty' } : { status: 'results', results }
+      if (results.length === 0 && (action as SearchAction_Complete).stillOutstanding) {
+        return state
+      } else if (results.length === 0) {
+        return { status: 'empty' }
+      }
+      return { status: 'results', results }
     case stateActionPair('stale', 'RESET'):
       return { status: 'initial' }
     case stateActionPair('empty', 'TRIGGERED'):
@@ -222,7 +230,12 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
       return { status: 'error' }
     case stateActionPair('empty', 'COMPLETED'): {
       const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
-      return results.length === 0 ? { status: 'empty' } : { status: 'results', results }
+      if (results.length === 0 && (action as SearchAction_Complete).stillOutstanding) {
+        return state
+      } else if (results.length === 0) {
+        return { status: 'empty' }
+      }
+      return { status: 'results', results }
     }
     case stateActionPair('empty', 'RESET'):
       return { status: 'initial' }
@@ -277,6 +290,8 @@ export function useLocalSearch(supabase: SupabaseClient) {
         const localIdempotencyKey = ++remoteSearchIdempotencyKey.current
         abortRunningRemoteSearches()
 
+        let outstandingSearches = 2
+
         new Promise<PostgrestSingleResponse<any>>(async (resolve, reject) => {
           rejectRunningSearches.current.push(reject)
 
@@ -287,7 +302,11 @@ export function useLocalSearch(supabase: SupabaseClient) {
             if (error) {
               throw error
             } else if (localIdempotencyKey === remoteSearchIdempotencyKey.current) {
-              dispatch({ type: 'COMPLETED', results: data })
+              dispatch({
+                type: 'COMPLETED',
+                results: data,
+                stillOutstanding: outstandingSearches > 1,
+              })
             }
           })
           .catch((error) => {
@@ -295,8 +314,13 @@ export function useLocalSearch(supabase: SupabaseClient) {
               // Ignore, intentionally cancelled
             } else {
               console.error(error)
-              return dispatch({ type: 'ERRORED' })
+              if (outstandingSearches === 1) {
+                dispatch({ type: 'ERRORED' })
+              }
             }
+          })
+          .finally(() => {
+            outstandingSearches--
           })
 
         new Promise(async (resolve, reject) => {
@@ -315,7 +339,11 @@ export function useLocalSearch(supabase: SupabaseClient) {
         })
           .then((data) => {
             if (localIdempotencyKey === remoteSearchIdempotencyKey.current) {
-              dispatch({ type: 'COMPLETED', results: data })
+              dispatch({
+                type: 'COMPLETED',
+                results: data,
+                stillOutstanding: outstandingSearches > 1,
+              })
             }
           })
           .catch((error) => {
@@ -323,8 +351,13 @@ export function useLocalSearch(supabase: SupabaseClient) {
               // Ignore, intentionally cancelled
             } else {
               console.error(error)
-              return dispatch({ type: 'ERRORED' })
+              if (outstandingSearches === 1) {
+                dispatch({ type: 'ERRORED' })
+              }
             }
+          })
+          .finally(() => {
+            outstandingSearches--
           })
       }
 
