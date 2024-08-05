@@ -131,6 +131,13 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
+  const CREATE_DEFAULT_HEADERS = {
+    'Content-Type': 'application/json',
+  }
+
+  const DEFAULT_HEADERS =
+    mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultValues?.config?.headers || {}
+
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
     ref,
@@ -147,7 +154,7 @@ export function LogDrainDestinationSheetForm({
       type: defaultType,
       http: defaultValues?.config?.http || 'http2',
       gzip: defaultValues?.config?.gzip || true,
-      headers: defaultValues?.config?.headers || {},
+      headers: DEFAULT_HEADERS,
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
