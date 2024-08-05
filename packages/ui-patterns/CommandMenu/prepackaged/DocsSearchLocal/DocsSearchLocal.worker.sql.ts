@@ -75,7 +75,7 @@ select * from (
 				*,
 				(page_section.hf_embedding <#> $1) * -1 as match_score
 			from page_section
-			where match_score > $2	
+			where (page_section.hf_embedding <#> $1) * -1 > $2	
 			order by match_score desc
 			limit 10
 		)
