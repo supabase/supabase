@@ -37,7 +37,6 @@ import toast from 'react-hot-toast'
 import { ReactNode, useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import Link from 'next/link'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import { FormDescription } from '@ui/components/shadcn/ui/form'
@@ -56,12 +55,6 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('datadog'),
     api_key: z.string().min(1, { message: 'API key is required' }),
     region: z.string().min(1, { message: 'Region is required' }),
-  }),
-  z.object({
-    type: z.literal('postgres'),
-  }),
-  z.object({
-    type: z.literal('bigquery'),
   }),
 ])
 

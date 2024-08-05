@@ -25,7 +25,7 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>
-export type LogDrainData = LogDrainsData[number]
+export type LogDrainData = LogDrainsData[number] & { type: 'webhook' | 'datadog' }
 export type LogDrainsyError = ResponseError
 
 export const useLogDrainsQuery = <TData = LogDrainsData>(
