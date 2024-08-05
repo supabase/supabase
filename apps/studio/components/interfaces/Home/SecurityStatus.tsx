@@ -3,9 +3,10 @@ import { useState } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+
 import Link from 'next/link'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { WarningIcon } from 'ui/src/components/StatusIcon'
 
 export const SecurityStatus = () => {
   const project = useSelectedProject()
