@@ -34,10 +34,11 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import Link from 'next/link'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -90,7 +91,7 @@ function LogDrainFormItem({
   label: string
   formControl: any
   placeholder?: string
-  description?: string
+  description?: ReactNode
   type?: string
   defaultValue?: string
 }) {
@@ -357,7 +358,19 @@ export function LogDrainDestinationSheetForm({
                       value="api_key"
                       label="API Key"
                       formControl={form.control}
-                      description="The API Key obtained from the Datadog dashboard."
+                      description={
+                        <>
+                          The API Key obtained from the Datadog dashboard{' '}
+                          <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm underline text-foreground"
+                            href="https://app.datadoghq.com/organization-settings/api-keys"
+                          >
+                            here
+                          </Link>
+                        </>
+                      }
                     />
                     <FormField_Shadcn_
                       name="region"
