@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { boolean, number, object } from 'yup'
+import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -22,6 +22,7 @@ import {
   Alert_Shadcn_,
   Form,
   InputNumber,
+  Input,
   Toggle,
 } from 'ui'
 import { WarningIcon } from 'ui'
@@ -36,6 +37,12 @@ const schema = object({
     .required('Must have a Reuse Interval value'),
   MFA_TOTP_ENROLL_ENABLED: boolean().required(),
   MFA_TOTP_VERIFY_ENABLED: boolean().required(),
+  MFA_PHONE_ENROLL_ENABLED: boolean().required(),
+  MFA_PHONE_VERIFY_ENABLED: boolean().required(),
+  MFA_PHONE_OTP_LENGTH: number()
+    .min(6, 'Must be a value more than 6')
+    .max(30, 'must be a value no greater than 30'),
+  SMS_TEMPLATE: string().required('SMS template is required.'),
   MFA_MAX_ENROLLED_FACTORS: number()
     .min(0, 'Must be be a value more than 0')
     .max(30, 'Must be a value no greater than 30'),
@@ -148,9 +155,9 @@ const AdvancedAuthSettingsForm = () => {
                     handleReset={handleReset}
                     disabled={!canUpdateConfig}
                     helper={
-                    !canUpdateConfig
-                    ? 'You need additional permissions to update authentication settings'
-                    : undefined
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
                     }
                   />
                 </div>
@@ -217,6 +224,37 @@ const AdvancedAuthSettingsForm = () => {
                     label="Control whether users can perform MFA Authentication with a TOTP factor"
                     layout="flex"
                     descriptionText="Allow verification"
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="MFA_PHONE_ENROLL_ENABLED"
+                    size="small"
+                    label="Allow Enrollment of Phone factors for MFA"
+                    layout="flex"
+                    descriptionText="Control whether users can enroll new TOTP factors"
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="MFA_PHONE_VERIFY_ENABLED"
+                    size="small"
+                    label="Control whether users can perform MFA Authentication with a TOTP factor"
+                    layout="flex"
+                    descriptionText="Allow verification"
+                    disabled={!canUpdateConfig}
+                  />
+                  <InputNumber
+                    id="MFA_PHONE_OTP_LENGTH"
+                    size="small"
+                    label="Phone OTP Length"
+                    descriptionText="Number of digits in OTP"
+                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
+                    disabled={!canUpdateConfig}
+                  />
+                  <Input
+                    id="MFA_PHONE_SMS_TEMPLATE"
+                    size="small"
+                    label="SMS Template"
+                    descriptionText="Content of SMS Template"
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
