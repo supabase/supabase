@@ -187,6 +187,10 @@
           "url": "/project/_/settings/storage"
         },
         {
+          "label": "Log Drains",
+          "url": "/project/_/settings/log-drains"
+        },
+        {
           "label": "Custom Domains",
           "url": "/project/_/settings/general#custom-domains"
         },

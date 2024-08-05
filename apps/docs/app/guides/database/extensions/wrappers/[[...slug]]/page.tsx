@@ -80,6 +80,13 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'paddle',
+    meta: {
+      title: 'Paddle',
+    },
+    remoteFile: 'paddle.md',
+  },
+  {
     slug: 'redis',
     meta: {
       title: 'Redis',
@@ -92,6 +99,13 @@ const pageMap = [
       title: 'AWS S3',
     },
     remoteFile: 's3.md',
+  },
+  {
+    slug: 'snowflake',
+    meta: {
+      title: 'Snowflake',
+    },
+    remoteFile: 'snowflake.md',
   },
   {
     slug: 'stripe',

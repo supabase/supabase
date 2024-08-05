@@ -37,7 +37,6 @@ export default function TicketForm() {
             username,
             referred_by: router.query?.referral ?? null,
           })
-          .eq('email', email)
           .select()
           .single()
           .then(({ error }: any) => fetchUser({ error, username }))

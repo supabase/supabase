@@ -166,7 +166,7 @@ const TicketingFlow = () => {
                   </div>
                 </m.div>
               )}
-              {/* {!showCustomizationForm && isGameMode && (
+              {!showCustomizationForm && isGameMode && (
                 <m.div
                   key="ticket"
                   initial={initial}
@@ -176,7 +176,7 @@ const TicketingFlow = () => {
                 >
                   <LWGame setIsGameMode={setIsGameMode} />
                 </m.div>
-              )} */}
+              )}
             </AnimatePresence>
           </LazyMotion>
         </div>

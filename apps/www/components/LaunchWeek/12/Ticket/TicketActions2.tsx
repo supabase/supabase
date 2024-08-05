@@ -22,7 +22,7 @@ export default function TicketActions2() {
   const text = hasSecretTicket ? TWEET_TEXT_SECRET : platinum ? TWEET_TEXT_PLATINUM : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
   const downloadUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-og?username=${encodeURIComponent(
     username ?? ''
   )}`
