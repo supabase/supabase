@@ -18,14 +18,14 @@ You can read about the initial announcement [here](https://github.com/orgs/supab
 
 The following table lists the supported destinations and the required setup configuration:
 
-| Destination     | Transport Method | Configuration                                     |
-| --------------- | ---------------- | ------------------------------------------------- |
-| Generic Webhook | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
-| Datadog         | HTTP             | API Key <br /> Region                             |
+| Destination           | Transport Method | Configuration                                     |
+| --------------------- | ---------------- | ------------------------------------------------- |
+| Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
+| Datadog               | HTTP             | API Key <br /> Region                             |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
-### Generic Webhook
+### Generic HTTP endpoint
 
 Logs are sent as a POST request with a JSON body. Both HTTP/1 and HTTP/2 protocols are supported.
 Custom headers can optionally be configured for all requests.
@@ -33,7 +33,7 @@ Custom headers can optionally be configured for all requests.
 Note that requests are **unsigned**.
 
 <Admonition type="note">
-  Unsigned webhook requests are temporary and all requests will signed in the near future.
+  Unsigned requests to HTTP endpoints are temporary and all requests will signed in the near future.
 </Admonition>
 
 ### Datadog
