@@ -103,8 +103,8 @@ const searchResultSchema = z.object({
   title: z.string(),
   subtitle: z.union([z.string(), z.null()]),
   description: z.union([z.string(), z.null()]),
-  headings: z.array(z.string()),
-  slugs: z.array(z.string()),
+  headings: z.array(z.string()).optional(),
+  slugs: z.array(z.string()).optional(),
 })
 export interface SearchResultSubsection {
   title: string
@@ -171,6 +171,7 @@ function stateActionPair(
 }
 
 function deriveSearchState(state: SearchState, action: SearchAction): SearchState {
+  console.log('RECEIVED ACTION:', action)
   switch (stateActionPair(state, action)) {
     case stateActionPair('initial', 'TRIGGERED'):
       return { status: 'loading' }
@@ -189,6 +190,7 @@ function deriveSearchState(state: SearchState, action: SearchAction): SearchStat
       return { status: 'error' }
     case stateActionPair('loading', 'COMPLETED'): {
       const results = parseMaybeSearchResults((action as SearchAction_Complete).results)
+      console.log('PARSED RESULTS:', results)
       if (results.length === 0 && (action as SearchAction_Complete).stillOutstanding) {
         return state
       } else if (results.length === 0) {
@@ -269,10 +271,13 @@ export function useLocalSearch(supabase: SupabaseClient) {
   const rejectRunningSearches = useRef([] as Array<(reason: any) => void>)
   const remoteSearchIdempotencyKey = useRef(0)
 
+  console.log('SEARCH STATE:', searchState)
+
   const FUNCTIONS_URL = '/functions/v1/'
   const ABORT_REASON = 'INTENTIONALLY_ABORTED'
 
   function abortRunningRemoteSearches() {
+    console.log('ABORTING RUNNING SEARCHES')
     while (rejectRunningSearches.current.length > 0) {
       rejectRunningSearches.current.pop()?.(ABORT_REASON)
     }
@@ -296,6 +301,7 @@ export function useLocalSearch(supabase: SupabaseClient) {
           rejectRunningSearches.current.push(reject)
 
           const result = await supabase.rpc('docs_search_fts', { query })
+          console.log('RPC DATA CAME BACK')
           resolve(result)
         })
           .then(({ data, error }) => {
@@ -334,6 +340,8 @@ export function useLocalSearch(supabase: SupabaseClient) {
             }
           )
           const data = await result.json()
+
+          console.log('EMBEDDING DATA CAME BACK')
 
           resolve(data)
         })
