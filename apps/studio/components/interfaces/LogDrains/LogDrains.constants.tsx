@@ -55,12 +55,6 @@ export type LogDrainDatadogConfig = {
   region: string
 }
 
-export type LogDrainElasticConfig = {
-  url: string
-  username: string
-  password: string
-}
-
 export type LogDrainWebhookConfig = {
   url: string
 }

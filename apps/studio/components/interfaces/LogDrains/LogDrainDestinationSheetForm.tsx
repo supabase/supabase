@@ -58,12 +58,6 @@ const formUnion = z.discriminatedUnion('type', [
     region: z.string().min(1, { message: 'Region is required' }),
   }),
   z.object({
-    type: z.literal('elastic'),
-    url: z.string().url({ message: 'URL is required and must be a valid URL' }),
-    username: z.string().min(1, { message: 'Username is required' }),
-    password: z.string().min(1, { message: 'Password is required' }),
-  }),
-  z.object({
     type: z.literal('postgres'),
   }),
   z.object({
@@ -161,8 +155,6 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
-      username: defaultValues?.config?.username || '',
-      password: defaultValues?.config?.password || '',
     },
   })
 
@@ -407,22 +399,6 @@ export function LogDrainDestinationSheetForm({
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
-                    />
-                  </div>
-                )}
-                {type === 'elastic' && (
-                  <div className="grid gap-4 px-content">
-                    <LogDrainFormItem value="url" label="Filebeat URL" formControl={form.control} />
-                    <LogDrainFormItem
-                      value="username"
-                      label="Username"
-                      formControl={form.control}
-                    />
-                    <LogDrainFormItem
-                      type="password"
-                      value="password"
-                      label="Password"
-                      formControl={form.control}
                     />
                   </div>
                 )}
