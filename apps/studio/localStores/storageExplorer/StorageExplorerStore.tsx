@@ -712,6 +712,7 @@ class StorageExplorerStore {
 
           // Max chunk size is 500MB
           chunkSize = Math.min(chunkSize, 500 * 1024 * 1024)
+          const uploadDataDuringCreation = file.size <= chunkSize
 
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
@@ -720,7 +721,7 @@ class StorageExplorerStore {
               authorization: `Bearer ${this.serviceKey}`,
               'x-source': 'supabase-dashboard',
             },
-            uploadDataDuringCreation: true,
+            uploadDataDuringCreation: uploadDataDuringCreation,
             removeFingerprintOnSuccess: true,
             metadata: {
               bucketName: this.selectedBucket.name,
