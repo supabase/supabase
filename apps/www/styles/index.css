@@ -343,6 +343,16 @@ animations
   }
 }
 
+/* Swiper */
+.swiper-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet,
+.swiper-pagination-horizontal.swiper-pagination-bullets .swiper-pagination-bullet {
+  @apply bg-foreground-lighter;
+}
+
+.swiper-pagination-bullet-active {
+  @apply !bg-foreground-lighter;
+}
+
 /**
 launch week
 */

@@ -16,6 +16,7 @@ import { getAllPostSlugs, getPostdata } from '~/lib/posts'
 import { Button } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import ShareArticleActions from '../../components/Blog/ShareArticleActions'
 
 type EventType = 'webinar' | 'launch_week' | 'conference'
 
@@ -140,7 +141,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       <DefaultLayout>
         <div className="flex flex-col w-full">
           <div className="bg-alternative w-full">
-            <SectionContainer className="grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-4 text-foreground-light">
+            <SectionContainer className="grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 items-start mb-8">
                   <div className="flex flex-row text-sm">
@@ -165,9 +166,20 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     </Link>
                   </Button>
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <p>Share on</p>
+                  <ShareArticleActions title={event.title} slug={event.slug} />
                 </div>
+              </div>
+              <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
+                {/* <Image
+                  src={`/images/blog/` + (event.thumb ? event.thumb : event.image)}
+                  fill
+                  sizes="100%"
+                  quality={100}
+                  className="object-cover"
+                  alt="event thumbnail"
+                /> */}
               </div>
             </SectionContainer>
           </div>
@@ -179,7 +191,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <ul className="list-none flex flex-col md:flex-row gap-4 md:gap-8">
                     {speakers?.map((speaker) => (
                       <li key={speaker?.author_id} className="flex gap-4">
-                        <div className="relative ring-background w-12 h-12 rounded-full ring-2">
+                        <div className="relative ring-background w-10 h-10 md:w-12 md:h-12 rounded-full ring-2">
                           {speaker?.author_image_url && (
                             <Image
                               src={speaker.author_image_url}
