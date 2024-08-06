@@ -288,7 +288,7 @@ th code {
  * widths
  */
 .prose :where(td) code {
-  @apply break-all
+  @apply break-all;
 }
 
 /* Zoomable image */
