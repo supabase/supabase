@@ -31,7 +31,7 @@ import {
   cn,
   singleThemes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -53,7 +53,7 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -233,7 +233,7 @@ const NavigationBar = () => {
             <NavigationIconButton
               size="tiny"
               onClick={() => {
-                setIsOpen(true)
+                setCommandMenuOpen(true)
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"

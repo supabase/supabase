@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
+import { useGenerateSqlCommand } from 'components/interfaces/SqlGenerator/SqlGenerator.Commands'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -88,6 +90,8 @@ const ProjectLayout = ({
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
+  useGenerateSqlCommand()
+
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
@@ -158,6 +162,7 @@ const ProjectLayout = ({
 
         <EnableBranchingModal />
         <AISettingsModal />
+        <GenerateSql />
         <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>

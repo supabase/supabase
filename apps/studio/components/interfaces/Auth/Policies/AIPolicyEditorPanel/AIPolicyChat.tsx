@@ -9,11 +9,12 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -22,7 +23,6 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
-import { AiIcon } from 'ui-patterns/Cmdk'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
@@ -46,11 +46,10 @@ export const AIPolicyChat = ({
   const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
-  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
   const telemetryProps = useTelemetryProps()
 
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const isOptedInToAI = useOrgOptedIntoAi()
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
@@ -157,7 +156,10 @@ export const AIPolicyChat = ({
               <FormItem_Shadcn_>
                 <FormControl_Shadcn_>
                   <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+                    <AiIconAnimation
+                      allowHoverEffect
+                      className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white"
+                    />
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"
