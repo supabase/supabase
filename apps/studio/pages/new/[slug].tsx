@@ -270,9 +270,14 @@ const Wizard: NextPageWithLayout = () => {
         .min(1, 'Please enter a project name.') // Required field check
         .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
         .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
-      postgresVersion: z.string({
-        required_error: 'Please enter a Postgres version.',
-      }),
+      postgresVersion: z
+        .string({
+          required_error: 'Please enter a Postgres version.',
+        })
+        .regex(
+          /^1[2-9]\.\d+(\.\d+)?(-\d+)?$/,
+          'Invalid Postgres version: should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+        ),
       dbRegion: z.string({
         required_error: 'Please select a region.',
       }),
