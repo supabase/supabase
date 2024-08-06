@@ -75,11 +75,18 @@ const Nav = (props: Props) => {
         className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
+        <div
+          className={cn(
+            'absolute inset-0 h-full w-full bg-background/80',
+            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            isGAWeekSection && 'dark:!bg-alternative'
+          )}
+        />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
-            // isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
