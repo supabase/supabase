@@ -147,17 +147,19 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
                         </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                          {projectsApplied
-                            ?.slice(0, 2)
-                            .map((name) => <span key={name}>{name}</span>)}
-                          {projectsApplied.length > 2 && (
-                            <span>
-                              And {projectsApplied.length - 2} other project
-                              {projectsApplied.length > 4 ? 's' : ''}
-                            </span>
-                          )}
-                        </TooltipContent_Shadcn_>
+                        {role?.project_ids !== null && projectsApplied.length > 1 && (
+                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
+                            {projectsApplied
+                              ?.slice(0, 2)
+                              .map((name) => <span key={name}>{name}</span>)}
+                            {projectsApplied.length > 2 && (
+                              <span>
+                                And {projectsApplied.length - 2} other project
+                                {projectsApplied.length > 4 ? 's' : ''}
+                              </span>
+                            )}
+                          </TooltipContent_Shadcn_>
+                        )}
                       </Tooltip_Shadcn_>
                     )}
                   </>
