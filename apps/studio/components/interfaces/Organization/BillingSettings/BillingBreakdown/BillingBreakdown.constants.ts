@@ -49,7 +49,6 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     key: PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS,
     name: 'Monthly Active Third-Party Users',
     units: 'absolute',
-    anchor: 'mauSso',
     category: 'Authentication',
     unitName: 'MAU',
   },
