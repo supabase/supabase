@@ -155,7 +155,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <h1 className="text-foreground text-3xl lg:text-4xl">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
-                    type="secondary"
+                    type="primary"
                     size="medium"
                     className="mt-2"
                     disabled={!IS_REGISTRATION_OPEN}
@@ -193,7 +193,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               </div>
               <aside className="mt-8">
                 <Button
-                  type="secondary"
+                  type="primary"
                   size="medium"
                   className="mt-2"
                   disabled={!IS_REGISTRATION_OPEN}

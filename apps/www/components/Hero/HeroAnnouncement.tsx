@@ -43,7 +43,7 @@ const HeroAnnouncement = ({ className }: Props) => {
     <AnnouncementBadge
       url="/events/ai-engineer-summit-2024"
       badge="Webinar"
-      announcement="AI Engineer Summit 2024"
+      announcement="Scale to Millions with AI"
     />,
     <AnnouncementBadge
       url="/launch-week"
