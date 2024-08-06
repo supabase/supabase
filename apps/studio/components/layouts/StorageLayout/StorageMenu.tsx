@@ -17,6 +17,13 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Menu } from 'ui'
 import BucketRow from './BucketRow'
+import {
+  InnerSideBarFilters,
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+} from 'ui-patterns'
+import { useLocalStorage } from '@uidotdev/usehooks'
 
 const StorageMenu = () => {
   const router = useRouter()
@@ -24,11 +31,17 @@ const StorageMenu = () => {
   const projectDetails = useSelectedProject()
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
+  const [searchText, setSearchText] = useState<string>('')
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
   const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
+  const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
+    'storage-explorer-sort',
+    'created-at'
+  )
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -39,12 +52,16 @@ const StorageMenu = () => {
 
   const { data, error, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
   const buckets = data ?? []
+  const sortedBuckets =
+    sort === 'alphabetical'
+      ? buckets.sort((a, b) => a.name.localeCompare(b.name))
+      : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1))
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
 
   return (
     <>
       <Menu type="pills" className="my-6 flex flex-grow flex-col">
-        <div className="mb-6 mx-5">
+        <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <ButtonTooltip
             block
             type="default"
@@ -61,6 +78,34 @@ const StorageMenu = () => {
           >
             New bucket
           </ButtonTooltip>
+
+          <InnerSideBarFilters className="px-0">
+            <InnerSideBarFilterSearchInput
+              name="search-buckets"
+              aria-labelledby="Search buckets"
+              placeholder="Search buckets..."
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value.trim())
+              }}
+            >
+              <InnerSideBarFilterSortDropdown
+                value={sort}
+                onValueChange={(value: any) => setSort(value)}
+              >
+                <InnerSideBarFilterSortDropdownItem
+                  key="alphabetical"
+                  value="alphabetical"
+                  className="flex gap-2"
+                >
+                  Alphabetical
+                </InnerSideBarFilterSortDropdownItem>
+                <InnerSideBarFilterSortDropdownItem key="created-at" value="created-at">
+                  Created at
+                </InnerSideBarFilterSortDropdownItem>
+              </InnerSideBarFilterSortDropdown>
+            </InnerSideBarFilterSearchInput>
+          </InnerSideBarFilters>
         </div>
 
         <div className="space-y-6">
@@ -104,7 +149,7 @@ const StorageMenu = () => {
                     </Alert_Shadcn_>
                   </div>
                 )}
-                {buckets.map((bucket, idx: number) => {
+                {sortedBuckets.map((bucket, idx: number) => {
                   const isSelected = bucketId === bucket.id
                   return (
                     <BucketRow
