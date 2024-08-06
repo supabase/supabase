@@ -39,6 +39,7 @@ import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useContentCountQuery } from 'data/content/content-count-query'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -84,9 +85,8 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
-  const numPrivateSnippets = Object.keys(snapV2.snippets).length
   const privateSnippetsTreeState =
-    folders.length === 0 && numPrivateSnippets === 0
+    folders.length === 0 && Object.keys(snapV2.snippets).length === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
@@ -129,6 +129,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       }
     },
   })
+
+  const { data } = useContentCountQuery({ projectRef, type: 'sql' })
+  const numPrivateSnippets = data?.count ?? 0
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
