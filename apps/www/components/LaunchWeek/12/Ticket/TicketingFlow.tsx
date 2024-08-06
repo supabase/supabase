@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
-import { Badge, cn } from 'ui'
+import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW12_DATE, LW12_LAUNCH_DATE } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
@@ -119,8 +119,6 @@ const TicketingFlow = () => {
                 >
                   <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
                     <TicketContainer />
-                    {/* {!hasPlatinumTicket && <TicketPresence />} */}
-                    {/* // not sure why this was only non platinum */}
                     <TicketPresence />
                     <TicketCopy />
                   </div>
@@ -130,7 +128,7 @@ const TicketingFlow = () => {
                         {hasSecretTicket ? (
                           <p className="text-2xl mb-1">Share the secret ticket to beat the odds</p>
                         ) : (
-                          <p className="text-2xl mb-1">Thanks for sharing</p>
+                          <p className="text-2xl mb-1">Thanks for sharing!</p>
                         )}
                         <p className="text-2xl text-foreground-light">
                           Follow Launch Week 12 announcements to find out if you're a lucky winner

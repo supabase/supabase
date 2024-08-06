@@ -2,8 +2,8 @@ import NextImage from 'next/image'
 
 export default function TicketActions() {
   return (
-    <div className="bg-surface-75 border border-muted w-full h-auto flex  flex-row rounded-lg overflow-hidden gap-3 items-center pr-12">
-      <div className="relative flex items-center justify-center h-auto w-2/5 object-center border-muted overflow-hidden">
+    <div className="bg-surface-75 border border-muted w-full h-auto grid sm:grid-cols-3 rounded-lg overflow-hidden sm:gap-3 items-center">
+      <div className="relative flex items-center justify-center h-auto w-full object-center border-muted overflow-hidden">
         <NextImage
           src="/images/launchweek/12/lw12-backpack-crop.png"
           alt="Supabase LW12 Wandrd backpack"
@@ -13,7 +13,7 @@ export default function TicketActions() {
           className="object-top mx-auto inset-x-0 w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
         />
       </div>
-      <p className="text-foreground-light text-sm ">
+      <p className="sm:col-span-2 text-foreground-light text-sm sm:text-left p-4 sm:pl-0 w-auto border-t sm:border-none">
         Share your ticket to increase your chances of winning a{' '}
         <a
           href="https://www.wandrd.com/products/prvke?variant=39289416089680"
