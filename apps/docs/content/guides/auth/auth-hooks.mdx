@@ -1,7 +1,7 @@
 ---
 id: 'auth-hooks'
 title: 'Auth Hooks'
-description: 'Use HTTP or Postgres Functions to customize your authentication flow'
+subtitle: 'Use HTTP or Postgres Functions to customize your authentication flow'
 ---
 
 Supabase allows you to use HTTP or Postgres Functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
@@ -19,11 +19,9 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 | ----------------------------- | -------------------- |
 | Custom Access Token           | Free, Pro            |
 | Send SMS                      | Free, Pro            |
-| Send email                    | Free, Pro            |
+| Send Email                    | Free, Pro            |
 | MFA Verification Attempt      | Teams and Enterprise |
 | Password Verification Attempt | Teams and Enterprise |
-
-You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
 
 ## Create a hook
 
@@ -1782,7 +1780,10 @@ Deno.serve(async (req) => {
     if (response.status !== 'queued') {
       return new Response(
         JSON.stringify({
-          error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`,
+          error: {
+            http_code: response.code,
+            message: `Failed to send SMS: ${response.message}. More info: ${response.more_info}`,
+          },
         }),
         {
           status: response.status,
@@ -1793,10 +1794,9 @@ Deno.serve(async (req) => {
       )
     }
     return new Response(
-      JSON.stringify({
-        message: 'SMS sent successfully.',
-      }),
+      {},
       {
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1805,7 +1805,10 @@ Deno.serve(async (req) => {
   } catch (error) {
     return new Response(
       JSON.stringify({
-        error: `Failed to process the request: ${error}`,
+        error: {
+          http_code: 500,
+          message: `Failed to send sms: ${JSON.stringify(error)}`,
+        }
       }),
       {
         status: 500,
@@ -1815,8 +1818,6 @@ Deno.serve(async (req) => {
       }
     )
   }
-
-  return Response.json(data)
 })
 ```
 
