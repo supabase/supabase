@@ -35,7 +35,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { ReactNode, useEffect, useState } from 'react'
-import { TrashIcon } from 'lucide-react'
+import { ExternalLink, TrashIcon } from 'lucide-react'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import Link from 'next/link'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
@@ -459,7 +459,14 @@ export function LogDrainDestinationSheetForm({
               <div className="text-foreground-light">
                 Additional drain cost
                 <div className="text-foreground-lighter mt-2">
-                  <Link href="/">Documentation</Link>
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline flex gap-1 items-center"
+                    href="https://supabase.com/docs/guides/platform/log-drains"
+                  >
+                    Documentation <ExternalLink className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
             }
