@@ -140,10 +140,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       />
       <DefaultLayout>
         <div className="flex flex-col w-full">
-          <div className="bg-alternative w-full">
+          <header className="bg-alternative w-full">
             <SectionContainer className="grid lg:min-h-[400px] h-full grid-cols-1 lg:grid-cols-2 gap-8 text-foreground-light">
               <div className="h-full flex flex-col justify-between">
-                <div className="flex flex-col gap-2 items-start mb-8">
+                <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
                   <div className="flex flex-row text-sm">
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
@@ -182,13 +182,34 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 /> */}
               </div>
             </SectionContainer>
-          </div>
-          <article>
-            <SectionContainer className="!pt-8">
+          </header>
+          <SectionContainer className="grid lg:grid-cols-3 gap-12">
+            <main className="lg:col-span-2">
+              <div className="prose prose-docs">
+                <h2 className="text-foreground-light text-sm font-mono uppercase">
+                  About this event
+                </h2>
+                <MDXRemote {...content} components={mdxComponents()} />
+              </div>
+              <aside className="mt-8">
+                <Button
+                  type="secondary"
+                  size="medium"
+                  className="mt-2"
+                  disabled={!IS_REGISTRATION_OPEN}
+                  asChild
+                >
+                  <Link href={event.registration_url ?? '#'}>
+                    {IS_REGISTRATION_OPEN ? 'Register now' : 'Registrations are closed'}
+                  </Link>
+                </Button>
+              </aside>
+            </main>
+            <aside className="order-first lg:order-last">
               {speakers && (
-                <div className="flex flex-col gap-4 !py-8">
+                <div className="flex flex-col gap-4">
                   <h2 className="text-foreground-light text-sm font-mono uppercase">Speakers</h2>
-                  <ul className="list-none flex flex-col md:flex-row gap-4 md:gap-8">
+                  <ul className="list-none flex flex-col md:flex-row flex-wrap lg:flex-col gap-4 md:gap-8 lg:gap-4">
                     {speakers?.map((speaker) => (
                       <li key={speaker?.author_id} className="flex gap-4">
                         <div className="relative ring-background w-10 h-10 md:w-12 md:h-12 rounded-full ring-2">
@@ -210,27 +231,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   </ul>
                 </div>
               )}
-              <main className="prose prose-docs">
-                <h2 className="text-foreground-light text-sm font-mono uppercase">
-                  About this event
-                </h2>
-                <MDXRemote {...content} components={mdxComponents()} />
-              </main>
-              <aside className="mt-8">
-                <Button
-                  type="secondary"
-                  size="medium"
-                  className="mt-2"
-                  disabled={!IS_REGISTRATION_OPEN}
-                  asChild
-                >
-                  <Link href={event.registration_url ?? '#'}>
-                    {IS_REGISTRATION_OPEN ? 'Register now' : 'Registrations are closed'}
-                  </Link>
-                </Button>
-              </aside>
-            </SectionContainer>
-          </article>
+            </aside>
+          </SectionContainer>
         </div>
       </DefaultLayout>
     </>
