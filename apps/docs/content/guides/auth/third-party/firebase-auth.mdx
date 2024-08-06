@@ -42,7 +42,28 @@ Make sure the all users in your application have the `role: 'authenticated'` [cu
 
 <TabPanel id="create-client-swift" label="Swift (iOS)">
 
-TODO!
+```swift
+import Supabase
+import FirebaseAuth
+
+struct MissingFirebaseTokenError: Error {}
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_ANON_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        guard let token = await Auth.auth().currentUser?.getIDToken() else {
+          throw MissingFirebaseTokenError()
+        }
+
+        return token
+      }
+    )
+  )
+)
+```
 
 </TabPanel>
 
