@@ -35,8 +35,6 @@ jobs:
 
       - name: Commit changes and push to existing branch
         run: |
-          git checkout -- package.json
-          git checkout -- package-lock.json
           git config --global user.name 'github-tidy-bot'
           git config --global user.email 'github-tidy-bot@supabase.com'
           if [[ `git status --porcelain` ]]; then
