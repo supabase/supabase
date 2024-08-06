@@ -17,12 +17,6 @@ export const SecurityStatus = () => {
   const noIssuesFound = errorLints.length === 0 && warnLints.length === 0
   const totalIssues = securityLints.length
 
-  const badgeColor = noIssuesFound
-    ? 'bg-brand'
-    : errorLints.length > 0
-      ? 'bg-destructive-600'
-      : 'bg-warning-600'
-
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
