@@ -20,8 +20,9 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
         info: <StatusIcon variant="default" />,
       }}
       theme={theme as ToasterProps['theme']}
-      // pointer-events-auto is needed to fix the toast when above radix modals
-      className="toaster group pointer-events-auto"
+      // pointer-events-auto is needed to fix the toast when above radix modals. Set the width to 420px to fix the toast
+      // progress component (bottom row rendered in two lines).
+      className="toaster group pointer-events-auto w-[420px]"
       // fontFamily: 'inherit' is needed to use the same font as the rest of the app
       style={{ fontFamily: 'inherit' }}
       toastOptions={{

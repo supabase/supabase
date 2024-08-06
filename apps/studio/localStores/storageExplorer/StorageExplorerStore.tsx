@@ -823,7 +823,7 @@ class StorageExplorerStore {
           `Successfully uploaded ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
+          { id: toastId, closeButton: true }
         )
       } else {
         toast.success(
