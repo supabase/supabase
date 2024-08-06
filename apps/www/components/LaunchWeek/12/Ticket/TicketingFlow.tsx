@@ -133,7 +133,8 @@ const TicketingFlow = () => {
                           <p className="text-2xl mb-1">Thanks for sharing</p>
                         )}
                         <p className="text-2xl text-foreground-light">
-                          Follow Launch Week 12 announcements to find out if you're a lucky winner.
+                          Follow Launch Week 12 announcements to find out if you're a lucky winner
+                          of limited swag.
                         </p>
                       </div>
                     ) : winningChances !== 2 ? (
@@ -165,7 +166,7 @@ const TicketingFlow = () => {
                   </div>
                 </m.div>
               )}
-              {/* {!showCustomizationForm && isGameMode && (
+              {!showCustomizationForm && isGameMode && (
                 <m.div
                   key="ticket"
                   initial={initial}
@@ -175,7 +176,7 @@ const TicketingFlow = () => {
                 >
                   <LWGame setIsGameMode={setIsGameMode} />
                 </m.div>
-              )} */}
+              )}
             </AnimatePresence>
           </LazyMotion>
         </div>

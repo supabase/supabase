@@ -41,6 +41,7 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -72,6 +73,15 @@ const NavigationBar = () => {
     'project_storage:all',
     'realtime:all',
   ])
+
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter(
+    (lint) =>
+      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
+  )
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -150,6 +160,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -164,6 +175,21 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative">
+                  {securityLints.length > 0 && (
+                    <div className="absolute flex h-2 w-2 left-6 top-2 z-10 bg-destructive-600 rounded-full" />
+                  )}
+
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
               )
             } else if (route.key === 'logs') {
               // TODO: Undo this when warehouse flag is removed
