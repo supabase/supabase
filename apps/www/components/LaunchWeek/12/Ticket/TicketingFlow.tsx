@@ -14,7 +14,7 @@ import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import LW12Background from '../LW12Background'
+// import LW12Background from '../LW12Background'
 import TicketCopy from './TicketCopy'
 import TicketActions2 from './TicketActions2'
 
@@ -181,12 +181,12 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      <LW12Background
+      {/* <LW12Background
         className={cn(
           'opacity-100 transition-opacity',
           hasTicket || (isGameMode && 'opacity-80 dark:opacity-60')
         )}
-      />
+      /> */}
     </>
   )
 }

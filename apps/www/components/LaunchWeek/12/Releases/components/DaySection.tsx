@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
@@ -14,19 +14,11 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
 
-  const [isMounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!isMounted) return null
-
   return (
     <section
       id={day.id}
       className={cn(
-        'lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] text-foreground dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
+        'lw-nav-anchor border-b py-8 first:border-t border-muted dark:border-muted/50 text-foreground scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
         className
       )}
     >
@@ -108,7 +100,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
           <div
             className={cn(
               `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-end
-              bg-surface-100/10 border border-dashed border-strong dark:border-[#14191B] dark:text-[#8B9092]
+              bg-default border border-dashed border-strong dark:border-muted
               rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
               cssGroup
             )}

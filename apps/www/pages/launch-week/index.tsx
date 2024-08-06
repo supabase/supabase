@@ -1,17 +1,35 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
-import { SITE_ORIGIN, LW_URL, LW12_TITLE, LW12_DATE } from '~/lib/constants'
-import supabase from '~/lib/supabase'
+import { LW12_DATE, LW12_TITLE, LW_URL, SITE_ORIGIN } from '~/lib/constants'
+import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Meetup } from '~/components/LaunchWeek/12/LWMeetups'
+import LWStickyNav from '~/components/LaunchWeek/12/Releases/LWStickyNav'
+import LWHeader from '~/components/LaunchWeek/12/Releases/LWHeader'
+import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
+import { cn } from 'ui'
+import LW12Background from '../../components/LaunchWeek/12/LW12Background'
+import useLwGame from '../../components/LaunchWeek/hooks/useLwGame'
 
+const BuildStage = dynamic(() => import('~/components/LaunchWeek/12/Releases/BuildStage'))
+const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
 const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/12/Ticket/TicketingFlow'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
+)
 
-export default function LaunchWeekIndex() {
+interface Props {
+  meetups?: Meetup[]
+}
+
+export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = `${LW12_TITLE} | ${LW12_DATE}`
@@ -32,6 +50,8 @@ export default function LaunchWeekIndex() {
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [ticketState, setTicketState] = useState<TicketState>('loading')
+  const { isGameMode, setIsGameMode } = useLwGame(ticketState !== 'ticket' || showCustomizationForm)
+  const hasTicket = !isGameMode && ticketState === 'ticket'
 
   useEffect(() => {
     if (supabase) {
@@ -86,15 +106,47 @@ export default function LaunchWeekIndex() {
       >
         <DefaultLayout
           className="
+            relative
             -mt-[60px] pt-[60px]
             overflow-hidden
-            xl:h-screen !min-h-fit
-            xl:!max-h-[calc(100vh-60px)]
             "
         >
-          <TicketingFlow />
+          <LW12Background
+            className={cn(
+              'opacity-100 transition-opacity max-h-[476px] overflow-hidden',
+              hasTicket || (isGameMode && 'opacity-80 dark:opacity-60')
+            )}
+          />
+          <LWStickyNav />
+          <LWHeader className="pb-20" />
+          <MainStage className="relative -mt-20 z-10" />
+          <BuildStage />
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
+            <LW12Meetups meetups={meetups} />
+          </SectionContainer>
+          <SectionContainer className="!pb-8" id="ticket">
+            <TicketingFlow />
+          </SectionContainer>
+          <SectionContainer className="lg:pb-40" id="awards">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { data: meetups } = await supabase!
+    .from('meetups')
+    .select('*')
+    .eq('launch_week', 'lw12')
+    .neq('isPublished', false)
+    .order('date', { ascending: false })
+
+  return {
+    props: {
+      meetups,
+    },
+  }
 }

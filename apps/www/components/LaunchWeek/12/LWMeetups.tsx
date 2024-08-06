@@ -76,8 +76,7 @@ const LWMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
       <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
-          Join our live community-driven meetups to Launch Week 12 with the community, listen to
-          tech talks and grab some swag.
+          Join our live community-driven meetups for Launch Week 12.
         </p>
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">

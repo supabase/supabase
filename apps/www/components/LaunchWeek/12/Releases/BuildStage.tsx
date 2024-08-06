@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { buildDays as days } from '~/components/LaunchWeek/11/Releases/data'
+import { buildDays as days } from '~/components/LaunchWeek/12/Releases/data'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AdventCard from './components/AdventCard'
