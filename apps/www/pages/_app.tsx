@@ -10,13 +10,14 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { SonnerToaster, themes } from 'ui'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
+import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -124,10 +125,11 @@ export default function App({ Component, pageProps }: AppProps) {
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
-            <CommandMenuProvider site="website">
+            <CommandProvider>
               <SonnerToaster position="top-right" />
               <Component {...pageProps} />
-            </CommandMenuProvider>
+              <WwwCommandMenu />
+            </CommandProvider>
           </ThemeProvider>
         </AuthProvider>
       </SessionContextProvider>

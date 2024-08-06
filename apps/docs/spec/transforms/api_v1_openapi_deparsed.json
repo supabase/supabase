@@ -1616,11 +1616,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1639,7 +1637,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1653,24 +1650,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -1852,11 +1855,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1875,7 +1876,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1889,24 +1889,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -2034,11 +2040,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2057,7 +2061,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2071,24 +2074,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -2216,11 +2225,9 @@
                               "type": "object",
                               "properties": {
                                 "status": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "validation_records": {
-                                  "required": true,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2239,7 +2246,6 @@
                                   }
                                 },
                                 "validation_errors": {
-                                  "required": false,
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2253,24 +2259,30 @@
                                     ]
                                   }
                                 }
-                              }
+                              },
+                              "required": [
+                                "status",
+                                "validation_records"
+                              ]
                             },
                             "ownership_verification": {
                               "type": "object",
                               "properties": {
                                 "type": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "name": {
-                                  "required": true,
                                   "type": "string"
                                 },
                                 "value": {
-                                  "required": true,
                                   "type": "string"
                                 }
-                              }
+                              },
+                              "required": [
+                                "type",
+                                "name",
+                                "value"
+                              ]
                             },
                             "custom_origin_server": {
                               "type": "string"
@@ -4092,6 +4104,9 @@
           "201": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to set up read replica"
           }
@@ -4143,6 +4158,9 @@
         },
         "responses": {
           "201": {
+            "description": ""
+          },
+          "403": {
             "description": ""
           },
           "500": {
@@ -7062,7 +7080,7 @@
     "/v1/projects/{ref}/config/auth/third-party-auth": {
       "post": {
         "operationId": "createTPAForProject",
-        "summary": "[Alpha] Creates a new third-party auth integration",
+        "summary": "Creates a new third-party auth integration",
         "parameters": [
           {
             "name": "ref",
@@ -9241,7 +9259,8 @@
                               "FAILED",
                               "PENDING",
                               "REMOVED",
-                              "ARCHIVED"
+                              "ARCHIVED",
+                              "CANCELLED"
                             ]
                           },
                           "is_physical_backup": {
@@ -10320,6 +10339,69 @@
           "message"
         ]
       },
+      "SslValidation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "validation_records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "txt_name": {
+                  "type": "string"
+                },
+                "txt_value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "txt_name",
+                "txt_value"
+              ]
+            }
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "validation_records"
+        ]
+      },
+      "OwnershipVerification": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "value"
+        ]
+      },
       "CustomHostnameDetails": {
         "type": "object",
         "properties": {
@@ -10333,11 +10415,9 @@
             "type": "object",
             "properties": {
               "status": {
-                "required": true,
                 "type": "string"
               },
               "validation_records": {
-                "required": true,
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -10356,7 +10436,6 @@
                 }
               },
               "validation_errors": {
-                "required": false,
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -10370,24 +10449,30 @@
                   ]
                 }
               }
-            }
+            },
+            "required": [
+              "status",
+              "validation_records"
+            ]
           },
           "ownership_verification": {
             "type": "object",
             "properties": {
               "type": {
-                "required": true,
                 "type": "string"
               },
               "name": {
-                "required": true,
                 "type": "string"
               },
               "value": {
-                "required": true,
                 "type": "string"
               }
-            }
+            },
+            "required": [
+              "type",
+              "name",
+              "value"
+            ]
           },
           "custom_origin_server": {
             "type": "string"
@@ -10442,11 +10527,9 @@
                 "type": "object",
                 "properties": {
                   "status": {
-                    "required": true,
                     "type": "string"
                   },
                   "validation_records": {
-                    "required": true,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -10465,7 +10548,6 @@
                     }
                   },
                   "validation_errors": {
-                    "required": false,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -10479,24 +10561,30 @@
                       ]
                     }
                   }
-                }
+                },
+                "required": [
+                  "status",
+                  "validation_records"
+                ]
               },
               "ownership_verification": {
                 "type": "object",
                 "properties": {
                   "type": {
-                    "required": true,
                     "type": "string"
                   },
                   "name": {
-                    "required": true,
                     "type": "string"
                   },
                   "value": {
-                    "required": true,
                     "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "value"
+                ]
               },
               "custom_origin_server": {
                 "type": "string"
@@ -10575,11 +10663,9 @@
                     "type": "object",
                     "properties": {
                       "status": {
-                        "required": true,
                         "type": "string"
                       },
                       "validation_records": {
-                        "required": true,
                         "type": "array",
                         "items": {
                           "type": "object",
@@ -10598,7 +10684,6 @@
                         }
                       },
                       "validation_errors": {
-                        "required": false,
                         "type": "array",
                         "items": {
                           "type": "object",
@@ -10612,24 +10697,30 @@
                           ]
                         }
                       }
-                    }
+                    },
+                    "required": [
+                      "status",
+                      "validation_records"
+                    ]
                   },
                   "ownership_verification": {
                     "type": "object",
                     "properties": {
                       "type": {
-                        "required": true,
                         "type": "string"
                       },
                       "name": {
-                        "required": true,
                         "type": "string"
                       },
                       "value": {
-                        "required": true,
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "type",
+                      "name",
+                      "value"
+                    ]
                   },
                   "custom_origin_server": {
                     "type": "string"
@@ -14225,7 +14316,8 @@
               "FAILED",
               "PENDING",
               "REMOVED",
-              "ARCHIVED"
+              "ARCHIVED",
+              "CANCELLED"
             ]
           },
           "is_physical_backup": {
@@ -14276,7 +14368,8 @@
                     "FAILED",
                     "PENDING",
                     "REMOVED",
-                    "ARCHIVED"
+                    "ARCHIVED",
+                    "CANCELLED"
                   ]
                 },
                 "is_physical_backup": {

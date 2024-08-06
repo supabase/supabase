@@ -1,4 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -11,6 +12,7 @@ import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
@@ -82,6 +84,7 @@ const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const queryClient = useQueryClient()
   const enableFolders = useFlag('sqlFolderOrganization')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -171,6 +174,9 @@ const SQLEditor = () => {
 
       // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
       refetchEntityDefinitions()
+
+      // revalidate lint query
+      queryClient.invalidateQueries(lintKeys.lint(ref))
     },
     onError(error: any, vars) {
       if (id) {

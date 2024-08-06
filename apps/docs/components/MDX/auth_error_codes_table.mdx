@@ -1,14 +1,3 @@
-Supabase Auth can throw or return various errors when using the API. All errors originating from the `supabase.auth` namespace of the JavaScript client library will be wrapped by the `AuthError` class.
-
-Error objects are split in a few classes:
-
-- `AuthApiError` -- errors which originate from the Supabase Auth API.
-  - Use `isAuthApiError` instead of `instanceof` checks to see if an error you caught is of this type.
-- `CustomAuthError` -- errors which generally originate from state in the client library.
-  - Use the `name` property on the error to identify the class of error received.
-
-Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
-
 In general the HTTP status codes you will likely receive are:
 
 - [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) is sent out in rare situations where a certain Auth feature is not available for the user, and you as the developer are not checking a precondition whether that API is available for the user.
@@ -77,7 +66,7 @@ To supplement HTTP status codes, Supabase Auth returns a string error code which
 | `sso_domain_already_exists`             | (Admin API.) Only one SSO domain can be registered per SSO identity provider.                                                                                                                                                                                                                                 |
 | `sso_provider_not_found`                | SSO provider not found. Check the arguments in `supabase.auth.signInWithSSO()`.                                                                                                                                                                                                                               |
 | `too_many_enrolled_mfa_factors`         | A user can only have a fixed number of enrolled MFA factors.                                                                                                                                                                                                                                                  |
-| `unexpected_audience`                   | (Deprecated feature not available via Supabase JavaScript client.) The request's `X-JWT-AUD` claim does not match the JWT's audience.                                                                                                                                                                         |
+| `unexpected_audience`                   | (Deprecated feature not available via Supabase client libraries.) The request's `X-JWT-AUD` claim does not match the JWT's audience.                                                                                                                                                                          |
 | `unexpected_failure`                    | Auth service is degraded or a bug is present, without a specific reason.                                                                                                                                                                                                                                      |
 | `user_already_exists`                   | User with this information (email address, phone number) cannot be created again as it already exists.                                                                                                                                                                                                        |
 | `user_banned`                           | User to which the API request relates has a `banned_until` property which is still active. No further API requests should be attempted until this field is cleared.                                                                                                                                           |
@@ -85,8 +74,3 @@ To supplement HTTP status codes, Supabase Auth returns a string error code which
 | `user_sso_managed`                      | When a user comes from SSO, certain fields of the user cannot be updated (like `email`).                                                                                                                                                                                                                      |
 | `validation_failed`                     | Provided parameters are not in the expected format.                                                                                                                                                                                                                                                           |
 | `weak_password`                         | User is signing up or changing their password without meeting the password strength criteria. Use the `AuthWeakPasswordError` class to access more information about what they need to do to make the password pass.                                                                                          |
-
-### Tips for better error handling
-
-- Do not use string matching on error messages! Always use the `name` and `code` properties of error objects to identify the situation.
-- Although HTTP status codes generally don't change, they can suddenly change due to bugs, so avoid relying on them unless absolutely necessary.
