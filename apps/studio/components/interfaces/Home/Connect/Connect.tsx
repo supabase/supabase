@@ -12,6 +12,7 @@ import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
+  DIALOG_PADDING_X_SMALL,
   DIALOG_PADDING_Y,
   Dialog,
   DialogContent,
@@ -180,7 +181,7 @@ const Connect = () => {
             defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
-            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X)}>
+            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_SMALL)}>
               <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
                 Connection String
               </TabsTrigger_Shadcn_>
@@ -265,7 +266,7 @@ const Connect = () => {
             <TabsContent_Shadcn_
               key="direct"
               value="direct"
-              className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+              className={cn(DIALOG_PADDING_X_SMALL, DIALOG_PADDING_Y, '!mt-0')}
             >
               <DatabaseConnectionString appearance="minimal" />
             </TabsContent_Shadcn_>
