@@ -43,7 +43,7 @@ const Nav = (props: Props) => {
     router.pathname.includes('launch-week') || isGAWeekSection || isDarkLaunchWeek
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isLaunchWeek11Page = router.pathname === '/ga-week'
-  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page
+  const hasStickySubnav = isLaunchWeekXPage || isLaunchWeek11Page || isLaunchWeekPage
   const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {

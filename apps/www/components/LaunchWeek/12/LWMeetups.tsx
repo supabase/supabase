@@ -21,7 +21,7 @@ function addHours(date: Date, hours: number) {
   return dateCopy
 }
 
-const LWMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
+const LWMeetups = ({ meetups, className }: { meetups?: Meetup[]; className?: string }) => {
   const { supabase } = useConfData()
   const now = new Date(Date.now())
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
@@ -72,7 +72,12 @@ const LWMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-foreground-lighter">
+    <div
+      className={cn(
+        'max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-foreground-lighter',
+        className
+      )}
+    >
       <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">

@@ -17,6 +17,7 @@ import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
 import { cn } from 'ui'
 import LW12Background from '../../components/LaunchWeek/12/LW12Background'
 import useLwGame from '../../components/LaunchWeek/hooks/useLwGame'
+import CTABanner from '../../components/CTABanner'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/12/Releases/BuildStage'))
 const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
@@ -104,16 +105,10 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout
-          className="
-            relative
-            -mt-[60px] pt-[60px]
-            overflow-hidden
-            "
-        >
+        <DefaultLayout>
           <LW12Background
             className={cn(
-              'opacity-100 transition-opacity max-h-[476px] overflow-hidden',
+              'opacity-100 transition-opacity max-h-[200px] overflow-hidden',
               hasTicket || (isGameMode && 'opacity-80 dark:opacity-60')
             )}
           />
@@ -121,15 +116,13 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <LWHeader className="pb-20" />
           <MainStage className="relative -mt-20 z-10" />
           <BuildStage />
-          <SectionContainer id="meetups" className="scroll-mt-[66px]">
-            <LW12Meetups meetups={meetups} />
+          <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor -mt-24 !pt-24">
+            <LW12Meetups meetups={meetups} className="pt-24" />
           </SectionContainer>
-          <SectionContainer className="!pb-8" id="ticket">
+          <SectionContainer className="!pb-8 lw-nav-anchor" id="ticket">
             <TicketingFlow />
           </SectionContainer>
-          <SectionContainer className="lg:pb-40" id="awards">
-            <LaunchWeekPrizeSection />
-          </SectionContainer>
+          <CTABanner />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
