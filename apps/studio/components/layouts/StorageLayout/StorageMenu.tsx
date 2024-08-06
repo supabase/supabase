@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { useLocalStorage } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
@@ -15,15 +16,15 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Menu } from 'ui'
-import BucketRow from './BucketRow'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
 import {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns'
-import { useLocalStorage } from '@uidotdev/usehooks'
+import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
   const router = useRouter()
@@ -54,8 +55,14 @@ const StorageMenu = () => {
   const buckets = data ?? []
   const sortedBuckets =
     sort === 'alphabetical'
-      ? buckets.sort((a, b) => a.name.localeCompare(b.name))
+      ? buckets.sort((a, b) =>
+          a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
+        )
       : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1))
+  const filteredBuckets =
+    searchText.length > 1
+      ? sortedBuckets.filter((bucket) => bucket.name.includes(searchText.trim()))
+      : sortedBuckets
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
 
   return (
@@ -86,7 +93,7 @@ const StorageMenu = () => {
               placeholder="Search buckets..."
               value={searchText}
               onChange={(e) => {
-                setSearchText(e.target.value.trim())
+                setSearchText(e.target.value)
               }}
             >
               <InnerSideBarFilterSortDropdown
@@ -140,16 +147,20 @@ const StorageMenu = () => {
             {isSuccess && (
               <>
                 {buckets.length === 0 && (
-                  <div className="px-2">
-                    <Alert_Shadcn_>
-                      <AlertTitle_Shadcn_>No buckets available</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        Buckets that you create will appear here
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  </div>
+                  <InnerSideBarEmptyPanel
+                    className="mx-2"
+                    title="No buckets available"
+                    description="Buckets that you create will appear here"
+                  />
                 )}
-                {sortedBuckets.map((bucket, idx: number) => {
+                {searchText.length > 0 && filteredBuckets.length === 0 && (
+                  <InnerSideBarEmptyPanel
+                    className="mx-2"
+                    title="No results found"
+                    description={`Your search for "${searchText}" did not return any results`}
+                  />
+                )}
+                {filteredBuckets.map((bucket, idx: number) => {
                   const isSelected = bucketId === bucket.id
                   return (
                     <BucketRow
