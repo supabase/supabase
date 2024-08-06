@@ -1,3 +1,5 @@
+import { IS_PLATFORM } from 'common'
+import { useAdvisorsLintCommands } from 'components/layouts/AdvisorsLayout/Advisors.Commands'
 import { CommandHeader, CommandInput, CommandList, CommandMenu } from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
@@ -11,6 +13,7 @@ import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
 import { useApiUrlCommand } from './ApiUrl'
 
 export default function StudioCommandMenu() {
+  useAdvisorsLintCommands()
   useApiKeysCommands()
   useApiUrlCommand()
   useProjectSwitchCommand()
@@ -18,8 +21,8 @@ export default function StudioCommandMenu() {
   useLayoutNavCommands()
   useDocsSearchCommands()
   useDocsAiCommands()
-  useSupportCommands()
-  useChangelogCommand()
+  useSupportCommands({ enabled: IS_PLATFORM })
+  useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
 
   return (

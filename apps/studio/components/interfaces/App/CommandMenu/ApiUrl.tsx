@@ -36,7 +36,7 @@ export function useApiUrlCommand() {
       enabled: !!project,
       deps: [apiUrl, project],
       orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 2 },
+      sectionMeta: { priority: 3 },
     }
   )
 }

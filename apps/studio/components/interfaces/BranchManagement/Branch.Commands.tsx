@@ -2,13 +2,8 @@ import { Forward, GitBranch } from 'lucide-react'
 
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import {
-  PageType,
-  orderSectionFirst,
-  useRegisterCommands,
-  useRegisterPage,
-  useSetPage,
-} from 'ui-patterns/CommandMenu'
+import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
 
 const SWITCH_BRANCH_PAGE_NAME = 'Switch branch'
 const EMPTY_ARRAY = [] as Array<any>
@@ -58,6 +53,10 @@ export function useBranchCommands() {
         icon: () => <GitBranch />,
       },
     ],
-    { enabled: isBranchingEnabled, orderSection: orderSectionFirst }
+    {
+      enabled: isBranchingEnabled,
+      orderSection: orderCommandSectionsByPriority,
+      sectionMeta: { priority: 3 },
+    }
   )
 }

@@ -103,7 +103,7 @@ export function useApiKeysCommands() {
     {
       enabled: !!project,
       orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 2 },
+      sectionMeta: { priority: 3 },
     }
   )
 }

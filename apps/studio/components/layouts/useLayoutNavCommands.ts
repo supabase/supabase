@@ -1,4 +1,5 @@
 import { useApiDocsGotoCommands } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs.Commands'
+import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './FunctionsLayout/Functions.Commands'
@@ -14,6 +15,7 @@ export function useLayoutNavCommands() {
   useSqlEditorGotoCommands()
   useDatabaseGotoCommands()
   useAuthGotoCommands()
+  useAdvisorsGoToCommands()
   useStorageGotoCommands()
   useFunctionsGotoCommands()
   useLogsGotoCommands()

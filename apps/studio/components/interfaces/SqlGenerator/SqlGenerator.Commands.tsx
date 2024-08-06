@@ -34,7 +34,7 @@ export function useGenerateSqlCommand() {
       enabled: !!ref,
       deps: [setShowGenerateSqlModal, setQuery],
       orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 1 },
+      sectionMeta: { priority: 2 },
     }
   )
 }
