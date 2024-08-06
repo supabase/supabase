@@ -74,7 +74,7 @@ export const validateFields = (fields: RowField[]) => {
       try {
         minifyJSON(field.value ?? '')
       } catch {
-        errors[field.name] = 'Value is an invalid JSON'
+        errors[field.name] = 'Value is invalid JSON'
       }
     }
     if (field.isIdentity || field.defaultValue) return

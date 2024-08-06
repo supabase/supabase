@@ -150,6 +150,9 @@ const TriggersList = ({
                 <Table.th key="events" className="hidden xl:table-cell">
                   Events
                 </Table.th>
+                <Table.th key="orientation" className="hidden xl:table-cell">
+                  Orientation
+                </Table.th>
                 <Table.th key="enabled" className="hidden w-20 xl:table-cell">
                   Enabled
                 </Table.th>

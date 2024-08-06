@@ -91,7 +91,7 @@ const WrapperTableEditor = ({
                 >
                   <div className="space-y-1">
                     <p>{table.label}</p>
-                    <p className="opacity-50">{table.description}</p>
+                    <p className="text-foreground-lighter">{table.description}</p>
                   </div>
                 </Listbox.Option>
               )
@@ -122,7 +122,7 @@ const Option = ({ option }: { option: TableOption }) => {
         {[
           ...(!option.required
             ? [
-                <Listbox.Option key="empty" value="" label="---">
+                <Listbox.Option key="empty" value="" label="---" className="!w-96">
                   ---
                 </Listbox.Option>,
               ]
@@ -133,6 +133,7 @@ const Option = ({ option }: { option: TableOption }) => {
               id={option.name + subOption.value}
               value={subOption.value}
               label={subOption.label}
+              className="!w-96"
             >
               {subOption.label}
             </Listbox.Option>

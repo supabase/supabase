@@ -18,7 +18,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -32,7 +31,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -126,18 +125,6 @@ const PITRSidePanel = () => {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
       }
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Point in Time Recovery',
-            section: 'Add ons',
-          },
-          projectRef,
-        },
-        router
-      )
     }
   }, [visible, isLoading])
 
@@ -171,7 +158,7 @@ const PITRSidePanel = () => {
         hasHipaaAddon
           ? 'Unable to change PITR with HIPAA add-on'
           : isFreePlan
-            ? 'Unable to enable point in time recovery on a free plan'
+            ? 'Unable to enable point in time recovery on a Free Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
@@ -230,19 +217,6 @@ const PITRSidePanel = () => {
                       } else {
                         setSelectedOption('pitr_7')
                       }
-                      Telemetry.sendActivity(
-                        {
-                          activity: 'Option Selected',
-                          source: 'Dashboard',
-                          data: {
-                            title: 'Point in Time Recovery',
-                            section: 'Add ons',
-                            option: option.name,
-                          },
-                          projectRef,
-                        },
-                        router
-                      )
                     }}
                   >
                     <img
@@ -290,8 +264,8 @@ const PITRSidePanel = () => {
               <WarningIcon />
               <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute instance size for using
-                read replicas is the Small Compute. You need to remove all read replicas before
+                You currently have active read replicas. The minimum compute size for using read
+                replicas is the Small Compute. You need to remove all read replicas before
                 downgrading Compute as it requires at least a Small compute instance.
               </AlertDescription_Shadcn_>
               <AlertDescription_Shadcn_ className="mt-2">
@@ -311,7 +285,7 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>

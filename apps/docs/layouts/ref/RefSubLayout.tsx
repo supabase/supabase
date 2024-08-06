@@ -122,7 +122,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           id={props.slug}
           data-ref-id={props.id}
           className={cn(
-            'text-2xl font-medium text-foreground scroll-mt-[calc(33px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
+            'text-2xl font-medium text-foreground scroll-mt-[calc(32px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
             !icon && 'mb-8',
             props.monoFont && 'font-mono'
           )}

@@ -127,7 +127,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -155,7 +155,7 @@ You can create a policy where the `using` clause checks if the user owns the pro
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -182,7 +182,7 @@ Let's say you have a table called `profiles` in the public schema and you only w
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 

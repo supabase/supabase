@@ -123,27 +123,51 @@ exists (
 
 Then, to join a topic with RLS enabled, instantiate the Channel with the `private` option set to `true`.
 
-```typescript
-import { createClient } from 'npm:@supabase/supabase-js@2.38.5'
-const url = 'https://<project_ref>.supabase.com'
-const apikey = '<api_key>'
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+    ```javascript
+    const channel = supabase.channel('room-1', {
+      config: { private: true },
+    })
 
-const client = createClient(url, apikey)
+    channel
+      .on('broadcast', { event: 'test' }, (payload) => console.log(payload))
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Connected!')
+        } else {
+          console.error(err)
+        }
+      })
+    ```
 
-const channel = client.channel('room-1', {
-  config: { private: true },
-})
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+    ```dart
+    final channel = supabase.channel(
+      'room-1',
+      opts: const RealtimeChannelConfig(private: true),
+    );
 
-channel
-  .on('broadcast', { event: 'test' }, (payload) => console.log(payload))
-  .subscribe((status: string, err: any) => {
-    if (status === 'SUBSCRIBED') {
-      console.log('Connected!')
-    } else {
-      console.error(err)
-    }
-  })
-```
+    channel
+        .onBroadcast(event: 'test', callback: (payload) => print(payload))
+        .subscribe((status, err) {
+      if (status == RealtimeSubscribeStatus.subscribed) {
+        print('Connected!');
+      } else {
+        print(err);
+      }
+    });
+    ```
+
+  </TabPanel>
+</Tabs>
 
 #### Allow a user to send a Broadcast message
 

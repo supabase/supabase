@@ -29,7 +29,7 @@ import {
   Separator,
   Theme,
   cn,
-  themes,
+  singleThemes,
 } from 'ui'
 import { useCommandMenu } from 'ui-patterns/Cmdk'
 import { useProjectContext } from '../ProjectContext'
@@ -41,6 +41,7 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -73,6 +74,15 @@ const NavigationBar = () => {
     'realtime:all',
   ])
 
+  const { data } = useProjectLintsQuery({
+    projectRef: project?.ref,
+  })
+
+  const securityLints = (data ?? []).filter(
+    (lint) =>
+      lint.categories.includes('SECURITY') && (lint.level === 'ERROR' || lint.level === 'WARN')
+  )
+
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
   const productRoutes = generateProductRoutes(projectRef, project, {
@@ -99,7 +109,7 @@ const NavigationBar = () => {
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
@@ -150,6 +160,7 @@ const NavigationBar = () => {
               onClick={onCloseNavigationIconLink}
             />
           ))}
+
           <Separator className="my-1 bg-border-muted" />
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
@@ -164,6 +175,21 @@ const NavigationBar = () => {
                 >
                   Project API
                 </NavigationIconButton>
+              )
+            } else if (route.key === 'advisors') {
+              return (
+                <div className="relative">
+                  {securityLints.length > 0 && (
+                    <div className="absolute flex h-2 w-2 left-6 top-2 z-10 bg-destructive-600 rounded-full" />
+                  )}
+
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                </div>
               )
             } else if (route.key === 'logs') {
               // TODO: Undo this when warehouse flag is removed
@@ -208,7 +234,7 @@ const NavigationBar = () => {
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
               rightText={
                 <div
                   className={cn(
@@ -337,15 +363,11 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  {singleThemes.map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
               {IS_PLATFORM && (

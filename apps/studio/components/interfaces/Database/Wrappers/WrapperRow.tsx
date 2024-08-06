@@ -3,11 +3,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
+import { Button, Collapsible, IconChevronUp, IconEdit, IconTrash } from 'ui'
 
 import { useParams } from 'common/hooks'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit, ExternalLink, Trash } from 'lucide-react'
 import type { WrapperMeta } from './Wrappers.types'
 
 interface WrapperRowProps {
@@ -80,8 +81,8 @@ const WrapperRow = ({
                 wrapper.server_options.map((option: any) => option.split('='))
               )
               const [encryptedMetadata, visibleMetadata] = partition(
-                wrapperMeta.server.options,
-                'hidden'
+                wrapperMeta.server.options.filter((option) => !option.hidden),
+                'secureEntry'
               )
 
               return (
@@ -107,7 +108,7 @@ const WrapperRow = ({
                           className="transition text-foreground-light hover:text-foreground flex items-center space-x-2"
                         >
                           <span>Encrypted in Vault</span>
-                          <IconExternalLink size={14} strokeWidth={1.5} />
+                          <ExternalLink size={14} strokeWidth={1.5} />
                         </Link>
                       </div>
                     ))}
@@ -135,18 +136,18 @@ const WrapperRow = ({
                       <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
                         <Button
                           type="default"
-                          icon={<IconEdit strokeWidth={1.5} />}
-                          className="py-2"
+                          icon={<Edit strokeWidth={1.5} />}
+                          className="px-1.5"
                         />
                       </Link>
                     ) : (
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger asChild>
                           <Button
-                            type="default"
                             disabled
-                            icon={<IconEdit strokeWidth={1.5} />}
-                            className="py-2"
+                            type="default"
+                            icon={<Edit strokeWidth={1.5} />}
+                            className="px-1.5"
                           />
                         </Tooltip.Trigger>
                         {!canManageWrappers && (
@@ -173,8 +174,8 @@ const WrapperRow = ({
                         <Button
                           type="default"
                           disabled={!canManageWrappers}
-                          icon={<IconTrash strokeWidth={1.5} />}
-                          className="py-2"
+                          icon={<Trash strokeWidth={1.5} />}
+                          className="px-1.5"
                           onClick={() => onSelectDelete(wrapper)}
                         />
                       </Tooltip.Trigger>

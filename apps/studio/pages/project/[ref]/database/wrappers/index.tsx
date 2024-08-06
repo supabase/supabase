@@ -45,14 +45,14 @@ const DatabaseWrappers: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
-        <ScaffoldSectionContent>
+        <ScaffoldSectionContent className="xl:!col-span-8">
           <FormHeader
             className="!mb-0"
             title="Foreign Data Wrappers"
             description="Query your data warehouse directly from your database, or third-party APIs using SQL"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
+        <ScaffoldSectionDetail className="xl:!col-span-4 flex items-center justify-end gap-x-2">
           <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
             <a
               target="_blank"
