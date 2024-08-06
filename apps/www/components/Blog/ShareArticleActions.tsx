@@ -14,7 +14,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
 
     <Link
       aria-label="Share on Linkedin"
-      href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${slug}&title=${title}`}
+      href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${slug}&title=${title}&text=${title}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >

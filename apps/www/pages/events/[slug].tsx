@@ -168,12 +168,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </div>
                 <div className="flex flex-col">
                   <p>Share on</p>
-                  <ShareArticleActions title={event.title} slug={event.slug} />
+                  <ShareArticleActions title={meta.title} slug={meta.url} />
                 </div>
               </div>
               <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
                 {/* <Image
-                  src={`/images/blog/` + (event.thumb ? event.thumb : event.image)}
+                  src={`/images/events/` + (event.thumb ? event.thumb : event.image)}
                   fill
                   sizes="100%"
                   quality={100}
