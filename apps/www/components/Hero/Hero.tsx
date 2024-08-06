@@ -3,51 +3,17 @@ import { useRouter } from 'next/router'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
-import { Button, cn, IconBookOpen } from 'ui'
+import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AnnouncementBadge from '~/components/Announcement/Badge'
-import { useState, useEffect, useRef } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore from 'swiper'
-import { Navigation, Pagination, A11y } from 'swiper/modules'
-
-SwiperCore.use([A11y, Navigation, Pagination])
-
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import HeroAnnouncement from './HeroAnnouncement'
+import { ChevronRightIcon } from '@heroicons/react/outline'
 
 const Hero = () => {
-  const [activeTab, setActiveTab] = useState(0)
-  const [apiSwiper, setApiSwiper] = useState(undefined)
-  const prevRef = useRef(null)
-  const nextRef = useRef(null)
-
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
-
-  useEffect(() => {
-    if (!apiSwiper) return
-    // @ts-ignore
-    apiSwiper.slideTo(activeTab)
-  }, [activeTab])
-
-  const slides = [
-    <AnnouncementBadge
-      url="/events/ai-engineer-summit-2024"
-      badge="Webinar"
-      announcement="AI Engineer Summit 2024"
-    />,
-    <AnnouncementBadge
-      url="/launch-week"
-      badge="Launch Week 12"
-      announcement="Claim your ticket"
-    />,
-  ]
 
   return (
     <div className="relative -mt-[65px]">
@@ -56,8 +22,14 @@ const Hero = () => {
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
-                <div className="flex flex-col items-center justify-center w-full">
-                  <HeroAnnouncement />
+                <div className="flex flex-col items-center">
+                  <div className="z-40 w-full flex flex-col gap-4 items-center justify-center -mt-4 md:-mt-8 mb-8 lg:mb-8">
+                    <AnnouncementBadge
+                      url="/launch-week"
+                      badge="Launch Week 12"
+                      announcement="Claim your ticket"
+                    />
+                  </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend

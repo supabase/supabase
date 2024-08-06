@@ -12,6 +12,7 @@ const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
+const EventCallout = dynamic(() => import('components/EventCallout'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Index = () => {
@@ -25,6 +26,7 @@ const Index = () => {
       <BuiltExamples />
       <MadeForDevelopers />
       <AdminAccess />
+      <EventCallout className="!pb-0" />
       <CustomerStories />
       <CTABanner />
       <ReactTooltip
